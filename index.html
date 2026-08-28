@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mixer Online</title><link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar"><div><h1>MIXER ONLINE</h1><p>Digital Audio Mixer • Versi 1</p></div>
+<div class="top-actions"><button id="startMic">🎤 MIC</button><label class="file-btn">🎵 AUDIO <input id="audioFile" type="file" accept="audio/*"></label><button id="stopAll">⏹ STOP</button></div></header>
+<main class="mixer"><section class="channels">
+<article class="channel" data-channel="mic"><div class="channel-title">MIC 1</div><div class="meter"><div class="meter-fill"></div></div><div class="knobs">
+<label>GAIN<input class="knob gain" type="range" min="0" max="2" step=".01" value="1"></label><label>BASS<input class="knob bass" type="range" min="-12" max="12" step=".5" value="0"></label><label>MID<input class="knob mid" type="range" min="-12" max="12" step=".5" value="0"></label><label>TREBLE<input class="knob treble" type="range" min="-12" max="12" step=".5" value="0"></label></div>
+<div class="pan-row"><span>PAN</span><input class="pan" type="range" min="-1" max="1" step=".01" value="0"></div><input class="fader" type="range" min="0" max="1" step=".01" value=".75"><div class="fader-value">75%</div>
+<div class="channel-actions"><button class="mute">MUTE</button><button class="solo">SOLO</button></div></article>
+<article class="channel" data-channel="music"><div class="channel-title">MUSIC 1</div><div class="meter"><div class="meter-fill"></div></div><div class="knobs">
+<label>GAIN<input class="knob gain" type="range" min="0" max="2" step=".01" value="1"></label><label>BASS<input class="knob bass" type="range" min="-12" max="12" step=".5" value="0"></label><label>MID<input class="knob mid" type="range" min="-12" max="12" step=".5" value="0"></label><label>TREBLE<input class="knob treble" type="range" min="-12" max="12" step=".5" value="0"></label></div>
+<div class="pan-row"><span>PAN</span><input class="pan" type="range" min="-1" max="1" step=".01" value="0"></div><input class="fader" type="range" min="0" max="1" step=".01" value=".75"><div class="fader-value">75%</div>
+<div class="channel-actions"><button class="mute">MUTE</button><button class="solo">SOLO</button></div></article>
+<article class="channel" data-channel="aux"><div class="channel-title">AUX 1</div><div class="meter"><div class="meter-fill"></div></div><div class="knobs">
+<label>GAIN<input class="knob gain" type="range" min="0" max="2" step=".01" value="1"></label><label>BASS<input class="knob bass" type="range" min="-12" max="12" step=".5" value="0"></label><label>MID<input class="knob mid" type="range" min="-12" max="12" step=".5" value="0"></label><label>TREBLE<input class="knob treble" type="range" min="-12" max="12" step=".5" value="0"></label></div>
+<div class="pan-row"><span>PAN</span><input class="pan" type="range" min="-1" max="1" step=".01" value="0"></div><input class="fader" type="range" min="0" max="1" step=".01" value=".75"><div class="fader-value">75%</div>
+<div class="channel-actions"><button class="mute">MUTE</button><button class="solo">SOLO</button></div></article>
+<article class="master"><div class="channel-title">MASTER</div><div class="meter master-meter"><div class="meter-fill"></div></div>
+<div class="master-knobs"><label>BASS<input id="masterBass" type="range" min="-12" max="12" step=".5" value="0"></label><label>TREBLE<input id="masterTreble" type="range" min="-12" max="12" step=".5" value="0"></label></div>
+<input id="masterFader" class="fader" type="range" min="0" max="1" step=".01" value=".8"><div id="masterValue" class="fader-value">80%</div><button id="masterMute" class="mute master-mute">MUTE</button><div class="status" id="status">Siap digunakan</div></article>
+</section></main><footer>🎚️ Mixer Online — Fondasi Versi 1</footer><script src="app.js"></script>
+</body></html>
