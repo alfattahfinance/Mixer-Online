@@ -38,3 +38,6 @@ input[type="range"]{touch-action:none}
 
 .echo-panel{border-top:1px solid #353b40;border-bottom:1px solid #353b40;margin:4px 14px 4px 0;padding:4px;font-size:7px;color:#858e94}.echo-panel>div{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}.echo-panel button{background:#252a2e;color:#9da5aa;border:1px solid #42484d;border-radius:2px;padding:3px 7px;font-size:7px}.echo-panel button.active{color:#d8c05a;border-color:#8a7130}.echo-panel label{display:flex;align-items:center;gap:3px}.echo-panel input{flex:1;min-width:0;height:12px;accent-color:#c1a13c}
 @media(max-width:560px){.echo-panel{margin-right:0;padding:6px;font-size:9px}.echo-panel button{min-height:32px;font-size:9px}.echo-panel input{height:18px}}
+
+/* Echo controls visible and touch friendly */
+.echo-panel{display:block!important;visibility:visible!important;opacity:1!important;position:relative;z-index:5}.echo-panel label{display:grid!important;grid-template-columns:72px 1fr;align-items:center;gap:6px;margin:3px 0}.echo-panel input[type="range"]{display:block!important;width:100%!important;min-width:70px!important}.echo-panel .echo-on{display:inline-block!important;min-width:42px}
