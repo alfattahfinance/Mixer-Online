@@ -1,26 +1,5 @@
 /* Universal Mixer Control Engine
-   Layer for future USB / MIDI / WebSocket / Bluetooth adapters.
-   Browser Bluetooth support is device/protocol dependent; audio Bluetooth
-   is not treated as mixer control. */
-
-window.MixerControl = (() => {
-  const listeners = new Set();
-  const state = { connected:false, transport:"none", deviceName:"Belum terhubung", protocol:"none" };
-  function emit(){ listeners.forEach(fn=>fn({...state})); }
-  function onStatus(fn){ listeners.add(fn); fn({...state}); return ()=>listeners.delete(fn); }
-  function setStatus(patch){ Object.assign(state,patch); emit(); }
-  async function connectWebBluetooth(){
-    if(!navigator.bluetooth) throw new Error("Web Bluetooth tidak didukung browser ini");
-    // Discovery is intentionally not hard-coded to a brand/model.
-    const device = await navigator.bluetooth.requestDevice({acceptAllDevices:true, optionalServices:[]});
-    setStatus({connected:true,transport:"bluetooth",deviceName:device.name||"Bluetooth device",protocol:"pending"});
-    device.addEventListener?.("gattserverdisconnected",()=>setStatus({connected:false,transport:"none",deviceName:"Terputus",protocol:"none"}));
-    return device;
-  }
-  function disconnect(){ setStatus({connected:false,transport:"none",deviceName:"Belum terhubung",protocol:"none"}); }
-  function sendControl(message){ 
-    if(!state.connected) return {ok:false,error:"Belum ada perangkat kontrol terhubung"};
-    return {ok:false,error:"Adapter protokol perangkat belum dipilih",message};
-  }
-  return {get state(){return {...state}},onStatus,connectWebBluetooth,disconnect,sendControl};
-})();
+   Normalized control layer. UI changes become device-neutral commands.
+   A real hardware adapter can subscribe later for MIDI/USB/Network/BLE.
+*/
+window.MixerControl=(()=>{const listeners=new Set();const commandListeners=new Set();const KEY="mixer-online-control-state-v1";let saved={};try{saved=JSON.parse(localStorage.getItem(KEY)||"{}")}catch{}const state={connected:false,transport:"none",deviceName:"Belum terhubung",protocol:"none",lastCommand:null};function emit(){listeners.forEach(fn=>fn({...state}))}function onStatus(fn){listeners.add(fn);fn({...state});return()=>listeners.delete(fn)}function setStatus(p){Object.assign(state,p);emit()}function emitCommand(command){state.lastCommand=command;commandListeners.forEach(fn=>fn({...command}));return state.connected?{ok:false,pending:true,command}:{ok:false,pending:true,command}}function onCommand(fn){commandListeners.add(fn);return()=>commandListeners.delete(fn)}function setControl(channel,control,value){const command={type:"mixer-control",channel:String(channel),control:String(control),value:Number.isFinite(Number(value))?Number(value):value,time:Date.now()};saved[command.channel]??={};saved[command.channel][command.control]=command.value;try{localStorage.setItem(KEY,JSON.stringify(saved))}catch{}return emitCommand(command)}function getControls(){return JSON.parse(JSON.stringify(saved))}async function connectWebBluetooth(){if(!navigator.bluetooth)throw new Error("Web Bluetooth tidak didukung browser ini");const device=await navigator.bluetooth.requestDevice({acceptAllDevices:true,optionalServices:[]});setStatus({connected:true,transport:"bluetooth",deviceName:device.name||"Bluetooth device",protocol:"pending"});device.addEventListener?.("gattserverdisconnected",()=>setStatus({connected:false,transport:"none",deviceName:"Terputus",protocol:"none"}));return device}function disconnect(){setStatus({connected:false,transport:"none",deviceName:"Belum terhubung",protocol:"none"})}function sendControl(message){return emitCommand(message)}return{get state(){return {...state}},onStatus,onCommand,setControl,getControls,connectWebBluetooth,disconnect,sendControl}})();
