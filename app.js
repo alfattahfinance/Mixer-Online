@@ -251,6 +251,36 @@ setStatus("Gagal memutar "+(file?.name||"audio")+" • "+(err?.name||"Error")+":
 }}
 function isAudioFile(file){if(!file)return false;const type=String(file.type||"").toLowerCase();if(type.startsWith("audio/"))return true;const name=String(file.name||"").toLowerCase();return /\\.(mp3|m4a|aac|wav|ogg|oga|opus|webm|flac)$/i.test(name)}
 function loadMusicPlayerFiles(files){const list=[...(files||[])].filter(isAudioFile);if(!list.length){setStatus("File musik tidak dikenali");return}stopMusicOnly();musicQueue=list;musicIndex=0;renderMusicQueue();const e=playerEls();if(e.state)e.state.textContent=list.length+" lagu siap • tekan PLAY";if(e.play)e.play.textContent="▶ PLAY";setStatus("Playlist siap — tekan PLAY untuk memulai")}
+function bindPhoneMediaButtons(){
+  const rec=document.getElementById("phoneRecorder");
+  const files=document.getElementById("phoneFiles");
+  const music=document.getElementById("phoneMusic");
+
+  rec?.addEventListener("click",()=>{
+    // Android/browser will offer the system recorder when supported.
+    const a=document.createElement("a");
+    a.href="intent:#Intent;action=android.provider.MediaStore.RECORD_SOUND;end";
+    a.click();
+    setStatus("Membuka Perekam bawaan ponsel…");
+  });
+
+  files?.addEventListener("click",()=>{
+    const input=document.createElement("input");
+    input.type="file";
+    input.multiple=true;
+    input.accept="audio/*,video/*,.pdf,.txt,.jpg,.jpeg,.png";
+    input.click();
+  });
+
+  music?.addEventListener("click",()=>{
+    // Prefer Android's registered music/audio app.
+    const a=document.createElement("a");
+    a.href="intent:#Intent;action=android.intent.action.MUSIC_PLAYER;end";
+    a.click();
+    setStatus("Membuka aplikasi Musik bawaan ponsel…");
+  });
+}
+
 function bindMusicPlayer(){const e=playerEls();if(!e.play||window._musicPlayerBound)return;window._musicPlayerBound=true;e.pick.onchange=ev=>{loadMusicPlayerFiles(ev.target.files);ev.target.value=""};e.play.onclick=()=>{if(!musicQueue.length)return;if(!musicAudio){playMusicAt(musicIndex);return}if(musicAudio.paused){resumeAudio().then(async()=>{try{await musicAudio?.play();e.play.textContent="⏸ PAUSE";e.state.textContent="PLAYING"}catch(err){e.state.textContent="GAGAL MEMUTAR";setStatus("Browser menolak audio: "+(err?.message||"tekan PLAY lagi"))}})}else{musicAudio.pause();e.play.textContent="▶ PLAY";e.state.textContent="PAUSED"}};e.prev.onclick=()=>{if(musicQueue.length)playMusicAt((musicIndex-1+musicQueue.length)%musicQueue.length)};e.next.onclick=()=>{if(musicQueue.length)playMusicAt((musicIndex+1)%musicQueue.length)};e.stop.onclick=stopMusicOnly;e.channel.onchange=()=>{if(musicAudio)playMusicAt(musicIndex)};e.mode.onchange=()=>{audioPlayMode=e.mode.value==="random"?"random":"sequential";e.state.textContent=e.mode.value==="random"?"ACAK":"BERURUTAN"};e.volume.oninput=()=>{if(musicAudio)musicAudio.volume=Number(e.volume.value);e.volumeValue.textContent=Math.round(Number(e.volume.value)*100)+"%"};e.queue.onclick=ev=>{const b=ev.target.closest("[data-music-index]");if(b)playMusicAt(Number(b.dataset.musicIndex))}}
 function db(v){return v<.001?"-∞":(20*Math.log10(v)).toFixed(1)+" dB"}function animate(){if(masterAnalyser){const d=new Uint8Array(masterAnalyser.frequencyBinCount);masterAnalyser.getByteFrequencyData(d);const a=d.reduce((x,y)=>x+y,0)/d.length/255;const masterPct=Math.max(3,Math.min(100,a*170));$(".master-meter .meter-fill").style.height=masterPct+"%";$(".master-meter .clip-dot").classList.toggle("active",masterPct>=96);const ml=masterAnalyser.getByteFrequencyData?Math.max(0,Math.min(1,a*2)):0;const mlEl=$("#masterLevel"),mpEl=$("#masterPeak"),msEl=$("#masterSignal");if(mlEl)mlEl.textContent=db(ml);if(mpEl)mpEl.textContent=db(Math.min(1,masterPct/100));if(msEl)msEl.textContent=ml>.008?"SIGNAL":"NO SIGNAL";state.channels.forEach(c=>{if(c._audio){const q=new Uint8Array(c._audio.analyser.frequencyBinCount);c._audio.analyser.getByteFrequencyData(q);const v=q.reduce((x,y)=>x+y,0)/q.length/255;const t=new Float32Array(c._audio.analyser.fftSize);c._audio.analyser.getFloatTimeDomainData(t);let sum=0;for(let z of t)sum+=z*z;const rms=Math.sqrt(sum/t.length);const peak=t.reduce((m,z)=>Math.max(m,Math.abs(z)),0);const lv=Math.max(0,Math.min(1,rms*2.2));const pk=Math.max(0,Math.min(1,peak));c.querySelector(".meter-fill").style.height=Math.max(3,Math.min(100,v*170))+"%";c.querySelector(".level-readout").textContent=db(v);c.querySelector(".monitor-fill").style.width=(lv*100)+"%";c.querySelector(".monitor-peak").style.left=Math.max(0,Math.min(99,pk*100))+"%";c.querySelector(".monitor-db").textContent=db(lv);c.querySelector(".monitor-peak-db").textContent=db(pk);const active=lv>.008;const ss=c.querySelector(".signal-state");if(ss)ss.textContent=active?"SIGNAL":"NO SIGNAL";c.querySelector(".monitor-status").textContent=active?"LIVE":"READY";c.querySelector(".monitor-src").textContent=state.routing[c.dataset.channel]||"—"}})}requestAnimationFrame(animate)}buildChannels(3);animate();// v37: master safety limiter/clip guard (UI + audio only, preserves existing channel controls)
 function initMasterProtection(){ensureAudio();if(!masterLimiter)return;masterLimiter.threshold.value=-1;masterLimiter.knee.value=0;masterLimiter.ratio.value=20;masterLimiter.attack.value=.003;masterLimiter.release.value=.12;window.__masterProtection={enabled:true,threshold:-1};}
@@ -264,3 +294,4 @@ function initControlEngine(){state.channels.forEach(card=>{restoreControl(card,"
 const originalBuild=buildChannels;buildChannels=function(n){originalBuild(n);initControlEngine()};initControlEngine();
 MixerAdapters.onStatus(s=>{MixerControl.setStatus({connected:!!s.connected,transport:s.type||"none",deviceName:s.name||"Belum terhubung",protocol:s.type||"none"});});MixerControl.onCommand(cmd=>{if(!MixerAdapters.hasTransport())return;const result=MixerAdapters.sendMapped(cmd,MixerProfiles.get().controlMappings);if(result.ok){setStatus("TX "+cmd.channel+" • "+cmd.control+" = "+cmd.value)}else if(result.reason==="unmapped")setStatus("Terhubung, tetapi kontrol belum dipetakan — aman");else if(result.reason&&result.reason!=="unmapped")setStatus("Perintah belum dikirim: "+result.reason)});
 bindMusicPlayer();
+bindPhoneMediaButtons();
