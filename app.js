@@ -167,22 +167,30 @@ if(e.progress)e.progress.style.width=p+"%";
 if(e.current)e.current.textContent=fmtTime(audio.currentTime);
 if(e.duration)e.duration.textContent=fmtTime(audio.duration);
 };
-audio.onended=()=>{
-if(token!==musicToken)return;
-cleanupIntegratedMusic();
-state.sources.delete(target.dataset.channel);
-let n;
-if(musicQueue.length<=1){
-  n=0;
-}else if(audioPlayMode==="random" || e.mode?.value==="random"){
-  // ACak: pilih lagu lain, tetapi jangan ulang lagu yang baru selesai.
-  do{n=Math.floor(Math.random()*musicQueue.length)}while(n===musicIndex);
-}else{
-  // Berurutan: lagu berikutnya sesuai urutan playlist.
-  n=musicIndex+1;
-  if(n>=musicQueue.length)n=0;
-}
-playMusicAt(n);
+let autoAdvanced=false;
+const advanceMusic=()=>{
+  if(autoAdvanced||token!==musicToken)return;
+  autoAdvanced=true;
+  const mode=e.mode?.value==="random"?"random":"sequential";
+  audioPlayMode=mode;
+  const oldIndex=musicIndex;
+  let n;
+  if(musicQueue.length<=1){
+    n=0;
+  }else if(mode==="random"){
+    do{n=Math.floor(Math.random()*musicQueue.length)}while(n===oldIndex);
+  }else{
+    n=(oldIndex+1)%musicQueue.length;
+  }
+  cleanupIntegratedMusic();
+  state.sources.delete(target.dataset.channel);
+  playMusicAt(n);
+};
+audio.onended=advanceMusic;
+audio.ontimeupdate=()=>{
+  if(token!==musicToken)return;
+  const d=audio.duration;
+  if(d>0 && d-audio.currentTime<0.15) advanceMusic();
 };
 audio.onerror=()=>{
 if(token!==musicToken)return;
