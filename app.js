@@ -20,30 +20,49 @@ function routeHardwareInput(card,route){state.routing[card.dataset.channel]=rout
 function bindTouchRange(el,vertical=false){
 if(!el||el.dataset.touchRangeBound)return;
 el.dataset.touchRangeBound="1";
-let active=false,last=0;
+let active=false;
 const step=Number(el.step)||.01,min=Number(el.min),max=Number(el.max),range=max-min;
 const decimals=Math.max(0,String(step).split(".")[1]?.length||0);
 const isKnob=el.classList.contains("knob");
-const isVertical=vertical||el.classList.contains("fader")||isKnob;
+const isFader=vertical||el.classList.contains("fader");
 const syncVisual=()=>el.style.setProperty("--control-value",String(range?(Number(el.value)-min)/range:.5));
 const setValue=v=>{
-v=Math.max(min,Math.min(max,v));
-const q=step>0?Math.round((v-min)/step)*step+min:v;
-const setter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value")?.set;
-if(setter)setter.call(el,String(q.toFixed(decimals)));else el.value=q.toFixed(decimals);
-syncVisual();el.dispatchEvent(new Event("input",{bubbles:true}));
+ v=Math.max(min,Math.min(max,v));
+ const q=step>0?Math.round((v-min)/step)*step+min:v;
+ const setter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value")?.set;
+ if(setter)setter.call(el,String(q.toFixed(decimals)));else el.value=q.toFixed(decimals);
+ syncVisual();
+ el.dispatchEvent(new Event("input",{bubbles:true}));
 };
-const down=ev=>{active=true;last=ev.clientY;el.setPointerCapture?.(ev.pointerId);ev.preventDefault()};
+const setFromPointer=ev=>{
+ const rect=el.getBoundingClientRect();
+ let p;
+ if(isKnob){
+   const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+   let deg=Math.atan2(ev.clientY-cy,ev.clientX-cx)*180/Math.PI;
+   if(deg<0)deg+=360;
+   if(deg<135)deg+=360;
+   deg=Math.max(135,Math.min(405,deg));
+   p=(deg-135)/270;
+ }else if(isFader){
+   p=1-(ev.clientY-rect.top)/Math.max(1,rect.height);
+ }else{
+   p=(ev.clientX-rect.left)/Math.max(1,rect.width);
+ }
+ setValue(min+p*range);
+};
+const down=ev=>{
+ active=true;
+ el.setPointerCapture?.(ev.pointerId);
+ setFromPointer(ev);
+ ev.preventDefault();
+};
 const move=ev=>{
-if(!active)return;
-const delta=ev.clientY-last;
-if(delta){
-const pixels=isKnob?150:Math.max(90,el.getBoundingClientRect().height);
-setValue(Number(el.value)-delta*range/pixels);last=ev.clientY;
-}
-ev.preventDefault();
+ if(!active)return;
+ setFromPointer(ev);
+ ev.preventDefault();
 };
-const up=()=>active=false;
+const up=()=>{active=false};
 el.addEventListener("pointerdown",down,{passive:false});
 el.addEventListener("pointermove",move,{passive:false});
 el.addEventListener("pointerup",up);
