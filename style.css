@@ -64,3 +64,6 @@ body{font-size:10px;overflow-x:hidden}
 
 /* v56 music transport controls */
 .music-player-main{gap:6px!important}.music-player-main button,.music-pick{min-width:68px;min-height:34px;padding:0 10px!important;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}.music-player-main button:active,.music-pick:active{transform:translateY(1px);filter:brightness(1.2)}.music-mode select,.music-player-main button,.music-pick{font-size:9px!important}.music-queue button{cursor:pointer;touch-action:manipulation}.music-volume input{min-width:80px}@media(max-width:560px){.music-player-main{grid-template-columns:repeat(2,minmax(0,1fr))!important}.music-pick,.music-player-main button,.music-mode{min-height:42px}.music-mode{grid-column:1/-1}.music-mode select{flex:1}}
+
+/* v57 touch controls */
+.knob,.fader,.send-list input,.echo-panel input,.master input[type="range"]{touch-action:none;-webkit-user-select:none;user-select:none;cursor:grab}.knob:active,.fader:active,.send-list input:active,.echo-panel input:active,.master input[type="range"]:active{cursor:grabbing}
