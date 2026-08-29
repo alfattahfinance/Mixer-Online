@@ -601,3 +601,32 @@ input.knob[type="range"]::-moz-range-thumb{
   transform:rotate(calc((var(--control-value,.5) - .5)*270deg))!important;
   rotate:0deg!important;
 }
+
+/* v73 — final knob frame cleanup: no square/rectangular box around rotary controls */
+.knob,
+input.knob,
+input[type="range"].knob{
+  box-sizing:border-box!important;
+  border:2px solid #080909!important;
+  outline:0!important;
+  border-radius:50%!important;
+  clip-path:circle(50% at 50% 50%)!important;
+  -webkit-clip-path:circle(50% at 50% 50%)!important;
+  box-shadow:inset 0 2px 3px rgba(255,255,255,.28),inset 0 -6px 8px #000,0 2px 2px #777,0 4px 7px #000!important;
+}
+.knob:focus,
+.knob:focus-visible,
+input.knob:focus,
+input.knob:focus-visible{
+  outline:none!important;
+  box-shadow:inset 0 2px 3px rgba(255,255,255,.28),inset 0 -6px 8px #000,0 2px 2px #777,0 4px 7px #000!important;
+}
+.knob::-webkit-slider-runnable-track,
+.knob::-webkit-slider-thumb,
+.knob::-moz-range-track,
+.knob::-moz-range-thumb{
+  border:0!important;
+  outline:0!important;
+  box-shadow:none!important;
+  background:transparent!important;
+}
