@@ -18,54 +18,72 @@ function updateFx(){const e=createFxEngine(),type=document.querySelector("#fxTyp
 function channelAudio(card,node){const gain=ctx.createGain();const fx=createFxEngine();const low=ctx.createBiquadFilter(),mid=ctx.createBiquadFilter(),high=ctx.createBiquadFilter(),pan=ctx.createStereoPanner(),analyser=ctx.createAnalyser(),bus1=ctx.createGain(),bus2=ctx.createGain(),fx1=ctx.createGain();const echoDelay=ctx.createDelay(2),echoFeedback=ctx.createGain(),echoWet=ctx.createGain(),echoInput=ctx.createGain();echoDelay.delayTime.value=.18;echoFeedback.gain.value=.28;echoWet.gain.value=.25;low.type="lowshelf";low.frequency.value=180;mid.type="peaking";mid.frequency.value=1000;mid.Q.value=.8;high.type="highshelf";high.frequency.value=4500;analyser.fftSize=256;node.connect(gain).connect(low).connect(mid).connect(high).connect(pan).connect(analyser);analyser.connect(masterGain);pan.connect(echoInput);echoInput.connect(echoDelay).connect(echoWet).connect(masterGain);echoDelay.connect(echoFeedback).connect(echoDelay);pan.connect(bus1).connect(masterGain);pan.connect(bus2).connect(masterGain);pan.connect(fx1).connect(fx.input);card._audio={gain,low,mid,high,pan,analyser,node,bus1,bus2,fx1,echoDelay,echoFeedback,echoWet,echoInput};card._audio.update=()=>{const f=+card.querySelector(".fader").value,g=+card.querySelector(".gain").value,muted=card.querySelector(".mute").classList.contains("active"),solo=state.solo.size&&!state.solo.has(card.dataset.channel);gain.gain.value=(muted||solo)?0:f*g;try{if(analyser&&analyser.getByteTimeDomainData){const buf=new Uint8Array(analyser.fftSize);analyser.getByteTimeDomainData(buf);let sum=0,peak=0;for(const x of buf){const a=(x-128)/128;sum+=a*a;peak=Math.max(peak,Math.abs(a))}const rms=Math.sqrt(sum/buf.length),level=rms>0?20*Math.log10(rms):-Infinity,pk=peak>0?20*Math.log10(peak):-Infinity;const mon=card.querySelector(".signal-state"),fill=card.querySelector(".monitor-fill"),db=card.querySelector(".monitor-db"),pdb=card.querySelector(".monitor-peak-db");if(mon)mon.textContent=level>-60?"SIGNAL":"NO SIGNAL";if(fill)fill.style.width=Math.max(0,Math.min(100,(level+60)/60*100))+"%";if(db)db.textContent=Number.isFinite(level)?level.toFixed(1)+" dB":"-∞";if(pdb)pdb.textContent=Number.isFinite(pk)?pk.toFixed(1)+" dB":"-∞";}}catch{}low.gain.value=+card.querySelector(".bass").value;mid.gain.value=+card.querySelector(".mid").value;high.gain.value=+card.querySelector(".treble").value;pan.pan.value=+card.querySelector(".pan").value;const sends=card.querySelectorAll(".send-list input");bus1.gain.value=+(sends[0]?.value||0)*(state.bus1Master??1);bus2.gain.value=+(sends[1]?.value||0)*(state.bus2Master??1);fx1.gain.value=+(sends[2]?.value||0)*(state.fx1Master??1);const on=card.querySelector(".echo-on")?.classList.contains("active");echoInput.gain.value=on?1:0;echoDelay.delayTime.value=+(card.querySelector(".echo-time")?.value||180)/1000;echoFeedback.gain.value=+(card.querySelector(".echo-feedback")?.value||28)/100;echoWet.gain.value=on?+(card.querySelector(".echo-mix")?.value||25)/100:0;echoFeedback.gain.value=Math.min(.8,Math.max(0,+(card.querySelector(".echo-feedback")?.value||28)/100));};card.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{card._audio.update();if(i.classList.contains("fader"))card.querySelector(".fader-value").textContent=Math.round(+i.value*100)+"%"}));card.querySelectorAll(".knob").forEach(i=>bindTouchRange(i,false));card.querySelectorAll(".send-list input,.echo-panel input").forEach(i=>bindTouchRange(i,false));bindTouchRange(f,true);card._audio.update()}function populateInputRoutes(card,index){const s=card.querySelector(".input-route");if(!s)return;const p=MixerProfiles.get().profile;const opts=[{v:"none",t:"INPUT —"},{v:"mic",t:"MIC"},{v:"audio",t:"AUDIO"}];for(let i=1;i<=Number(p.inputs||0);i++)opts.push({v:"hw:"+i,t:"INPUT "+i});s.innerHTML=opts.map(o=>'<option value="'+o.v+'">'+o.t+'</option>').join("");const saved=state.routing[card.dataset.channel]||"none";s.value=opts.some(o=>o.v===saved)?saved:"none"}
 function routeHardwareInput(card,route){state.routing[card.dataset.channel]=route;const ch=Number((card.dataset.channel||"").replace(/\\D/g,""));if(route.startsWith("hw:")){MixerControl.setControl("ch"+ch,"input-route",route);setStatus("CH"+ch+" ← "+route.toUpperCase())}}
 function bindTouchRange(el,vertical=false){
-if(!el||el.dataset.touchRangeBound)return;
-el.dataset.touchRangeBound="1";
-let active=false;
-const min=Number(el.min||0),max=Number(el.max||1),range=max-min,step=Number(el.step)||.01;
-const isKnob=el.classList.contains("knob");
-const isFader=vertical||el.classList.contains("fader");
-const sync=()=>el.style.setProperty("--control-value",String(range?(Number(el.value)-min)/range:.5));
-const write=v=>{
- v=Math.max(min,Math.min(max,v));
- v=step>0?Math.round((v-min)/step)*step+min:v;
- const setter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value")?.set;
- setter?setter.call(el,String(v)):el.value=v;
- sync();el.dispatchEvent(new Event("input",{bubbles:true}));
-};
-let sx=0,sy=0,sv=0;
-const down=ev=>{
- if(ev.button!==undefined&&ev.button!==0)return;
- active=true;sx=ev.clientX;sy=ev.clientY;sv=Number(el.value);
- el.setPointerCapture?.(ev.pointerId);
- ev.preventDefault();ev.stopPropagation();
-};
-const move=ev=>{
- if(!active)return;
- let v=sv;
- if(isFader){
-   const h=Math.max(80,el.getBoundingClientRect().height);
-   v=sv-(ev.clientY-sy)*range/h;
- }else if(isKnob){
-   const rect=el.getBoundingClientRect(),cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
-   const a0=Math.atan2(sy-cy,sx-cx),a1=Math.atan2(ev.clientY-cy,ev.clientX-cx);
-   let d=(a1-a0)*180/Math.PI;
-   if(d>180)d-=360;if(d<-180)d+=360;
-   if(Math.abs(ev.clientY-sy)>8 && Math.abs(ev.clientX-sx)<Math.abs(ev.clientY-sy)*1.5) d=-(ev.clientY-sy)*1.8;
-   v=sv+(d/270)*range;
- }else{
-   const w=Math.max(80,el.getBoundingClientRect().width);
-   v=sv+(ev.clientX-sx)*range/w;
- }
- write(v);ev.preventDefault();ev.stopPropagation();
-};
-const up=()=>{active=false};
-el.addEventListener("pointerdown",down,{passive:false});
-el.addEventListener("pointermove",move,{passive:false});
-el.addEventListener("pointerup",up);
-el.addEventListener("pointercancel",up);
-el.addEventListener("lostpointercapture",up);
-sync();
+  if(!el || el.dataset.touchRangeBound==="v69") return;
+  el.dataset.touchRangeBound="v69";
+
+  const min=Number(el.min||0), max=Number(el.max||1), range=max-min;
+  const step=Number(el.step)||0.01;
+  const isFader=el.classList.contains("fader") || el.id==="masterFader";
+  const isKnob=el.classList.contains("knob");
+  let dragging=false, startY=0, startX=0, startValue=0;
+
+  const setValue=v=>{
+    v=Math.max(min,Math.min(max,v));
+    if(step>0) v=min+Math.round((v-min)/step)*step;
+    const setter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value")?.set;
+    if(setter) setter.call(el,String(v));
+    else el.value=String(v);
+    el.style.setProperty("--control-value",String(range ? (v-min)/range : 0.5));
+    el.dispatchEvent(new Event("input",{bubbles:true}));
+    el.dispatchEvent(new Event("change",{bubbles:true}));
+  };
+
+  const down=e=>{
+    if(e.button!==undefined && e.button!==0) return;
+    dragging=true;
+    startY=e.clientY;
+    startX=e.clientX;
+    startValue=Number(el.value);
+    el.setPointerCapture?.(e.pointerId);
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const move=e=>{
+    if(!dragging) return;
+    let value=startValue;
+
+    if(isFader){
+      // FADER: ONLY vertical movement. Never use X.
+      const sensitivity=180;
+      value=startValue-(e.clientY-startY)*(range/sensitivity);
+    }else if(isKnob){
+      // KNOB: vertical finger movement changes rotary value.
+      value=startValue-(e.clientY-startY)*(range/180);
+    }else{
+      const sensitivity=180;
+      value=startValue+(e.clientX-startX)*(range/sensitivity);
+    }
+
+    setValue(value);
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const up=e=>{
+    dragging=false;
+    if(e) e.stopPropagation();
+  };
+
+  el.addEventListener("pointerdown",down,{passive:false});
+  el.addEventListener("pointermove",move,{passive:false});
+  el.addEventListener("pointerup",up);
+  el.addEventListener("pointercancel",up);
+  el.addEventListener("lostpointercapture",()=>dragging=false);
+  el.style.touchAction="none";
+  el.style.setProperty("--control-value",String(range ? (Number(el.value)-min)/range : 0.5));
 }
+
 function bindAllRangeControls(root=document){
  root.querySelectorAll?.('input[type="range"]').forEach(el=>{
    const vertical=el.classList.contains("fader");
