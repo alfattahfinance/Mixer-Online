@@ -649,3 +649,7 @@ input.knob:focus-visible{
 /* v74 — functional indicator LEDs */
 .master-lamps .lamp.power.active{background:#d8b83d;box-shadow:0 0 5px #d8b83d,0 0 11px rgba(216,184,61,.7)}
 .player-led-wrap{display:flex;align-items:center;gap:5px}.player-led{width:8px;height:8px}.player-led.active{background:#35d65a;box-shadow:0 0 6px #35d65a,0 0 12px rgba(53,214,90,.8)}
+
+/* v76 — restore clickable mixer buttons after LED styling */
+.channel-actions,.channel-actions .mute,.channel-actions .solo,.master-mute{position:relative;z-index:20;pointer-events:auto!important;cursor:pointer!important}
+.channel-actions button,.master button{touch-action:manipulation}
