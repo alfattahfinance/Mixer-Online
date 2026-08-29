@@ -717,3 +717,47 @@ input.knob:focus-visible{
   border-color:#ffd45a!important;
   box-shadow:0 0 7px rgba(255,176,0,.85),inset 0 0 7px rgba(255,255,255,.12)!important;
 }
+
+/* v82 — unify CH MUTE/SOLO digital button hardware */
+.channel .channel-actions button.mute,
+.channel .channel-actions button.solo{
+  appearance:none!important;-webkit-appearance:none!important;
+  position:relative!important;display:inline-flex!important;
+  align-items:center!important;justify-content:center!important;
+  box-sizing:border-box!important;
+  width:70px!important;min-width:70px!important;
+  height:34px!important;min-height:34px!important;
+  padding:0 10px!important;margin:0!important;
+  opacity:1!important;visibility:visible!important;
+  pointer-events:auto!important;cursor:pointer!important;
+  color:#dfe5e8!important;background:#252a2e!important;
+  border:1px solid #596168!important;border-radius:4px!important;
+  font-weight:700!important;line-height:1!important;
+  touch-action:manipulation!important;user-select:none!important;
+  -webkit-tap-highlight-color:transparent!important;
+  outline:none!important;
+}
+.channel .channel-actions button.mute.active{
+  color:#fff!important;background:#e51f3d!important;
+  border-color:#ff6075!important;
+  box-shadow:0 0 7px rgba(255,48,69,.8),inset 0 0 7px rgba(255,255,255,.12)!important;
+}
+.channel .channel-actions button.solo.active{
+  color:#fff!important;background:#ffb000!important;
+  border-color:#ffd45a!important;
+  box-shadow:0 0 7px rgba(255,176,0,.85),inset 0 0 7px rgba(255,255,255,.12)!important;
+}
+.channel .channel-actions button.mute:focus,
+.channel .channel-actions button.solo:focus,
+.channel .channel-actions button.mute:focus-visible,
+.channel .channel-actions button.solo:focus-visible{
+  outline:none!important;box-shadow:none!important;
+}
+.channel .channel-actions button.mute.active:focus,
+.channel .channel-actions button.mute.active:focus-visible{
+  box-shadow:0 0 7px rgba(255,48,69,.8),inset 0 0 7px rgba(255,255,255,.12)!important;
+}
+.channel .channel-actions button.solo.active:focus,
+.channel .channel-actions button.solo.active:focus-visible{
+  box-shadow:0 0 7px rgba(255,176,0,.85),inset 0 0 7px rgba(255,255,255,.12)!important;
+}
