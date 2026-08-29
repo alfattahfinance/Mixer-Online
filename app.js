@@ -21,46 +21,42 @@ function bindTouchRange(el,vertical=false){
 if(!el||el.dataset.touchRangeBound)return;
 el.dataset.touchRangeBound="1";
 let active=false;
-const step=Number(el.step)||.01,min=Number(el.min),max=Number(el.max),range=max-min;
-const decimals=Math.max(0,String(step).split(".")[1]?.length||0);
+const min=Number(el.min||0),max=Number(el.max||1),range=max-min,step=Number(el.step)||.01;
 const isKnob=el.classList.contains("knob");
 const isFader=vertical||el.classList.contains("fader");
-const syncVisual=()=>el.style.setProperty("--control-value",String(range?(Number(el.value)-min)/range:.5));
-const setValue=v=>{
+const sync=()=>el.style.setProperty("--control-value",String(range?(Number(el.value)-min)/range:.5));
+const write=v=>{
  v=Math.max(min,Math.min(max,v));
- const q=step>0?Math.round((v-min)/step)*step+min:v;
+ v=step>0?Math.round((v-min)/step)*step+min:v;
  const setter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value")?.set;
- if(setter)setter.call(el,String(q.toFixed(decimals)));else el.value=q.toFixed(decimals);
- syncVisual();
- el.dispatchEvent(new Event("input",{bubbles:true}));
+ setter?setter.call(el,String(v)):el.value=v;
+ sync();el.dispatchEvent(new Event("input",{bubbles:true}));
 };
-const setFromPointer=ev=>{
- const rect=el.getBoundingClientRect();
- let p;
- if(isKnob){
-   const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
-   let deg=Math.atan2(ev.clientY-cy,ev.clientX-cx)*180/Math.PI;
-   if(deg<0)deg+=360;
-   if(deg<135)deg+=360;
-   deg=Math.max(135,Math.min(405,deg));
-   p=(deg-135)/270;
- }else if(isFader){
-   p=1-(ev.clientY-rect.top)/Math.max(1,rect.height);
- }else{
-   p=(ev.clientX-rect.left)/Math.max(1,rect.width);
- }
- setValue(min+p*range);
-};
+let sx=0,sy=0,sv=0;
 const down=ev=>{
- active=true;
+ if(ev.button!==undefined&&ev.button!==0)return;
+ active=true;sx=ev.clientX;sy=ev.clientY;sv=Number(el.value);
  el.setPointerCapture?.(ev.pointerId);
- setFromPointer(ev);
- ev.preventDefault();
+ ev.preventDefault();ev.stopPropagation();
 };
 const move=ev=>{
  if(!active)return;
- setFromPointer(ev);
- ev.preventDefault();
+ let v=sv;
+ if(isFader){
+   const h=Math.max(80,el.getBoundingClientRect().height);
+   v=sv-(ev.clientY-sy)*range/h;
+ }else if(isKnob){
+   const rect=el.getBoundingClientRect(),cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+   const a0=Math.atan2(sy-cy,sx-cx),a1=Math.atan2(ev.clientY-cy,ev.clientX-cx);
+   let d=(a1-a0)*180/Math.PI;
+   if(d>180)d-=360;if(d<-180)d+=360;
+   if(Math.abs(ev.clientY-sy)>8 && Math.abs(ev.clientX-sx)<Math.abs(ev.clientY-sy)*1.5) d=-(ev.clientY-sy)*1.8;
+   v=sv+(d/270)*range;
+ }else{
+   const w=Math.max(80,el.getBoundingClientRect().width);
+   v=sv+(ev.clientX-sx)*range/w;
+ }
+ write(v);ev.preventDefault();ev.stopPropagation();
 };
 const up=()=>{active=false};
 el.addEventListener("pointerdown",down,{passive:false});
@@ -68,8 +64,15 @@ el.addEventListener("pointermove",move,{passive:false});
 el.addEventListener("pointerup",up);
 el.addEventListener("pointercancel",up);
 el.addEventListener("lostpointercapture",up);
-syncVisual();
+sync();
 }
+function bindAllRangeControls(root=document){
+ root.querySelectorAll?.('input[type="range"]').forEach(el=>{
+   const vertical=el.classList.contains("fader");
+   bindTouchRange(el,vertical);
+ });
+}
+
 function wire(card){card.querySelector(".mute").onclick=e=>{e.currentTarget.classList.toggle("active");const on=e.currentTarget.classList.contains("active"),s=card.querySelector(".mute-status");if(s)s.textContent="MUTE: "+(on?"ON":"OFF");card._audio?.update();controlCommand(card,"mute",on?1:0)};card.querySelector(".solo").onclick=e=>{const k=card.dataset.channel;e.currentTarget.classList.toggle("active");const on=e.currentTarget.classList.contains("active");on?state.solo.add(k):state.solo.delete(k);const s=card.querySelector(".solo-status");if(s)s.textContent="SOLO: "+(on?"ON":"OFF");state.channels.forEach(c=>c._audio?.update());controlCommand(card,"solo",on?1:0)};const echoBtn=card.querySelector(".echo-on");if(echoBtn)echoBtn.onclick=()=>{echoBtn.classList.toggle("active");echoBtn.textContent=echoBtn.classList.contains("active")?"ON":"OFF";card._audio?.update();controlCommand(card,"echo",echoBtn.classList.contains("active")?1:0)};card.querySelectorAll(".echo-time,.echo-feedback,.echo-mix").forEach(i=>i.addEventListener("input",()=>card._audio?.update()));card.querySelector(".input-route").onchange=e=>{routeHardwareInput(card,e.target.value);setStatus(card.dataset.channel.toUpperCase()+" ← "+(e.target.value==="none"?"—":e.target.value.toUpperCase()))};const f=card.querySelector(".fader"),fv=card.querySelector(".fader-value");if(f){const sync=()=>{fv.textContent=Math.round(+f.value*100)+"%";controlCommand(card,"fader",f.value)};f.addEventListener("input",sync);f.addEventListener("change",sync);}}/* v59 functional UI wiring */
 function initTopUiControls(){
   const connect=$("#connectDevice");
@@ -227,6 +230,7 @@ function initDeviceMapping(){const p=MixerProfiles.get().profile,n=$("#profileNa
 /* Device-neutral control wiring */
 function controlCommand(card,control,value){const ch=card?.dataset?.channel;if(!ch)return;MixerControl.setControl(ch,control,value)}
 function restoreControl(card,selector,control){const saved=MixerControl.getControls()?.[card.dataset.channel]?.[control];if(saved===undefined)return;const el=card.querySelector(selector);if(el){el.value=saved;el.dispatchEvent(new Event("input"))}}
+bindAllRangeControls();
 function initControlEngine(){state.channels.forEach(card=>{restoreControl(card,".fader","fader");restoreControl(card,".gain","gain");restoreControl(card,".pan","pan");restoreControl(card,".bass","low");restoreControl(card,".mid","mid");restoreControl(card,".treble","high")});if(state._controlEngineBound)return;state._controlEngineBound=true;const box=$("#channels");if(!box)return;box.addEventListener("input",e=>{const el=e.target;if(state.feedbackApplying||window.MixerFeedback?._applying)return;if(!el.matches("input[type=range]"))return;if(el.closest(".master"))return;const card=el.closest(".channel");if(!card)return;const control=el.classList.contains("fader")?"fader":el.classList.contains("gain")?"gain":el.classList.contains("pan")?"pan":el.classList.contains("bass")?"low":el.classList.contains("mid")?"mid":el.classList.contains("treble")?"high":el.closest(".send-list")?.children[0]===el.parentElement?"bus1":el.closest(".send-list")?.children[1]===el.parentElement?"bus2":"fx1";controlCommand(card,control,el.value)});box.addEventListener("click",e=>{const b=e.target;if(!b.matches(".mute,.solo"))return;const card=b.closest(".channel");if(card)controlCommand(card,b.classList.contains("mute")?"mute":"solo",b.classList.contains("active")?1:0)});MixerControl.onCommand(c=>{const e=$("#connectionStatus");if(e&&!MixerControl.state.connected)e.title="Last command: "+c.channel+" / "+c.control+" = "+c.value})}
 const originalBuild=buildChannels;buildChannels=function(n){originalBuild(n);initControlEngine()};initControlEngine();
 MixerAdapters.onStatus(s=>{MixerControl.setStatus({connected:!!s.connected,transport:s.type||"none",deviceName:s.name||"Belum terhubung",protocol:s.type||"none"});});MixerControl.onCommand(cmd=>{if(!MixerAdapters.hasTransport())return;const result=MixerAdapters.sendMapped(cmd,MixerProfiles.get().controlMappings);if(result.ok){setStatus("TX "+cmd.channel+" • "+cmd.control+" = "+cmd.value)}else if(result.reason==="unmapped")setStatus("Terhubung, tetapi kontrol belum dipetakan — aman");else if(result.reason&&result.reason!=="unmapped")setStatus("Perintah belum dikirim: "+result.reason)});
