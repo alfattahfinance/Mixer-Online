@@ -1,0 +1,10 @@
+/* Final target layout v20260830 */
+.channel-rack{overflow:hidden!important}
+.channels{position:relative!important}
+.master-side-dock{position:sticky!important;right:0!important;z-index:30!important;flex-shrink:0!important;box-shadow:-8px 0 14px rgba(0,0,0,.45)!important}
+.master-side-content{min-height:0!important}
+.master-side-content input:not([type=range]),.master-side-content select,.master-side-content button{color:#dfe4e6!important;background:#111719!important;border-color:#454d50!important}
+.master-side-content button{min-height:27px!important}
+.master-side-menu button{color:#cdd2d4!important;background:linear-gradient(#30373a,#15191b)!important}
+.master-side-menu button.active{color:#f3d13a!important;border-color:#806d27!important}
+@media(max-width:650px){.master-side-dock{position:sticky!important;right:0!important;flex-basis:225px!important;min-width:225px!important}}
