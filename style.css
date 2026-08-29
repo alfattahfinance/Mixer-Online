@@ -562,3 +562,42 @@ input.knob[type="range"]::-moz-range-thumb{
   width:56px!important;height:56px!important;
   background:transparent!important;border:0!important;
 }
+
+/* v72 — remove native square range completely; rotary is drawn by wrapper */
+.knob{
+  all:unset!important;
+  box-sizing:border-box!important;
+  display:block!important;
+  position:relative!important;
+  width:58px!important;height:58px!important;
+  margin:3px auto!important;
+  border-radius:50%!important;
+  background:radial-gradient(circle at 35% 28%,#858a8c 0,#505557 18%,#292d2f 42%,#111314 62%,#656a6c 68%,#161819 74%,#070809 100%)!important;
+  border:2px solid #090a0b!important;
+  box-shadow:inset 0 2px 3px rgba(255,255,255,.28),inset 0 -6px 8px #000,0 2px 2px #777,0 4px 7px #000!important;
+  -webkit-appearance:none!important;appearance:none!important;
+  transform:none!important;rotate:0deg!important;
+  overflow:hidden!important;
+}
+.knob::-webkit-slider-runnable-track,.knob::-moz-range-track,
+.knob::-webkit-slider-thumb,.knob::-moz-range-thumb{
+  -webkit-appearance:none!important;appearance:none!important;
+  display:none!important;width:0!important;height:0!important;
+  border:0!important;background:transparent!important;
+}
+.knob::before{
+  content:""!important;position:absolute!important;
+  inset:9px!important;border-radius:50%!important;
+  background:radial-gradient(circle at 35% 30%,#3e4345,#151718 62%,#090a0a)!important;
+  transform:none!important;rotate:0deg!important;
+}
+.knob::after{
+  content:""!important;position:absolute!important;
+  left:50%!important;top:5px!important;
+  width:4px!important;height:18px!important;
+  margin-left:-2px!important;border-radius:2px!important;
+  background:#f2d45e!important;box-shadow:0 0 7px #efd16b!important;
+  transform-origin:2px 24px!important;
+  transform:rotate(calc((var(--control-value,.5) - .5)*270deg))!important;
+  rotate:0deg!important;
+}
