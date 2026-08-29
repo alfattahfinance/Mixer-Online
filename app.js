@@ -17,7 +17,58 @@ function setStatus(m){const e=$("#status");if(e)e.textContent=m;const s=$("#conn
 function updateFx(){const e=createFxEngine(),type=document.querySelector("#fxType")?.value||"delay";const wet=+(document.querySelector("#fxWet")?.value||.25);e.delay.delayTime.value=Math.max(0,Math.min(1,+(document.querySelector("#fxDelay")?.value||.28)));e.feedback.gain.value=Math.max(0,Math.min(.9,+(document.querySelector("#fxFeedback")?.value||.32)));e.wet.gain.value=Math.max(0,Math.min(1,wet));try{e.input.disconnect();e.delay.disconnect();e.feedback.disconnect();e.reverb.disconnect();e.wet.disconnect()}catch{}if(type==="reverb"){e.input.connect(e.reverb);e.reverb.connect(e.wet)}else{e.input.connect(e.delay);e.delay.connect(e.feedback);e.feedback.connect(e.delay);e.delay.connect(e.wet)}e.wet.connect(e.out);}
 function channelAudio(card,node){const gain=ctx.createGain();const fx=createFxEngine();const low=ctx.createBiquadFilter(),mid=ctx.createBiquadFilter(),high=ctx.createBiquadFilter(),pan=ctx.createStereoPanner(),analyser=ctx.createAnalyser(),bus1=ctx.createGain(),bus2=ctx.createGain(),fx1=ctx.createGain();const echoDelay=ctx.createDelay(2),echoFeedback=ctx.createGain(),echoWet=ctx.createGain(),echoInput=ctx.createGain();echoDelay.delayTime.value=.18;echoFeedback.gain.value=.28;echoWet.gain.value=.25;low.type="lowshelf";low.frequency.value=180;mid.type="peaking";mid.frequency.value=1000;mid.Q.value=.8;high.type="highshelf";high.frequency.value=4500;analyser.fftSize=256;node.connect(gain).connect(low).connect(mid).connect(high).connect(pan).connect(analyser);analyser.connect(masterGain);pan.connect(echoInput);echoInput.connect(echoDelay).connect(echoWet).connect(masterGain);echoDelay.connect(echoFeedback).connect(echoDelay);pan.connect(bus1).connect(masterGain);pan.connect(bus2).connect(masterGain);pan.connect(fx1).connect(fx.input);card._audio={gain,low,mid,high,pan,analyser,node,bus1,bus2,fx1,echoDelay,echoFeedback,echoWet,echoInput};card._audio.update=()=>{const f=+card.querySelector(".fader").value,g=+card.querySelector(".gain").value,muted=card.querySelector(".mute").classList.contains("active"),solo=state.solo.size&&!state.solo.has(card.dataset.channel);gain.gain.value=(muted||solo)?0:f*g;try{if(analyser&&analyser.getByteTimeDomainData){const buf=new Uint8Array(analyser.fftSize);analyser.getByteTimeDomainData(buf);let sum=0,peak=0;for(const x of buf){const a=(x-128)/128;sum+=a*a;peak=Math.max(peak,Math.abs(a))}const rms=Math.sqrt(sum/buf.length),level=rms>0?20*Math.log10(rms):-Infinity,pk=peak>0?20*Math.log10(peak):-Infinity;const mon=card.querySelector(".signal-state"),fill=card.querySelector(".monitor-fill"),db=card.querySelector(".monitor-db"),pdb=card.querySelector(".monitor-peak-db");if(mon)mon.textContent=level>-60?"SIGNAL":"NO SIGNAL";if(fill)fill.style.width=Math.max(0,Math.min(100,(level+60)/60*100))+"%";if(db)db.textContent=Number.isFinite(level)?level.toFixed(1)+" dB":"-∞";if(pdb)pdb.textContent=Number.isFinite(pk)?pk.toFixed(1)+" dB":"-∞";}}catch{}low.gain.value=+card.querySelector(".bass").value;mid.gain.value=+card.querySelector(".mid").value;high.gain.value=+card.querySelector(".treble").value;pan.pan.value=+card.querySelector(".pan").value;const sends=card.querySelectorAll(".send-list input");bus1.gain.value=+(sends[0]?.value||0)*(state.bus1Master??1);bus2.gain.value=+(sends[1]?.value||0)*(state.bus2Master??1);fx1.gain.value=+(sends[2]?.value||0)*(state.fx1Master??1);const on=card.querySelector(".echo-on")?.classList.contains("active");echoInput.gain.value=on?1:0;echoDelay.delayTime.value=+(card.querySelector(".echo-time")?.value||180)/1000;echoFeedback.gain.value=+(card.querySelector(".echo-feedback")?.value||28)/100;echoWet.gain.value=on?+(card.querySelector(".echo-mix")?.value||25)/100:0;echoFeedback.gain.value=Math.min(.8,Math.max(0,+(card.querySelector(".echo-feedback")?.value||28)/100));};card.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{card._audio.update();if(i.classList.contains("fader"))card.querySelector(".fader-value").textContent=Math.round(+i.value*100)+"%"}));card.querySelectorAll(".knob").forEach(i=>bindTouchRange(i,false));card.querySelectorAll(".send-list input,.echo-panel input").forEach(i=>bindTouchRange(i,false));bindTouchRange(f,true);card._audio.update()}function populateInputRoutes(card,index){const s=card.querySelector(".input-route");if(!s)return;const p=MixerProfiles.get().profile;const opts=[{v:"none",t:"INPUT —"},{v:"mic",t:"MIC"},{v:"audio",t:"AUDIO"}];for(let i=1;i<=Number(p.inputs||0);i++)opts.push({v:"hw:"+i,t:"INPUT "+i});s.innerHTML=opts.map(o=>'<option value="'+o.v+'">'+o.t+'</option>').join("");const saved=state.routing[card.dataset.channel]||"none";s.value=opts.some(o=>o.v===saved)?saved:"none"}
 function routeHardwareInput(card,route){state.routing[card.dataset.channel]=route;const ch=Number((card.dataset.channel||"").replace(/\\D/g,""));if(route.startsWith("hw:")){MixerControl.setControl("ch"+ch,"input-route",route);setStatus("CH"+ch+" ← "+route.toUpperCase())}}
-function bindTouchRange(el,vertical=false){if(!el||el.dataset.touchRangeBound)return;el.dataset.touchRangeBound="1";let active=false,last=0;const step=Number(el.step)||.01,min=Number(el.min),max=Number(el.max),range=max-min;const decimals=Math.max(0,String(step).split(".")[1]?.length||0);const isVertical=vertical||el.classList.contains("fader");const setValue=v=>{v=Math.max(min,Math.min(max,v));const q=step>0?Math.round((v-min)/step)*step+min:v;const setter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value")?.set;if(setter)setter.call(el,String(q.toFixed(decimals)));else el.value=q.toFixed(decimals);el.style.setProperty("--control-value",String(range?(q-min)/range:.5));el.dispatchEvent(new Event("input",{bubbles:true}))};const down=ev=>{active=true;last=isVertical?ev.clientY:ev.clientX;el.setPointerCapture?.(ev.pointerId);ev.preventDefault()};const move=ev=>{if(!active)return;const now=isVertical?ev.clientY:ev.clientX,delta=now-last;if(delta){const pixels=Math.max(45,isVertical?el.getBoundingClientRect().height:el.getBoundingClientRect().width);setValue(Number(el.value)+(isVertical?-delta:delta)*range/pixels);last=now}ev.preventDefault()};const up=()=>{active=false};el.addEventListener("pointerdown",down,{passive:false});el.addEventListener("pointermove",move,{passive:false});el.addEventListener("pointerup",up);el.addEventListener("pointercancel",up);el.style.setProperty("--control-value",String(range?(Number(el.value)-min)/range:.5))}
+function bindTouchRange(el,vertical=false){
+if(!el||el.dataset.touchRangeBound)return;
+el.dataset.touchRangeBound="1";
+let active=false,last=0;
+const step=Number(el.step)||.01,min=Number(el.min),max=Number(el.max),range=max-min;
+const decimals=Math.max(0,String(step).split(".")[1]?.length||0);
+const isKnob=el.classList.contains("knob")||el.classList.contains("gain")||el.classList.contains("pan")||el.classList.contains("bass")||el.classList.contains("mid")||el.classList.contains("treble");
+const isVertical=vertical||el.classList.contains("fader")||isKnob;
+const pixelsPerRange=isKnob?180:Math.max(90,isVertical?el.getBoundingClientRect().height:el.getBoundingClientRect().width);
+const syncVisual=()=>{
+ const v=Number(el.value);
+ el.style.setProperty("--control-value",String(range?(v-min)/range:.5));
+};
+const setValue=v=>{
+ v=Math.max(min,Math.min(max,v));
+ const q=step>0?Math.round((v-min)/step)*step+min:v;
+ const setter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value")?.set;
+ if(setter)setter.call(el,String(q.toFixed(decimals)));else el.value=q.toFixed(decimals);
+ syncVisual();
+ el.dispatchEvent(new Event("input",{bubbles:true}));
+};
+const down=ev=>{
+ active=true;
+ last=isKnob||isVertical?ev.clientY:ev.clientX;
+ el.setPointerCapture?.(ev.pointerId);
+ ev.preventDefault();
+};
+const move=ev=>{
+ if(!active)return;
+ const now=isKnob||isVertical?ev.clientY:ev.clientX;
+ const delta=now-last;
+ if(delta){
+   const pixels=Math.max(60,pixelsPerRange);
+   setValue(Number(el.value)+(isKnob||isVertical?-delta:delta)*range/pixels);
+   last=now;
+ }
+ ev.preventDefault();
+};
+const up=()=>{active=false};
+el.addEventListener("pointerdown",down,{passive:false});
+el.addEventListener("pointermove",move,{passive:false});
+el.addEventListener("pointerup",up);
+el.addEventListener("pointercancel",up);
+el.addEventListener("lostpointercapture",up);
+el.addEventListener("wheel",ev=>{
+ if(document.activeElement!==el&&isKnob){
+   ev.preventDefault();
+   setValue(Number(el.value)-Math.sign(ev.deltaY)*range/40);
+ }
+},{passive:false});
+syncVisual();
+}
 function wire(card){card.querySelector(".mute").onclick=e=>{e.currentTarget.classList.toggle("active");const on=e.currentTarget.classList.contains("active"),s=card.querySelector(".mute-status");if(s)s.textContent="MUTE: "+(on?"ON":"OFF");card._audio?.update();controlCommand(card,"mute",on?1:0)};card.querySelector(".solo").onclick=e=>{const k=card.dataset.channel;e.currentTarget.classList.toggle("active");const on=e.currentTarget.classList.contains("active");on?state.solo.add(k):state.solo.delete(k);const s=card.querySelector(".solo-status");if(s)s.textContent="SOLO: "+(on?"ON":"OFF");state.channels.forEach(c=>c._audio?.update());controlCommand(card,"solo",on?1:0)};const echoBtn=card.querySelector(".echo-on");if(echoBtn)echoBtn.onclick=()=>{echoBtn.classList.toggle("active");echoBtn.textContent=echoBtn.classList.contains("active")?"ON":"OFF";card._audio?.update();controlCommand(card,"echo",echoBtn.classList.contains("active")?1:0)};card.querySelectorAll(".echo-time,.echo-feedback,.echo-mix").forEach(i=>i.addEventListener("input",()=>card._audio?.update()));card.querySelector(".input-route").onchange=e=>{routeHardwareInput(card,e.target.value);setStatus(card.dataset.channel.toUpperCase()+" ← "+(e.target.value==="none"?"—":e.target.value.toUpperCase()))};const f=card.querySelector(".fader"),fv=card.querySelector(".fader-value");if(f){const sync=()=>{fv.textContent=Math.round(+f.value*100)+"%";controlCommand(card,"fader",f.value)};f.addEventListener("input",sync);f.addEventListener("change",sync);}}/* v59 functional UI wiring */
 function initTopUiControls(){
   const connect=$("#connectDevice");
