@@ -171,10 +171,18 @@ audio.onended=()=>{
 if(token!==musicToken)return;
 cleanupIntegratedMusic();
 state.sources.delete(target.dataset.channel);
-let n=musicIndex;
-n=musicIndex+1;
-if(n<musicQueue.length)playMusicAt(n);
-else{e.state.textContent="SELESAI";e.play.textContent="▶ PLAY";}
+let n;
+if(musicQueue.length<=1){
+  n=0;
+}else if(audioPlayMode==="random" || e.mode?.value==="random"){
+  // ACak: pilih lagu lain, tetapi jangan ulang lagu yang baru selesai.
+  do{n=Math.floor(Math.random()*musicQueue.length)}while(n===musicIndex);
+}else{
+  // Berurutan: lagu berikutnya sesuai urutan playlist.
+  n=musicIndex+1;
+  if(n>=musicQueue.length)n=0;
+}
+playMusicAt(n);
 };
 audio.onerror=()=>{
 if(token!==musicToken)return;
