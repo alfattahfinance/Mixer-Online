@@ -1218,3 +1218,93 @@ footer{display:none}
   #channels>.master{flex-basis:100px!important;width:100px!important;min-width:100px!important;max-width:100px!important;height:490px!important}
   #channels>.channel .fader{height:275px!important;flex-basis:275px!important}
 }
+
+/* v90 — mobile cleanup: keep the reference console intact and restore clipped master controls */
+@media(max-width:800px){
+  html,body{width:100%;max-width:100%;overflow-x:hidden!important}
+  .mixer{width:100%!important;max-width:100%!important;display:block!important;box-sizing:border-box!important;padding:4px!important}
+  #digitalScreen{
+    width:100%!important;box-sizing:border-box!important;
+    height:310px!important;min-height:310px!important;margin:0 0 5px!important;
+    overflow:hidden!important;
+  }
+  #digitalScreen .screen-tabs{display:flex!important;overflow-x:auto!important;white-space:nowrap!important}
+  #digitalScreen .screen-body{
+    height:255px!important;min-height:255px!important;
+    box-sizing:border-box!important;padding:10px!important;
+    overflow:hidden!important;
+  }
+  #digitalScreen .screen-source{max-width:58%!important}
+  #digitalScreen .screen-readout{max-width:42%!important}
+  #digitalScreen .screen-channels{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:3px!important}
+  #digitalScreen .screen-meter{display:flex!important;position:absolute!important;right:8px!important;bottom:8px!important;width:90px!important;height:150px!important}
+  #musicPlayer{
+    width:100%!important;box-sizing:border-box!important;
+    height:auto!important;min-height:190px!important;margin:0 0 5px!important;
+    overflow:hidden!important;
+  }
+  .music-player-main{display:flex!important;flex-wrap:wrap!important;gap:5px!important}
+  .music-player-main>*{flex:0 0 auto!important}
+  .music-track{display:grid!important;grid-template-columns:1fr 70px!important}
+  #channels{
+    width:100%!important;max-width:100%!important;box-sizing:border-box!important;
+    display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
+    align-items:stretch!important;justify-content:flex-start!important;
+    overflow-x:auto!important;overflow-y:hidden!important;
+    scroll-snap-type:x mandatory!important;
+    height:650px!important;min-height:650px!important;
+    padding:5px!important;gap:5px!important;
+  }
+  #channels>.channel{
+    flex:0 0 155px!important;width:155px!important;min-width:155px!important;max-width:155px!important;
+    height:630px!important;min-height:630px!important;max-height:630px!important;
+    box-sizing:border-box!important;scroll-snap-align:start!important;
+  }
+  #channels>.channel .channel-head{flex:0 0 34px!important;height:34px!important}
+  #channels>.channel .channel-tabs{flex:0 0 23px!important;height:23px!important}
+  #channels>.channel .route{flex:0 0 25px!important;height:25px!important}
+  #channels>.channel .knob-row{flex-basis:58px!important;height:58px!important}
+  #channels>.channel .eq-grid{flex-basis:58px!important;height:58px!important}
+  #channels>.channel .send-list{flex-basis:38px!important;height:38px!important}
+  #channels>.channel .fader{flex-basis:245px!important;height:245px!important;width:42px!important}
+  #channels>.channel .channel-actions{flex-basis:50px!important;height:50px!important}
+  #channels>.channel .channel-actions button{height:23px!important}
+  #channels>.master{
+    flex:0 0 260px!important;width:260px!important;min-width:260px!important;max-width:260px!important;
+    height:630px!important;min-height:630px!important;max-height:630px!important;
+    box-sizing:border-box!important;overflow-y:auto!important;overflow-x:hidden!important;
+    scroll-snap-align:start!important;
+  }
+  /* Do not clip the master utility sections on narrow screens */
+  #channels>.master .bus-fx-masters,
+  #channels>.master .output-routing,
+  #channels>.master .scene-panel,
+  #channels>.master .history-panel,
+  #channels>.master .lock-panel,
+  #channels>.master .connection-panel,
+  #channels>.master .mapper-panel,
+  #channels>.master .hardware-test-panel,
+  #channels>.master .esp32-sim-panel,
+  #channels>.master .usb-audio-panel{
+    display:block!important;width:100%!important;box-sizing:border-box!important;
+    max-height:none!important;overflow:visible!important;margin:4px 0!important;
+  }
+  #channels>.master .bus-fx-masters input[type=range]{width:100%!important}
+  #channels>.master select,#channels>.master input,#channels>.master button{max-width:100%!important;box-sizing:border-box!important}
+}
+/* v90 desktop: retain full advanced master controls in a clean right-hand column */
+@media(min-width:801px){
+  #channels>.master{overflow-y:auto!important;overflow-x:hidden!important}
+  #channels>.master .bus-fx-masters,
+  #channels>.master .output-routing,
+  #channels>.master .scene-panel,
+  #channels>.master .history-panel,
+  #channels>.master .lock-panel,
+  #channels>.master .connection-panel,
+  #channels>.master .mapper-panel,
+  #channels>.master .hardware-test-panel,
+  #channels>.master .esp32-sim-panel,
+  #channels>.master .usb-audio-panel{
+    display:block!important;max-height:none!important;overflow:visible!important;
+  }
+}
