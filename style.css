@@ -809,3 +809,44 @@ input.knob:focus-visible{
 .screen-channels{position:absolute;left:8px;right:205px;bottom:7px;display:grid;grid-template-columns:repeat(4,1fr);gap:3px}.screen-channels div{padding:5px 7px;background:#101416;border:1px solid #30373a;border-radius:2px}.screen-channels b{display:block;margin-top:2px;font:10px monospace;color:#e1e4e5}
 .screen-meter{position:absolute;right:8px;top:7px;bottom:7px;width:175px;background:#070909;border:1px solid #343a3d;border-radius:2px;padding:4px 24px 16px;display:flex;align-items:flex-end;justify-content:center;gap:8px}.screen-meter i{display:block;width:18px;height:70%;background:linear-gradient(to top,#2dbd50 0 65%,#dfc83f 65% 85%,#e13c37 85%);box-shadow:0 0 4px rgba(53,214,90,.35)}.screen-meter i:nth-child(2){height:54%}.screen-meter span{position:absolute;bottom:3px;color:#697278;font-size:7px}.screen-meter span:nth-of-type(1){left:66px}.screen-meter span:nth-of-type(2){left:91px}.screen-scale{position:absolute;right:5px;top:7px;bottom:24px;writing-mode:vertical-rl;color:#5d676c;font:6px monospace}
 @media(max-width:760px){.screen-body{padding-right:8px;min-height:150px}.screen-source{width:55%}.screen-readout{left:57%;gap:8px}.screen-channels{right:8px;bottom:7px}.screen-meter{display:none}}
+
+/* v85 — REFERENCE CONSOLE SKIN: replace old mixer presentation */
+body{background:#07090a;color:#d8dcde}
+.mixer{max-width:1920px;padding:6px}
+.device-bar,.device-config{display:none!important}
+.music-player{margin:0 0 5px;min-height:72px;padding:5px;background:linear-gradient(#1c2022,#090b0c);border-color:#343b3f}
+.music-player-head{padding:3px 6px}.music-player-head strong{font-size:9px}.music-player-main{padding:3px 0;gap:3px}.music-pick,.music-player-main button,.music-mode{height:25px}.music-track{display:grid;grid-template-columns:1fr 180px;gap:5px;align-items:center}.music-progress{margin:0}.music-queue{display:none}
+.digital-screen{margin:0 0 5px;padding:4px;background:#090b0c;border:1px solid #3d4549;border-radius:2px;box-shadow:inset 0 1px #4f5659,0 3px 8px #000}
+.screen-tabs{height:25px}.screen-tabs button{height:25px;padding:0 16px;background:linear-gradient(#202527,#0c0f10);border-color:#30373a}.screen-tabs button.active{color:#f5d64d;border-color:#a98a25}
+.screen-body{min-height:250px;padding:8px 205px 8px 10px;background:radial-gradient(circle at 42% 0,#16242b,#050708 72%);border-color:#31393d}
+.screen-source strong{font-size:14px;color:#e4e7e8}.screen-readout strong{font-size:15px}.screen-channels b{font-size:12px;color:#dfe4e6}.screen-meter{width:185px}
+.channels{grid-template-columns:repeat(16,minmax(72px,1fr)) minmax(145px,1.65fr);gap:2px;padding:3px;background:#080a0b;border-color:#30373a;align-items:stretch}
+.channel,.master{min-width:0;padding:3px;border-radius:2px;background:linear-gradient(#252a2c,#111415);border-color:#3f474b;box-shadow:inset 0 1px #4c5356,0 2px 5px #000}
+.channel{display:flex;flex-direction:column}
+.channel-head{height:25px;padding:0 3px}.channel-head strong{font-size:9px}.channel-menu{display:none}.channel-led{font-size:8px}
+.channel:after,.master:after{top:5px;right:4px;width:5px;height:5px}
+.channel-tabs,.route{display:none}
+.mini-meter{position:relative;right:auto;top:auto;order:1;width:7px;height:90px;margin:3px auto;background:#050707}
+.channel-lamps{order:2;display:flex!important;justify-content:center;gap:3px;margin:2px 0;font-size:5px}
+.channel-lamps .lamp-wrap{font-size:0}.channel-lamps .lamp{width:5px!important;height:5px!important}
+.level-readout{order:3;height:17px;margin:2px 0;text-align:center;font-size:7px}
+.knob-row,.eq-grid,.send-list,.echo-panel,.channel-monitor{display:none!important}
+.fader{order:4;width:38px!important;height:265px!important;margin:2px auto!important;background:linear-gradient(90deg,transparent 22%,#303639 23% 27%,#070909 28% 72%,#303639 73% 77%,transparent 78%)}
+.fader::-webkit-slider-runnable-track{width:3px;background:repeating-linear-gradient(to bottom,transparent 0 12px,#70787d 12px 13px)}
+.fader::-webkit-slider-thumb{width:25px;height:12px;margin-left:-11px;background:linear-gradient(#e7e9e9,#9ca3a5 45%,#3b4042)}
+.fader-value{order:5;width:42px;margin:1px auto 3px;font-size:7px}
+.channel-actions{order:6;grid-template-columns:1fr;gap:2px;margin-top:auto}
+.channel-actions button.mute,.channel-actions button.solo{width:100%!important;min-width:0!important;height:23px!important;font-size:6px!important;padding:0 2px!important}
+.channel-status{order:7;display:block;text-align:center;margin:2px 0 0;padding:2px;font-size:5px}.mute-status,.solo-status{display:block}
+.channel-bottom{order:8;font-size:6px;padding-top:2px}
+.master{grid-column:17;grid-row:1;display:flex;flex-direction:column;background:linear-gradient(#303126,#161812);border-color:#746331}
+.master .channel-title{font-size:12px;height:27px}
+.master-meter{height:16px}.master-lamps{display:flex!important;justify-content:center;gap:6px;font-size:6px;margin:3px 0}
+.master-monitor{font-size:7px}.master-knobs{padding:3px}.master .fader{height:285px!important;width:42px!important}
+.master .master-mute{height:27px;font-size:7px}
+.bus-fx-masters,.output-routing,.usb-audio-panel,.esp32-sim-panel,.hardware-test-panel,.mapper-panel,.connection-panel,.lock-panel,.history-panel,.scene-panel{font-size:6px;padding:4px;margin-top:3px}
+.bus-fx-masters label,.output-routing label{grid-template-columns:35px 1fr;gap:3px}
+.mapping-panel{z-index:200}
+footer{display:none}
+@media(max-width:1400px){.channels{grid-template-columns:repeat(8,minmax(85px,1fr)) minmax(150px,1.6fr)}.master{grid-column:9;grid-row:1 / span 2}.digital-screen .screen-body{min-height:220px}}
+@media(max-width:800px){.channels{grid-template-columns:repeat(4,minmax(88px,1fr))}.master{grid-column:1 / -1;grid-row:auto}.screen-body{padding-right:8px}.screen-meter{display:none}.music-track{grid-template-columns:1fr}}
