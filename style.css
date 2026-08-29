@@ -703,3 +703,17 @@ input.knob:focus-visible{
 .channel .channel-actions button.mute.active{
   box-shadow:0 0 7px rgba(255,48,69,.8),inset 0 0 6px rgba(255,255,255,.08)!important;
 }
+
+/* v81 — modern digital mixer SOLO indicator */
+.channel .channel-actions button.solo{
+  color:#dfe5e8!important;
+  background:#252a2e!important;
+  border-color:#596168!important;
+  box-shadow:none!important;
+}
+.channel .channel-actions button.solo.active{
+  color:#fff!important;
+  background:#ffb000!important;
+  border-color:#ffd45a!important;
+  box-shadow:0 0 7px rgba(255,176,0,.85),inset 0 0 7px rgba(255,255,255,.12)!important;
+}
