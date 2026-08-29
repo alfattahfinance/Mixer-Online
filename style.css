@@ -525,3 +525,40 @@ body{
   transform:none!important;
   rotate:none!important;
 }
+
+/* v71 — HARD FIX: rotary control must NEVER rotate its square input box */
+input.knob[type="range"]{
+  appearance:none!important;
+  -webkit-appearance:none!important;
+  transform:none!important;
+  rotate:0deg!important;
+  scale:1!important;
+  position:relative!important;
+  display:block!important;
+  overflow:visible!important;
+}
+input.knob[type="range"]::-webkit-slider-runnable-track{
+  transform:none!important;
+  rotate:0deg!important;
+  width:56px!important;height:56px!important;
+  background:transparent!important;
+  border:0!important;
+}
+input.knob[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none!important;
+  transform:none!important;
+  rotate:0deg!important;
+  width:56px!important;height:56px!important;
+  background:transparent!important;
+  border:0!important;
+}
+input.knob[type="range"]::-moz-range-track{
+  transform:none!important;rotate:0deg!important;
+  width:56px!important;height:56px!important;
+  background:transparent!important;border:0!important;
+}
+input.knob[type="range"]::-moz-range-thumb{
+  transform:none!important;rotate:0deg!important;
+  width:56px!important;height:56px!important;
+  background:transparent!important;border:0!important;
+}
