@@ -632,14 +632,19 @@ input.knob:focus-visible{
 }
 
 /* v69 — physical mixer indicator lamps */
-.channel-lamps,.master-lamps{display:flex;align-items:center;justify-content:center;gap:7px;margin:4px 0 5px;padding:4px 5px;background:#0b0d0e;border:1px solid #303538;border-radius:3px;box-shadow:inset 0 1px 3px #000}
-.lamp-wrap{display:flex;align-items:center;gap:3px;color:#747c80;font:6px monospace;text-transform:uppercase}
-.lamp{width:7px;height:7px;border-radius:50%;background:#202426;border:1px solid #080909;box-shadow:inset 0 1px 2px #000,0 0 0 transparent}
-.lamp.signal.active{background:#35d65a;box-shadow:0 0 5px #35d65a,0 0 10px rgba(53,214,90,.7)}
-.lamp.on.active{background:#d8b83d;box-shadow:0 0 5px #d8b83d,0 0 10px rgba(216,184,61,.65)}
-.lamp.peak.active,.lamp.clip.active{background:#ef3d38;box-shadow:0 0 6px #ef3d38,0 0 12px rgba(239,61,56,.75)}
-.lamp.mute.active{background:#ef3d38;box-shadow:0 0 5px #ef3d38}
+/* v75 — digital mixer LED palette: cool digital status + metering convention */
+.channel-lamps,.master-lamps{display:flex;align-items:center;justify-content:center;gap:7px;margin:4px 0 5px;padding:4px 5px;background:#090b0d;border:1px solid #252a2e;border-radius:3px;box-shadow:inset 0 1px 4px #000}
+.lamp-wrap{display:flex;align-items:center;gap:3px;color:#7d858b;font:6px monospace;text-transform:uppercase}
+.lamp{width:7px;height:7px;border-radius:50%;background:#171b1e;border:1px solid #050607;box-shadow:inset 0 1px 2px #000,0 0 0 transparent}
+.lamp.signal.active{background:#19e66b;box-shadow:0 0 4px #19e66b,0 0 9px rgba(25,230,107,.72)}
+.lamp.on.active{background:#26a9ff;box-shadow:0 0 4px #26a9ff,0 0 9px rgba(38,169,255,.65)}
+.lamp.peak.active{background:#ffc21a;box-shadow:0 0 5px #ffc21a,0 0 10px rgba(255,194,26,.72)}
+.lamp.clip.active,.lamp.mute.active{background:#ff3045;box-shadow:0 0 5px #ff3045,0 0 11px rgba(255,48,69,.8)}
 .master-lamps{margin-top:5px}
+.master-lamps .lamp.power.active{background:#26a9ff;box-shadow:0 0 4px #26a9ff,0 0 10px rgba(38,169,255,.7)}
+.player-led.active{background:#19e66b;box-shadow:0 0 5px #19e66b,0 0 11px rgba(25,230,107,.8)}
+.channel-head .channel-led{font-size:0;width:8px;height:8px;border-radius:50%;background:#171b1e;box-shadow:inset 0 1px 2px #000}
+.channel-head .channel-led::after{content:"";display:block;width:100%;height:100%;border-radius:50%;background:#26a9ff;box-shadow:0 0 5px #26a9ff,0 0 10px rgba(38,169,255,.65)}
 
 /* v74 — functional indicator LEDs */
 .master-lamps .lamp.power.active{background:#d8b83d;box-shadow:0 0 5px #d8b83d,0 0 11px rgba(216,184,61,.7)}
