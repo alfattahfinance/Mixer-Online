@@ -1410,3 +1410,53 @@ body{background:#07090a!important}
  #channels>.channel .knob{width:29px!important;height:29px!important}
  #channels>.channel .fader{height:265px!important}
 }
+
+/* v92 — dense reference-console layout for tablet/mobile-browser widths */
+@media (min-width:801px) and (max-width:1200px){
+  body{overflow-x:hidden!important}
+  .mixer{max-width:100%!important;padding:5px!important}
+  .channels{
+    display:grid!important;
+    grid-template-columns:repeat(16,minmax(0,1fr)) 104px!important;
+    gap:2px!important;
+    overflow:visible!important;
+    padding:3px!important;
+  }
+  #channels>.channel{
+    min-width:0!important;width:auto!important;max-width:none!important;
+    height:555px!important;padding:3px!important;overflow:hidden!important;
+  }
+  #channels>.master{
+    min-width:0!important;width:auto!important;max-width:none!important;
+    height:555px!important;padding:4px!important;overflow-y:auto!important;overflow-x:hidden!important;
+  }
+  .channel-head{height:30px!important;padding:0 3px!important}
+  .channel-head strong{font-size:8px!important;letter-spacing:.3px!important}
+  .channel-menu{font-size:9px!important}
+  .channel-tabs{height:22px!important;margin-top:2px!important}
+  .channel-tabs button{font-size:5px!important}
+  .route,.knob-row,.eq-grid,.send-list,.echo-panel,.channel-monitor,.channel-bottom{display:none!important}
+  .level-readout{height:16px!important;margin:2px 2px 2px 0!important;font-size:5px!important}
+  .mini-meter{top:60px!important;right:2px!important;width:5px!important;height:220px!important}
+  .fader{height:320px!important;width:30px!important;margin:4px auto!important}
+  .fader::-webkit-slider-runnable-track{height:320px!important}
+  .fader::-moz-range-track{height:320px!important}
+  .fader::-webkit-slider-thumb{width:28px!important;height:14px!important;margin-left:-12px!important}
+  .fader::-moz-range-thumb{width:28px!important;height:14px!important}
+  .fader-value{width:30px!important;font-size:5px!important;margin:0 auto 3px!important}
+  .channel-actions{grid-template-columns:1fr!important;gap:2px!important}
+  .channel-actions button{height:25px!important;font-size:5px!important}
+  .channel-actions .solo{order:0}.channel-actions .mute{order:1}
+  .channel-status{font-size:4px!important;padding:2px!important;white-space:nowrap;overflow:hidden}
+  .master .fader{height:300px!important}
+  .master .fader::-webkit-slider-runnable-track{height:300px!important}
+  .master .fader::-moz-range-track{height:300px!important}
+  .master-knobs{gap:1px!important;padding:2px!important}
+  .master-knobs input{width:30px!important;height:30px!important}
+  .bus-fx-masters,.output-routing{padding:3px!important}
+  .bus-fx-masters>strong,.output-routing>strong{font-size:5px!important}
+  .bus-fx-masters label,.output-routing label{grid-template-columns:25px 1fr!important;font-size:5px!important}
+  .fx-controls{margin-top:2px!important;padding-top:2px!important}
+  .fx-controls strong{font-size:5px!important}
+  .fx-controls label{grid-template-columns:28px 1fr!important}
+}
