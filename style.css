@@ -1308,3 +1308,105 @@ footer{display:none}
     display:block!important;max-height:none!important;overflow:visible!important;
   }
 }
+
+/* v91 — final reference-console skin pass: bring every visible section into the same digital-mixer language */
+:root{
+ --ref-black:#080a0b;--ref-panel:#111517;--ref-panel2:#1b2022;--ref-line:#3e464a;
+ --ref-cyan:#16c9ef;--ref-green:#29dc55;--ref-yellow:#e5c23e;--ref-red:#ef3d35;
+}
+body{background:#07090a!important}
+.topbar{background:linear-gradient(#1b2022,#0b0d0e 72%,#050607)!important;border-bottom:1px solid #3a4043!important}
+.top-actions button,.file-btn,.play-mode{background:linear-gradient(#252a2d,#101315)!important;border-color:#3e4649!important}
+.mixer{display:grid!important;grid-template-columns:minmax(0,1fr) 310px!important;grid-template-areas:
+"device device" "config config" "screen player" "channels channels"!important;gap:5px!important}
+.device-bar{grid-area:device}.device-config{grid-area:config}
+#digitalScreen{grid-area:screen!important;min-width:0!important}
+#musicPlayer{grid-area:player!important;min-width:0!important}
+#channels{grid-area:channels!important}
+
+/* Digital display: reference-style analyzer / readout */
+.digital-screen{background:#0a1012!important;border-color:#374146!important;box-shadow:inset 0 0 25px rgba(0,180,220,.08),0 3px 10px #000!important}
+.digital-screen .screen-tabs{height:34px!important;background:#111619!important;border-bottom:1px solid #354044!important}
+.digital-screen .screen-tabs button{background:#171c1e!important;border-color:#30383c!important;color:#7c878c!important}
+.digital-screen .screen-tabs button.active{color:#f0d45a!important;border-bottom:2px solid #e0bd3c!important}
+.digital-screen .screen-body{position:relative!important;min-height:315px!important;height:315px!important;overflow:hidden!important;
+ background:
+ repeating-linear-gradient(0deg,transparent 0 24px,rgba(90,130,145,.13) 25px),
+ repeating-linear-gradient(90deg,transparent 0 48px,rgba(90,130,145,.13) 49px),
+ radial-gradient(circle at 35% 55%,rgba(0,155,205,.15),transparent 45%),#081014!important}
+.digital-screen .screen-source{position:absolute!important;left:14px!important;top:12px!important;max-width:48%!important}
+.digital-screen .screen-source small{color:#65757d!important}.digital-screen .screen-source strong{display:block!important;color:#e0e6e8!important;font-size:15px!important;margin-top:3px!important}.digital-screen .screen-source span{color:var(--ref-green)!important}
+.digital-screen .screen-readout{position:absolute!important;left:47%!important;top:12px!important;display:flex!important;gap:24px!important;color:#6f7d82!important}
+.digital-screen .screen-readout span{display:flex!important;flex-direction:column!important;font-size:7px!important}.digital-screen .screen-readout strong{font-size:15px!important;color:#d5dcdf!important;font-weight:400!important;margin-top:2px!important}
+.digital-screen .screen-channels{position:absolute!important;left:14px!important;right:160px!important;bottom:10px!important;display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:4px!important}
+.digital-screen .screen-channels>div{padding:7px!important;background:#101719!important;border:1px solid #2e393d!important;box-shadow:inset 0 1px #465258!important}
+.digital-screen .screen-channels small{display:block!important;color:#6d7a7f!important;font-size:6px!important}.digital-screen .screen-channels b{color:#d8dfe1!important;font:12px monospace!important}
+.digital-screen .screen-meter{position:absolute!important;right:15px!important;top:55px!important;bottom:10px!important;width:105px!important;background:#050708!important;border:1px solid #394247!important;display:flex!important;align-items:flex-end!important;justify-content:center!important;gap:8px!important;padding:8px 18px 17px!important}
+.digital-screen .screen-meter i{display:block!important;width:20px!important;height:18%!important;background:linear-gradient(to top,#1fc550 0 65%,#e1c33d 65% 84%,#e43d36 84%)!important;box-shadow:0 0 5px rgba(42,220,85,.35)!important}
+.digital-screen .screen-meter span{position:absolute!important;bottom:3px!important;color:#66747a!important;font-size:6px!important}
+.digital-screen .screen-meter span:nth-of-type(1){left:27px}.digital-screen .screen-meter span:nth-of-type(2){right:27px}
+.digital-screen .screen-scale{position:absolute!important;right:2px!important;top:8px!important;writing-mode:vertical-rl!important;color:#56636a!important;font:6px monospace!important}
+
+/* Player becomes a proper hardware-style side display */
+.music-player{background:linear-gradient(#171c1e,#0b0e0f)!important;border-color:#3b4448!important;box-shadow:inset 0 1px #4c5559,0 3px 9px #000!important}
+.music-player-head{background:#121719!important;border-bottom:1px solid #30393d!important}
+.music-player-head strong{color:#d5dcdf!important;letter-spacing:.6px}.player-state{color:var(--ref-green)!important}
+.music-player-main{display:grid!important;grid-template-columns:1fr 1fr!important;gap:5px!important}
+.music-player-main .music-pick{grid-column:1/-1!important}
+.music-pick,.music-player-main button{height:34px!important;background:linear-gradient(#2b3032,#171b1d)!important;border:1px solid #465055!important;color:#d1d7d9!important}
+.music-mode{background:#0d1011!important;color:#69767c!important;border-color:#343c40!important}
+.music-mode select{background:#090b0c!important;color:#cbd1d3!important}
+.music-track{background:#090b0c!important;border-color:#2d3539!important}
+.music-progress{background:#050607!important;border-color:#30383b!important}.music-progress span{background:var(--ref-green)!important}
+.music-volume input{accent-color:var(--ref-yellow)!important}
+
+/* Channel bank: no oversized cards; every strip has the same hardware grammar */
+.channels{grid-template-columns:repeat(16,minmax(62px,1fr)) minmax(92px,1.5fr)!important;gap:2px!important;padding:3px!important;background:#080a0b!important}
+.channel{height:560px!important;padding:3px!important;background:linear-gradient(#252a2c,#141819 28%,#0b0d0e)!important;border-color:#3d4549!important;border-radius:2px!important}
+.channel-head{height:31px!important;padding:0 4px!important}.channel-head strong{font-size:9px!important}
+.channel-head .channel-menu{font-size:10px!important}.channel-led{font-size:8px!important}
+.channel-tabs{height:22px!important;margin-top:3px!important}.channel-tabs button{font-size:6px!important}
+.route{margin:3px 0!important}.route select{height:22px!important;font-size:7px!important}
+.level-readout{height:15px!important;margin:0 12px 2px 0!important;font-size:6px!important}
+.knob-row,.eq-grid{gap:2px!important;margin-right:11px!important}.knob-row label,.eq-grid label{font-size:5px!important}
+.knob{width:31px!important;height:31px!important}
+.knob::-webkit-slider-thumb{height:11px!important}
+.send-list{margin:3px 11px 3px 0!important;padding:2px!important;font-size:5px!important}.send-list>div{height:13px!important;grid-template-columns:26px 1fr!important}
+.mini-meter{right:4px!important;top:75px!important;height:105px!important;width:6px!important}
+.fader{height:255px!important;width:34px!important;margin:4px auto!important}
+.fader::-webkit-slider-thumb{width:25px!important;height:11px!important;margin-left:-11px!important}
+.fader-value{width:38px!important;font-size:6px!important;margin:-1px auto 2px!important}
+.echo-panel{margin:3px 11px 3px 0!important;padding:3px!important}.echo-panel label{grid-template-columns:38px 1fr!important;font-size:5px!important}
+.channel-actions{gap:2px!important}.channel-actions button{height:25px!important;font-size:6px!important}
+.channel-status{font-size:5px!important}.channel-monitor{height:58px!important;margin-top:3px!important;padding:3px!important}
+.monitor-title,.monitor-readouts,.monitor-source{font-size:5px!important}
+.channel-bottom{font-size:5px!important}
+.master{height:560px!important;padding:4px!important;overflow-y:auto!important;background:linear-gradient(#302f27,#171814 35%,#0c0e0d)!important}
+.master .channel-title{font-size:10px!important}.master .fader{height:230px!important}
+.master-knobs input{width:31px!important;height:31px!important}
+.master-mute{height:27px!important;font-size:7px!important}
+.bus-fx-masters,.output-routing,.usb-audio-panel,.esp32-sim-panel,.hardware-test-panel,.mapper-panel,.connection-panel,.lock-panel,.history-panel,.scene-panel{margin-top:3px!important;padding:4px!important}
+.bus-fx-masters>strong,.output-routing>strong,.usb-audio-panel>strong,.esp32-sim-panel>strong,.hardware-test-panel>strong,.mapper-panel>strong,.connection-panel>strong,.lock-panel>strong,.history-panel>strong,.scene-panel>strong{font-size:6px!important;margin-bottom:3px!important}
+
+/* Landscape/tablet gets the full reference density */
+@media(min-width:801px){
+ .channels{overflow-x:auto!important}
+ #channels>.channel{min-width:70px!important;max-width:120px!important}
+ #channels>.master{min-width:170px!important;max-width:240px!important}
+}
+@media(max-width:800px){
+ .mixer{display:grid!important;grid-template-columns:1fr!important;grid-template-areas:"device" "config" "screen" "player" "channels"!important}
+ .device-bar,.device-config{margin-bottom:3px!important}
+ #digitalScreen{height:300px!important;min-height:300px!important}
+ #digitalScreen .screen-body{height:265px!important;min-height:265px!important}
+ #digitalScreen .screen-source{left:9px!important;top:9px!important;max-width:52%!important}
+ #digitalScreen .screen-readout{left:52%!important;gap:9px!important}
+ #digitalScreen .screen-channels{left:9px!important;right:105px!important;grid-template-columns:repeat(2,1fr)!important;bottom:7px!important}
+ #digitalScreen .screen-meter{right:7px!important;top:52px!important;width:82px!important}
+ #musicPlayer{min-height:185px!important}
+ #channels{height:auto!important;min-height:0!important;display:flex!important;overflow-x:auto!important;overflow-y:hidden!important;align-items:stretch!important;gap:3px!important;padding:3px!important}
+ #channels>.channel{flex:0 0 112px!important;width:112px!important;min-width:112px!important;max-width:112px!important;height:570px!important;min-height:570px!important;max-height:570px!important}
+ #channels>.master{flex:0 0 205px!important;width:205px!important;min-width:205px!important;max-width:205px!important;height:570px!important;min-height:570px!important}
+ #channels>.channel .knob{width:29px!important;height:29px!important}
+ #channels>.channel .fader{height:265px!important}
+}
