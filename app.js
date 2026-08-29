@@ -273,11 +273,25 @@ function bindPhoneMediaButtons(){
   });
 
   music?.addEventListener("click",()=>{
-    // Prefer Android's registered music/audio app.
-    const a=document.createElement("a");
-    a.href="intent:#Intent;action=android.intent.action.MUSIC_PLAYER;end";
-    a.click();
-    setStatus("Membuka aplikasi Musik bawaan ponsel…");
+    // Use Android's standard audio-player intent; fall back to ACTION_VIEW.
+    const intents=[
+      "intent:#Intent;action=android.intent.action.MUSIC_PLAYER;end",
+      "intent:#Intent;action=android.intent.action.VIEW;type=audio/*;end"
+    ];
+    let launched=false;
+    for(const href of intents){
+      try{
+        const a=document.createElement("a");
+        a.href=href;
+        a.style.display="none";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        launched=true;
+        break;
+      }catch(_){}
+    }
+    setStatus(launched?"Membuka aplikasi Musik/pemutar audio…":"Pemutar musik tidak tersedia di ponsel");
   });
 }
 
