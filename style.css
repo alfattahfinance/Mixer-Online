@@ -916,3 +916,139 @@ footer{display:none}
   .channel .fader{height:190px!important}
   .master .fader{height:240px!important}
 }
+
+/* v87 — FINAL CLEAN CONSOLE BANK: fixed equal strips, no squashing/no giant empty cards */
+.channels{
+  display:flex!important;
+  flex-direction:row!important;
+  flex-wrap:nowrap!important;
+  align-items:stretch!important;
+  justify-content:flex-start!important;
+  gap:5px!important;
+  width:100%!important;
+  min-width:0!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  padding:6px!important;
+  box-sizing:border-box!important;
+  scrollbar-width:thin;
+}
+.channels>.channel{
+  flex:0 0 185px!important;
+  width:185px!important;
+  min-width:185px!important;
+  max-width:185px!important;
+  height:650px!important;
+  min-height:650px!important;
+  max-height:650px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  flex-shrink:0!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  padding:5px!important;
+  position:relative!important;
+}
+.channels>.master{
+  flex:0 0 225px!important;
+  width:225px!important;
+  min-width:225px!important;
+  max-width:225px!important;
+  height:650px!important;
+  min-height:650px!important;
+  max-height:650px!important;
+  flex-shrink:0!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  padding:6px!important;
+}
+/* reset the old absolute/ordered channel layout */
+.channels>.channel .channel-head{position:relative!important;inset:auto!important;flex:0 0 35px!important;height:35px!important}
+.channels>.channel .channel-tabs{display:flex!important;position:relative!important;inset:auto!important;height:25px!important;flex:0 0 25px!important;margin:3px 0!important}
+.channels>.channel .route{display:block!important;position:relative!important;inset:auto!important;height:28px!important;flex:0 0 28px!important;margin:2px 0!important}
+.channels>.channel .route select{width:100%!important;height:28px!important;box-sizing:border-box!important}
+.channels>.channel .mini-meter{
+  position:relative!important;inset:auto!important;
+  order:0!important;flex:0 0 7px!important;
+  width:100%!important;height:7px!important;
+  margin:2px 0!important;background:#070909!important;
+}
+.channels>.channel .channel-lamps{
+  position:relative!important;inset:auto!important;
+  order:0!important;display:flex!important;
+  flex:0 0 18px!important;height:18px!important;
+  justify-content:space-around!important;align-items:center!important;
+  margin:2px 0!important;
+}
+.channels>.channel .channel-lamps .lamp-wrap{font-size:6px!important}
+.channels>.channel .channel-lamps .lamp{width:6px!important;height:6px!important}
+.channels>.channel .level-readout{
+  order:0!important;position:relative!important;inset:auto!important;
+  flex:0 0 18px!important;height:18px!important;margin:1px 0!important;
+  text-align:center!important;font-size:8px!important;
+}
+.channels>.channel .knob-row{
+  order:0!important;display:grid!important;grid-template-columns:1fr 1fr!important;
+  flex:0 0 62px!important;height:62px!important;gap:2px!important;
+}
+.channels>.channel .eq-grid{
+  order:0!important;display:grid!important;grid-template-columns:repeat(3,1fr)!important;
+  flex:0 0 62px!important;height:62px!important;gap:2px!important;
+}
+.channels>.channel .knob-row label,.channels>.channel .eq-grid label{
+  display:flex!important;flex-direction:column!important;align-items:center!important;
+  justify-content:flex-start!important;font-size:6px!important;gap:1px!important;
+}
+.channels>.channel .knob{
+  width:34px!important;height:34px!important;margin:0 auto!important;
+}
+.channels>.channel .send-list{
+  order:0!important;display:flex!important;flex-direction:column!important;
+  flex:0 0 42px!important;height:42px!important;margin:2px 0!important;
+}
+.channels>.channel .send-list div{
+  display:flex!important;align-items:center!important;gap:3px!important;
+  height:13px!important;font-size:6px!important;
+}
+.channels>.channel .send-list input{flex:1!important;width:auto!important;height:8px!important}
+.channels>.channel .fader{
+  order:0!important;position:relative!important;inset:auto!important;
+  flex:0 0 220px!important;width:46px!important;height:220px!important;
+  margin:2px auto!important;
+}
+.channels>.channel .fader-value{
+  order:0!important;position:relative!important;inset:auto!important;
+  flex:0 0 18px!important;height:18px!important;width:50px!important;
+  margin:0 auto!important;text-align:center!important;font-size:7px!important;
+}
+.channels>.channel .echo-panel,
+.channels>.channel .channel-monitor{display:none!important}
+.channels>.channel .channel-actions{
+  order:0!important;display:grid!important;grid-template-columns:1fr 1fr!important;
+  flex:0 0 27px!important;height:27px!important;gap:3px!important;margin-top:auto!important;
+}
+.channels>.channel .channel-actions button{
+  width:100%!important;min-width:0!important;height:27px!important;font-size:7px!important;
+}
+.channels>.channel .channel-status{
+  order:0!important;display:flex!important;justify-content:space-around!important;
+  flex:0 0 17px!important;height:17px!important;font-size:5px!important;
+}
+.channels>.channel .channel-bottom{
+  order:0!important;display:flex!important;justify-content:space-between!important;
+  flex:0 0 17px!important;height:17px!important;font-size:6px!important;
+}
+/* MASTER gets a clean, dedicated console strip */
+.channels>.master .master-meter{flex:0 0 28px!important;height:28px!important}
+.channels>.master .master-lamps{display:flex!important;justify-content:space-around!important;height:20px!important}
+.channels>.master .master-monitor{font-size:7px!important}
+.channels>.master .master-knobs{display:grid!important;grid-template-columns:1fr 1fr!important;gap:4px!important}
+.channels>.master .master-knobs input{width:42px!important;height:42px!important}
+.channels>.master #masterFader{height:260px!important;flex:0 0 260px!important;margin:4px auto!important}
+.channels>.master .fader-value{width:55px!important;margin:0 auto!important}
+.channels>.master .master-mute{height:28px!important;flex:0 0 28px!important}
+@media(max-width:800px){
+  .channels{gap:5px!important;padding:5px!important}
+  .channels>.channel{flex-basis:185px!important;width:185px!important;min-width:185px!important;max-width:185px!important;height:650px!important;min-height:650px!important}
+  .channels>.master{flex-basis:225px!important;width:225px!important;min-width:225px!important;max-width:225px!important;height:650px!important;min-height:650px!important}
+}
