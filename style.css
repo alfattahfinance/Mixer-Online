@@ -37,3 +37,73 @@
   .master-side-dock{height:380px;min-height:380px;flex-basis:225px;min-width:225px}
   .master-side-menu{grid-template-columns:repeat(5,1fr)}
 }
+
+
+/* v20260830-3 — final UI completion */
+.master-side-title{height:22px;display:flex;align-items:center;justify-content:space-between;padding:0 4px;color:#d7c13e;font-size:8px;letter-spacing:.5px;border-bottom:1px solid #30383b}
+.master-side-title span{color:#697478}
+.master-side-dock{height:410px!important;min-height:410px!important;max-height:410px!important;flex:0 0 248px!important;min-width:248px!important;box-sizing:border-box}
+.master-side-content{background:#080b0d;border:1px solid #252c2f;border-radius:3px;padding:5px;overflow-y:auto!important;overflow-x:hidden!important}
+.master-side-content>*{box-sizing:border-box}
+.master-side-content input:not([type="range"]),.master-side-content select,.master-side-content button{background:#111719!important;color:#dfe4e6!important;border:1px solid #454d50!important;box-shadow:none!important}
+.master-side-content input[type="range"]{background:transparent!important;border:0!important}
+.master-side-content input::placeholder{color:#727c80!important}
+.master-side-content button{font-weight:600}
+.master-side-dock.show-fx-focus .bus-fx-masters>label,
+.master-side-dock.show-fx-focus .bus-fx-masters>strong:first-child{display:none!important}
+.master-side-dock.show-fx-focus .bus-fx-masters .fx-controls{display:block!important;margin-top:0!important}
+.master-side-dock.show-fx-focus .bus-fx-masters .fx-controls>strong{display:block!important}
+.master-side-content .scene-panel,.master-side-content .history-panel,.master-side-content .lock-panel,.master-side-content .connection-panel,.master-side-content .mapper-panel,.master-side-content .hardware-test-panel,.master-side-content .esp32-sim-panel,.master-side-content .usb-audio-panel,.master-side-content .output-routing,.master-side-content .bus-fx-masters{margin:0 0 6px!important}
+.master-side-content .mapper-panel,.master-side-content .hardware-test-panel,.master-side-content .esp32-sim-panel,.master-side-content .usb-audio-panel{font-size:8px!important}
+.master-side-content .mapper-panel *,.master-side-content .hardware-test-panel *,.master-side-content .esp32-sim-panel *,.master-side-content .usb-audio-panel *{max-width:100%}
+.screen-tab-panel{position:relative;min-height:347px;height:347px;padding:12px;background:radial-gradient(circle at 38% 45%,#0b252b,#081012 58%,#060809);overflow:hidden}
+.screen-tab-panel[hidden]{display:none!important}
+.screen-view{height:100%;overflow:auto;color:#dce2e4}
+.screen-view[hidden]{display:none!important}
+.screen-view-head{height:34px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #303b3f;margin-bottom:10px;color:#e7ecee}
+.screen-view-head b{color:#f0d039;font-size:12px}
+.screen-view-head span{color:#758085;font-size:8px}
+.meter-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;height:190px}
+.meter-grid article{display:flex;flex-direction:column;align-items:center;gap:5px;border:1px solid #28363a;background:#070b0c;padding:8px}
+.meter-grid article>b{font-size:9px;color:#9da7aa}
+.meter-grid article>span{font-size:9px;color:#d5dadd}
+.meter-v{width:24px;height:140px;border:1px solid #354146;background:#020405;display:flex;align-items:flex-end;padding:2px}
+.meter-v em{display:block;width:100%;height:10%;background:linear-gradient(to top,#1dbb4e 0 55%,#e1c522 55% 82%,#e63a3a 82%);transition:height .2s}
+.meter-channel-row{display:flex;gap:5px;height:82px;overflow-x:auto;padding:4px 0}
+.meter-channel-row>span{flex:0 0 28px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:6px;color:#8e989c}
+.meter-channel-row i{height:58px;width:8px;background:#06090a;border:1px solid #283235;display:flex;align-items:flex-end}
+.meter-channel-row em{display:block;width:100%;background:#18b94a}
+.eq-board{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.eq-board label{display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid #303c40;background:#080c0d}
+.eq-board b{color:#d6bf38;font-size:9px}
+.eq-board input[type="range"],.fx-board input[type="range"]{width:100%;accent-color:#dfc532}
+.eq-board output{font-size:10px;color:#e2e7e9;text-align:center}
+.eq-note{margin-top:12px;padding:8px;border:1px solid #283437;color:#7f8a8e;font-size:8px}
+.fx-board{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fx-board label,.routing-board label{display:flex;flex-direction:column;gap:4px;color:#8c979a;font-size:8px}
+.fx-board select,.routing-board select{height:30px;background:#111719;color:#e1e5e7;border:1px solid #444d50}
+.fx-board input{height:28px}
+.screen-open-menu{margin-top:12px;height:30px;background:linear-gradient(#343b3e,#15191b);color:#e1c733;border:1px solid #5d5225;border-radius:3px;padding:0 10px;font-size:8px}
+.routing-board{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.routing-board select{padding:0 6px}
+.route-flow{grid-column:1/-1;border:1px solid #29363a;background:#070b0c;padding:14px;text-align:center;color:#aab4b7;font-size:9px}
+.setup-board{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.setup-board div{border:1px solid #303b3f;background:#080c0d;padding:14px;display:flex;flex-direction:column;gap:6px}
+.setup-board b{color:#d3bd37;font-size:8px}.setup-board span{color:#dbe0e2;font-size:11px}
+.master{align-self:stretch!important}
+@media(max-width:1100px){
+ .master-side-dock{flex-basis:220px!important;min-width:220px!important}
+ .master-side-menu{grid-template-columns:repeat(3,1fr)!important}
+ .screen-tab-panel{min-height:330px;height:330px}
+}
+@media(max-width:650px){
+ .master-side-dock{height:380px!important;min-height:380px!important;max-height:380px!important;flex-basis:225px!important;min-width:225px!important}
+ .master-side-menu{grid-template-columns:repeat(5,1fr)!important}
+ .screen-tab-panel{min-height:330px;height:330px;padding:8px}
+ .eq-board{grid-template-columns:repeat(2,1fr)}
+ .meter-grid{gap:6px;height:180px}
+ .meter-v{height:125px}
+ .fx-board{grid-template-columns:1fr}
+ .topbar{overflow:hidden}
+ .top-actions{max-width:100%;overflow-x:auto}
+}
