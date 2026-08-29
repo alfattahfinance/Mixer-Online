@@ -1,0 +1,129 @@
+name: Fix integrated music playback
+
+on:
+  push:
+    paths-ignore:
+      - "app.js"
+      - ".github/workflows/fix-music-playback.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch playback gesture handling
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path("app.js")
+          s = p.read_text(encoding="utf-8")
+
+          start = s.index("async function playMusicAt(i){")
+          end = s.index("function isAudioFile(file){", start)
+
+          replacement = r'''async function playMusicAt(i){
+if(!musicQueue.length)return;
+const request=++musicToken;
+musicIndex=Math.max(0,Math.min(i,musicQueue.length-1));
+stopIntegratedMixerAudio();
+const file=musicQueue[musicIndex],e=playerEls();
+const target=state.channels[Math.max(0,Math.min(state.channels.length-1,Number(e.channel?.value||0)))];
+if(!target){if(e.state)e.state.textContent="NO CHANNEL";return}
+const token=request;
+try{
+  ensureAudio();
+  if(ctx.state==="suspended")ctx.resume().catch(()=>{});
+  const url=URL.createObjectURL(file);
+  musicObjectUrl=url;
+  const audio=new Audio();
+  audio.preload="auto";
+  audio.loop=false;
+  audio.volume=Math.max(0,Math.min(1,Number(e.volume?.value||1)));
+  musicAudio=audio;
+  musicCard=target;
+  e.now.textContent=file.name||"Audio";
+  e.state.textContent="LOADING";
+  e.play.textContent="⏸ PAUSE";
+  renderMusicQueue();
+  audio.src=url;
+  audio.load();
+  try{
+    musicAudioNode=ctx.createMediaElementSource(audio);
+    channelAudio(target,musicAudioNode);
+  }catch(err){
+    musicAudioNode=null;
+  }
+  state.sources.set(target.dataset.channel,{element:audio,card:target});
+  target.querySelector(".input-route").value="audio";
+  state.routing[target.dataset.channel]="audio";
+  audio.ontimeupdate=()=>{
+    if(token!==musicToken)return;
+    const p=audio.duration?audio.currentTime/audio.duration*100:0;
+    if(e.progress)e.progress.style.width=p+"%";
+    if(e.current)e.current.textContent=fmtTime(audio.currentTime);
+    if(e.duration)e.duration.textContent=fmtTime(audio.duration);
+  };
+  audio.onended=()=>{
+    if(token!==musicToken)return;
+    cleanupIntegratedMusic();
+    state.sources.delete(target.dataset.channel);
+    let n=musicIndex;
+    if(audioPlayMode==="random"&&musicQueue.length>1){
+      do{n=Math.floor(Math.random()*musicQueue.length)}while(n===musicIndex);
+    }else n=musicIndex+1;
+    if(n<musicQueue.length)playMusicAt(n);
+    else{e.state.textContent="SELESAI";e.play.textContent="▶ PLAY";}
+  };
+  audio.onerror=()=>{
+    if(token!==musicToken)return;
+    const code=audio.error?.code;
+    cleanupIntegratedMusic();
+    state.sources.delete(target.dataset.channel);
+    e.state.textContent="ERROR AUDIO";
+    e.play.textContent="▶ PLAY";
+    setStatus("Gagal membaca file "+(file.name||"audio")+" • code "+(code??"unknown"));
+  };
+  await audio.play();
+  if(request!==musicToken)return;
+  e.state.textContent="PLAYING";
+  setStatus((musicIndex+1)+"/"+musicQueue.length+" • "+file.name+" → "+target.dataset.channel.toUpperCase());
+}catch(err){
+  cleanupIntegratedMusic();
+  state.sources.delete(target.dataset.channel);
+  e.state.textContent="GAGAL MEMUTAR";
+  e.play.textContent="▶ PLAY";
+  setStatus("Gagal memutar "+(file.name||"audio")+" • "+(err?.name||"Error")+": "+(err?.message||"Browser menolak audio"));
+}
+}
+'''
+          p.write_text(s[:start] + replacement + s[end:], encoding="utf-8")
+          PY
+      - name: Remove async resume from pause path
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path("app.js")
+          s=p.read_text(encoding="utf-8")
+          old='if(musicAudio.paused){resumeAudio().then(async()=>{try{await musicAudio?.play();e.play.textContent="⏸ PAUSE";e.state.textContent="PLAYING"}catch(err){e.state.textContent="GAGAL MEMUTAR";setStatus("Browser menolak audio: "+(err?.message||"tekan PLAY lagi"))}})}else'
+          new='if(musicAudio.paused){ensureAudio();if(ctx.state==="suspended")ctx.resume().catch(()=>{});musicAudio.play().then(()=>{e.play.textContent="⏸ PAUSE";e.state.textContent="PLAYING"}).catch(err=>{e.state.textContent="GAGAL MEMUTAR";setStatus("Browser menolak audio: "+(err?.message||"tekan PLAY lagi"))})}else'
+          if old not in s:
+              raise SystemExit("pause-path pattern not found")
+          p.write_text(s.replace(old,new,1),encoding="utf-8")
+          PY
+      - name: Verify patch
+        run: |
+          grep -q 'if(ctx.state==="suspended")ctx.resume().catch(()=>{})' app.js
+          node --check app.js
+      - name: Commit fix and remove helper workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app.js .github/workflows/fix-music-playback.yml
+          git commit -m "fix: preserve PLAY gesture for integrated music playback"
+          git push
