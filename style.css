@@ -71,3 +71,7 @@ body{font-size:10px;overflow-x:hidden}
 
 /* v58 correct mixer gestures */
 .knob-row .knob,.eq-grid .knob,.master-knobs input{touch-action:none}.fader{touch-action:none;cursor:grab}.fader:active{cursor:grabbing}.send-list input,.echo-panel input{touch-action:none;cursor:grab}
+
+/* v59 functional UI states */
+.channel-collapsed{min-height:44px!important}.channel-collapsed>*:not(.channel-head){display:none!important}.channel-collapsed .channel-head{margin-bottom:0}
+.detail-panel{margin-top:5px;padding:10px;background:#0c0f10;border:1px solid #343a3e;border-radius:2px;box-shadow:inset 0 1px 5px #050607;color:#8d969b;font:8px monospace}.detail-panel strong{display:block;color:var(--gold2);font-size:9px;margin-bottom:8px}.detail-panel div{display:flex;justify-content:space-between;padding:5px 2px;border-bottom:1px solid #252a2c}.detail-panel b{color:#d0d5d7;font-weight:normal}
