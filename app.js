@@ -311,6 +311,24 @@ function initDeviceMapping(){const p=MixerProfiles.get().profile,n=$("#profileNa
 function controlCommand(card,control,value){const ch=card?.dataset?.channel;if(!ch)return;MixerControl.setControl(ch,control,value)}
 function restoreControl(card,selector,control){const saved=MixerControl.getControls()?.[card.dataset.channel]?.[control];if(saved===undefined)return;const el=card.querySelector(selector);if(el){el.value=saved;el.dispatchEvent(new Event("input"))}}
 bindAllRangeControls();
+/* v78 — definitive CH MUTE binding: delegated pointer handler */
+(function bindChannelMuteDefinitive(){
+  const box=document.querySelector("#channels");
+  if(!box||box.dataset.muteFixBound)return;
+  box.dataset.muteFixBound="1";
+  const toggle=(e)=>{
+    const btn=e.target.closest(".channel .channel-actions .mute");
+    if(!btn||e.target!==btn)return;
+    e.preventDefault();e.stopImmediatePropagation();
+    const card=btn.closest(".channel"); if(!card)return;
+    const on=btn.classList.toggle("active");
+    const s=card.querySelector(".mute-status");
+    if(s)s.textContent="MUTE: "+(on?"ON":"OFF");
+    card._audio?.update();
+    controlCommand(card,"mute",on?1:0);
+  };
+  box.addEventListener("pointerup",toggle,true);
+})(); 
 function initControlEngine(){state.channels.forEach(card=>{restoreControl(card,".fader","fader");restoreControl(card,".gain","gain");restoreControl(card,".pan","pan");restoreControl(card,".bass","low");restoreControl(card,".mid","mid");restoreControl(card,".treble","high")});if(state._controlEngineBound)return;state._controlEngineBound=true;const box=$("#channels");if(!box)return;box.addEventListener("input",e=>{const el=e.target;if(state.feedbackApplying||window.MixerFeedback?._applying)return;if(!el.matches("input[type=range]"))return;if(el.closest(".master"))return;const card=el.closest(".channel");if(!card)return;const control=el.classList.contains("fader")?"fader":el.classList.contains("gain")?"gain":el.classList.contains("pan")?"pan":el.classList.contains("bass")?"low":el.classList.contains("mid")?"mid":el.classList.contains("treble")?"high":el.closest(".send-list")?.children[0]===el.parentElement?"bus1":el.closest(".send-list")?.children[1]===el.parentElement?"bus2":"fx1";controlCommand(card,control,el.value)});box.addEventListener("click",e=>{const b=e.target;if(!b.matches(".mute,.solo"))return;const card=b.closest(".channel");if(card)controlCommand(card,b.classList.contains("mute")?"mute":"solo",b.classList.contains("active")?1:0)});MixerControl.onCommand(c=>{const e=$("#connectionStatus");if(e&&!MixerControl.state.connected)e.title="Last command: "+c.channel+" / "+c.control+" = "+c.value})}
 // Independent channel faders: channel controls never mirror MASTER.
 const originalBuild=buildChannels;
