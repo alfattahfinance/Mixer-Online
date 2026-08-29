@@ -255,43 +255,20 @@ function bindPhoneMediaButtons(){
   const rec=document.getElementById("phoneRecorder");
   const files=document.getElementById("phoneFiles");
   const music=document.getElementById("phoneMusic");
-
   rec?.addEventListener("click",()=>{
-    // Android/browser will offer the system recorder when supported.
-    const a=document.createElement("a");
-    a.href="intent:#Intent;action=android.provider.MediaStore.RECORD_SOUND;end";
-    a.click();
-    setStatus("Membuka Perekam bawaan ponsel…");
+    if(window.NativeMedia?.openRecorder) NativeMedia.openRecorder();
+    else {const a=document.createElement("input");a.type="file";a.accept="audio/*";a.capture="microphone";a.click();}
   });
-
   files?.addEventListener("click",()=>{
-    const input=document.createElement("input");
-    input.type="file";
-    input.multiple=true;
-    input.accept="audio/*,video/*,.pdf,.txt,.jpg,.jpeg,.png";
-    input.click();
+    if(window.NativeMedia?.openFiles) NativeMedia.openFiles();
+    else {const a=document.createElement("input");a.type="file";a.multiple=true;a.click();}
   });
-
   music?.addEventListener("click",()=>{
-    // Use Android's standard audio-player intent; fall back to ACTION_VIEW.
-    const intents=[
-      "intent:#Intent;action=android.intent.action.MUSIC_PLAYER;end",
-      "intent:#Intent;action=android.intent.action.VIEW;type=audio/*;end"
-    ];
-    let launched=false;
-    for(const href of intents){
-      try{
-        const a=document.createElement("a");
-        a.href=href;
-        a.style.display="none";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        launched=true;
-        break;
-      }catch(_){}
+    if(window.NativeMedia?.openMusic) NativeMedia.openMusic();
+    else {
+      const a=document.createElement("input");a.type="file";a.accept="audio/*";a.multiple=true;a.click();
+      setStatus("Pilih musik dari ponsel…");
     }
-    setStatus(launched?"Membuka aplikasi Musik/pemutar audio…":"Pemutar musik tidak tersedia di ponsel");
   });
 }
 
