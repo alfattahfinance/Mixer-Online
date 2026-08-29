@@ -26,10 +26,10 @@ body{font-size:10px;overflow-x:hidden}
 .level-readout{height:16px;margin:0 18px 3px 0;padding:2px 5px;text-align:right;background:#090b0c;border:1px solid #2d3336;border-radius:2px;color:#9ba3a8;font:8px monospace}
 .knob-row,.eq-grid{display:grid;gap:5px;margin-right:15px}.knob-row{grid-template-columns:1fr 1fr}.eq-grid{grid-template-columns:repeat(3,1fr);margin-top:4px}
 .knob-row label,.eq-grid label{display:flex;flex-direction:column;align-items:center;gap:2px;color:#8b9499;font-size:7px;text-transform:uppercase}
-.knob{appearance:none;-webkit-appearance:none;width:40px!important;height:40px!important;padding:0!important;margin:1px auto;border:2px solid #0a0b0c!important;border-radius:50%!important;box-shadow:inset 0 1px 2px #73787a,0 2px 4px #000;cursor:grab;touch-action:none;position:relative;background:radial-gradient(circle at 38% 35%,#62686a 0,#303538 35%,#111314 58%,#050607 72%,#4a4f51 74%,#181a1b 100%)}
+.knob{appearance:none;-webkit-appearance:none;width:46px!important;height:46px!important;padding:0!important;margin:2px auto;border:2px solid #0a0b0c!important;border-radius:50%!important;box-shadow:inset 0 2px 3px #73787a,0 3px 5px #000;cursor:grab;touch-action:none;position:relative;background:radial-gradient(circle at 38% 35%,#6c7274 0,#353a3c 34%,#151718 58%,#070809 72%,#4b5052 74%,#181a1b 100%);transition:filter .08s ease}
 .knob:active{cursor:grabbing}
 .knob::-webkit-slider-runnable-track{height:40px;background:transparent}.knob::-webkit-slider-thumb{-webkit-appearance:none;width:4px;height:17px;margin-top:0;border:0;border-radius:2px;background:var(--gold2);box-shadow:0 0 5px var(--gold);transform:rotate(calc((var(--control-value, .5) * 270deg) - 135deg));transform-origin:2px 20px}
-.knob::-moz-range-track{height:40px;background:transparent}.knob::-moz-range-thumb{width:4px;height:17px;border:0;border-radius:2px;background:var(--gold2);box-shadow:0 0 5px var(--gold);transform:rotate(calc((var(--control-value, .5) * 270deg) - 135deg));transform-origin:2px 20px}
+.knob::-moz-range-track{height:46px;background:transparent}.knob::-moz-range-thumb{width:6px;height:18px;border:0;border-radius:3px;background:var(--gold2);box-shadow:0 0 6px var(--gold);}
 .send-list{margin:6px 15px 5px 0;padding:4px 5px;background:#0c0f10;border:1px solid #30363a;border-radius:2px;box-shadow:inset 0 2px 5px #050607;color:#858e93;font-size:7px}
 .send-list>div{display:grid;grid-template-columns:35px 1fr;align-items:center;gap:4px;height:17px;position:relative}.send-list>div:before{content:"";width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green);position:absolute;left:-2px}
 .send-list input{width:100%;height:9px;accent-color:var(--gold);filter:drop-shadow(0 1px 2px #000)}
@@ -75,3 +75,9 @@ body{font-size:10px;overflow-x:hidden}
 /* v59 functional UI states */
 .channel-collapsed{min-height:44px!important}.channel-collapsed>*:not(.channel-head){display:none!important}.channel-collapsed .channel-head{margin-bottom:0}
 .detail-panel{margin-top:5px;padding:10px;background:#0c0f10;border:1px solid #343a3e;border-radius:2px;box-shadow:inset 0 1px 5px #050607;color:#8d969b;font:8px monospace}.detail-panel strong{display:block;color:var(--gold2);font-size:9px;margin-bottom:8px}.detail-panel div{display:flex;justify-content:space-between;padding:5px 2px;border-bottom:1px solid #252a2c}.detail-panel b{color:#d0d5d7;font-weight:normal}
+
+/* v60 realistic responsive touch controls */
+.knob{background:conic-gradient(from -135deg,#d8bd58 0deg,transparent 0deg 270deg,rgba(0,0,0,.0) 270deg),radial-gradient(circle at 38% 35%,#6c7274 0,#353a3c 34%,#151718 58%,#070809 72%,#4b5052 74%,#181a1b 100%)}
+.fader{width:50px!important;background:linear-gradient(90deg,transparent 35%,#555b5e 36% 39%,#080a0b 40% 60%,#555b5e 61% 64%,transparent 65%);touch-action:none}
+.fader::-webkit-slider-thumb{width:34px;height:16px;margin-left:-15px;border-radius:3px;background:linear-gradient(#e0e2e3,#8b9193 45%,#303436);border:1px solid #080909;box-shadow:0 2px 4px #000,0 0 3px #777}
+.fader::-moz-range-thumb{width:34px;height:16px;border-radius:3px;background:#9a9fa1;border:1px solid #080909;box-shadow:0 2px 4px #000}
