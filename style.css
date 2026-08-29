@@ -427,3 +427,39 @@ body{
  .channel{min-height:720px}
  .master{min-height:780px}
 }
+
+/* v67 — FIX: knob bezel stays fixed, fader track is genuinely vertical */
+.knob{
+ position:relative!important;
+ overflow:visible!important;
+ transform:none!important;
+}
+.knob::before{
+ transform:none!important;
+}
+.knob::after{
+ transform:rotate(calc((var(--control-value,.5) - .5)*270deg))!important;
+ transform-origin:2px 24px!important;
+}
+.fader{
+ writing-mode:vertical-lr!important;
+ direction:rtl!important;
+ appearance:none!important;-webkit-appearance:none!important;
+ width:46px!important;height:250px!important;
+ transform:none!important;
+ margin:0 auto!important;
+ background:linear-gradient(90deg,transparent 20%,#0a0c0d 21% 29%,#686e70 30% 34%,#101213 35% 65%,#686e70 66% 70%,#0a0c0d 71% 79%,transparent 80%)!important;
+}
+.fader::-webkit-slider-runnable-track{
+ width:5px!important;height:250px!important;
+ background:repeating-linear-gradient(to bottom,#858b8d 0 1px,transparent 1px 12px)!important;
+}
+.fader::-webkit-slider-thumb{
+ width:44px!important;height:19px!important;
+ margin-left:-19px!important;margin-top:0!important;
+}
+.fader::-moz-range-track{width:5px!important;height:250px!important}
+.fader::-moz-range-thumb{width:44px!important;height:19px!important}
+.master .fader{height:300px!important}
+.master .fader::-webkit-slider-runnable-track{height:300px!important}
+.master .fader::-moz-range-track{height:300px!important}
