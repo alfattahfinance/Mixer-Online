@@ -505,3 +505,23 @@ body{
  .fader,#masterFader{height:260px!important;min-height:260px!important}
  .master .fader,#masterFader{height:310px!important;min-height:310px!important}
 }
+
+/* v70 — rotary knob: FIXED bezel/container, only indicator rotates */
+.knob{
+  transform:none!important;
+  rotate:none!important;
+  position:relative!important;
+  overflow:visible!important;
+}
+.knob::before{
+  transform:none!important;
+  rotate:none!important;
+}
+.knob::after{
+  transform-origin:2px 24px!important;
+  rotate:calc((var(--control-value,.5) - .5)*270deg)!important;
+}
+.knob:active{
+  transform:none!important;
+  rotate:none!important;
+}
