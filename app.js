@@ -103,14 +103,16 @@ const file=musicQueue[musicIndex],e=playerEls();
 const target=state.channels[Math.max(0,Math.min(state.channels.length-1,Number(e.channel?.value||0)))];
 if(!target){if(e.state)e.state.textContent="NO CHANNEL";return}
 const token=request;
-let directPlayback=false;
+let routed=false,url="",audio=null;
 try{
 ensureAudio();
 if(ctx.state==="suspended")ctx.resume().catch(()=>{});
-const url=URL.createObjectURL(file);
+url=URL.createObjectURL(file);
 musicObjectUrl=url;
-const audio=new Audio();
+audio=new Audio();
 audio.preload="auto";
+audio.playsInline=true;
+audio.autoplay=false;
 audio.loop=false;
 audio.volume=Math.max(0,Math.min(1,Number(e.volume?.value||1)));
 musicAudio=audio;
@@ -121,17 +123,6 @@ e.play.textContent="⏸ PAUSE";
 renderMusicQueue();
 audio.src=url;
 audio.load();
-try{
-musicAudioNode=ctx.createMediaElementSource(audio);
-channelAudio(target,musicAudioNode);
-}catch(err){
-directPlayback=true;
-musicAudioNode=null;
-setStatus("Audio langsung — routing WebAudio tidak tersedia");
-}
-state.sources.set(target.dataset.channel,{element:audio,card:target});
-target.querySelector(".input-route").value="audio";
-state.routing[target.dataset.channel]="audio";
 audio.ontimeupdate=()=>{
 if(token!==musicToken)return;
 const p=audio.duration?audio.currentTime/audio.duration*100:0;
@@ -152,23 +143,60 @@ else{e.state.textContent="SELESAI";e.play.textContent="▶ PLAY";}
 };
 audio.onerror=()=>{
 if(token!==musicToken)return;
-const msg=audio.error?.message||("code "+(audio.error?.code??"unknown"));
+const code=audio.error?.code;
+const msg=audio.error?.message||({1:"ABORTED",2:"NETWORK",3:"DECODE",4:"FORMAT TIDAK DIDUKUNG"}[code]||"MEDIA ERROR");
 cleanupIntegratedMusic();
 state.sources.delete(target.dataset.channel);
 e.state.textContent="ERROR AUDIO";
 e.play.textContent="▶ PLAY";
-setStatus("Gagal membaca file "+(file.name||"audio")+" • "+msg);
+setStatus("Gagal memutar "+(file.name||"audio")+" • "+msg);
 };
+// Start native playback first from the explicit PLAY gesture.
+// This is more reliable on Android/Chrome for local Blob/File audio.
+try{
 await audio.play();
-if(request!==musicToken)return;
-e.state.textContent="PLAYING";
-setStatus((musicIndex+1)+"/"+musicQueue.length+" • "+file.name+" → "+target.dataset.channel.toUpperCase()+(directPlayback?" • DIRECT":""));
-}catch(err){
+}catch(firstErr){
+try{
+if(ctx.state==="suspended")await ctx.resume();
+await audio.play();
+}catch(secondErr){
+const err=secondErr||firstErr;
+const reason=err?.name==="NotAllowedError"?"IZIN PLAYBACK DITOLAK":
+err?.name==="NotSupportedError"?"FORMAT AUDIO TIDAK DIDUKUNG":
+(err?.message||err?.name||"Browser menolak audio");
 cleanupIntegratedMusic();
 state.sources.delete(target.dataset.channel);
 e.state.textContent="GAGAL MEMUTAR";
 e.play.textContent="▶ PLAY";
-setStatus("Gagal memutar "+(file.name||"audio")+" • "+(err?.name||"Error")+": "+(err?.message||"Browser menolak audio"));
+setStatus("Gagal memutar "+(file.name||"audio")+" • "+reason);
+return;
+}
+}
+if(request!==musicToken){stopAudioElement(audio);return}
+// Native playback is already working. Route the same element through the
+// mixer only after playback succeeds; if routing fails, keep direct playback.
+try{
+musicAudioNode=ctx.createMediaElementSource(audio);
+channelAudio(target,musicAudioNode);
+routed=true;
+}catch(err){
+musicAudioNode=null;
+routed=false;
+}
+state.sources.set(target.dataset.channel,{element:audio,card:target});
+target.querySelector(".input-route").value="audio";
+state.routing[target.dataset.channel]="audio";
+e.state.textContent="PLAYING";
+setStatus((musicIndex+1)+"/"+musicQueue.length+" • "+file.name+" → "+target.dataset.channel.toUpperCase()+(routed?" • MIXER":" • DIRECT"));
+}catch(err){
+try{if(audio)stopAudioElement(audio)}catch{}
+try{if(url)URL.revokeObjectURL(url)}catch{}
+if(state.sources.get(target.dataset.channel)?.element===audio)state.sources.delete(target.dataset.channel);
+disposeChannelAudio(target);
+musicAudio=null;musicAudioNode=null;musicCard=null;musicObjectUrl=null;
+e.state.textContent="GAGAL MEMUTAR";
+e.play.textContent="▶ PLAY";
+setStatus("Gagal memutar "+(file?.name||"audio")+" • "+(err?.name||"Error")+": "+(err?.message||"Browser gagal membaca audio"));
 }}
 function isAudioFile(file){if(!file)return false;const type=String(file.type||"").toLowerCase();if(type.startsWith("audio/"))return true;const name=String(file.name||"").toLowerCase();return /\\.(mp3|m4a|aac|wav|ogg|oga|opus|webm|flac)$/i.test(name)}
 function loadMusicPlayerFiles(files){const list=[...(files||[])].filter(isAudioFile);if(!list.length){setStatus("File musik tidak dikenali");return}stopMusicOnly();musicQueue=list;musicIndex=0;renderMusicQueue();const e=playerEls();if(e.state)e.state.textContent=list.length+" lagu siap • tekan PLAY";if(e.play)e.play.textContent="▶ PLAY";setStatus("Playlist siap — tekan PLAY untuk memulai")}
