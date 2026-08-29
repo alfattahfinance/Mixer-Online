@@ -273,3 +273,157 @@ footer{display:none!important}
  .master .fader{height:300px!important}
  .music-player-main{gap:5px!important}
 }
+
+/* v66 — FULL PHYSICAL MIXER FACEPLATE */
+body{
+ background:
+ radial-gradient(circle at 15% 8%,rgba(255,255,255,.08),transparent 22%),
+ radial-gradient(circle at 85% 18%,rgba(255,255,255,.05),transparent 20%),
+ linear-gradient(180deg,#2c3032 0,#111416 12%,#07090a 100%)!important;
+}
+.mixer{padding:10px!important}
+.device-bar,.device-config,.music-player{
+ border-radius:4px!important;
+ background:linear-gradient(180deg,#4a4e50 0,#292d2f 7%,#171a1c 52%,#0c0e0f 100%)!important;
+ border:1px solid #666b6d!important;
+ box-shadow:inset 0 1px rgba(255,255,255,.25),inset 0 -1px #050606,0 4px 12px #000!important;
+}
+.device-bar:before,.device-config:before{
+ content:"";display:block;width:7px;height:7px;border-radius:50%;
+ background:#17191a;box-shadow:inset 0 1px 1px #777,0 1px 2px #000;
+}
+.channels{
+ padding:8px!important;gap:8px!important;
+ background:linear-gradient(180deg,#07090a,#1b1e20 50%,#070809)!important;
+ border:1px solid #666b6d!important;
+ box-shadow:inset 0 1px #777b7d,inset 0 -1px #000,0 5px 18px #000!important;
+}
+.channel,.master{
+ min-height:760px;
+ padding:8px!important;
+ border-radius:4px!important;
+ position:relative;
+ background:
+ linear-gradient(90deg,rgba(255,255,255,.025),transparent 14%,transparent 86%,rgba(0,0,0,.16)),
+ linear-gradient(180deg,#44494b 0,#303537 4%,#25292b 18%,#191d1f 55%,#101213 100%)!important;
+ border:1px solid #717678!important;
+ box-shadow:
+ inset 1px 0 rgba(255,255,255,.08),
+ inset -1px 0 #090a0b,
+ inset 0 1px rgba(255,255,255,.25),
+ inset 0 -1px #050606,
+ 0 5px 12px #000!important;
+}
+.channel:before,.master:before{
+ content:"";position:absolute;left:4px;right:4px;top:4px;height:3px;
+ background:linear-gradient(90deg,#151718,#717779,#151718);
+ opacity:.65;pointer-events:none;
+}
+.channel:after,.master:after{
+ top:12px!important;right:12px!important;width:7px!important;height:7px!important;
+}
+.channel-head{
+ margin-top:3px!important;height:38px!important;
+ border-radius:3px!important;
+ background:linear-gradient(#606567,#414648 40%,#292d2f 42%,#202426)!important;
+ border:1px solid #7b8082!important;
+ box-shadow:inset 0 1px rgba(255,255,255,.32),inset 0 -2px #111314,0 2px 4px #000!important;
+}
+.channel-head strong{text-shadow:0 1px 2px #000!important}
+.channel-tabs{
+ border-radius:2px!important;
+ box-shadow:inset 0 2px 4px #050607!important;
+}
+.route select,.device-bar select,.device-config select,.device-bar input,.device-config input{
+ box-shadow:inset 0 2px 5px #030405,0 1px 1px #555!important;
+}
+.level-readout{
+ box-shadow:inset 0 2px 5px #000!important;
+ border-color:#50575a!important;
+}
+.knob-row,.eq-grid{
+ padding:6px 4px!important;
+ background:linear-gradient(180deg,#171a1c,#0d0f10)!important;
+ border:1px solid #363d40!important;
+ border-radius:3px!important;
+ box-shadow:inset 0 2px 6px #050607,0 1px 1px #555!important;
+}
+.knob-row label,.eq-grid label{font-weight:700!important;letter-spacing:.7px!important}
+.knob{
+ width:58px!important;height:58px!important;
+ border:2px solid #090a0b!important;
+ box-shadow:
+ inset 0 2px 3px rgba(255,255,255,.28),
+ inset 0 -6px 8px #000,
+ 0 2px 2px #777,
+ 0 4px 7px #000!important;
+ background:radial-gradient(circle at 35% 28%,#858a8c 0,#505557 18%,#292d2f 42%,#111314 62%,#656a6c 68%,#161819 74%,#070809 100%)!important;
+}
+.knob::before{
+ inset:9px!important;
+ background:radial-gradient(circle at 35% 30%,#3e4345,#151718 62%,#090a0a)!important;
+ box-shadow:inset 0 1px 2px #000!important;
+}
+.knob::after{
+ top:5px!important;height:18px!important;width:4px!important;
+ background:#f2d45e!important;
+ box-shadow:0 0 7px #efd16b!important;
+ transform-origin:2px 24px!important;
+}
+.send-list{
+ border-radius:3px!important;
+ box-shadow:inset 0 2px 6px #000,0 1px 1px #555!important;
+}
+.fader{
+ width:46px!important;height:250px!important;
+ border-radius:3px!important;
+ background:
+ linear-gradient(90deg,transparent 20%,#0a0c0d 21% 29%,#686e70 30% 34%,#101213 35% 65%,#686e70 66% 70%,#0a0c0d 71% 79%,transparent 80%)!important;
+ box-shadow:inset 0 0 3px #000!important;
+}
+.fader::-webkit-slider-runnable-track{
+ width:5px!important;height:250px!important;
+ background:repeating-linear-gradient(to bottom,#858b8d 0 1px,transparent 1px 12px)!important;
+}
+.fader::-webkit-slider-thumb{
+ width:44px!important;height:19px!important;margin-left:-19px!important;
+ background:linear-gradient(180deg,#f4f5f5,#c8cccd 28%,#6c7274 52%,#eceeee 80%,#9ca1a3)!important;
+ border:1px solid #181a1b!important;border-radius:3px!important;
+ box-shadow:0 2px 4px #000,inset 0 1px rgba(255,255,255,.7)!important;
+}
+.fader-value{
+ background:#050707!important;border-color:#5b6265!important;
+ box-shadow:inset 0 2px 4px #000!important;
+}
+.echo-panel,.channel-monitor,.bus-fx-masters,.output-routing,.usb-audio-panel,.esp32-sim-panel,.hardware-test-panel,.mapper-panel,.connection-panel,.lock-panel,.history-panel,.scene-panel{
+ border-radius:3px!important;
+ box-shadow:inset 0 1px rgba(255,255,255,.12),inset 0 -1px #050606,0 2px 5px #000!important;
+}
+.channel-actions button,.master-mute{
+ border-radius:3px!important;
+ text-shadow:0 1px 2px #000!important;
+}
+.master{
+ border-color:#9b8140!important;
+ background:linear-gradient(180deg,#514a35 0,#3c392b 8%,#29281f 28%,#191a16 62%,#101210 100%)!important;
+}
+.master .channel-title{
+ background:linear-gradient(#5b543d,#312f24)!important;
+ border:1px solid #79683d!important;border-radius:3px!important;
+ box-shadow:inset 0 1px #a79563,0 2px 4px #000!important;
+}
+.master-knobs{
+ padding:8px!important;
+ box-shadow:inset 0 2px 6px #000!important;
+}
+.master .fader{height:300px!important}
+.master .fader::-webkit-slider-runnable-track{height:300px!important}
+@media(min-width:1251px){
+ .channels{grid-template-columns:repeat(4,minmax(245px,1fr))!important}
+}
+@media(max-width:560px){
+ .channel,.master{min-height:0}
+ .channels{padding:5px!important}
+ .channel{min-height:720px}
+ .master{min-height:780px}
+}
