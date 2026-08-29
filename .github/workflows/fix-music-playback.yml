@@ -2,9 +2,6 @@ name: Fix integrated music playback
 
 on:
   push:
-    paths-ignore:
-      - "app.js"
-      - ".github/workflows/fix-music-playback.yml"
   workflow_dispatch:
 
 permissions:
@@ -12,6 +9,7 @@ permissions:
 
 jobs:
   fix:
+    if: github.event_name == 'workflow_dispatch' || github.event.head_commit.message != 'fix: preserve PLAY gesture for integrated music playback'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,14 +17,10 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import re
-
           p = Path("app.js")
           s = p.read_text(encoding="utf-8")
-
           start = s.index("async function playMusicAt(i){")
           end = s.index("function isAudioFile(file){", start)
-
           replacement = r'''async function playMusicAt(i){
 if(!musicQueue.length)return;
 const request=++musicToken;
@@ -56,9 +50,7 @@ try{
   try{
     musicAudioNode=ctx.createMediaElementSource(audio);
     channelAudio(target,musicAudioNode);
-  }catch(err){
-    musicAudioNode=null;
-  }
+  }catch(err){ musicAudioNode=null; }
   state.sources.set(target.dataset.channel,{element:audio,card:target});
   target.querySelector(".input-route").value="audio";
   state.routing[target.dataset.channel]="audio";
@@ -112,18 +104,17 @@ try{
           s=p.read_text(encoding="utf-8")
           old='if(musicAudio.paused){resumeAudio().then(async()=>{try{await musicAudio?.play();e.play.textContent="⏸ PAUSE";e.state.textContent="PLAYING"}catch(err){e.state.textContent="GAGAL MEMUTAR";setStatus("Browser menolak audio: "+(err?.message||"tekan PLAY lagi"))}})}else'
           new='if(musicAudio.paused){ensureAudio();if(ctx.state==="suspended")ctx.resume().catch(()=>{});musicAudio.play().then(()=>{e.play.textContent="⏸ PAUSE";e.state.textContent="PLAYING"}).catch(err=>{e.state.textContent="GAGAL MEMUTAR";setStatus("Browser menolak audio: "+(err?.message||"tekan PLAY lagi"))})}else'
-          if old not in s:
-              raise SystemExit("pause-path pattern not found")
+          if old not in s: raise SystemExit("pause-path pattern not found")
           p.write_text(s.replace(old,new,1),encoding="utf-8")
           PY
       - name: Verify patch
         run: |
           grep -q 'if(ctx.state==="suspended")ctx.resume().catch(()=>{})' app.js
           node --check app.js
-      - name: Commit fix and remove helper workflow
+      - name: Commit fix
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app.js .github/workflows/fix-music-playback.yml
-          git commit -m "fix: preserve PLAY gesture for integrated music playback"
+          git add app.js
+          git diff --cached --quiet || git commit -m "fix: preserve PLAY gesture for integrated music playback"
           git push
