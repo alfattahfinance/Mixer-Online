@@ -1,44 +1,37 @@
-/* v20260830-2 — definitive right-side master menu layout */
+/* Definitive layout controller v20260830-3 */
 (function(){
-  const PANELS=["bus-fx-masters","output-routing","scene-panel","history-panel","lock-panel","connection-panel","mapper-panel","hardware-test-panel","esp32-sim-panel","usb-audio-panel"];
-  function init(){
-    const master=document.querySelector(".master"),rack=document.querySelector("#channels");
-    if(!master||!rack||master.dataset.sideMenuReady==="2")return;
-    const panels=PANELS.map(c=>master.querySelector("."+c)).filter(Boolean);
-    if(!panels.length)return;
-    master.dataset.sideMenuReady="2";
-    const dock=document.createElement("aside");
-    dock.className="master-side-dock";
-    dock.setAttribute("aria-label","Menu Master");
-    dock.innerHTML='<div class="master-side-menu" role="tablist">'+
-      '<button type="button" data-tab="panel" class="active">PANEL</button>'+
-      '<button type="button" data-tab="aux">AUX / BUS</button>'+
-      '<button type="button" data-tab="fx">FX</button>'+
-      '<button type="button" data-tab="scenes">SCENES</button>'+
-      '<button type="button" data-tab="setup">SETUP</button>'+
-      '</div><div class="master-side-content"></div>';
-    rack.appendChild(dock);
-    const content=dock.querySelector(".master-side-content");
-    panels.forEach(p=>{
-      const cls=PANELS.find(x=>p.classList.contains(x));
-      p.dataset.sideGroup=cls==="bus-fx-masters"?"panel":cls==="output-routing"?"aux":(cls==="scene-panel"||cls==="history-panel")?"scenes":"setup";
-      content.appendChild(p);
-    });
-    const show=tab=>{
-      dock.dataset.tab=tab;
-      dock.querySelectorAll(".master-side-menu button").forEach(b=>{
-        const active=b.dataset.tab===tab;
-        b.classList.toggle("active",active);
-        b.setAttribute("aria-selected",active?"true":"false");
-      });
-      content.querySelectorAll("[data-side-group]").forEach(p=>{
-        p.hidden=tab==="fx"?p.dataset.sideGroup!=="panel":p.dataset.sideGroup!==tab;
-      });
-      content.scrollTop=0;
-    };
-    dock.querySelectorAll(".master-side-menu button").forEach(b=>b.addEventListener("click",()=>show(b.dataset.tab)));
-    show("panel");
-  }
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
-  setTimeout(init,80);setTimeout(init,300);setTimeout(init,800);
+const G={panel:["bus-fx-masters"],aux:["output-routing"],fx:["bus-fx-masters"],scenes:["scene-panel","history-panel"],setup:["lock-panel","connection-panel","mapper-panel","hardware-test-panel","esp32-sim-panel","usb-audio-panel"]};
+const ALL=[...new Set(Object.values(G).flat())];
+function wait(fn,n){if(fn())return;if(n>0)setTimeout(()=>wait(fn,n-1),120)}
+function initMaster(){
+ const m=document.querySelector(".master"),r=document.querySelector("#channels"); if(!m||!r)return false;
+ if(m.dataset.sideMenuReady==="3")return true;
+ const ps=ALL.map(x=>m.querySelector("."+x)).filter(Boolean); if(!ps.length)return false;
+ const d=document.createElement("aside");d.className="master-side-dock";d.setAttribute("aria-label","Menu Master");
+ d.innerHTML='<div class="master-side-title"><b>MASTER CONTROL</b><span>MENU</span></div><div class="master-side-menu" role="tablist"><button type="button" data-tab="panel" class="active">PANEL</button><button type="button" data-tab="aux">AUX / BUS</button><button type="button" data-tab="fx">FX</button><button type="button" data-tab="scenes">SCENES</button><button type="button" data-tab="setup">SETUP</button></div><div class="master-side-content"></div>';
+ r.appendChild(d);const c=d.querySelector(".master-side-content");
+ ps.forEach(p=>{p.dataset.sidePanel=ALL.find(x=>p.classList.contains(x))||"";c.appendChild(p)});
+ function show(t){d.dataset.tab=t;d.querySelectorAll(".master-side-menu button").forEach(b=>{const on=b.dataset.tab===t;b.classList.toggle("active",on);b.setAttribute("aria-selected",on?"true":"false")});c.querySelectorAll("[data-side-panel]").forEach(p=>{const x=p.dataset.sidePanel;p.hidden=!(G[t]||[]).includes(x)});d.classList.toggle("show-fx-focus",t==="fx");c.scrollTop=0}
+ d.querySelectorAll(".master-side-menu button").forEach(b=>b.addEventListener("click",()=>show(b.dataset.tab)));show("panel");m.dataset.sideMenuReady="3";return true;
+}
+function initScreen(){
+ const s=document.querySelector("#digitalScreen");if(!s||s.dataset.tabsReady==="3")return !!s;
+ const tabs=[...s.querySelectorAll(".screen-tabs button")];const body=s.querySelector(".screen-body");if(!tabs.length||!body)return false;
+ const p=document.createElement("div");p.className="screen-tab-panel";
+ p.innerHTML='<section data-view="meters" class="screen-view"><div class="screen-view-head"><b>METERS</b><span>LIVE CHANNEL MONITOR</span></div><div class="meter-grid"><article><b>INPUT L</b><i class="meter-v"><em id="uiL"></em></i><span>-∞ dB</span></article><article><b>INPUT R</b><i class="meter-v"><em id="uiR"></em></i><span>-∞ dB</span></article><article><b>MASTER</b><i class="meter-v"><em id="uiM"></em></i><span id="uiMdb">-∞ dB</span></article></div><div class="meter-channel-row" id="uiChannelMeters"></div></section>'+
+ '<section data-view="eq" class="screen-view"><div class="screen-view-head"><b>4-BAND EQ</b><span>CHANNEL 1</span></div><div class="eq-board"><label><b>LOW</b><input data-eq=".bass" type="range" min="-12" max="12" step=".5" value="0"><output>0 dB</output></label><label><b>LOW MID</b><input data-eq=".mid" type="range" min="-12" max="12" step=".5" value="0"><output>0 dB</output></label><label><b>HIGH MID</b><input data-eq=".treble" type="range" min="-12" max="12" step=".5" value="0"><output>0 dB</output></label><label><b>GAIN</b><input data-eq=".gain" type="range" min="0" max="2" step=".01" value="1"><output>1.00</output></label></div><div class="eq-note">EQ di sini terhubung langsung ke CH 1. Fader channel tetap independen dari MASTER.</div></section>'+
+ '<section data-view="effect" class="screen-view"><div class="screen-view-head"><b>EFFECT</b><span>FX 1</span></div><div class="fx-board"><label>PRESET<select id="screenFxPreset"><option value="">CUSTOM</option><option value="vocal">VOCAL</option><option value="mc">MC / SPEECH</option><option value="music">MUSIC</option><option value="hall">HALL</option><option value="slap">SLAPBACK</option></select></label><label>TYPE<select id="screenFxType"><option value="delay">DELAY</option><option value="reverb">REVERB</option></select></label><label>TIME<input id="screenFxDelay" type="range" min="0" max="1" step=".01" value=".28"></label><label>FEEDBACK<input id="screenFxFeedback" type="range" min="0" max=".9" step=".01" value=".32"></label><label>WET<input id="screenFxWet" type="range" min="0" max="1" step=".01" value=".25"></label></div><button type="button" class="screen-open-menu" data-open-menu="fx">BUKA FX DI MENU MASTER</button></section>'+
+ '<section data-view="routing" class="screen-view"><div class="screen-view-head"><b>ROUTING</b><span>OUTPUT</span></div><div class="routing-board"><label>OUT 1<select id="screenOut1"><option>MAIN L/R</option><option>AUX 1</option><option>AUX 2</option><option>MONITOR</option></select></label><label>OUT 2<select id="screenOut2"><option>MAIN L/R</option><option>AUX 1</option><option>AUX 2</option><option>MONITOR</option></select></label><div class="route-flow">CH 1–16 → BUS / AUX / FX → MAIN L/R</div></div><button type="button" class="screen-open-menu" data-open-menu="aux">BUKA ROUTING DI MENU MASTER</button></section>'+
+ '<section data-view="setup" class="screen-view"><div class="screen-view-head"><b>SETUP</b><span>DEVICE & SAFETY</span></div><div class="setup-board"><div><b>CHANNELS</b><span id="uiSetupChannels">16</span></div><div><b>DEVICE</b><span id="uiSetupDevice">OFFLINE</span></div><div><b>PROTECTION</b><span>READY</span></div></div><button type="button" class="screen-open-menu" data-open-menu="setup">BUKA SETUP DI MENU MASTER</button></section>';
+ s.appendChild(p);const views=[...p.querySelectorAll(".screen-view")];
+ function open(i){i=Math.max(0,Math.min(5,i));tabs.forEach((b,n)=>b.classList.toggle("active",n===i));const name=["home","meters","eq","effect","routing","setup"][i];body.hidden=name!=="home";p.hidden=name==="home";views.forEach(v=>v.hidden=v.dataset.view!==name);if(name==="eq")syncEq();if(name==="effect")syncFx();if(name==="routing")syncRoute()}
+ tabs.forEach((b,i)=>b.addEventListener("click",()=>open(i)));
+ p.querySelectorAll("[data-open-menu]").forEach(b=>b.addEventListener("click",()=>document.querySelector('.master-side-menu [data-tab="'+b.dataset.openMenu+'"]')?.click()));
+ function syncEq(){const card=document.querySelector(".channel[data-channel='ch1']");if(!card)return;p.querySelectorAll("[data-eq]").forEach(x=>{const y=card.querySelector(x.dataset.eq);if(!y)return;x.value=y.value;const o=x.parentElement.querySelector("output");o.textContent=x.dataset.eq===".gain"?Number(x.value).toFixed(2):Number(x.value).toFixed(1)+" dB";if(!x.dataset.bound){x.dataset.bound="1";x.addEventListener("input",()=>{y.value=x.value;y.dispatchEvent(new Event("input",{bubbles:true}));o.textContent=x.dataset.eq===".gain"?Number(x.value).toFixed(2):Number(x.value).toFixed(1)+" dB"})}})}
+ function syncFx(){[["screenFxPreset","#fxPreset"],["screenFxType","#fxType"],["screenFxDelay","#fxDelay"],["screenFxFeedback","#fxFeedback"],["screenFxWet","#fxWet"]].forEach(([a,b])=>{const x=p.querySelector("#"+a),y=document.querySelector(b);if(!x||!y)return;x.value=y.value;if(!x.dataset.bound){x.dataset.bound="1";x.addEventListener("input",()=>{y.value=x.value;y.dispatchEvent(new Event("input",{bubbles:true}))});x.addEventListener("change",()=>{y.value=x.value;y.dispatchEvent(new Event("change",{bubbles:true}))})}})}
+ function syncRoute(){const ss=document.querySelectorAll(".output-routing select");[[p.querySelector("#screenOut1"),ss[0]],[p.querySelector("#screenOut2"),ss[1]]].forEach(([x,y])=>{if(!x||!y)return;x.value=y.value;if(!x.dataset.bound){x.dataset.bound="1";x.addEventListener("change",()=>{y.value=x.value;y.dispatchEvent(new Event("change",{bubbles:true}))})}})}
+ function meters(){const master=Number(document.querySelector("#masterFader")?.value||0),m=p.querySelector("#uiM");if(m)m.style.height=Math.round(master*100)+"%";const md=p.querySelector("#uiMdb");if(md)md.textContent=master<=.001?"-∞":(20*Math.log10(master)).toFixed(1)+" dB";const row=p.querySelector("#uiChannelMeters"),cs=[...document.querySelectorAll(".channel .fader")].slice(0,16);if(row)row.innerHTML=cs.map((x,i)=>'<span><b>CH '+(i+1)+'</b><i><em style="height:'+Math.round(Number(x.value||0)*100)+'%"></em></i></span>').join("");const n=p.querySelector("#uiSetupChannels");if(n)n.textContent=document.querySelectorAll(".channel").length;const d=p.querySelector("#uiSetupDevice"),st=document.querySelector("#connectionStatus");if(d)d.textContent=st?.textContent||"OFFLINE"}
+ setInterval(meters,500);meters();open(0);s.dataset.tabsReady="3";return true;
+}
+function init(){return initMaster()&&initScreen()}wait(init,30);window.addEventListener("load",()=>wait(init,20));
 })();
