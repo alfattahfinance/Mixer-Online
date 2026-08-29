@@ -658,3 +658,24 @@ input.knob:focus-visible{
 .channel-actions{position:relative!important;z-index:999!important;display:grid!important;pointer-events:auto!important}
 .channel-actions .mute,.channel-actions .solo{position:relative!important;z-index:1000!important;display:block!important;pointer-events:auto!important;touch-action:manipulation!important;user-select:none!important;-webkit-tap-highlight-color:transparent!important}
 .channel-actions button::before,.channel-actions button::after{pointer-events:none!important}
+
+/* v79 — CH MUTE button: explicit visual/button layer */
+.channel .channel-actions{position:relative!important;z-index:10000!important}
+.channel .channel-actions button.mute{
+  appearance:none!important;-webkit-appearance:none!important;
+  position:relative!important;display:inline-flex!important;
+  align-items:center!important;justify-content:center!important;
+  min-height:34px!important;min-width:70px!important;
+  opacity:1!important;visibility:visible!important;
+  pointer-events:auto!important;cursor:pointer!important;
+  color:#dfe5e8!important;background:#252a2e!important;
+  border:1px solid #596168!important;border-radius:4px!important;
+  font-weight:700!important;touch-action:manipulation!important;
+  z-index:10001!important;
+}
+.channel .channel-actions button.mute.active{
+  color:#fff!important;background:#e51f3d!important;
+  border-color:#ff6075!important;
+  box-shadow:0 0 6px rgba(255,48,69,.8),inset 0 0 8px rgba(255,255,255,.12)!important;
+}
+.channel .channel-actions button.mute:active{transform:scale(.97)!important}
