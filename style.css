@@ -143,3 +143,12 @@ footer{margin-top:8px}
  .channel-actions button{min-height:40px}
 }
 @media(min-width:1400px){.channels{grid-template-columns:repeat(4,minmax(245px,1fr))}.master{grid-column:span 1}}
+
+/* v51 — FX section polish */
+.bus-fx-masters{margin-top:6px;padding:7px;border:1px solid #41474a;border-radius:3px;background:linear-gradient(#1b1f20,#101314);box-shadow:inset 0 1px #292d2f}
+.bus-fx-masters>strong,.fx-controls>strong{display:block;color:#c9b66b;font-size:9px;letter-spacing:.5px;margin-bottom:5px}
+.bus-fx-masters>label,.fx-controls>label{display:grid;grid-template-columns:74px 1fr;align-items:center;gap:6px;margin:4px 0;font-size:8px;color:#858e92}
+.bus-fx-masters input[type=range],.fx-controls input[type=range]{width:100%;height:13px}
+.fx-controls{margin-top:7px;padding-top:6px;border-top:1px solid #303538}
+.fx-controls select{width:100%;height:25px;background:#0c0f10;border:1px solid #454b4e;color:#c8ccce;border-radius:2px;font-size:9px;padding:0 5px}
+@media(max-width:620px){.bus-fx-masters{padding:8px}.bus-fx-masters>label,.fx-controls>label{grid-template-columns:82px 1fr;font-size:9px}.fx-controls select{height:34px}.bus-fx-masters input[type=range],.fx-controls input[type=range]{height:18px}}
