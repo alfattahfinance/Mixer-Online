@@ -172,9 +172,7 @@ if(token!==musicToken)return;
 cleanupIntegratedMusic();
 state.sources.delete(target.dataset.channel);
 let n=musicIndex;
-if(audioPlayMode==="random"&&musicQueue.length>1){
-do{n=Math.floor(Math.random()*musicQueue.length)}while(n===musicIndex);
-}else n=musicIndex+1;
+n=musicIndex+1;
 if(n<musicQueue.length)playMusicAt(n);
 else{e.state.textContent="SELESAI";e.play.textContent="▶ PLAY";}
 };
