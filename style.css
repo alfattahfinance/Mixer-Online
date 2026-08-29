@@ -653,3 +653,8 @@ input.knob:focus-visible{
 /* v76 — restore clickable mixer buttons after LED styling */
 .channel-actions,.channel-actions .mute,.channel-actions .solo,.master-mute{position:relative;z-index:20;pointer-events:auto!important;cursor:pointer!important}
 .channel-actions button,.master button{touch-action:manipulation}
+
+/* v77 — CH MUTE hit-area fix: keep buttons above all channel layers */
+.channel-actions{position:relative!important;z-index:999!important;display:grid!important;pointer-events:auto!important}
+.channel-actions .mute,.channel-actions .solo{position:relative!important;z-index:1000!important;display:block!important;pointer-events:auto!important;touch-action:manipulation!important;user-select:none!important;-webkit-tap-highlight-color:transparent!important}
+.channel-actions button::before,.channel-actions button::after{pointer-events:none!important}
