@@ -679,3 +679,27 @@ input.knob:focus-visible{
   box-shadow:0 0 6px rgba(255,48,69,.8),inset 0 0 8px rgba(255,255,255,.12)!important;
 }
 .channel .channel-actions button.mute:active{transform:scale(.97)!important}
+
+/* v80 — remove blue focus/tap glow from CH SOLO/MUTE row */
+.channel .channel-actions,
+.channel .channel-actions:focus,
+.channel .channel-actions:focus-visible,
+.channel .channel-actions:active{
+  outline:none!important;
+  box-shadow:none!important;
+  background-image:none!important;
+  -webkit-tap-highlight-color:transparent!important;
+}
+.channel .channel-actions button:focus,
+.channel .channel-actions button:focus-visible{
+  outline:none!important;
+}
+.channel .channel-actions button:active{
+  box-shadow:none!important;
+}
+.channel .channel-actions button.solo.active{
+  box-shadow:0 0 6px rgba(255,194,26,.75),inset 0 0 6px rgba(255,255,255,.08)!important;
+}
+.channel .channel-actions button.mute.active{
+  box-shadow:0 0 7px rgba(255,48,69,.8),inset 0 0 6px rgba(255,255,255,.08)!important;
+}
