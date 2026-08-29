@@ -23,50 +23,32 @@ el.dataset.touchRangeBound="1";
 let active=false,last=0;
 const step=Number(el.step)||.01,min=Number(el.min),max=Number(el.max),range=max-min;
 const decimals=Math.max(0,String(step).split(".")[1]?.length||0);
-const isKnob=el.classList.contains("knob")||el.classList.contains("gain")||el.classList.contains("pan")||el.classList.contains("bass")||el.classList.contains("mid")||el.classList.contains("treble");
+const isKnob=el.classList.contains("knob");
 const isVertical=vertical||el.classList.contains("fader")||isKnob;
-const pixelsPerRange=isKnob?180:Math.max(90,isVertical?el.getBoundingClientRect().height:el.getBoundingClientRect().width);
-const syncVisual=()=>{
- const v=Number(el.value);
- el.style.setProperty("--control-value",String(range?(v-min)/range:.5));
-};
+const syncVisual=()=>el.style.setProperty("--control-value",String(range?(Number(el.value)-min)/range:.5));
 const setValue=v=>{
- v=Math.max(min,Math.min(max,v));
- const q=step>0?Math.round((v-min)/step)*step+min:v;
- const setter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value")?.set;
- if(setter)setter.call(el,String(q.toFixed(decimals)));else el.value=q.toFixed(decimals);
- syncVisual();
- el.dispatchEvent(new Event("input",{bubbles:true}));
+v=Math.max(min,Math.min(max,v));
+const q=step>0?Math.round((v-min)/step)*step+min:v;
+const setter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value")?.set;
+if(setter)setter.call(el,String(q.toFixed(decimals)));else el.value=q.toFixed(decimals);
+syncVisual();el.dispatchEvent(new Event("input",{bubbles:true}));
 };
-const down=ev=>{
- active=true;
- last=isKnob||isVertical?ev.clientY:ev.clientX;
- el.setPointerCapture?.(ev.pointerId);
- ev.preventDefault();
-};
+const down=ev=>{active=true;last=ev.clientY;el.setPointerCapture?.(ev.pointerId);ev.preventDefault()};
 const move=ev=>{
- if(!active)return;
- const now=isKnob||isVertical?ev.clientY:ev.clientX;
- const delta=now-last;
- if(delta){
-   const pixels=Math.max(60,pixelsPerRange);
-   setValue(Number(el.value)+(isKnob||isVertical?-delta:delta)*range/pixels);
-   last=now;
- }
- ev.preventDefault();
+if(!active)return;
+const delta=ev.clientY-last;
+if(delta){
+const pixels=isKnob?150:Math.max(90,el.getBoundingClientRect().height);
+setValue(Number(el.value)-delta*range/pixels);last=ev.clientY;
+}
+ev.preventDefault();
 };
-const up=()=>{active=false};
+const up=()=>active=false;
 el.addEventListener("pointerdown",down,{passive:false});
 el.addEventListener("pointermove",move,{passive:false});
 el.addEventListener("pointerup",up);
 el.addEventListener("pointercancel",up);
 el.addEventListener("lostpointercapture",up);
-el.addEventListener("wheel",ev=>{
- if(document.activeElement!==el&&isKnob){
-   ev.preventDefault();
-   setValue(Number(el.value)-Math.sign(ev.deltaY)*range/40);
- }
-},{passive:false});
 syncVisual();
 }
 function wire(card){card.querySelector(".mute").onclick=e=>{e.currentTarget.classList.toggle("active");const on=e.currentTarget.classList.contains("active"),s=card.querySelector(".mute-status");if(s)s.textContent="MUTE: "+(on?"ON":"OFF");card._audio?.update();controlCommand(card,"mute",on?1:0)};card.querySelector(".solo").onclick=e=>{const k=card.dataset.channel;e.currentTarget.classList.toggle("active");const on=e.currentTarget.classList.contains("active");on?state.solo.add(k):state.solo.delete(k);const s=card.querySelector(".solo-status");if(s)s.textContent="SOLO: "+(on?"ON":"OFF");state.channels.forEach(c=>c._audio?.update());controlCommand(card,"solo",on?1:0)};const echoBtn=card.querySelector(".echo-on");if(echoBtn)echoBtn.onclick=()=>{echoBtn.classList.toggle("active");echoBtn.textContent=echoBtn.classList.contains("active")?"ON":"OFF";card._audio?.update();controlCommand(card,"echo",echoBtn.classList.contains("active")?1:0)};card.querySelectorAll(".echo-time,.echo-feedback,.echo-mix").forEach(i=>i.addEventListener("input",()=>card._audio?.update()));card.querySelector(".input-route").onchange=e=>{routeHardwareInput(card,e.target.value);setStatus(card.dataset.channel.toUpperCase()+" ← "+(e.target.value==="none"?"—":e.target.value.toUpperCase()))};const f=card.querySelector(".fader"),fv=card.querySelector(".fader-value");if(f){const sync=()=>{fv.textContent=Math.round(+f.value*100)+"%";controlCommand(card,"fader",f.value)};f.addEventListener("input",sync);f.addEventListener("change",sync);}}/* v59 functional UI wiring */
