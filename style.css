@@ -1196,3 +1196,25 @@ footer{display:none}
     height:525px!important;
   }
 }
+
+/* v89 — hard reference layout override */
+@media (min-width:801px){
+  .mixer{display:grid!important;grid-template-columns:minmax(0,1fr) 300px!important;grid-template-rows:auto auto!important;gap:5px!important;max-width:1920px!important}
+  #digitalScreen{grid-column:1!important;grid-row:1!important;height:365px!important}
+  #musicPlayer{grid-column:2!important;grid-row:1!important;height:365px!important}
+  #channels{grid-column:1 / -1!important;grid-row:2!important;display:flex!important;flex-wrap:nowrap!important;overflow-x:auto!important;gap:2px!important;height:515px!important;min-height:515px!important;padding:3px!important}
+  #channels>.channel{flex:0 0 68px!important;width:68px!important;min-width:68px!important;max-width:68px!important;height:505px!important;min-height:505px!important;max-height:505px!important;display:flex!important;flex-direction:column!important;padding:2px!important}
+  #channels>.master{flex:0 0 120px!important;width:120px!important;min-width:120px!important;max-width:120px!important;height:505px!important}
+  #channels>.channel .channel-head{flex:0 0 27px!important;height:27px!important}
+  #channels>.channel .fader{flex:0 0 285px!important;height:285px!important;width:28px!important;margin:2px auto!important}
+  #channels>.channel .channel-actions{display:grid!important;grid-template-columns:1fr!important;gap:2px!important;flex:0 0 48px!important;margin-top:auto!important}
+  #channels>.channel .channel-actions button{height:23px!important;font-size:6px!important}
+}
+@media (min-width:801px) and (max-width:1100px){
+  .mixer{grid-template-columns:minmax(0,1fr) 240px!important}
+  #digitalScreen,#musicPlayer{height:335px!important}
+  #channels{height:500px!important;min-height:500px!important}
+  #channels>.channel{flex-basis:58px!important;width:58px!important;min-width:58px!important;max-width:58px!important;height:490px!important;min-height:490px!important}
+  #channels>.master{flex-basis:100px!important;width:100px!important;min-width:100px!important;max-width:100px!important;height:490px!important}
+  #channels>.channel .fader{height:275px!important;flex-basis:275px!important}
+}
