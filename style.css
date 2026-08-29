@@ -1460,3 +1460,104 @@ body{background:#07090a!important}
   .fx-controls strong{font-size:5px!important}
   .fx-controls label{grid-template-columns:28px 1fr!important}
 }
+
+
+/* v93 — reference-console correction: match the supplied digital-mixer reference instead of the old card layout */
+:root{
+  --ref-bg:#07090a;--ref-surface:#101416;--ref-surface2:#171b1d;
+  --ref-border:#394247;--ref-gold:#e0bd3c;--ref-green:#29d957;
+  --ref-cyan:#18bfe9;--ref-red:#e63b35;
+}
+html,body{background:#07090a!important;color:#d7dcde!important}
+body{font-family:Arial,Helvetica,sans-serif!important;overflow-x:hidden!important}
+.topbar{height:58px!important;min-height:58px!important;padding:6px 10px!important;background:linear-gradient(#171b1d,#0a0c0d 72%,#050607)!important;border-bottom:1px solid #343b3e!important}
+.topbar h1{font-size:15px!important;letter-spacing:2px!important}
+.topbar p{font-size:7px!important}
+.top-actions{gap:4px!important;flex-wrap:nowrap!important}
+.top-actions button,.file-btn,.play-mode{height:34px!important;padding:0 9px!important;background:linear-gradient(#24292b,#101315)!important;border:1px solid #3d4549!important;border-radius:2px!important}
+.mixer{display:grid!important;grid-template-columns:minmax(0,1fr) 300px!important;grid-template-areas:"screen player" "channels channels"!important;gap:5px!important;padding:5px!important;max-width:1540px!important}
+.device-bar,.device-config{display:none!important}
+#digitalScreen{grid-area:screen!important;height:390px!important;min-height:390px!important;margin:0!important;background:#081013!important;border:1px solid #394348!important}
+#musicPlayer{grid-area:player!important;height:390px!important;min-height:390px!important;margin:0!important}
+#channels{grid-area:channels!important}
+
+/* analyzer area */
+#digitalScreen .screen-tabs{height:38px!important;display:flex!important;background:#111619!important}
+#digitalScreen .screen-tabs button{height:36px!important;min-width:74px!important;background:#151a1c!important;border-right:1px solid #2e3639!important;color:#7c878c!important;font-size:8px!important}
+#digitalScreen .screen-tabs button.active{color:#efd34d!important;border-bottom:2px solid #d9b934!important}
+#digitalScreen .screen-body{
+  height:350px!important;min-height:350px!important;position:relative!important;overflow:hidden!important;
+  background:
+    repeating-linear-gradient(0deg,transparent 0 24px,rgba(120,150,160,.13) 25px),
+    repeating-linear-gradient(90deg,transparent 0 44px,rgba(120,150,160,.13) 45px),
+    radial-gradient(circle at 44% 58%,rgba(0,160,215,.14),transparent 48%),#081013!important;
+}
+#digitalScreen .screen-body:before{
+  content:"";position:absolute;left:38px;right:118px;top:55px;height:205px;opacity:.9;
+  background:
+    linear-gradient(to top,rgba(17,126,190,.82),rgba(17,126,190,.82)) 0 100%/2% 24% no-repeat,
+    linear-gradient(to top,rgba(17,126,190,.82),rgba(17,126,190,.82)) 5% 100%/2% 38% no-repeat,
+    linear-gradient(to top,rgba(17,126,190,.82),rgba(17,126,190,.82)) 10% 100%/2% 31% no-repeat,
+    linear-gradient(to top,rgba(17,126,190,.82),rgba(17,126,190,.82)) 15% 100%/2% 45% no-repeat,
+    linear-gradient(to top,rgba(17,126,190,.82),rgba(17,126,190,.82)) 20% 100%/2% 55% no-repeat,
+    linear-gradient(to top,rgba(17,126,190,.82),rgba(17,126,190,.82)) 25% 100%/2% 64% no-repeat,
+    linear-gradient(to top,rgba(17,126,190,.82),rgba(17,126,190,.82)) 30% 100%/2% 48% no-repeat,
+    linear-gradient(to top,rgba(17,126,190,.82),rgba(17,126,190,.82)) 35% 100%/2% 76% no-repeat,
+    linear-gradient(to top,rgba(17,126,190,.82),rgba(17,126,190,.82)) 40% 100%/2% 52% no-repeat,
+    linear-gradient(to top,rgba(17,126,190,.82),rgba(17,126,190,.82)) 45% 100%/2% 69% no-repeat,
+    linear-gradient(to top,rgba(17,126,190,.82),rgba(17,126,190,.82)) 50% 100%/2% 44% no-repeat,
+    linear-gradient(to top,rgba(17,126,190,.82),rgba(17,126,190,.82)) 55% 100%/2% 61% no-repeat,
+    linear-gradient(to top,rgba(17,126,190,.82),rgba(17,126,190,.82)) 60% 100%/2% 36% no-repeat,
+    linear-gradient(to top,rgba(17,126,190,.82),rgba(17,126,190,.82)) 65% 100%/2% 51% no-repeat,
+    linear-gradient(to top,rgba(17,126,190,.82),rgba(17,126,190,.82)) 70% 100%/2% 42% no-repeat,
+    linear-gradient(to top,rgba(17,126,190,.82),rgba(17,126,190,.82)) 75% 100%/2% 58% no-repeat,
+    linear-gradient(to top,rgba(17,126,190,.82),rgba(17,126,190,.82)) 80% 100%/2% 35% no-repeat,
+    linear-gradient(to top,rgba(17,126,190,.82),rgba(17,126,190,.82)) 85% 100%/2% 46% no-repeat,
+    linear-gradient(to top,rgba(17,126,190,.82),rgba(17,126,190,.82)) 90% 100%/2% 29% no-repeat,
+    linear-gradient(to top,rgba(17,126,190,.82),rgba(17,126,190,.82)) 95% 100%/2% 39% no-repeat;
+  filter:drop-shadow(0 0 3px rgba(0,150,220,.35));
+}
+#digitalScreen .screen-source{left:14px!important;top:10px!important;z-index:2!important}
+#digitalScreen .screen-readout{left:48%!important;top:10px!important;z-index:2!important}
+#digitalScreen .screen-channels{left:14px!important;right:125px!important;bottom:8px!important;z-index:3!important}
+#digitalScreen .screen-meter{right:12px!important;top:48px!important;bottom:8px!important;width:92px!important;z-index:3!important}
+
+/* player = dedicated USB-style monitor */
+#musicPlayer{background:linear-gradient(#171c1e,#0a0d0e)!important;border-color:#3b4448!important}
+.music-player-head{height:42px!important;background:#101517!important}
+.music-player-main{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:5px!important}
+.music-player-main .music-pick{grid-column:1/-1!important}
+.music-pick,.music-player-main button{height:34px!important;min-width:0!important}
+.music-mode{min-width:0!important}
+.music-track{margin-top:4px!important}
+.music-volume{margin-top:10px!important}
+
+/* fader bank: thin console strips, not large cards */
+#channels{display:grid!important;grid-template-columns:repeat(16,minmax(0,1fr)) 180px!important;gap:2px!important;padding:3px!important;background:#080a0b!important;border:1px solid #30383c!important;overflow:hidden!important}
+#channels>.channel{height:500px!important;min-width:0!important;width:auto!important;max-width:none!important;padding:3px!important;background:linear-gradient(#22272a,#121617 24%,#0a0c0d)!important;border-color:#394247!important;border-radius:2px!important}
+#channels>.channel .route,#channels>.channel .knob-row,#channels>.channel .eq-grid,#channels>.channel .send-list,#channels>.channel .echo-panel,#channels>.channel .channel-monitor,#channels>.channel .channel-bottom{display:none!important}
+#channels>.channel .channel-head{height:30px!important}
+#channels>.channel .channel-tabs{display:none!important}
+#channels>.channel .level-readout{height:15px!important;margin:3px 2px!important}
+#channels>.channel .mini-meter{top:60px!important;right:2px!important;height:250px!important;width:5px!important}
+#channels>.channel .fader{height:315px!important;width:31px!important;margin:5px auto!important}
+#channels>.channel .fader-value{width:35px!important;margin:0 auto 3px!important}
+#channels>.channel .channel-actions{grid-template-columns:1fr!important;gap:2px!important;margin-top:3px!important}
+#channels>.channel .channel-actions button{height:25px!important;font-size:6px!important}
+#channels>.master{height:500px!important;min-width:0!important;width:auto!important;max-width:none!important;overflow-y:auto!important;padding:4px!important;background:linear-gradient(#343126,#181914 28%,#0c0e0d)!important;border-color:#6c5b2d!important}
+#channels>.master .master-knobs input{width:32px!important;height:32px!important}
+#channels>.master .master .fader{height:235px!important}
+#channels>.master .bus-fx-masters,#channels>.master .output-routing,#channels>.master .scene-panel,#channels>.master .history-panel,#channels>.master .lock-panel,#channels>.master .connection-panel,#channels>.master .mapper-panel,#channels>.master .hardware-test-panel,#channels>.master .esp32-sim-panel,#channels>.master .usb-audio-panel{display:block!important;max-height:none!important;overflow:visible!important}
+
+/* portrait phone: keep console horizontal like real hardware; user can swipe the channel bank */
+@media(max-width:800px){
+  .mixer{display:grid!important;grid-template-columns:1fr!important;grid-template-areas:"screen" "player" "channels"!important;padding:3px!important}
+  #digitalScreen{height:300px!important;min-height:300px!important}
+  #digitalScreen .screen-body{height:262px!important;min-height:262px!important}
+  #musicPlayer{height:auto!important;min-height:205px!important}
+  #channels{display:flex!important;overflow-x:auto!important;overflow-y:hidden!important;grid-template-columns:none!important;height:520px!important;min-height:520px!important;scroll-snap-type:x proximity!important}
+  #channels>.channel{flex:0 0 82px!important;width:82px!important;min-width:82px!important;max-width:82px!important;height:505px!important}
+  #channels>.master{flex:0 0 150px!important;width:150px!important;min-width:150px!important;height:505px!important}
+  #channels>.channel .fader{height:320px!important}
+  .top-actions{flex-wrap:wrap!important}
+}
