@@ -463,3 +463,45 @@ body{
 .master .fader{height:300px!important}
 .master .fader::-webkit-slider-runnable-track{height:300px!important}
 .master .fader::-moz-range-track{height:300px!important}
+
+/* v68 — native range itself is vertical for channel + master faders */
+.fader,
+#masterFader{
+  -webkit-appearance:slider-vertical!important;
+  appearance:slider-vertical!important;
+  writing-mode:vertical-lr!important;
+  direction:rtl!important;
+  width:44px!important;
+  height:270px!important;
+  min-width:44px!important;
+  min-height:270px!important;
+  transform:none!important;
+  cursor:ns-resize!important;
+  touch-action:none!important;
+}
+.fader::-webkit-slider-runnable-track,
+#masterFader::-webkit-slider-runnable-track{
+  width:6px!important;
+  height:270px!important;
+  background:repeating-linear-gradient(to bottom,#858b8d 0 1px,transparent 1px 12px)!important;
+}
+.fader::-webkit-slider-thumb,
+#masterFader::-webkit-slider-thumb{
+  width:44px!important;height:20px!important;
+  margin:0!important;
+}
+.fader::-moz-range-track,
+#masterFader::-moz-range-track{
+  width:6px!important;height:270px!important;
+}
+.fader::-moz-range-thumb,
+#masterFader::-moz-range-thumb{
+  width:44px!important;height:20px!important;
+}
+.master .fader,#masterFader{height:310px!important;min-height:310px!important}
+.master .fader::-webkit-slider-runnable-track,#masterFader::-webkit-slider-runnable-track{height:310px!important}
+.master .fader::-moz-range-track,#masterFader::-moz-range-track{height:310px!important}
+@media(max-width:560px){
+ .fader,#masterFader{height:260px!important;min-height:260px!important}
+ .master .fader,#masterFader{height:310px!important;min-height:310px!important}
+}
