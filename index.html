@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
   <meta name="theme-color" content="#05080a">
   <title>Mixer Online</title>
-  <link rel="stylesheet" href="style.css?v=20260830-v11">
+  <link rel="stylesheet" href="style.css?v=20260830-v13">
 </head>
 <body>
   <div class="app">
@@ -183,6 +183,36 @@
           <h4>USB</h4>
           <div class="route-grid"><button>USB 1 ▮▮▮</button><button>00:24</button><button>USB 2 ▮</button><button>00:00</button></div>
         </div>
+        <div class="reference-panel">
+          <h4>PANEL / AUX / BUS / FX</h4>
+          <div class="bus-master">
+            <label>BUS 1 <input type="range" min="0" max="100" value="80"></label>
+            <label>BUS 2 <input type="range" min="0" max="100" value="70"></label>
+            <label>BUS 3 <input type="range" min="0" max="100" value="60"></label>
+            <label>BUS 4 <input type="range" min="0" max="100" value="50"></label>
+          </div>
+          <h4>FX 1 — EFFECT</h4>
+          <div class="fx-controls">
+            <label>PRESET <select id="fxPreset"><option value="">CUSTOM</option><option>VOCAL</option><option>MC / SPEECH</option><option>MUSIC</option><option>HALL</option></select></label>
+            <label>TYPE <select id="fxType"><option value="delay">DELAY</option><option value="reverb">REVERB</option></select></label>
+            <label>TIME <input id="fxDelay" type="range" min="0" max="100" value="35"></label>
+            <label>FEEDBACK <input id="fxFeedback" type="range" min="0" max="100" value="35"></label>
+            <label>WET <input id="fxWet" type="range" min="0" max="100" value="28"></label>
+          </div>
+          <h4>OUTPUT ROUTING</h4>
+          <div class="routing-block"><label>OUT 1 <select><option>MAIN L/R</option><option>BUS 1</option><option>BUS 2</option><option>USB 1</option></select></label><label>OUT 2 <select><option>MAIN L/R</option><option>BUS 3</option><option>BUS 4</option><option>USB 2</option></select></label></div>
+          <h4>SCENES / PRESETS</h4>
+          <div class="scene-row"><input placeholder="Nama scene"><button>SAVE</button><button>RECALL</button></div>
+          <div class="scene-row"><button>RENAME</button><button>DUPLICATE</button><button>DELETE</button></div>
+          <div class="scene-row"><button>EXPORT</button><button>IMPORT</button></div>
+          <h4>HISTORY</h4><div class="scene-row"><button>↶ UNDO</button><button>↷ REDO</button></div>
+          <h4>LIVE PROTECTION</h4><div class="lock-row"><button>🔒 LOCK</button><span>Lock mencegah perubahan kontrol saat live.</span></div>
+          <h4>DEVICE CONNECTION</h4><div class="device-box"><label>TRANSPORT <select><option>MIDI</option><option>ESP32 BLE</option><option>WEBSOCKET</option></select></label><div class="device-online">● ESP32 SIMULATOR — RX/TX AKTIF</div><button id="deviceConnect">CONNECT</button><button id="deviceDisconnect">DISCONNECT</button></div>
+          <h4>AUTO CHANNEL MAPPER</h4><div class="mapper-row"><label>CHANNELS <input type="number" min="1" max="64" value="16"></label><button>APPLY CHANNELS</button><button>AUTO MAP CONTROLS</button></div>
+          <h4>HARDWARE TEST</h4><div class="hardware-test"><select><option>SOLO 1</option><option>FADER CH1</option><option>GAIN CH1</option><option>LOW CH1</option><option>MID CH1</option><option>HIGH CH1</option><option>PAN CH1</option></select><select><option>ON</option><option>OFF</option></select><button>SEND TEST</button></div>
+          <h4>ESP32 SIMULATOR</h4><div class="sim-box"><button id="restartSimulator">RESTART SIMULATOR</button><span>● ONLINE</span><small>ESP32 virtual • BLE/JSON ready • TX/RX synchronized</small></div>
+          <h4>USB AUDIO</h4><div class="usb-audio-box"><button id="detectUsbAudio">DETECT USB AUDIO</button><span>USB audio input/output bridge</span></div>
+        </div>
       </aside>
     </main>
 
@@ -209,10 +239,10 @@
     </footer>
   </div>
 
-  <script src="connection.js?v=20260830-v11"></script>
-  <script src="adapters.js?v=20260830-v11"></script>
-  <script src="device-profile.js?v=20260830-v11"></script>
-  <script src="feedback.js?v=20260830-v11"></script>
-  <script src="app.js?v=20260830-v11"></script>
+  <script src="connection.js?v=20260830-v13"></script>
+  <script src="adapters.js?v=20260830-v13"></script>
+  <script src="device-profile.js?v=20260830-v13"></script>
+  <script src="feedback.js?v=20260830-v13"></script>
+  <script src="app.js?v=20260830-v13"></script>
 </body>
 </html>
