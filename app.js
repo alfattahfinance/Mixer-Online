@@ -54,7 +54,8 @@ function bindReferenceControls(){
   const root=document.querySelector(".reference-panel"); if(!root)return;
   const lockedKey="mixer-online-live-lock";
   const lamp=b=>{if(!b)return;let l=b.querySelector(":scope > .control-lamp");if(!l){l=document.createElement("i");l.className="control-lamp off";b.prepend(l)}return l};
-  const setOn=(b,on)=>{if(!b)return;b.classList.toggle("indicator-active",!!on);const l=lamp(b);l?.classList.toggle("on",!!on);l?.classList.toggle("off",!on);b.dataset.on=on?"1":"0"};
+  const notify=(msg,on=true)=>{status(msg);document.dispatchEvent(new CustomEvent("mixer:notification",{detail:{message:msg,on}}))};
+  const setOn=(b,on,label)=>{if(!b)return;b.classList.toggle("indicator-active",!!on);b.setAttribute("aria-pressed",on?"true":"false");const l=lamp(b);l?.classList.toggle("on",!!on);l?.classList.toggle("off",!on);b.dataset.on=on?"1":"0";if(label)b.dataset.statusLabel=label};
   const setLock=on=>{document.body.classList.toggle("mixer-locked",on);const b=root.querySelector(".lock-row button");if(b){b.textContent=on?"🔓 UNLOCK":"🔒 LOCK";setOn(b,on)}try{localStorage.setItem(lockedKey,on?"1":"0")}catch{}};
   let locked=false;try{locked=localStorage.getItem(lockedKey)==="1"}catch{}setLock(locked);
 
@@ -75,41 +76,41 @@ function bindReferenceControls(){
     const p=presets[e.target.value];if(!p||locked)return;
     const type=root.querySelector("#fxType");if(type)type.value=p.type;
     [["fxDelay",p.delay],["fxFeedback",p.feedback],["fxWet",p.wet]].forEach(([id,v])=>{const x=root.querySelector("#"+id);if(x){x.value=v;x.dispatchEvent(new Event("input",{bubbles:true}))}});
-    status("FX "+e.target.value+" ON");
+    notify("FX "+e.target.value+" ON");
   });
 
   // Output routing: selectable and visibly active.
-  root.querySelectorAll(".routing-block select").forEach((sel,i)=>sel.addEventListener("change",()=>{if(locked)return;setOn(sel,sel.value!=="MAIN L/R");send("OUT "+(i+1),"route",sel.value);status("OUT "+(i+1)+" → "+sel.value)}));
+  root.querySelectorAll(".routing-block select").forEach((sel,i)=>sel.addEventListener("change",()=>{if(locked)return;setOn(sel,sel.value!=="MAIN L/R");send("OUT "+(i+1),"route",sel.value);notify("OUT "+(i+1)+" → "+sel.value)}));
 
   // Scenes.
   const input=root.querySelector(".scene-row input"),rows=[...root.querySelectorAll(".scene-row")],buttons=[...root.querySelectorAll(".scene-row button")];
   const sceneName=()=>input?.value?.trim()||"Scene";
   const sceneState=()=>({channels:state.channels.map(c=>({fader:Number(c.querySelector(".fader")?.value||0),muted:c.classList.contains("muted"),soloed:c.classList.contains("soloed")})),master:Number($("#masterFader")?.value||80),musicMode:$("#musicMode")?.value||"sequential",savedAt:Date.now()});
-  const applyScene=o=>{if(!o)return;state.channels.forEach((ch,i)=>{const v=o.channels?.[i];if(!v)return;const f=ch.querySelector(".fader");if(f){f.value=v.fader;ch.querySelector(".value")&&(ch.querySelector(".value").textContent=Math.round(v.fader)+"%")}ch.classList.toggle("muted",!!v.muted);ch.classList.toggle("soloed",!!v.soloed);ch.querySelectorAll(".mute,.topmute").forEach(b=>b.textContent=v.muted?"UNMUTE":"MUTE");updateChannelAudio(ch)});if($("#masterFader")&&o.master!=null){$("#masterFader").value=o.master;$("#masterValue")&&($("#masterValue").textContent=o.master+"%");$("#masterFader").dispatchEvent(new Event("input",{bubbles:true}))};status("SCENE RECALLED")};
+  const applyScene=o=>{if(!o)return;state.channels.forEach((ch,i)=>{const v=o.channels?.[i];if(!v)return;const f=ch.querySelector(".fader");if(f){f.value=v.fader;ch.querySelector(".value")&&(ch.querySelector(".value").textContent=Math.round(v.fader)+"%")}ch.classList.toggle("muted",!!v.muted);ch.classList.toggle("soloed",!!v.soloed);ch.querySelectorAll(".mute,.topmute").forEach(b=>b.textContent=v.muted?"UNMUTE":"MUTE");updateChannelAudio(ch)});if($("#masterFader")&&o.master!=null){$("#masterFader").value=o.master;$("#masterValue")&&($("#masterValue").textContent=o.master+"%");$("#masterFader").dispatchEvent(new Event("input",{bubbles:true}))};notify("SCENE RECALLED")};
   const findBtn=t=>buttons.find(b=>b.textContent.trim()===t);
-  findBtn("SAVE")?.addEventListener("click",()=>{try{localStorage.setItem("mixer-scene-"+sceneName(),JSON.stringify(sceneState()));status("SCENE SAVED • "+sceneName());setOn(findBtn("SAVE"),true)}catch{status("SCENE SAVE ERROR")}});
-  findBtn("RECALL")?.addEventListener("click",()=>{try{applyScene(JSON.parse(localStorage.getItem("mixer-scene-"+sceneName())||"null"))}catch{status("SCENE NOT FOUND")}});
-  findBtn("RENAME")?.addEventListener("click",()=>{if(input){input.focus();input.select()}status("ENTER NEW SCENE NAME")});
-  findBtn("DUPLICATE")?.addEventListener("click",()=>{try{const src=localStorage.getItem("mixer-scene-"+sceneName());if(!src){status("SCENE NOT FOUND");return}const n=sceneName()+" COPY";localStorage.setItem("mixer-scene-"+n,src);if(input)input.value=n;status("SCENE DUPLICATED")}catch{}});
-  findBtn("DELETE")?.addEventListener("click",()=>{try{localStorage.removeItem("mixer-scene-"+sceneName());status("SCENE DELETED");setOn(findBtn("DELETE"),true)}catch{}});
-  findBtn("EXPORT")?.addEventListener("click",()=>{const blob=new Blob([JSON.stringify(sceneState(),null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=sceneName()+".json";a.click();URL.revokeObjectURL(a.href);status("SCENE EXPORTED")});
+  findBtn("SAVE")?.addEventListener("click",()=>{try{localStorage.setItem("mixer-scene-"+sceneName(),JSON.stringify(sceneState()));notify("SCENE SAVED • "+sceneName());setOn(findBtn("SAVE"),true)}catch{notify("SCENE SAVE ERROR",false)}});
+  findBtn("RECALL")?.addEventListener("click",()=>{try{applyScene(JSON.parse(localStorage.getItem("mixer-scene-"+sceneName())||"null"))}catch{notify("SCENE NOT FOUND",false)}});
+  findBtn("RENAME")?.addEventListener("click",()=>{if(input){input.focus();input.select()}notify("ENTER NEW SCENE NAME")});
+  findBtn("DUPLICATE")?.addEventListener("click",()=>{try{const src=localStorage.getItem("mixer-scene-"+sceneName());if(!src){notify("SCENE NOT FOUND",false);return}const n=sceneName()+" COPY";localStorage.setItem("mixer-scene-"+n,src);if(input)input.value=n;notify("SCENE DUPLICATED")}catch{}});
+  findBtn("DELETE")?.addEventListener("click",()=>{try{localStorage.removeItem("mixer-scene-"+sceneName());notify("SCENE DELETED");setOn(findBtn("DELETE"),true)}catch{}});
+  findBtn("EXPORT")?.addEventListener("click",()=>{const blob=new Blob([JSON.stringify(sceneState(),null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=sceneName()+".json";a.click();URL.revokeObjectURL(a.href);notify("SCENE EXPORTED")});
   const importInput=document.createElement("input");importInput.type="file";importInput.accept=".json,application/json";importInput.hidden=true;root.appendChild(importInput);
-  findBtn("IMPORT")?.addEventListener("click",()=>importInput.click());importInput.addEventListener("change",async()=>{const file=importInput.files?.[0];if(!file)return;try{applyScene(JSON.parse(await file.text()));status("SCENE IMPORTED")}catch{status("IMPORT ERROR")}importInput.value=""});
-  findBtn("↶ UNDO")?.addEventListener("click",()=>{document.execCommand("undo");status("UNDO")});
-  findBtn("↷ REDO")?.addEventListener("click",()=>{document.execCommand("redo");status("REDO")});
+  findBtn("IMPORT")?.addEventListener("click",()=>importInput.click());importInput.addEventListener("change",async()=>{const file=importInput.files?.[0];if(!file)return;try{applyScene(JSON.parse(await file.text()));notify("SCENE IMPORTED")}catch{notify("IMPORT ERROR",false)}importInput.value=""});
+  findBtn("↶ UNDO")?.addEventListener("click",()=>{document.execCommand("undo");notify("UNDO")});
+  findBtn("↷ REDO")?.addEventListener("click",()=>{document.execCommand("redo");notify("REDO")});
 
   // Lock.
   root.querySelector(".lock-row button")?.addEventListener("click",()=>{locked=!locked;setLock(locked)});
 
   // Device / hardware.
-  root.querySelector("#deviceConnect")?.addEventListener("click",async()=>{if(locked)return;setOn(root.querySelector("#deviceConnect"),true);try{await window.MixerAdapters?.simulator?.();status("ESP32 CONNECTED")}catch(e){setOn(root.querySelector("#deviceConnect"),false);status("ESP32 OFFLINE")}});
-  root.querySelector("#deviceDisconnect")?.addEventListener("click",()=>{window.MixerAdapters?.disconnect?.();setOn(root.querySelector("#deviceConnect"),false);setOn(root.querySelector("#deviceDisconnect"),true);status("DISCONNECTED")});
-  root.querySelector("#restartSimulator")?.addEventListener("click",async()=>{window.MixerAdapters?.disconnect?.();await window.MixerAdapters?.simulator?.();setOn(root.querySelector("#restartSimulator"),true);status("ESP32 SIMULATOR READY")});
+  root.querySelector("#deviceConnect")?.addEventListener("click",async()=>{if(locked)return;setOn(root.querySelector("#deviceConnect"),true);try{await window.MixerAdapters?.simulator?.();notify("ESP32 CONNECTED")}catch(e){setOn(root.querySelector("#deviceConnect"),false);notify("ESP32 OFFLINE",false)}});
+  root.querySelector("#deviceDisconnect")?.addEventListener("click",()=>{window.MixerAdapters?.disconnect?.();setOn(root.querySelector("#deviceConnect"),false);setOn(root.querySelector("#deviceDisconnect"),true);notify("DISCONNECTED",false)});
+  root.querySelector("#restartSimulator")?.addEventListener("click",async()=>{window.MixerAdapters?.disconnect?.();await window.MixerAdapters?.simulator?.();setOn(root.querySelector("#restartSimulator"),true);notify("ESP32 SIMULATOR READY")});
 
-  root.querySelector(".mapper-row button:nth-of-type(1)")?.addEventListener("click",()=>{const n=Number(root.querySelector('.mapper-row input[type=number]')?.value||16);buildChannels(n);status("CHANNELS APPLIED: "+n)});
-  root.querySelector(".mapper-row button:nth-of-type(2)")?.addEventListener("click",()=>{state.channels.forEach((ch,i)=>{ch.dataset.mapped="1";ch.querySelectorAll("input,select").forEach(x=>x.dataset.autoMapped="1")});status("CONTROLS AUTO MAPPED");setOn(root.querySelector(".mapper-row button:nth-of-type(2)"),true)});
+  root.querySelector(".mapper-row button:nth-of-type(1)")?.addEventListener("click",()=>{const n=Number(root.querySelector('.mapper-row input[type=number]')?.value||16);buildChannels(n);notify("CHANNELS APPLIED: "+n)});
+  root.querySelector(".mapper-row button:nth-of-type(2)")?.addEventListener("click",()=>{state.channels.forEach((ch,i)=>{ch.dataset.mapped="1";ch.querySelectorAll("input,select").forEach(x=>x.dataset.autoMapped="1")});notify("CONTROLS AUTO MAPPED");setOn(root.querySelector(".mapper-row button:nth-of-type(2)"),true)});
 
-  root.querySelector(".hardware-test button")?.addEventListener("click",()=>{const sel=root.querySelectorAll(".hardware-test select");const control=(sel[0]?.value||"SOLO 1").toLowerCase().replace(/\s+/g,"_");const ch=control.match(/(\d+)/)?.[1]||1;send(Number(ch),control.replace(/_\d+$/,""),sel[1]?.value==="ON"?1:0);status("HARDWARE TEST TX");setOn(root.querySelector(".hardware-test button"),sel[1]?.value==="ON")});
+  root.querySelector(".hardware-test button")?.addEventListener("click",()=>{const sel=root.querySelectorAll(".hardware-test select");const control=(sel[0]?.value||"SOLO 1").toLowerCase().replace(/\s+/g,"_");const ch=control.match(/(\d+)/)?.[1]||1;send(Number(ch),control.replace(/_\d+$/,""),sel[1]?.value==="ON"?1:0);notify("HARDWARE TEST TX");setOn(root.querySelector(".hardware-test button"),sel[1]?.value==="ON")});
 
   // Add a lamp to every actionable control in this panel only.
   root.querySelectorAll("button").forEach(b=>{if(!b.querySelector(".control-lamp")&&!b.closest(".lock-row")?.querySelector(".control-lamp"))lamp(b)});
