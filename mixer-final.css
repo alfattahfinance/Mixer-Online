@@ -92,3 +92,38 @@ button:active,[role="button"]:active,[role="tab"]:active{filter:brightness(1.22)
 .screen-view-host{pointer-events:none!important;z-index:5!important}.screen-view-host .screen-view-panel.active{pointer-events:auto!important}
 .channel-rack{position:relative;z-index:10!important}.channels .channel,.channels .bus-strip,.channels .master{position:relative;z-index:11!important}
 @media(max-width:1100px){.master-side-dock{z-index:99999!important}.master-side-menu button{min-height:30px!important}.master-side-content button,.master-side-content input,.master-side-content select{min-height:28px!important}}
+
+/* === MASTER REFERENCE CONSOLE — FADER / STRIP MATCH === */
+@media(min-width:1200px){
+ .channel-rack{height:470px!important;min-height:470px!important;padding:5px!important;overflow:hidden!important}
+ .channels{height:458px!important;min-height:458px!important;display:flex!important;flex-wrap:nowrap!important;align-items:stretch!important;gap:3px!important;padding:0 258px 0 0!important;overflow:hidden!important;box-sizing:border-box!important}
+ .channels .channel{flex:0 0 60px!important;min-width:60px!important;width:60px!important;height:448px!important;min-height:448px!important;padding:3px!important;box-sizing:border-box!important}
+ .channels .bus-strip{display:flex!important;flex:0 0 48px!important;min-width:48px!important;width:48px!important;height:448px!important;min-height:448px!important;padding:3px!important;box-sizing:border-box!important}
+ .channels .master{display:flex!important;flex:0 0 60px!important;min-width:60px!important;width:60px!important;height:448px!important;min-height:448px!important;padding:4px!important;box-sizing:border-box!important}
+ .channels .channel-head{height:27px!important;padding:0 2px!important}.channels .channel-head strong{font-size:8px!important}.channels .channel-menu{font-size:8px!important}
+ .channels .channel-tabs{height:15px!important;margin:1px 0!important}.channels .channel-tabs button{height:15px!important;font-size:5px!important;padding:0 2px!important}
+ .channels .route{margin:1px 0!important}.channels .route select,.channels .input-route{height:18px!important;font-size:6px!important}
+ .channels .mini-meter{height:3px!important;margin:2px 0!important}
+ .channels .channel-lamps{min-height:38px!important;display:grid!important;grid-template-columns:repeat(5,1fr)!important;gap:1px!important}
+ .channels .channel-lamps .lamp-wrap{font-size:4px!important}.channels .channel-lamps .lamp{width:6px!important;height:6px!important}
+ .channels .level-readout{height:16px!important;font-size:6px!important;padding:2px!important}
+ .channels .knob-row{display:grid!important;grid-template-columns:1fr 1fr!important;gap:2px!important;margin:2px 0!important}.channels .knob-row label{font-size:5px!important}
+ .channels .knob-row .knob{height:24px!important;width:100%!important}
+ .channels .eq-grid,.channels .send-list,.channels .echo-panel,.channels .channel-monitor{display:none!important}
+ .channels .channel .fader{height:255px!important;width:24px!important;margin:2px auto!important;touch-action:none!important;cursor:grab!important}
+ .channels .channel .fader:active{cursor:grabbing!important}
+ .channels .channel .fader::-webkit-slider-runnable-track{width:7px!important;border-radius:2px!important}
+ .channels .channel .fader::-webkit-slider-thumb{width:16px!important;height:28px!important;margin-left:-4.5px!important}
+ .channels .fader-value{height:19px!important;padding:3px 1px!important;font-size:7px!important}
+ .channels .channel-actions{gap:2px!important;margin-top:2px!important}.channels .channel-actions button{height:23px!important;font-size:6px!important}
+ .channels .channel-status,.channels .channel-bottom{font-size:4px!important;margin-top:2px!important}
+ .channels .bus-strip .bus-mode{font-size:5px!important;padding:2px 0!important}.channels .bus-strip .bus-fader{height:275px!important;width:22px!important;margin:2px auto!important}
+ .channels .bus-strip .fader-value{font-size:6px!important}.channels .bus-strip .bus-mute{height:22px!important;font-size:6px!important}
+ .channels .master .channel-title{height:29px!important;font-size:8px!important;padding:0 4px!important}
+ .channels .master .master-lamps{font-size:4px!important}.channels .master .master-monitor{font-size:5px!important}
+ .channels .master .master-knobs{display:none!important}.channels .master .fader{height:285px!important;width:24px!important;margin:2px auto!important}
+ .channels .master .fader::-webkit-slider-thumb{width:16px!important;height:28px!important;margin-left:-4.5px!important}
+ .channels .master .fader-value{font-size:6px!important}.channels .master .master-mute{height:23px!important;font-size:6px!important}
+ .master-side-dock{right:5px!important;top:5px!important;width:250px!important;height:458px!important;max-height:458px!important;z-index:99999!important}
+ .master-side-menu button{height:31px!important;font-size:7px!important}.master-side-content{height:405px!important}
+}
