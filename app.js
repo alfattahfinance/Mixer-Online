@@ -281,36 +281,7 @@ function paintMeter(el,m){if(!el)return;const pct=Math.max(0,Math.min(100,m.r*22
 function paintLamps(root,m){if(!root)return;const sig=root.querySelector(".lamp.signal"),pk=root.querySelector(".lamp.peak,.lamp.clip");sig?.classList.toggle("active",m.r>.008);pk?.classList.toggle("active",m.p>.82)}
 function animate(){const ml=readMeter(masterAnalyser),mr=readMeter(masterAnalyserR),mm={r:Math.max(ml.r,mr.r),p:Math.max(ml.p,mr.p)};paintMeter($(".master-meter .meter-fill"),mm);$(".master-meter .clip-dot")?.classList.toggle("active",mm.p>.98);const mlEl=$("#masterLevel"),mpEl=$("#masterPeak"),msEl=$("#masterSignal");if(mlEl)mlEl.textContent=db(ml.r);if(mpEl)mpEl.textContent=db(mm.p);if(msEl)msEl.textContent=mm.r>.008?"SIGNAL":"NO SIGNAL";paintLamps(document.querySelector(".master-lamps"),mm);state.channels.forEach(c=>{if(!c._audio)return;const m=readMeter(c._audio.analyser);paintMeter(c.querySelector(".mini-meter .meter-fill"),m);paintLamps(c,m);if(c.querySelector(".level-readout"))c.querySelector(".level-readout").textContent=db(m.r);const lv=Math.max(0,Math.min(1,m.r*2.2));const mon=c.querySelector(".monitor-fill");if(mon)mon.style.width=lv*100+"%";const peak=c.querySelector(".monitor-peak");if(peak)peak.style.left=Math.max(0,Math.min(99,m.p*100))+"%";const md=c.querySelector(".monitor-db"),pd=c.querySelector(".monitor-peak-db");if(md)md.textContent=db(lv);if(pd)pd.textContent=db(m.p);const ss=c.querySelector(".signal-state"),st=c.querySelector(".monitor-status");if(ss)ss.textContent=lv>.008?"SIGNAL":"NO SIGNAL";if(st)st.textContent=lv>.008?"LIVE":"READY";const src=c.querySelector(".monitor-src");if(src)src.textContent=state.routing[c.dataset.channel]||"—"});updatePhysicalLamps();requestAnimationFrame(animate)}
 buildChannels(16);animate();// v37: master safety limiter/clip guard (UI + audio only, preserves existing channel controls)
-function updatePhysicalLamps(){
-  state.channels.forEach(card=>{
-    const audio=card._audio;
-    const signal=card.querySelector(".lamp.signal");
-    const peak=card.querySelector(".lamp.peak");
-    const on=card.querySelector(".lamp.on");
-    const mute=card.querySelector(".lamp.mute");
-    on?.classList.toggle("active",!card.querySelector(".channel-actions .mute")?.classList.contains("active"));
-    mute?.classList.toggle("active",card.querySelector(".channel-actions .mute")?.classList.contains("active"));
-    if(!audio){signal?.classList.remove("active");peak?.classList.remove("active");return}
-    try{
-      const data=new Uint8Array(audio.analyser.frequencyBinCount);
-      audio.analyser.getByteFrequencyData(data);
-      const avg=data.reduce((a,b)=>a+b,0)/data.length/255;
-      const active=avg>.008;
-      signal?.classList.toggle("active",active);
-      peak?.classList.toggle("active",avg>.92);
-    }catch(e){}
-  });
-  const mm=document.querySelector(".master-lamps");
-  if(mm&&masterAnalyser){
-    try{
-      const d=new Uint8Array(masterAnalyser.frequencyBinCount);
-      masterAnalyser.getByteFrequencyData(d);
-      const avg=d.reduce((a,b)=>a+b,0)/d.length/255;
-      mm.querySelector(".lamp.signal")?.classList.toggle("active",avg>.008);
-      mm.querySelector(".lamp.clip")?.classList.toggle("active",avg>.92);
-    }catch(e){}
-  }
-}
+function updatePhysicalLamps(){state.channels.forEach(card=>{const audio=card._audio;const on=card.querySelector(".lamp.on"),mute=card.querySelector(".lamp.mute"),sig=card.querySelector(".lamp.signal"),pk=card.querySelector(".lamp.peak");const muted=card.querySelector(".channel-actions .mute")?.classList.contains("active");on?.classList.toggle("active",!muted);mute?.classList.toggle("active",!!muted);if(!audio){sig?.classList.remove("active");pk?.classList.remove("active");return}const m=readMeter(audio.analyser);sig?.classList.toggle("active",!muted&&m.r>.008);pk?.classList.toggle("active",!muted&&m.p>.82)});const mm=document.querySelector(".master-lamps");if(mm){const ml=readMeter(masterAnalyser),mr=readMeter(masterAnalyserR),m={r:Math.max(ml.r,mr.r),p:Math.max(ml.p,mr.p)};mm.querySelector(".lamp.signal")?.classList.toggle("active",m.r>.008);mm.querySelector(".lamp.clip")?.classList.toggle("active",m.p>.98)}}
 function initMasterProtection(){ensureAudio();if(!masterLimiter)return;masterLimiter.threshold.value=-1;masterLimiter.knee.value=0;masterLimiter.ratio.value=20;masterLimiter.attack.value=.003;masterLimiter.release.value=.12;window.__masterProtection={enabled:true,threshold:-1};}
 initMasterProtection();
 function initDeviceMapping(){const p=MixerProfiles.get().profile,n=$("#profileName"),pr=$("#profileProtocol"),ins=$("#profileInputs"),outs=$("#profileOutputs"),count=$("#channelCount");if(n)n.value=p.name;if(pr)pr.value=p.protocol;if(ins)ins.value=p.inputs;if(outs)outs.value=p.outputs;$("#saveProfile")?.addEventListener("click",()=>{const prof=MixerProfiles.configure({name:n.value.trim()||"Universal / Custom",protocol:pr.value,inputs:+ins.value||0,outputs:+outs.value||0,channels:+count.value||p.channels});setStatus("Profil tersimpan: "+prof.name);renderMappingPanel()});$("#mappingToggle")?.addEventListener("click",()=>{const panel=$("#mappingPanel");panel.hidden=!panel.hidden;if(!panel.hidden)renderMappingPanel()});function renderMappingPanel(){const panel=$("#mappingPanel");if(!panel)return;const data=MixerProfiles.get(),maps=data.controlMappings||{};panel.innerHTML='<div class="mapping-head"><strong>CONTROL MAPPING</strong><span>Atur bahasa kontrol untuk perangkat</span></div><div class="mapping-note">MIDI: CH 0–15 • CC 0–127. Nilai kontrol akan dinormalisasi sesuai rentang.</div><div class="mapping-grid"></div>';const grid=panel.querySelector(".mapping-grid");MixerProfiles.controls.forEach(control=>{const m=maps[control]||{channel:0,cc:20+MixerProfiles.controls.indexOf(control),min:0,max:1,mode:"cc-offset",targetChannel:1};const row=document.createElement("div");row.className="mapping-row control-map";row.innerHTML='<strong>'+control.toUpperCase()+'</strong><label>MODE <select class="map-mode"><option value="fixed">FIXED</option><option value="cc-offset">CC+CH</option><option value="midi-channel">MIDI CH</option></select></label><label>CH <input class="map-ch" type="number" min="0" max="15" value="'+m.channel+'"></label><label>CC <input class="map-cc" type="number" min="0" max="127" value="'+m.cc+'"></label><label>TARGET <input class="map-target" type="number" min="1" max="128" value="'+(m.targetChannel||1)+'"></label><label>MIN <input class="map-min" type="number" step=".01" value="'+m.min+'"></label><label>MAX <input class="map-max" type="number" step=".01" value="'+m.max+'"></label><button type="button">SAVE</button>';row.querySelector(".map-mode").value=m.mode||"fixed";row.querySelector("button").onclick=()=>{const ok=MixerProfiles.setControlMapping(control,{channel:+row.querySelector(".map-ch").value,cc:+row.querySelector(".map-cc").value,min:+row.querySelector(".map-min").value,max:+row.querySelector(".map-max").value,mode:row.querySelector(".map-mode").value,targetChannel:+row.querySelector(".map-target").value});setStatus(ok?"Mapping "+control.toUpperCase()+" tersimpan":"Mapping tidak valid")};grid.appendChild(row)})}window.renderMappingPanel=renderMappingPanel}initDeviceMapping();initConnectionPanel();initMapperPanel();initHardwareTestPanel();
