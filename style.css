@@ -306,4 +306,4 @@ html,body{overflow-x:auto}
 .hardware-test select,.hardware-test input,.hardware-test button{min-width:0;width:100%;font-size:8px;padding-left:4px;padding-right:4px;box-sizing:border-box}
 .hardware-test button{white-space:nowrap}
 .hardware-test input{height:24px}
-@media(max-width:1200px){.hardware-test{grid-template-columns:minmax(0,1fr) minmax(52px,68px) auto!important}.hardware-test select,.hardware-test input,.hardware-test button{font-size:7px}}
+@media(max-width:1200px){.hardware-test{grid-template-columns:minmax(0,1fr) 64px auto!important}.hardware-test select,.hardware-test input,.hardware-test button{font-size:7px}}
