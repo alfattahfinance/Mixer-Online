@@ -68,7 +68,7 @@ function bindReferenceControls(){
   root.querySelector("#deviceConnect")?.addEventListener("click",async()=>{try{await window.MixerAdapters?.simulator?.();status("ESP32 CONNECTED")}catch(e){status("ESP32 OFFLINE")}});
   root.querySelector("#deviceDisconnect")?.addEventListener("click",()=>{window.MixerAdapters?.disconnect?.();status("DISCONNECTED")});
   root.querySelector("#restartSimulator")?.addEventListener("click",async()=>{window.MixerAdapters?.disconnect?.();await window.MixerAdapters?.simulator?.();status("ESP32 SIMULATOR READY")});
-  root.querySelector("#detectUsbAudio")?.addEventListener("click",async()=>{try{await window.MixerAdapters?.usbAudio?.();status("USB AUDIO READY")}catch(e){status("USB AUDIO "+(e.message||"UNAVAILABLE"))}});
+
   root.querySelector(".hardware-test button")?.addEventListener("click",()=>{const sel=root.querySelectorAll(".hardware-test select");const control=(sel[0]?.value||"SOLO 1").toLowerCase().replace(/\s+/g,"_");const ch=control.match(/(\d+)/)?.[1]||1;send(Number(ch),control.replace(/_\d+$/,""),sel[1]?.value==="ON"?1:0);status("HARDWARE TEST TX")});
 }
 function init(){bindMusic();bindNativeButtons();bindTabs();bindConnection();bindMasterControls();bindReferenceControls();initIndicatorLights();bindMaifDcaUsbAudio();const count=Number($("#channelCount")?.value||16);buildChannels(count);requestAnimationFrame(()=>{const box=$("#channels");if(box&&!box.children.length)buildChannels(count);box?.scrollTo?.({left:0,behavior:"auto"});initIndicatorLights();updateMeters()});$("#applyChannels")?.addEventListener("click",()=>{buildChannels($("#channelCount")?.value);initIndicatorLights()});window.MixerAdapters?.simulator?.();drawSpectrum();setInterval(()=>{updateMeters();updateDcaValues()},60)}
