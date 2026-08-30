@@ -60,13 +60,7 @@ function bindReferenceControls(){
   let locked=false;try{locked=localStorage.getItem(lockedKey)==="1"}catch{}setLock(locked);
 
   // BUS/AUX level controls: real value, visible level, ON/OFF lamp.
-  root.querySelectorAll(".bus-master label").forEach((label,i)=>{
-    const x=label.querySelector("input[type=range]"); if(!x)return;
-    const key="mixer-bus-"+(i+1),saved=Number(localStorage.getItem(key));
-    if(Number.isFinite(saved))x.value=Math.max(0,Math.min(100,saved));
-    const update=()=>{const v=Number(x.value);label.dataset.level=x.value;label.classList.toggle("active-level",v>0);const l=label.querySelector(".control-lamp");l?.classList.toggle("on",v>0);l?.classList.toggle("off",v<=0);if(!locked)send("BUS "+(i+1),"level",v);notify("BUS "+(i+1)+" "+(v>0?"ON":"OFF")+" • "+v+"%")};
-    x.addEventListener("input",update);update();
-  });
+  root.querySelectorAll(".bus-master label").forEach((label,i)=>{const x=label.querySelector("input[type=range]");if(!x)return;const key="mixer-bus-"+(i+1);const saved=Number(localStorage.getItem(key));if(Number.isFinite(saved))x.value=Math.max(0,Math.min(100,saved));const update=()=>{const v=Number(x.value);label.dataset.level=x.value;label.classList.toggle("active-level",v>0);const l=label.querySelector(".control-lamp");l?.classList.toggle("on",v>0);l?.classList.toggle("off",v<=0);try{localStorage.setItem(key,String(v))}catch{}if(!locked){send("BUS "+(i+1),"level",v);notify("BUS "+(i+1)+" "+(v>0?"ON":"OFF")+" • "+v+"% ",v>0)}};x.addEventListener("input",update);x.addEventListener("change",update);update();});
 
   // FX controls.
   ["fxDelay","fxFeedback","fxWet"].forEach(id=>root.querySelector("#"+id)?.addEventListener("input",e=>{const v=Number(e.target.value);if(!locked)send("FX 1",id.replace("fx","").toLowerCase(),v);notify("FX 1 "+(v>0?"ON":"OFF")+" • "+id.replace("fx","").toUpperCase()+" "+v)}));
