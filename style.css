@@ -18,66 +18,327 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 @media(max-width:900px){.topbar{position:relative;height:auto;min-height:58px;flex-direction:column;align-items:stretch}.top-actions{width:100%}.upper{display:flex;flex-direction:column;gap:6px}.input-meter{display:none}.digital-screen,.music-player{width:100%}.channel-rack{height:475px}.channels{height:461px;padding-right:0}.master-side-dock{right:4px;top:4px;width:calc(100% - 8px);height:461px}}
 @media(max-width:700px){.console{padding:4px}.brand h1{font-size:clamp(15px,5vw,19px);letter-spacing:1.5px}.top-actions button,.file-btn,.play-mode{height:34px;font-size:10px;padding-inline:8px}.screen-body{min-height:0;padding:7px}.spectrum{height:180px}.screen-source{max-width:50%}.screen-source strong{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.screen-readout{right:8px;gap:7px}.screen-readout strong{font-size:12px}.reference-eq{grid-template-columns:repeat(2,minmax(0,1fr));margin-right:62px;gap:5px}.player-buttons{grid-template-columns:repeat(2,1fr)}.player-buttons button{height:38px}.player-meta{display:grid;grid-template-columns:1fr 1fr}.channel-rack{height:430px}.channels{height:416px}.channel{flex-basis:82px;width:82px;height:416px}.channel .fader,.mini-meter{height:205px}.fader-bank{height:205px;flex-basis:205px}.knob-row{height:108px}.knob-row label{height:47px}.knob-row .knob{width:34px;height:34px}.master-side-dock{height:416px}.master-side-content{height:340px}}
 @media(max-width:430px){.channel-rack{height:400px}.channels{height:386px}.channel{flex-basis:76px;width:76px;height:386px}.channel .fader,.mini-meter{height:185px}.fader-bank{height:185px;flex-basis:185px;grid-template-columns:11px 1fr 8px}.knob-row{height:102px}.knob-row .knob{width:32px;height:32px}.channel-actions{height:46px}.channel-actions button{height:22px}.master-side-dock{height:386px}.master-side-content{height:310px}}
+/* MIXER ONLINE — SINGLE FINAL SKIN / RESPONSIVE LAYOUT
+ * One stylesheet. No retired skin layers or emergency override stacks.
+ */
 
-/* FINAL RESPONSIVE FIX — no overlay / no orphan EQ card */
-.reference-eq{
-  position:absolute;
-  left:14px;
-  right:92px;
-  bottom:62px;
-  height:54px;
+/* Screen-docked dynamic views (METERS / EQ / EFFECT / ROUTING / SETUP) */
+.screen-view-host,
+.screen-view-panel{
+  width:100%;
+  max-width:100%;
+  min-width:0;
   margin:0;
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:7px;
-  z-index:3;
+  overflow:auto;
+  pointer-events:auto;
+  position:relative;
+  box-sizing:border-box;
 }
-.reference-eq .ref-eq-title{
-  position:absolute;
-  left:0;
-  top:-16px;
-  color:#7f898d;
-  font-size:9px;
+.screen-body > .screen-view-host,
+.screen-body > .screen-view-panel{
+  display:block;
+  min-height:0;
+  max-height:100%;
 }
-.reference-eq label{min-width:0;height:54px;padding:5px 7px;display:flex;flex-direction:column;justify-content:center;gap:2px;overflow:hidden}
-.reference-eq label b,.reference-eq label span,.reference-eq label output{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.screen-source{left:14px;bottom:12px;max-width:42%;z-index:4}
-.screen-readout{bottom:12px;z-index:4}
-.screen-meter{top:auto;bottom:10px;z-index:4}
+.screen-view-host input,
+.screen-view-host select,
+.screen-view-host button,
+.screen-view-panel input,
+.screen-view-panel select,
+.screen-view-panel button{
+  pointer-events:auto;
+  touch-action:manipulation;
+}
 
+/* Dynamic screen content must stay inside the mixer display. */
+#digitalScreen .screen-body{
+  overflow:hidden;
+  min-width:0;
+}
+#digitalScreen .screen-body > .screen-view-host,
+#digitalScreen .screen-body > .screen-view-panel{
+  max-height:100%;
+}
+
+/* Responsive mixer frame */
+html,body{
+  width:100%;
+  min-width:0;
+  min-height:100%;
+  overflow-x:hidden;
+}
+main.console{
+  width:100%;
+  max-width:1800px;
+  margin:0 auto;
+  padding:clamp(4px,.65vw,10px);
+}
+.upper{
+  width:100%;
+  min-width:0;
+  grid-template-columns:clamp(70px,6.5vw,100px) minmax(0,1fr) clamp(260px,20vw,320px);
+  gap:clamp(4px,.5vw,8px);
+  min-height:0;
+}
+.digital-screen,.music-player,.input-meter{
+  min-width:0;
+}
+.digital-screen{
+  min-height:clamp(330px,31vw,430px);
+}
+.screen-body{
+  min-height:clamp(300px,29vw,390px);
+}
+.spectrum{
+  height:clamp(165px,16vw,220px);
+}
+
+/* Channel rack: channels and master are separate columns, never overlapping. */
 .channel-rack{
+  width:100%;
+  min-width:0;
+  height:auto;
+  min-height:clamp(473px,calc(100vh - 520px),900px);
+  margin-top:clamp(5px,.6vw,8px);
+  padding:clamp(4px,.45vw,7px);
   display:grid;
-  grid-template-columns:minmax(0,1fr) 355px;
-  gap:7px;
-  height:475px;
+  grid-template-columns:minmax(0,1fr) clamp(270px,22vw,355px);
+  gap:clamp(5px,.5vw,8px);
   overflow:hidden;
 }
-.channels{
+.channel-rack > .channels{
   grid-column:1;
   grid-row:1;
   min-width:0;
   width:100%;
-  height:461px;
-  padding-right:0;
+  height:100%;
+  min-height:473px;
+  padding:0;
+  display:flex;
+  flex-wrap:nowrap;
+  gap:clamp(3px,.35vw,5px);
   overflow-x:auto;
   overflow-y:hidden;
+  touch-action:pan-x;
+  overscroll-behavior-x:contain;
 }
-.master-side-dock{
-  position:relative;
+.channel-rack > .master-side-dock{
   grid-column:2;
   grid-row:1;
-  right:auto;
-  top:auto;
+  position:relative!important;
+  inset:auto!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:473px;
+  margin:0;
+  z-index:20;
+}
+
+/* One channel skin for CH1–CH16 and beyond. */
+.channel{
+  flex:0 0 clamp(76px,5.2vw,88px);
+  width:clamp(76px,5.2vw,88px);
+  min-width:0;
+  height:100%;
+  min-height:473px;
+  padding:clamp(4px,.35vw,6px);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.channel-head{
+  height:28px;
+  min-height:28px;
+}
+.channel-tabs{
+  height:18px;
+  min-height:18px;
+  margin:3px 0;
+}
+.channel-tabs button{
+  height:18px;
+  min-height:18px;
+}
+.route select,.input-route{
+  height:23px;
+  min-height:23px;
+}
+.channel-lamps{
+  height:47px;
+  min-height:47px;
+  margin:3px 0;
+  padding:3px;
+}
+.level-readout{
+  height:19px;
+  min-height:19px;
+  padding-top:3px;
+}
+
+/* Uniform GAIN/PAN knobs with large touch targets. */
+.knob-row{
+  height:88px;
+  min-height:88px;
+  gap:3px;
+  margin:3px 0 2px;
+}
+.knob-row label{
+  height:41px;
+  min-height:41px;
+  grid-template-rows:12px 29px;
+}
+.knob-row .knob{
+  width:31px;
+  height:31px;
+  min-width:31px;
+  min-height:31px;
+}
+.knob-row .knob::-webkit-slider-runnable-track{height:31px}
+.knob-row .knob::-webkit-slider-thumb{width:29px;height:29px}
+
+/* Uniform vertical fader + scale + handle + meter. */
+.fader-bank{
+  flex:1 1 auto;
+  height:auto;
+  min-height:240px;
+  display:grid;
+  grid-template-columns:13px minmax(0,1fr) 11px;
+  gap:3px;
+  margin:2px 0;
+}
+.fader-scale{
+  height:100%!important;
+  min-height:120px!important;
+}
+.channel .fader{
+  width:27px;
+  height:100%!important;
+  min-height:120px!important;
+  margin:0 auto;
+}
+.channel .fader::-webkit-slider-thumb{
+  width:20px;
+  height:28px;
+}
+.mini-meter{
+  width:11px!important;
+  min-width:11px!important;
+  height:100%!important;
+  min-height:120px!important;
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  position:relative!important;
+  overflow:hidden;
+  pointer-events:none;
+  background:repeating-linear-gradient(to bottom,#080b0c 0 6px,#293235 7px 8px)!important;
+  border:1px solid #566064!important;
+}
+.mini-meter .meter-fill{
+  position:absolute!important;
+  left:0!important;
+  bottom:0!important;
+  width:100%!important;
+  min-height:2px;
+  background:linear-gradient(to top,#13d957 0 65%,#e8d32b 66% 84%,#e52929 85%)!important;
+}
+.fader-value{
+  height:19px;
+  min-height:19px;
+  padding:3px;
+}
+.channel-actions{
+  height:44px;
+  min-height:44px;
+  gap:2px;
+  margin:3px 0;
+}
+.channel-actions button{
+  height:21px;
+  min-height:21px;
+  min-width:0;
+  touch-action:manipulation;
+}
+.channel-status,.channel-bottom{
+  height:10px;
+  min-height:10px;
+  line-height:10px;
+}
+
+/* Master / AUX / FX dock uses the same mixer skin and stays inside the rack. */
+.master-side-dock{
+  padding:6px;
+  overflow:hidden;
+}
+.master-side-content{
+  min-width:0;
+  height:calc(100% - 60px);
+  min-height:0;
+  overflow:auto;
+  overflow-x:hidden;
+}
+.master-side-content input[type=range]{
   width:100%;
-  height:461px;
-  z-index:10;
+  min-width:0;
+  min-height:28px;
 }
-.master-side-content{min-width:0;overflow:auto}
+.master-side-content button,
+.master-side-content select,
+.master-side-content input{
+  touch-action:manipulation;
+}
+
+/* Never leave a viewport-sized black floor after the mixer. */
+main.console{
+  min-height:0!important;
+}
+footer{
+  margin-top:0;
+}
+
+/* Tablet */
 @media(max-width:1200px){
-  .channel-rack{grid-template-columns:minmax(0,1fr) 310px}
-  .channels{padding-right:0}
+  .upper{
+    grid-template-columns:78px minmax(0,1fr) 290px;
+  }
+  .channel-rack{
+    grid-template-columns:minmax(0,1fr) 300px;
+  }
 }
+
+/* Phone/tablet: upper panels stack; channel rack remains a horizontal mixer surface,
+   while MASTER/AUX/FX becomes a full-width dock below it. */
 @media(max-width:900px){
+  .topbar{
+    position:relative;
+    height:auto;
+    min-height:56px;
+    flex-direction:column;
+    align-items:stretch;
+  }
+  .top-actions{
+    width:100%;
+    overflow-x:auto;
+  }
+  .upper{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:5px;
+  }
+  .input-meter{
+    display:none;
+  }
+  .digital-screen{
+    width:100%;
+    min-height:0;
+  }
+  .screen-body{
+    min-height:315px;
+  }
+  .music-player{
+    width:100%;
+    min-height:285px;
+  }
   .channel-rack{
     display:flex;
     flex-direction:column;
@@ -86,209 +347,219 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
     overflow:visible;
     gap:6px;
   }
-  .channels{
+  .channel-rack > .channels{
     order:1;
-    flex:0 0 430px;
     width:100%;
-    height:430px;
-    padding-right:0;
+    height:420px;
+    min-height:420px;
+    flex:0 0 420px;
     overflow-x:auto;
     overflow-y:hidden;
   }
-  .master-side-dock{
+  .channel{
+    flex:0 0 82px;
+    width:82px;
+    height:100%;
+    min-height:416px;
+  }
+  .channel-rack > .master-side-dock{
     order:2;
-    position:relative;
-    width:100%;
-    height:390px;
-    flex:0 0 390px;
-    right:auto;
-    top:auto;
+    width:100%!important;
+    height:380px!important;
+    min-height:380px;
+    flex:0 0 380px;
+  }
+  .master-side-content{
+    height:calc(100% - 60px);
+  }
+  .channel .fader,
+  .mini-meter,
+  .fader-scale,
+  .fader-bank{
+    min-height:205px!important;
   }
 }
-@media(max-width:700px){
+
+/* Small phone */
+@media(max-width:600px){
+  .console{
+    padding:4px;
+  }
+  .brand h1{
+    font-size:clamp(15px,5vw,19px);
+    letter-spacing:1.5px;
+  }
+  .top-actions button,.file-btn,.play-mode{
+    height:34px;
+    font-size:10px;
+    padding-inline:8px;
+  }
+  .screen-body{
+    min-height:300px;
+    padding:7px;
+  }
+  .spectrum{
+    height:160px;
+  }
+  .screen-source{
+    left:8px;
+    bottom:7px;
+    max-width:45%;
+  }
+  .screen-readout{
+    right:7px;
+    bottom:7px;
+    gap:7px;
+  }
+  .screen-meter{
+    right:7px;
+    bottom:7px;
+  }
   .reference-eq{
     left:7px;
-    right:62px;
+    right:55px;
     bottom:58px;
-    height:72px;
+    height:66px;
     grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:5px;
+    gap:4px;
   }
-  .reference-eq label{height:34px;padding:3px 5px}
-  .reference-eq .ref-eq-title{top:-14px}
-  .screen-source{bottom:8px;max-width:46%}
-  .screen-readout{bottom:8px}
-  .screen-meter{bottom:7px}
-  .channels{flex-basis:416px;height:416px}
-  .master-side-dock{height:370px;flex-basis:370px}
+  .music-player{
+    min-height:270px;
+  }
+  .channel-rack{
+    padding:4px;
+  }
+  .channel-rack > .channels{
+    height:398px;
+    min-height:398px;
+    flex-basis:398px;
+  }
+  .channel{
+    flex-basis:78px;
+    width:78px;
+    min-height:398px;
+  }
+  .channel-head{
+    height:26px;
+    min-height:26px;
+  }
+  .channel-lamps{
+    height:44px;
+    min-height:44px;
+  }
+  .level-readout{
+    height:18px;
+    min-height:18px;
+  }
+  .knob-row{
+    height:75px;
+    min-height:75px;
+  }
+  .knob-row label{
+    height:35px;
+    min-height:35px;
+    grid-template-rows:11px 24px;
+  }
+  .knob-row .knob{
+    width:29px;
+    height:29px;
+    min-width:29px;
+    min-height:29px;
+  }
+  .fader-bank{
+    min-height:105px!important;
+  }
+  .channel-actions{
+    height:42px;
+    min-height:42px;
+  }
+  .channel-actions button{
+    height:20px;
+    min-height:20px;
+  }
+  .channel-status,.channel-bottom{
+    height:9px;
+    min-height:9px;
+    line-height:9px;
+  }
+  .channel .fader,.mini-meter,.fader-scale{
+    min-height:105px!important;
+  }
+  .master-side-dock{
+    height:360px!important;
+    min-height:360px;
+    flex-basis:360px;
+  }
 }
+
+/* Very small phone */
 @media(max-width:430px){
-  .reference-eq{right:54px;bottom:54px;height:68px}
-  .reference-eq label{font-size:7px}
-  .channels{flex-basis:386px;height:386px}
-  .master-side-dock{height:350px;flex-basis:350px}
+  .topbar{
+    padding:4px 6px;
+  }
+  .brand h1{
+    font-size:16px;
+  }
+  .top-actions button,.file-btn,.play-mode{
+    height:32px;
+    padding:0 7px;
+    font-size:9px;
+  }
+  .screen-body{
+    min-height:285px;
+  }
+  .spectrum{
+    height:150px;
+  }
+  .music-player{
+    min-height:255px;
+  }
+  .channel-rack > .channels{
+    height:382px;
+    min-height:382px;
+    flex-basis:382px;
+  }
+  .channel{
+    flex-basis:74px;
+    width:74px;
+    min-height:382px;
+    padding:4px;
+  }
+  .channel-head{
+    height:25px;
+    min-height:25px;
+  }
+  .channel-lamps{
+    height:41px;
+    min-height:41px;
+  }
+  .knob-row{
+    height:70px;
+    min-height:70px;
+  }
+  .knob-row label{
+    height:33px;
+    min-height:33px;
+  }
+  .knob-row .knob{
+    width:27px;
+    height:27px;
+    min-width:27px;
+    min-height:27px;
+  }
+  .fader-bank{
+    min-height:100px!important;
+  }
+  .channel .fader,.mini-meter,.fader-scale{
+    min-height:100px!important;
+  }
+  .master-side-dock{
+    height:345px!important;
+    min-height:345px;
+    flex-basis:345px;
+  }
+  footer{
+    height:34px;
+    min-height:34px;
+  }
 }
-
-/* FINAL LAYOUT CLEANUP */
-main{min-height:calc(100vh - 96px)}
-.screen-channels{display:none!important}
-.channel-rack{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 355px;gap:7px;align-items:stretch}
-.channel-rack > .channels{grid-column:1;grid-row:1;min-width:0;width:100%;padding-right:0!important}
-.channel-rack > .master-side-dock{grid-column:2;grid-row:1;position:relative!important;inset:auto!important;width:100%!important;height:461px!important;margin:0;z-index:20}
-.channel-rack > .channels > .master-side-dock{display:none!important}
-.master-side-content{min-height:0;height:386px;overflow-y:auto;overflow-x:hidden}
-@media(max-width:1200px){
-  .channel-rack{grid-template-columns:minmax(0,1fr) 310px}
-}
-@media(max-width:900px){
-  main{min-height:0}
-  .channel-rack{display:flex;flex-direction:column;height:auto;gap:6px;overflow:visible}
-  .channel-rack > .channels{order:1;width:100%;height:430px;flex:0 0 430px;overflow-x:auto;overflow-y:hidden}
-  .channel-rack > .master-side-dock{order:2;width:100%!important;height:390px!important;flex:0 0 390px;position:relative!important}
-}
-@media(max-width:700px){
-  .channel-rack > .channels{height:416px;flex-basis:416px}
-  .channel-rack > .master-side-dock{height:370px!important;flex-basis:370px}
-}
-@media(max-width:430px){
-  .channel-rack > .channels{height:386px;flex-basis:386px}
-  .channel-rack > .master-side-dock{height:350px!important;flex-basis:350px}
-}
-
-/* FINAL RESPONSIVE SCALE v20260830 */
-/* One responsive sizing system. No fixed desktop canvas on small screens. */
-html,body{width:100%;min-width:0;overflow-x:hidden}
-main.console{width:100%;max-width:1800px;margin:0 auto;padding:clamp(4px,0.65vw,10px)}
-.upper{width:100%;grid-template-columns:clamp(70px,6.5vw,100px) minmax(0,1fr) clamp(260px,20vw,320px);gap:clamp(4px,.5vw,8px);min-height:0}
-.digital-screen,.music-player,.input-meter{min-width:0}
-.digital-screen{min-height:clamp(330px,31vw,430px)}
-.screen-body{min-height:clamp(300px,29vw,390px)}
-.spectrum{height:clamp(165px,16vw,220px)}
-.channel-rack{width:100%;height:auto;min-height:0;margin-top:clamp(5px,.6vw,8px);padding:clamp(4px,.45vw,7px);display:grid;grid-template-columns:minmax(0,1fr) clamp(270px,22vw,355px);gap:clamp(5px,.5vw,8px);overflow:hidden}
-.channel-rack>.channels{grid-column:1;grid-row:1;width:100%;height:clamp(405px,31vw,461px);min-width:0;padding:0;display:flex;flex-wrap:nowrap;gap:clamp(3px,.35vw,5px);overflow-x:auto;overflow-y:hidden}
-.channel{flex:0 0 clamp(76px,5.2vw,88px);width:clamp(76px,5.2vw,88px);height:100%;min-width:0;padding:clamp(4px,.35vw,6px);display:flex;flex-direction:column;overflow:hidden}
-.channel-head{height:28px;min-height:28px}
-.channel-tabs{height:18px;min-height:18px;margin:3px 0}
-.channel-tabs button{height:18px}
-.route select,.input-route{height:23px;min-height:23px}
-.channel-lamps{height:47px;min-height:47px;margin:3px 0;padding:3px}
-.level-readout{height:19px;min-height:19px;padding-top:3px}
-.knob-row{height:88px;min-height:88px;gap:3px;margin:3px 0 2px}
-.knob-row label{height:41px;min-height:41px;grid-template-rows:12px 29px}
-.knob-row .knob{width:31px;height:31px}
-.knob-row .knob::-webkit-slider-runnable-track{height:31px}
-.knob-row .knob::-webkit-slider-thumb{width:29px;height:29px}
-.fader-bank{height:auto;min-height:0;flex:1 1 auto;display:grid;grid-template-columns:11px 1fr 8px;gap:2px;margin:2px 0}
-.channel .fader,.mini-meter{height:100%;min-height:100px}
-.channel .fader{width:27px}
-.channel .fader::-webkit-slider-thumb{width:20px;height:28px}
-.fader-value{height:19px;min-height:19px;padding:3px}
-.channel-actions{height:44px;min-height:44px;gap:2px;margin:3px 0}
-.channel-actions button{height:21px;min-height:21px}
-.channel-status,.channel-bottom{height:10px;min-height:10px;line-height:10px}
-.master-side-dock{grid-column:2;grid-row:1;position:relative!important;inset:auto!important;width:100%!important;height:100%!important;min-height:405px;max-height:none;z-index:20}
-.master-side-content{height:calc(100% - 60px);min-height:0;overflow:auto}
-footer{width:100%;height:36px;min-height:36px}
-
-@media(max-width:1200px){
- .upper{grid-template-columns:78px minmax(0,1fr) 290px}
- .channel-rack{grid-template-columns:minmax(0,1fr) 300px}
-}
-@media(max-width:900px){
- .topbar{position:relative;height:auto;min-height:56px}
- .top-actions{width:100%;overflow-x:auto}
- .upper{display:grid;grid-template-columns:1fr;gap:5px}
- .input-meter{display:none}
- .digital-screen{width:100%;min-height:0}
- .screen-body{min-height:315px}
- .music-player{width:100%;min-height:285px}
- .channel-rack{display:flex;flex-direction:column;height:auto;overflow:visible;gap:6px}
- .channel-rack>.channels{order:1;width:100%;height:420px;flex:0 0 420px;overflow-x:auto;overflow-y:hidden}
- .channel{flex:0 0 82px;width:82px;height:408px}
- .master-side-dock{order:2;width:100%!important;height:380px!important;min-height:380px;flex:0 0 380px}
- .master-side-content{height:calc(100% - 60px)}
-}
-@media(max-width:600px){
- .console{padding:4px}
- .screen-body{min-height:300px;padding:7px}
- .spectrum{height:160px}
- .reference-eq{left:7px;right:55px;bottom:58px;height:66px;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
- .screen-source{left:8px;bottom:7px;max-width:45%}
- .screen-readout{right:7px;bottom:7px;gap:7px}
- .screen-meter{right:7px;bottom:7px}
- .music-player{min-height:270px}
- .channel-rack{padding:4px}
- .channel-rack>.channels{height:398px;flex-basis:398px}
- .channel{flex-basis:78px;width:78px;height:386px}
- .channel-head{height:26px;min-height:26px}
- .channel-tabs,.channel-tabs button{height:17px;min-height:17px}
- .route select,.input-route{height:22px;min-height:22px}
- .channel-lamps{height:44px;min-height:44px}
- .level-readout{height:18px;min-height:18px}
- .knob-row{height:75px;min-height:75px}
- .knob-row label{height:35px;min-height:35px;grid-template-rows:11px 24px}
- .knob-row .knob{width:29px;height:29px}
- .fader-bank{min-height:105px}
- .fader-value{height:18px;min-height:18px}
- .channel-actions{height:42px;min-height:42px}
- .channel-actions button{height:20px;min-height:20px}
- .channel-status,.channel-bottom{height:9px;min-height:9px;line-height:9px}
- .master-side-dock{height:360px!important;min-height:360px;flex-basis:360px}
-}
-@media(max-width:430px){
- .topbar{padding:4px 6px}
- .brand h1{font-size:16px}
- .top-actions button,.file-btn,.play-mode{height:32px;padding:0 7px;font-size:9px}
- .screen-body{min-height:285px}
- .spectrum{height:150px}
- .music-player{min-height:255px}
- .channel-rack>.channels{height:382px;flex-basis:382px}
- .channel{flex-basis:74px;width:74px;height:370px;padding:4px}
- .channel-head{height:25px;min-height:25px}
- .channel-lamps{height:41px;min-height:41px}
- .knob-row{height:70px;min-height:70px}
- .knob-row label{height:33px;min-height:33px}
- .knob-row .knob{width:27px;height:27px}
- .fader-bank{min-height:100px}
- .master-side-dock{height:345px!important;min-height:345px;flex-basis:345px}
- footer{height:34px;min-height:34px}
-}
-
-/* FINAL METER GAP FIX */
-html,body{height:auto!important;min-height:0!important}main.console{min-height:0!important;height:auto!important}.channel-rack{height:473px!important;min-height:473px!important}.channel-rack>.channels{height:461px!important;min-height:461px!important}.channel{height:461px!important;min-height:461px!important}.fader-bank{height:245px!important;min-height:245px!important;grid-template-columns:13px minmax(0,1fr) 10px}.channel .fader,.mini-meter,.fader-scale{height:245px!important;min-height:245px!important}.mini-meter{position:relative;overflow:hidden}.mini-meter .meter-fill{position:absolute!important;left:0;bottom:0;width:100%!important;min-height:2px;transition:height .08s linear}.master-side-dock{height:461px!important;min-height:461px!important}.master-side-content{height:386px!important;min-height:0!important}footer{margin-top:0!important}
-@media(max-width:900px){.channel-rack{height:auto!important;min-height:0!important}.channel-rack>.channels{height:416px!important;min-height:416px!important;flex-basis:416px!important}.channel{height:416px!important;min-height:416px!important}.channel .fader,.mini-meter,.fader-scale,.fader-bank{height:205px!important;min-height:205px!important}.master-side-dock{height:390px!important;min-height:390px!important}}
-@media(max-width:700px){.channel-rack>.channels{height:416px!important;min-height:416px!important;flex-basis:416px!important}.channel{height:416px!important;min-height:416px!important}.channel .fader,.mini-meter,.fader-scale,.fader-bank{height:205px!important;min-height:205px!important}.master-side-dock{height:370px!important;min-height:370px!important}}
-@media(max-width:430px){.channel-rack>.channels{height:386px!important;min-height:386px!important;flex-basis:386px!important}.channel{height:386px!important;min-height:386px!important}.channel .fader,.mini-meter,.fader-scale,.fader-bank{height:185px!important;min-height:185px!important}.master-side-dock{height:350px!important;min-height:350px!important}}
-
-/* FINAL CHANNEL EXTENSION + VISIBLE METER STRIP v20260830 */
-/* The channel rack consumes the remaining viewport instead of leaving an empty floor. */
-main.console{display:flex!important;flex-direction:column!important;min-height:calc(100vh - 96px)!important}
-.upper{flex:0 0 auto!important}
-.channel-rack{flex:1 1 auto!important;height:auto!important;min-height:clamp(473px,calc(100vh - 520px),900px)!important}
-.channel-rack>.channels{height:100%!important;min-height:473px!important}
-.channel-rack>.channels>.channel{height:100%!important;min-height:473px!important}
-.channel .fader-bank{flex:1 1 auto!important;height:auto!important;min-height:240px!important}
-.channel .fader,.channel .mini-meter,.channel .fader-scale{height:100%!important;min-height:120px!important}
-.channel .mini-meter{width:11px!important;min-width:11px!important;display:block!important;visibility:visible!important;opacity:1!important;background:repeating-linear-gradient(to bottom,#080b0c 0 6px,#293235 7px 8px)!important;border:1px solid #566064!important;position:relative!important;overflow:hidden!important}
-.channel .mini-meter .meter-fill{position:absolute!important;left:0!important;bottom:0!important;width:100%!important;min-height:2px!important;background:linear-gradient(to top,#13d957 0 65%,#e8d32b 66% 84%,#e52929 85%)!important}
-@media(max-width:900px){
- main.console{min-height:0!important}
- .channel-rack{min-height:calc(100vh - 700px)!important}
- .channel-rack>.channels{height:clamp(416px,calc(100vh - 700px),900px)!important;min-height:416px!important;flex:1 1 auto!important}
- .channel-rack>.channels>.channel{height:100%!important;min-height:416px!important}
- .channel-rack>.master-side-dock{flex:0 0 380px!important;height:380px!important}
-}
-@media(max-width:600px){
- .channel-rack{min-height:calc(100vh - 720px)!important}
- .channel-rack>.channels{height:clamp(398px,calc(100vh - 720px),850px)!important;min-height:398px!important}
- .channel-rack>.channels>.channel{min-height:398px!important}
- .channel-rack>.master-side-dock{flex-basis:360px!important;height:360px!important}
-}
-@media(max-width:430px){
- .channel-rack{min-height:calc(100vh - 680px)!important}
- .channel-rack>.channels{height:clamp(382px,calc(100vh - 680px),800px)!important;min-height:382px!important}
- .channel-rack>.channels>.channel{min-height:382px!important}
- .channel-rack>.master-side-dock{flex-basis:345px!important;height:345px!important}
-}
-/* Never hide the channel meter strip on small screens. */
-@media(max-width:900px){.channel .mini-meter{display:block!important}}
