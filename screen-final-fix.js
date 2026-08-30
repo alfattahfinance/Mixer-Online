@@ -24,9 +24,10 @@ function build(){
  const screen=$('#digitalScreen'),body=screen?.querySelector('.screen-body'),bar=screen?.querySelector('.screen-tabs');if(!screen||!body||!bar)return;
  addStyle();
  $('.screen-view-host,.final-screen-layer').forEach(x=>x.remove());
+ $(' .screen-view-panel').forEach(x=>{if(x.parentElement===body&&!x.classList.contains('master-side-dock'))x.remove()});
  const md=body.querySelector('.master-side-dock');
- if(md){const rack=$('.channel-rack');if(rack&&md.parentElement!==rack)rack.appendChild(md)}
- $('#digitalScreen .screen-view-panel').forEach(x=>{if(!x.classList.contains('master-side-dock'))x.remove()});
+ if(md) md.style.display='none';
+ $('.channel-rack .master-side-dock').forEach(x=>x.remove());
  let host=body.querySelector('.screen-dock-host');if(host)host.remove();
  host=document.createElement('div');host.className='screen-dock-host';body.appendChild(host);
  const make=(name,html)=>{const p=document.createElement('section');p.className='screen-dock';p.dataset.view=name;p.innerHTML=html;host.appendChild(p);return p};
