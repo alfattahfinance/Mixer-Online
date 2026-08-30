@@ -81,3 +81,14 @@ footer{height:40px;border-top:1px solid #292f32;background:#0b0e10;color:#737d81
  .channels .fader-value{height:17px!important;font-size:6px!important}.channels .channel-actions{gap:2px!important}.channels .channel-actions button{height:22px!important;font-size:6px!important}.channels .channel-status,.channels .channel-bottom{font-size:4px!important}
  .channels .bus-strip .bus-fader{height:220px!important}.channels .master .fader{height:215px!important}
 }
+
+/* === UNIVERSAL TOUCH RESPONSE FIX === */
+html,body{touch-action:manipulation!important;-webkit-tap-highlight-color:rgba(255,255,255,.08)}
+button,a,input,select,textarea,[role="button"],[role="tab"],.channel,.channel-head,.channel-actions,.master-side-dock,.master-side-menu{touch-action:manipulation!important;-webkit-user-select:none;user-select:none}
+button,a,[role="button"],[role="tab"]{cursor:pointer!important;-webkit-touch-callout:none!important}
+button:active,[role="button"]:active,[role="tab"]:active{filter:brightness(1.22);transform:translateY(1px)}
+.master-side-dock,.master-side-menu,.master-side-menu button,.master-side-content{pointer-events:auto!important}
+.master-side-dock{z-index:99999!important;isolation:isolate!important}
+.screen-view-host{pointer-events:none!important;z-index:5!important}.screen-view-host .screen-view-panel.active{pointer-events:auto!important}
+.channel-rack{position:relative;z-index:10!important}.channels .channel,.channels .bus-strip,.channels .master{position:relative;z-index:11!important}
+@media(max-width:1100px){.master-side-dock{z-index:99999!important}.master-side-menu button{min-height:30px!important}.master-side-content button,.master-side-content input,.master-side-content select{min-height:28px!important}}
