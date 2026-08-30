@@ -112,8 +112,9 @@
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', () => setTimeout(boot, 50), {once:true});
   }else{
-    setTimeout(boot, 50);
+    setTimeout(boot, 650);
   }
 
+  window.addEventListener('load', () => setTimeout(boot, 120), {once:true});
   window.MixerFinalScreenFix = { refresh: boot };
 })();
