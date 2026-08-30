@@ -4,22 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Mixer Online — Digital Audio Mixer</title>
-<link rel="stylesheet" href="style.css?v=20260830-finalref9">
-<link rel="stylesheet" href="mixer-final.css?v=20260830-ref9">
-<link rel="stylesheet" href="final-responsive.css?v=20260830-refskin10">
+<link rel="stylesheet" href="style.css?v=20260830-single-skin">
 </head>
 <body>
 <header class="topbar">
   <div class="brand"><h1>MIXER ONLINE</h1><small>Digital Audio Mixer</small></div>
   <div class="top-actions">
-    <button id="phoneRecorder">🎙 PEREKAM</button>
-    <button id="phoneFiles">📁 FILE</button>
-    <button id="phoneMusic">🎵 MUSIK</button>
-    <button id="startMic">🎤 MIC</button>
+    <button id="phoneRecorder">🎙 PEREKAM</button><button id="phoneFiles">📁 FILE</button><button id="phoneMusic">🎵 MUSIK</button><button id="startMic">🎤 MIC</button>
     <label class="file-btn">🎚 AUDIO<input id="audioFile" type="file" accept="audio/*" multiple></label>
     <label class="play-mode">MODE <select id="audioPlayMode"><option value="sequential">BERURUTAN</option><option value="random">ACAK</option></select></label>
-    <button id="connectDevice">🔗 CONNECT <i class="top-led"></i></button>
-    <button id="stopAll">■ STOP</button>
+    <button id="connectDevice">🔗 CONNECT <i class="top-led"></i></button><button id="stopAll">■ STOP</button>
   </div>
 </header>
 <main class="console">
@@ -32,7 +26,7 @@
         <div class="screen-source"><small>INPUT / PLAYER</small><strong id="screenTrack">NO SIGNAL</strong><span id="screenPlayState">READY</span></div>
         <div class="screen-readout"><span>BPM<strong>120.0</strong></span><span>KEY<strong>C</strong></span><span>TIME<strong id="screenTime">00:00</strong></span></div>
         <div class="screen-channels"><div><small>CH 1</small><b id="screenCh1">0.0 dB</b></div><div><small>CH 2</small><b id="screenCh2">0.0 dB</b></div><div><small>CH 3</small><b id="screenCh3">0.0 dB</b></div><div><small>MASTER</small><b id="screenMaster">0.0 dB</b></div></div>
-        <div class="screen-meter"><i id="screenMeterL"></i><i id="screenMeterR"></i><span>L</span><span>R</span><div class="screen-scale">0 &nbsp; -3 &nbsp; -6 &nbsp; -12 &nbsp; -18 &nbsp; -24 &nbsp; -∞</div></div>
+        <div class="screen-meter"><i id="screenMeterL"></i><i id="screenMeterR"></i><span>L</span><span>R</span></div>
       </div>
     </section>
     <section id="musicPlayer" class="music-player panel">
