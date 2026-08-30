@@ -58,14 +58,21 @@
 
     /* Replace tab buttons so the old mixer-final click handlers cannot
        hide the screen body or route the view outside the mixer. */
-    const labels = ['HOME','METERS','EQ','EFFECT','ROUTING','SETUP'];
+    const labels = ['HOME','METERS','EQ','EFFECT','ROUTING','SETUP','MASTER'];
     const oldButtons = Array.from(tabs.querySelectorAll('button'));
     oldButtons.forEach((oldButton, i) => {
       const b = oldButton.cloneNode(true);
       b.textContent = labels[i] || oldButton.textContent;
       oldButton.replaceWith(b);
     });
-    const buttons = Array.from(tabs.querySelectorAll('button'));
+    let buttons = Array.from(tabs.querySelectorAll('button'));
+    while(buttons.length < labels.length){
+      const b=document.createElement('button');
+      b.type='button';
+      b.textContent=labels[buttons.length];
+      tabs.appendChild(b);
+      buttons.push(b);
+    }
 
     const homeNodes = [
       body.querySelector('.spectrum'),
@@ -89,7 +96,7 @@
         panel.style.display = active ? 'block' : 'none';
       });
       buttons.forEach((b,i) => {
-        const active = labels[i].toLowerCase() === name;
+        const active = labels[i]?.toLowerCase() === name;
         b.classList.toggle('active', active);
         b.setAttribute('aria-selected', active ? 'true' : 'false');
       });
