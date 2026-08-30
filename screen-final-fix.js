@@ -25,6 +25,13 @@
       document.head.appendChild(style);
     }
 
+    /* Let the original screen controller initialize its existing controls once.
+       We immediately replace the tab nodes afterward, so its old full-page routing
+       cannot remain active. */
+    const bootstrapButtons = Array.from(tabs.querySelectorAll('button'));
+    bootstrapButtons.slice(1).forEach(b => { try { b.click(); } catch(e){} });
+    try { bootstrapButtons[0]?.click(); } catch(e){}
+
     /* Remove the broken/legacy host created by the previous layout bridge.
        Keep its actual view panels so their existing control wiring survives. */
     const oldHost = screen.querySelector(':scope > .screen-view-host');
