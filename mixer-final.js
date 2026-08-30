@@ -4,6 +4,9 @@ if(window.__mixerFinalUI)return;window.__mixerFinalUI=true;
 const $=s=>document.querySelector(s), qa=s=>[...document.querySelectorAll(s)], clamp=(n,a=0,b=1)=>Math.max(a,Math.min(b,Number(n)||0));
 const style=document.createElement('style');style.id='mixer-final-inline';style.textContent='html{scroll-behavior:smooth}.channel-rack{scroll-margin-top:60px}.master-side-dock{order:999}';document.head.appendChild(style);
 function ensureInputLeds(){const box=$('.input-meter');if(!box)return;let x=box.querySelector('.input-leds');if(!x){x=document.createElement('div');x.className='input-leds';x.innerHTML='<span><i class="lamp signal"></i>L</span><span><i class="lamp signal"></i>R</span>';box.appendChild(x)}return x}
+function meterCard(card,level){if(!card)return;const fill=card.querySelector('.meter-fill');if(fill)fill.style.height=Math.max(2,Math.min(100,level*100))+'%';const readout=card.querySelector('.level-readout');if(readout)readout.textContent=level<.001?'−∞':(20*Math.log10(level)).toFixed(1)+' dB'}
+function setLamps(card,rms,peak){if(!card)return;const muted=!!card.querySelector('.channel-actions .mute.active');card.querySelector('.lamp.on')?.classList.toggle('active',!muted);card.querySelector('.lamp.mute')?.classList.toggle('active',muted);card.querySelector('.lamp.signal')?.classList.toggle('active',rms>.008&&!muted);card.querySelector('.lamp.peak')?.classList.toggle('active',peak>.82&&!muted);card.querySelector('.lamp.clip')?.classList.toggle('active',peak>.98&&!muted)}
+function safeAnalyser(analyser){return analyser&&typeof analyser.getFloatTimeDomainData==='function'?analyser:null}
 function readAnalyser(analyser){
   if(!analyser) return {r:0,p:0,freq:null};
   try{
@@ -18,7 +21,7 @@ function readAnalyser(analyser){
   }catch{return {r:0,p:0,freq:null}}
 }
 function level(){
-  const master=readAnalyser(window.masterAnalyser);
+  const master=readAnalyser(safeAnalyser(window.masterAnalyser));
   if(master.r>.001||master.p>.002)return master;
   const target=Number($('#musicChannel')?.value||0);
   return readAnalyser(window.__mixerState?.channels?.[target]?._audio?.analyser);
@@ -26,7 +29,7 @@ function level(){
 function updateMeters(){
   const st=window.__mixerState, cards=st?.channels||[];
   const master=readAnalyser(window.masterAnalyser);
-  const levels=cards.map(c=>readAnalyser(c?._audio?.analyser));
+  const levels=cards.map(c=>readAnalyser(safeAnalyser(c?._audio?.analyser)));
   cards.forEach((card,i)=>{
     const z=levels[i];
     meterCard(card,z.r); setLamps(card,z.r,z.p);
@@ -66,6 +69,6 @@ function makeScreenViews(){const s=$('#digitalScreen');if(!s||s.dataset.finalVie
 function makeMasterMenu(){const m=$('.master'),rack=$('#channels');if(!m||!rack||rack.querySelector('.master-side-dock'))return;const dock=document.createElement('aside');dock.className='master-side-dock';dock.innerHTML='<div class="master-side-title"><b>MASTER CONTROL</b><span>MENU</span></div><div class="master-side-menu" role="tablist"><button data-tab="panel" class="active">PANEL</button><button data-tab="aux">AUX / BUS</button><button data-tab="fx">FX</button><button data-tab="scenes">SCENES</button><button data-tab="setup">SETUP</button></div><div class="master-side-content"></div>';rack.appendChild(dock);const content=dock.querySelector('.master-side-content');const groups={panel:['bus-fx-masters'],aux:['output-routing'],fx:['bus-fx-masters'],scenes:['scene-panel','history-panel'],setup:['lock-panel','connection-panel','mapper-panel','hardware-test-panel','esp32-sim-panel','usb-audio-panel']};const all=[...new Set(Object.values(groups).flat())];all.forEach(cls=>{const p=m.querySelector('.'+cls);if(p){p.dataset.sidePanel=cls;content.appendChild(p)}});function show(tab){dock.querySelectorAll('.master-side-menu button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));content.querySelectorAll('[data-side-panel]').forEach(p=>p.classList.toggle('side-active',(groups[tab]||[]).includes(p.dataset.sidePanel)));}dock.querySelectorAll('button').forEach(b=>b.onclick=()=>show(b.dataset.tab));show('panel')}
 function masterIndependence(){const f=$('#masterFader');if(!f||f.dataset.finalBound)return;f.dataset.finalBound='1';f.addEventListener('input',()=>{const v=Number(f.value);const val=$('#masterValue');if(val)val.textContent=Math.round(v*100)+'%';if(window.masterGain&&!$('#masterMute')?.classList.contains('active'))window.masterGain.gain.value=v});}
 const finalRuntimeStyle=document.createElement('style');finalRuntimeStyle.id='mixer-final-runtime-style';finalRuntimeStyle.textContent=`.spectrum-bars{display:flex!important;align-items:flex-end!important;justify-content:space-between!important;gap:2px!important;position:absolute!important;inset:0!important;padding:18px 12px 28px!important;pointer-events:none!important}.spectrum-live-bar{display:block!important;flex:1 1 0!important;min-width:2px!important;max-width:12px!important;background:linear-gradient(to top,#0875ad 0%,#10b8e5 75%,#f2cf2b 100%)!important;opacity:.9!important;transition:height .06s linear!important}.screen-view-host{position:absolute;left:0;right:0;top:42px;bottom:0;z-index:5}.screen-view-panel{display:none;height:100%;overflow:auto;padding:12px;background:radial-gradient(circle at 40% 45%,#0b252b,#081012 60%,#060809)}.screen-view-panel.active{display:block}.screen-view-panel .meter-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.screen-view-panel .meter-card{display:flex;flex-direction:column;align-items:center;gap:5px;border:1px solid #28363a;background:#070b0c;padding:8px}.screen-view-panel .vbar{height:150px;width:22px;border:1px solid #354146;background:#020405;display:flex;align-items:flex-end;padding:2px}.screen-view-panel .vbar em{display:block;width:100%;height:3%;background:linear-gradient(to top,#1dbb4e 0 55%,#e1c522 55% 82%,#e63a3a 82%);transition:height .08s linear}.channel-meter-row{display:flex;gap:5px;height:82px;overflow-x:auto;padding:5px 0}.channel-meter-row>span{flex:0 0 28px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:6px;color:#8e989c}.channel-meter-row i{height:58px;width:8px;background:#06090a;border:1px solid #283235;display:flex;align-items:flex-end}.channel-meter-row em{display:block;width:100%;background:#18b94a}.master-side-dock{z-index:20}`;document.head.appendChild(finalRuntimeStyle);
-function boot(){makeMasterMenu();makeScreenViews();masterIndependence();setInterval(updateMeters,60);updateMeters()}
+function boot(){makeMasterMenu();makeScreenViews();masterIndependence();setInterval(()=>{try{updateMeters()}catch(e){window.__mixerMeterError=e}},60);try{updateMeters()}catch(e){window.__mixerMeterError=e}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,150));else setTimeout(boot,150);
 })();
