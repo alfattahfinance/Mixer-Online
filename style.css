@@ -307,3 +307,8 @@ html,body{overflow-x:auto}
 .hardware-test button{white-space:nowrap}
 .hardware-test input{height:24px}
 @media(max-width:1200px){.hardware-test{grid-template-columns:minmax(0,1fr) 64px auto!important}.hardware-test select,.hardware-test input,.hardware-test button{font-size:7px}}
+/* FINAL TOUCH-SAFETY: lower MAIF/DCA → ESP32/USB controls */
+.console>.dca{position:relative!important;z-index:40!important;pointer-events:auto!important;}
+.console>.dca *{pointer-events:auto;}
+.console>.dca button,.console>.dca select,.console>.dca input{touch-action:manipulation!important;pointer-events:auto!important;cursor:pointer!important;}
+.console>.dca .control-lamp{pointer-events:none!important;}
