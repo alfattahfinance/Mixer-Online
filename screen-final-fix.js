@@ -12,6 +12,19 @@
     const tabs = screen?.querySelector('.screen-tabs');
     if(!screen || !body || !tabs) return;
 
+
+    if(!document.getElementById('screen-final-fix-style')){
+      const style = document.createElement('style');
+      style.id = 'screen-final-fix-style';
+      style.textContent = `
+        #digitalScreen .screen-body.final-docked-screen{position:relative;overflow:hidden!important;min-width:0}
+        #digitalScreen .final-screen-layer{position:absolute;inset:0;z-index:10;overflow:hidden;pointer-events:none}
+        #digitalScreen .final-screen-layer > .screen-view-panel{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:12px;overflow:auto;box-sizing:border-box;pointer-events:auto;background:radial-gradient(circle at 40% 45%,#0b252b,#081012 60%,#060809)}
+        #digitalScreen .final-screen-layer > .screen-view-panel[hidden]{display:none!important}
+      `;
+      document.head.appendChild(style);
+    }
+
     /* Remove the broken/legacy host created by the previous layout bridge.
        Keep its actual view panels so their existing control wiring survives. */
     const oldHost = screen.querySelector(':scope > .screen-view-host');
