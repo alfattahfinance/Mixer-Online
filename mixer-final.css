@@ -127,3 +127,30 @@ button:active,[role="button"]:active,[role="tab"]:active{filter:brightness(1.22)
  .master-side-dock{right:5px!important;top:5px!important;width:250px!important;height:458px!important;max-height:458px!important;z-index:99999!important}
  .master-side-menu button{height:31px!important;font-size:7px!important}.master-side-content{height:405px!important}
 }
+
+/* === REFERENCE SKIN V2 — CONSOLE STRIP === */
+@media(min-width:900px){
+ .channel-rack{background:linear-gradient(180deg,#0b1012,#070a0b)!important;border:1px solid #263034!important;box-shadow:inset 0 1px 0 #30383b!important}
+ .channels{gap:4px!important}
+ .channels .channel{background:linear-gradient(180deg,#151a1c 0%,#0b0f10 42%,#080b0c 100%)!important;border:1px solid #343b3e!important;border-radius:3px!important;box-shadow:inset 1px 0 #252b2e,inset -1px 0 #050607,0 2px 5px #000!important}
+ .channels .channel-head{background:linear-gradient(#293033,#111618)!important;border:1px solid #40494c!important;border-radius:2px!important}
+ .channels .channel-head strong{color:#d9dfe0!important;text-shadow:0 1px #000!important}
+ .channels .channel-led{color:#16e65b!important;text-shadow:0 0 6px #16e65b!important}
+ .channels .channel-tabs{border-bottom:1px solid #3a3d26!important}.channels .channel-tabs .tab.active{color:#ead22c!important;border-bottom:2px solid #d8bd1c!important}
+ .channels .route select,.channels .input-route{background:linear-gradient(#171d1f,#080b0c)!important;border:1px solid #3a4245!important;color:#cbd0d1!important;border-radius:2px!important}
+ .channels .mini-meter{background:#050708!important;border:1px solid #252c2f!important}
+ .channels .channel-lamps{background:#070a0b!important;border:1px solid #202629!important;border-radius:2px!important;padding:3px!important}
+ .channels .channel-lamps .lamp-wrap{color:#727a7d!important}.channels .channel-lamps .lamp{width:7px!important;height:7px!important;border:1px solid #3c4548!important}
+ .channels .level-readout{background:#020303!important;border:1px solid #282f31!important;color:#e2e5e5!important;font-variant-numeric:tabular-nums}
+ .channels .knob-row{padding:1px!important}.channels .knob-row label{color:#81898c!important}
+ .channels .knob-row .knob{appearance:none!important;width:30px!important;height:30px!important;border-radius:50%!important;background:radial-gradient(circle at 35% 28%,#f5db43 0 18%,#9b8620 19% 28%,#303022 29% 42%,#0c0f10 43%)!important;border:2px solid #4d4d35!important;box-shadow:0 2px 3px #000,inset 0 0 2px #fff3!important}
+ .channels .channel .fader{height:255px!important;width:26px!important;margin:3px auto!important;background:linear-gradient(90deg,transparent 0 28%,#171c1e 29% 71%,transparent 72%)!important}
+ .channels .channel .fader::-webkit-slider-runnable-track{width:8px!important;background:repeating-linear-gradient(to bottom,#111719 0 8px,#454d50 9px 10px)!important;border:1px solid #566064!important;box-shadow:0 0 3px #000!important}
+ .channels .channel .fader::-webkit-slider-thumb{width:19px!important;height:31px!important;background:linear-gradient(#f0f2f2,#a5abad 48%,#686f72 52%,#dfe2e3)!important;border:1px solid #4b5356!important;border-radius:2px!important;box-shadow:0 2px 4px #000,0 0 1px #fff!important}
+ .channels .fader-value{background:#030404!important;border:1px solid #343a3c!important;color:#e7e8e8!important}
+ .channels .channel-actions button{border-radius:2px!important}.channels .channel-actions .solo{background:linear-gradient(#2b2b24,#151712)!important;color:#e8cf32!important;border-color:#625722!important}.channels .channel-actions .mute{background:linear-gradient(#d62b2b,#8f1515)!important;border-color:#f04a4a!important}
+ .channels .channel-status,.channels .channel-bottom{color:#697275!important}
+ .channels .bus-strip{background:linear-gradient(180deg,#171a1b,#080b0c)!important;border:1px solid #454b4d!important}
+ .channels .master{background:linear-gradient(180deg,#302b18,#15130e 35%,#080a0b)!important;border:1px solid #806c25!important}
+ .channels .master .fader{height:285px!important}.channels .master .channel-title{box-shadow:inset 0 1px #77672e!important}
+}
