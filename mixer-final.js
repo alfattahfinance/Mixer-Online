@@ -28,7 +28,8 @@ function level(){
 }
 function updateMeters(){
   const st=window.__mixerState, cards=st?.channels||[];
-  const master=readAnalyser(window.masterAnalyser);
+  const master=readAnalyser(safeAnalyser(window.masterAnalyser));
+  const masterR=readAnalyser(safeAnalyser(window.masterAnalyserR));
   const levels=cards.map(c=>readAnalyser(safeAnalyser(c?._audio?.analyser)));
   cards.forEach((card,i)=>{
     const z=levels[i];
@@ -50,11 +51,11 @@ function updateMeters(){
     if(mp)mp.textContent=master.p<.001?'−∞':(20*Math.log10(master.p)).toFixed(1)+' dB';
     if(ms)ms.textContent=master.r>.008?'SIGNAL':'NO SIGNAL';
   }
-  const input=$('.input-meter .meter-fill'); if(input)input.style.height=Math.max(2,Math.min(100,master.r*100))+'%';
-  const leds=ensureInputLeds(); leds?.querySelectorAll('.lamp').forEach(x=>x.classList.toggle('active',master.r>.008));
-  const sl=$('#screenMeterL'),sr=$('#screenMeterR'); if(sl)sl.style.height=Math.max(2,master.r*100)+'%'; if(sr)sr.style.height=Math.max(2,master.p*95)+'%';
-  const vL=$('#viewL'),vR=$('#viewR'),vM=$('#viewM'); if(vL)vL.style.height=Math.max(3,master.r*100)+'%'; if(vR)vR.style.height=Math.max(3,master.p*100)+'%'; if(vM)vM.style.height=Math.max(3,master.r*100)+'%';
-  const vLdb=$('#viewLdb'),vRdb=$('#viewRdb'),vMdb=$('#viewMdb'); if(vLdb)vLdb.textContent=master.r<.001?'−∞ dB':(20*Math.log10(master.r)).toFixed(1)+' dB'; if(vRdb)vRdb.textContent=master.p<.001?'−∞ dB':(20*Math.log10(master.p)).toFixed(1)+' dB'; if(vMdb)vMdb.textContent=master.r<.001?'−∞ dB':(20*Math.log10(master.r)).toFixed(1)+' dB';
+  const input=$('.input-meter .meter-fill'); if(input)input.style.height=Math.max(2,Math.min(100,Math.max(master.r,masterR.r)*100))+'%';
+  const leds=ensureInputLeds(); if(leds){const ls=leds.querySelectorAll('.lamp'); if(ls[0])ls[0].classList.toggle('active',master.r>.008); if(ls[1])ls[1].classList.toggle('active',masterR.r>.008);}
+  const sl=$('#screenMeterL'),sr=$('#screenMeterR'); if(sl)sl.style.height=Math.max(2,master.r*100)+'%'; if(sr)sr.style.height=Math.max(2,masterR.r*100)+'%';
+  const vL=$('#viewL'),vR=$('#viewR'),vM=$('#viewM'); if(vL)vL.style.height=Math.max(3,master.r*100)+'%'; if(vR)vR.style.height=Math.max(3,masterR.r*100)+'%'; if(vM)vM.style.height=Math.max(3,Math.max(master.r,masterR.r)*100)+'%';
+  const vLdb=$('#viewLdb'),vRdb=$('#viewRdb'),vMdb=$('#viewMdb'); if(vLdb)vLdb.textContent=master.r<.001?'−∞ dB':(20*Math.log10(master.r)).toFixed(1)+' dB'; if(vRdb)vRdb.textContent=masterR.r<.001?'−∞ dB':(20*Math.log10(masterR.r)).toFixed(1)+' dB'; if(vMdb)vMdb.textContent=Math.max(master.r,masterR.r)<.001?'−∞ dB':(20*Math.log10(Math.max(master.r,masterR.r))).toFixed(1)+' dB';
   const row=$('#viewChannels');
   if(row&&row.childElementCount!==cards.length)row.innerHTML=cards.map((_,i)=>'<span>CH '+(i+1)+'<i><em></em></i></span>').join('');
   if(row)cards.forEach((c,i)=>{const em=row.children[i]?.querySelector('em');if(em)em.style.height=Math.max(2,levels[i].r*100)+'%'});
