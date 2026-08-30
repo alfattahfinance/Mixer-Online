@@ -9,7 +9,7 @@
 #include <BLE2902.h>
 static const char* SERVICE_UUID="6e400001-b5a3-f393-e0a9-e50e24dcca9e";
 static const char* RX_UUID="6e400002-b5a3-f393-e0a9-e50e24dcca9e";
-static const char* TX_UUID="6e400003-b5a3-f393-e0a9-e50e9";
+static const char* TX_UUID="6e400003-b5a3-f393-e0a9-e50e24dcca9e";
 BLECharacteristic* txChar=nullptr;
 String lineBuffer;
 float faderState[17],gainState[17],panState[17],masterFader=80;
