@@ -243,3 +243,69 @@ html,body{pointer-events:auto!important}
  .channel-actions button{min-height:36px!important}
  .channel-tabs button{min-height:32px!important}
 }
+
+/* RESPONSIVE V4 — prevent clipping; content may scroll inside its own region */
+html,body{overflow-x:hidden!important;overflow-y:auto!important}
+.console{overflow:visible!important}
+.upper{overflow:visible!important}
+.digital-screen,.music-player,.input-meter{overflow:hidden!important}
+.screen-body{overflow:hidden!important}
+.screen-tabs{overflow-x:auto!important;overflow-y:hidden!important;white-space:nowrap!important}
+.screen-tabs button{flex:0 0 auto!important}
+.music-player{overflow:hidden!important}
+.music-queue{overflow:auto!important;-webkit-overflow-scrolling:touch!important}
+.channel-rack{overflow:hidden!important}
+.channels{overflow-x:auto!important;overflow-y:hidden!important;-webkit-overflow-scrolling:touch!important;scrollbar-width:thin!important;padding-bottom:5px!important}
+.channels .channel{overflow:hidden!important}
+.master-side-dock{overflow:hidden!important}
+.master-side-content{overflow-x:hidden!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch!important}
+
+/* Never clip the top controls */
+@media(max-width:900px){
+ .topbar{overflow:visible!important}
+ .top-actions{overflow-x:auto!important;overflow-y:hidden!important}
+ .upper{overflow:visible!important}
+ .digital-screen{overflow:hidden!important}
+ .music-player{overflow:hidden!important}
+}
+
+/* Phone: let every section use its natural height; only the channel strip scrolls sideways */
+@media(max-width:600px){
+ .console{width:100%!important;max-width:100%!important;overflow:visible!important}
+ .upper{width:100%!important;height:auto!important;overflow:visible!important}
+ .digital-screen{width:100%!important;height:auto!important;min-height:0!important;overflow:hidden!important}
+ .screen-body{height:auto!important;min-height:315px!important;overflow:hidden!important}
+ .spectrum{max-width:100%!important}
+ .music-player{width:100%!important;height:auto!important;min-height:0!important;overflow:hidden!important}
+ .player-buttons{width:100%!important}
+ .music-queue{width:100%!important;max-width:100%!important}
+ .channel-rack{width:100%!important;height:clamp(365px,100vw,410px)!important;overflow:hidden!important}
+ .channels{width:100%!important;height:100%!important;overflow-x:auto!important;overflow-y:hidden!important;padding-right:4px!important}
+ .channels .channel{flex:0 0 72px!important;width:72px!important;min-width:72px!important}
+ .master-side-dock{width:calc(100% - 8px)!important;max-width:calc(100% - 8px)!important;overflow:hidden!important}
+}
+
+/* 320–360px screens: shrink spacing, not content visibility */
+@media(max-width:360px){
+ .console{padding:2px!important}
+ .topbar{padding:4px!important}
+ .top-actions button,.file-btn,.play-mode{padding-inline:5px!important;font-size:9px!important}
+ .screen-tabs button{min-width:64px!important}
+ .screen-body{padding:5px!important}
+ .reference-eq{gap:4px!important;margin-right:60px!important}
+ .music-player{padding:5px!important}
+ .player-buttons{gap:4px!important}
+ .player-buttons button{height:36px!important;font-size:10px!important}
+ .channel-rack{height:350px!important}
+ .channels .channel{flex-basis:66px!important;width:66px!important;min-width:66px!important}
+ .channels .fader-bank{height:165px!important;flex-basis:165px!important}
+ .channels .channel .fader,.channels .mini-meter{height:165px!important}
+}
+
+/* Landscape phones: use the available width instead of stacking everything unnecessarily */
+@media(max-width:900px) and (orientation:landscape){
+ .upper{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(250px,36vw)!important;grid-template-areas:"screen player"!important;align-items:stretch!important}
+ .digital-screen{min-height:320px!important}
+ .music-player{min-height:320px!important}
+ .channel-rack{margin-top:6px!important}
+}
