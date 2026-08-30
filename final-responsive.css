@@ -248,3 +248,44 @@ footer{width:100%!important;max-width:100%!important;min-width:0!important;overf
   .channels .master .fader{height:145px!important;min-height:145px!important}
   .channels .master .master-meter{height:145px!important}
 }
+
+/* === R7: FIT THE ENTIRE CHANNEL STRIP === */
+.channel-rack{height:475px!important;min-height:475px!important;overflow:hidden!important}
+.channels{height:461px!important;min-height:461px!important;overflow-x:auto!important;overflow-y:hidden!important;padding-bottom:0!important}
+.channels .channel{height:459px!important;min-height:459px!important;max-height:459px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
+.channels .channel-head{flex:0 0 28px!important;height:28px!important;min-height:28px!important}
+.channels .channel-tabs{flex:0 0 18px!important;height:18px!important;min-height:18px!important}
+.channels .route{flex:0 0 24px!important;height:24px!important;min-height:24px!important}
+.channels .channel-lamps{flex:0 0 45px!important;height:45px!important;min-height:45px!important;margin:2px 0!important;padding:3px!important}
+.channels .level-readout{flex:0 0 19px!important;height:19px!important;min-height:19px!important}
+.channels .knob-row{flex:0 0 57px!important;height:57px!important;min-height:57px!important;margin:2px 0!important}
+.channels .knob-row .knob{width:30px!important;height:30px!important;min-width:30px!important;min-height:30px!important}
+.channels .fader-bank{flex:1 1 auto!important;min-height:145px!important;height:auto!important;margin:2px 0!important}
+.channels .channel .fader,.channels .mini-meter{height:100%!important;min-height:145px!important}
+.channels .fader-value{flex:0 0 19px!important;height:19px!important;min-height:19px!important}
+.channels .channel-actions{flex:0 0 47px!important;height:47px!important;min-height:47px!important;margin:2px 0 0!important;gap:2px!important}
+.channels .channel-actions button{flex:0 0 22px!important;height:22px!important;min-height:22px!important}
+.channels .channel-status,.channels .channel-bottom{flex:0 0 10px!important;height:10px!important;min-height:10px!important;margin:0!important;overflow:hidden!important}
+.master-side-dock{top:6px!important;height:459px!important;max-height:459px!important;overflow:hidden!important}
+.master-side-content{height:382px!important;max-height:382px!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch!important}
+@media(max-width:700px){
+ .channel-rack{height:430px!important;min-height:430px!important}.channels{height:416px!important;min-height:416px!important}
+ .channels .channel{height:414px!important;min-height:414px!important;max-height:414px!important}
+ .channels .channel-head{flex-basis:27px!important;height:27px!important;min-height:27px!important}.channels .channel-tabs{flex-basis:17px!important;height:17px!important;min-height:17px!important}
+ .channels .route{flex-basis:22px!important;height:22px!important;min-height:22px!important}.channels .channel-lamps{flex-basis:42px!important;height:42px!important;min-height:42px!important}
+ .channels .level-readout{flex-basis:18px!important;height:18px!important;min-height:18px!important}.channels .knob-row{flex-basis:53px!important;height:53px!important;min-height:53px!important}
+ .channels .knob-row .knob{width:28px!important;height:28px!important;min-width:28px!important;min-height:28px!important}.channels .fader-bank{min-height:120px!important}
+ .channels .channel .fader,.channels .mini-meter{min-height:120px!important}.channels .fader-value{flex-basis:18px!important;height:18px!important;min-height:18px!important}
+ .channels .channel-actions{flex-basis:45px!important;height:45px!important;min-height:45px!important}.channels .channel-actions button{flex-basis:21px!important;height:21px!important;min-height:21px!important}
+ .channels .channel-status,.channels .channel-bottom{flex-basis:9px!important;height:9px!important;min-height:9px!important}.master-side-dock{height:414px!important;max-height:414px!important}.master-side-content{height:340px!important;max-height:340px!important}
+}
+@media(max-width:430px){
+ .channel-rack{height:410px!important;min-height:410px!important}.channels{height:396px!important;min-height:396px!important}.channels .channel{height:394px!important;min-height:394px!important;max-height:394px!important}
+ .channels .channel-head{flex-basis:26px!important;height:26px!important;min-height:26px!important}.channels .channel-tabs{flex-basis:16px!important;height:16px!important;min-height:16px!important}
+ .channels .route{flex-basis:21px!important;height:21px!important;min-height:21px!important}.channels .channel-lamps{flex-basis:40px!important;height:40px!important;min-height:40px!important}
+ .channels .level-readout{flex-basis:17px!important;height:17px!important;min-height:17px!important}.channels .knob-row{flex-basis:50px!important;height:50px!important;min-height:50px!important}
+ .channels .knob-row .knob{width:26px!important;height:26px!important;min-width:26px!important;min-height:26px!important}.channels .fader-bank{min-height:105px!important}
+ .channels .channel .fader,.channels .mini-meter{min-height:105px!important}.channels .fader-value{flex-basis:17px!important;height:17px!important;min-height:17px!important}
+ .channels .channel-actions{flex-basis:43px!important;height:43px!important;min-height:43px!important}.channels .channel-actions button{flex-basis:20px!important;height:20px!important;min-height:20px!important}
+ .channels .channel-status,.channels .channel-bottom{flex-basis:8px!important;height:8px!important;min-height:8px!important}.master-side-dock{height:394px!important;max-height:394px!important}.master-side-content{height:320px!important;max-height:320px!important}
+}
