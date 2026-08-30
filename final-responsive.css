@@ -221,3 +221,25 @@ button,.file-btn,select{min-height:32px}
   button,.file-btn,select{min-height:36px!important}
   input[type=range]{min-height:28px!important}
 }
+
+/* TOUCH FIX V3 — interactive elements must remain above decorative overlays */
+html,body{pointer-events:auto!important}
+.topbar,.console,.upper,.digital-screen,.music-player,.channel-rack,.channels,.channel,.master,.master-side-dock{pointer-events:auto!important}
+.screen-body,.spectrum,.reference-eq,.reference-rta,.screen-meter,.screen-source,.screen-readout{pointer-events:none!important}
+.screen-tabs,.screen-tabs button,.player-buttons,.player-buttons button,.music-queue,.music-queue button,.music-volume,.music-volume input,
+.channel-head,.channel-head button,.channel-tabs,.channel-tabs button,.channel-lamps,.channel-actions,.channel-actions button,
+.channel select,.channel input,.channels input[type=range],.master input,.master button,.master select,.master-side-menu,.master-side-menu button,
+.master-side-content button,.master-side-content input,.master-side-content select{pointer-events:auto!important;position:relative!important;z-index:20!important}
+.channels .channel{isolation:isolate!important}
+.channels .channel-lamps,.channels .channel-actions,.channels .knob-row,.channels .fader-bank{position:relative!important;z-index:10!important}
+.channels .fader{position:relative!important;z-index:30!important;pointer-events:auto!important}
+.channels .mini-meter{pointer-events:none!important;z-index:1!important}
+.master-side-dock{z-index:50!important}
+.master-side-menu{position:relative!important;z-index:60!important}
+.master-side-content{position:relative!important;z-index:55!important}
+.master-side-content:before,.master-side-content:after{pointer-events:none!important}
+@media(pointer:coarse){
+ button,.file-btn,select{cursor:pointer!important;-webkit-tap-highlight-color:transparent!important}
+ .channel-actions button{min-height:36px!important}
+ .channel-tabs button{min-height:32px!important}
+}
