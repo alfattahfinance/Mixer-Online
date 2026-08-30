@@ -297,3 +297,6 @@ html,body{overflow-x:auto}
 
 /* Reliable interaction feedback */
 .reference-panel input[type=range],.reference-panel select,.reference-panel button{touch-action:manipulation}.reference-panel button{cursor:pointer}.reference-panel button.indicator-active{outline:1px solid rgba(25,240,75,.35)}
+
+/* ESP32 Simulator + USB Audio status only */
+#restartSimulator,#detectUsbAudio{touch-action:manipulation}#restartSimulator.indicator-active,#detectUsbAudio.indicator-active{border-color:#19f04b!important;color:#19f04b!important;box-shadow:0 0 8px rgba(25,240,75,.45)}
