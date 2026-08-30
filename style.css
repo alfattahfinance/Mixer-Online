@@ -40,3 +40,26 @@ html,body{width:100%;min-height:100%;overscroll-behavior-x:none}
  .channel-section{height:455px;min-height:455px}
  .channel{flex-basis:72px;min-width:72px}
 }
+
+/* v13 reference console: tablet uses horizontal console surface instead of hiding/overlapping panels */
+body{overflow-x:auto}
+.console{align-items:stretch}
+.reference-panel{border-top:1px solid #263139;margin-top:8px;padding-top:4px;overflow:visible}
+.reference-panel h4{color:#d5c100;margin:9px 0 4px;border-bottom:1px solid #263139;padding-bottom:3px;font-size:10px}
+.bus-master,.fx-controls{display:grid;gap:4px}
+.bus-master label,.fx-controls label,.routing-block label{display:grid;grid-template-columns:74px 1fr;align-items:center;gap:4px;color:#9ca7ac;font-size:8px}
+.bus-master input,.fx-controls input{width:100%;height:18px;min-height:18px}
+.fx-controls select,.routing-block select{width:100%;height:24px;min-height:24px;font-size:9px}
+.routing-block{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.scene-row{display:flex;gap:3px;margin:3px 0}
+.scene-row input{min-width:0;flex:1;height:24px;min-height:24px}
+.scene-row button{flex:1;min-height:24px;font-size:8px;padding:0 4px}
+.lock-row,.device-box,.sim-box,.usb-audio-box{border:1px solid #263139;background:#080d10;padding:6px;font-size:8px;color:#8e999e}
+.lock-row{display:flex;gap:5px;align-items:center}.lock-row button{min-height:25px;color:#ffd400}
+.device-box{display:grid;grid-template-columns:1fr 1fr;gap:4px}.device-box label{grid-column:1/-1;display:grid;gap:3px}.device-box select{min-height:24px}.device-box button,.sim-box button,.usb-audio-box button{min-height:24px;font-size:8px}.device-online{grid-column:1/-1;color:#00e83f}
+.mapper-row{display:grid;grid-template-columns:55px 1fr 1fr;gap:3px}.mapper-row label{display:grid;gap:2px;color:#89949a}.mapper-row input{min-height:24px}.mapper-row button{min-height:24px;font-size:7px;padding:0 3px}
+.hardware-test{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px}.hardware-test select,.hardware-test button{min-height:24px;font-size:8px}
+.sim-box{display:grid;grid-template-columns:1fr 1fr;gap:4px}.sim-box small{grid-column:1/-1;color:#758087}.usb-audio-box{display:flex;gap:5px;align-items:center}
+@media(max-width:1200px){.console{grid-template-columns:92px minmax(620px,1fr) 300px 292px;min-width:1310px;overflow:visible}.dca{display:block;grid-column:auto}.eq-row{grid-template-columns:42px repeat(4,minmax(110px,1fr)) 115px}.rta{display:block}}
+@media(max-width:760px){.app{width:max-content;min-width:1298px}.topbar{min-width:1298px}.console{grid-template-columns:78px 620px 300px 292px;min-width:1298px}.channel-section{min-width:1298px}.footer{min-width:1298px}.top-actions{justify-content:flex-start}.top-actions label{display:none}.eq-row{grid-template-columns:42px repeat(4,120px) 115px}.channel-section{overflow-x:auto;overflow-y:hidden}.channels{min-width:max-content}.master-strip{flex:0 0 82px;min-width:82px}}
+@media(max-width:500px){.console{grid-template-columns:78px 620px 300px 292px;min-width:1298px}.channel{flex-basis:70px;min-width:70px}.master-strip{flex-basis:82px;min-width:82px}}
