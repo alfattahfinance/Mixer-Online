@@ -156,3 +156,95 @@ footer{width:100%!important;max-width:100%!important;min-width:0!important;overf
 .eq-point,.spectrum-bars,.grid,.mini-meter,.master-meter,.screen-meter,.reference-rta{pointer-events:none!important}
 .channel-lamps,.channel-actions,.knob-row,.fader-bank{position:relative!important;z-index:10!important}
 .channel-actions button,.channel-tabs button,.channel-head button,.channel select,.channel input,.master button,.master select,.master input{position:relative!important;z-index:40!important;pointer-events:auto!important}
+
+
+/* FINAL BOTTOM-CONTROLS FIX
+   Keep the whole channel strip inside its rack so SOLO/MUTE/status are visible.
+*/
+.channels .channel{
+  height:490px!important;
+  min-height:490px!important;
+  overflow:hidden!important;
+}
+.channels .channel .fader{
+  height:190px!important;
+  min-height:190px!important;
+  margin:8px auto 4px!important;
+}
+.channels .channel .channel-actions{
+  margin-top:auto!important;
+  display:flex!important;
+  flex-direction:column-reverse!important;
+  gap:3px!important;
+}
+.channels .channel .channel-actions button{
+  display:block!important;
+  height:25px!important;
+  min-height:25px!important;
+}
+.channels .channel .channel-status,
+.channels .channel .channel-bottom{
+  display:flex!important;
+}
+.channels .master{
+  height:490px!important;
+  min-height:490px!important;
+}
+.channels .master .fader{
+  height:190px!important;
+  min-height:190px!important;
+}
+.channels .master .master-meter{
+  height:190px!important;
+}
+
+/* Do not crop the rack vertically. Horizontal scrolling remains intact. */
+.channel-rack{
+  overflow:hidden!important;
+}
+.channels{
+  height:490px!important;
+  min-height:490px!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  padding-bottom:4px!important;
+}
+
+/* On phones the rack is shorter but still reserves space for SOLO/MUTE. */
+@media(max-width:700px){
+  .channel-rack{
+    height:430px!important;
+    min-height:430px!important;
+  }
+  .channels{
+    height:430px!important;
+    min-height:430px!important;
+  }
+  .channels .channel{
+    height:420px!important;
+    min-height:420px!important;
+  }
+  .channels .channel .fader{
+    height:155px!important;
+    min-height:155px!important;
+  }
+  .channels .master{
+    height:420px!important;
+    min-height:420px!important;
+  }
+  .channels .master .fader{
+    height:155px!important;
+    min-height:155px!important;
+  }
+  .channels .master .master-meter{
+    height:155px!important;
+  }
+}
+@media(max-width:430px){
+  .channel-rack,.channels{height:410px!important;min-height:410px!important}
+  .channels .channel{height:400px!important;min-height:400px!important}
+  .channels .channel .fader{height:145px!important;min-height:145px!important}
+  .channels .master{height:400px!important;min-height:400px!important}
+  .channels .master .fader{height:145px!important;min-height:145px!important}
+  .channels .master .master-meter{height:145px!important}
+}
