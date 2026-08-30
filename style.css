@@ -128,3 +128,29 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
   .channels{flex-basis:386px;height:386px}
   .master-side-dock{height:350px;flex-basis:350px}
 }
+
+/* FINAL LAYOUT CLEANUP */
+main{min-height:calc(100vh - 96px)}
+.screen-channels{display:none!important}
+.channel-rack{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 355px;gap:7px;align-items:stretch}
+.channel-rack > .channels{grid-column:1;grid-row:1;min-width:0;width:100%;padding-right:0!important}
+.channel-rack > .master-side-dock{grid-column:2;grid-row:1;position:relative!important;inset:auto!important;width:100%!important;height:461px!important;margin:0;z-index:20}
+.channel-rack > .channels > .master-side-dock{display:none!important}
+.master-side-content{min-height:0;height:386px;overflow-y:auto;overflow-x:hidden}
+@media(max-width:1200px){
+  .channel-rack{grid-template-columns:minmax(0,1fr) 310px}
+}
+@media(max-width:900px){
+  main{min-height:0}
+  .channel-rack{display:flex;flex-direction:column;height:auto;gap:6px;overflow:visible}
+  .channel-rack > .channels{order:1;width:100%;height:430px;flex:0 0 430px;overflow-x:auto;overflow-y:hidden}
+  .channel-rack > .master-side-dock{order:2;width:100%!important;height:390px!important;flex:0 0 390px;position:relative!important}
+}
+@media(max-width:700px){
+  .channel-rack > .channels{height:416px;flex-basis:416px}
+  .channel-rack > .master-side-dock{height:370px!important;flex-basis:370px}
+}
+@media(max-width:430px){
+  .channel-rack > .channels{height:386px;flex-basis:386px}
+  .channel-rack > .master-side-dock{height:350px!important;flex-basis:350px}
+}
