@@ -29,5 +29,29 @@ function drawSpectrum(){const cv=$("#specCanvas");if(!cv)return;const x=cv.getCo
 function bindTabs(){const tabs=$$(".tabs button[data-tab]");const views={home:"#homeView",meters:"#metersView",eq:"#eqView",effect:"#effectView",routing:"#routingView",setup:"#setupView"};tabs.forEach(b=>b.addEventListener("click",()=>{tabs.forEach(x=>x.classList.toggle("active",x===b));Object.entries(views).forEach(([k,s])=>{const v=$(s);if(v)v.style.display=k===b.dataset.tab?"block":"none"});}));Object.entries(views).forEach(([k,s])=>{const v=$(s);if(v)v.style.display=k==="home"?"block":"none"})}
 function bindMasterControls(){const m=$("#masterFader"),mute=$("#masterMute");m?.addEventListener("input",()=>{const v=Number(m.value);const o=$("#masterValue");if(o)o.textContent=v+"%";if(state.masterGain)state.masterGain.gain.value=v/100;send("MASTER","fader",v);updateMeters()});mute?.addEventListener("click",()=>{const on=!mute.classList.contains("active");mute.classList.toggle("active",on);mute.textContent=on?"UNMUTE":"MUTE";if(state.masterGain)state.masterGain.gain.value=on?0:Number(m?.value||80)/100;send("MASTER","mute",on?1:0)})}
 function bindNativeButtons(){if(window.NativeMedia){$("#phoneRecorder")?.addEventListener("click",()=>NativeMedia.openRecorder());$("#phoneFiles")?.addEventListener("click",()=>NativeMedia.openFiles());$("#phoneMusic")?.addEventListener("click",()=>NativeMedia.openMusic())}}
-function init(){bindMusic();bindNativeButtons();bindTabs();bindConnection();bindMasterControls();const count=Number($("#channelCount")?.value||16);buildChannels(count);requestAnimationFrame(()=>{const box=$("#channels");if(box&&!box.children.length)buildChannels(count);box?.scrollTo?.({left:0,behavior:"auto"})});$("#applyChannels")?.addEventListener("click",()=>buildChannels($("#channelCount")?.value));window.MixerAdapters?.simulator?.();drawSpectrum()}
+
+function bindReferenceControls(){
+  const root=document.querySelector(".reference-panel"); if(!root)return;
+  const lockedKey="mixer-online-live-lock";
+  const setLock=on=>{document.body.classList.toggle("mixer-locked",on);root.querySelector(".lock-row button")?.replaceChildren(document.createTextNode(on?"🔓 UNLOCK":"🔒 LOCK"));try{localStorage.setItem(lockedKey,on?"1":"0")}catch{}};
+  let locked=false; try{locked=localStorage.getItem(lockedKey)==="1"}catch{} setLock(locked);
+  root.querySelector(".lock-row button")?.addEventListener("click",()=>{locked=!locked;setLock(locked)});
+  root.querySelectorAll(".bus-master input").forEach((x,i)=>x.addEventListener("input",()=>{if(!locked)send("BUS "+(i+1),"level",Number(x.value))}));
+  ["fxDelay","fxFeedback","fxWet"].forEach(id=>root.querySelector("#"+id)?.addEventListener("input",e=>{if(!locked)send("FX 1",id.replace("fx","").toLowerCase(),Number(e.target.value))}));
+  root.querySelector("#fxType")?.addEventListener("change",e=>{if(!locked)send("FX 1","type",e.target.value)});
+  root.querySelector(".scene-row input")?.addEventListener("input",e=>{e.target.dataset.scene=e.target.value});
+  const sceneName=()=>root.querySelector(".scene-row input")?.value?.trim()||"Scene";
+  const sceneState=()=>({channels:state.channels.map(c=>({fader:Number(c.querySelector(".fader")?.value||0),muted:c.classList.contains("muted"),soloed:c.classList.contains("soloed")})),master:Number($("#masterFader")?.value||80),musicMode:$("#musicMode")?.value||"sequential"});
+  const applyScene=o=>{if(!o)return;state.channels.forEach((c,i)=>{const v=o.channels?.[i];if(!v)return;const f=c.querySelector(".fader");if(f){f.value=v.fader;c.querySelector(".value").textContent=Math.round(v.fader)+"%"}c.classList.toggle("muted",!!v.muted);c.classList.toggle("soloed",!!v.soloed);c.querySelectorAll(".mute,.topmute").forEach(b=>b.textContent=v.muted?"UNMUTE":"MUTE");updateChannelAudio(c)});if($("#masterFader")&&o.master!=null){$("#masterFader").value=o.master;$("#masterValue").textContent=o.master+"%";$("#masterFader").dispatchEvent(new Event("input",{bubbles:true}))}};
+  const sceneButtons=[...root.querySelectorAll(".scene-row button")];
+  const save=sceneButtons.find(b=>b.textContent==="SAVE"),recall=sceneButtons.find(b=>b.textContent==="RECALL");
+  save?.addEventListener("click",()=>{try{localStorage.setItem("mixer-scene-"+sceneName(),JSON.stringify(sceneState()));status("SCENE SAVED")}catch{}});
+  recall?.addEventListener("click",()=>{try{applyScene(JSON.parse(localStorage.getItem("mixer-scene-"+sceneName())||"null"));status("SCENE RECALLED")}catch{}});
+  root.querySelector("#deviceConnect")?.addEventListener("click",async()=>{try{await window.MixerAdapters?.simulator?.();status("ESP32 CONNECTED")}catch(e){status("ESP32 OFFLINE")}});
+  root.querySelector("#deviceDisconnect")?.addEventListener("click",()=>{window.MixerAdapters?.disconnect?.();status("DISCONNECTED")});
+  root.querySelector("#restartSimulator")?.addEventListener("click",async()=>{window.MixerAdapters?.disconnect?.();await window.MixerAdapters?.simulator?.();status("ESP32 SIMULATOR READY")});
+  root.querySelector("#detectUsbAudio")?.addEventListener("click",async()=>{try{await window.MixerAdapters?.usbAudio?.();status("USB AUDIO READY")}catch(e){status("USB AUDIO "+(e.message||"UNAVAILABLE"))}});
+  root.querySelector(".hardware-test button")?.addEventListener("click",()=>{const sel=root.querySelectorAll(".hardware-test select");const control=(sel[0]?.value||"SOLO 1").toLowerCase().replace(/\s+/g,"_");const ch=control.match(/(\d+)/)?.[1]||1;send(Number(ch),control.replace(/_\d+$/,""),sel[1]?.value==="ON"?1:0);status("HARDWARE TEST TX")});
+}
+function init(){bindMusic();bindNativeButtons();bindTabs();bindConnection();bindMasterControls();bindReferenceControls();const count=Number($("#channelCount")?.value||16);buildChannels(count);requestAnimationFrame(()=>{const box=$("#channels");if(box&&!box.children.length)buildChannels(count);box?.scrollTo?.({left:0,behavior:"auto"})});$("#applyChannels")?.addEventListener("click",()=>buildChannels($("#channelCount")?.value));window.MixerAdapters?.simulator?.();drawSpectrum()}
 document.readyState==="loading"?document.addEventListener("DOMContentLoaded",init):init();
