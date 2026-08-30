@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
   <meta name="theme-color" content="#05080a">
   <title>Mixer Online</title>
-  <link rel="stylesheet" href="style.css?v=20260831-v18">
+  <link rel="stylesheet" href="style.css?v=20260831-v19">
 </head>
 <body>
   <div class="app">
@@ -15,8 +15,8 @@
         <button id="phoneRecorder">🎙 PEREKAM</button>
         <button id="phoneFiles">📁 FILE</button>
         <button id="phoneMusic">🎵 MUSIK</button>
-        <button>🎙 MIC</button>
-        <button>♪ AUDIO</button>
+        <button id="phoneMic">🎙 MIC</button>
+        <button id="audioInputBtn">♪ AUDIO</button>
         <label>MODE 
           <select id="audioPlayMode">
             <option>BERURUTAN</option>
@@ -158,30 +158,30 @@
       <aside class="dca panel">
         <div class="dca-title"><b>MAIF</b><span>DCAs</span></div>
         <div class="dca-grid">
-          <button>DCA 1<br>Solo<br>0.0</button>
-          <button>DCA 2<br>Solo<br>0.0</button>
-          <button>DCA 3<br>Solo<br>0.0</button>
-          <button>DCA 4<br>Solo<br>0.0</button>
+          <button class="dca-btn" data-dca="1">DCA 1<br><span>SOLO</span><br><output>0.0</output></button>
+          <button class="dca-btn" data-dca="2">DCA 2<br><span>SOLO</span><br><output>0.0</output></button>
+          <button class="dca-btn" data-dca="3">DCA 3<br><span>SOLO</span><br><output>0.0</output></button>
+          <button class="dca-btn" data-dca="4">DCA 4<br><span>SOLO</span><br><output>0.0</output></button>
         </div>
         <h4>MUTE GROUPS</h4>
-        <div class="groups"><button>1</button><button>2</button><button>3</button><button>4</button></div>
+        <div class="groups mute-groups"><button data-group="1">1</button><button data-group="2">2</button><button data-group="3">3</button><button data-group="4">4</button></div>
         <h4>AUTO MIX</h4>
         <div>☑ Active</div>
         <div>☑ Last Gate</div>
         <h4>DCA GROUPS</h4>
-        <div class="groups"><button>1</button><button>2</button><button>3</button><button>4</button></div>
+        <div class="groups dca-groups"><button data-dcagroup="1">1</button><button data-dcagroup="2">2</button><button data-dcagroup="3">3</button><button data-dcagroup="4">4</button></div>
         <div class="right-tools">
           <h4>FADER</h4>
           <div class="auto-check">☑ Geser atas bawah<br>☑ Bentuk fader vertikal<br>☑ Tombol di tengah jalur</div>
           <div class="route-grid">
-            <button>Bus 1</button><button>Bus 5</button>
-            <button>Bus 2</button><button>Bus 6</button>
-            <button>Bus 3</button><button>FX 1</button>
-            <button>Bus 4</button><button>FX 2</button>
-            <button>FX 3</button><button>FX 4</button>
+            <button class="route-btn" data-route="BUS 1">Bus 1</button><button class="route-btn" data-route="BUS 5">Bus 5</button>
+            <button class="route-btn" data-route="BUS 2">Bus 2</button><button class="route-btn" data-route="BUS 6">Bus 6</button>
+            <button class="route-btn" data-route="BUS 3">Bus 3</button><button class="route-btn" data-route="FX 1">FX 1</button>
+            <button class="route-btn" data-route="BUS 4">Bus 4</button><button class="route-btn" data-route="FX 2">FX 2</button>
+            <button class="route-btn" data-route="FX 3">FX 3</button><button class="route-btn" data-route="FX 4">FX 4</button>
           </div>
           <h4>USB</h4>
-          <div class="route-grid"><button>USB 1 ▮▮▮</button><button>00:24</button><button>USB 2 ▮</button><button>00:00</button></div>
+          <div class="route-grid usb-route"><button class="usb-route-btn" data-usb="1">USB 1 ▮▮▮</button><button class="usb-time" data-usb-time="1">00:00</button><button class="usb-route-btn" data-usb="2">USB 2 ▮</button><button class="usb-time" data-usb-time="2">00:00</button></div>
         </div>
         <div class="reference-panel">
           <h4>PANEL / AUX / BUS / FX</h4>
