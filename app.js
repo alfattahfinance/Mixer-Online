@@ -103,8 +103,8 @@ function bindReferenceControls(){
   root.querySelector(".lock-row button")?.addEventListener("click",()=>{locked=!locked;setLock(locked)});
 
   // Device / hardware.
-  root.querySelector("#deviceConnect")?.addEventListener("click",async()=>{if(locked)return;setOn(root.querySelector("#deviceConnect"),true);try{await window.MixerAdapters?.simulator?.();notify("ESP32 CONNECTED")}catch(e){setOn(root.querySelector("#deviceConnect"),false);notify("ESP32 OFFLINE",false)}});
-  root.querySelector("#deviceDisconnect")?.addEventListener("click",()=>{window.MixerAdapters?.disconnect?.();setOn(root.querySelector("#deviceConnect"),false);setOn(root.querySelector("#deviceDisconnect"),true);notify("DISCONNECTED",false)});
+  root.querySelector("#deviceConnect")?.addEventListener("click",async()=>{if(locked)return;const b=root.querySelector("#deviceConnect");const on=b?.classList.contains("indicator-active");if(on){window.MixerAdapters?.disconnect?.();setOn(b,false);notify("ESP32 OFF");return}try{const adapter=window.MixerAdapters?.simulator;if(typeof adapter!=="function")throw Error("ESP32 ADAPTER UNAVAILABLE");await adapter();setOn(b,true);notify("ESP32 ON • CONNECTED")}catch(e){setOn(b,false);notify("ESP32 OFF • "+(e.message||"UNAVAILABLE"),false)}});
+  root.querySelector("#deviceDisconnect")?.addEventListener("click",()=>{const b=root.querySelector("#deviceDisconnect");const on=b?.classList.contains("indicator-active");if(on){window.MixerAdapters?.disconnect?.();setOn(b,false);notify("ESP32 DISCONNECT OFF",false)}else{window.MixerAdapters?.disconnect?.();setOn(root.querySelector("#deviceConnect"),false);setOn(b,true);notify("DISCONNECT ON",false)}});
   root.querySelector("#restartSimulator")?.addEventListener("click",async()=>{window.MixerAdapters?.disconnect?.();await window.MixerAdapters?.simulator?.();setOn(root.querySelector("#restartSimulator"),true);notify("ESP32 SIMULATOR READY")});
 
   root.querySelector(".mapper-row button:nth-of-type(1)")?.addEventListener("click",()=>{const n=Number(root.querySelector('.mapper-row input[type=number]')?.value||16);buildChannels(n);notify("CHANNELS APPLIED: "+n)});
