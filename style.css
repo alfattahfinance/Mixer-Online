@@ -154,37 +154,77 @@ body{background:#020405}
 
 
 
-/* PATCH-V16 — tablet bottom channel rack: all CH + MASTER stay aligned */
-.channel-section{width:100%!important;display:flex!important;align-items:stretch!important;gap:4px!important;overflow:hidden!important;}
-.channels{display:flex!important;flex:1 1 auto!important;min-width:0!important;overflow:hidden!important;gap:2px!important;align-items:stretch!important;}
-.channel{flex:1 1 0!important;min-width:0!important;max-width:none!important;width:auto!important;}
-.master-strip{flex:0 0 82px!important;min-width:82px!important;max-width:82px!important;position:relative!important;z-index:50!important;}
-@media (max-width:1200px){
-  .channel-section{width:100%!important;min-width:0!important;height:455px!important;}
-  .channels{overflow:hidden!important;}
-  .channel{flex:1 1 0!important;min-width:0!important;max-width:none!important;padding-left:2px!important;padding-right:2px!important;}
-  .master-strip{flex:0 0 68px!important;min-width:68px!important;max-width:68px!important;}
-  .fader-wrap{min-height:250px!important;}
+
+
+/* PATCH-V15 — stable tablet console layout */
+html,body{overflow-x:auto}
+.app{max-width:1600px}
+.console{grid-template-columns:100px minmax(420px,1fr) 300px 280px!important;min-height:410px!important}
+.center{min-width:0!important}
+.tabs{pointer-events:auto!important;position:relative!important;z-index:100!important}
+.tabs button{pointer-events:auto!important;cursor:pointer!important}
+.channel-section{display:flex!important;align-items:stretch!important;height:455px!important;min-height:455px!important;overflow:hidden!important}
+.channels{display:flex!important;flex:1 1 auto!important;min-width:0!important;overflow-x:auto!important;overflow-y:hidden!important;gap:3px!important}
+.channel{flex:1 1 0!important;min-width:62px!important;max-width:86px!important;height:100%!important}
+.master-strip{flex:0 0 82px!important;min-width:82px!important;height:100%!important;position:relative!important;z-index:20!important}
+.fader-wrap{flex:1 1 auto!important;min-height:260px!important}
+.fader{height:100%!important;appearance:slider-vertical!important;-webkit-appearance:slider-vertical!important;touch-action:none!important}
+.ch-lamp{pointer-events:none!important}
+@media(max-width:1250px) and (min-width:761px){
+ .app{min-width:1000px!important}
+ .console{grid-template-columns:76px minmax(400px,1fr) 260px 245px!important;min-width:1000px!important}
+ .channel-section{min-width:1000px!important}
+ .channel{min-width:56px!important;max-width:none!important}
+ .master-strip{flex-basis:68px!important;min-width:68px!important}
 }
-@media (max-width:760px){
-  .channel-section{height:480px!important;min-height:480px!important;display:flex!important;overflow:hidden!important;}
-  .channels{flex:1 1 auto!important;min-width:0!important;overflow:hidden!important;gap:1px!important;}
-  .channel{flex:1 1 0!important;min-width:0!important;max-width:none!important;width:auto!important;padding:2px 1px!important;gap:3px!important;}
-  .master-strip{flex:0 0 64px!important;min-width:64px!important;max-width:64px!important;padding:3px!important;}
-  .ch-head{font-size:7px!important;}
-  .ch-btn{font-size:6px!important;min-height:22px!important;}
-  .value{font-size:7px!important;}
-  .knob{width:18px!important;height:18px!important;}
-  .knobs>div{font-size:5px!important;}
-  .fader-wrap{min-height:270px!important;}
-  .fader{width:18px!important;}
-  .ch-bottom .label{font-size:6px!important;}
-  .ch-bottom .status{font-size:5px!important;}
-  .master-head{font-size:8px!important;}
-  .master-strip .fader{width:20px!important;}
+@media(max-width:760px){
+ .app{min-width:0!important;width:100%!important}
+ .console{grid-template-columns:70px minmax(0,1fr)!important;min-width:0!important}
+ .center{grid-column:2!important;grid-row:1!important;height:395px!important}
+ .right{grid-column:2!important;grid-row:2!important;height:315px!important}
+ .dca{grid-column:1/-1!important;grid-row:3!important;display:block!important;min-height:360px!important}
+ .channel-section{height:480px!important;min-height:480px!important}
+ .channels{overflow-x:auto!important}
+ .channel{flex:0 0 72px!important;min-width:72px!important;max-width:72px!important}
+ .master-strip{flex:0 0 72px!important;min-width:72px!important}
 }
-@media (max-width:500px){
-  .channel-section{height:450px!important;min-height:450px!important;}
-  .master-strip{flex-basis:58px!important;min-width:58px!important;max-width:58px!important;}
-  .fader-wrap{min-height:245px!important;}
+@media(max-width:500px){
+ .console{grid-template-columns:62px minmax(0,1fr)!important}
+ .channel{flex-basis:68px!important;min-width:68px!important;max-width:68px!important}
+ .master-strip{flex-basis:68px!important;min-width:68px!important}
+}
+.mixer-locked .tabs button{pointer-events:auto!important;opacity:1!important}
+\n/* PATCH-V16 — tablet bottom channel rack: all CH + MASTER stay aligned */
+.channel-section{width:100%!important;display:flex!important;align-items:stretch!important;gap:4px!important;overflow:hidden!important}
+.channels{display:flex!important;flex:1 1 auto!important;min-width:0!important;overflow:hidden!important;gap:2px!important;align-items:stretch!important}
+.channel{flex:1 1 0!important;min-width:0!important;max-width:none!important;width:auto!important}
+.master-strip{flex:0 0 82px!important;min-width:82px!important;max-width:82px!important;position:relative!important;z-index:50!important}
+@media(max-width:1200px){
+ .channel-section{width:100%!important;min-width:0!important;height:455px!important}
+ .channels{overflow:hidden!important}
+ .channel{flex:1 1 0!important;min-width:0!important;max-width:none!important;padding-left:2px!important;padding-right:2px!important}
+ .master-strip{flex:0 0 68px!important;min-width:68px!important;max-width:68px!important}
+ .fader-wrap{min-height:250px!important}
+}
+@media(max-width:760px){
+ .channel-section{height:480px!important;min-height:480px!important;display:flex!important;overflow:hidden!important}
+ .channels{flex:1 1 auto!important;min-width:0!important;overflow:hidden!important;gap:1px!important}
+ .channel{flex:1 1 0!important;min-width:0!important;max-width:none!important;width:auto!important;padding:2px 1px!important;gap:3px!important}
+ .master-strip{flex:0 0 64px!important;min-width:64px!important;max-width:64px!important;padding:3px!important}
+ .ch-head{font-size:7px!important}
+ .ch-btn{font-size:6px!important;min-height:22px!important}
+ .value{font-size:7px!important}
+ .knob{width:18px!important;height:18px!important}
+ .knobs>div{font-size:5px!important}
+ .fader-wrap{min-height:270px!important}
+ .fader{width:18px!important}
+ .ch-bottom .label{font-size:6px!important}
+ .ch-bottom .status{font-size:5px!important}
+ .master-head{font-size:8px!important}
+ .master-strip .fader{width:20px!important}
+}
+@media(max-width:500px){
+ .channel-section{height:450px!important;min-height:450px!important}
+ .master-strip{flex-basis:58px!important;min-width:58px!important;max-width:58px!important}
+ .fader-wrap{min-height:245px!important}
 }
