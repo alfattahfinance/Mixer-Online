@@ -1,311 +1,158 @@
-/* FINAL RESPONSIVE LAYOUT — replaces conflicting legacy responsive rules */
-html,body{max-width:100%;min-width:0!important}
-body{overflow-x:hidden!important}
-.topbar{width:100%;max-width:100vw!important}
-.top-actions{min-width:0;max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
-.console{width:100%;max-width:1600px;margin-inline:auto}
-.upper{width:100%;grid-template-columns:clamp(78px,7vw,100px) minmax(0,1fr) clamp(270px,20vw,305px)!important}
-.digital-screen,.music-player{min-width:0!important;width:100%}
-.channel-rack{width:100%;max-width:100%;overflow:hidden}
-.channels{max-width:100%;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;touch-action:pan-x}
-.channels .channel{flex:0 0 clamp(68px,5.35vw,82px)!important;width:clamp(68px,5.35vw,82px)!important;min-width:clamp(68px,5.35vw,82px)!important}
-.master-side-dock{box-sizing:border-box!important}
-
-/* Tablet: screen and player stack; never squeeze them side-by-side */
-@media (max-width:900px){
- .topbar{display:flex;flex-wrap:wrap;height:auto!important;min-height:58px;padding:6px!important;gap:5px!important}
- .brand{flex:0 0 auto}
- .top-actions{flex:1 1 100%;width:100%;padding-bottom:2px}
- .upper{display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-template-areas:"screen" "player"!important}
- .input-meter{display:none!important}
- .digital-screen{grid-area:screen!important;min-height:390px!important}
- .music-player{grid-area:player!important;min-height:0!important}
- .channel-rack{margin-top:6px!important}
- .master-side-dock{right:5px!important;width:min(355px,calc(100% - 10px))!important;min-width:0!important}
- .channels{padding-right:0!important}
-}
-
-/* Phone */
-@media (max-width:600px){
- .console{padding:5px!important}
- .topbar{position:relative!important}
- .brand{width:100%!important}
- .brand h1{font-size:17px!important}
- .top-actions{display:flex!important;flex-wrap:nowrap!important;overflow-x:auto!important}
- .top-actions button,.file-btn,.play-mode{flex:0 0 auto!important}
- .digital-screen{min-height:360px!important}
- .screen-tabs{overflow-x:auto!important;white-space:nowrap!important}
- .screen-tabs button{flex:0 0 72px!important}
- .screen-body{min-height:320px!important;padding:7px!important}
- .spectrum{height:175px!important}
- .spectrum-bars{padding:12px 8px 24px!important}
- .screen-meter{top:190px!important;right:7px!important;width:62px!important;height:82px!important}
- .screen-source{left:8px!important;bottom:8px!important}
- .screen-readout{right:75px!important;bottom:8px!important;gap:8px!important}
- .screen-readout strong{font-size:13px!important}
- .reference-eq{grid-template-columns:repeat(2,minmax(0,1fr))!important;margin-right:70px!important;height:auto!important}
- .music-player{min-height:300px!important;padding:7px!important}
- .player-buttons{grid-template-columns:repeat(2,1fr)!important}
- .music-queue{max-height:110px!important;overflow:auto!important}
- .channel-rack{height:400px!important;min-height:400px!important;padding:4px!important}
- .channels{height:386px!important;min-height:386px!important;gap:3px!important}
- .channels .channel{height:386px!important;min-height:386px!important;flex-basis:72px!important;width:72px!important;min-width:72px!important}
- .channels .fader-bank{height:205px!important;min-height:205px!important;flex-basis:205px!important}
- .channels .channel .fader,.channels .mini-meter{height:205px!important}
- .channels .channel-lamps{height:48px!important;min-height:48px!important}
- .channels .knob-row{height:50px!important;min-height:50px!important}
- .master-side-dock{position:absolute!important;right:4px!important;top:4px!important;width:calc(100% - 8px)!important;height:386px!important;max-height:386px!important}
- .master-side-content{height:310px!important;max-height:310px!important}
-}
-
-/* Very narrow phones */
-@media (max-width:380px){
- .console{padding:3px!important}
- .digital-screen{min-height:340px!important}
- .screen-body{min-height:300px!important}
- .spectrum{height:155px!important}
- .screen-meter{top:168px!important;height:72px!important}
- .channel-rack{height:370px!important;min-height:370px!important}
- .channels{height:356px!important;min-height:356px!important}
- .channels .channel{height:356px!important;min-height:356px!important;flex-basis:66px!important;width:66px!important;min-width:66px!important}
- .channels .fader-bank{height:180px!important;min-height:180px!important;flex-basis:180px!important}
- .channels .channel .fader,.channels .mini-meter{height:180px!important}
- .master-side-dock{height:356px!important;max-height:356px!important}
- .master-side-content{height:280px!important;max-height:280px!important}
-}
-
-/* Touch controls: prevent browser gesture conflicts without disabling normal page scroll */
+/* MIXER ONLINE — RESPONSIVE V5
+   Clean replacement for the old responsive overrides.
+   No forced desktop canvas, no clipped controls, touch-safe.
+*/
+html,body{width:100%;min-width:0!important;max-width:none!important;margin:0!important;overflow-x:hidden!important;-webkit-text-size-adjust:100%}
+*,*::before,*::after{box-sizing:border-box}
 button,input,select,.file-btn{touch-action:manipulation}
 input[type=range]{touch-action:none}
+button,.file-btn,select{cursor:pointer;-webkit-tap-highlight-color:transparent}
 
+.topbar,.console{width:100%!important;min-width:0!important;max-width:1600px!important;margin-inline:auto!important}
+.topbar{overflow:visible!important}
+.console{padding:7px!important;overflow:visible!important}
 
-/* RESPONSIVE V2 — fluid layout, no desktop-width leakage */
-:root{--ui-gap:clamp(4px,0.6vw,9px);--rack-h:clamp(360px,42vw,475px)}
-html{width:100%;min-width:0!important;overflow-x:hidden!important}
-body{width:100%;min-width:0!important;margin:0!important;overflow-x:hidden!important}
-*,*::before,*::after{box-sizing:border-box!important;max-width:100%}
-img,svg,canvas,video{max-width:100%;height:auto}
-button,select,input{max-width:100%;font:inherit}
+.top-actions{min-width:0!important;max-width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;-webkit-overflow-scrolling:touch!important;scrollbar-width:none;touch-action:pan-x!important}
+.top-actions::-webkit-scrollbar{display:none}
+.top-actions>*{flex:0 0 auto!important}
 
-/* Desktop/tablet fluid shell */
-.topbar{width:100%!important;max-width:none!important;min-width:0!important}
-.top-actions{min-width:0!important;max-width:100%!important}
-.console{width:100%!important;max-width:1600px!important;min-width:0!important}
-.upper{width:100%!important;min-width:0!important;grid-template-columns:clamp(72px,7vw,100px) minmax(0,1fr) clamp(260px,20vw,305px)!important;gap:var(--ui-gap)!important}
-.upper>*{min-width:0!important}
+.upper{width:100%!important;min-width:0!important;display:grid!important;grid-template-columns:96px minmax(0,1fr) minmax(285px,305px)!important;gap:7px!important}
+.upper>*{min-width:0!important;max-width:100%!important}
 .digital-screen,.music-player,.input-meter{min-width:0!important;max-width:100%!important}
-.screen-body,.spectrum,.music-player{overflow:hidden!important}
-.screen-tabs{min-width:0!important;overflow-x:auto!important;overscroll-behavior-x:contain}
-.screen-tabs button{flex:1 1 0!important;min-width:72px!important}
-.screen-readout{min-width:0!important}
-.screen-source{min-width:0!important;max-width:60%!important}
-.screen-source strong{display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
-.screen-channels{min-width:0!important}
-.music-player-head,.player-meta,.music-volume{min-width:0!important}
-.music-player-head>div{min-width:0!important}
-.music-player-head small{display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
-.player-buttons{min-width:0!important}
-.player-buttons button{min-width:0!important;white-space:nowrap!important}
-.music-queue{min-width:0!important;overflow:auto!important}
-.music-queue button{min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+.digital-screen,.music-player{overflow:hidden!important}
+
+.screen-tabs{display:flex!important;min-width:0!important;max-width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;white-space:nowrap!important;scrollbar-width:none;touch-action:pan-x!important}
+.screen-tabs::-webkit-scrollbar{display:none}
+.screen-tabs button{flex:0 0 88px!important;min-width:72px!important;touch-action:manipulation!important}
+
+.screen-body{min-width:0!important;max-width:100%!important}
+.spectrum{min-width:0!important;max-width:100%!important}
+.spectrum-bars,.eq-point:after{pointer-events:none!important}
+
+.music-player-head,.player-meta,.music-volume,.player-buttons{min-width:0!important;max-width:100%!important}
+.player-buttons{display:grid!important}
+.player-buttons button{min-width:0!important;max-width:100%!important;touch-action:manipulation!important}
+.music-queue{min-width:0!important;max-width:100%!important;overflow:auto!important;-webkit-overflow-scrolling:touch!important}
 .music-volume{display:grid!important;grid-template-columns:auto minmax(0,1fr) auto!important;align-items:center!important;gap:6px!important}
 .music-volume input{width:100%!important;min-width:0!important}
 
-/* Rack is intentionally horizontally scrollable: channels never shrink below a usable touch width */
-.channel-rack{width:100%!important;max-width:100%!important;min-width:0!important;overflow:hidden!important}
-.channels{width:100%!important;max-width:100%!important;min-width:0!important;overflow-x:auto!important;overflow-y:hidden!important;display:flex!important;flex-wrap:nowrap!important;scroll-snap-type:x proximity!important;touch-action:pan-x!important;-webkit-overflow-scrolling:touch!important}
-.channels .channel{flex:0 0 clamp(68px,5.35vw,82px)!important;width:clamp(68px,5.35vw,82px)!important;min-width:clamp(68px,5.35vw,82px)!important;scroll-snap-align:start!important}
-.channels .channel *{min-width:0!important}
-.channels .fader,.channels input[type=range]{touch-action:none!important}
-.channels .channel-actions button,.channels .channel-head,.channels select{touch-action:manipulation!important}
+.channel-rack{width:100%!important;min-width:0!important;max-width:100%!important;overflow:hidden!important;position:relative!important}
+.channels{width:100%!important;min-width:0!important;max-width:100%!important;display:flex!important;flex-wrap:nowrap!important;align-items:stretch!important;gap:3px!important;overflow-x:auto!important;overflow-y:hidden!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior-x:contain!important;scrollbar-width:thin!important;touch-action:pan-x!important;padding-bottom:5px!important}
+.channels .channel{flex:0 0 78px!important;width:78px!important;min-width:78px!important;max-width:none!important;overflow:hidden!important}
+.channels .channel button,.channels .channel select,.channels .channel input{touch-action:manipulation!important}
+.channels .channel input[type=range]{touch-action:none!important}
+.channels .fader{position:relative!important;z-index:30!important;pointer-events:auto!important}
+.channels .mini-meter{pointer-events:none!important}
 
-/* Side master menu: never determines document width */
-.master-side-dock{box-sizing:border-box!important;max-width:calc(100vw - 8px)!important}
-.master-side-content{min-width:0!important;max-width:100%!important;overflow-x:hidden!important;overflow-y:auto!important}
-.master-side-content>*{max-width:100%!important}
-.master-side-content input,.master-side-content select,.master-side-content button{min-width:0!important;max-width:100%!important}
+.master{flex:0 0 126px!important;width:126px!important;min-width:126px!important;max-width:none!important}
+.master-side-dock{flex:0 0 250px!important;width:250px!important;min-width:250px!important;max-width:250px!important;box-sizing:border-box!important;overflow:hidden!important;z-index:50!important}
+.master-side-menu,.master-side-menu button{pointer-events:auto!important;touch-action:manipulation!important}
+.master-side-content{min-width:0!important;max-width:100%!important;overflow-x:hidden!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important}
+.master-side-content *{max-width:100%!important}
+.master-side-content input,.master-side-content select,.master-side-content button{min-width:0!important;max-width:100%!important;pointer-events:auto!important}
 .master-side-content input[type=range]{width:100%!important}
 
+.screen-view-host{max-width:100%!important;overflow:hidden!important;pointer-events:none!important}
+.screen-view-panel{max-width:100%!important;overflow:auto!important;-webkit-overflow-scrolling:touch!important;pointer-events:auto!important}
+.screen-view-panel input,.screen-view-panel select,.screen-view-panel button{pointer-events:auto!important}
+
+footer{width:100%!important;max-width:100%!important;min-width:0!important;overflow:hidden!important}
+
 /* Tablet */
-@media (max-width:1100px){
-  .console{padding-inline:6px!important}
-  .upper{grid-template-columns:76px minmax(0,1fr) 275px!important}
-  .top-actions{gap:4px!important}
-  .top-actions button,.file-btn,.play-mode{padding-inline:7px!important}
-  .screen-tabs button{min-width:68px!important}
-  .channels .channel{flex-basis:74px!important;width:74px!important;min-width:74px!important}
-  .channels{padding-right:0!important}
-  .master-side-dock{width:min(320px,calc(100vw - 10px))!important;min-width:0!important}
+@media(max-width:1100px){
+ .console{padding:6px!important}
+ .upper{grid-template-columns:82px minmax(0,1fr) 270px!important;gap:6px!important}
+ .channels .channel{flex-basis:74px!important;width:74px!important;min-width:74px!important}
+ .master{flex-basis:118px!important;width:118px!important;min-width:118px!important}
+ .master-side-dock{flex-basis:230px!important;width:230px!important;min-width:230px!important;max-width:230px!important}
 }
 
-/* Tablet portrait / small tablet */
-@media (max-width:900px){
-  .topbar{height:auto!important;display:grid!important;grid-template-columns:1fr!important;gap:5px!important;padding:6px!important}
-  .brand{width:100%!important}
-  .top-actions{width:100%!important;display:flex!important;flex-wrap:nowrap!important;overflow-x:auto!important;scrollbar-width:none!important;padding-bottom:2px!important}
-  .top-actions::-webkit-scrollbar{display:none!important}
-  .top-actions>*{flex:0 0 auto!important}
-  .upper{display:flex!important;flex-direction:column!important;gap:6px!important}
-  .input-meter{display:none!important}
-  .digital-screen{order:1!important;width:100%!important;min-height:0!important}
-  .music-player{order:2!important;width:100%!important;min-height:0!important}
-  .channel-rack{order:3!important}
-  .screen-body{min-height:clamp(310px,52vw,390px)!important}
-  .spectrum{height:clamp(155px,28vw,220px)!important}
-  .screen-meter{right:8px!important}
-  .screen-readout{right:90px!important}
-  .reference-eq{margin-right:78px!important}
-  .master-side-dock{position:absolute!important;right:4px!important;top:4px!important;width:min(340px,calc(100% - 8px))!important;min-width:0!important}
-}
-
-/* Phone landscape/portrait: readable controls, no accidental page zoom/overflow */
-@media (max-width:600px){
-  .console{padding:4px!important}
-  .brand h1{font-size:clamp(15px,5vw,19px)!important;letter-spacing:1.5px!important}
-  .brand small{font-size:8px!important}
-  .top-actions button,.file-btn,.play-mode{height:34px!important;font-size:11px!important}
-  .upper{gap:5px!important}
-  .digital-screen{min-height:330px!important}
-  .screen-tabs{height:38px!important}
-  .screen-tabs button{flex:0 0 76px!important}
-  .screen-body{min-height:315px!important;padding:7px!important}
-  .spectrum{height:165px!important}
-  .spectrum-bars{padding:12px 7px 24px!important}
-  .eq-point{width:28px!important;height:28px!important}
-  .eq-point:after{height:118px!important}
-  .screen-meter{top:180px!important;right:6px!important;width:58px!important;height:78px!important}
-  .screen-source{left:8px!important;bottom:8px!important;max-width:48%!important}
-  .screen-source small{font-size:7px!important}
-  .screen-source strong{font-size:12px!important}
-  .screen-readout{left:52%;right:60px!important;bottom:8px!important;justify-content:flex-end!important;gap:8px!important}
-  .screen-readout span{font-size:7px!important}
-  .screen-readout strong{font-size:12px!important}
-  .screen-channels{display:none!important}
-  .reference-eq{grid-template-columns:repeat(2,minmax(0,1fr))!important;margin-right:66px!important}
-  .reference-rta{width:36px!important}
-  .music-player{padding:7px!important}
-  .music-player-head strong{font-size:12px!important}
-  .player-buttons{grid-template-columns:repeat(2,minmax(0,1fr))!important}
-  .player-buttons button{height:38px!important}
-  .player-meta{grid-template-columns:1fr 1fr!important}
-  .music-queue{grid-template-columns:repeat(2,minmax(0,1fr))!important;max-height:115px!important}
-  .channel-rack{height:clamp(365px,100vw,410px)!important;min-height:0!important;padding:4px!important}
-  .channels{height:100%!important;min-height:0!important;gap:3px!important;padding:0!important}
-  .channels .channel{height:100%!important;min-height:0!important;flex:0 0 72px!important;width:72px!important;min-width:72px!important}
-  .channels .fader-bank{height:clamp(175px,50vw,215px)!important;min-height:0!important;flex-basis:clamp(175px,50vw,215px)!important}
-  .channels .channel .fader,.channels .mini-meter{height:clamp(175px,50vw,215px)!important}
-  .channels .channel-lamps{height:48px!important;min-height:48px!important}
-  .channels .knob-row{height:48px!important;min-height:48px!important}
-  .master-side-dock{top:4px!important;right:4px!important;width:calc(100% - 8px)!important;height:calc(100% - 8px)!important;max-height:none!important}
-  .master-side-content{height:calc(100% - 66px)!important;max-height:none!important}
-  footer{font-size:9px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
-}
-
-/* Very small phones */
-@media (max-width:380px){
-  .top-actions button,.file-btn,.play-mode{font-size:10px!important;padding-inline:6px!important}
-  .digital-screen{min-height:315px!important}
-  .screen-body{min-height:300px!important}
-  .spectrum{height:150px!important}
-  .screen-meter{top:165px!important}
-  .screen-readout{left:48%;right:55px!important}
-  .channel-rack{height:355px!important}
-  .channels .channel{flex-basis:66px!important;width:66px!important;min-width:66px!important}
-  .channels .fader-bank{height:165px!important;flex-basis:165px!important}
-  .channels .channel .fader,.channels .mini-meter{height:165px!important}
-}
-
-/* Touch hit targets and native scrolling */
-button,.file-btn,select{min-height:32px}
-@media (pointer:coarse){
-  button,.file-btn,select{min-height:36px!important}
-  input[type=range]{min-height:28px!important}
-}
-
-/* TOUCH FIX V3 — interactive elements must remain above decorative overlays */
-html,body{pointer-events:auto!important}
-.topbar,.console,.upper,.digital-screen,.music-player,.channel-rack,.channels,.channel,.master,.master-side-dock{pointer-events:auto!important}
-.screen-body,.spectrum,.reference-eq,.reference-rta,.screen-meter,.screen-source,.screen-readout{pointer-events:none!important}
-.screen-tabs,.screen-tabs button,.player-buttons,.player-buttons button,.music-queue,.music-queue button,.music-volume,.music-volume input,
-.channel-head,.channel-head button,.channel-tabs,.channel-tabs button,.channel-lamps,.channel-actions,.channel-actions button,
-.channel select,.channel input,.channels input[type=range],.master input,.master button,.master select,.master-side-menu,.master-side-menu button,
-.master-side-content button,.master-side-content input,.master-side-content select{pointer-events:auto!important;position:relative!important;z-index:20!important}
-.channels .channel{isolation:isolate!important}
-.channels .channel-lamps,.channels .channel-actions,.channels .knob-row,.channels .fader-bank{position:relative!important;z-index:10!important}
-.channels .fader{position:relative!important;z-index:30!important;pointer-events:auto!important}
-.channels .mini-meter{pointer-events:none!important;z-index:1!important}
-.master-side-dock{z-index:50!important}
-.master-side-menu{position:relative!important;z-index:60!important}
-.master-side-content{position:relative!important;z-index:55!important}
-.master-side-content:before,.master-side-content:after{pointer-events:none!important}
-@media(pointer:coarse){
- button,.file-btn,select{cursor:pointer!important;-webkit-tap-highlight-color:transparent!important}
- .channel-actions button{min-height:36px!important}
- .channel-tabs button{min-height:32px!important}
-}
-
-/* RESPONSIVE V4 — prevent clipping; content may scroll inside its own region */
-html,body{overflow-x:hidden!important;overflow-y:auto!important}
-.console{overflow:visible!important}
-.upper{overflow:visible!important}
-.digital-screen,.music-player,.input-meter{overflow:hidden!important}
-.screen-body{overflow:hidden!important}
-.screen-tabs{overflow-x:auto!important;overflow-y:hidden!important;white-space:nowrap!important}
-.screen-tabs button{flex:0 0 auto!important}
-.music-player{overflow:hidden!important}
-.music-queue{overflow:auto!important;-webkit-overflow-scrolling:touch!important}
-.channel-rack{overflow:hidden!important}
-.channels{overflow-x:auto!important;overflow-y:hidden!important;-webkit-overflow-scrolling:touch!important;scrollbar-width:thin!important;padding-bottom:5px!important}
-.channels .channel{overflow:hidden!important}
-.master-side-dock{overflow:hidden!important}
-.master-side-content{overflow-x:hidden!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch!important}
-
-/* Never clip the top controls */
+/* Tablet portrait / narrow screens: stack the upper modules so nothing is squeezed. */
 @media(max-width:900px){
- .topbar{overflow:visible!important}
- .top-actions{overflow-x:auto!important;overflow-y:hidden!important}
- .upper{overflow:visible!important}
- .digital-screen{overflow:hidden!important}
- .music-player{overflow:hidden!important}
+ .topbar{display:flex!important;flex-direction:column!important;align-items:stretch!important;height:auto!important;min-height:58px!important;padding:6px!important}
+ .brand{width:100%!important}
+ .top-actions{width:100%!important;display:flex!important;flex-wrap:nowrap!important}
+ .upper{display:flex!important;flex-direction:column!important;gap:6px!important}
+ .input-meter{display:none!important}
+ .digital-screen{order:1!important;width:100%!important}
+ .music-player{order:2!important;width:100%!important}
+ .channel-rack{order:3!important}
+ .master-side-dock{flex-basis:240px!important;width:240px!important;min-width:240px!important;max-width:240px!important}
+ .screen-body{min-height:330px!important}
+ .spectrum{height:180px!important}
 }
 
-/* Phone: let every section use its natural height; only the channel strip scrolls sideways */
-@media(max-width:600px){
- .console{width:100%!important;max-width:100%!important;overflow:visible!important}
- .upper{width:100%!important;height:auto!important;overflow:visible!important}
- .digital-screen{width:100%!important;height:auto!important;min-height:0!important;overflow:hidden!important}
- .screen-body{height:auto!important;min-height:315px!important;overflow:hidden!important}
- .spectrum{max-width:100%!important}
- .music-player{width:100%!important;height:auto!important;min-height:0!important;overflow:hidden!important}
- .player-buttons{width:100%!important}
- .music-queue{width:100%!important;max-width:100%!important}
- .channel-rack{width:100%!important;height:clamp(365px,100vw,410px)!important;overflow:hidden!important}
- .channels{width:100%!important;height:100%!important;overflow-x:auto!important;overflow-y:hidden!important;padding-right:4px!important}
- .channels .channel{flex:0 0 72px!important;width:72px!important;min-width:72px!important}
- .master-side-dock{width:calc(100% - 8px)!important;max-width:calc(100% - 8px)!important;overflow:hidden!important}
+/* Phone */
+@media(max-width:700px){
+ .console{padding:4px!important}
+ .brand h1{font-size:clamp(15px,5vw,19px)!important;letter-spacing:1.5px!important}
+ .brand small{font-size:8px!important}
+ .top-actions{gap:5px!important;padding-bottom:2px!important}
+ .top-actions button,.file-btn,.play-mode{height:34px!important;min-height:34px!important;font-size:10px!important;padding-inline:8px!important}
+ .digital-screen,.music-player{width:100%!important;height:auto!important;min-height:0!important}
+ .screen-tabs{height:38px!important}
+ .screen-tabs button{flex:0 0 76px!important;min-width:76px!important;font-size:9px!important}
+ .screen-body{height:auto!important;min-height:0!important;padding:7px!important}
+ .spectrum{height:180px!important}
+ .screen-source{max-width:50%!important;overflow:hidden!important}
+ .screen-source strong{max-width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-size:13px!important}
+ .screen-readout{max-width:48%!important;gap:7px!important}
+ .screen-readout strong{font-size:12px!important}
+ .screen-channels{display:none!important}
+ .reference-eq{grid-template-columns:repeat(2,minmax(0,1fr))!important;margin:7px 68px 0 0!important;gap:5px!important}
+ .reference-rta{display:none!important}
+ .player-buttons{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:5px!important}
+ .player-buttons button{height:38px!important;min-height:38px!important}
+ .player-meta{display:grid!important;grid-template-columns:1fr 1fr!important;gap:5px!important}
+ .music-queue{max-height:120px!important}
+ .channel-rack{height:380px!important;min-height:380px!important;padding:3px!important}
+ .channels{height:100%!important;min-height:0!important;padding:0 0 5px!important}
+ .channels .channel{flex:0 0 72px!important;width:72px!important;min-width:72px!important;height:370px!important;min-height:370px!important}
+ .channels .channel .fader{height:205px!important}
+ .channels .mini-meter{height:205px!important;top:142px!important}
+ .master{flex:0 0 116px!important;width:116px!important;min-width:116px!important;height:370px!important;min-height:370px!important}
+ .master .fader{height:195px!important}
+ .master-meter{height:195px!important;top:78px!important}
+ .master-side-dock{flex:0 0 230px!important;width:230px!important;min-width:230px!important;max-width:230px!important;height:370px!important;min-height:370px!important;max-height:370px!important}
+ .master-side-content{max-height:calc(100% - 60px)!important}
+ footer{height:auto!important;min-height:36px!important;padding:9px!important;white-space:nowrap!important;text-overflow:ellipsis!important}
 }
 
-/* 320–360px screens: shrink spacing, not content visibility */
+/* Small phones */
+@media(max-width:430px){
+ .screen-tabs button{flex-basis:72px!important;min-width:72px!important}
+ .spectrum{height:165px!important}
+ .screen-body{padding:6px!important}
+ .reference-eq{margin-right:62px!important}
+ .channels{height:355px!important}
+ .channels .channel{flex-basis:68px!important;width:68px!important;min-width:68px!important;height:345px!important;min-height:345px!important}
+ .channels .channel .fader,.channels .mini-meter{height:185px!important}
+ .channels .mini-meter{top:136px!important}
+ .master{flex-basis:108px!important;width:108px!important;min-width:108px!important;height:345px!important;min-height:345px!important}
+ .master .fader{height:180px!important}
+ .master-meter{height:180px!important;top:74px!important}
+ .master-side-dock{flex-basis:215px!important;width:215px!important;min-width:215px!important;max-width:215px!important;height:345px!important;min-height:345px!important;max-height:345px!important}
+}
+
+/* Very narrow: reduce spacing, never hide controls. */
 @media(max-width:360px){
  .console{padding:2px!important}
  .topbar{padding:4px!important}
  .top-actions button,.file-btn,.play-mode{padding-inline:5px!important;font-size:9px!important}
  .screen-tabs button{min-width:64px!important}
- .screen-body{padding:5px!important}
- .reference-eq{gap:4px!important;margin-right:60px!important}
- .music-player{padding:5px!important}
- .player-buttons{gap:4px!important}
- .player-buttons button{height:36px!important;font-size:10px!important}
- .channel-rack{height:350px!important}
  .channels .channel{flex-basis:66px!important;width:66px!important;min-width:66px!important}
- .channels .fader-bank{height:165px!important;flex-basis:165px!important}
- .channels .channel .fader,.channels .mini-meter{height:165px!important}
+ .master-side-dock{flex-basis:205px!important;width:205px!important;min-width:205px!important}
 }
 
-/* Landscape phones: use the available width instead of stacking everything unnecessarily */
+/* Landscape tablet/phone: use two useful columns instead of wasting vertical space. */
 @media(max-width:900px) and (orientation:landscape){
  .upper{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(250px,36vw)!important;grid-template-areas:"screen player"!important;align-items:stretch!important}
- .digital-screen{min-height:320px!important}
- .music-player{min-height:320px!important}
- .channel-rack{margin-top:6px!important}
+ .digital-screen{grid-area:screen!important}
+ .music-player{grid-area:player!important}
+ .digital-screen,.music-player{min-height:320px!important}
 }
+
+/* Ensure decorative layers never steal taps. */
+.eq-point,.spectrum-bars,.grid,.mini-meter,.master-meter,.screen-meter,.reference-rta{pointer-events:none!important}
+.channel-lamps,.channel-actions,.knob-row,.fader-bank{position:relative!important;z-index:10!important}
+.channel-actions button,.channel-tabs button,.channel-head button,.channel select,.channel input,.master button,.master select,.master input{position:relative!important;z-index:40!important;pointer-events:auto!important}
