@@ -67,7 +67,7 @@ function bindReferenceControls(){
 
 function initSystemNotifications(){if(window.__mixerNotifyBound)return;window.__mixerNotifyBound=true;const show=(msg,on=true)=>{let n=document.querySelector("#mixerNotification");if(!n){n=document.createElement("div");n.id="mixerNotification";n.setAttribute("role","status");n.setAttribute("aria-live","assertive");document.body.appendChild(n)}n.textContent=String(msg);n.dataset.state=on?"ON":"OFF";n.classList.toggle("is-on",on);n.classList.toggle("is-off",!on);n.classList.add("show");clearTimeout(window.__mixerNoticeTimer);window.__mixerNoticeTimer=setTimeout(()=>n.classList.remove("show"),2600)};window.mixerNotify=show;document.addEventListener("mixer:notification",e=>{const d=e.detail||{};show(d.message,d.on!==false)});}
 function init(){initSystemNotifications();bindMusic();bindNativeButtons();bindTabs();bindConnection();bindMasterControls();bindReferenceControls();initIndicatorLights();const count=Number($("#channelCount")?.value||16);buildChannels(count);bindMaifDcaUsbAudio();bindDcaControls();bindOnOffLamps();requestAnimationFrame(()=>{const box=$("#channels");box?.scrollTo?.({left:0,behavior:"auto"});initIndicatorLights();bindDcaControls();bindOnOffLamps();updateMeters()});$("#applyChannels")?.addEventListener("click",()=>{buildChannels($("#channelCount")?.value);refreshHardwareTestTargets();initIndicatorLights();bindDcaControls();bindOnOffLamps()});window.MixerAdapters?.simulator?.();drawSpectrum();setInterval(()=>{updateMeters();updateDcaValues()},60)}
-document.readyState==="loading"?document.addEventListener("DOMContentLoaded",init):init();
+
 /* Mixer Online core: one audio engine + one control engine. */
 "use strict";
 const AudioCtx=window.AudioContext||window.webkitAudioContext,$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
@@ -121,3 +121,5 @@ function updateDcaValues(){document.querySelectorAll(".dca-btn").forEach(b=>{con
 
 function bindNativeButtons(){if(window.NativeMedia){$("#phoneRecorder")?.addEventListener("click",()=>NativeMedia.openRecorder());$("#phoneFiles")?.addEventListener("click",()=>NativeMedia.openFiles());$("#phoneMusic")?.addEventListener("click",()=>NativeMedia.openMusic())}}
 
+// Boot only after the mixer state and all controls are initialized.
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
