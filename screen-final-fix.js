@@ -1,127 +1,47 @@
-/* MIXER ONLINE — FINAL SCREEN DOCK FIX
- * Fixes the legacy full-page/blank screen view.
- * Views are kept inside #digitalScreen .screen-body.
- * Does not modify audio, ESP32, player, channel controls, mute/solo or scenes.
+/* MIXER ONLINE — SCREEN DOCK FINAL
+ * Meters / EQ / Effect / Routing / Setup stay inside #digitalScreen.
+ * Replaces the legacy full-page screen layer.
  */
 (function(){
-  'use strict';
-
-  function boot(){
-    const screen = document.getElementById('digitalScreen');
-    const body = screen?.querySelector('.screen-body');
-    const tabs = screen?.querySelector('.screen-tabs');
-    if(!screen || !body || !tabs) return;
-
-
-    if(!document.getElementById('screen-final-fix-style')){
-      const style = document.createElement('style');
-      style.id = 'screen-final-fix-style';
-      style.textContent = `
-        #digitalScreen .screen-body.final-docked-screen{position:relative;overflow:hidden!important;min-width:0}
-        #digitalScreen .final-screen-layer{position:absolute;inset:0;z-index:10;overflow:hidden;pointer-events:none}
-        #digitalScreen .final-screen-layer > .screen-view-panel{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:12px;overflow:auto;box-sizing:border-box;pointer-events:auto;background:radial-gradient(circle at 40% 45%,#0b252b,#081012 60%,#060809)}
-        #digitalScreen .final-screen-layer > .screen-view-panel[hidden]{display:none!important}
-      `;
-      document.head.appendChild(style);
-    }
-
-    /* Let the original screen controller initialize its existing controls once.
-       We immediately replace the tab nodes afterward, so its old full-page routing
-       cannot remain active. */
-    const bootstrapButtons = Array.from(tabs.querySelectorAll('button'));
-    bootstrapButtons.slice(1).forEach(b => { try { b.click(); } catch(e){} });
-    try { bootstrapButtons[0]?.click(); } catch(e){}
-
-    /* Remove the broken/legacy host created by the previous layout bridge.
-       Keep its actual view panels so their existing control wiring survives. */
-    const oldHost = screen.querySelector(':scope > .screen-view-host');
-    const panels = oldHost ? Array.from(oldHost.querySelectorAll('.screen-view-panel')) : [];
-    if(oldHost) oldHost.remove();
-
-    /* If a previous run already moved the panels, collect them too. */
-    const existingPanels = Array.from(screen.querySelectorAll('.screen-view-panel[data-screen]'));
-    const allPanels = [...new Set([...panels, ...existingPanels])];
-
-    let layer = body.querySelector('.final-screen-layer');
-    if(!layer){
-      layer = document.createElement('div');
-      layer.className = 'final-screen-layer';
-      body.appendChild(layer);
-    }
-
-    allPanels.forEach(panel => {
-      if(!panel.dataset.screen) return;
-      layer.appendChild(panel);
-      panel.classList.remove('active');
-      panel.hidden = true;
-    });
-
-    /* Replace tab buttons so the old mixer-final click handlers cannot
-       hide the screen body or route the view outside the mixer. */
-    const labels = ['HOME','METERS','EQ','EFFECT','ROUTING','SETUP','MASTER'];
-    const oldButtons = Array.from(tabs.querySelectorAll('button'));
-    oldButtons.forEach((oldButton, i) => {
-      const b = oldButton.cloneNode(true);
-      b.textContent = labels[i] || oldButton.textContent;
-      oldButton.replaceWith(b);
-    });
-    let buttons = Array.from(tabs.querySelectorAll('button'));
-    while(buttons.length < labels.length){
-      const b=document.createElement('button');
-      b.type='button';
-      b.textContent=labels[buttons.length];
-      tabs.appendChild(b);
-      buttons.push(b);
-    }
-
-    const homeNodes = [
-      body.querySelector('.spectrum'),
-      body.querySelector('.reference-eq'),
-      body.querySelector('.screen-source'),
-      body.querySelector('.screen-readout'),
-      body.querySelector('.screen-channels'),
-      body.querySelector('.screen-meter')
-    ].filter(Boolean);
-
-    function show(name){
-      body.style.display = 'block';
-      body.classList.add('final-docked-screen');
-      homeNodes.forEach(node => {
-        node.style.display = name === 'home' ? '' : 'none';
-      });
-      allPanels.forEach(panel => {
-        const active = panel.dataset.screen === name;
-        panel.hidden = !active;
-        panel.classList.toggle('active', active);
-        panel.style.display = active ? 'block' : 'none';
-      });
-      buttons.forEach((b,i) => {
-        const active = labels[i]?.toLowerCase() === name;
-        b.classList.toggle('active', active);
-        b.setAttribute('aria-selected', active ? 'true' : 'false');
-      });
-      /* Keep the display itself fixed inside the mixer. */
-      screen.scrollTop = 0;
-      body.scrollTop = 0;
-    }
-
-    buttons.forEach((b,i) => {
-      b.addEventListener('click', function(e){
-        e.preventDefault();
-        e.stopPropagation();
-        show(labels[i].toLowerCase());
-      }, false);
-    });
-
-    show('home');
-  }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', () => setTimeout(boot, 50), {once:true});
-  }else{
-    setTimeout(boot, 650);
-  }
-
-  window.addEventListener('load', () => setTimeout(boot, 120), {once:true});
-  window.MixerFinalScreenFix = { refresh: boot };
+'use strict';
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const tabs=['home','meters','eq','effect','routing','setup'];
+function addStyle(){if($('#screenDockStyle'))return;const s=document.createElement('style');s.id='screenDockStyle';s.textContent=
+'#digitalScreen{min-width:0;min-height:0;overflow:hidden!important}'+
+'#digitalScreen .screen-body{position:relative!important;min-width:0;min-height:0;height:calc(100% - 40px)!important;overflow:hidden!important}'+
+'#digitalScreen .screen-dock{position:absolute;inset:0;z-index:60;display:none;box-sizing:border-box;padding:10px;overflow:auto;background:radial-gradient(circle at 42% 42%,#0b252b,#081012 62%,#060809)}'+
+'#digitalScreen .screen-dock.active{display:block!important}'+
+'.dock-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;color:#e4c62b;font-size:12px}.dock-head span{color:#718085;font-size:9px}'+
+'.dock-meters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.dock-meter{min-height:175px;border:1px solid #29383c;background:#050809;padding:8px;display:flex;flex-direction:column;align-items:center;gap:6px}.dock-meter b{font-size:10px}.dock-vbar{height:135px;width:22px;border:1px solid #394448;background:#020304;display:flex;align-items:flex-end;padding:2px}.dock-vbar em{display:block;width:100%;height:2%;background:linear-gradient(to top,#16c94b 0 55%,#e4c625 55% 82%,#e73535 82%)}.dock-meter small{color:#7d888c;font-size:9px}'+
+'.dock-channels{display:flex;gap:5px;overflow-x:auto;padding:8px 0 2px}.dock-ch{flex:0 0 30px;text-align:center;color:#7f898d;font-size:7px}.dock-ch .bar{height:75px;border:1px solid #303a3d;background:#040607;display:flex;align-items:flex-end;margin-top:3px}.dock-ch em{width:100%;height:2%;background:linear-gradient(to top,#17c94b 0 65%,#e4cf25 66% 84%,#e53636 85%)}'+
+'.dock-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.dock-card{border:1px solid #2e3b3f;background:#091012;padding:9px;display:grid;gap:6px;color:#9aa4a8;font-size:9px}.dock-card input,.dock-card select{width:100%;min-width:0}.dock-card output{color:#e0e5e7;font-size:10px}'+
+'.dock-route{display:grid;grid-template-columns:1fr 1fr;gap:8px}.dock-route label{display:grid;gap:5px;color:#929da1;font-size:9px}.dock-route select{height:30px;background:#080c0d;color:#d8dddf;border:1px solid #394347}.dock-flow{margin-top:9px;padding:10px;border:1px solid #2b393d;color:#8c989c;font-size:10px}'+
+'.dock-setup{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.dock-setup>div{border:1px solid #2b393d;background:#091012;padding:12px;display:grid;gap:5px}.dock-setup b{font-size:9px;color:#879296}.dock-setup span{font-size:15px;color:#dfe4e6}'+
+'@media(max-width:700px){#digitalScreen .screen-dock{padding:7px}.dock-meters{grid-template-columns:repeat(3,minmax(82px,1fr));overflow-x:auto}.dock-meter{min-height:150px}.dock-vbar{height:105px}.dock-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dock-route,.dock-setup{grid-template-columns:1fr}}'+
+'@media(max-width:430px){#digitalScreen .screen-body{height:280px!important}.dock-grid{gap:5px}.dock-card{padding:7px}}'+
+'.screen-view-host,.final-screen-layer{display:none!important} .screen-view-panel:not(#digitalScreen .screen-view-panel){display:none!important}';document.head.appendChild(s)}
+function build(){
+ const screen=$('#digitalScreen'),body=screen?.querySelector('.screen-body'),bar=screen?.querySelector('.screen-tabs');if(!screen||!body||!bar)return;
+ addStyle();
+ $$('.screen-view-host,.final-screen-layer').forEach(x=>x.remove());
+ $$('#digitalScreen .screen-view-panel').forEach(x=>x.remove());
+ let host=body.querySelector('.screen-dock-host');if(host)host.remove();
+ host=document.createElement('div');host.className='screen-dock-host';body.appendChild(host);
+ const make=(name,html)=>{const p=document.createElement('section');p.className='screen-dock';p.dataset.view=name;p.innerHTML=html;host.appendChild(p);return p};
+ const meters=make('meters','<div class="dock-head"><b>METERS</b><span>LIVE CHANNEL MONITOR</span></div><div class="dock-meters"><article class="dock-meter"><b>INPUT L</b><div class="dock-vbar"><em id="dockL"></em></div><small id="dockLdb">−∞ dB</small></article><article class="dock-meter"><b>INPUT R</b><div class="dock-vbar"><em id="dockR"></em></div><small id="dockRdb">−∞ dB</small></article><article class="dock-meter"><b>MASTER</b><div class="dock-vbar"><em id="dockM"></em></div><small id="dockMdb">−∞ dB</small></article></div><div class="dock-channels" id="dockChannels"></div>');
+ const eq=make('eq','<div class="dock-head"><b>4-BAND EQ</b><span>CH 1</span></div><div class="dock-grid"><label class="dock-card">LOW<input data-target=".bass" type="range" min="-12" max="12" step=".5" value="0"><output>0 dB</output></label><label class="dock-card">LOW MID<input data-target=".mid" type="range" min="-12" max="12" step=".5" value="0"><output>0 dB</output></label><label class="dock-card">HIGH MID<input data-target=".treble" type="range" min="-12" max="12" step=".5" value="0"><output>0 dB</output></label><label class="dock-card">GAIN<input data-target=".gain" type="range" min="0" max="2" step=".01" value="1"><output>1.00</output></label></div>');
+ const fx=make('effect','<div class="dock-head"><b>EFFECT</b><span>FX 1</span></div><div class="dock-grid"><label class="dock-card">PRESET<select id="dockFxPreset"><option value="">CUSTOM</option><option value="vocal">VOCAL</option><option value="mc">MC / SPEECH</option><option value="music">MUSIC</option><option value="hall">HALL</option><option value="slap">SLAPBACK</option></select></label><label class="dock-card">TYPE<select id="dockFxType"><option value="delay">DELAY</option><option value="reverb">REVERB</option></select></label><label class="dock-card">TIME<input id="dockFxDelay" type="range" min="0" max="1" step=".01" value=".28"></label><label class="dock-card">FEEDBACK<input id="dockFxFeedback" type="range" min="0" max=".9" step=".01" value=".32"></label><label class="dock-card">WET<input id="dockFxWet" type="range" min="0" max="1" step=".01" value=".25"></label></div>');
+ const routing=make('routing','<div class="dock-head"><b>ROUTING</b><span>OUTPUT</span></div><div class="dock-route"><label>OUT 1<select id="dockOut1"></select></label><label>OUT 2<select id="dockOut2"></select></label></div><div class="dock-flow">CH 1–16 → BUS / AUX / FX → MAIN L/R</div>');
+ make('setup','<div class="dock-head"><b>SETUP</b><span>DEVICE & SAFETY</span></div><div class="dock-setup"><div><b>CHANNELS</b><span id="dockCount">16</span></div><div><b>DEVICE</b><span id="dockDevice">OFFLINE</span></div><div><b>PROTECTION</b><span>READY</span></div></div>');
+ const bs=[...bar.querySelectorAll('button')];bs.forEach((b,i)=>{const n=b.cloneNode(true);n.textContent=tabs[i].toUpperCase();b.replaceWith(n)});const buttons=[...bar.querySelectorAll('button')];
+ function show(name){const home=name==='home';body.querySelectorAll(':scope > *').forEach(n=>{if(n!==host)n.style.display=home?'':''});host.style.display=home?'none':'block';host.querySelectorAll('.screen-dock').forEach(p=>p.classList.toggle('active',p.dataset.view===name));buttons.forEach((b,i)=>b.classList.toggle('active',tabs[i]===name))}
+ buttons.forEach((b,i)=>b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();show(tabs[i])},{passive:false}));show('home');
+ const c1=()=>$('.channel');eq.querySelectorAll('[data-target]').forEach(m=>{const t=c1()?.querySelector(m.dataset.target);if(!t)return;m.value=t.value;m.addEventListener('input',()=>{t.value=m.value;t.dispatchEvent(new Event('input',{bubbles:true}));const o=m.parentElement.querySelector('output');if(o)o.value=m.dataset.target==='.gain'?Number(m.value).toFixed(2):Number(m.value).toFixed(1)+' dB'})});
+ [['dockFxPreset','#fxPreset'],['dockFxType','#fxType'],['dockFxDelay','#fxDelay'],['dockFxFeedback','#fxFeedback'],['dockFxWet','#fxWet']].forEach(([a,b])=>{const x=$('#'+a),t=$(b);if(!x||!t)return;x.value=t.value;x.addEventListener('input',()=>{t.value=x.value;t.dispatchEvent(new Event('input',{bubbles:true}))});x.addEventListener('change',()=>{t.value=x.value;t.dispatchEvent(new Event('change',{bubbles:true}))})});
+ const outs=$$('.output-routing select');[['dockOut1',outs[0]],['dockOut2',outs[1]]].forEach(([a,t])=>{const x=$('#'+a);if(x&&t){x.innerHTML=t.innerHTML;x.value=t.value;x.onchange=()=>{t.value=x.value;t.dispatchEvent(new Event('change',{bubbles:true}))}}});
+ $('#dockCount').textContent=$$('.channel').length||16;$('#dockDevice').textContent=$('#connectionStatus')?.textContent||'OFFLINE';
+ function update(){const src=$$('.mini-meter .meter-fill'),box=$('#dockChannels');if(box&&box.childElementCount!==src.length){box.innerHTML='';src.forEach((_,i)=>{const d=document.createElement('span');d.className='dock-ch';d.innerHTML='<span>CH '+(i+1)+'</span><span class="bar"><em></em></span>';box.appendChild(d)})}src.forEach((s,i)=>{const e=box?.children[i]?.querySelector('em');if(e){const h=s.parentElement?.clientHeight||1;e.style.height=Math.max(2,Math.min(100,s.offsetHeight/h*100))+'%'}});const a=$('#screenMeterL'),b=$('#screenMeterR');if(a&&$('#dockL'))$('#dockL').style.height=a.style.height||'2%';if(b&&$('#dockR'))$('#dockR').style.height=b.style.height||'2%';const mf=$('#masterFader'),mm=$('#dockM');if(mm)mm.style.height=Math.max(2,(Number(mf?.value)||0)*100)+'%';const db=v=>v<=.001?'−∞ dB':(20*Math.log10(Math.max(.001,v))).toFixed(1)+' dB';if($('#dockMdb'))$('#dockMdb').textContent=db(Number(mf?.value)||0)}
+ setInterval(update,100);update();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(build,120),{once:true});else setTimeout(build,120);window.addEventListener('load',()=>setTimeout(build,180),{once:true});
 })();
