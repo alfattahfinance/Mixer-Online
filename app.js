@@ -64,12 +64,12 @@ function bindReferenceControls(){
     const x=label.querySelector("input[type=range]"); if(!x)return;
     const key="mixer-bus-"+(i+1),saved=Number(localStorage.getItem(key));
     if(Number.isFinite(saved))x.value=Math.max(0,Math.min(100,saved));
-    const update=()=>{label.dataset.level=x.value;label.classList.toggle("active-level",Number(x.value)>0);try{localStorage.setItem(key,x.value)}catch{};if(!locked)send("BUS "+(i+1),"level",Number(x.value))};
+    const update=()=>{const v=Number(x.value);label.dataset.level=x.value;label.classList.toggle("active-level",v>0);const l=label.querySelector(".control-lamp");l?.classList.toggle("on",v>0);l?.classList.toggle("off",v<=0);if(!locked)send("BUS "+(i+1),"level",v);notify("BUS "+(i+1)+" "+(v>0?"ON":"OFF")+" • "+v+"%")};
     x.addEventListener("input",update);update();
   });
 
   // FX controls.
-  ["fxDelay","fxFeedback","fxWet"].forEach(id=>root.querySelector("#"+id)?.addEventListener("input",e=>{if(!locked)send("FX 1",id.replace("fx","").toLowerCase(),Number(e.target.value))}));
+  ["fxDelay","fxFeedback","fxWet"].forEach(id=>root.querySelector("#"+id)?.addEventListener("input",e=>{const v=Number(e.target.value);if(!locked)send("FX 1",id.replace("fx","").toLowerCase(),v);notify("FX 1 "+(v>0?"ON":"OFF")+" • "+id.replace("fx","").toUpperCase()+" "+v)}));
   root.querySelector("#fxType")?.addEventListener("change",e=>{if(!locked)send("FX 1","type",e.target.value)});
   root.querySelector("#fxPreset")?.addEventListener("change",e=>{
     const presets={VOCAL:{type:"reverb",delay:25,feedback:18,wet:35},"MC / SPEECH":{type:"delay",delay:18,feedback:12,wet:22},MUSIC:{type:"delay",delay:30,feedback:28,wet:30},HALL:{type:"reverb",delay:55,feedback:35,wet:48},CUSTOM:null};
@@ -80,7 +80,7 @@ function bindReferenceControls(){
   });
 
   // Output routing: selectable and visibly active.
-  root.querySelectorAll(".routing-block select").forEach((sel,i)=>sel.addEventListener("change",()=>{if(locked)return;setOn(sel,sel.value!=="MAIN L/R");send("OUT "+(i+1),"route",sel.value);notify("OUT "+(i+1)+" → "+sel.value)}));
+  root.querySelectorAll(".routing-block select").forEach((sel,i)=>sel.addEventListener("change",()=>{if(locked)return;const on=sel.value!=="MAIN L/R";setOn(sel,on);send("OUT "+(i+1),"route",sel.value);notify("OUT "+(i+1)+" "+(on?"ON":"OFF")+" → "+sel.value)}));
 
   // Scenes.
   const input=root.querySelector(".scene-row input"),rows=[...root.querySelectorAll(".scene-row")],buttons=[...root.querySelectorAll(".scene-row button")];
@@ -96,8 +96,8 @@ function bindReferenceControls(){
   findBtn("EXPORT")?.addEventListener("click",()=>{const blob=new Blob([JSON.stringify(sceneState(),null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=sceneName()+".json";a.click();URL.revokeObjectURL(a.href);notify("SCENE EXPORTED")});
   const importInput=document.createElement("input");importInput.type="file";importInput.accept=".json,application/json";importInput.hidden=true;root.appendChild(importInput);
   findBtn("IMPORT")?.addEventListener("click",()=>importInput.click());importInput.addEventListener("change",async()=>{const file=importInput.files?.[0];if(!file)return;try{applyScene(JSON.parse(await file.text()));notify("SCENE IMPORTED")}catch{notify("IMPORT ERROR",false)}importInput.value=""});
-  findBtn("↶ UNDO")?.addEventListener("click",()=>{document.execCommand("undo");notify("UNDO")});
-  findBtn("↷ REDO")?.addEventListener("click",()=>{document.execCommand("redo");notify("REDO")});
+  findBtn("↶ UNDO")?.addEventListener("click",()=>{document.execCommand("undo");notify("UNDO ON");setOn(findBtn("↶ UNDO"),true);setTimeout(()=>setOn(findBtn("↶ UNDO"),false),300)});
+  findBtn("↷ REDO")?.addEventListener("click",()=>{document.execCommand("redo");notify("REDO ON");setOn(findBtn("↷ REDO"),true);setTimeout(()=>setOn(findBtn("↷ REDO"),false),300)});
 
   // Lock.
   root.querySelector(".lock-row button")?.addEventListener("click",()=>{locked=!locked;setLock(locked)});
