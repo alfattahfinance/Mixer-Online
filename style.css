@@ -280,3 +280,6 @@ html,body{overflow-x:auto}
 #homeView .eq-row{position:relative!important;z-index:5!important;isolation:isolate!important;min-height:108px!important;height:108px!important;max-height:108px!important;overflow:hidden!important;margin-top:6px!important}
 #homeView .eq-row>*{position:relative!important;z-index:1!important}
 #homeView .player-status{position:relative!important;z-index:5!important;min-height:32px!important}
+
+/* MAIF / DCA / USB / AUDIO active states */
+.dca button.indicator-active,.route-btn.indicator-active,.usb-route-btn.indicator-active,.groups button.indicator-active,.auto-check.indicator-active{border-color:#00e83f!important;color:#00ff4c!important;box-shadow:0 0 8px rgba(0,232,63,.45),inset 0 0 8px rgba(0,232,63,.12)!important}.dca-btn.indicator-active{background:linear-gradient(#143b24,#0b1810)!important}.usb-audio-box button.indicator-active{background:#0d4020!important;color:#00ff4c!important}
