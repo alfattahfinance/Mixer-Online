@@ -2,6 +2,7 @@
 (()=>{'use strict';
 if(window.__mixerFinalUI)return;window.__mixerFinalUI=true;
 const $=s=>document.querySelector(s), qa=s=>[...document.querySelectorAll(s)], clamp=(n,a=0,b=1)=>Math.max(a,Math.min(b,Number(n)||0));
+function syncReferenceKnobs(root=document){root.querySelectorAll('.knob-row .knob.gain,.knob-row .knob.pan').forEach(el=>{if(el.dataset.refKnobBound)return;el.dataset.refKnobBound='1';const paint=()=>{const min=Number(el.min),max=Number(el.max),v=Number(el.value);const n=max>min?(v-min)/(max-min):.5;el.style.setProperty('--angle',(-140+n*280)+'deg')};el.addEventListener('input',paint,{passive:true});el.addEventListener('change',paint,{passive:true});paint()})}
 const style=document.createElement('style');style.id='mixer-final-inline';style.textContent='html{scroll-behavior:smooth}.channel-rack{scroll-margin-top:60px}.master-side-dock{order:999}';document.head.appendChild(style);
 function ensureInputLeds(){const box=$('.input-meter');if(!box)return;let x=box.querySelector('.input-leds');if(!x){x=document.createElement('div');x.className='input-leds';x.innerHTML='<span><i class="lamp signal"></i>L</span><span><i class="lamp signal"></i>R</span>';box.appendChild(x)}return x}
 function meterCard(card,level){if(!card)return;const fill=card.querySelector('.meter-fill');if(fill)fill.style.height=Math.max(2,Math.min(100,level*100))+'%';const readout=card.querySelector('.level-readout');if(readout)readout.textContent=level<.001?'−∞':(20*Math.log10(level)).toFixed(1)+' dB'}
@@ -26,7 +27,7 @@ function level(){
   const target=Number($('#musicChannel')?.value||0);
   return readAnalyser(window.__mixerState?.channels?.[target]?._audio?.analyser);
 }
-function updateMeters(){
+function updateMeters(){syncReferenceKnobs();
   const st=window.__mixerState, cards=st?.channels||[];
   const master=readAnalyser(safeAnalyser(window.masterAnalyser));
   const masterR=readAnalyser(safeAnalyser(window.masterAnalyserR));
