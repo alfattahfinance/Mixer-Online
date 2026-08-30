@@ -563,3 +563,35 @@ footer{
     min-height:34px;
   }
 }
+
+
+/* FINAL RESPONSIVE RACK FIX
+ * On phone/tablet the channel surface fills the remaining visible mixer height.
+ * No fixed 382/398/420px floor that leaves a black area underneath.
+ */
+@media (max-width:900px){
+  .channel-rack{
+    height:var(--mixer-rack-fill-height,420px)!important;
+    min-height:var(--mixer-rack-fill-height,420px)!important;
+  }
+  .channel-rack > .channels{
+    height:100%!important;
+    min-height:100%!important;
+    flex-basis:100%!important;
+  }
+  .channel-rack > .master-side-dock{
+    height:100%!important;
+    min-height:100%!important;
+    flex-basis:100%!important;
+  }
+  .channel{
+    height:100%!important;
+    min-height:100%!important;
+  }
+  .channel .fader,
+  .mini-meter,
+  .fader-scale{
+    min-height:0!important;
+    height:100%!important;
+  }
+}
