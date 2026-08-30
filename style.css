@@ -265,3 +265,18 @@ html,body{overflow-x:auto}
   .console>.right{height:315px!important;max-height:315px!important;}
   .console>.input-meter{height:auto!important;max-height:none!important;}
 }
+
+/* PATCH-V18 — FIX HOME MIXER OVERLAP
+   Keep the spectrum/graph inside its own rectangle so it cannot paint
+   over the EQ/RTA row or the player status below it. */
+.center{position:relative!important;overflow:hidden!important}
+.center>.view{min-height:0!important;overflow:hidden!important}
+.center>#homeView{height:calc(100% - 38px)!important;max-height:calc(100% - 38px)!important;min-height:0!important;overflow:hidden!important}
+#homeView .graph-head{position:relative!important;height:220px!important;min-height:220px!important;max-height:220px!important;overflow:hidden!important;flex:none!important}
+#homeView .spectrum{position:relative!important;height:220px!important;min-height:220px!important;max-height:220px!important;overflow:hidden!important;z-index:1!important}
+#homeView .spectrum canvas{z-index:0!important;display:block!important;pointer-events:none!important}
+#homeView .point,#homeView .freq{z-index:2!important}
+#homeView .aux-meter{position:relative!important;z-index:2!important;overflow:hidden!important}
+#homeView .eq-row{position:relative!important;z-index:5!important;isolation:isolate!important;min-height:108px!important;height:108px!important;max-height:108px!important;overflow:hidden!important;margin-top:6px!important}
+#homeView .eq-row>*{position:relative!important;z-index:1!important}
+#homeView .player-status{position:relative!important;z-index:5!important;min-height:32px!important}
