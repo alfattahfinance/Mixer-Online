@@ -1,405 +1,117 @@
 /* ==========================================
-   RESET & BASE STYLES
+   PERBAIKAN CONTAINER & CHANNEL STRIP
    ========================================== */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
 
-:root {
-  --bg-color: #05080a;
-  --panel-bg: #0d1217;
-  --panel-border: #1a232c;
-  --accent-blue: #00e5ff;
-  --accent-green: #00ff66;
-  --btn-mute: #d93838;
-  --btn-solo: #e6b800;
-  --text-main: #d0d8e0;
-  --text-dim: #7a8b9e;
-}
-
-body {
-  background-color: var(--bg-color);
-  color: var(--text-main);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-size: 11px;
-  user-select: none;
-  overflow-x: hidden;
-}
-
-/* ==========================================
-   APP LAYOUT
-   ========================================== */
-.app {
+/* Pastikan area bawah menampung channel & master */
+.channel-section {
   display: flex;
-  flex-direction: column;
-  height: 100vh;
-  padding: 6px;
   gap: 6px;
-}
-
-/* TOPBAR */
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--panel-bg);
-  border: 1px solid var(--panel-border);
-  padding: 4px 10px;
-  border-radius: 4px;
-}
-
-.brand {
-  font-weight: bold;
-  font-size: 14px;
-  color: #fff;
-}
-
-.brand small {
-  display: block;
-  font-size: 9px;
-  color: var(--text-dim);
-  font-weight: normal;
-}
-
-.top-actions {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.top-actions button, .top-actions select {
-  background: #161e27;
-  border: 1px solid #283545;
-  color: var(--text-main);
-  padding: 3px 6px;
-  border-radius: 3px;
-  font-size: 10px;
-  cursor: pointer;
-}
-
-.top-actions button:hover {
-  background: #202b38;
-}
-
-/* CONSOLE MAIN GRID */
-.console {
-  display: grid;
-  grid-template-columns: 80px 1fr 260px 170px;
-  gap: 6px;
+  height: 320px;
   flex: 1;
   min-height: 0;
 }
 
-.panel {
-  background: var(--panel-bg);
-  border: 1px solid var(--panel-border);
-  border-radius: 4px;
-  padding: 6px;
-  display: flex;
-  flex-direction: column;
-}
-
-/* INPUT METER PANEL (LEFT) */
-.input-meter {
-  align-items: center;
+/* Container horizontal untuk scroll channel 1-16 */
+#channels {
+  display: flex !important;
+  flex-direction: row !important;
   gap: 6px;
-}
-
-.rec {
-  background: var(--btn-mute);
-  color: #fff;
-  border: none;
-  font-weight: bold;
-  width: 100%;
-  padding: 4px 0;
-  border-radius: 3px;
-  cursor: pointer;
-}
-
-.meter-wrap {
-  display: flex;
-  gap: 4px;
   flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 6px;
   align-items: stretch;
 }
 
-.meter {
-  width: 10px;
-  background: #000;
-  border: 1px solid #222;
-  position: relative;
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.meter i {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 30%;
-  background: linear-gradient(to top, #00ff66 60%, #ffcc00 85%, #ff3344 100%);
-}
-
-.scale {
-  font-size: 8px;
-  color: var(--text-dim);
-  line-height: 1.1;
-  text-align: right;
-}
-
-/* CENTER PANEL (SPECTRUM & EQ) */
-.center {
-  gap: 6px;
-  overflow: hidden;
-}
-
-.tabs {
-  display: flex;
-  gap: 2px;
-  border-bottom: 1px solid var(--panel-border);
-  padding-bottom: 4px;
-}
-
-.tabs button {
-  background: #141b24;
-  border: 1px solid transparent;
-  color: var(--text-dim);
-  padding: 4px 10px;
-  font-size: 10px;
-  font-weight: bold;
-  cursor: pointer;
-  border-radius: 3px 3px 0 0;
-}
-
-.tabs button.active {
-  background: #202b38;
-  color: var(--accent-blue);
-  border-color: var(--panel-border) var(--panel-border) transparent;
-}
-
-.view {
-  display: none;
-  flex: 1;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.view.active {
-  display: flex;
-}
-
-.graph-head {
-  display: flex;
-  gap: 8px;
-  height: 140px;
-}
-
-.spectrum {
-  flex: 1;
-  background: #000;
+/* Styling untuk setiap Channel Strip (sesuai class .channel dari app.js) */
+.channel {
+  min-width: 68px;
+  max-width: 68px;
+  background: #0d1217;
   border: 1px solid #1a232c;
-  position: relative;
-  border-radius: 3px;
-}
-
-#specCanvas {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.point {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: rgba(0, 229, 255, 0.3);
-  border: 1px solid var(--accent-blue);
-  color: #fff;
-  font-size: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.p1 { top: 30%; left: 15%; }
-.p2 { top: 40%; left: 35%; }
-.p3 { top: 25%; left: 60%; }
-.p4 { top: 45%; left: 80%; }
-
-.eq-row {
-  display: grid;
-  grid-template-columns: 50px repeat(4, 1fr) 110px;
-  gap: 4px;
-  background: #090d11;
-  padding: 6px;
-  border-radius: 3px;
-}
-
-.eqbox {
-  background: #12181f;
-  border: 1px solid #1e2832;
-  padding: 4px;
-  border-radius: 2px;
+  border-radius: 4px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  padding: 4px;
+  gap: 4px;
+  box-sizing: border-box;
 }
 
-.eqbox label {
+.ch-head {
   display: flex;
   justify-content: space-between;
-  font-size: 9px;
-  color: var(--text-dim);
-}
-
-.eqbox input {
-  width: 45px;
-  background: #000;
-  border: 1px solid #222;
-  color: #fff;
-  font-size: 9px;
-  text-align: right;
-}
-
-/* RIGHT PANEL (USB PLAYER) */
-.right {
-  gap: 6px;
-}
-
-.usb-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px;
-}
-
-.usb-buttons button {
-  background: #161e27;
-  border: 1px solid #283545;
-  color: #fff;
-  padding: 4px;
-  font-size: 9px;
-  cursor: pointer;
-}
-
-.playlist {
-  flex: 1;
-  background: #000;
-  border: 1px solid #1a232c;
-  border-radius: 3px;
-  padding: 4px;
-  overflow-y: auto;
-  font-size: 9px;
-  color: var(--text-dim);
-}
-
-/* DCA PANEL */
-.dca {
-  gap: 4px;
-}
-
-.dca-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 4px;
-}
-
-.dca-grid button, .groups button {
-  background: #141b24;
-  border: 1px solid #222d3a;
-  color: #fff;
-  padding: 4px;
-  font-size: 9px;
-  border-radius: 2px;
-  cursor: pointer;
-}
-
-.groups {
-  display: flex;
-  gap: 2px;
-}
-
-.groups button {
-  flex: 1;
-}
-
-/* ==========================================
-   CHANNEL STRIPS SECTION (BOTTOM)
-   ========================================== */
-.channel-section {
-  display: flex;
-  gap: 6px;
-  height: 280px;
-}
-
-.channels {
-  display: flex;
-  gap: 4px;
-  flex: 1;
-  overflow-x: auto;
-  padding-bottom: 4px;
-}
-
-.channel-strip {
-  min-width: 64px;
-  max-width: 64px;
-  background: var(--panel-bg);
-  border: 1px solid var(--panel-border);
-  border-radius: 3px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 4px;
-  gap: 4px;
-}
-
-.ch-name {
+  width: 100%;
   font-size: 10px;
   font-weight: bold;
-  color: var(--accent-blue);
-  background: #080b0e;
-  width: 100%;
-  text-align: center;
-  padding: 2px 0;
+  color: #00e5ff;
+  background: #06090c;
+  padding: 2px 4px;
   border-radius: 2px;
+  box-sizing: border-box;
 }
 
-.btn-solo {
-  background: var(--btn-solo);
-  color: #000;
-  font-weight: bold;
-  border: none;
+.ch-btn {
   width: 100%;
-  padding: 2px 0;
   font-size: 9px;
+  font-weight: bold;
+  padding: 3px 0;
+  border: none;
   border-radius: 2px;
   cursor: pointer;
-}
-
-.btn-solo.active {
-  box-shadow: 0 0 6px var(--btn-solo);
-}
-
-.btn-mute {
-  background: var(--btn-mute);
+  background: #161e27;
   color: #fff;
-  font-weight: bold;
-  border: none;
+}
+
+.ch-btn.topmute, .ch-btn.mute {
+  background: #d93838;
+}
+
+.channel.muted .ch-btn.mute, 
+.channel.muted .ch-btn.topmute {
+  background: #ff0000;
+  box-shadow: 0 0 6px #ff0000;
+}
+
+.ch-btn.solo {
+  background: #e6b800;
+  color: #000;
+}
+
+.channel.soloed .ch-btn.solo {
+  background: #ffff00;
+  box-shadow: 0 0 6px #ffff00;
+}
+
+.value {
+  font-size: 10px;
+  color: #00ff66;
+  font-family: monospace;
+}
+
+/* Knob Styling */
+.knobs {
+  display: flex;
+  gap: 4px;
+  justify-content: space-between;
   width: 100%;
-  padding: 2px 0;
-  font-size: 9px;
-  border-radius: 2px;
-  cursor: pointer;
-  opacity: 0.6;
+  font-size: 8px;
+  text-align: center;
+  color: #7a8b9e;
 }
 
-.btn-mute.active {
-  opacity: 1;
-  box-shadow: 0 0 6px var(--btn-mute);
+.knob {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #1a232c;
+  border: 1px solid #00e5ff;
+  margin: 0 auto;
+  transform: rotate(var(--rot, -135deg));
+  cursor: ns-resize;
 }
 
+/* Fader Layout Vertical */
 .fader-wrap {
   flex: 1;
   display: flex;
@@ -407,55 +119,54 @@ body {
   justify-content: center;
   position: relative;
   width: 100%;
+  min-height: 120px;
+}
+
+.scale-y {
+  position: absolute;
+  left: 2px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  font-size: 7px;
+  color: #556677;
+  pointer-events: none;
 }
 
 .fader {
   appearance: slider-vertical;
   -webkit-appearance: slider-vertical;
-  width: 20px;
+  width: 18px;
   height: 100%;
   background: transparent;
   cursor: pointer;
 }
 
-.ch-val {
-  font-size: 9px;
-  color: var(--text-dim);
+.ch-lamp {
+  width: 4px;
+  background: #000;
+  height: 100%;
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
 }
 
-/* MASTER STRIP */
-.master-strip {
-  width: 70px;
-  align-items: center;
-  gap: 4px;
-}
-
-.master-head {
-  color: #ffcc00;
-  font-size: 11px;
-}
-
-.master-strip .fader {
-  height: 160px;
-}
-
-/* FOOTER */
-.footer {
+.ch-bottom {
+  width: 100%;
   display: flex;
-  justify-content: space-between;
-  background: var(--panel-bg);
-  border: 1px solid var(--panel-border);
-  padding: 3px 10px;
-  border-radius: 3px;
-  font-size: 9px;
-  color: var(--text-dim);
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
 }
 
-.dot {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  background: var(--accent-green);
-  border-radius: 50%;
-  box-shadow: 0 0 4px var(--accent-green);
+.ch-bottom .label {
+  font-size: 9px;
+  color: #fff;
+  font-weight: bold;
+}
+
+.ch-bottom .status {
+  font-size: 8px;
+  color: #00ff66;
 }
