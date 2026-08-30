@@ -6,7 +6,7 @@
 <title>Mixer Online — Digital Audio Mixer</title>
 <link rel="stylesheet" href="style.css?v=20260830-finalref9">
 <link rel="stylesheet" href="mixer-final.css?v=20260830-ref-skin7">
-<link rel="stylesheet" href="final-responsive.css?v=20260830-r4">
+<link rel="stylesheet" href="final-responsive.css?v=20260830-r5">
 </head>
 <body>
 <header class="topbar">
@@ -22,43 +22,19 @@
     <button id="stopAll">■ STOP</button>
   </div>
 </header>
-
 <main class="console">
   <section class="upper">
-    <aside class="input-meter panel">
-      <div class="rec-big">● REC</div>
-      <div class="meter-title">INPUT LEVEL</div>
-      <div class="meter-vertical"><div class="meter-fill"></div></div>
-      <div class="meter-scale">OVER<br>+1<br>-3<br>-6<br>-12<br>-18<br>-24<br>-36<br>-48<br>-60</div>
-      <span class="lr">L &nbsp; R</span>
-    </aside>
-
+    <aside class="input-meter panel"><div class="rec-big">● REC</div><div class="meter-title">INPUT LEVEL</div><div class="meter-vertical"><div class="meter-fill"></div></div><div class="meter-scale">OVER<br>+1<br>-3<br>-6<br>-12<br>-18<br>-24<br>-36<br>-48<br>-60</div><span class="lr">L &nbsp; R</span></aside>
     <section id="digitalScreen" class="digital-screen panel">
-      <div class="screen-tabs">
-        <button class="active" type="button">HOME</button><button type="button">METERS</button>
-        <button type="button">EQ</button><button type="button">EFFECT</button>
-        <button type="button">ROUTING</button><button type="button">SETUP</button>
-      </div>
+      <div class="screen-tabs"><button class="active" type="button">HOME</button><button type="button">METERS</button><button type="button">EQ</button><button type="button">EFFECT</button><button type="button">ROUTING</button><button type="button">SETUP</button></div>
       <div class="screen-body">
-        <div class="spectrum">
-          <div class="grid"></div>
-          <div class="spectrum-bars" aria-hidden="true"></div>
-          <div class="eq-point p1">1</div><div class="eq-point p2">2</div>
-          <div class="eq-point p3">3</div><div class="eq-point p4">4</div>
-          <div class="freq">20 &nbsp;&nbsp; 50 &nbsp;&nbsp; 100 &nbsp;&nbsp; 200 &nbsp;&nbsp; 500 &nbsp;&nbsp; 1k &nbsp;&nbsp; 2k &nbsp;&nbsp; 5k &nbsp;&nbsp; 10k &nbsp;&nbsp; 20k</div>
-        </div>
+        <div class="spectrum"><div class="grid"></div><div class="spectrum-bars" aria-hidden="true"></div><div class="eq-point p1">1</div><div class="eq-point p2">2</div><div class="eq-point p3">3</div><div class="eq-point p4">4</div><div class="freq">20 &nbsp;&nbsp; 50 &nbsp;&nbsp; 100 &nbsp;&nbsp; 200 &nbsp;&nbsp; 500 &nbsp;&nbsp; 1k &nbsp;&nbsp; 2k &nbsp;&nbsp; 5k &nbsp;&nbsp; 10k &nbsp;&nbsp; 20k</div></div>
         <div class="screen-source"><small>INPUT / PLAYER</small><strong id="screenTrack">NO SIGNAL</strong><span id="screenPlayState">READY</span></div>
         <div class="screen-readout"><span>BPM<strong>120.0</strong></span><span>KEY<strong>C</strong></span><span>TIME<strong id="screenTime">00:00</strong></span></div>
-        <div class="screen-channels">
-          <div><small>CH 1</small><b id="screenCh1">0.0 dB</b></div><div><small>CH 2</small><b id="screenCh2">0.0 dB</b></div>
-          <div><small>CH 3</small><b id="screenCh3">0.0 dB</b></div><div><small>MASTER</small><b id="screenMaster">0.0 dB</b></div>
-        </div>
-        <div class="screen-meter"><i id="screenMeterL"></i><i id="screenMeterR"></i><span>L</span><span>R</span>
-          <div class="screen-scale">0 &nbsp; -3 &nbsp; -6 &nbsp; -12 &nbsp; -18 &nbsp; -24 &nbsp; -∞</div>
-        </div>
+        <div class="screen-channels"><div><small>CH 1</small><b id="screenCh1">0.0 dB</b></div><div><small>CH 2</small><b id="screenCh2">0.0 dB</b></div><div><small>CH 3</small><b id="screenCh3">0.0 dB</b></div><div><small>MASTER</small><b id="screenMaster">0.0 dB</b></div></div>
+        <div class="screen-meter"><i id="screenMeterL"></i><i id="screenMeterR"></i><span>L</span><span>R</span><div class="screen-scale">0 &nbsp; -3 &nbsp; -6 &nbsp; -12 &nbsp; -18 &nbsp; -24 &nbsp; -∞</div></div>
       </div>
     </section>
-
     <section id="musicPlayer" class="music-player panel">
       <div class="music-player-head"><div><strong>▣ USB 1</strong><small>PEMUTAR MUSIK TERINTEGRASI</small></div><span id="playerState" class="player-state">READY</span></div>
       <label class="music-pick">📂 PILIH MUSIK<input id="musicFile" type="file" accept="audio/*" multiple></label>
@@ -69,23 +45,9 @@
       <div class="music-volume"><span>VOL</span><input id="musicVolume" type="range" min="0" max="1" step=".01" value="1"><b id="musicVolumeValue">100%</b></div>
     </section>
   </section>
-
-  <section class="channel-rack">
-    <div id="channels" class="channels"></div>
-  </section>
-
-  <section class="setup-hidden" aria-hidden="true">
-    <div class="device-bar"><label>DEVICE <select id="deviceProfile"><option value="custom">Universal / Custom</option></select></label><label>CHANNELS <input id="channelCount" type="number" min="1" max="64" value="16"></label><button id="applyChannels">APPLY</button><span id="connectionStatus">● Offline</span></div>
-    <div class="device-config" id="deviceConfig"><span>PROFILE</span><input id="profileName" placeholder="Nama perangkat"><select id="profileProtocol"><option value="none">Custom / None</option><option value="midi">MIDI</option><option value="usb">USB Control</option><option value="network">Network / Wi-Fi</option><option value="bluetooth">Bluetooth Control</option></select><label>IN <input id="profileInputs" type="number" value="8"></label><label>OUT <input id="profileOutputs" type="number" value="2"></label><button id="saveProfile">SAVE PROFILE</button><button id="mappingToggle">INPUT MAPPING</button></div>
-    <div id="mappingPanel" class="mapping-panel" hidden></div>
-  </section>
+  <section class="channel-rack"><div id="channels" class="channels"></div></section>
+  <section class="setup-hidden" aria-hidden="true"><div class="device-bar"><label>DEVICE <select id="deviceProfile"><option value="custom">Universal / Custom</option></select></label><label>CHANNELS <input id="channelCount" type="number" min="1" max="64" value="16"></label><button id="applyChannels">APPLY</button><span id="connectionStatus">● Offline</span></div><div class="device-config" id="deviceConfig"><span>PROFILE</span><input id="profileName" placeholder="Nama perangkat"><select id="profileProtocol"><option value="none">Custom / None</option><option value="midi">MIDI</option><option value="usb">USB Control</option><option value="network">Network / Wi-Fi</option><option value="bluetooth">Bluetooth Control</option></select><label>IN <input id="profileInputs" type="number" value="8"></label><label>OUT <input id="profileOutputs" type="number" value="2"></label><button id="saveProfile">SAVE PROFILE</button><button id="mappingToggle">INPUT MAPPING</button></div><div id="mappingPanel" class="mapping-panel" hidden></div></section>
 </main>
 <footer>DEVICE <b>ESP32 SIMULATOR</b> <i class="online-dot"></i> ONLINE &nbsp; • &nbsp; ESP32 VIRTUAL • BLE READY</footer>
-
-<script src="connection.js?v=20260829-48"></script>
-<script src="adapters.js?v=20260829-48"></script>
-<script src="device-profile.js?v=20260829-48"></script>
-<script src="feedback.js?v=20260829-48"></script>
-<script src="app.js?v=20260830-ref-lamps3"></script>
-<script src="mixer-final.js?v=20260830-ref-lamps3"></script>
+<script src="connection.js?v=20260829-48"></script><script src="adapters.js?v=20260829-48"></script><script src="device-profile.js?v=20260829-48"></script><script src="feedback.js?v=20260829-48"></script><script src="app.js?v=20260830-ref-lamps3"></script><script src="mixer-final.js?v=20260830-ref-lamps3"></script>
 </body></html>
