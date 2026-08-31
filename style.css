@@ -332,3 +332,20 @@ html,body{overflow-x:auto}
 .channel-gain-pan .knob:focus{outline:1px solid #ffd000;outline-offset:2px}
 .channel-gain-pan .gainKnob{--knob-fill:135deg}
 .channel-gain-pan .panKnob{--knob-fill:135deg}
+
+/* CHANNEL GAIN/PAN — responsive only, scoped to channel strips */
+.channel-gain-pan{width:100%;box-sizing:border-box;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(2px,4%,6px)}
+.channel-gain-pan .knob-unit{width:100%;min-width:0}
+.channel-gain-pan .knob{width:clamp(24px,6vw,36px);height:clamp(24px,6vw,36px);max-width:36px;max-height:36px}
+.channel-gain-pan .knob .knob-indicator{top:4px;height:clamp(7px,1.5vw,10px);transform-origin:50% clamp(8px,1.8vw,11px)}
+.channel-gain-pan .knob-scale{font-size:clamp(5px,1.1vw,8px);padding-inline:0}
+.channel-gain-pan .knob-value{font-size:clamp(5px,1.1vw,8px);line-height:1.2;min-height:10px;padding:1px 0}
+.channel-gain-pan .knob-unit>label{font-size:clamp(6px,1.15vw,9px);white-space:nowrap;overflow:hidden;text-overflow:clip}
+@media(max-width:700px){
+ .channel-gain-pan{gap:2px}
+ .channel-gain-pan .knob{width:28px;height:28px}
+ .channel-gain-pan .knob-value{font-size:6px}
+}
+@media(min-width:1200px){
+ .channel-gain-pan .knob{width:36px;height:36px}
+}
