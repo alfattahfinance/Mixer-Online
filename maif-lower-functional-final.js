@@ -23,7 +23,6 @@ function refreshAudio(){
  (s.channels||[]).forEach(c=>{
    const n=Number(c.dataset.channel);
    const dcaSolo=ds.has(n);
-   // This mixer has 16 channels: DCA/Mute/DCA Group N maps directly to CH N.
    const muted=mg.has(n)||c.classList.contains("muted");
    c.classList.toggle("dca-soloed",dcaSolo);
    c.classList.toggle("group-muted",mg.has(n));
@@ -46,13 +45,16 @@ function render(){
 }
 function make16(selector,attr,label){
  const p=panel(),box=p?.querySelector(selector);if(!box)return;
- box.replaceChildren();
- for(let i=1;i<=16;i++){
-   const b=document.createElement("button");b.className=label;b.setAttribute(attr,String(i));b.type="button";
-   if(label==="dca-btn")b.innerHTML="DCA "+i+"<br><span>SOLO</span><br><output>0.0</output>";
-   else b.textContent=String(i);
-   box.appendChild(b);
- }
+ const existing=[...box.querySelectorAll("button")];
+ if(existing.length!==16){
+   box.replaceChildren();
+   for(let i=1;i<=16;i++){
+     const b=document.createElement("button");b.className=label;b.setAttribute(attr,String(i));b.type="button";
+     if(label==="dca-btn")b.innerHTML="DCA "+i+"<br><span>SOLO</span><br><output>0.0</output>";
+     else b.textContent=String(i);
+     box.appendChild(b);
+   }
+ } else existing.forEach((b,i)=>{b.setAttribute(attr,String(i+1));if(label==="dca-btn")b.innerHTML="DCA "+(i+1)+"<br><span>SOLO</span><br><output>0.0</output>";else b.textContent=String(i+1)});
 }
 function snapshot(){
  const s=ensureSets(),p=panel();if(!s||!p)return null;
