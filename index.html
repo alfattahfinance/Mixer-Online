@@ -162,14 +162,26 @@
           <button class="dca-btn" data-dca="2">DCA 2<br><span>SOLO</span><br><output>0.0</output></button>
           <button class="dca-btn" data-dca="3">DCA 3<br><span>SOLO</span><br><output>0.0</output></button>
           <button class="dca-btn" data-dca="4">DCA 4<br><span>SOLO</span><br><output>0.0</output></button>
+          <button class="dca-btn" data-dca="5">DCA 5<br><span>SOLO</span><br><output>0.0</output></button>
+          <button class="dca-btn" data-dca="6">DCA 6<br><span>SOLO</span><br><output>0.0</output></button>
+          <button class="dca-btn" data-dca="7">DCA 7<br><span>SOLO</span><br><output>0.0</output></button>
+          <button class="dca-btn" data-dca="8">DCA 8<br><span>SOLO</span><br><output>0.0</output></button>
+          <button class="dca-btn" data-dca="9">DCA 9<br><span>SOLO</span><br><output>0.0</output></button>
+          <button class="dca-btn" data-dca="10">DCA 10<br><span>SOLO</span><br><output>0.0</output></button>
+          <button class="dca-btn" data-dca="11">DCA 11<br><span>SOLO</span><br><output>0.0</output></button>
+          <button class="dca-btn" data-dca="12">DCA 12<br><span>SOLO</span><br><output>0.0</output></button>
+          <button class="dca-btn" data-dca="13">DCA 13<br><span>SOLO</span><br><output>0.0</output></button>
+          <button class="dca-btn" data-dca="14">DCA 14<br><span>SOLO</span><br><output>0.0</output></button>
+          <button class="dca-btn" data-dca="15">DCA 15<br><span>SOLO</span><br><output>0.0</output></button>
+          <button class="dca-btn" data-dca="16">DCA 16<br><span>SOLO</span><br><output>0.0</output></button>
         </div>
         <h4>MUTE GROUPS</h4>
-        <div class="groups mute-groups"><button data-group="1">1</button><button data-group="2">2</button><button data-group="3">3</button><button data-group="4">4</button></div>
+        <div class="groups mute-groups"><button data-group="1">1</button><button data-group="2">2</button><button data-group="3">3</button><button data-group="4">4</button><button data-group="5">5</button><button data-group="6">6</button><button data-group="7">7</button><button data-group="8">8</button><button data-group="9">9</button><button data-group="10">10</button><button data-group="11">11</button><button data-group="12">12</button><button data-group="13">13</button><button data-group="14">14</button><button data-group="15">15</button><button data-group="16">16</button></div>
         <h4>AUTO MIX</h4>
         <button class="auto-option" id="autoMixActive"><i class="control-lamp off"></i><span>Active</span></button>
         <button class="auto-option" id="autoMixLastGate"><i class="control-lamp off"></i><span>Last Gate</span></button>
         <h4>DCA GROUPS</h4>
-        <div class="groups dca-groups"><button data-dcagroup="1">1</button><button data-dcagroup="2">2</button><button data-dcagroup="3">3</button><button data-dcagroup="4">4</button></div>
+        <div class="groups dca-groups"><button data-dcagroup="1">1</button><button data-dcagroup="2">2</button><button data-dcagroup="3">3</button><button data-dcagroup="4">4</button><button data-dcagroup="5">5</button><button data-dcagroup="6">6</button><button data-dcagroup="7">7</button><button data-dcagroup="8">8</button><button data-dcagroup="9">9</button><button data-dcagroup="10">10</button><button data-dcagroup="11">11</button><button data-dcagroup="12">12</button><button data-dcagroup="13">13</button><button data-dcagroup="14">14</button><button data-dcagroup="15">15</button><button data-dcagroup="16">16</button></div>
         <div class="right-tools">
           <h4>FADER</h4>
           <div class="auto-check">☑ Geser atas bawah<br>☑ Bentuk fader vertikal<br>☑ Tombol di tengah jalur</div>
@@ -190,6 +202,8 @@
             <label>BUS 2 <input type="range" min="0" max="100" value="70"></label>
             <label>BUS 3 <input type="range" min="0" max="100" value="60"></label>
             <label>BUS 4 <input type="range" min="0" max="100" value="50"></label>
+            <label>BUS 5 <input type="range" min="0" max="100" value="50"></label>
+            <label>BUS 6 <input type="range" min="0" max="100" value="50"></label>
           </div>
           <h4>FX 1 — EFFECT</h4>
           <div class="fx-controls">
@@ -208,7 +222,7 @@
           <h4>HISTORY</h4><div class="scene-row"><button>↶ UNDO</button><button>↷ REDO</button></div>
           <h4>LIVE PROTECTION</h4><div class="lock-row"><button>🔒 LOCK</button><span>Lock mencegah perubahan kontrol saat live.</span></div>
           <h4>DEVICE CONNECTION</h4><div class="device-box"><label>TRANSPORT <select><option>MIDI</option><option>ESP32 BLE</option><option>WEBSOCKET</option></select></label><div class="device-online">● ESP32 SIMULATOR — RX/TX AKTIF</div><button id="deviceConnect">CONNECT</button><button id="deviceDisconnect">DISCONNECT</button></div>
-          <h4>AUTO CHANNEL MAPPER</h4><div class="mapper-row"><label>CHANNELS <input type="number" min="1" max="64" value="16"></label><button>APPLY CHANNELS</button><button>AUTO MAP CONTROLS</button></div>
+          <h4>AUTO CHANNEL MAPPER</h4><div class="mapper-row"><label>CHANNELS <input type="number" min="1" max="16" value="16"></label><button>APPLY CHANNELS</button><button>AUTO MAP CONTROLS</button></div>
           <h4>HARDWARE TEST</h4><div class="hardware-test"><select><option>SOLO CH1</option><option>FADER CH1</option><option>GAIN CH1</option><option>LOW CH1</option><option>MID CH1</option><option>HIGH CH1</option><option>PAN CH1</option></select><select><option>ON</option><option>OFF</option></select><button id="hardwareSendTest">SEND TEST</button></div>
           <h4>ESP32 SIMULATOR</h4><div class="sim-box"><button id="restartSimulator">RESTART SIMULATOR</button><span id="simulatorStatus">● OFFLINE</span><small id="simulatorDetail">ESP32 virtual • simulator stopped</small></div>
           <h4>USB AUDIO</h4><div class="usb-audio-box"><button id="detectUsbAudio">DETECT USB AUDIO</button><span id="usbAudioStatus">● OFFLINE</span><small id="usbAudioDetail">USB audio input/output bridge • stopped</small></div>
