@@ -23,6 +23,7 @@ function refreshAudio(){
  (s.channels||[]).forEach(c=>{
    const n=Number(c.dataset.channel);
    const dcaSolo=ds.has(n);
+   // This mixer has 16 channels: DCA/Mute/DCA Group N maps directly to CH N.
    const muted=mg.has(n)||c.classList.contains("muted");
    c.classList.toggle("dca-soloed",dcaSolo);
    c.classList.toggle("group-muted",mg.has(n));
@@ -106,10 +107,10 @@ function autoToggle(b){
 function mapper(){
  const p=panel(),input=p?.querySelector(".mapper-row input[type=number]");if(!p||!input)return;
  if(isLocked()){notify("LIVE PROTECTION • CHANNEL MAPPER TERKUNCI",false);return}
- const n=Math.max(1,Math.min(64,Number(input.value)||16));pushHistory();
+ const n=Math.max(1,Math.min(16,Number(input.value)||16));pushHistory();
  const ok=!!window.MixerOnline?.buildChannels?.(n);if(!ok){notify("AUTO CHANNEL MAPPER • GAGAL APPLY",false);return}
  state().channels.forEach((c,i)=>c.dataset.mapped="1");
- notify("AUTO CHANNEL MAPPER • "+n+" CHANNELS APPLIED",true);refreshAudio();
+ notify("AUTO CHANNEL MAPPER • "+n+" / 16 CHANNELS APPLIED",true);refreshAudio();
 }
 function autoMap(){
  const p=panel(),s=ensureSets();if(!p||!s)return;
