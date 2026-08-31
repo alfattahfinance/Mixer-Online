@@ -66,7 +66,7 @@ function bindReferenceControls(){
 }
 
 function initSystemNotifications(){if(window.__mixerNotifyBound)return;window.__mixerNotifyBound=true;const show=(msg,on=true)=>{let n=document.querySelector("#mixerNotification");if(!n){n=document.createElement("div");n.id="mixerNotification";n.setAttribute("role","status");n.setAttribute("aria-live","assertive");document.body.appendChild(n)}n.textContent=String(msg);n.dataset.state=on?"ON":"OFF";n.classList.toggle("is-on",on);n.classList.toggle("is-off",!on);n.classList.add("show");clearTimeout(window.__mixerNoticeTimer);window.__mixerNoticeTimer=setTimeout(()=>n.classList.remove("show"),2600)};window.mixerNotify=show;document.addEventListener("mixer:notification",e=>{const d=e.detail||{};show(d.message,d.on!==false)});}
-function init(){initSystemNotifications();const count=Number($("#channelCount")?.value||16);buildChannels(count);refreshHardwareTestTargets();bindMusic();bindNativeButtons();bindTabs();bindConnection();bindChannelDetail();bindMasterControls();bindReferenceControls();initIndicatorLights();bindMaifDcaUsbAudio();bindDcaControls();bindOnOffLamps();requestAnimationFrame(()=>{const box=$("#channels");box?.scrollTo?.({left:0,behavior:"auto"});initIndicatorLights();bindDcaControls();bindOnOffLamps();updateMeters()});$("#applyChannels")?.addEventListener("pointerup",()=>{buildChannels($("#channelCount")?.value);refreshHardwareTestTargets();initIndicatorLights();bindDcaControls();bindOnOffLamps()});window.MixerAdapters?.simulator?.();window.MixerOnline.ensureChannels?.();setTimeout(()=>window.MixerOnline.ensureChannels?.(),120);drawSpectrum();setInterval(()=>{window.MixerOnline.ensureChannels?.();updateMeters();updateDcaValues()},60)}
+function init(){initSystemNotifications();const count=Number($("#channelCount")?.value||16);buildChannels(count);refreshHardwareTestTargets();bindMusic();bindNativeButtons();bindTabs();bindConnection();bindChannelDetail();bindMasterControls();bindReferenceControls();initIndicatorLights();bindMaifDcaUsbAudio();bindDcaControls();bindOnOffLamps();bindNonChannelFunctional();requestAnimationFrame(()=>{const box=$("#channels");box?.scrollTo?.({left:0,behavior:"auto"});initIndicatorLights();bindDcaControls();bindOnOffLamps();updateMeters()});$("#applyChannels")?.addEventListener("pointerup",()=>{buildChannels($("#channelCount")?.value);refreshHardwareTestTargets();initIndicatorLights();bindDcaControls();bindOnOffLamps()});window.MixerAdapters?.simulator?.();window.MixerOnline.ensureChannels?.();setTimeout(()=>window.MixerOnline.ensureChannels?.(),120);drawSpectrum();setInterval(()=>{window.MixerOnline.ensureChannels?.();updateMeters();updateDcaValues()},60)}
 
 /* Mixer Online core: one audio engine + one control engine. */
 "use strict";
@@ -204,6 +204,51 @@ function updateDcaValues(){
  });
 }
 
+function initNonChannelAudio(){
+ if(window.__nonChannelAudioReady)return;window.__nonChannelAudioReady=true;
+ state.busGains=state.busGains||Array.from({length:6},()=>null);
+ state.busNodes=state.busNodes||[];
+ state.fx={input:null,delay:null,feedback:null,wet:null,return:null,type:"delay"};
+ const ctx=state.ctx;if(!ctx||!state.masterGain)return;
+ for(let i=0;i<6;i++){const g=ctx.createGain();g.gain.value=[.8,.7,.6,.5,.5,.5][i];g.connect(state.masterGain);state.busNodes[i]=g}
+ const fi=ctx.createGain(),delay=ctx.createDelay(2),fb=ctx.createGain(),wet=ctx.createGain(),ret=ctx.createGain();
+ fi.connect(delay);delay.connect(fb);fb.connect(delay);delay.connect(wet);wet.connect(ret);ret.connect(state.masterGain);
+ wet.gain.value=.28;fb.gain.value=.35;delay.delayTime.value=.35;
+ state.fx={input:fi,delay,feedback:fb,wet,return:ret,type:"delay"};
+}
+function updateNonChannelAudio(){
+ const ctx=state.ctx;if(!ctx)return;initNonChannelAudio();const now=ctx.currentTime;
+ state.channels.forEach(c=>{
+   if(!c._gain)return;
+   c._busSends??=[];
+   for(let i=0;i<6;i++){let g=c._busSends[i];if(!g){g=ctx.createGain();c._gain.connect(g);g.connect(state.busNodes[i]);c._busSends[i]=g}const v=clamp(Number(c.dataset.aux||0)/100,0,1);g.gain.setTargetAtTime(v,now,.01)}
+   let fx=c._fxSend;if(!fx){fx=ctx.createGain();c._gain.connect(fx);fx.connect(state.fx.input);c._fxSend=fx}fx.gain.setTargetAtTime(clamp(Number(c.dataset.fx||0)/100,0,1),now,.01);
+ });
+ const fx=state.fx,wet=Number($("#fxWet")?.value||28)/100,feedback=Number($("#fxFeedback")?.value||35)/100,time=Number($("#fxDelay")?.value||35)/100;
+ fx.wet.gain.setTargetAtTime(wet,now,.01);fx.feedback.gain.setTargetAtTime(feedback,now,.01);fx.delay.delayTime.setTargetAtTime(.02+time*1.2,now,.01);
+}
+function bindNonChannelFunctional(){
+ const root=document;
+ if(window.__nonChannelControlsBound)return;window.__nonChannelControlsBound=true;
+ const notify2=(m,on=true)=>{status(m);try{document.dispatchEvent(new CustomEvent("mixer:notification",{detail:{message:m,on}}))}catch{}};
+ ["fxDelay","fxFeedback","fxWet"].forEach(id=>$( "#"+id)?.addEventListener("input",updateNonChannelAudio));
+ $("#fxType")?.addEventListener("change",e=>{state.fx&&(state.fx.type=e.target.value);notify2("FX 1 TYPE • "+e.target.value.toUpperCase())});
+ $("#fxPreset")?.addEventListener("change",e=>{
+   const p={VOCAL:["reverb",25,18,35],"MC / SPEECH":["delay",18,12,22],MUSIC:["delay",30,28,30],HALL:["reverb",55,35,48]}[e.target.value];if(!p)return;
+   const t=$("#fxType");if(t)t.value=p[0];[["fxDelay",p[1]],["fxFeedback",p[2]],["fxWet",p[3]]].forEach(([id,v])=>{const x=$("#"+id);if(x)x.value=v});updateNonChannelAudio();notify2("FX PRESET • "+e.target.value);
+ });
+ root.querySelectorAll(".bus-master input[type=range]").forEach((x,i)=>x.addEventListener("input",()=>{initNonChannelAudio();const v=Number(x.value)/100;state.busNodes[i]?.gain.setTargetAtTime(v,state.ctx?.currentTime||0,.01);updateNonChannelAudio();}));
+ root.querySelectorAll(".route-btn").forEach(b=>b.addEventListener("pointerup",()=>{state.activeRoute=b.classList.contains("indicator-active")?(b.dataset.route||"MAIN L/R"):"MAIN L/R";notify2("ROUTING • "+state.activeRoute,state.activeRoute!=="MAIN L/R")}));
+ root.querySelectorAll(".routing-block select").forEach((x,i)=>x.addEventListener("change",()=>notify2("OUTPUT "+(i+1)+" → "+x.value)));
+ root.querySelectorAll("#routingView button").forEach(b=>b.addEventListener("pointerup",()=>{state.activeRoute=b.textContent.trim();notify2("ROUTING → "+state.activeRoute,true)}));
+ $("#recBtn")?.addEventListener("pointerup",async()=>{if(window.__mixerRecorder)return window.__mixerRecorder.stop();try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});const mr=new MediaRecorder(stream);const chunks=[];mr.ondataavailable=e=>e.data.size&&chunks.push(e.data);mr.onstop=()=>{stream.getTracks().forEach(t=>t.stop());const blob=new Blob(chunks,{type:mr.mimeType||"audio/webm"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="mixer-recording.webm";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);window.__mixerRecorder=null;notify2("REC • SAVED",true)};mr.start();window.__mixerRecorder=mr;notify2("REC • RECORDING",true)}catch(e){notify2("REC • "+(e.message||"UNAVAILABLE"),false)}});
+ $("#phoneFiles")?.addEventListener("pointerup",()=>{if(window.NativeMedia)return;let i=$("#musicFile");i?.click()});
+ $("#phoneMic")?.addEventListener("pointerup",()=>connectUsbAudio().then(()=>notify2("MIC • INPUT ACTIVE",true)).catch(e=>notify2("MIC • "+(e.message||"UNAVAILABLE"),false)));
+ $("#audioInputBtn")?.addEventListener("pointerup",()=>connectUsbAudio().then(()=>notify2("AUDIO • INPUT ACTIVE",true)).catch(e=>notify2("AUDIO • "+(e.message||"UNAVAILABLE"),false)));
+ const setupSave=root.querySelector("#setupView button:nth-of-type(2)"),setupRecall=root.querySelector("#setupView button:nth-of-type(3)");
+ setupSave?.addEventListener("pointerup",()=>{localStorage.setItem("mixer-setup-scene",JSON.stringify({master:Number($("#masterFader")?.value||80),musicMode:$("#musicMode")?.value||"sequential",route:state.activeRoute||"MAIN L/R"}));notify2("SETUP • SAVED",true)});
+ setupRecall?.addEventListener("pointerup",()=>{try{const x=JSON.parse(localStorage.getItem("mixer-setup-scene")||"null");if(!x)throw Error("NOT FOUND");if($("#masterFader")){$("#masterFader").value=x.master;$("#masterFader").dispatchEvent(new Event("input",{bubbles:true}))}if($("#musicMode"))$("#musicMode").value=x.musicMode||"sequential";state.activeRoute=x.route||"MAIN L/R";notify2("SETUP • RECALLED",true)}catch{notify2("SETUP • SCENE NOT FOUND",false)}});
+}
 function bindNativeButtons(){if(window.NativeMedia){$("#phoneRecorder")?.addEventListener("pointerup",()=>NativeMedia.openRecorder());$("#phoneFiles")?.addEventListener("pointerup",()=>NativeMedia.openFiles());$("#phoneMusic")?.addEventListener("pointerup",()=>NativeMedia.openMusic())}}
 
 // Boot only after the mixer state and all controls are initialized.
