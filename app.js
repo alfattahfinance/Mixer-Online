@@ -91,14 +91,21 @@ function applyHardwareTestToChannel(ch,control,value){const c=state.channels?.[N
 
 function send(channel,control,value){const ch=String(channel);const target=ch==="MASTER"?"MASTER":/^CH\s*\d+$/i.test(ch)?ch:ch;return window.MixerControl?.setControl?.(target,control,value)}
 function updateChannelAudio(c){
- const n=Number(c.dataset.channel)||0,f=Number(c.querySelector(".fader")?.value||0)/100,g=Number(c.querySelector(".gainKnob")?.dataset.value||1)/2;
+ const n=Number(c.dataset.channel)||0;
+ const f=Number(c.querySelector(".fader")?.value||0)/100;
+ const g=Number(c.querySelector(".gainKnob")?.dataset.value||1)/2;
  const muted=c.classList.contains("muted")||state.muteGroups?.has(n);
- const soloed=c.classList.contains("soloed"), dcaSolo=state.dcaSolo?.has(n);
- const hasSolo=state.solo.size>0, hasDca=state.dcaSolo?.size>0;
- const level=(muted||(hasSolo&&!soloed)||(hasDca&&!dcaSolo))?0:f*g;
- if(c._gain)c._gain.gain.value=level;
+ const soloed=c.classList.contains("soloed");
+ const dcaSolo=state.dcaSolo?.has(n);
+ const hasSolo=state.solo.size>0,hasDca=state.dcaSolo?.size>0;
+ const audible=!muted&&(!hasSolo||soloed)&&(!hasDca||dcaSolo);
+ if(c._gain)c._gain.gain.setTargetAtTime(audible?f*g:0,state.ctx?.currentTime||0,.008);
  c.classList.toggle("group-muted",!!state.muteGroups?.has(n));
  c.classList.toggle("dca-soloed",!!dcaSolo);
+}
+function applyControlState(n){
+ const c=state.channels?.[n-1];if(!c)return;
+ updateChannelAudio(c);
 }
 function paintKnob(k,type,v){const min=type==="gain"?0:-1,max=type==="gain"?2:1,n=(v-min)/(max-min),rot=-135+n*270;k.style.setProperty("--rot",rot+"deg");k.style.setProperty("--knob-fill",Math.max(0,Math.min(270,n*270))+"deg");k.setAttribute("aria-valuenow",String(v));const out=k.parentElement?.querySelector(".knob-value");if(out)out.textContent=type==="gain"?(v<=0?"−∞":(20*Math.log10(v)).toFixed(1)+" dB"):(Math.abs(v)<.005?"C":v<0?"L "+Math.round(Math.abs(v)*100)+"%":"R "+Math.round(v*100)+"%")}
 function setChannelKnob(c,type,v){const k=c.querySelector(type==="gain"?".gainKnob":".panKnob");if(!k)return;v=type==="gain"?clamp(Number(v)||0,0,2):clamp(Number(v)||0,-1,1);k.dataset.value=String(v);paintKnob(k,type,v);send(Number(c.dataset.channel),type,v);updateChannelAudio(c)}
