@@ -312,3 +312,9 @@ html,body{overflow-x:auto}
 .console>.dca *{pointer-events:auto;}
 .console>.dca button,.console>.dca select,.console>.dca input{touch-action:manipulation!important;pointer-events:auto!important;cursor:pointer!important;}
 .console>.dca .control-lamp{pointer-events:none!important;}
+
+/* DCA→bottom touch reliability: scoped only to MAIF panel */
+.dca{position:relative!important;z-index:200!important;pointer-events:auto!important;}
+.dca button,.dca select,.dca input{pointer-events:auto!important;touch-action:manipulation!important;user-select:none;}
+.dca .bus-master input,.dca .fx-controls input,.dca .routing-block select,.dca .scene-row input{user-select:auto;}
+.dca .control-lamp{pointer-events:none!important;}
