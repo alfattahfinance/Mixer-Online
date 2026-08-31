@@ -146,8 +146,9 @@ function updateChannelAudio(c){
  const dcaSolo=state.dcaSolo?.has(n);
  const hasSolo=state.solo.size>0,hasDca=state.dcaSolo?.size>0;
  const audible=!muted&&(!hasSolo||soloed)&&(!hasDca||dcaSolo);
- const level=audible?f*g:0;
- if(c._gain)c._gain.gain.setTargetAtTime(level,state.ctx?.currentTime||0,.008);
+ const gainLevel=audible?g:0;
+ if(c._preGain)c._preGain.gain.setTargetAtTime(gainLevel,state.ctx?.currentTime||0,.008);
+ if(c._gain)c._gain.gain.setTargetAtTime(audible?f:0,state.ctx?.currentTime||0,.008);
  if(c._pan){
    const x=Math.max(-1,Math.min(1,p));
    c._pan.pan.setTargetAtTime(x,state.ctx?.currentTime||0,.008);
