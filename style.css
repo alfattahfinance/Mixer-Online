@@ -395,3 +395,7 @@ html,body{overflow-x:auto}
 .channel .channel-gain-pan .knob::after{
   content:"";position:absolute;inset:-9px;border-radius:50%;background:transparent;
 }
+
+/* 16-channel MAIF layout: compact but all controls remain addressable. */
+.dca-grid,.groups{grid-template-columns:repeat(4,1fr)!important;}
+@media (max-width:700px){.dca-grid,.groups{grid-template-columns:repeat(4,1fr)!important}.dca-grid button{min-height:48px;font-size:8px}.groups button{min-height:23px;font-size:9px}}
