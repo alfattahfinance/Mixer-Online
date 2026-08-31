@@ -86,7 +86,53 @@ function nextTrack(auto=state.playing){if(!state.playlist.length)return;const mo
 function prevTrack(){if(!state.playlist.length)return;loadTrack((state.index-1+state.playlist.length)%state.playlist.length,state.playing)}
 function setPlaylist(files){state.playlist=[...files].filter(f=>f.type.startsWith("audio/")||/\.(mp3|wav|m4a|aac|ogg|flac)$/i.test(f.name));state.urls.forEach(u=>{try{URL.revokeObjectURL(u)}catch{}});state.urls=[];state.index=0;state.playing=false;renderPlaylist();if(state.playlist.length)loadTrack(0,false);else status("PILIH MUSIK")}
 function bindMusic(){const input=$("#musicFile");input?.addEventListener("change",e=>setPlaylist(e.target.files));$("#pickMusic")?.addEventListener("pointerup",()=>input?.click());$("#play")?.addEventListener("pointerup",()=>state.audio&&!state.audio.paused?pauseMusic():playMusic());$("#prev")?.addEventListener("pointerup",prevTrack);$("#next")?.addEventListener("pointerup",()=>nextTrack(true));$("#stopMusic")?.addEventListener("pointerup",()=>{state.audio?.pause();if(state.audio)state.audio.currentTime=0;state.playing=false;status("STOPPED")});const vol=$("#masterVol");vol?.addEventListener("input",()=>{const v=Number(vol.value);if(state.masterGain)state.masterGain.gain.value=v;else if(state.audio)state.audio.volume=v;setText("#musicVolumeValue",Math.round(v*100)+"%")});$("#audioPlayMode")?.addEventListener("change",e=>{const m=$("#musicMode");if(m)m.value=e.target.value==="ACAK"?"random":"sequential"});$("#musicMode")?.addEventListener("change",e=>{const m=$("#audioPlayMode");if(m)m.value=e.target.value==="random"?"ACAK":"BERURUTAN"});$("#musicChannel")?.addEventListener("change",routeMusicChannel)}
-function routeMusicChannel(){if(!state.ctx||!state.mixBus)return;try{state.mixBus.disconnect()}catch(e){}state.channels.forEach(c=>{if(c._gain){try{c._gain.disconnect()}catch(e){}}if(c._pan){try{c._pan.disconnect()}catch(e){}}});const target=Number(String($("#musicChannel")?.value||"CH 1").replace(/\D/g,""))||1;state.channels.forEach(c=>{const g=state.ctx.createGain(),p=state.ctx.createStereoPanner(),a=state.ctx.createAnalyser();a.fftSize=256;a.smoothingTimeConstant=.72;c._gain=g;c._pan=p;c._audio={analyser:a};g.connect(p);p.connect(a);a.connect(state.masterGain);updateChannelAudio(c)});const c=state.channels[target-1];if(c&&c._gain)state.mixBus.connect(c._gain);updateMeters()}
+function channelEqValues(){
+ const row=document.querySelector("#homeView .eq-row");
+ if(!row)return [{type:"lowshelf",freq:80,gain:4,q:1.2},{type:"peaking",freq:250,gain:-2.5,q:1},{type:"peaking",freq:2500,gain:3,q:1.2},{type:"highshelf",freq:8000,gain:2,q:1}];
+ const boxes=[...row.querySelectorAll(".eqbox")];
+ const nums=box=>[...box.querySelectorAll("input")].map(x=>parseFloat(String(x.value).replace(/[^0-9+-.]/g,""))||0);
+ const v=boxes.slice(0,4).map((b,i)=>{const n=nums(b);return {type:i===0?"lowshelf":i===3?"highshelf":"peaking",freq:n[0]||[80,250,2500,8000][i],gain:n[1]||0,q:n[2]||1}});
+ return v.length===4?v:channelEqValues();
+}
+function applyChannelEq(c){
+ if(!c?._eq)return;
+ const on=c._eqEnabled!==false, vals=c._eqValues||channelEqValues();
+ vals.forEach((v,i)=>{const f=c._eq[i];if(!f)return;f.type=v.type;f.frequency=Math.max(20,Math.min(20000,v.freq));f.gain=on?Math.max(-24,Math.min(24,v.gain)):0;f.Q=Math.max(.1,Math.min(18,v.q))});
+}
+function bindChannelEq(){
+ const row=document.querySelector("#homeView .eq-row");if(!row||row.dataset.bound==="1")return;
+ row.dataset.bound="1";
+ const refresh=()=>{const n=Number(String(document.querySelector("#musicChannel")?.value||"CH 1").replace(/\D/g,""))||1;const c=state.channels[n-1];if(!c)return;c._eqValues=channelEqValues();applyChannelEq(c);send(n,"eq",JSON.stringify(c._eqValues));updateChannelAudio(c)};
+ row.querySelectorAll(".eqbox input").forEach(x=>x.addEventListener("change",refresh));
+ const b=row.querySelector(".eq-title .tiny");b?.addEventListener("click",()=>{const n=Number(String(document.querySelector("#musicChannel")?.value||"CH 1").replace(/\D/g,""))||1,c=state.channels[n-1];if(!c)return;c._eqEnabled=c._eqEnabled===false;applyChannelEq(c);b.textContent=c._eqEnabled===false?"OFF":"ON";send(n,"eqEnabled",c._eqEnabled?1:0);updateChannelAudio(c)});
+}
+function rebuildChannelAudio(c){
+ const ctx=state.ctx;if(!ctx)return;
+ for(const k of ["_input","_preGain","_gain","_pan","_audio"])try{c[k]?.disconnect?.()}catch(e){}
+ c._input=ctx.createGain();
+ c._preGain=ctx.createGain();
+ const q=channelEqValues();
+ c._eq=q.map(v=>{const f=ctx.createBiquadFilter();f.type=v.type;f.frequency.value=v.freq;f.gain.value=v.gain;f.Q.value=v.q;return f});
+ c._pan=ctx.createStereoPanner();
+ c._gain=ctx.createGain();
+ c._audio={analyser:ctx.createAnalyser()};
+ c._audio.analyser.fftSize=256;c._audio.analyser.smoothingTimeConstant=.72;
+ c._input.connect(c._preGain);
+ let node=c._preGain;c._eq.forEach(f=>{node.connect(f);node=f});node.connect(c._pan);c._pan.connect(c._gain);c._gain.connect(c._audio.analyser);c._audio.analyser.connect(state.masterGain);
+ c._eqValues=q;c._eqEnabled=true;applyChannelEq(c);
+ updateChannelAudio(c);
+}
+function routeMusicChannel(){
+ if(!state.ctx||!state.mixBus)return;
+ try{state.mixBus.disconnect()}catch(e){}
+ state.channels.forEach(c=>{try{c._input?.disconnect()}catch(e){};try{c._gain?.disconnect()}catch(e){};try{c._pan?.disconnect()}catch(e){};if(!c._eq)c._eqValues=channelEqValues();rebuildChannelAudio(c)});
+ const target=Number(String($("#musicChannel")?.value||"CH 1").replace(/\D/g,""))||1;
+ const c=state.channels[target-1];
+ if(c?. _input)state.mixBus.connect(c._input);
+ if(state.usbSource&&c?._input){try{state.usbSource.disconnect()}catch(e){};state.usbSource.connect(c._input)}
+ bindChannelEq();
+ updateMeters();
+}
 function applyHardwareTestToChannel(ch,control,value){const c=state.channels?.[Number(ch)-1];if(!c)return false;const v=Number(value)>0;if(control==="mute"||control==="solo"){const cls=control==="mute"?"muted":"soloed";c.classList.toggle(cls,v);if(control==="mute"){c.querySelectorAll(".mute,.topmute").forEach(b=>b.textContent=v?"UNMUTE":"MUTE");}else{if(v)state.solo.add(Number(ch));else state.solo.delete(Number(ch));c.querySelector(".solo")?.setAttribute("aria-pressed",v?"true":"false");}updateChannelAudio(c);if(control==="solo")state.channels.forEach(updateChannelAudio);send(Number(ch),control,v?1:0);return true}if(control==="fader"){const input=c.querySelector(".fader");if(!input)return false;input.value=Math.round(Number(value));input.dispatchEvent(new Event("input",{bubbles:true}));return true}if(control==="gain"||control==="pan"){const knob=c.querySelector(control==="gain"?".gainKnob":".panKnob");if(!knob)return false;const v=Number(value);knob.dataset.value=String(v);const max=control==="gain"?2:1;const min=control==="gain"?0:-1;const norm=(v-min)/(max-min);knob.style.setProperty("--rot",(-135+norm*270)+"deg");updateChannelAudio(c);return true}if(control==="low"||control==="mid"||control==="high"){c.dataset[control]=String(Number(value));return true}return false}
 
 function send(channel,control,value){const ch=String(channel);const target=ch==="MASTER"?"MASTER":/^CH\s*\d+$/i.test(ch)?ch:ch;return window.MixerControl?.setControl?.(target,control,value)}
