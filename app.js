@@ -93,13 +93,20 @@ function send(channel,control,value){const ch=String(channel);const target=ch===
 function updateChannelAudio(c){
  const n=Number(c.dataset.channel)||0;
  const f=Number(c.querySelector(".fader")?.value||0)/100;
- const g=Number(c.querySelector(".gainKnob")?.dataset.value||1)/2;
+ const g=clamp(Number(c.querySelector(".gainKnob")?.dataset.value??1)/2,0,1);
+ const p=clamp(Number(c.querySelector(".panKnob")?.dataset.value??0),-1,1);
  const muted=c.classList.contains("muted")||state.muteGroups?.has(n);
  const soloed=c.classList.contains("soloed");
  const dcaSolo=state.dcaSolo?.has(n);
  const hasSolo=state.solo.size>0,hasDca=state.dcaSolo?.size>0;
  const audible=!muted&&(!hasSolo||soloed)&&(!hasDca||dcaSolo);
- if(c._gain)c._gain.gain.setTargetAtTime(audible?f*g:0,state.ctx?.currentTime||0,.008);
+ const level=audible?f*g:0;
+ if(c._gain)c._gain.gain.setTargetAtTime(level,state.ctx?.currentTime||0,.008);
+ if(c._pan){
+   const x=Math.max(-1,Math.min(1,p));
+   c._pan.pan.setTargetAtTime(x,state.ctx?.currentTime||0,.008);
+ }
+ c.dataset.fader=String(f*100);c.dataset.gain=String(g*2);c.dataset.pan=String(p);
  c.classList.toggle("group-muted",!!state.muteGroups?.has(n));
  c.classList.toggle("dca-soloed",!!dcaSolo);
 }
