@@ -54,19 +54,9 @@ function boot(){
  document.addEventListener("pointerup",handle,true);
  document.addEventListener("mixer:state-changed",refresh);
  const s=st();if(s)sets(s);
- qa(".dca-btn").forEach(b=>{
-   const n=Number(b.dataset.dca);
-   lamp(b,st()?.dcaSolo?.has(n));
-   b.addEventListener("click",e=>{e.preventDefault();e.stopImmediatePropagation();dca(n,b)},{capture:true});
- });
- qa(".mute-groups button").forEach(b=>{
-   const n=Number(b.dataset.group); lamp(b,st()?.muteGroups?.has(n));
-   b.addEventListener("click",e=>{e.preventDefault();e.stopImmediatePropagation();mute(n,b)},{capture:true});
- });
- qa(".dca-groups button").forEach(b=>{
-   const n=Number(b.dataset.dcagroup); lamp(b,st()?.dcaGroups?.has(n));
-   b.addEventListener("click",e=>{e.preventDefault();e.stopImmediatePropagation();dgroup(n,b)},{capture:true});
- });
+ qa(".dca-btn").forEach(b=>lamp(b,st()?.dcaSolo?.has(Number(b.dataset.dca))));
+ qa(".mute-groups button").forEach(b=>lamp(b,st()?.muteGroups?.has(Number(b.dataset.group))));
+ qa(".dca-groups button").forEach(b=>lamp(b,st()?.dcaGroups?.has(Number(b.dataset.dcagroup))));
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(boot,350),{once:true});else setTimeout(boot,350);
 })();
