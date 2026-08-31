@@ -232,6 +232,16 @@
 
     <section class="channel-section">
       <div id="channels" class="channels"></div>
+      <section class="channel-detail-panel panel" id="channelDetail" hidden aria-label="Channel settings">
+        <div class="channel-detail-head"><b class="channel-detail-title">CH 1</b><button type="button" class="channel-detail-close">CLOSE</button></div>
+        <div class="channel-detail-grid">
+          <label>LOW <input id="chLow" data-channel-detail-control="low" type="range" min="-12" max="12" step="0.1" value="0"><output data-out="chLow">0 dB</output></label>
+          <label>MID <input id="chMid" data-channel-detail-control="mid" type="range" min="-12" max="12" step="0.1" value="0"><output data-out="chMid">0 dB</output></label>
+          <label>HIGH <input id="chHigh" data-channel-detail-control="high" type="range" min="-12" max="12" step="0.1" value="0"><output data-out="chHigh">0 dB</output></label>
+          <label>AUX / BUS <input id="chAux" data-channel-detail-control="aux" type="range" min="0" max="100" step="1" value="0"><output data-out="chAux">0%</output></label>
+          <label>FX <input id="chFx" data-channel-detail-control="fx" type="range" min="0" max="100" step="1" value="0"><output data-out="chFx">0%</output></label>
+        </div>
+      </section>
       <aside class="master-strip panel">
         <b class="master-head">MASTER</b>
         <div class="lamps">●<br>●<br>●<br>●<br>●</div>
@@ -257,7 +267,7 @@
   <script src="adapters.js?v=20260831-v44"></script>
   <script src="device-profile.js?v=20260830-v15"></script>
   <script src="feedback.js?v=20260830-v15"></script>
-  <script src="app.js?v=20260831-v49"></script>
+  <script src="app.js?v=20260831-v50"></script>
   <script src="onoff-panel-fix.js?v=20260831-v1"></script>
   <script src="lower-panel-final-fix.js?v=20260831-v1"></script>
   <script src="maif-lower-functional-final.js?v=20260831-v1"></script>
