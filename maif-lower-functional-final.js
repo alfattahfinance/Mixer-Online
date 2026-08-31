@@ -1,142 +1,147 @@
-/* MAIF lower panel — final functional controller.
-   Capture-phase controller intentionally owns ONLY .dca controls listed in the
-   lower-panel request. Existing channel/master code is untouched. */
+/* MAIF CONTROL EXPANSION v16 — DCA/MUTE/DCA GROUP 1-16 + HISTORY + LOCK + MAPPER.
+   Scoped to the MAIF .dca panel only. */
 (function(){
 "use strict";
-const q=s=>document.querySelector(s), qa=s=>[...document.querySelectorAll(s)];
-const P=()=>q(".dca");
-const st=()=>window.MixerOnline?.state;
-const say=(m,on=true)=>{try{window.mixerNotify?.(m)}catch{};document.dispatchEvent(new CustomEvent("mixer:notification",{detail:{message:m,on}}))};
-const lamp=(b,on)=>{if(!b)return;b.classList.toggle("indicator-active",!!on);b.setAttribute("aria-pressed",on?"true":"false");let l=b.querySelector(":scope > .control-lamp");if(!l){l=document.createElement("i");l.className="control-lamp off";b.prepend(l)}l.classList.toggle("on",!!on);l.classList.toggle("off",!on)};
+const Q=s=>document.querySelector(s), QA=s=>[...document.querySelectorAll(s)];
+const panel=()=>Q(".dca"), state=()=>window.MixerOnline?.state;
+const notify=(m,on=true)=>{try{window.mixerNotify?.(m)}catch{};document.dispatchEvent(new CustomEvent("mixer:notification",{detail:{message:m,on}}))};
+const setOn=(b,on)=>{if(!b)return;b.classList.toggle("indicator-active",!!on);b.setAttribute("aria-pressed",on?"true":"false");b.dataset.on=on?"1":"0";let l=b.querySelector(":scope > .control-lamp");if(!l){l=document.createElement("i");l.className="control-lamp off";b.prepend(l)}l.classList.toggle("on",!!on);l.classList.toggle("off",!on)};
 const send=(target,control,value)=>{try{return window.MixerControl?.setControl?.(target,control,value)}catch{return null}};
-const locked=()=>!!window.__mixerLiveLocked;
-function audioRefresh(){
- const s=st();if(!s)return;
- const ds=s.dcaSolo||new Set(), ms=s.muteGroups||new Set(), ss=s.solo||new Set();
- const anyD=ds.size>0, anyS=ss.size>0;
+const isLocked=()=>!!window.__mixerLiveLocked;
+
+function ensureSets(){
+ const s=state();if(!s)return null;
+ s.dcaSolo ||= new Set(); s.muteGroups ||= new Set(); s.dcaGroups ||= new Set();
+ return s;
+}
+function channel(n){
+ const s=state(); return s?.channels?.find(c=>Number(c.dataset.channel)===n)||Q('#channels .channel:nth-child('+n+')');
+}
+function refreshAudio(){
+ const s=ensureSets();if(!s)return;
+ const ds=s.dcaSolo, mg=s.muteGroups, dg=s.dcaGroups;
  (s.channels||[]).forEach(c=>{
-   const n=Number(c.dataset.channel),g=Math.floor((n-1)/4)+1;
-   const f=Number(c.querySelector(".fader")?.value||0)/100;
-   const gain=Number(c.querySelector(".gainKnob")?.dataset.value||1)/2;
-   const mute=c.classList.contains("muted")||ms.has(g);
-   const allowedD=!anyD||ds.has(g),allowedS=!anyS||c.classList.contains("soloed");
-   if(c._gain)c._gain.gain.value=(mute||!allowedD||!allowedS)?0:f*gain;
-   c.classList.toggle("dca-soloed",ds.has(g));
+   const n=Number(c.dataset.channel);
+   const dcaSolo=ds.has(n);
+   const muted=mg.has(n)||c.classList.contains("muted");
+   c.classList.toggle("dca-soloed",dcaSolo);
+   c.classList.toggle("group-muted",mg.has(n));
+   c.dataset.dcaGroup=dg.has(n)?"1":"0";
+   if(c._gain){
+     const anySolo=ds.size>0;
+     const audible=(!muted)&&(!anySolo||dcaSolo);
+     const f=Number(c.querySelector(".fader")?.value||0)/100;
+     const g=Number(c.querySelector(".gainKnob")?.dataset.value||1)/2;
+     c._gain.gain.value=audible?f*g:0;
+   }
  });
 }
-function dca(n,b){
- const s=st();if(!s)return;
- s.dcaSolo=s.dcaSolo||new Set();const on=!s.dcaSolo.has(n);
- on?s.dcaSolo.add(n):s.dcaSolo.delete(n);
- lamp(b,on);
- const sp=b.querySelector("span");if(sp)sp.textContent=on?"SOLO ON":"SOLO";
- qa(".channel").forEach(c=>{const ch=Number(c.dataset.channel),g=Math.floor((ch-1)/4)+1;c.classList.toggle("dca-soloed",on&&g===n)});
- send("DCA "+n,"solo",on?1:0);audioRefresh();say("DCA "+n+" SOLO "+(on?"ON":"OFF"),on);
+function render(){
+ const p=panel(),s=ensureSets();if(!p||!s)return;
+ p.querySelectorAll(".dca-btn").forEach(b=>setOn(b,s.dcaSolo.has(Number(b.dataset.dca))));
+ p.querySelectorAll(".mute-groups button").forEach(b=>setOn(b,s.muteGroups.has(Number(b.dataset.group))));
+ p.querySelectorAll(".dca-groups button").forEach(b=>setOn(b,s.dcaGroups.has(Number(b.dataset.dcagroup))));
+ const lock=p.querySelector(".lock-row button"); if(lock){lock.textContent=isLocked()?"🔓 UNLOCK":"🔒 LOCK";setOn(lock,isLocked())}
 }
-function muteGroup(n,b){
- const s=st();if(!s)return;s.muteGroups=s.muteGroups||new Set();const on=!s.muteGroups.has(n);
- on?s.muteGroups.add(n):s.muteGroups.delete(n);lamp(b,on);
- const a=(n-1)*4+1;
- (s.channels||[]).filter(c=>{const x=Number(c.dataset.channel);return x>=a&&x<a+4}).forEach(c=>{
-   c.classList.toggle("group-muted",on);c.classList.toggle("muted",on);
-   c.querySelectorAll(".mute,.topmute").forEach(x=>x.textContent=on?"UNMUTE":"MUTE");
- });
- send("MUTE GROUP "+n,"mute",on?1:0);audioRefresh();say("MUTE GROUP "+n+" "+(on?"ON":"OFF"),on);
-}
-function dcaGroup(n,b){
- const s=st();if(!s)return;s.dcaGroups=s.dcaGroups||new Set();const on=!s.dcaGroups.has(n);
- on?s.dcaGroups.add(n):s.dcaGroups.delete(n);lamp(b,on);send("DCA GROUP "+n,"active",on?1:0);say("DCA GROUP "+n+" "+(on?"ON":"OFF"),on);
-}
-function autoMix(b){
- const on=!b.classList.contains("indicator-active");lamp(b,on);send(b.id,"active",on?1:0);
- say((b.id==="autoMixActive"?"AUTO MIX ACTIVE":"AUTO MIX LAST GATE")+" "+(on?"ON":"OFF"),on);
-}
-function route(b){
- const was=b.classList.contains("indicator-active"),name=b.dataset.route||"ROUTE",on=!was;
- qa(".route-btn").forEach(x=>{if(x!==b)lamp(x,false)});
- lamp(b,on);const s=st();if(s)s.activeRoute=on?name:"MAIN L/R";
- send("ROUTING","route",on?name:"MAIN L/R");say(name+" "+(on?"ON":"OFF"),on);
-}
-function usb(b){
- const n=Number(b.dataset.usb);const on=!b.classList.contains("indicator-active");
- qa(".usb-route-btn").forEach(x=>{if(x!==b)lamp(x,false)});
- lamp(b,on);
- const ch=q("#musicChannel");if(ch&&on){ch.value="CH "+n;ch.dispatchEvent(new Event("change",{bubbles:true}))}
- send("USB "+n,"select",on?1:0);say("USB "+n+" "+(on?"ON":"OFF"),on);
-}
-function busFader(x,i){
- const v=Math.max(0,Math.min(100,Number(x.value)||0)),label=x.closest("label");label?.classList.toggle("active-level",v>0);
- let l=label?.querySelector(":scope > .control-lamp");if(label&&!l){l=document.createElement("i");l.className="control-lamp off";label.prepend(l)}
- l?.classList.toggle("on",v>0);l?.classList.toggle("off",v===0);
- if(!locked())send("BUS "+(i+1),"level",v);
-}
-function fx(id){
- const x=q("#"+id);if(!x)return;const v=Number(x.value)||0;const c=id.replace("fx","").toUpperCase();
- if(!locked())send("FX 1",c.toLowerCase(),v);
- say("FX 1 "+c+" "+(v>0?"ON":"OFF")+" • "+v,v>0);
-}
-const presets={VOCAL:{type:"reverb",delay:25,feedback:18,wet:35},"MC / SPEECH":{type:"delay",delay:18,feedback:12,wet:22},MUSIC:{type:"delay",delay:30,feedback:28,wet:30},HALL:{type:"reverb",delay:55,feedback:35,wet:48}};
-function fxPreset(){
- const s=q("#fxPreset"),v=s?.value,p=presets[v];if(!p)return;
- const t=q("#fxType");if(t)t.value=p.type;
- [["fxDelay",p.delay],["fxFeedback",p.feedback],["fxWet",p.wet]].forEach(([id,n])=>{const x=q("#"+id);if(x){x.value=n;send("FX 1",id.slice(2).toLowerCase(),n)}});
- send("FX 1","preset",v);say("FX 1 PRESET "+v+" ON",true);
-}
-function output(s,i){
- const v=s.value,on=v!=="MAIN L/R";s.classList.toggle("indicator-active",on);s.setAttribute("aria-pressed",on?"true":"false");
- send("OUT "+(i+1),"route",v);say("OUT "+(i+1)+" "+(on?"ON":"OFF")+" → "+v,on);
+function make16(selector,attr,label){
+ const p=panel(),box=p?.querySelector(selector);if(!box)return;
+ box.replaceChildren();
+ for(let i=1;i<=16;i++){
+   const b=document.createElement("button");b.className=label;b.setAttribute(attr,String(i));b.type="button";
+   if(label==="dca-btn")b.innerHTML="DCA "+i+"<br><span>SOLO</span><br><output>0.0</output>";
+   else b.textContent=String(i);
+   box.appendChild(b);
+ }
 }
 function snapshot(){
- const s=st();return {channels:(s?.channels||[]).map(c=>({fader:Number(c.querySelector(".fader")?.value||0),gain:Number(c.querySelector(".gainKnob")?.dataset.value||1),muted:c.classList.contains("muted"),soloed:c.classList.contains("soloed")})),master:Number(q("#masterFader")?.value||80),dcaSolo:[...(s?.dcaSolo||[])],muteGroups:[...(s?.muteGroups||[])],dcaGroups:[...(s?.dcaGroups||[])],bus:qa(".bus-master input[type=range]").map(x=>Number(x.value)),fx:{preset:q("#fxPreset")?.value||"",type:q("#fxType")?.value||"delay",delay:Number(q("#fxDelay")?.value||0),feedback:Number(q("#fxFeedback")?.value||0),wet:Number(q("#fxWet")?.value||0)},routes:qa(".routing-block select").map(x=>x.value),activeRoute:s?.activeRoute||"MAIN L/R",savedAt:Date.now()};
+ const s=ensureSets(),p=panel();if(!s||!p)return null;
+ return {dca:[...s.dcaSolo],mute:[...s.muteGroups],groups:[...s.dcaGroups],
+  mapped:(s.channels||[]).map(c=>({n:Number(c.dataset.channel),mute:c.classList.contains("muted"),solo:c.classList.contains("soloed"),dca:c.classList.contains("dca-soloed"),gm:c.classList.contains("group-muted")})),
+  auto:{active:!!Q("#autoMixActive")?.classList.contains("indicator-active"),last:!!Q("#autoMixLastGate")?.classList.contains("indicator-active")},
+  count:Number(p.querySelector(".mapper-row input[type=number]")?.value||s.channelCount||16)};
 }
 function restore(o){
- const s=st();if(!o||!s)return false;s.dcaSolo=new Set(o.dcaSolo||[]);s.muteGroups=new Set(o.muteGroups||[]);s.dcaGroups=new Set(o.dcaGroups||[]);
- (s.channels||[]).forEach((c,i)=>{const v=o.channels?.[i];if(!v)return;const f=c.querySelector(".fader"),g=c.querySelector(".gainKnob");if(f){f.value=v.fader;f.dispatchEvent(new Event("input",{bubbles:true}))}if(g&&v.gain!=null){g.dataset.value=v.gain;g.dispatchEvent(new Event("input",{bubbles:true}))}c.classList.toggle("muted",!!v.muted);c.classList.toggle("soloed",!!v.soloed)});
- if(q("#masterFader")&&o.master!=null){q("#masterFader").value=o.master;q("#masterFader").dispatchEvent(new Event("input",{bubbles:true}))}
- qa(".dca-btn").forEach(b=>lamp(b,s.dcaSolo.has(Number(b.dataset.dca))));
- qa(".mute-groups button").forEach(b=>lamp(b,s.muteGroups.has(Number(b.dataset.group))));
- qa(".dca-groups button").forEach(b=>lamp(b,s.dcaGroups.has(Number(b.dataset.dcagroup))));
- qa(".bus-master input[type=range]").forEach((x,i)=>{if(o.bus?.[i]!=null)x.value=o.bus[i];busFader(x,i)});
- if(o.fx){if(q("#fxPreset"))q("#fxPreset").value=o.fx.preset||"";if(q("#fxType"))q("#fxType").value=o.fx.type||"delay";["fxDelay","fxFeedback","fxWet"].forEach((id,j)=>{const x=q("#"+id);if(x)x.value=[o.fx.delay,o.fx.feedback,o.fx.wet][j]??x.value})}
- qa(".routing-block select").forEach((x,i)=>{if(o.routes?.[i]!=null)x.value=o.routes[i];output(x,i)});
- audioRefresh();return true;
+ const s=ensureSets(),p=panel();if(!s||!o)return;
+ s.dcaSolo=new Set(o.dca||[]);s.muteGroups=new Set(o.mute||[]);s.dcaGroups=new Set(o.groups||[]);
+ (s.channels||[]).forEach(c=>{const v=o.mapped?.find(x=>x.n===Number(c.dataset.channel));if(v){c.classList.toggle("muted",!!v.mute);c.classList.toggle("soloed",!!v.solo)}});
+ if(Q("#autoMixActive"))setOn(Q("#autoMixActive"),!!o.auto?.active);
+ if(Q("#autoMixLastGate"))setOn(Q("#autoMixLastGate"),!!o.auto?.last);
+ render();refreshAudio();
 }
-function scenes(){
- const p=P();if(!p||p.dataset.sceneFinal==="1")return;p.dataset.sceneFinal="1";
- const rows=[...p.querySelectorAll(".scene-row")],buttons=rows.flatMap(r=>[...r.querySelectorAll("button")]),input=p.querySelector(".scene-row input");
- const btn=t=>buttons.find(b=>b.textContent.trim()===t),name=()=>input?.value.trim()||"Scene";
- const undo=[],redo=[];
- btn("SAVE")?.addEventListener("click",e=>{e.stopImmediatePropagation();if(locked()){say("SCENE SAVE BLOCKED • LOCKED",false);return}localStorage.setItem("mixer-scene-"+name(),JSON.stringify(snapshot()));say("SCENE SAVED • "+name(),true)},true);
- btn("RECALL")?.addEventListener("click",e=>{e.stopImmediatePropagation();const n=name(),o=JSON.parse(localStorage.getItem("mixer-scene-"+n)||"null");if(!o){say("SCENE NOT FOUND • "+n,false);return}restore(o);say("SCENE RECALLED • "+n,true)},true);
- btn("RENAME")?.addEventListener("click",e=>{e.stopImmediatePropagation();const old=name(),n=prompt("Nama scene baru:",old);if(!n)return;const o=localStorage.getItem("mixer-scene-"+old);if(o)localStorage.setItem("mixer-scene-"+n,o);if(input)input.value=n;say("SCENE RENAMED • "+n,true)},true);
- btn("DUPLICATE")?.addEventListener("click",e=>{e.stopImmediatePropagation();const old=name(),n=old+" COPY",o=localStorage.getItem("mixer-scene-"+old);if(!o){say("SCENE NOT FOUND • "+old,false);return}localStorage.setItem("mixer-scene-"+n,o);if(input)input.value=n;say("SCENE DUPLICATED • "+n,true)},true);
- btn("DELETE")?.addEventListener("click",e=>{e.stopImmediatePropagation();const n=name();localStorage.removeItem("mixer-scene-"+n);say("SCENE DELETED • "+n,true)},true);
- btn("EXPORT")?.addEventListener("click",e=>{e.stopImmediatePropagation();const blob=new Blob([JSON.stringify(snapshot(),null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name()+".json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);say("SCENE EXPORTED • "+name(),true)},true);
- let file=q("#mixerFinalImport");if(!file){file=document.createElement("input");file.type="file";file.accept=".json,application/json";file.hidden=true;file.id="mixerFinalImport";p.appendChild(file)}
- btn("IMPORT")?.addEventListener("click",e=>{e.stopImmediatePropagation();file.click()},true);
- file.addEventListener("change",async()=>{try{const o=JSON.parse(await file.files[0].text());restore(o);say("SCENE IMPORTED",true)}catch{say("IMPORT ERROR",false)}file.value=""});
- btn("↶ UNDO")?.addEventListener("click",e=>{e.stopImmediatePropagation();const o=undo.pop();if(!o){say("UNDO EMPTY",false);return}redo.push(snapshot());restore(o);say("UNDO ON",true)},true);
- btn("↷ REDO")?.addEventListener("click",e=>{e.stopImmediatePropagation();const o=redo.pop();if(!o){say("REDO EMPTY",false);return}undo.push(snapshot());restore(o);say("REDO ON",true)},true);
+const history={undo:[],redo:[],busy:false};
+function pushHistory(){
+ if(history.busy)return;const o=snapshot();if(!o)return;
+ history.undo.push(o);if(history.undo.length>50)history.undo.shift();history.redo.length=0;
+}
+function undo(){
+ const current=snapshot(),o=history.undo.pop();if(!o){notify("HISTORY • UNDO KOSONG",false);return}
+ history.busy=true;history.redo.push(current);restore(o);history.busy=false;notify("HISTORY • UNDO",true);
+}
+function redo(){
+ const current=snapshot(),o=history.redo.pop();if(!o){notify("HISTORY • REDO KOSONG",false);return}
+ history.busy=true;history.undo.push(current);restore(o);history.busy=false;notify("HISTORY • REDO",true);
+}
+function toggleDca(n,b){
+ if(isLocked()){notify("LIVE PROTECTION • DCA "+n+" TERKUNCI",false);return}
+ pushHistory();const s=ensureSets(),on=!s.dcaSolo.has(n);on?s.dcaSolo.add(n):s.dcaSolo.delete(n);
+ setOn(b,on);send("DCA "+n,"solo",on?1:0);refreshAudio();notify("DCA "+n+" SOLO "+(on?"ON":"OFF"),on);
+}
+function toggleMute(n,b){
+ if(isLocked()){notify("LIVE PROTECTION • MUTE GROUP "+n+" TERKUNCI",false);return}
+ pushHistory();const s=ensureSets(),on=!s.muteGroups.has(n);on?s.muteGroups.add(n):s.muteGroups.delete(n);
+ const c=channel(n);c?.classList.toggle("group-muted",on);c?.classList.toggle("muted",on);
+ setOn(b,on);send("MUTE GROUP "+n,"mute",on?1:0);refreshAudio();notify("MUTE GROUP "+n+" "+(on?"ON":"OFF"),on);
+}
+function toggleDcaGroup(n,b){
+ if(isLocked()){notify("LIVE PROTECTION • DCA GROUP "+n+" TERKUNCI",false);return}
+ pushHistory();const s=ensureSets(),on=!s.dcaGroups.has(n);on?s.dcaGroups.add(n):s.dcaGroups.delete(n);
+ const c=channel(n);if(c)c.dataset.dcaGroup=on?"1":"0";
+ setOn(b,on);send("DCA GROUP "+n,"active",on?1:0);notify("DCA GROUP "+n+" "+(on?"ON":"OFF"),on);
+}
+function autoToggle(b){
+ if(isLocked()){notify("LIVE PROTECTION • AUTO MIX TERKUNCI",false);return}
+ pushHistory();const on=!b.classList.contains("indicator-active");setOn(b,on);
+ send(b.id,"active",on?1:0);notify((b.id==="autoMixActive"?"AUTO MIX ACTIVE":"AUTO MIX LAST GATE")+" "+(on?"ON":"OFF"),on);
+}
+function mapper(){
+ const p=panel(),input=p?.querySelector(".mapper-row input[type=number]");if(!p||!input)return;
+ if(isLocked()){notify("LIVE PROTECTION • CHANNEL MAPPER TERKUNCI",false);return}
+ const n=Math.max(1,Math.min(64,Number(input.value)||16));pushHistory();
+ const ok=!!window.MixerOnline?.buildChannels?.(n);if(!ok){notify("AUTO CHANNEL MAPPER • GAGAL APPLY",false);return}
+ state().channels.forEach((c,i)=>c.dataset.mapped="1");
+ notify("AUTO CHANNEL MAPPER • "+n+" CHANNELS APPLIED",true);refreshAudio();
+}
+function autoMap(){
+ const p=panel(),s=ensureSets();if(!p||!s)return;
+ if(isLocked()){notify("LIVE PROTECTION • AUTO MAP TERKUNCI",false);return}
+ pushHistory();s.channels.forEach((c,i)=>{c.dataset.mapped="1";c.dataset.autoMapped="1";c.querySelectorAll("input,select").forEach(x=>x.dataset.autoMapped="1")});
+ setOn(p.querySelector(".mapper-row button:nth-of-type(2)"),true);notify("AUTO CHANNEL MAPPER • CONTROLS MAPPED",true);
 }
 function install(){
- const p=P();if(!p||p.dataset.finalFunctional==="1")return;p.dataset.finalFunctional="1";
- // Capture phase stops the older toggle handlers from firing twice.
+ const p=panel();if(!p||p.dataset.v16==="1")return;p.dataset.v16="1";
+ make16(".dca-grid","data-dca","dca-btn");make16(".mute-groups","data-group","mute-btn");make16(".dca-groups","data-dcagroup","dca-group-btn");
+ // Normalize classes so the existing CSS remains intact.
+ QA(".mute-groups button").forEach(b=>b.classList.add("group-btn"));
+ QA(".dca-groups button").forEach(b=>b.classList.add("group-btn"));
+ render();
  p.addEventListener("click",e=>{
    const b=e.target.closest("button");if(!b||!p.contains(b))return;
-   if(b.matches(".dca-btn")){e.preventDefault();e.stopImmediatePropagation();dca(Number(b.dataset.dca),b);return}
-   if(b.matches(".mute-groups button")){e.preventDefault();e.stopImmediatePropagation();muteGroup(Number(b.dataset.group),b);return}
-   if(b.matches(".auto-option")){e.preventDefault();e.stopImmediatePropagation();autoMix(b);return}
-   if(b.matches(".dca-groups button")){e.preventDefault();e.stopImmediatePropagation();dcaGroup(Number(b.dataset.dcagroup),b);return}
-   if(b.matches(".route-btn")){e.preventDefault();e.stopImmediatePropagation();route(b);return}
-   if(b.matches(".usb-route-btn")){e.preventDefault();e.stopImmediatePropagation();usb(b);return}
+   if(b.matches(".dca-btn")){e.preventDefault();e.stopImmediatePropagation();toggleDca(Number(b.dataset.dca),b);return}
+   if(b.matches(".mute-groups button")){e.preventDefault();e.stopImmediatePropagation();toggleMute(Number(b.dataset.group),b);return}
+   if(b.matches(".dca-groups button")){e.preventDefault();e.stopImmediatePropagation();toggleDcaGroup(Number(b.dataset.dcagroup),b);return}
+   if(b.matches(".auto-option")){e.preventDefault();e.stopImmediatePropagation();autoToggle(b);return}
+   const txt=b.textContent.trim();
+   if(txt==="↶ UNDO"){e.preventDefault();e.stopImmediatePropagation();undo();return}
+   if(txt==="↷ REDO"){e.preventDefault();e.stopImmediatePropagation();redo();return}
+   if(b.matches(".lock-row button")){e.preventDefault();e.stopImmediatePropagation();const on=!isLocked();window.__mixerLiveLocked=on;document.body.classList.toggle("mixer-locked",on);try{localStorage.setItem("mixer-live-locked",on?"1":"0")}catch{}render();notify(on?"LIVE PROTECTION ON • CONTROLS LOCKED":"LIVE PROTECTION OFF • CONTROLS UNLOCKED",on);return}
+   if(b.matches(".mapper-row button:nth-of-type(1)")){e.preventDefault();e.stopImmediatePropagation();mapper();return}
+   if(b.matches(".mapper-row button:nth-of-type(2)")){e.preventDefault();e.stopImmediatePropagation();autoMap();return}
  },true);
- p.addEventListener("input",e=>{const x=e.target;if(x.matches(".bus-master input[type=range]")){const i=qa(".bus-master input[type=range]").indexOf(x);busFader(x,i)}else if(["fxDelay","fxFeedback","fxWet"].includes(x.id))fx(x.id)},true);
- p.addEventListener("change",e=>{const x=e.target;if(x.id==="fxPreset"){e.stopImmediatePropagation();fxPreset()}else if(x.id==="fxType"){e.stopImmediatePropagation();send("FX 1","type",x.value);say("FX 1 TYPE "+String(x.value).toUpperCase()+" ON",true)}else if(x.matches(".routing-block select")){e.stopImmediatePropagation();output(x,qa(".routing-block select").indexOf(x))}},true);
- scenes();
- // Initial visual state.
- qa(".dca-btn,.mute-groups button,.dca-groups button,.route-btn,.usb-route-btn,.auto-option").forEach(b=>lamp(b,b.classList.contains("indicator-active")));
- qa(".bus-master input[type=range]").forEach((x,i)=>busFader(x,i));
+ // Capture before normal changes so history has a real previous state.
+ p.addEventListener("pointerdown",e=>{const b=e.target.closest("button");if(!b||!p.contains(b))return;if(b.matches(".dca-btn,.mute-groups button,.dca-groups button,.auto-option,.lock-row button,.mapper-row button"))return;},true);
+ try{window.__mixerLiveLocked=localStorage.getItem("mixer-live-locked")==="1"}catch{}
+ render();refreshAudio();
 }
-if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(install,220),{once:true});else setTimeout(install,220);
-window.addEventListener("load",()=>setTimeout(install,220));
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(install,180),{once:true});else setTimeout(install,180);
+window.addEventListener("load",()=>setTimeout(install,180));
 })();
