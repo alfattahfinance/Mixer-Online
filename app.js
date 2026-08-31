@@ -90,7 +90,16 @@ function routeMusicChannel(){if(!state.ctx||!state.mixBus)return;try{state.mixBu
 function applyHardwareTestToChannel(ch,control,value){const c=state.channels?.[Number(ch)-1];if(!c)return false;const v=Number(value)>0;if(control==="mute"||control==="solo"){const cls=control==="mute"?"muted":"soloed";c.classList.toggle(cls,v);if(control==="mute"){c.querySelectorAll(".mute,.topmute").forEach(b=>b.textContent=v?"UNMUTE":"MUTE");}else{if(v)state.solo.add(Number(ch));else state.solo.delete(Number(ch));c.querySelector(".solo")?.setAttribute("aria-pressed",v?"true":"false");}updateChannelAudio(c);if(control==="solo")state.channels.forEach(updateChannelAudio);send(Number(ch),control,v?1:0);return true}if(control==="fader"){const input=c.querySelector(".fader");if(!input)return false;input.value=Math.round(Number(value));input.dispatchEvent(new Event("input",{bubbles:true}));return true}if(control==="gain"||control==="pan"){const knob=c.querySelector(control==="gain"?".gainKnob":".panKnob");if(!knob)return false;const v=Number(value);knob.dataset.value=String(v);const max=control==="gain"?2:1;const min=control==="gain"?0:-1;const norm=(v-min)/(max-min);knob.style.setProperty("--rot",(-135+norm*270)+"deg");updateChannelAudio(c);return true}if(control==="low"||control==="mid"||control==="high"){c.dataset[control]=String(Number(value));return true}return false}
 
 function send(channel,control,value){const ch=String(channel);const target=ch==="MASTER"?"MASTER":/^CH\s*\d+$/i.test(ch)?ch:ch;return window.MixerControl?.setControl?.(target,control,value)}
-function updateChannelAudio(c){const f=Number(c.querySelector(".fader")?.value||0)/100,g=Number(c.querySelector(".gainKnob")?.dataset.value||1)/2,muted=c.classList.contains("muted"),soloed=c.classList.contains("soloed"),hasSolo=state.solo.size>0;const level=(muted||(hasSolo&&!soloed))?0:f*g;if(c._gain)c._gain.gain.value=level}
+function updateChannelAudio(c){
+ const n=Number(c.dataset.channel)||0,f=Number(c.querySelector(".fader")?.value||0)/100,g=Number(c.querySelector(".gainKnob")?.dataset.value||1)/2;
+ const muted=c.classList.contains("muted")||state.muteGroups?.has(n);
+ const soloed=c.classList.contains("soloed"), dcaSolo=state.dcaSolo?.has(n);
+ const hasSolo=state.solo.size>0, hasDca=state.dcaSolo?.size>0;
+ const level=(muted||(hasSolo&&!soloed)||(hasDca&&!dcaSolo))?0:f*g;
+ if(c._gain)c._gain.gain.value=level;
+ c.classList.toggle("group-muted",!!state.muteGroups?.has(n));
+ c.classList.toggle("dca-soloed",!!dcaSolo);
+}
 function paintKnob(k,type,v){const min=type==="gain"?0:-1,max=type==="gain"?2:1,n=(v-min)/(max-min),rot=-135+n*270;k.style.setProperty("--rot",rot+"deg");k.style.setProperty("--knob-fill",Math.max(0,Math.min(270,n*270))+"deg");k.setAttribute("aria-valuenow",String(v));const out=k.parentElement?.querySelector(".knob-value");if(out)out.textContent=type==="gain"?(v<=0?"−∞":(20*Math.log10(v)).toFixed(1)+" dB"):(Math.abs(v)<.005?"C":v<0?"L "+Math.round(Math.abs(v)*100)+"%":"R "+Math.round(v*100)+"%")}
 function setChannelKnob(c,type,v){const k=c.querySelector(type==="gain"?".gainKnob":".panKnob");if(!k)return;v=type==="gain"?clamp(Number(v)||0,0,2):clamp(Number(v)||0,-1,1);k.dataset.value=String(v);paintKnob(k,type,v);send(Number(c.dataset.channel),type,v);updateChannelAudio(c)}
 function knobDrag(e,c,type){e.preventDefault();const k=e.currentTarget,start=Number(k.dataset.value??(type==="gain"?1:0)),startY=e.clientY;const move=ev=>{const d=(startY-ev.clientY)/110,v=type==="gain"?clamp(start+d,0,2):clamp(start+d,-1,1);setChannelKnob(c,type,v)};const up=()=>{removeEventListener("pointermove",move);removeEventListener("pointerup",up);removeEventListener("pointercancel",up)};addEventListener("pointermove",move);addEventListener("pointerup",up);addEventListener("pointercancel",up);k.setPointerCapture?.(e.pointerId);move(e)}
@@ -124,7 +133,12 @@ const audioBtn=$("#audioInputBtn");audioBtn?.addEventListener("click",()=>connec
 const mic=$("#phoneMic");mic?.addEventListener("click",()=>connectUsbAudio().catch(e=>status("MIC "+(e.message||"UNAVAILABLE"))));
 }
 async function connectUsbAudio(){if(!navigator.mediaDevices?.getUserMedia)throw Error("Audio input tidak tersedia");if(state.usbStream?.active){status("USB AUDIO READY");return state.usbStream}const devices=await navigator.mediaDevices.enumerateDevices();const ins=devices.filter(d=>d.kind==="audioinput");if(!ins.length)throw Error("USB/MIC input tidak ditemukan");const preferred=ins.find(d=>/usb|audio interface|line in|mic/i.test(d.label))||ins[0];const stream=await navigator.mediaDevices.getUserMedia({audio:{deviceId:{exact:preferred.deviceId},echoCancellation:false,noiseSuppression:false,autoGainControl:false}});state.usbStream=stream;state.usbSource=null;if(state.ctx){state.usbSource=state.ctx.createMediaStreamSource(stream);if(!state.usbAnalyser){state.usbAnalyser=state.ctx.createAnalyser();state.usbAnalyser.fftSize=256;state.usbAnalyser.smoothingTimeConstant=.72}state.usbSource.connect(state.usbAnalyser);state.usbAnalyser.connect(state.masterGain);if(state.ctx.state==="suspended")await state.ctx.resume()}state.usbDevice=preferred.label||"USB Audio";status("USB AUDIO READY");const box=document.querySelector(".usb-audio-box span");if(box)box.textContent=state.usbDevice+" • INPUT ACTIVE";return stream}
-function updateDcaValues(){document.querySelectorAll(".dca-btn").forEach(b=>{const n=Number(b.dataset.dca),chs=state.channels.filter(c=>{const x=Number(c.dataset.channel),s=(n-1)*4+1;return x>=s&&x<s+4}),avg=chs.length?chs.reduce((a,c)=>a+Number(c.querySelector(".fader")?.value||0),0)/chs.length:0,o=b.querySelector("output");if(o)o.value=(avg/100).toFixed(1)})}
+function updateDcaValues(){
+ document.querySelectorAll(".dca-btn").forEach(b=>{
+   const n=Number(b.dataset.dca),c=state.channels[n-1],o=b.querySelector("output");
+   if(o)o.value=c?(Number(c.querySelector(".fader")?.value||0)/100).toFixed(1):"0.0";
+ });
+}
 
 function bindNativeButtons(){if(window.NativeMedia){$("#phoneRecorder")?.addEventListener("pointerup",()=>NativeMedia.openRecorder());$("#phoneFiles")?.addEventListener("pointerup",()=>NativeMedia.openFiles());$("#phoneMusic")?.addEventListener("pointerup",()=>NativeMedia.openMusic())}}
 
