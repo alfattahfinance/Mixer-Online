@@ -37,7 +37,7 @@ function scene(action){
 function handle(e){const t=e.target,b=t.closest?.("button");if(!b)return;
  const p=b.closest(".dca");if(!p)return;
  let handled=false;
- if(b.matches(".dca-btn")){dca(Number(b.dataset.dca),b);handled=true}
+ if(b.matches(".dca-btn")){return}
  else if(b.matches(".mute-groups button")){mute(Number(b.dataset.group),b);handled=true}
  else if(b.matches(".dca-groups button")){dgroup(Number(b.dataset.dcagroup),b);handled=true}
  else if(b.matches(".auto-option")){auto(b);handled=true}
@@ -54,7 +54,17 @@ function boot(){
  document.addEventListener("pointerup",handle,true);
  document.addEventListener("mixer:state-changed",refresh);
  const s=st();if(s)sets(s);
- qa(".dca-btn").forEach(b=>lamp(b,st()?.dcaSolo?.has(Number(b.dataset.dca))));
+ qa(".dca-btn").forEach(b=>{
+   const n=Number(b.dataset.dca);
+   lamp(b,st()?.dcaSolo?.has(n));
+   if(b.dataset.authoritativeDcaBound==="1") return;
+   b.dataset.authoritativeDcaBound="1";
+   b.addEventListener("click",e=>{
+     e.preventDefault();
+     e.stopPropagation();
+     dca(n,b);
+   });
+ });
  qa(".mute-groups button").forEach(b=>lamp(b,st()?.muteGroups?.has(Number(b.dataset.group))));
  qa(".dca-groups button").forEach(b=>lamp(b,st()?.dcaGroups?.has(Number(b.dataset.dcagroup))));
 }
