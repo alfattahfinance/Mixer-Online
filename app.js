@@ -128,7 +128,7 @@ function routeMusicChannel(){
  state.channels.forEach(c=>{try{c._input?.disconnect()}catch(e){};try{c._gain?.disconnect()}catch(e){};try{c._pan?.disconnect()}catch(e){};if(!c._eq)c._eqValues=channelEqValues();rebuildChannelAudio(c)});
  const target=Number(String($("#musicChannel")?.value||"CH 1").replace(/\D/g,""))||1;
  const c=state.channels[target-1];
- if(c?. _input)state.mixBus.connect(c._input);
+ if(c?._input)state.mixBus.connect(c._input);
  if(state.usbSource&&c?._input){try{state.usbSource.disconnect()}catch(e){};state.usbSource.connect(c._input)}
  bindChannelEq();
  updateMeters();
