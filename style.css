@@ -379,3 +379,19 @@ html,body{overflow-x:auto}
 @media(max-width:420px){
  .channel .channel-gain-pan .knob{width:22px!important;height:22px!important;min-width:22px!important;min-height:22px!important}
 }
+
+/* CHANNEL GAIN/PAN TOUCH TARGET — visual stays compact */
+.channel .channel-gain-pan .knob{
+  position:relative!important;
+  width:24px!important;height:24px!important;
+  min-width:24px!important;min-height:24px!important;
+  max-width:30px!important;max-height:30px!important;
+  margin:2px auto!important;
+  padding:0!important;
+  touch-action:none!important;
+  pointer-events:auto!important;
+  -webkit-tap-highlight-color:transparent!important;
+}
+.channel .channel-gain-pan .knob::after{
+  content:"";position:absolute;inset:-9px;border-radius:50%;background:transparent;
+}
