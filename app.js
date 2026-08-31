@@ -131,6 +131,7 @@ function routeMusicChannel(){
  if(c?._input)state.mixBus.connect(c._input);
  if(state.usbSource&&c?._input){try{state.usbSource.disconnect()}catch(e){};state.usbSource.connect(c._input)}
  bindChannelEq();
+ updateNonChannelAudio();
  updateMeters();
 }
 function applyHardwareTestToChannel(ch,control,value){const c=state.channels?.[Number(ch)-1];if(!c)return false;const v=Number(value)>0;if(control==="mute"||control==="solo"){const cls=control==="mute"?"muted":"soloed";c.classList.toggle(cls,v);if(control==="mute"){c.querySelectorAll(".mute,.topmute").forEach(b=>b.textContent=v?"UNMUTE":"MUTE");}else{if(v)state.solo.add(Number(ch));else state.solo.delete(Number(ch));c.querySelector(".solo")?.setAttribute("aria-pressed",v?"true":"false");}updateChannelAudio(c);if(control==="solo")state.channels.forEach(updateChannelAudio);send(Number(ch),control,v?1:0);return true}if(control==="fader"){const input=c.querySelector(".fader");if(!input)return false;input.value=Math.round(Number(value));input.dispatchEvent(new Event("input",{bubbles:true}));return true}if(control==="gain"||control==="pan"){const knob=c.querySelector(control==="gain"?".gainKnob":".panKnob");if(!knob)return false;const v=Number(value);knob.dataset.value=String(v);const max=control==="gain"?2:1;const min=control==="gain"?0:-1;const norm=(v-min)/(max-min);knob.style.setProperty("--rot",(-135+norm*270)+"deg");updateChannelAudio(c);return true}if(control==="low"||control==="mid"||control==="high"){c.dataset[control]=String(Number(value));return true}return false}
