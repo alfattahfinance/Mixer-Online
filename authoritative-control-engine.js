@@ -52,6 +52,7 @@ function handle(e){const t=e.target,b=t.closest?.("button");if(!b)return;
 function boot(){
  try{window.__mixerLiveLocked=localStorage.getItem("mixer-online-live-lock")==="1"}catch{}
  document.addEventListener("pointerup",handle,true);
+ document.addEventListener("mixer:state-changed",refresh);
  const s=st();if(s)sets(s);
  qa(".dca-btn").forEach(b=>lamp(b,st()?.dcaSolo?.has(Number(b.dataset.dca))));
  qa(".mute-groups button").forEach(b=>lamp(b,st()?.muteGroups?.has(Number(b.dataset.group))));
