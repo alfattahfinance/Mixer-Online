@@ -120,6 +120,12 @@ function autoMap(){
 }
 function install(){
  const p=panel();if(!p||p.dataset.v16==="1")return;p.dataset.v16="1";
+ // Mixer-Online hardware profile used here is fixed to 16 channels.
+ // Rebuild only when the channel rack is not CH1–CH16.
+ const s=ensureSets();
+ if(s && s.channelCount!==16 && typeof window.MixerOnline?.buildChannels==="function"){
+   try{window.MixerOnline.buildChannels(16);s.channelCount=16}catch{}
+ }
  make16(".dca-grid","data-dca","dca-btn");make16(".mute-groups","data-group","mute-btn");make16(".dca-groups","data-dcagroup","dca-group-btn");
  // Normalize classes so the existing CSS remains intact.
  QA(".mute-groups button").forEach(b=>b.classList.add("group-btn"));
