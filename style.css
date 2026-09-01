@@ -780,3 +780,32 @@ main.console{width:100%;min-width:0}
 
 /* Portrait/tablet/mobile: keep the existing responsive behavior; this rule only
    controls the desktop/landscape split requested above. */
+
+
+/* === 16CH SPLIT RENDER SAFETY === */
+@media (orientation:landscape) and (min-width:900px){
+  .channel-bank-left>#channels,
+  .channel-bank-right>#channelsRight{
+    display:grid!important;
+    grid-template-columns:repeat(8,minmax(0,1fr))!important;
+    grid-template-rows:auto!important;
+    grid-auto-flow:column!important;
+    align-items:stretch!important;
+    height:auto!important;
+    min-height:690px!important;
+    overflow:hidden!important;
+  }
+  .channel-bank-left .channel,
+  .channel-bank-right .channel{
+    display:flex!important;
+    min-height:680px!important;
+    height:auto!important;
+    visibility:visible!important;
+  }
+  .channel-bank-left .channel[data-ch="17"],
+  .channel-bank-left .channel[data-ch="18"],
+  .channel-bank-right .channel[data-ch="17"],
+  .channel-bank-right .channel[data-ch="18"]{
+    display:none!important;
+  }
+}
