@@ -454,3 +454,43 @@ main.console{width:100%;min-width:0}
   .channel .knob-wrap{min-width:54px;min-height:54px}
   .channel input.fader{height:175px}
 }
+
+
+/* === CHANNEL STRIP PHYSICAL ORDER === */
+/* Physical mixer order: GAIN → LOW → MID → HIGH → PAN → VOLUME → MUTE → SOLO. */
+.channel .fader-section{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  margin-top:3px;
+  padding-top:2px;
+  border-top:1px solid #252a2d;
+}
+.channel .fader-label{
+  display:block;
+  width:100%;
+  color:#aeb7ba;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.06em;
+  margin-bottom:1px;
+}
+.channel .fader-section output{
+  display:block;
+  margin:0 0 3px;
+}
+.channel input.fader{
+  margin:4px auto 1px;
+  flex:0 0 auto;
+}
+@media (min-width:1201px){
+  .channel{min-height:790px}
+}
+@media (orientation:landscape) and (min-width:1201px) and (max-height:800px){
+  .channel{min-height:735px}
+}
+@media (max-width:1200px){
+  .channel{min-height:750px}
+}
