@@ -890,3 +890,72 @@ main.console{width:100%;min-width:0}
     min-width: 58px !important;
   }
 }
+
+
+/* === REBUILD CH10–CH18 POSITION (LANDSCAPE) ===
+   Layout only: CH1–CH9 | MIXER SCREEN | CH10–CH18.
+   Engine/protocol/control behavior remains untouched.
+*/
+@media (orientation: landscape) and (min-width: 700px) {
+  #channels.channel-layout {
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) clamp(300px,28vw,390px) minmax(0,1fr) !important;
+    grid-template-rows:auto auto !important;
+    grid-template-areas:"left center right" "bottom bottom bottom" !important;
+    gap:7px !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    align-items:start !important;
+    box-sizing:border-box !important;
+  }
+  #channels.channel-layout > .channel-bank-left {
+    grid-area:left !important; grid-column:1 !important; grid-row:1 !important;
+    width:100% !important; min-width:0 !important; max-width:100% !important;
+    overflow:hidden !important;
+  }
+  #channels.channel-layout > .center-console {
+    grid-area:center !important; grid-column:2 !important; grid-row:1 !important;
+    width:100% !important; min-width:0 !important; max-width:100% !important;
+    margin:0 !important; overflow:hidden !important; box-sizing:border-box !important;
+  }
+  #channels.channel-layout > .channel-bank-right {
+    grid-area:right !important; grid-column:3 !important; grid-row:1 !important;
+    width:100% !important; min-width:0 !important; max-width:100% !important;
+    margin:0 !important; overflow:hidden !important; align-self:start !important;
+    box-sizing:border-box !important;
+  }
+  #channels.channel-layout > .channel-bank-left .channel-side,
+  #channels.channel-layout > .channel-bank-right .channel-side {
+    display:grid !important;
+    grid-template-columns:repeat(9,minmax(62px,1fr)) !important;
+    gap:2px !important; width:100% !important; max-width:100% !important;
+    min-width:0 !important; padding:3px !important; box-sizing:border-box !important;
+    overflow-x:auto !important; overflow-y:hidden !important;
+    touch-action:pan-x !important; overscroll-behavior-x:contain !important;
+    -webkit-overflow-scrolling:touch !important;
+  }
+  #channels.channel-layout > .channel-bank-left .channel,
+  #channels.channel-layout > .channel-bank-right .channel {
+    width:auto !important; min-width:62px !important; max-width:none !important;
+    box-sizing:border-box !important;
+  }
+  #channels.channel-layout > .master-rack {
+    grid-area:bottom !important; grid-column:1 / -1 !important; grid-row:2 !important;
+    width:100% !important; min-width:0 !important; max-width:100% !important;
+  }
+}
+
+/* Wide landscape: nine channels fit on each side without horizontal scrolling. */
+@media (orientation: landscape) and (min-width: 1350px) {
+  #channels.channel-layout {
+    grid-template-columns:minmax(0,1fr) minmax(340px,380px) minmax(0,1fr) !important;
+  }
+  #channels.channel-layout > .channel-bank-left .channel-side,
+  #channels.channel-layout > .channel-bank-right .channel-side {
+    grid-template-columns:repeat(9,minmax(0,1fr)) !important;
+    overflow-x:hidden !important;
+  }
+  #channels.channel-layout > .channel-bank-left .channel,
+  #channels.channel-layout > .channel-bank-right .channel { min-width:0 !important; }
+}
