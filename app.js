@@ -200,7 +200,6 @@ function bindEffectEngine(){
     if(x.dataset.scope==="FX_RETURN")sendReturnControl(x.dataset.target,x.value);else sendAuxControl(x.dataset.target,x.value);
   }));
   $("fxTap")?.addEventListener("click",e=>{e.preventDefault();tapEffectTempo()});
-  $("screenFxTap")?.addEventListener("click",e=>{e.preventDefault();tapEffectTempo()});
   $("screenFxSelect")?.addEventListener("change",e=>chooseFx(e.target.value));
   $("screenFxPreset")?.addEventListener("change",e=>choosePreset(e.target.value));
   $("screenFxType")?.addEventListener("change",e=>{activeFx().type=e.target.value;updateEffectUI();send({type:"CONTROL",scope:"FX",target:state.effects.selected,param:"type",value:e.target.value})});
