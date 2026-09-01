@@ -729,3 +729,59 @@ main.console{width:100%;min-width:0}
 #channels.channel-layout > .master-rack{grid-area:bottom!important;grid-column:auto!important;grid-row:auto!important;width:100%!important;}
 @media (orientation:landscape) and (min-width:700px){#channels.channel-layout{grid-template-columns:minmax(0,1fr) clamp(260px,28vw,390px) minmax(0,1fr)!important;grid-template-areas:"left center right" "bottom bottom bottom"!important;}#channels.channel-layout > .channel-bank-left .channel-side,#channels.channel-layout > .channel-bank-right .channel-side{grid-template-columns:repeat(9,minmax(58px,1fr))!important;overflow-x:auto!important;overflow-y:hidden!important;}#channels.channel-layout > .channel-bank-left .channel,#channels.channel-layout > .channel-bank-right .channel{min-width:58px!important;}}
 @media (orientation:landscape) and (min-width:1350px){#channels.channel-layout > .channel-bank-left .channel-side,#channels.channel-layout > .channel-bank-right .channel{grid-template-columns:repeat(9,minmax(0,1fr))!important;overflow:hidden!important;}#channels.channel-layout > .channel-bank-left .channel,#channels.channel-layout > .channel-bank-right .channel{min-width:0!important;}}
+
+
+/* === CH10-CH18 FINAL MATCH: mirror CH1-CH9 layout exactly === */
+#channels.channel-layout > .channel-bank-left,
+#channels.channel-layout > .channel-bank-right{
+  align-self:start!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  overflow:hidden!important;
+}
+#channels.channel-layout > .channel-bank-left .channel-side,
+#channels.channel-layout > .channel-bank-right .channel-side{
+  display:grid!important;
+  grid-template-columns:repeat(9,minmax(0,1fr))!important;
+  grid-template-rows:1fr!important;
+  grid-auto-flow:column!important;
+  grid-auto-columns:auto!important;
+  gap:2px!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  padding:3px!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+#channels.channel-layout > .channel-bank-left .channel,
+#channels.channel-layout > .channel-bank-right .channel{
+  grid-row:1!important;
+  grid-column:auto!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+}
+#channels.channel-layout > .channel-bank-right .channel-side{
+  direction:ltr!important;
+}
+@media (orientation:landscape) and (min-width:900px){
+  #channels.channel-layout{
+    grid-template-columns:minmax(0,1fr) 390px minmax(0,1fr)!important;
+    grid-template-areas:"left center right" "bottom bottom bottom"!important;
+  }
+}
+@media (orientation:landscape) and (min-width:700px) and (max-width:899px){
+  #channels.channel-layout{
+    grid-template-columns:minmax(0,1fr) clamp(270px,31vw,330px) minmax(0,1fr)!important;
+    grid-template-areas:"left center right" "bottom bottom bottom"!important;
+  }
+  #channels.channel-layout > .channel-bank-left .channel-side,
+  #channels.channel-layout > .channel-bank-right .channel-side{
+    grid-template-columns:repeat(9,minmax(0,1fr))!important;
+    overflow:hidden!important;
+  }
+}
