@@ -571,478 +571,150 @@ main.console{width:100%;min-width:0}
 .status-head strong{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .status-head small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* --- CENTERED SPLIT CHANNEL LAYOUT: SKIN ONLY --- */
-.console{display:block;padding:7px}
-.channel-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,390px) minmax(0,1fr);grid-template-areas:"left center right" "bottom bottom bottom";gap:7px;align-items:start}
-.channel-bank-left{grid-area:left}
-.center-console{grid-area:center;min-width:0}
-.channel-bank-right{grid-area:right}
-.channel-bank{min-width:0;overflow:hidden}
-.channel-bank>#channels,.channel-side{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:2px;padding:3px;overflow:hidden}
-.channel-bank .channel-side .channel{min-width:0;width:100%}
-.channel-bank .channel{min-height:690px}
-.master-rack{grid-area:bottom;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:7px;align-items:stretch;padding:7px}
-.master-rack .meter-rack,.master-rack .master-card,.master-rack .monitor-card,.master-rack .phones-card{min-height:150px}
-.master-rack .master-card input{height:190px}
-.master-rack .meter{height:100px}
-@media(max-width:1200px) and (min-width:901px){
-  .channel-layout{grid-template-columns:minmax(0,1fr) minmax(330px,360px) minmax(0,1fr)}
-  .channel-bank>#channels,.channel-side{grid-template-columns:repeat(9,minmax(54px,1fr))}
-  .channel-bank .channel{padding-left:2px;padding-right:2px}
-  .channel input.fader{height:170px}
-  .channel .knob-wrap{transform:scale(.9)}
-}
-@media(max-width:900px){
-  .channel-layout{grid-template-columns:1fr;grid-template-areas:"left" "center" "right" "bottom"}
-  .channel-bank>#channels,.channel-side{grid-template-columns:repeat(9,minmax(62px,1fr));overflow-x:auto}
-  .channel-bank .channel{min-width:62px}
-  .center-console{width:100%}
-  .master-rack{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media(orientation:landscape) and (max-width:1200px) and (min-width:901px){
-  .channel-layout{grid-template-columns:minmax(0,1fr) minmax(320px,350px) minmax(0,1fr)}
-  .channel-bank .channel{min-height:640px}
-  .channel input.fader{height:155px}
-  .channel .knob-wrap{transform:scale(.84)}
+
+/* === SINGLE SOURCE OF TRUTH: SPLIT 18CH LAYOUT ===
+   CH1-CH9 | MIXER SCREEN | CH10-CH18
+   Layout/skin only. Channel engine and CONTROL/TX/ACK/FEEDBACK code untouched.
+   IMPORTANT: keep only this block for the split layout to prevent CSS collisions.
+*/
+.console{
+  display:block;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  padding:7px;
 }
 
-/* === LANDSCAPE FIX: CH10-CH18 MUST STAY RIGHT OF CENTER === */
-@media (orientation:landscape) and (min-width:901px){
+#channels.channel-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(300px,28vw) minmax(0,1fr);
+  grid-template-rows:auto auto;
+  grid-template-areas:"left center right" "bottom bottom bottom";
+  gap:7px;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  align-items:start;
+}
+
+#channels.channel-layout > .channel-bank-left{grid-area:left}
+#channels.channel-layout > .center-console{grid-area:center;min-width:0;width:100%;max-width:100%;box-sizing:border-box}
+#channels.channel-layout > .channel-bank-right{grid-area:right}
+#channels.channel-layout > .master-rack{
+  grid-area:bottom;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  box-sizing:border-box;
+}
+
+/* Both channel banks are identical: exactly 9 equal strips each. */
+#channels.channel-layout > .channel-bank-left,
+#channels.channel-layout > .channel-bank-right{
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  overflow:hidden;
+  box-sizing:border-box;
+}
+
+#channels.channel-layout > .channel-bank-left .channel-side,
+#channels.channel-layout > .channel-bank-right .channel-side{
+  display:grid;
+  grid-template-columns:repeat(9,minmax(0,1fr));
+  grid-auto-columns:auto;
+  gap:2px;
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  padding:3px;
+  overflow:hidden;
+  box-sizing:border-box;
+}
+
+#channels.channel-layout > .channel-bank-left .channel,
+#channels.channel-layout > .channel-bank-right .channel{
+  width:100%;
+  min-width:0;
+  max-width:none;
+  margin:0;
+  box-sizing:border-box;
+}
+
+#channels.channel-layout > .master-rack{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:7px;
+  align-items:stretch;
+  padding:7px;
+}
+
+#channels.channel-layout > .master-rack .meter-rack,
+#channels.channel-layout > .master-rack .master-card,
+#channels.channel-layout > .master-rack .monitor-card,
+#channels.channel-layout > .master-rack .phones-card{
+  min-width:0;
+}
+
+/* Landscape tablet/phone: preserve the 3-column composition.
+   Banks scroll internally only when nine strips cannot fit comfortably. */
+@media (orientation:landscape) and (min-width:700px){
   #channels.channel-layout{
-    display:grid !important;
-    grid-template-columns:minmax(0,1fr) minmax(300px,340px) minmax(0,1fr) !important;
-    grid-template-rows:auto auto !important;
-    grid-template-areas:"left center right" "bottom bottom bottom" !important;
-    align-items:start !important;
-    width:100% !important;
-    min-width:0 !important;
-  }
-  #channels.channel-layout > .channel-bank-left{
-    grid-area:left !important;
-    grid-column:1 !important;
-    grid-row:1 !important;
-  }
-  #channels.channel-layout > .center-console{
-    grid-area:center !important;
-    grid-column:2 !important;
-    grid-row:1 !important;
-  }
-  #channels.channel-layout > .channel-bank-right{
-    grid-area:right !important;
-    grid-column:3 !important;
-    grid-row:1 !important;
-    align-self:start !important;
-    margin-top:0 !important;
-  }
-  #channels.channel-layout > .master-rack{
-    grid-area:bottom !important;
-    grid-column:1 / -1 !important;
-    grid-row:2 !important;
-  }
-  #channels.channel-layout .channel-side{
-    display:grid !important;
-    grid-template-columns:repeat(9,minmax(0,1fr)) !important;
-    width:100% !important;
-    min-width:0 !important;
-    overflow:hidden !important;
-  }
-  #channels.channel-layout .channel-side .channel{
-    min-width:0 !important;
-    width:100% !important;
-  }
-}
-
-
-/* === CH10-CH18 LANDSCAPE RESPONSIVE FINAL FIX ===
-   Keep the split layout: CH1-9 | MIXER SCREEN | CH10-18.
-   Each bank owns its width; channels never push the center or right bank off-screen.
-*/
-@media (orientation: landscape) and (min-width: 901px) {
-  #channels.channel-layout {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) minmax(300px, 340px) minmax(0, 1fr) !important;
-    grid-template-areas: "left center right" "bottom bottom bottom" !important;
-    gap: 7px !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    overflow: visible !important;
-  }
-
-  #channels.channel-layout > .channel-bank-left,
-  #channels.channel-layout > .channel-bank-right,
-  #channels.channel-layout > .center-console,
-  #channels.channel-layout > .master-rack {
-    min-width: 0 !important;
-    max-width: 100% !important;
-  }
-
-  #channels.channel-layout > .channel-bank-left {
-    grid-area: left !important;
-    grid-column: 1 !important;
-    grid-row: 1 !important;
-  }
-
-  #channels.channel-layout > .center-console {
-    grid-area: center !important;
-    grid-column: 2 !important;
-    grid-row: 1 !important;
-  }
-
-  #channels.channel-layout > .channel-bank-right {
-    grid-area: right !important;
-    grid-column: 3 !important;
-    grid-row: 1 !important;
-    margin: 0 !important;
-    align-self: start !important;
-  }
-
-  #channels.channel-layout > .master-rack {
-    grid-area: bottom !important;
-    grid-column: 1 / -1 !important;
-    grid-row: 2 !important;
-  }
-
-  /* CRITICAL: each side is an independent 9-channel strip.
-     It may scroll horizontally inside its own bank, but cannot widen the page. */
-  #channels.channel-layout > .channel-bank-left .channel-side,
-  #channels.channel-layout > .channel-bank-right .channel-side {
-    display: grid !important;
-    grid-template-columns: repeat(9, minmax(62px, 1fr)) !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    gap: 2px !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    overscroll-behavior-x: contain !important;
-    -webkit-overflow-scrolling: touch !important;
-    touch-action: pan-x !important;
-    scrollbar-width: thin !important;
-  }
-
-  #channels.channel-layout > .channel-bank-left .channel,
-  #channels.channel-layout > .channel-bank-right .channel {
-    width: auto !important;
-    min-width: 62px !important;
-    max-width: none !important;
-  }
-
-  #channels.channel-layout > .channel-bank-left,
-  #channels.channel-layout > .channel-bank-right {
-    overflow: hidden !important;
-  }
-}
-
-/* Tablet landscape: give CH10-18 the same usable width as CH1-9. */
-@media (orientation: landscape) and (min-width: 901px) and (max-width: 1200px) {
-  #channels.channel-layout {
-    grid-template-columns: minmax(0, 1fr) minmax(290px, 320px) minmax(0, 1fr) !important;
-  }
-
-  #channels.channel-layout > .channel-bank-left .channel-side,
-  #channels.channel-layout > .channel-bank-right .channel-side {
-    grid-template-columns: repeat(9, minmax(58px, 1fr)) !important;
-  }
-
-  #channels.channel-layout > .channel-bank-left .channel,
-  #channels.channel-layout > .channel-bank-right .channel {
-    min-width: 58px !important;
-  }
-}
-
-/* Large landscape: allow all 9 channels to fit naturally when there is room. */
-@media (orientation: landscape) and (min-width: 1201px) {
-  #channels.channel-layout {
-    grid-template-columns: minmax(0, 1fr) minmax(330px, 380px) minmax(0, 1fr) !important;
-  }
-
-  #channels.channel-layout > .channel-bank-left .channel-side,
-  #channels.channel-layout > .channel-bank-right .channel-side {
-    grid-template-columns: repeat(9, minmax(64px, 1fr)) !important;
-  }
-
-  #channels.channel-layout > .channel-bank-left .channel,
-  #channels.channel-layout > .channel-bank-right .channel {
-    min-width: 64px !important;
-  }
-}
-
-
-/* === FINAL SPLIT ALIGNMENT: CH10–CH18 ===
-   Landscape: CH1–CH9 | MIXER SCREEN | CH10–CH18.
-   This is layout-only; channel/engine/protocol code is untouched.
-*/
-@media (orientation: landscape) and (min-width: 600px) {
-  html, body {
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    overflow-x: hidden;
-  }
-
-  .console {
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    box-sizing: border-box !important;
-    padding: 6px !important;
-  }
-
-  #channels.channel-layout {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) minmax(280px, 26vw) minmax(0, 1fr) !important;
-    grid-template-rows: auto auto !important;
-    grid-template-areas: "left center right" "bottom bottom bottom" !important;
-    column-gap: 6px !important;
-    row-gap: 7px !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    box-sizing: border-box !important;
-    align-items: start !important;
-  }
-
-  #channels.channel-layout > .channel-bank-left {
-    grid-area: left !important;
-    grid-column: 1 !important;
-    grid-row: 1 !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    overflow: hidden !important;
-  }
-
-  #channels.channel-layout > .center-console {
-    grid-area: center !important;
-    grid-column: 2 !important;
-    grid-row: 1 !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    overflow: hidden !important;
-    box-sizing: border-box !important;
-  }
-
-  #channels.channel-layout > .channel-bank-right {
-    grid-area: right !important;
-    grid-column: 3 !important;
-    grid-row: 1 !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    overflow: hidden !important;
-    align-self: start !important;
-    box-sizing: border-box !important;
-  }
-
-  #channels.channel-layout > .master-rack {
-    grid-area: bottom !important;
-    grid-column: 1 / -1 !important;
-    grid-row: 2 !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-  }
-
-  /* Both banks use exactly the same strip geometry. */
-  #channels.channel-layout > .channel-bank-left .channel-side,
-  #channels.channel-layout > .channel-bank-right .channel-side {
-    display: grid !important;
-    grid-template-columns: repeat(9, minmax(64px, 1fr)) !important;
-    gap: 2px !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    padding: 3px !important;
-    box-sizing: border-box !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    touch-action: pan-x !important;
-    overscroll-behavior-x: contain !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-
-  #channels.channel-layout > .channel-bank-left .channel,
-  #channels.channel-layout > .channel-bank-right .channel {
-    width: auto !important;
-    min-width: 64px !important;
-    max-width: none !important;
-    box-sizing: border-box !important;
-  }
-}
-
-/* Smaller landscape screens: keep the three columns, allow each bank to scroll internally. */
-@media (orientation: landscape) and (min-width: 600px) and (max-width: 900px) {
-  #channels.channel-layout {
-    grid-template-columns: minmax(0, 1fr) minmax(230px, 30vw) minmax(0, 1fr) !important;
-  }
-
-  #channels.channel-layout > .channel-bank-left .channel-side,
-  #channels.channel-layout > .channel-bank-right .channel-side {
-    grid-template-columns: repeat(9, minmax(58px, 1fr)) !important;
-  }
-
-  #channels.channel-layout > .channel-bank-left .channel,
-  #channels.channel-layout > .channel-bank-right .channel {
-    min-width: 58px !important;
-  }
-}
-
-
-/* === REBUILD CH10–CH18 POSITION (LANDSCAPE) ===
-   Layout only: CH1–CH9 | MIXER SCREEN | CH10–CH18.
-   Engine/protocol/control behavior remains untouched.
-*/
-@media (orientation: landscape) and (min-width: 700px) {
-  #channels.channel-layout {
-    display:grid !important;
-    grid-template-columns:minmax(0,1fr) clamp(300px,28vw,390px) minmax(0,1fr) !important;
-    grid-template-rows:auto auto !important;
-    grid-template-areas:"left center right" "bottom bottom bottom" !important;
-    gap:7px !important;
-    width:100% !important;
-    max-width:100% !important;
-    min-width:0 !important;
-    align-items:start !important;
-    box-sizing:border-box !important;
-  }
-  #channels.channel-layout > .channel-bank-left {
-    grid-area:left !important; grid-column:1 !important; grid-row:1 !important;
-    width:100% !important; min-width:0 !important; max-width:100% !important;
-    overflow:hidden !important;
-  }
-  #channels.channel-layout > .center-console {
-    grid-area:center !important; grid-column:2 !important; grid-row:1 !important;
-    width:100% !important; min-width:0 !important; max-width:100% !important;
-    margin:0 !important; overflow:hidden !important; box-sizing:border-box !important;
-  }
-  #channels.channel-layout > .channel-bank-right {
-    grid-area:right !important; grid-column:3 !important; grid-row:1 !important;
-    width:100% !important; min-width:0 !important; max-width:100% !important;
-    margin:0 !important; overflow:hidden !important; align-self:start !important;
-    box-sizing:border-box !important;
+    grid-template-columns:minmax(0,1fr) clamp(230px,28vw,380px) minmax(0,1fr);
   }
   #channels.channel-layout > .channel-bank-left .channel-side,
-  #channels.channel-layout > .channel-bank-right .channel-side {
-    display:grid !important;
-    grid-template-columns:repeat(9,minmax(62px,1fr)) !important;
-    gap:2px !important; width:100% !important; max-width:100% !important;
-    min-width:0 !important; padding:3px !important; box-sizing:border-box !important;
-    overflow-x:auto !important; overflow-y:hidden !important;
-    touch-action:pan-x !important; overscroll-behavior-x:contain !important;
-    -webkit-overflow-scrolling:touch !important;
+  #channels.channel-layout > .channel-bank-right .channel-side{
+    grid-template-columns:repeat(9,minmax(58px,1fr));
+    overflow-x:auto;
+    overflow-y:hidden;
+    touch-action:pan-x;
+    overscroll-behavior-x:contain;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:thin;
   }
   #channels.channel-layout > .channel-bank-left .channel,
-  #channels.channel-layout > .channel-bank-right .channel {
-    width:auto !important; min-width:62px !important; max-width:none !important;
-    box-sizing:border-box !important;
-  }
-  #channels.channel-layout > .master-rack {
-    grid-area:bottom !important; grid-column:1 / -1 !important; grid-row:2 !important;
-    width:100% !important; min-width:0 !important; max-width:100% !important;
+  #channels.channel-layout > .channel-bank-right .channel{
+    min-width:58px;
   }
 }
 
-/* Wide landscape: nine channels fit on each side without horizontal scrolling. */
-@media (orientation: landscape) and (min-width: 1350px) {
-  #channels.channel-layout {
-    grid-template-columns:minmax(0,1fr) minmax(340px,380px) minmax(0,1fr) !important;
-  }
-  #channels.channel-layout > .channel-bank-left .channel-side,
-  #channels.channel-layout > .channel-bank-right .channel-side {
-    grid-template-columns:repeat(9,minmax(0,1fr)) !important;
-    overflow-x:hidden !important;
-  }
-  #channels.channel-layout > .channel-bank-left .channel,
-  #channels.channel-layout > .channel-bank-right .channel { min-width:0 !important; }
-}
-
-
-/* === CHANNEL STRIP SIZE LOCK ===
-   CH1–CH9 and CH10–CH18 use exactly the same strip geometry.
-   Layout only; engine/control/protocol behavior untouched.
-*/
-@media (orientation: landscape) and (min-width: 700px) {
-  #channels.channel-layout > .channel-bank-left,
-  #channels.channel-layout > .channel-bank-right {
-    width:100% !important;
-    flex:none !important;
-    box-sizing:border-box !important;
-  }
-
-  #channels.channel-layout > .channel-bank-left .channel-side,
-  #channels.channel-layout > .channel-bank-right .channel-side {
-    display:grid !important;
-    grid-template-columns:repeat(9,minmax(0,1fr)) !important;
-    grid-auto-columns:auto !important;
-    gap:2px !important;
-    padding:3px !important;
-    width:100% !important;
-    min-width:0 !important;
-    max-width:100% !important;
-    box-sizing:border-box !important;
-  }
-
-  #channels.channel-layout > .channel-bank-left .channel,
-  #channels.channel-layout > .channel-bank-right .channel {
-    width:100% !important;
-    min-width:0 !important;
-    max-width:none !important;
-    margin:0 !important;
-    box-sizing:border-box !important;
-  }
-}
-
-
-/* === FINAL VIEWPORT LAYOUT LOCK: CH1-9 | MIXER | CH10-18 ===
-   Layout-only. Engine/control/TX/ACK/FEEDBACK untouched.
-   Uses viewport width so Android Chrome landscape cannot fall back
-   to the stacked mobile rule.
-*/
-@media (min-width:901px){
+/* Wide landscape: fit all 9 strips on both sides with no horizontal bank scroll. */
+@media (orientation:landscape) and (min-width:1350px){
   #channels.channel-layout{
-    display:grid!important;
-    grid-template-columns:minmax(0,1fr) clamp(300px,28vw,390px) minmax(0,1fr)!important;
-    grid-template-rows:auto auto!important;
-    grid-template-areas:"left center right" "bottom bottom bottom"!important;
-    gap:7px!important;
-    width:100%!important;
-    max-width:100%!important;
-    min-width:0!important;
-    box-sizing:border-box!important;
-    align-items:start!important;
+    grid-template-columns:minmax(0,1fr) clamp(340px,28vw,390px) minmax(0,1fr);
   }
-  #channels.channel-layout>.channel-bank-left{grid-area:left!important;grid-column:1!important;grid-row:1!important;}
-  #channels.channel-layout>.center-console{grid-area:center!important;grid-column:2!important;grid-row:1!important;}
-  #channels.channel-layout>.channel-bank-right{grid-area:right!important;grid-column:3!important;grid-row:1!important;}
-  #channels.channel-layout>.master-rack{grid-area:bottom!important;grid-column:1/-1!important;grid-row:2!important;}
-
-  #channels.channel-layout>.channel-bank-left,
-  #channels.channel-layout>.channel-bank-right,
-  #channels.channel-layout>.center-console,
-  #channels.channel-layout>.master-rack{
-    width:100%!important;min-width:0!important;max-width:100%!important;
-    margin:0!important;box-sizing:border-box!important;
+  #channels.channel-layout > .channel-bank-left .channel-side,
+  #channels.channel-layout > .channel-bank-right .channel{
+    grid-template-columns:repeat(9,minmax(0,1fr));
+    overflow:hidden;
   }
-
-  #channels.channel-layout>.channel-bank-left .channel-side,
-  #channels.channel-layout>.channel-bank-right .channel-side{
-    display:grid!important;
-    grid-template-columns:repeat(9,minmax(0,1fr))!important;
-    grid-auto-columns:unset!important;
-    gap:2px!important;
-    width:100%!important;min-width:0!important;max-width:100%!important;
-    overflow:hidden!important;
-    box-sizing:border-box!important;
-  }
-
-  #channels.channel-layout>.channel-bank-left .channel,
-  #channels.channel-layout>.channel-bank-right .channel{
-    width:100%!important;min-width:0!important;max-width:none!important;
-    margin:0!important;box-sizing:border-box!important;
+  #channels.channel-layout > .channel-bank-left .channel,
+  #channels.channel-layout > .channel-bank-right .channel{
+    min-width:0;
   }
 }
-/* === END FINAL VIEWPORT LAYOUT LOCK === */
+
+/* Portrait: stack naturally; this does not affect landscape. */
+@media (orientation:portrait), (max-width:699px){
+  #channels.channel-layout{
+    grid-template-columns:1fr;
+    grid-template-areas:"left" "center" "right" "bottom";
+  }
+  #channels.channel-layout > .channel-bank-left{grid-area:left}
+  #channels.channel-layout > .center-console{grid-area:center}
+  #channels.channel-layout > .channel-bank-right{grid-area:right}
+  #channels.channel-layout > .master-rack{grid-area:bottom}
+  #channels.channel-layout > .channel-bank-left .channel-side,
+  #channels.channel-layout > .channel-bank-right .channel-side{
+    grid-template-columns:repeat(9,minmax(62px,1fr));
+    overflow-x:auto;
+    overflow-y:hidden;
+    touch-action:pan-x;
+  }
+  #channels.channel-layout > .channel-bank-left .channel,
+  #channels.channel-layout > .channel-bank-right .channel{
+    min-width:62px;
+  }
+}
