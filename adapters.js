@@ -280,7 +280,8 @@ window.MixerAdapters = (() => {
   function receiveSimulator(packet) {
     if (!active?.connected || active.type !== "simulator") return false;
 
-    const mapped = bridgeApply(packet);\n    const ok = mapped.ok && applyPacketToSimulator(packet);
+    const mapped = bridgeApply(packet);
+    const ok = mapped.ok && applyPacketToSimulator(packet);
     const now = Date.now();
 
     const ack = {
@@ -376,7 +377,8 @@ window.MixerAdapters = (() => {
     if (!active?.write)
       return { ok: false, reason: "bluetooth-write-characteristic-unavailable" };
 
-    const data = new TextEncoder().encode(JSON.stringify(packet) + "\n");
+    const data = new TextEncoder().encode(JSON.stringify(packet) + "
+");
     const writer = active.write.writeValueWithoutResponse || active.write.writeValue;
 
     try {
@@ -494,7 +496,8 @@ window.MixerAdapters = (() => {
         notify.addEventListener("characteristicvaluechanged", event => {
           const chunk = new TextDecoder().decode(event.target.value);
           connection.buffer += chunk;
-          const lines = connection.buffer.split(/\r?\n/);
+          const lines = connection.buffer.split(/\r?
+/);
           connection.buffer = lines.pop() || "";
 
           for (const line of lines) {
@@ -535,7 +538,10 @@ window.MixerAdapters = (() => {
     get active() { return active; },
     get protocol() { return PROTOCOL; },
     supportsBluetooth: () => !!navigator.bluetooth,
-    getSimulatorState: () => active?.type === "simulator" ? active.state : loadSimulatorState(),\n    getBridgeStatus: () => active?.bridge ? { ...active.bridge, commands: active.bridge.commands.slice(-50), feedback: (active.bridge.feedback||[]).slice(-50) } : null,\n    hardwareFeedback,\n    simulateHardwareChange,
+    getSimulatorState: () => active?.type === "simulator" ? active.state : loadSimulatorState(),
+    getBridgeStatus: () => active?.bridge ? { ...active.bridge, commands: active.bridge.commands.slice(-50), feedback: (active.bridge.feedback||[]).slice(-50) } : null,
+    hardwareFeedback,
+    simulateHardwareChange,
     resetSimulatorState: () => {
       try { localStorage.removeItem(SIM_KEY); } catch {}
       if (active?.type === "simulator") {
