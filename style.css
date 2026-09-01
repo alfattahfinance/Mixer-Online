@@ -494,3 +494,8 @@ main.console{width:100%;min-width:0}
 @media (max-width:1200px){
   .channel{min-height:750px}
 }
+
+/* === FADER TEST VISUAL FEEDBACK === */
+.channel.fader-test-active{outline:1px solid #1594ff;box-shadow:0 0 10px rgba(21,148,255,.45),inset 0 0 8px rgba(21,148,255,.12)}
+.channel.fader-test-active .fader-section{background:rgba(21,148,255,.05);border-radius:4px}
+.channel.fader-test-active .fader-label{color:#55baff}
