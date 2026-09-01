@@ -639,3 +639,144 @@ main.console{width:100%;min-width:0}
   }
   .channel-bank-left .channel,.channel-bank-right .channel{min-width:58px!important}
 }
+
+
+/* === FINAL 16CH SPLIT AROUND CENTER SCREEN — LAYOUT ONLY === */
+/* Deliberately CSS-only for channel positioning. Mixer engine/state remains unchanged. */
+@media (orientation:landscape) and (min-width:900px){
+  main.console{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(320px,31vw) minmax(0,1fr) minmax(120px,13vw)!important;
+    grid-template-rows:auto!important;
+    grid-template-areas:"left center right master"!important;
+    gap:6px!important;
+    width:100%!important;
+    min-width:0!important;
+    padding:6px!important;
+    align-items:start!important;
+    box-sizing:border-box!important;
+  }
+
+  .channel-bank-left{
+    grid-area:left!important;
+    grid-column:auto!important;
+    grid-row:auto!important;
+    min-width:0!important;
+    width:100%!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+  }
+  .center-console{
+    grid-area:center!important;
+    grid-column:auto!important;
+    grid-row:auto!important;
+    min-width:0!important;
+    width:100%!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+  }
+  .channel-bank-right{
+    grid-area:right!important;
+    grid-column:auto!important;
+    grid-row:auto!important;
+    min-width:0!important;
+    width:100%!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+  }
+  .master-rack{
+    grid-area:master!important;
+    grid-column:auto!important;
+    grid-row:auto!important;
+    min-width:0!important;
+    width:100%!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+  }
+
+  /* Exactly 8 visible channel strips per side. The JS still owns all channel state. */
+  .channel-bank-left .channel[data-ch="9"],
+  .channel-bank-left .channel[data-ch="10"],
+  .channel-bank-left .channel[data-ch="11"],
+  .channel-bank-left .channel[data-ch="12"],
+  .channel-bank-left .channel[data-ch="13"],
+  .channel-bank-left .channel[data-ch="14"],
+  .channel-bank-left .channel[data-ch="15"],
+  .channel-bank-left .channel[data-ch="16"],
+  .channel-bank-left .channel[data-ch="17"],
+  .channel-bank-left .channel[data-ch="18"]{
+    display:none!important;
+  }
+  .channel-bank-right .channel[data-ch="1"],
+  .channel-bank-right .channel[data-ch="2"],
+  .channel-bank-right .channel[data-ch="3"],
+  .channel-bank-right .channel[data-ch="4"],
+  .channel-bank-right .channel[data-ch="5"],
+  .channel-bank-right .channel[data-ch="6"],
+  .channel-bank-right .channel[data-ch="7"],
+  .channel-bank-right .channel[data-ch="8"],
+  .channel-bank-right .channel[data-ch="17"],
+  .channel-bank-right .channel[data-ch="18"]{
+    display:none!important;
+  }
+
+  .channel-bank-left>#channels,
+  .channel-bank-right>#channelsRight{
+    display:grid!important;
+    grid-template-columns:repeat(8,minmax(0,1fr))!important;
+    grid-template-rows:1fr!important;
+    grid-auto-flow:column!important;
+    gap:3px!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+    padding:3px!important;
+    box-sizing:border-box!important;
+    touch-action:none!important;
+  }
+
+  .channel-bank-left .channel,
+  .channel-bank-right .channel{
+    grid-row:1!important;
+    grid-column:auto!important;
+    min-width:0!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+    box-sizing:border-box!important;
+  }
+
+  .channel-bank-left .bank-title span{font-size:10px}
+  .channel-bank-right .bank-title span{font-size:10px}
+
+  .center-console .screen-frame{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin:0 auto!important;
+    box-sizing:border-box!important;
+  }
+}
+
+/* On narrower landscape screens, keep the same left | center | right | master relationship
+   and allow the whole console to scroll horizontally instead of collapsing the banks. */
+@media (orientation:landscape) and (min-width:900px) and (max-width:1250px){
+  html,body{min-width:0!important;overflow-x:auto!important}
+  main.console{
+    width:max-content!important;
+    min-width:1420px!important;
+    grid-template-columns:460px 320px 460px 120px!important;
+  }
+  .channel-bank-left>#channels,
+  .channel-bank-right>#channelsRight{
+    grid-template-columns:repeat(8,56px)!important;
+  }
+  .channel-bank-left .channel,
+  .channel-bank-right .channel{
+    min-width:56px!important;
+  }
+}
+
+/* Portrait/tablet/mobile: keep the existing responsive behavior; this rule only
+   controls the desktop/landscape split requested above. */
