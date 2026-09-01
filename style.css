@@ -605,3 +605,49 @@ main.console{width:100%;min-width:0}
   .channel input.fader{height:155px}
   .channel .knob-wrap{transform:scale(.84)}
 }
+
+/* === LANDSCAPE FIX: CH10-CH18 MUST STAY RIGHT OF CENTER === */
+@media (orientation:landscape) and (min-width:901px){
+  #channels.channel-layout{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) minmax(300px,340px) minmax(0,1fr) !important;
+    grid-template-rows:auto auto !important;
+    grid-template-areas:"left center right" "bottom bottom bottom" !important;
+    align-items:start !important;
+    width:100% !important;
+    min-width:0 !important;
+  }
+  #channels.channel-layout > .channel-bank-left{
+    grid-area:left !important;
+    grid-column:1 !important;
+    grid-row:1 !important;
+  }
+  #channels.channel-layout > .center-console{
+    grid-area:center !important;
+    grid-column:2 !important;
+    grid-row:1 !important;
+  }
+  #channels.channel-layout > .channel-bank-right{
+    grid-area:right !important;
+    grid-column:3 !important;
+    grid-row:1 !important;
+    align-self:start !important;
+    margin-top:0 !important;
+  }
+  #channels.channel-layout > .master-rack{
+    grid-area:bottom !important;
+    grid-column:1 / -1 !important;
+    grid-row:2 !important;
+  }
+  #channels.channel-layout .channel-side{
+    display:grid !important;
+    grid-template-columns:repeat(9,minmax(0,1fr)) !important;
+    width:100% !important;
+    min-width:0 !important;
+    overflow:hidden !important;
+  }
+  #channels.channel-layout .channel-side .channel{
+    min-width:0 !important;
+    width:100% !important;
+  }
+}
