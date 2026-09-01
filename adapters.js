@@ -123,6 +123,55 @@ window.MixerAdapters = (() => {
     emitStatus();
   }
 
+  // Physical ESP32 bridge mapping. Values are normalized by protocol;
+  // the actual GPIO/ADC/DAC implementation is isolated behind this mapper.
+  const PHYSICAL_CHANNELS = 4;
+  const PHYSICAL_PARAMS = ["fader","gain","low","mid","high","pan","mute","solo"];
+
+  function mapRemoteToHardware(packet) {
+    if (!packet || !active?.bridge) return { ok:false, reason:"bridge-offline" };
+    if (packet.type === "MASTER")
+      return { ok:true, target:"MASTER", value:Math.max(0,Math.min(100,Number(packet.value))) };
+
+    if (packet.type !== "CONTROL")
+      return { ok:false, reason:"unsupported-command" };
+
+    const ch = Number(packet.ch);
+    const param = String(packet.param);
+    if (!Number.isInteger(ch) || ch < 1 || ch > PHYSICAL_CHANNELS)
+      return { ok:false, reason:"physical-channel-out-of-range" };
+    if (!PHYSICAL_PARAMS.includes(param))
+      return { ok:false, reason:"unsupported-physical-control" };
+
+    const range = {
+      fader:[0,100], gain:[0,2], low:[-12,12], mid:[-12,12],
+      high:[-12,12], pan:[-1,1]
+    }[param];
+
+    let value = packet.value;
+    if (range) {
+      value = Number(value);
+      if (!Number.isFinite(value)) return { ok:false,reason:"invalid-value" };
+      value = Math.max(range[0],Math.min(range[1],value));
+    } else value = !!value;
+
+    return { ok:true,target:`CH${ch}`,channel:ch,param,value };
+  }
+
+  function bridgeApply(packet) {
+    const mapped = mapRemoteToHardware(packet);
+    if (!mapped.ok) return mapped;
+    // The simulator records the hardware-facing command. A future physical
+    // ESP32 can consume exactly this command without changing Mixer-Online.
+    active.bridge.commands.push({
+      ...mapped,
+      sourceId: packet.id,
+      protocol: PROTOCOL,
+      ts: Date.now()
+    });
+    return mapped;
+  }
+
   function validateControl(packet) {
     const allowed = ["fader", "gain", "low", "mid", "high", "pan", "mute", "solo"];
     if (!Number.isInteger(packet.ch) || packet.ch < 1 || packet.ch > 18)
