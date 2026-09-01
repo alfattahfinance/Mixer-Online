@@ -959,3 +959,39 @@ main.console{width:100%;min-width:0}
   #channels.channel-layout > .channel-bank-left .channel,
   #channels.channel-layout > .channel-bank-right .channel { min-width:0 !important; }
 }
+
+
+/* === CHANNEL STRIP SIZE LOCK ===
+   CH1–CH9 and CH10–CH18 use exactly the same strip geometry.
+   Layout only; engine/control/protocol behavior untouched.
+*/
+@media (orientation: landscape) and (min-width: 700px) {
+  #channels.channel-layout > .channel-bank-left,
+  #channels.channel-layout > .channel-bank-right {
+    width:100% !important;
+    flex:none !important;
+    box-sizing:border-box !important;
+  }
+
+  #channels.channel-layout > .channel-bank-left .channel-side,
+  #channels.channel-layout > .channel-bank-right .channel-side {
+    display:grid !important;
+    grid-template-columns:repeat(9,minmax(0,1fr)) !important;
+    grid-auto-columns:auto !important;
+    gap:2px !important;
+    padding:3px !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
+  }
+
+  #channels.channel-layout > .channel-bank-left .channel,
+  #channels.channel-layout > .channel-bank-right .channel {
+    width:100% !important;
+    min-width:0 !important;
+    max-width:none !important;
+    margin:0 !important;
+    box-sizing:border-box !important;
+  }
+}
