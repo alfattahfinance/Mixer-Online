@@ -552,3 +552,16 @@ main.console{width:100%;min-width:0}
   .center-console{padding:4px}
   .master-card input{height:125px}
 }
+
+
+/* === LIVE SIGNAL LED BRIDGE === */
+.led-meter{position:relative;display:flex;flex-direction:column-reverse;gap:2px;width:14px;height:86px;padding:2px;border:1px solid #242a2d;border-radius:3px;background:#080a0b;box-sizing:border-box;overflow:visible;transition:filter .08s ease}
+.led-segments{display:flex;flex:1;flex-direction:column-reverse;gap:2px;width:100%}
+.led-segments i{display:block;flex:1 1 0;min-height:3px;border-radius:1px;background:#1b2022;box-shadow:inset 0 0 2px rgba(0,0,0,.7);transition:background .06s linear,box-shadow .06s linear,opacity .06s linear}
+.led-segments i.lit{background:#55cfff;box-shadow:0 0 5px rgba(85,207,255,.75);opacity:1}
+.led-meter.peak .led-segments i.lit{background:#ff5b57;box-shadow:0 0 6px rgba(255,91,87,.9)}
+.led-peak{position:absolute;top:-4px;left:2px;right:2px;height:2px;border-radius:2px;background:#272c2e;opacity:.65}
+.led-peak.on{background:#ff4d4d;box-shadow:0 0 7px rgba(255,77,77,.95);opacity:1}
+.led-meter.signal{filter:brightness(1.08)}
+.channel .led-meter{margin:3px auto 5px}
+@media (max-width:560px){.led-meter{height:72px;width:12px}.led-segments{gap:1px}.led-segments i{min-height:2px}}
