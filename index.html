@@ -1,1 +1,136 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mixer Online</title><link rel="stylesheet" href="style.css"></head><body><header><b>MIXER ONLINE</b><span id="status">OFFLINE</span><button id="power">SYSTEM OFF</button><button id="connectEsp">CONNECT ESP32</button><button id="connectBluetooth">CONNECT BLUETOOTH</button></header><main><section id="channels"></section><aside><h2>MASTER</h2><input id="master" type="range" min="0" max="100" value="75" orient="vertical"><output id="masterVal">75%</output></aside></main><section class="device-connection"><h2>DEVICE CONNECTION</h2><label for="transportSelect">TRANSPORT</label><select id="transportSelect"><option value="esp32">ESP32 SIMULATOR / BRIDGE</option><option value="bluetooth">BLUETOOTH</option></select><div id="deviceStatus" class="device-status">🔴 ESP32 SIMULATOR OFFLINE</div><div id="deviceProtocol">Protocol: ESP32-MIXER/1</div><button id="deviceConnect">CONNECT ESP32</button><button id="deviceDisconnect">DISCONNECT</button><div id="deviceHint" class="small">Simulator ESP32 berjalan langsung di Mixer-Online. Ini bukan Wokwi dan bukan koneksi Wi-Fi ke mixer analog.<br><strong>BRIDGE:</strong> Remote → ESP32 → kontrol elektronik mixer. CH1–CH4 dipetakan sebagai channel fisik.</div></section><section class="bridge-panel"><h2>ESP32 BRIDGE STATUS</h2><div class="bridge-summary"><span id="bridgeState">OFFLINE</span><span id="bridgeTransport">TRANSPORT: —</span><span id="bridgeProtocol">PROTOCOL: ESP32-MIXER/1</span></div><div class="bridge-counters">TX <b id="bridgeTx">0</b> · ACK <b id="bridgeAck">0</b> · RX/FEEDBACK <b id="bridgeRx">0</b></div><div id="bridgeLast" class="bridge-last">LAST: —</div><div id="bridgeLog" class="bridge-log"><div>TX / ACK / RX akan tampil di sini.</div></div></section><section class="sim"><h2>CONNECTION / TEST</h2><div>Transport: <b id="transportStatus">OFFLINE</b></div><div id="connectionHint" class="small">Mixer yang menerima remote: Bluetooth langsung. Mixer yang tidak menerima remote: gunakan ESP32 sebagai bridge.</div><pre id="rx">RX: —</pre><pre id="tx">TX: —</pre><button id="simulateRx">SIMULATE HARDWARE RX</button><button id="runTest">RUN 18CH LOOPBACK TEST</button><button id="runStressTest">RUN REPEAT STRESS TEST</button><button id="runMuteSoloTest">RUN MUTE/SOLO TEST</button><button id="runMasterIsolationTest">RUN MASTER ISOLATION TEST</button><button id="runFaderTest">RUN FADER CH1–CH18 TEST</button><button id="runCombinationTest">RUN COMBINATION CONTROL TEST</button><button id="runBidirectionalSyncTest">RUN TWO-WAY SYNC TEST</button><button id="savePreset">SAVE PRESET</button><button id="recallPreset">RECALL PRESET</button><button id="runSaveRecallTest">RUN SAVE/RECALL TEST</button><pre id="testResult">TEST: —</pre></section><script src="connection.js?v=20260901-1428"></script><script src="adapters.js?v=20260901-1428"></script><script src="app.js?v=20260901-1428"></script></body></html>
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090b0c">
+<title>MIXER-ONLINE • 18CH Digital Mixer</title>
+<link rel="stylesheet" href="style.css?v=20260901-skin1">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><b>MIXER-ONLINE</b><span>18CH DIGITAL MIXER</span></div>
+  <div class="system-box">
+    <span class="box-title">SYSTEM</span>
+    <button id="power" class="power-btn">SYSTEM OFF</button>
+  </div>
+  <div class="bridge-head">
+    <span class="box-title">ESP32 BRIDGE</span>
+    <div class="head-status"><i id="statusLamp"></i><span id="status">OFFLINE</span></div>
+    <button id="connectEsp">CONNECT ESP32</button>
+    <button id="connectBluetooth" class="bluetooth-btn">CONNECT BLUETOOTH</button>
+  </div>
+  <div class="status-head">
+    <span class="box-title">STATUS</span>
+    <strong id="headerBridgeStatus">BRIDGE STANDBY</strong>
+    <small>18 CHANNELS • TWO-WAY SYNC</small>
+  </div>
+  <div class="scene-head">
+    <span class="box-title">SCENE</span>
+    <div><button id="savePresetTop">SAVE</button><button id="recallPresetTop">RECALL</button><button id="defaultScene">DEFAULT</button></div>
+  </div>
+  <div class="clock-head"><span class="box-title">TIME</span><strong id="clock">--:--:--</strong><small>LIVE MIXER</small></div>
+</header>
+
+<main class="console">
+  <section class="channel-bank">
+    <div class="bank-title"><span>INPUT CHANNELS</span><small>CH1–CH18</small></div>
+    <div id="channels"></div>
+  </section>
+
+  <section class="center-console">
+    <div class="screen-frame">
+      <div class="screen-title"><b>MIXER-ONLINE</b><span>18CH DIGITAL MIXER</span></div>
+      <div class="screen-tabs"><button class="active">HOME</button><button>METER</button><button>RTA</button><button>SETUP</button><button>EFFECT</button></div>
+      <div class="screen-content">
+        <div class="spectrum" id="visualMeter">
+          <div class="bars"></div><div class="screen-label">MAIN&nbsp; L &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; R</div>
+        </div>
+        <div class="player">
+          <b>USB PLAYER</b><strong>TRACK 01</strong><small>00:00:00 / 00:00:00</small>
+          <div class="player-buttons"><button>◀</button><button>▶</button><button>▶▶</button><button>▶|</button></div>
+          <span>VOL 75%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fx-rack">
+      <div class="rack-title">EFFECT PROCESSOR <span>PARAMETER</span></div>
+      <div class="fx-display"><strong>HALL 1</strong><small>REVERB • TIME 2.45s • LEVEL 45%</small></div>
+      <button>TAP</button><div class="fake-knob"></div><button>SELECT</button>
+      <div class="fx-buttons"><button>FX1</button><button>FX2</button><button>AUX1</button><button>AUX2</button><button>AUX3</button><button>AUX4</button></div>
+    </div>
+
+    <div class="aux-rack">
+      <div class="aux-unit"><b>AUX / BUS</b><div><span>AUX1</span><span>AUX2</span><span>AUX3</span><span>AUX4</span></div><div class="mini-knobs"><i></i><i></i><i></i><i></i></div></div>
+      <div class="aux-unit"><b>FX RETURN</b><div><span>FX1</span><span>FX2</span></div><div class="mini-knobs"><i></i><i></i></div></div>
+    </div>
+  </section>
+
+  <aside class="master-rack">
+    <div class="meter-rack"><b>MAIN L&nbsp; R</b><div class="main-meters"><div class="meter"></div><div class="meter"></div></div></div>
+    <div class="master-card">
+      <h2>MASTER</h2>
+      <input id="master" type="range" min="0" max="100" value="75" orient="vertical">
+      <output id="masterVal">75%</output>
+      <span class="peak-dot"></span>
+    </div>
+    <div class="monitor-card"><b>MONITOR</b><span>SOURCE</span><button>MAIN L/R</button><div class="monitor-knob"></div><span>LEVEL</span></div>
+    <div class="phones-card">🎧 <b>PHONES</b><div class="phone-knob"></div><span>●</span></div>
+  </aside>
+</main>
+
+<nav class="bottom-nav">
+  <button class="active">CH 1–8</button><button>CH 9–16</button><button>CH 17–18</button><button>FX</button><button>MASTER</button><button>SCENE</button><button>SETUP</button><button>SYSTEM</button>
+</nav>
+
+<section class="right-tools">
+  <section class="device-connection">
+    <div class="section-heading"><h2>DEVICE CONNECTION</h2><span id="deviceLamp" class="lamp red"></span></div>
+    <label for="transportSelect">TRANSPORT</label>
+    <select id="transportSelect"><option value="esp32">ESP32 SIMULATOR / BRIDGE</option><option value="bluetooth">BLUETOOTH</option></select>
+    <div id="deviceStatus" class="device-status">🔴 ESP32 SIMULATOR OFFLINE</div>
+    <div id="deviceProtocol">Protocol: ESP32-MIXER/1</div>
+    <button id="deviceConnect">CONNECT ESP32</button><button id="deviceDisconnect">DISCONNECT</button>
+    <div id="deviceHint" class="small">Simulator ESP32 berjalan langsung di Mixer-Online. Bukan Wokwi dan bukan Wi-Fi ke mixer analog.</div>
+  </section>
+
+  <section class="bridge-panel">
+    <div class="section-heading"><h2>ESP32 BRIDGE STATUS</h2><span class="bridge-live">● TWO-WAY</span></div>
+    <div class="bridge-summary"><span id="bridgeState">OFFLINE</span><span id="bridgeTransport">TRANSPORT: —</span><span id="bridgeProtocol">PROTOCOL: ESP32-MIXER/1</span></div>
+    <div class="bridge-counters"><span>TX <b id="bridgeTx">0</b></span><span>ACK <b id="bridgeAck">0</b></span><span>RX/FEEDBACK <b id="bridgeRx">0</b></span></div>
+    <div id="bridgeLast" class="bridge-last">LAST: —</div>
+    <div id="bridgeLog" class="bridge-log"><div>CONTROL → TX → ACK → FEEDBACK → UI</div></div>
+  </section>
+
+  <section class="media-rack"><h2>PLAYER / RECORDER</h2><div><button>🎙<small>RECORDER</small></button><button>📁<small>FILE</small></button><button>🎵<small>MUSIC</small></button></div></section>
+</section>
+
+<section class="connection-test-panel sim">
+  <h2>CONNECTION / TEST</h2>
+  <div class="transport-line">Transport: <b id="transportStatus">OFFLINE</b></div>
+  <div id="connectionHint" class="small">Mixer yang menerima remote: Bluetooth langsung. Mixer yang tidak menerima remote: gunakan ESP32 sebagai bridge.</div>
+  <pre id="rx">RX: —</pre><pre id="tx">TX: —</pre>
+  <div class="test-buttons">
+    <button id="simulateRx">SIMULATE HARDWARE RX</button><button id="runTest">RUN 18CH LOOPBACK TEST</button><button id="runStressTest">RUN REPEAT STRESS TEST</button><button id="runMuteSoloTest">RUN MUTE/SOLO TEST</button><button id="runMasterIsolationTest">RUN MASTER ISOLATION TEST</button><button id="runFaderTest">RUN FADER CH1–CH18 TEST</button><button id="runCombinationTest">RUN COMBINATION CONTROL TEST</button><button id="runBidirectionalSyncTest">RUN TWO-WAY SYNC TEST</button><button id="savePreset">SAVE PRESET</button><button id="recallPreset">RECALL PRESET</button><button id="runSaveRecallTest">RUN SAVE/RECALL TEST</button>
+  </div>
+  <pre id="testResult">TEST: —</pre>
+</section>
+
+<footer class="status-footer"><span>CONNECTION <b id="footerConnection">● ESP32 SIMULATOR OFFLINE</b></span><span>MODE: <b>TWO-WAY SYNC</b></span><span>SYSTEM STATUS <b>18 CHANNELS READY</b></span><span>CPU: <b>18%</b></span><span>MEM: <b>42%</b></span></footer>
+
+<script src="connection.js?v=20260901-skin1"></script>
+<script src="adapters.js?v=20260901-skin1"></script>
+<script src="app.js?v=20260901-skin1"></script>
+<script>
+(function(){
+ const clock=document.getElementById('clock'); const tick=()=>clock&&(clock.textContent=new Date().toLocaleTimeString());
+ tick(); setInterval(tick,1000);
+ document.getElementById('savePresetTop')?.addEventListener('click',()=>document.getElementById('savePreset')?.click());
+ document.getElementById('recallPresetTop')?.addEventListener('click',()=>document.getElementById('recallPreset')?.click());
+ document.getElementById('defaultScene')?.addEventListener('click',()=>{localStorage.removeItem('mr18_preset_default');document.getElementById('testResult').textContent='DEFAULT SCENE: factory state ready';});
+ const updateSkin=()=>{const live=document.getElementById('status')?.textContent==='ONLINE';document.getElementById('statusLamp')?.classList.toggle('live',live);document.getElementById('deviceLamp')?.classList.toggle('green',live);document.getElementById('deviceLamp')?.classList.toggle('red',!live);document.getElementById('headerBridgeStatus').textContent=live?'PERMANENT BRIDGE ACTIVE':'BRIDGE STANDBY';document.getElementById('footerConnection').textContent=live?'● ESP32 SIMULATOR ONLINE':'● ESP32 SIMULATOR OFFLINE';};
+setInterval(updateSkin,400); updateSkin();
+})();
+</script>
+</body></html>
