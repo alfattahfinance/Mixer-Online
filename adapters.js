@@ -217,6 +217,53 @@ window.MixerAdapters = (() => {
     return false;
   }
 
+  // Hardware -> bridge -> Mixer-Online feedback path.
+  // Physical ESP32 will call this with values read from the analog mixer.
+  function hardwareFeedback(ch, param, value, extra = {}) {
+    if (!active?.connected || !active?.bridge)
+      return { ok:false, reason:"bridge-offline" };
+
+    const channel = Number(ch);
+    const allowed = PHYSICAL_PARAMS;
+    if (param !== "master" && (!Number.isInteger(channel) || channel < 1 || channel > PHYSICAL_CHANNELS))
+      return { ok:false, reason:"physical-channel-out-of-range" };
+    if (param !== "master" && !allowed.includes(param))
+      return { ok:false, reason:"unsupported-physical-control" };
+
+    const packet = {
+      protocol: PROTOCOL,
+      type: "FEEDBACK",
+      ...(param === "master" ? {} : { ch: channel }),
+      param: String(param),
+      value,
+      source: "hardware",
+      device: "ESP32-BRIDGE",
+      transport: active.transport,
+      ts: Date.now(),
+      ...extra
+    };
+
+    active.bridge.feedback = active.bridge.feedback || [];
+    active.bridge.feedback.push(packet);
+    if (active.bridge.feedback.length > 100) active.bridge.feedback.shift();
+    emitRx(packet);
+    return { ok:true, packet };
+  }
+
+  function simulateHardwareChange(ch, param, value) {
+    if (!active?.state || active.type !== "simulator")
+      return { ok:false, reason:"simulator-offline" };
+    const packet = hardwareFeedback(ch, param, value, { simulated:true });
+    if (!packet.ok) return packet;
+    if (param === "master") active.state.master = Number(value);
+    else {
+      const c = active.state.channels[Number(ch)-1];
+      if (c) c[param] = value;
+    }
+    saveSimulatorState();
+    return packet;
+  }
+
   function emitRx(packet) {
     if (!active?.connected) return false;
     active.rx.push(packet);
@@ -488,7 +535,7 @@ window.MixerAdapters = (() => {
     get active() { return active; },
     get protocol() { return PROTOCOL; },
     supportsBluetooth: () => !!navigator.bluetooth,
-    getSimulatorState: () => active?.type === "simulator" ? active.state : loadSimulatorState(),\n    getBridgeStatus: () => active?.bridge ? { ...active.bridge, commands: active.bridge.commands.slice(-50) } : null,
+    getSimulatorState: () => active?.type === "simulator" ? active.state : loadSimulatorState(),\n    getBridgeStatus: () => active?.bridge ? { ...active.bridge, commands: active.bridge.commands.slice(-50), feedback: (active.bridge.feedback||[]).slice(-50) } : null,\n    hardwareFeedback,\n    simulateHardwareChange,
     resetSimulatorState: () => {
       try { localStorage.removeItem(SIM_KEY); } catch {}
       if (active?.type === "simulator") {
