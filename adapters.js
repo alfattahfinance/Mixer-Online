@@ -137,6 +137,7 @@ window.MixerAdapters = (() => {
 
   function disconnect() {
     try { active?.device?.gatt?.disconnect(); } catch {}
+    stopMeterSimulation();
     active = null;
     emitStatus();
   }
@@ -420,6 +421,25 @@ window.MixerAdapters = (() => {
     return emitRx(packet);
   }
 
+  let meterTimer = null;
+  function stopMeterSimulation(){if(meterTimer){clearInterval(meterTimer);meterTimer=null;}}
+  function startMeterSimulation(){
+    stopMeterSimulation();
+    meterTimer=setInterval(()=>{
+      if(!active?.connected||active.type!=="simulator"){stopMeterSimulation();return;}
+      const now=Date.now()/1000;
+      active.state.channels.forEach((c,i)=>{
+        const gate=c.mute?0:1;
+        const base=(Number(c.fader)/100)*(Number(c.gain)/2);
+        const wave=(Math.sin(now*5+i*.71)+1)/2;
+        const level=Math.max(0,Math.min(2,base*(0.25+0.75*wave)*gate));
+        c.level=Number(level.toFixed(3));
+        emitRx({protocol:PROTOCOL,type:"METER",ch:i+1,level:c.level,source:"simulator",device:"ESP32-SIMULATOR",transport:"esp32",ts:Date.now()});
+      });
+      saveSimulatorState();
+    },80);
+  }
+
   async function simulator() {
     if (active?.type === "simulator" && active.connected)
       return active;
@@ -446,6 +466,7 @@ window.MixerAdapters = (() => {
       lastAck: null,
       lastError: null
     });
+    startMeterSimulation();
 
     return active;
   }
