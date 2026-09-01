@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#090b0c">
-<title>MIXER-ONLINE • 9CH Digital Mixer</title>
-<link rel="stylesheet" href="style.css?v=20260902-ch9-only-02">
+<title>MIXER-ONLINE • 16CH Digital Mixer</title>
+<link rel="stylesheet" href="style.css?v=20260902-ch16-01">
 </head>
 <body>
 <header class="topbar">
-  <div class="brand"><b>MIXER-ONLINE</b><span>9CH Digital Mixer</span></div>
+  <div class="brand"><b>MIXER-ONLINE</b><span>16CH Digital Mixer</span></div>
   <div class="system-box">
     <span class="box-title">SYSTEM</span>
     <button id="power" class="power-btn">SYSTEM OFF</button>
@@ -23,7 +23,7 @@
   <div class="status-head">
     <span class="box-title">STATUS</span>
     <strong id="headerBridgeStatus">BRIDGE STANDBY</strong>
-    <small><span class="channel-count-status">9 CHANNELS READY</span> • TWO-WAY SYNC</small>
+    <small><span class="channel-count-status">16 CHANNELS READY</span> • TWO-WAY SYNC</small>
   </div>
   <div class="scene-head">
     <span class="box-title">SCENE</span>
@@ -35,13 +35,13 @@
 <main class="console">
   <div id="channels" class="channel-layout">
     <section class="channel-bank channel-bank-left">
-      <div class="bank-title"><span>INPUT CHANNELS 1–9</span><small>CH1–CH9</small></div>
+      <div class="bank-title"><span>INPUT CHANNELS 1–8</span><small>CH1–CH8</small></div>
       <div class="channel-side" id="channelsLeft"></div>
     </section>
 
   <section class="center-console">
     <div class="screen-frame">
-      <div class="screen-title"><b>MIXER-ONLINE</b><span>9CH Digital Mixer</span></div>
+      <div class="screen-title"><b>MIXER-ONLINE</b><span>16CH Digital Mixer</span></div>
       <div class="screen-tabs" id="screenTabs"><button class="active" data-screen="HOME">HOME</button><button data-screen="METER">METER</button><button data-screen="RTA">RTA</button><button data-screen="SETUP">SETUP</button><button data-screen="EFFECT">EFFECT</button><button data-screen="SCENE">SCENE</button></div>
       <div class="screen-content" id="screenContent">
   <section class="screen-view active" data-view="HOME">
@@ -62,7 +62,7 @@
     <div class="rta-display"><div class="rta-grid"></div><div class="rta-bars" id="rtaBars"></div><div class="rta-labels"><span>63</span><span>125</span><span>250</span><span>500</span><span>1K</span><span>2K</span><span>4K</span><span>8K</span><span>16K</span></div></div>
   </section>
   <section class="screen-view" data-view="SETUP">
-    <div class="setup-screen"><b>SYSTEM SETUP</b><div class="setup-grid"><span>CHANNELS <strong class="channel-count-value">18</strong></span><span>TRANSPORT <strong id="setupTransport">OFFLINE</strong></span><span>PROTOCOL <strong>ESP32-MIXER/1</strong></span><span>SYNC <strong>TWO-WAY</strong></span><span>SYSTEM <strong id="setupSystem">OFF</strong></span><span>REMOTE <strong>BLUETOOTH / BRIDGE</strong></span></div><div class="channel-mapper"><div><b>AUTO CHANNEL MAPPER</b><small id="mapperStatus">18 CH • 1:1 READY</small></div><label>CHANNELS <select id="mapperChannels"><option value="4">4</option><option value="8">8</option><option value="9" selected>9</option></select></label><button id="autoMapChannels" type="button" onclick="autoMapChannels()">AUTO MAP</button><button id="applyChannelMap" type="button" onclick="applyChannelMap()">APPLY CHANNELS</button><div id="channelMapPreview">CH1→CH1 • CH2→CH2 • CH3→CH3 • CH4→CH4 • … • CH9→CH9</div></div></div></div>
+    <div class="setup-screen"><b>SYSTEM SETUP</b><div class="setup-grid"><span>CHANNELS <strong class="channel-count-value">18</strong></span><span>TRANSPORT <strong id="setupTransport">OFFLINE</strong></span><span>PROTOCOL <strong>ESP32-MIXER/1</strong></span><span>SYNC <strong>TWO-WAY</strong></span><span>SYSTEM <strong id="setupSystem">OFF</strong></span><span>REMOTE <strong>BLUETOOTH / BRIDGE</strong></span></div><div class="channel-mapper"><div><b>AUTO CHANNEL MAPPER</b><small id="mapperStatus">18 CH • 1:1 READY</small></div><label>CHANNELS <select id="mapperChannels"><option value="4">4</option><option value="8">8</option><option value="16" selected>16</option></select></label><button id="autoMapChannels" type="button" onclick="autoMapChannels()">AUTO MAP</button><button id="applyChannelMap" type="button" onclick="applyChannelMap()">APPLY CHANNELS</button><div id="channelMapPreview">CH1→CH1 • CH2→CH2 • CH3→CH3 • CH4→CH4 • … • CH16→CH16</div></div></div></div>
   </section>
   <section class="screen-view" data-view="EFFECT">
     <div class="effect-screen effect-screen-live">
@@ -99,7 +99,12 @@
     </div>
   </section>
 
-    <aside class="master-rack">
+    <section class="channel-bank channel-bank-right">
+      <div class="bank-title"><span>INPUT CHANNELS 9–16</span><small>CH9–CH16</small></div>
+      <div class="channel-side" id="channelsRight"></div>
+    </section>
+
+  <aside class="master-rack">
     <div class="meter-rack"><b>MAIN L&nbsp; R</b><div class="main-meters"><div class="meter"></div><div class="meter"></div></div></div>
     <div class="master-card">
       <h2>MASTER</h2>
@@ -150,11 +155,11 @@
   <pre id="testResult">TEST: —</pre>
 </section>
 
-<footer class="status-footer"><span>CONNECTION <b id="footerConnection">● ESP32 SIMULATOR OFFLINE</b></span><span>MODE: <b>TWO-WAY SYNC</b></span><span>SYSTEM STATUS <b class="channel-count-status">9 CHANNELS READY</b></span><span>CPU: <b>18%</b></span><span>MEM: <b>42%</b></span></footer>
+<footer class="status-footer"><span>CONNECTION <b id="footerConnection">● ESP32 SIMULATOR OFFLINE</b></span><span>MODE: <b>TWO-WAY SYNC</b></span><span>SYSTEM STATUS <b class="channel-count-status">16 CHANNELS READY</b></span><span>CPU: <b>18%</b></span><span>MEM: <b>42%</b></span></footer>
 
 <script src="connection.js?v=20260901-fx2"></script>
 <script src="adapters.js?v=20260901-fx2"></script>
-<script src="app.js?v=20260902-ch9-only-01"></script>
+<script src="app.js?v=20260902-ch16-01"></script>
 <script>
 (function(){
  const clock=document.getElementById('clock'); const tick=()=>clock&&(clock.textContent=new Date().toLocaleTimeString());
@@ -162,7 +167,7 @@
  document.getElementById('savePresetTop')?.addEventListener('click',()=>document.getElementById('savePreset')?.click());
  document.getElementById('recallPresetTop')?.addEventListener('click',()=>document.getElementById('recallPreset')?.click());
  document.getElementById('defaultScene')?.addEventListener('click',()=>{localStorage.removeItem('mr18_preset_default');document.getElementById('testResult').textContent='DEFAULT SCENE: factory state ready';});
- const tabs=document.querySelectorAll('#screenTabs [data-screen]'); const views=document.querySelectorAll('.screen-view'); const setScreen=(name)=>{tabs.forEach(b=>b.classList.toggle('active',b.dataset.screen===name));views.forEach(v=>v.classList.toggle('active',v.dataset.view===name));document.querySelector('.screen-frame')?.setAttribute('data-screen',name);if(name==='METER')buildScreenMeters();if(name==='RTA')buildRta();if(name==='SETUP')updateSetup();};tabs.forEach(b=>b.addEventListener('click',()=>setScreen(b.dataset.screen)));function buildScreenMeters(){const root=document.getElementById('screenChannelMeters');if(!root)return;root.innerHTML='';for(let i=0;i<9;i++){const el=document.createElement('i');el.style.height=(12+((i*17)%70))+'%';el.title='CH'+(i+1);root.appendChild(el)}}function buildRta(){const root=document.getElementById('rtaBars');if(!root)return;root.innerHTML='';for(let i=0;i<9;i++){const b=document.createElement('i');b.style.height=(18+((i*23)%72))+'%';root.appendChild(b)}}function updateSetup(){const a=window.MixerAdapters?.active;const t=document.getElementById('setupTransport');const s=document.getElementById('setupSystem');if(t)t.textContent=a?.connected?(a.transport==='bluetooth'?'BLUETOOTH':'ESP32 BRIDGE'):'OFFLINE';if(s)s.textContent=document.getElementById('power')?.classList.contains('on')?'ON':'OFF'}document.getElementById('screenSceneSave')?.addEventListener('click',()=>document.getElementById('savePreset')?.click());document.getElementById('screenSceneRecall')?.addEventListener('click',()=>document.getElementById('recallPreset')?.click());document.getElementById('screenSceneDefault')?.addEventListener('click',()=>document.getElementById('defaultScene')?.click());function selectScreenChannel(id){const c=window.state?.channels?.[id-1];if(!c)return;const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};set('screenInput','CH'+id);set('screenFader',c.fader+'%');set('screenGain',Number(c.gain).toFixed(2));set('screenPan',c.pan===0?'CENTER':(c.pan<0?'L '+Math.round(Math.abs(c.pan)*100)+'%':'R '+Math.round(c.pan*100)+'%'));set('screenStatus',c.mute?'MUTED':c.solo?'SOLO':'READY');set('meterSelected','CH'+id);set('meterLevel',Math.round((c.level||0)*50)+'%');} document.getElementById('channels')?.addEventListener('click',e=>{const ch=e.target.closest('.channel');if(ch){const id=Number(ch.dataset.ch);selectScreenChannel(id);}});document.getElementById('screenFxTap')?.addEventListener('click',()=>window.tapEffectTempo?.());const updateSkin=()=>{const live=document.getElementById('status')?.textContent==='ONLINE';document.getElementById('statusLamp')?.classList.toggle('live',live);document.getElementById('deviceLamp')?.classList.toggle('green',live);document.getElementById('deviceLamp')?.classList.toggle('red',!live);document.getElementById('headerBridgeStatus').textContent=live?'PERMANENT BRIDGE ACTIVE':'BRIDGE STANDBY';document.getElementById('footerConnection').textContent=live?'● ESP32 SIMULATOR ONLINE':'● ESP32 SIMULATOR OFFLINE';};
+ const tabs=document.querySelectorAll('#screenTabs [data-screen]'); const views=document.querySelectorAll('.screen-view'); const setScreen=(name)=>{tabs.forEach(b=>b.classList.toggle('active',b.dataset.screen===name));views.forEach(v=>v.classList.toggle('active',v.dataset.view===name));document.querySelector('.screen-frame')?.setAttribute('data-screen',name);if(name==='METER')buildScreenMeters();if(name==='RTA')buildRta();if(name==='SETUP')updateSetup();};tabs.forEach(b=>b.addEventListener('click',()=>setScreen(b.dataset.screen)));function buildScreenMeters(){const root=document.getElementById('screenChannelMeters');if(!root)return;root.innerHTML='';for(let i=0;i<16;i++){const el=document.createElement('i');el.style.height=(12+((i*17)%70))+'%';el.title='CH'+(i+1);root.appendChild(el)}}function buildRta(){const root=document.getElementById('rtaBars');if(!root)return;root.innerHTML='';for(let i=0;i<16;i++){const b=document.createElement('i');b.style.height=(18+((i*23)%72))+'%';root.appendChild(b)}}function updateSetup(){const a=window.MixerAdapters?.active;const t=document.getElementById('setupTransport');const s=document.getElementById('setupSystem');if(t)t.textContent=a?.connected?(a.transport==='bluetooth'?'BLUETOOTH':'ESP32 BRIDGE'):'OFFLINE';if(s)s.textContent=document.getElementById('power')?.classList.contains('on')?'ON':'OFF'}document.getElementById('screenSceneSave')?.addEventListener('click',()=>document.getElementById('savePreset')?.click());document.getElementById('screenSceneRecall')?.addEventListener('click',()=>document.getElementById('recallPreset')?.click());document.getElementById('screenSceneDefault')?.addEventListener('click',()=>document.getElementById('defaultScene')?.click());function selectScreenChannel(id){const c=window.state?.channels?.[id-1];if(!c)return;const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};set('screenInput','CH'+id);set('screenFader',c.fader+'%');set('screenGain',Number(c.gain).toFixed(2));set('screenPan',c.pan===0?'CENTER':(c.pan<0?'L '+Math.round(Math.abs(c.pan)*100)+'%':'R '+Math.round(c.pan*100)+'%'));set('screenStatus',c.mute?'MUTED':c.solo?'SOLO':'READY');set('meterSelected','CH'+id);set('meterLevel',Math.round((c.level||0)*50)+'%');} document.getElementById('channels')?.addEventListener('click',e=>{const ch=e.target.closest('.channel');if(ch){const id=Number(ch.dataset.ch);selectScreenChannel(id);}});document.getElementById('screenFxTap')?.addEventListener('click',()=>window.tapEffectTempo?.());const updateSkin=()=>{const live=document.getElementById('status')?.textContent==='ONLINE';document.getElementById('statusLamp')?.classList.toggle('live',live);document.getElementById('deviceLamp')?.classList.toggle('green',live);document.getElementById('deviceLamp')?.classList.toggle('red',!live);document.getElementById('headerBridgeStatus').textContent=live?'PERMANENT BRIDGE ACTIVE':'BRIDGE STANDBY';document.getElementById('footerConnection').textContent=live?'● ESP32 SIMULATOR ONLINE':'● ESP32 SIMULATOR OFFLINE';};
 window.initEffectEngine?.();
 setInterval(updateSkin,400); updateSkin();
 })();
