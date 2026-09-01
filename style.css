@@ -320,3 +320,137 @@ main.console{width:100%;min-width:0}
   .master-card input{height:125px}
   .right-tools{padding:3px}
 }
+\n
+/* === LANDSCAPE 1536+ / LARGE TABLET RESPONSIVE FIX === */
+/* Keep the page inside the real viewport. The 18-channel strip remains horizontally touch-scrollable. */
+@media (orientation:landscape) and (min-width:1201px) and (max-width:1800px){
+  html,body{width:100%;min-width:0;max-width:100%;overflow-x:hidden}
+  body{min-height:100vh}
+
+  .topbar{
+    width:100%;
+    min-width:0;
+    grid-template-columns:minmax(190px,1.15fr) minmax(95px,.65fr) minmax(230px,1.25fr) minmax(220px,1.1fr) minmax(205px,1fr) minmax(110px,.7fr);
+  }
+  .topbar>*{min-width:0}
+  .bridge-head,.status-head,.scene-head,.clock-head{min-width:0;overflow:hidden}
+  .bridge-head button,.scene-head button{min-width:0}
+
+  .console{
+    width:100%;
+    min-width:0;
+    grid-template-columns:minmax(0,1fr) minmax(360px,27vw) minmax(132px,10vw);
+    gap:6px;
+    padding:6px;
+    align-items:start;
+  }
+  .channel-bank,.center-console,.master-rack{min-width:0;max-width:100%}
+
+  /* Never let the 18-channel bank widen the whole page. */
+  .channel-bank{overflow:hidden}
+  .channel-bank>#channels{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    grid-template-columns:repeat(18,minmax(76px,1fr));
+    overflow-x:auto;
+    overflow-y:hidden;
+    touch-action:pan-x;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:thin;
+  }
+  .channel{min-width:76px}
+
+  .center-console{width:100%;overflow:hidden;padding:6px}
+  .screen-frame{width:100%;min-width:0}
+  .screen-title{min-width:0}
+  .screen-title b,.screen-title span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  /* The screen never creates a second horizontal scrollbar. */
+  .screen-content,.screen-view,.screen-view.active{min-width:0;max-width:100%}
+  .screen-content{grid-template-columns:minmax(0,1fr) minmax(105px,32%)}
+  .screen-tabs{min-width:0;overflow-x:auto;scrollbar-width:none;touch-action:pan-x}
+  .screen-tabs button{min-width:70px;flex:1 0 70px}
+  .pro-screen-grid{grid-template-columns:minmax(0,1fr) minmax(100px,28%);min-width:0}
+  .screen-big-meter,.rta-display,.setup-screen,.effect-screen,.scene-screen{min-width:0;max-width:100%;overflow:hidden}
+
+  /* EFFECT screen/rack: controls wrap instead of being cut off. */
+  .effect-screen-live{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:6px;
+    height:auto;
+    min-height:190px;
+  }
+  .effect-screen-live .fx-screen-select{
+    grid-column:1/-1;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+  .effect-screen-live label{min-width:0}
+  .fx-parameter-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:6px;
+  }
+  .fx-buttons{flex-wrap:wrap}
+  .fx-buttons button{flex:1 1 70px;min-width:0}
+  .fx-extra{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .fx-extra label,.fx-extra select{min-width:0;max-width:100%}
+
+  .aux-rack{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    min-width:0;
+    max-width:100%;
+  }
+  .aux-unit{min-width:0;overflow:hidden}
+  .aux-labels,.mini-knobs,.aux-values{min-width:0;max-width:100%}
+
+  .master-rack{
+    width:100%;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:5px;
+    padding:4px;
+    overflow:hidden;
+  }
+  .master-card,.meter-rack,.monitor-card,.phones-card{min-width:0;max-width:100%;overflow:hidden}
+  .master-card input{height:min(42vh,210px);max-height:210px}
+
+  .bottom-nav{
+    width:100%;
+    min-width:0;
+    overflow-x:auto;
+    touch-action:pan-x;
+  }
+  .right-tools{
+    width:100%;
+    min-width:0;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(220px,.8fr);
+    gap:6px;
+  }
+  .right-tools>*{min-width:0;max-width:100%;overflow:hidden}
+  .connection-test-panel{width:calc(100% - 12px);max-width:calc(100% - 12px);overflow:hidden}
+}
+
+@media (orientation:landscape) and (min-width:1201px) and (max-height:800px){
+  .topbar{height:auto;padding:5px 6px}
+  .console{padding:5px}
+  .channel{min-height:650px}
+  .channel-bank>#channels{grid-template-columns:repeat(18,minmax(74px,1fr))}
+  .channel{min-width:74px}
+  .screen-frame{padding:6px}
+  .screen-tabs button{min-height:30px}
+  .screen-view .screen-content{min-height:0}
+  .pro-screen-grid{height:205px}
+  .meter-columns{height:165px}
+  .rta-display{height:205px}
+  .setup-screen,.effect-screen,.scene-screen{min-height:190px;padding:10px}
+  .master-card input{height:175px}
+  .status-footer{position:relative}
+}
+
+/* Large landscape touch targets: avoid tiny controls while preserving the compact mixer layout. */
+@media (orientation:landscape) and (min-width:1201px) and (pointer:coarse){
+  button,.screen-tabs button,.fx-buttons button{min-height:34px}
+  .channel button{min-height:30px}
+  .channel .knob-wrap{min-width:54px;min-height:54px}
+  .channel input.fader{height:175px}
+}
