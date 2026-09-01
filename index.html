@@ -33,10 +33,11 @@
 </header>
 
 <main class="console">
-  <section class="channel-bank">
-    <div class="bank-title"><span>INPUT CHANNELS</span><small>CH1–CH18</small></div>
-    <div id="channels"></div>
-  </section>
+  <div id="channels" class="channel-layout">
+    <section class="channel-bank channel-bank-left">
+      <div class="bank-title"><span>INPUT CHANNELS 1–9</span><small>CH1–CH9</small></div>
+      <div class="channel-side" id="channelsLeft"></div>
+    </section>
 
   <section class="center-console">
     <div class="screen-frame">
@@ -98,6 +99,11 @@
     </div>
   </section>
 
+    <section class="channel-bank channel-bank-right">
+      <div class="bank-title"><span>INPUT CHANNELS 10–18</span><small>CH10–CH18</small></div>
+      <div class="channel-side" id="channelsRight"></div>
+    </section>
+
   <aside class="master-rack">
     <div class="meter-rack"><b>MAIN L&nbsp; R</b><div class="main-meters"><div class="meter"></div><div class="meter"></div></div></div>
     <div class="master-card">
@@ -109,6 +115,7 @@
     <div class="monitor-card"><b>MONITOR</b><span>SOURCE</span><button>MAIN L/R</button><div class="monitor-knob"></div><span>LEVEL</span></div>
     <div class="phones-card">🎧 <b>PHONES</b><div class="phone-knob"></div><span>●</span></div>
   </aside>
+  </div>
 </main>
 
 <nav class="bottom-nav">
