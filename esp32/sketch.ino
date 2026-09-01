@@ -52,6 +52,43 @@ void handleHealth() {
   sendJson(doc);
 }
 
+void handleFeedback() {
+  if (server.method() != HTTP_POST) {
+    server.send(405, "text/plain", "POST only");
+    return;
+  }
+  JsonDocument in;
+  DeserializationError err = deserializeJson(in, server.arg("plain"));
+  if (err) {
+    sendAck("", false, "invalid-json");
+    return;
+  }
+  const char* protocol = in["protocol"] | "";
+  if (strcmp(protocol, "ESP32-MIXER/1") != 0) {
+    sendAck(in["id"] | "", false, "unsupported-protocol");
+    return;
+  }
+  const char* type = in["type"] | "";
+  if (strcmp(type, "METER") != 0 && strcmp(type, "FEEDBACK") != 0 && strcmp(type, "LEVEL") != 0) {
+    sendAck(in["id"] | "", false, "unsupported-feedback");
+    return;
+  }
+  int ch = in["ch"] | 0;
+  if (ch < 1 || ch > 18) {
+    sendAck(in["id"] | "", false, "invalid-channel");
+    return;
+  }
+  float level = in["level"] | (in["value"] | 0.0f);
+  if (!isfinite(level) || level < 0.0f || level > 2.0f) {
+    sendAck(in["id"] | "", false, "invalid-level");
+    return;
+  }
+  // This endpoint is the physical-mixer -> ESP32 bridge ingress.
+  // A hardware driver can post ADC/DSP measurements here; the same
+  // ESP32-MIXER/1 packet can then be forwarded to the web transport.
+  sendAck(in["id"] | "", true);
+}
+
 void handleControl() {
   if (server.method() != HTTP_POST) {
     server.send(405, "text/plain", "POST only");
@@ -119,6 +156,8 @@ void setup() {
   server.on("/api/v1/health", HTTP_GET, handleHealth);
   server.on("/control", HTTP_POST, handleControl);
   server.on("/api/v1/control", HTTP_POST, handleControl);
+  server.on("/feedback", HTTP_POST, handleFeedback);
+  server.on("/api/v1/feedback", HTTP_POST, handleFeedback);
 
   server.begin();
 
