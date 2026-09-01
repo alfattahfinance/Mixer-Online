@@ -88,3 +88,71 @@
  .fx-extra{flex-direction:column}
  .aux-live .aux-control{height:82px}
 }
+
+/* === LARGE PHONE / TABLET RESPONSIVE OVERRIDE === */
+html,body{width:100%;max-width:100%;overflow-x:hidden}
+body{min-width:0}
+.console{min-width:0;width:100%}
+.channel-bank{min-width:0}
+.channel-bank>#channels{min-width:0}
+.center-console,.master-rack{min-width:0}
+.right-tools{min-width:0}
+.screen-frame{min-width:0}
+.screen-content,.screen-view,.effect-screen,.setup-screen,.scene-screen{min-width:0}
+@media (max-width:1400px){
+  .topbar{grid-template-columns:1.2fr 100px 1.35fr 1.15fr 1fr;min-width:0}
+  .clock-head{display:none}
+  .console{grid-template-columns:minmax(0,1fr) 300px;min-width:0}
+  .channel-bank{grid-column:1/-1}
+  .channel-bank>#channels{grid-template-columns:repeat(18,82px);overflow-x:auto;overflow-y:hidden;max-width:100%;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+  .center-console{grid-column:1}
+  .master-rack{grid-column:2}
+  .right-tools{grid-template-columns:1fr 1.25fr;min-width:0}
+  .media-rack{grid-column:1/-1}
+}
+@media (max-width:1100px){
+  .topbar{grid-template-columns:1fr 1fr 1.2fr 1fr;gap:5px;padding:6px;height:auto}
+  .brand{grid-column:1/-1}
+  .system-box,.bridge-head,.status-head,.scene-head{min-width:0}
+  .bridge-head{grid-template-columns:1fr auto auto}
+  .console{grid-template-columns:minmax(0,1fr) 230px;gap:5px;padding:5px}
+  .center-console{padding:5px}
+  .master-rack{padding:5px}
+  .screen-content{grid-template-columns:1fr}
+  .screen-content .player{display:none}
+  .pro-screen-grid{grid-template-columns:1fr 105px}
+  .right-tools{grid-template-columns:1fr;gap:5px;padding:5px}
+  .media-rack{grid-column:auto}
+}
+@media (max-width:850px){
+  .topbar{grid-template-columns:1fr 1fr}
+  .bridge-head{grid-column:1/-1}
+  .status-head{display:none}
+  .scene-head{grid-column:1/-1}
+  .console{grid-template-columns:1fr}
+  .channel-bank{grid-column:1}
+  .center-console{grid-column:1}
+  .master-rack{grid-column:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .screen-content{grid-template-columns:1fr}
+  .screen-tabs{overflow-x:auto;scrollbar-width:none}
+  .screen-tabs button{min-width:82px}
+  .effect-screen-live{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .effect-screen-live .fx-screen-select{grid-column:1/-1}
+  .fx-parameter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .aux-rack{grid-template-columns:1fr}
+  .right-tools{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .topbar{grid-template-columns:1fr}
+  .brand,.bridge-head,.scene-head{grid-column:1}
+  .bridge-head{grid-template-columns:1fr 1fr}
+  .bridge-head .box-title{grid-column:1/-1}
+  .console{padding:3px}
+  .channel-bank>#channels{grid-template-columns:repeat(18,78px);padding:3px}
+  .channel{min-width:78px}
+  .screen-tabs button{min-width:72px;padding:5px 6px}
+  .effect-screen-live{grid-template-columns:1fr}
+  .effect-screen-live .fx-screen-select{grid-template-columns:1fr 1fr}
+  .fx-parameter-grid{grid-template-columns:1fr}
+  .master-rack{grid-template-columns:1fr 1fr}
+}
