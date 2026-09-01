@@ -41,8 +41,9 @@
   <section class="center-console">
     <div class="screen-frame">
       <div class="screen-title"><b>MIXER-ONLINE</b><span>18CH DIGITAL MIXER</span></div>
-      <div class="screen-tabs"><button class="active">HOME</button><button>METER</button><button>RTA</button><button>SETUP</button><button>EFFECT</button><button>SCENE</button></div>
-      <div class="screen-content">
+      <div class="screen-tabs" id="screenTabs"><button class="active" data-screen="HOME">HOME</button><button data-screen="METER">METER</button><button data-screen="RTA">RTA</button><button data-screen="SETUP">SETUP</button><button data-screen="EFFECT">EFFECT</button><button data-screen="SCENE">SCENE</button></div>
+      <div class="screen-content" id="screenContent">
+  <section class="screen-view active" data-view="HOME">
         <div class="screen-dashboard">
           <div class="spectrum" id="visualMeter"><div class="grid-lines"></div><div class="bars"></div><div class="screen-scale"><span>0</span><span>-6</span><span>-12</span><span>-24</span><span>-48</span></div><div class="screen-label">MAIN L&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MAIN R</div></div>
           <div class="screen-readouts"><div><small>INPUT</small><b id="screenInput">CH1</b></div><div><small>FADER</small><b id="screenFader">75%</b></div><div><small>GAIN</small><b id="screenGain">1.00</b></div><div><small>PAN</small><b id="screenPan">CENTER</b></div><div><small>STATUS</small><b id="screenStatus">READY</b></div></div>
@@ -52,7 +53,23 @@
           <div class="player-buttons"><button>◀</button><button>▶</button><button>▶▶</button><button>▶|</button></div>
           <span>VOL 75%</span>
         </div>
-      </div>
+      </section>
+  <section class="screen-view" data-view="METER">
+    <div class="pro-screen-grid"><div class="screen-big-meter"><div class="meter-columns" id="screenChannelMeters"></div><span class="meter-db">0&nbsp;&nbsp;&nbsp;-6&nbsp;&nbsp;&nbsp;-12&nbsp;&nbsp;&nbsp;-24&nbsp;&nbsp;&nbsp;-48</span></div><div class="screen-info-card"><b>METER / INPUT</b><strong id="meterSelected">CH1</strong><span>LEVEL <em id="meterLevel">0%</em></span><span>PEAK <em id="meterPeak">-∞ dB</em></span><span>STATUS <em>LIVE</em></span></div></div>
+  </section>
+  <section class="screen-view" data-view="RTA">
+    <div class="rta-display"><div class="rta-grid"></div><div class="rta-bars" id="rtaBars"></div><div class="rta-labels"><span>63</span><span>125</span><span>250</span><span>500</span><span>1K</span><span>2K</span><span>4K</span><span>8K</span><span>16K</span></div></div>
+  </section>
+  <section class="screen-view" data-view="SETUP">
+    <div class="setup-screen"><b>SYSTEM SETUP</b><div class="setup-grid"><span>CHANNELS <strong>18</strong></span><span>TRANSPORT <strong id="setupTransport">OFFLINE</strong></span><span>PROTOCOL <strong>ESP32-MIXER/1</strong></span><span>SYNC <strong>TWO-WAY</strong></span><span>SYSTEM <strong id="setupSystem">OFF</strong></span><span>REMOTE <strong>BLUETOOTH / BRIDGE</strong></span></div></div>
+  </section>
+  <section class="screen-view" data-view="EFFECT">
+    <div class="effect-screen"><div><b>FX1</b><strong>HALL 1</strong><span>REVERB</span></div><div><b>TIME</b><strong>2.45s</strong></div><div><b>PRE-DELAY</b><strong>32ms</strong></div><div><b>DECAY</b><strong>65%</strong></div><div><b>LEVEL</b><strong>-3.0dB</strong></div><button id="screenFxTap">TAP</button></div>
+  </section>
+  <section class="screen-view" data-view="SCENE">
+    <div class="scene-screen"><b>SCENE MANAGER</b><strong id="sceneName">DEFAULT</strong><div><button id="screenSceneSave">SAVE</button><button id="screenSceneRecall">RECALL</button><button id="screenSceneDefault">DEFAULT</button></div><small>Scene tersimpan di browser dan dapat dipanggil kembali.</small></div>
+  </section>
+</div>
     </div>
 
     <div class="fx-rack">
@@ -130,7 +147,7 @@
  document.getElementById('savePresetTop')?.addEventListener('click',()=>document.getElementById('savePreset')?.click());
  document.getElementById('recallPresetTop')?.addEventListener('click',()=>document.getElementById('recallPreset')?.click());
  document.getElementById('defaultScene')?.addEventListener('click',()=>{localStorage.removeItem('mr18_preset_default');document.getElementById('testResult').textContent='DEFAULT SCENE: factory state ready';});
- const updateSkin=()=>{const live=document.getElementById('status')?.textContent==='ONLINE';document.getElementById('statusLamp')?.classList.toggle('live',live);document.getElementById('deviceLamp')?.classList.toggle('green',live);document.getElementById('deviceLamp')?.classList.toggle('red',!live);document.getElementById('headerBridgeStatus').textContent=live?'PERMANENT BRIDGE ACTIVE':'BRIDGE STANDBY';document.getElementById('footerConnection').textContent=live?'● ESP32 SIMULATOR ONLINE':'● ESP32 SIMULATOR OFFLINE';};
+ const tabs=document.querySelectorAll('#screenTabs [data-screen]'); const views=document.querySelectorAll('.screen-view'); const setScreen=(name)=>{tabs.forEach(b=>b.classList.toggle('active',b.dataset.screen===name));views.forEach(v=>v.classList.toggle('active',v.dataset.view===name));document.querySelector('.screen-frame')?.setAttribute('data-screen',name);if(name==='METER')buildScreenMeters();if(name==='RTA')buildRta();if(name==='SETUP')updateSetup();};tabs.forEach(b=>b.addEventListener('click',()=>setScreen(b.dataset.screen)));function buildScreenMeters(){const root=document.getElementById('screenChannelMeters');if(!root)return;root.innerHTML='';for(let i=0;i<18;i++){const el=document.createElement('i');el.style.height=(12+((i*17)%70))+'%';el.title='CH'+(i+1);root.appendChild(el)}}function buildRta(){const root=document.getElementById('rtaBars');if(!root)return;root.innerHTML='';for(let i=0;i<18;i++){const b=document.createElement('i');b.style.height=(18+((i*23)%72))+'%';root.appendChild(b)}}function updateSetup(){const a=window.MixerAdapters?.active;const t=document.getElementById('setupTransport');const s=document.getElementById('setupSystem');if(t)t.textContent=a?.connected?(a.transport==='bluetooth'?'BLUETOOTH':'ESP32 BRIDGE'):'OFFLINE';if(s)s.textContent=document.getElementById('power')?.classList.contains('on')?'ON':'OFF'}document.getElementById('screenSceneSave')?.addEventListener('click',()=>document.getElementById('savePreset')?.click());document.getElementById('screenSceneRecall')?.addEventListener('click',()=>document.getElementById('recallPreset')?.click());document.getElementById('screenSceneDefault')?.addEventListener('click',()=>document.getElementById('defaultScene')?.click());document.getElementById('screenFxTap')?.addEventListener('click',()=>{document.querySelector('.fx-buttons button')?.click()});const updateSkin=()=>{const live=document.getElementById('status')?.textContent==='ONLINE';document.getElementById('statusLamp')?.classList.toggle('live',live);document.getElementById('deviceLamp')?.classList.toggle('green',live);document.getElementById('deviceLamp')?.classList.toggle('red',!live);document.getElementById('headerBridgeStatus').textContent=live?'PERMANENT BRIDGE ACTIVE':'BRIDGE STANDBY';document.getElementById('footerConnection').textContent=live?'● ESP32 SIMULATOR ONLINE':'● ESP32 SIMULATOR OFFLINE';};
 setInterval(updateSkin,400); updateSkin();
 })();
 </script>
