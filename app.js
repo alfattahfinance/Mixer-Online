@@ -1,6 +1,6 @@
 const N=18; let activeChannelCount=18;
 const R={fader:[0,100],gain:[0,2],low:[-12,12],mid:[-12,12],high:[-12,12],pan:[-1,1]};
-const state={system:false,connected:false,channels:Array.from({length:N},(_,i)=>({id:i+1,fader:75,gain:1,low:0,mid:0,high:0,pan:0,mute:false,solo:false,level:0})),master:75,revision:0,sim:{online:false,txCount:0,rxCount:0}};
+const state={system:false,connected:false,channels:Array.from({length:N},(_,i)=>({id:i+1,fader:75,gain:1,low:0,mid:0,high:0,pan:0,mute:false,solo:false,level:0})),master:75,effects:{selected:"FX1",fx1:{preset:"HALL 1",type:"REVERB",time:2.45,preDelay:32,decay:65,level:-3,tapBpm:120},fx2:{preset:"ROOM",type:"REVERB",time:1.6,preDelay:24,decay:55,level:-6,tapBpm:120},aux:{AUX1:0,AUX2:0,AUX3:0,AUX4:0},fxReturn:{FX1:.45,FX2:.45}},revision:0,sim:{online:false,txCount:0,rxCount:0}}; window.state=state;
 const $=id=>document.getElementById(id);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function knobVisual(x){const w=x.parentElement;const min=Number(x.min),max=Number(x.max),v=Number(x.value);const pct=max===min?0:(v-min)/(max-min);w.style.setProperty("--knob-angle",(-135+pct*270)+"deg");w.setAttribute("aria-valuemin",x.min);w.setAttribute("aria-valuemax",x.max);w.setAttribute("aria-valuenow",x.value);}
@@ -23,8 +23,8 @@ function syncHeader(){const power=$("power"),status=$("status"),esp=$("connectEs
 function toggleSystem(){state.system=!state.system;if(!state.system){window.MixerAdapters?.disconnect?.();state.connected=false;state.sim.online=false}syncHeader();render()}
 function toggleConnection(){if(state.connected){window.MixerAdapters?.disconnect?.();state.connected=false;state.sim.online=false;syncHeader();return true}if(!state.system){$("testResult").textContent="CONNECT BLOCKED: SYSTEM OFF";return false}window.MixerAdapters?.simulator?.();state.connected=true;state.sim.online=true;syncHeader();rx({type:"HELLO",device:"ESP32-SIMULATOR",channels:N});return true}
 function applyControl(p){const ch=Number(p.ch);if(ch<1||ch>N)return false;const c=state.channels[ch-1];const k=p.param;if(R[k])c[k]=clamp(Number(p.value),R[k][0],R[k][1]);else if(k==="mute"||k==="solo")c[k]=!!p.value;else return false;return true}
-function rx(p){if(!p||typeof p!=="object")return false;$("rx").textContent="RX: "+JSON.stringify(p);state.sim.rxCount++;if(p.type==="HELLO")return p.channels===N;if(p.type==="ACK")return !!p.ok;if(p.type==="FEEDBACK"){if(p.param==="master"){state.master=clamp(Number(p.value),0,100);const m=$("master");if(m)m.value=state.master;const mv=$("masterVal");if(mv)mv.textContent=state.master+"%";return true}return applyControl(p)&&render(),true}if(p.type==="CONTROL")return applyControl(p)&&render(),true;if(p.type==="MASTER"){state.master=clamp(Number(p.value),0,100);$("masterVal").textContent=state.master+"%";return true}if(p.type==="METER"){const ch=Number(p.ch);if(ch<1||ch>N)return false;state.channels[ch-1].level=clamp(Number(p.level)||0,0,2);render();return true}return false}
-function hydrateFromSimulator(){const s=window.MixerAdapters?.getSimulatorState?.();if(!s||!Array.isArray(s.channels)||s.channels.length!==N)return false;state.channels=s.channels.map((c,i)=>({...state.channels[i],...c,id:i+1}));state.master=clamp(Number(s.master??state.master),0,100);const m=$("master");if(m)m.value=state.master;const mv=$("masterVal");if(mv)mv.textContent=state.master+"%";render();return true}function simulatorReceive(packet){if(!state.sim.online)return false;rx({...packet,device:"ESP32-SIMULATOR"});return true}
+function rx(p){if(!p||typeof p!=="object")return false;$("rx").textContent="RX: "+JSON.stringify(p);state.sim.rxCount++;if(p.type==="HELLO")return p.channels===N;if(p.type==="ACK")return !!p.ok;if(p.type==="FEEDBACK"){if(p.param==="master"){state.master=clamp(Number(p.value),0,100);const m=$("master");if(m)m.value=state.master;const mv=$("masterVal");if(mv)mv.textContent=state.master+"%";return true}if(p.scope&&p.scope!=="CHANNEL")return applyEffectFeedback(p);return applyControl(p)&&render(),true}if(p.type==="CONTROL")return applyControl(p)&&render(),true;if(p.type==="MASTER"){state.master=clamp(Number(p.value),0,100);$("masterVal").textContent=state.master+"%";return true}if(p.type==="METER"){const ch=Number(p.ch);if(ch<1||ch>N)return false;state.channels[ch-1].level=clamp(Number(p.level)||0,0,2);render();return true}return false}
+function hydrateFromSimulator(){const s=window.MixerAdapters?.getSimulatorState?.();if(!s||!Array.isArray(s.channels)||s.channels.length!==N)return false;state.channels=s.channels.map((c,i)=>({...state.channels[i],...c,id:i+1}));state.master=clamp(Number(s.master??state.master),0,100);if(s.effects)state.effects={...state.effects,...s.effects,fx1:{...state.effects.fx1,...s.effects.fx1},fx2:{...state.effects.fx2,...s.effects.fx2},aux:{...state.effects.aux,...s.effects.aux},fxReturn:{...state.effects.fxReturn,...s.effects.fxReturn}};const m=$("master");if(m)m.value=state.master;const mv=$("masterVal");if(mv)mv.textContent=state.master+"%";render();return true}function simulatorReceive(packet){if(!state.sim.online)return false;rx({...packet,device:"ESP32-SIMULATOR"});return true}
 function send(msg){const active=window.MixerAdapters?.active;if(!active?.connected){state.connected=false;state.sim.online=false;syncHeader();$("tx").textContent="TX: BLOCKED — TRANSPORT OFFLINE";return false}state.connected=true;state.sim.online=active.transport==="esp32";const packet={...msg,rev:++state.revision,ts:Date.now()};const result=window.MixerAdapters?.sendMapped?.(packet);if(!result?.ok){$("tx").textContent="TX: BLOCKED — "+(result?.reason||"TRANSPORT ERROR");return false}state.sim.txCount++;$("tx").textContent="TX: "+JSON.stringify(packet);localStorage.setItem("mr18_last_tx",JSON.stringify(packet));if(window.MixerAdapters?.active?.type==="simulator")bridgePanelEvent(packet);return true}
 $("power").addEventListener("click",e=>{e.preventDefault();toggleSystem()});
 $("master").addEventListener("input",e=>{if(!state.system)return;state.master=Number(e.target.value);$("masterVal").textContent=state.master+"%";send({type:"MASTER",value:state.master})});
@@ -78,3 +78,132 @@ function applyChannelMap(){const n=Math.min(N,Math.max(1,Number(document.getElem
 function loadChannelMap(){try{const x=JSON.parse(localStorage.getItem("mr18_channel_map")||"null");if(Array.isArray(x)&&x.length===N)x.forEach((v,i)=>channelMap[i]=Number(v)||0);const n=Number(localStorage.getItem("mr18_active_channels"));if(n>=1&&n<=N)activeChannelCount=n}catch{}renderChannelMap();render();updateChannelCountUI(activeChannelCount)}
 function initChannelMapper(){loadChannelMap();const ch=document.getElementById("mapperChannels"),auto=document.getElementById("autoMapChannels"),apply=document.getElementById("applyChannelMap");ch?.addEventListener("change",renderChannelMap);auto?.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();autoMapChannels();});apply?.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();applyChannelMap();});renderChannelMap();}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",initChannelMapper,{once:true});else initChannelMapper();
+
+
+/* === LIVE EFFECT ENGINE === */
+const FX_RANGES={time:[0.1,10],preDelay:[0,200],decay:[0,100],level:[-20,6],tapBpm:[40,240]};
+const FX_PRESETS={
+  "HALL 1":{type:"REVERB",time:2.45,preDelay:32,decay:65,level:-3},
+  "ROOM":{type:"REVERB",time:1.60,preDelay:24,decay:55,level:-6},
+  "PLATE":{type:"REVERB",time:1.90,preDelay:18,decay:72,level:-4},
+  "DELAY":{type:"DELAY",time:0.80,preDelay:90,decay:45,level:-5},
+  "CHORUS":{type:"CHORUS",time:1.20,preDelay:12,decay:40,level:-6}
+};
+let fxTapTimes=[];
+function activeFxKey(){return state.effects.selected==="FX2"?"fx2":"fx1"}
+function activeFx(){return state.effects[activeFxKey()]}
+function fmtFx(param,v){v=Number(v);if(param==="time")return v.toFixed(2)+"s";if(param==="preDelay")return Math.round(v)+"ms";if(param==="decay")return Math.round(v)+"%";if(param==="level")return v.toFixed(1)+"dB";return String(v)}
+function updateEffectUI(){
+  const fxName=state.effects.selected==="FX2"?"FX2":"FX1", fx=activeFx();
+  document.querySelectorAll("[data-fx-select]").forEach(b=>b.classList.toggle("active",b.dataset.fxSelect===fxName));
+  const set=(id,v)=>{const e=$(id);if(e)e.textContent=v};
+  set("fxRackPreset",fx.preset);set("fxRackSummary",fx.type+" • TIME "+fmtFx("time",fx.time)+" • LEVEL "+fmtFx("level",fx.level));
+  set("fxBpm",Math.round(fx.tapBpm)+" BPM");set("screenFxBpm",Math.round(fx.tapBpm)+" BPM");
+  const ss=$( "screenFxSelect");if(ss)ss.value=fxName;
+  const sp=$( "screenFxPreset");if(sp)sp.value=fx.preset;
+  const st=$( "screenFxType");if(st)st.value=fx.type;
+  document.querySelectorAll(".fx-control").forEach(x=>{
+    const scope=x.dataset.scope||"FX", target=x.dataset.target||fxName;
+    if(scope!=="FX"||target!==fxName)return;
+    const v=fx[x.dataset.param];if(v!==undefined)x.value=v;
+    const o=x.parentElement.querySelector("[data-fx-value='"+x.dataset.param+"']");if(o)o.textContent=fmtFx(x.dataset.param,v);
+  });
+  document.querySelectorAll(".fx-preset").forEach(x=>{x.dataset.target=fxName;x.value=fx.preset});
+  document.querySelectorAll(".fx-type").forEach(x=>{x.dataset.target=fxName;x.value=fx.type});
+  document.querySelectorAll("[data-aux-value]").forEach(o=>{const k=o.dataset.auxValue;o.textContent=Math.round((state.effects.aux[k]||0)*100)+"%"});
+  document.querySelectorAll("[data-return-value]").forEach(o=>{const k=o.dataset.returnValue;o.textContent=Math.round((state.effects.fxReturn[k]||0)*100)+"%"});
+  document.querySelectorAll(".aux-control").forEach(x=>{
+    if(x.dataset.scope==="FX_RETURN")return;
+    const k=x.dataset.target;if(k&&state.effects.aux[k]!==undefined)x.value=state.effects.aux[k];
+  });
+  document.querySelectorAll('.aux-control[data-scope="FX_RETURN"]').forEach(x=>{const k=x.dataset.target;if(k&&state.effects.fxReturn[k]!==undefined)x.value=state.effects.fxReturn[k]});
+  const screenVals={time:"time",preDelay:"preDelay",decay:"decay",level:"level"};
+  Object.entries(screenVals).forEach(([p])=>{
+    const x=document.querySelector('.effect-screen-live .fx-control[data-param="'+p+'"]');if(x){x.dataset.target=fxName;x.value=fx[p];const o=x.parentElement.querySelector("[data-fx-value='"+p+"']");if(o)o.textContent=fmtFx(p,fx[p])}
+  });
+}
+function sendFxControl(target,param,value){
+  if(!state.system)return false;
+  const key=target==="FX2"?"fx2":"fx1", fx=state.effects[key];
+  if(FX_RANGES[param])value=clamp(Number(value),FX_RANGES[param][0],FX_RANGES[param][1]);else value=String(value);
+  fx[param]=value;state.effects.selected=target;
+  updateEffectUI();
+  return send({type:"CONTROL",scope:"FX",target,param,value});
+}
+function sendAuxControl(target,value){
+  if(!state.system)return false;
+  value=clamp(Number(value),0,1);state.effects.aux[target]=value;updateEffectUI();
+  return send({type:"CONTROL",scope:"AUX",target,param:"auxLevel",value});
+}
+function sendReturnControl(target,value){
+  if(!state.system)return false;
+  value=clamp(Number(value),0,1);state.effects.fxReturn[target]=value;updateEffectUI();
+  return send({type:"CONTROL",scope:"FX_RETURN",target,param:"returnLevel",value});
+}
+function applyEffectFeedback(p){
+  const scope=String(p.scope||"FX"), target=String(p.target||p.fx||p.bus||"");
+  if(scope==="FX"){
+    const key=target==="FX2"?"fx2":"fx1",fx=state.effects[key];
+    if(FX_RANGES[p.param])fx[p.param]=clamp(Number(p.value),FX_RANGES[p.param][0],FX_RANGES[p.param][1]);
+    else if(p.param==="preset"||p.param==="type")fx[p.param]=String(p.value);
+    else return false;
+    state.effects.selected=target==="FX2"?"FX2":"FX1";updateEffectUI();return true;
+  }
+  if(scope==="AUX"){
+    if(!(target in state.effects.aux))return false;state.effects.aux[target]=clamp(Number(p.value),0,1);updateEffectUI();return true;
+  }
+  if(scope==="FX_RETURN"){
+    if(!(target in state.effects.fxReturn))return false;state.effects.fxReturn[target]=clamp(Number(p.value),0,1);updateEffectUI();return true;
+  }
+  return false;
+}
+function tapEffectTempo(){
+  if(!state.system)return false;
+  const now=Date.now();fxTapTimes=fxTapTimes.filter(t=>now-t<3000);fxTapTimes.push(now);
+  let bpm=activeFx().tapBpm||120;
+  if(fxTapTimes.length>=2){
+    const gaps=[];for(let i=1;i<fxTapTimes.length;i++)gaps.push(fxTapTimes[i]-fxTapTimes[i-1]);
+    const avg=gaps.reduce((a,b)=>a+b,0)/gaps.length;
+    if(avg>0)bpm=clamp(60000/avg,40,240);
+  }
+  bpm=Math.round(bpm);activeFx().tapBpm=bpm;updateEffectUI();
+  send({type:"CONTROL",scope:"FX",target:state.effects.selected,param:"tapBpm",value:bpm});
+  const r=$("testResult");if(r)r.textContent="FX TAP TEMPO: "+bpm+" BPM • "+state.effects.selected;
+  return true;
+}
+function chooseFx(target){
+  if(!["FX1","FX2"].includes(target))return false;
+  state.effects.selected=target;updateEffectUI();
+  send({type:"CONTROL",scope:"FX",target,param:"type",value:activeFx().type});
+  return true;
+}
+function choosePreset(preset){
+  const target=state.effects.selected, p=FX_PRESETS[preset];if(!p)return false;
+  const fx=activeFx();fx.preset=preset;Object.assign(fx,p);updateEffectUI();
+  send({type:"CONTROL",scope:"FX",target,param:"preset",value:preset});
+  for(const k of ["type","time","preDelay","decay","level"])send({type:"CONTROL",scope:"FX",target,param:k,value:fx[k]});
+  return true;
+}
+function bindEffectEngine(){
+  document.querySelectorAll("[data-fx-select]").forEach(b=>b.addEventListener("click",e=>{e.preventDefault();chooseFx(b.dataset.fxSelect)}));
+  document.querySelectorAll(".fx-control").forEach(x=>x.addEventListener("input",()=>{
+    const target=x.dataset.target||state.effects.selected,param=x.dataset.param;
+    sendFxControl(target,param,x.value);
+  }));
+  document.querySelectorAll(".fx-preset").forEach(x=>x.addEventListener("change",()=>choosePreset(x.value)));
+  document.querySelectorAll(".fx-type").forEach(x=>x.addEventListener("change",()=>{
+    const target=x.dataset.target||state.effects.selected;const v=x.value;
+    activeFx().type=v;updateEffectUI();send({type:"CONTROL",scope:"FX",target,param:"type",value:v});
+  }));
+  document.querySelectorAll(".aux-control").forEach(x=>x.addEventListener("input",()=>{
+    if(x.dataset.scope==="FX_RETURN")sendReturnControl(x.dataset.target,x.value);else sendAuxControl(x.dataset.target,x.value);
+  }));
+  $("fxTap")?.addEventListener("click",e=>{e.preventDefault();tapEffectTempo()});
+  $("screenFxTap")?.addEventListener("click",e=>{e.preventDefault();tapEffectTempo()});
+  $("screenFxSelect")?.addEventListener("change",e=>chooseFx(e.target.value));
+  $("screenFxPreset")?.addEventListener("change",e=>choosePreset(e.target.value));
+  $("screenFxType")?.addEventListener("change",e=>{activeFx().type=e.target.value;updateEffectUI();send({type:"CONTROL",scope:"FX",target:state.effects.selected,param:"type",value:e.target.value})});
+  updateEffectUI();
+}
+window.tapEffectTempo=tapEffectTempo;
+window.initEffectEngine=bindEffectEngine;
