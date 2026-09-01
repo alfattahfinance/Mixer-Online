@@ -995,3 +995,54 @@ main.console{width:100%;min-width:0}
     box-sizing:border-box !important;
   }
 }
+
+
+/* === FINAL VIEWPORT LAYOUT LOCK: CH1-9 | MIXER | CH10-18 ===
+   Layout-only. Engine/control/TX/ACK/FEEDBACK untouched.
+   Uses viewport width so Android Chrome landscape cannot fall back
+   to the stacked mobile rule.
+*/
+@media (min-width:901px){
+  #channels.channel-layout{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) clamp(300px,28vw,390px) minmax(0,1fr)!important;
+    grid-template-rows:auto auto!important;
+    grid-template-areas:"left center right" "bottom bottom bottom"!important;
+    gap:7px!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+    align-items:start!important;
+  }
+  #channels.channel-layout>.channel-bank-left{grid-area:left!important;grid-column:1!important;grid-row:1!important;}
+  #channels.channel-layout>.center-console{grid-area:center!important;grid-column:2!important;grid-row:1!important;}
+  #channels.channel-layout>.channel-bank-right{grid-area:right!important;grid-column:3!important;grid-row:1!important;}
+  #channels.channel-layout>.master-rack{grid-area:bottom!important;grid-column:1/-1!important;grid-row:2!important;}
+
+  #channels.channel-layout>.channel-bank-left,
+  #channels.channel-layout>.channel-bank-right,
+  #channels.channel-layout>.center-console,
+  #channels.channel-layout>.master-rack{
+    width:100%!important;min-width:0!important;max-width:100%!important;
+    margin:0!important;box-sizing:border-box!important;
+  }
+
+  #channels.channel-layout>.channel-bank-left .channel-side,
+  #channels.channel-layout>.channel-bank-right .channel-side{
+    display:grid!important;
+    grid-template-columns:repeat(9,minmax(0,1fr))!important;
+    grid-auto-columns:unset!important;
+    gap:2px!important;
+    width:100%!important;min-width:0!important;max-width:100%!important;
+    overflow:hidden!important;
+    box-sizing:border-box!important;
+  }
+
+  #channels.channel-layout>.channel-bank-left .channel,
+  #channels.channel-layout>.channel-bank-right .channel{
+    width:100%!important;min-width:0!important;max-width:none!important;
+    margin:0!important;box-sizing:border-box!important;
+  }
+}
+/* === END FINAL VIEWPORT LAYOUT LOCK === */
