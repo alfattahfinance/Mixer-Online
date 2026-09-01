@@ -377,8 +377,7 @@ window.MixerAdapters = (() => {
     if (!active?.write)
       return { ok: false, reason: "bluetooth-write-characteristic-unavailable" };
 
-    const data = new TextEncoder().encode(JSON.stringify(packet) + "
-");
+    const data = new TextEncoder().encode(JSON.stringify(packet) + "\n");
     const writer = active.write.writeValueWithoutResponse || active.write.writeValue;
 
     try {
@@ -426,6 +425,7 @@ window.MixerAdapters = (() => {
       rx: [],
       ack: [],
       pending: new Map(),
+      bridge: { mode:"two-way", target:"analog-mixer", physicalChannels:4, commands:[], feedback:[] },
       startedAt: Date.now(),
       lastTx: null,
       lastRx: null,
@@ -496,8 +496,7 @@ window.MixerAdapters = (() => {
         notify.addEventListener("characteristicvaluechanged", event => {
           const chunk = new TextDecoder().decode(event.target.value);
           connection.buffer += chunk;
-          const lines = connection.buffer.split(/\r?
-/);
+          const lines = connection.buffer.split(/\r?\n/);
           connection.buffer = lines.pop() || "";
 
           for (const line of lines) {
