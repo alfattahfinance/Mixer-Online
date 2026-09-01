@@ -41,12 +41,13 @@
   <section class="center-console">
     <div class="screen-frame">
       <div class="screen-title"><b>MIXER-ONLINE</b><span>18CH DIGITAL MIXER</span></div>
-      <div class="screen-tabs"><button class="active">HOME</button><button>METER</button><button>RTA</button><button>SETUP</button><button>EFFECT</button></div>
+      <div class="screen-tabs"><button class="active">HOME</button><button>METER</button><button>RTA</button><button>SETUP</button><button>EFFECT</button><button>SCENE</button></div>
       <div class="screen-content">
-        <div class="spectrum" id="visualMeter">
-          <div class="bars"></div><div class="screen-label">MAIN&nbsp; L &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; R</div>
+        <div class="screen-dashboard">
+          <div class="spectrum" id="visualMeter"><div class="grid-lines"></div><div class="bars"></div><div class="screen-scale"><span>0</span><span>-6</span><span>-12</span><span>-24</span><span>-48</span></div><div class="screen-label">MAIN L&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MAIN R</div></div>
+          <div class="screen-readouts"><div><small>INPUT</small><b id="screenInput">CH1</b></div><div><small>FADER</small><b id="screenFader">75%</b></div><div><small>GAIN</small><b id="screenGain">1.00</b></div><div><small>PAN</small><b id="screenPan">CENTER</b></div><div><small>STATUS</small><b id="screenStatus">READY</b></div></div>
         </div>
-        <div class="player">
+        <div class="player"><div class="screen-mini"><span>USB / MUSIC</span><i>● READY</i></div>
           <b>USB PLAYER</b><strong>TRACK 01</strong><small>00:00:00 / 00:00:00</small>
           <div class="player-buttons"><button>◀</button><button>▶</button><button>▶▶</button><button>▶|</button></div>
           <span>VOL 75%</span>
