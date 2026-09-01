@@ -23,7 +23,7 @@
   <div class="status-head">
     <span class="box-title">STATUS</span>
     <strong id="headerBridgeStatus">BRIDGE STANDBY</strong>
-    <small>18 CHANNELS • TWO-WAY SYNC</small>
+    <small><span class="channel-count-status">18 CHANNELS READY</span> • TWO-WAY SYNC</small>
   </div>
   <div class="scene-head">
     <span class="box-title">SCENE</span>
@@ -61,7 +61,7 @@
     <div class="rta-display"><div class="rta-grid"></div><div class="rta-bars" id="rtaBars"></div><div class="rta-labels"><span>63</span><span>125</span><span>250</span><span>500</span><span>1K</span><span>2K</span><span>4K</span><span>8K</span><span>16K</span></div></div>
   </section>
   <section class="screen-view" data-view="SETUP">
-    <div class="setup-screen"><b>SYSTEM SETUP</b><div class="setup-grid"><span>CHANNELS <strong>18</strong></span><span>TRANSPORT <strong id="setupTransport">OFFLINE</strong></span><span>PROTOCOL <strong>ESP32-MIXER/1</strong></span><span>SYNC <strong>TWO-WAY</strong></span><span>SYSTEM <strong id="setupSystem">OFF</strong></span><span>REMOTE <strong>BLUETOOTH / BRIDGE</strong></span></div><div class="channel-mapper"><div><b>AUTO CHANNEL MAPPER</b><small id="mapperStatus">18 CH • 1:1 READY</small></div><label>CHANNELS <select id="mapperChannels"><option value="4">4</option><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="18" selected>18</option></select></label><button id="autoMapChannels">AUTO MAP</button><button id="applyChannelMap">APPLY CHANNELS</button><div id="channelMapPreview">CH1→CH1 • CH2→CH2 • CH3→CH3 • CH4→CH4 • … • CH18→CH18</div></div></div></div>
+    <div class="setup-screen"><b>SYSTEM SETUP</b><div class="setup-grid"><span>CHANNELS <strong class="channel-count-value">18</strong></span><span>TRANSPORT <strong id="setupTransport">OFFLINE</strong></span><span>PROTOCOL <strong>ESP32-MIXER/1</strong></span><span>SYNC <strong>TWO-WAY</strong></span><span>SYSTEM <strong id="setupSystem">OFF</strong></span><span>REMOTE <strong>BLUETOOTH / BRIDGE</strong></span></div><div class="channel-mapper"><div><b>AUTO CHANNEL MAPPER</b><small id="mapperStatus">18 CH • 1:1 READY</small></div><label>CHANNELS <select id="mapperChannels"><option value="4">4</option><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="18" selected>18</option></select></label><button id="autoMapChannels">AUTO MAP</button><button id="applyChannelMap">APPLY CHANNELS</button><div id="channelMapPreview">CH1→CH1 • CH2→CH2 • CH3→CH3 • CH4→CH4 • … • CH18→CH18</div></div></div></div>
   </section>
   <section class="screen-view" data-view="EFFECT">
     <div class="effect-screen"><div><b>FX1</b><strong>HALL 1</strong><span>REVERB</span></div><div><b>TIME</b><strong>2.45s</strong></div><div><b>PRE-DELAY</b><strong>32ms</strong></div><div><b>DECAY</b><strong>65%</strong></div><div><b>LEVEL</b><strong>-3.0dB</strong></div><button id="screenFxTap">TAP</button></div>
@@ -135,11 +135,11 @@
   <pre id="testResult">TEST: —</pre>
 </section>
 
-<footer class="status-footer"><span>CONNECTION <b id="footerConnection">● ESP32 SIMULATOR OFFLINE</b></span><span>MODE: <b>TWO-WAY SYNC</b></span><span>SYSTEM STATUS <b>18 CHANNELS READY</b></span><span>CPU: <b>18%</b></span><span>MEM: <b>42%</b></span></footer>
+<footer class="status-footer"><span>CONNECTION <b id="footerConnection">● ESP32 SIMULATOR OFFLINE</b></span><span>MODE: <b>TWO-WAY SYNC</b></span><span>SYSTEM STATUS <b class="channel-count-status">18 CHANNELS READY</b></span><span>CPU: <b>18%</b></span><span>MEM: <b>42%</b></span></footer>
 
 <script src="connection.js?v=20260901-skin1"></script>
 <script src="adapters.js?v=20260901-skin1"></script>
-<script src="app.js?v=20260901-skin1"></script>
+<script src="app.js?v=20260901-mapper3"></script>
 <script>
 (function(){
  const clock=document.getElementById('clock'); const tick=()=>clock&&(clock.textContent=new Date().toLocaleTimeString());
