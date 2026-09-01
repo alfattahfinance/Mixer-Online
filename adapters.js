@@ -20,7 +20,14 @@ window.MixerAdapters = (() => {
       ch: i + 1, fader: 75, gain: 1, low: 0, mid: 0, high: 0,
       pan: 0, mute: false, solo: false, level: 0
     })),
-    master: 75
+    master: 75,
+    effects: {
+      selected: "FX1",
+      fx1: { preset: "HALL 1", type: "REVERB", time: 2.45, preDelay: 32, decay: 65, level: -3.0, tapBpm: 120 },
+      fx2: { preset: "ROOM", type: "REVERB", time: 1.60, preDelay: 24, decay: 55, level: -6.0, tapBpm: 120 },
+      aux: { AUX1: 0.0, AUX2: 0.0, AUX3: 0.0, AUX4: 0.0 },
+      fxReturn: { FX1: 0.45, FX2: 0.45 }
+    }
   });
 
   function loadSimulatorState() {
@@ -42,7 +49,14 @@ window.MixerAdapters = (() => {
           solo: !!c.solo,
           level: Number(c.level ?? 0)
         })),
-        master: Number(saved.master ?? 75)
+        master: Number(saved.master ?? 75),
+        effects: {
+          selected: saved.effects?.selected || "FX1",
+          fx1: { preset: saved.effects?.fx1?.preset || "HALL 1", type: saved.effects?.fx1?.type || "REVERB", time: Number(saved.effects?.fx1?.time ?? 2.45), preDelay: Number(saved.effects?.fx1?.preDelay ?? 32), decay: Number(saved.effects?.fx1?.decay ?? 65), level: Number(saved.effects?.fx1?.level ?? -3), tapBpm: Number(saved.effects?.fx1?.tapBpm ?? 120) },
+          fx2: { preset: saved.effects?.fx2?.preset || "ROOM", type: saved.effects?.fx2?.type || "REVERB", time: Number(saved.effects?.fx2?.time ?? 1.6), preDelay: Number(saved.effects?.fx2?.preDelay ?? 24), decay: Number(saved.effects?.fx2?.decay ?? 55), level: Number(saved.effects?.fx2?.level ?? -6), tapBpm: Number(saved.effects?.fx2?.tapBpm ?? 120) },
+          aux: { AUX1: Number(saved.effects?.aux?.AUX1 ?? 0), AUX2: Number(saved.effects?.aux?.AUX2 ?? 0), AUX3: Number(saved.effects?.aux?.AUX3 ?? 0), AUX4: Number(saved.effects?.aux?.AUX4 ?? 0) },
+          fxReturn: { FX1: Number(saved.effects?.fxReturn?.FX1 ?? .45), FX2: Number(saved.effects?.fxReturn?.FX2 ?? .45) }
+        }
       };
     } catch {
       return defaults();
@@ -106,7 +120,11 @@ window.MixerAdapters = (() => {
       ...(command.type === "CONTROL" ? {
         ch: Number(command.ch),
         param: String(command.param),
-        value: command.value
+        value: command.value,
+        ...(command.scope ? { scope: String(command.scope) } : {}),
+        ...(command.target ? { target: String(command.target) } : {}),
+        ...(command.fx ? { fx: String(command.fx) } : {}),
+        ...(command.bus ? { bus: String(command.bus) } : {})
       } : {}),
       ...(command.type === "MASTER" ? {
         value: Number(command.value)
@@ -131,31 +149,61 @@ window.MixerAdapters = (() => {
   function mapRemoteToHardware(packet) {
     if (!packet || !active?.bridge) return { ok:false, reason:"bridge-offline" };
     if (packet.type === "MASTER")
-      return { ok:true, target:"MASTER", value:Math.max(0,Math.min(100,Number(packet.value))) };
-
+      return { ok:true,target:"MASTER",value:Math.max(0,Math.min(100,Number(packet.value))) };
     if (packet.type !== "CONTROL")
       return { ok:false, reason:"unsupported-command" };
 
-    const ch = Number(packet.ch);
+    const scope = packet.scope ? String(packet.scope) : "CHANNEL";
     const param = String(packet.param);
-    if (!Number.isInteger(ch) || ch < 1 || ch > PHYSICAL_CHANNELS)
-      return { ok:false, reason:"physical-channel-out-of-range" };
-    if (!PHYSICAL_PARAMS.includes(param))
-      return { ok:false, reason:"unsupported-physical-control" };
-
-    const range = {
+    const ranges = {
       fader:[0,100], gain:[0,2], low:[-12,12], mid:[-12,12],
-      high:[-12,12], pan:[-1,1]
-    }[param];
+      high:[-12,12], pan:[-1,1],
+      time:[0.1,10], preDelay:[0,200], decay:[0,100], level:[-20,6],
+      tapBpm:[40,240], auxLevel:[0,1], returnLevel:[0,1]
+    };
 
-    let value = packet.value;
-    if (range) {
-      value = Number(value);
+    if (scope === "FX") {
+      const fx = String(packet.target || packet.fx || "FX1");
+      if (!["FX1","FX2"].includes(fx)) return { ok:false, reason:"invalid-fx" };
+      if (!["preset","type","time","preDelay","decay","level","tapBpm"].includes(param))
+        return { ok:false, reason:"unsupported-fx-control" };
+      let value=packet.value;
+      if (ranges[param]) {
+        value=Number(value);
+        if (!Number.isFinite(value)) return { ok:false,reason:"invalid-value" };
+        value=Math.max(ranges[param][0],Math.min(ranges[param][1],value));
+      } else value=String(value);
+      return { ok:true,target:fx,scope,param,value };
+    }
+
+    if (scope === "AUX") {
+      const bus=String(packet.target || packet.bus || "AUX1");
+      if (!["AUX1","AUX2","AUX3","AUX4"].includes(bus)) return { ok:false,reason:"invalid-aux" };
+      const value=Number(packet.value);
       if (!Number.isFinite(value)) return { ok:false,reason:"invalid-value" };
-      value = Math.max(range[0],Math.min(range[1],value));
-    } else value = !!value;
+      return { ok:true,target:bus,scope,param:"auxLevel",value:Math.max(0,Math.min(1,value)) };
+    }
 
-    return { ok:true,target:`CH${ch}`,channel:ch,param,value };
+    if (scope === "FX_RETURN") {
+      const fx=String(packet.target || packet.fx || "FX1");
+      if (!["FX1","FX2"].includes(fx)) return { ok:false,reason:"invalid-fx-return" };
+      const value=Number(packet.value);
+      if (!Number.isFinite(value)) return { ok:false,reason:"invalid-value" };
+      return { ok:true,target:fx,scope,param:"returnLevel",value:Math.max(0,Math.min(1,value)) };
+    }
+
+    const ch=Number(packet.ch);
+    if (!Number.isInteger(ch)||ch<1||ch>PHYSICAL_CHANNELS)
+      return { ok:false,reason:"physical-channel-out-of-range" };
+    if (!PHYSICAL_PARAMS.includes(param))
+      return { ok:false,reason:"unsupported-physical-control" };
+    let value=packet.value;
+    if (ranges[param]) {
+      value=Number(value);
+      if (!Number.isFinite(value)) return { ok:false,reason:"invalid-value" };
+      value=Math.max(ranges[param][0],Math.min(ranges[param][1],value));
+    } else value=!!value;
+    return { ok:true,target:`CH${ch}`,channel:ch,param,value,scope:"CHANNEL" };
   }
 
   function bridgeApply(packet) {
@@ -173,81 +221,91 @@ window.MixerAdapters = (() => {
   }
 
   function validateControl(packet) {
-    const allowed = ["fader", "gain", "low", "mid", "high", "pan", "mute", "solo"];
-    if (!Number.isInteger(packet.ch) || packet.ch < 1 || packet.ch > 18)
-      return "invalid-channel";
-    if (!allowed.includes(packet.param))
-      return "unsupported-control";
+    const scope=String(packet.scope||"CHANNEL");
+    if (scope==="FX") {
+      if (!["FX1","FX2"].includes(String(packet.target||packet.fx||"FX1"))) return "invalid-fx";
+      if (!["preset","type","time","preDelay","decay","level","tapBpm"].includes(packet.param)) return "unsupported-fx-control";
+      return null;
+    }
+    if (scope==="AUX") return ["AUX1","AUX2","AUX3","AUX4"].includes(String(packet.target||packet.bus||"")) ? null : "invalid-aux";
+    if (scope==="FX_RETURN") return ["FX1","FX2"].includes(String(packet.target||packet.fx||"")) ? null : "invalid-fx-return";
+    const allowed=["fader","gain","low","mid","high","pan","mute","solo"];
+    if(!Number.isInteger(packet.ch)||packet.ch<1||packet.ch>18) return "invalid-channel";
+    if(!allowed.includes(packet.param)) return "unsupported-control";
     return null;
   }
 
   function applyPacketToSimulator(packet) {
-    if (!active?.state || active.type !== "simulator") return false;
+    if(!active?.state||active.type!=="simulator") return false;
+    if(packet.type==="CONTROL"){
+      const error=validateControl(packet);
+      if(error) return false;
+      const scope=String(packet.scope||"CHANNEL");
+      const effects=active.state.effects ||= defaults().effects;
 
-    if (packet.type === "CONTROL") {
-      const error = validateControl(packet);
-      if (error) return false;
-
-      const c = active.state.channels[packet.ch - 1];
-      const ranges = {
-        fader: [0, 100], gain: [0, 2], low: [-12, 12],
-        mid: [-12, 12], high: [-12, 12], pan: [-1, 1]
-      };
-
-      if (ranges[packet.param]) {
-        const n = Number(packet.value);
-        if (!Number.isFinite(n)) return false;
-        c[packet.param] = Math.max(ranges[packet.param][0],
-          Math.min(ranges[packet.param][1], n));
-      } else {
-        c[packet.param] = !!packet.value;
+      if(scope==="FX"){
+        const fx=String(packet.target||packet.fx||"FX1").toLowerCase();
+        const key=fx==="fx2"?"fx2":"fx1";
+        const ranges={time:[.1,10],preDelay:[0,200],decay:[0,100],level:[-20,6],tapBpm:[40,240]};
+        if(["preset","type"].includes(packet.param)) effects[key][packet.param]=String(packet.value);
+        else {
+          const r=ranges[packet.param], n=Number(packet.value);
+          if(!r||!Number.isFinite(n)) return false;
+          effects[key][packet.param]=Math.max(r[0],Math.min(r[1],n));
+        }
+        effects.selected=fx.toUpperCase();
+        saveSimulatorState();
+        return true;
       }
-      saveSimulatorState();
-      return true;
-    }
+      if(scope==="AUX"){
+        const bus=String(packet.target||packet.bus);
+        const n=Number(packet.value);
+        if(!["AUX1","AUX2","AUX3","AUX4"].includes(bus)||!Number.isFinite(n)) return false;
+        effects.aux[bus]=Math.max(0,Math.min(1,n));
+        saveSimulatorState(); return true;
+      }
+      if(scope==="FX_RETURN"){
+        const fx=String(packet.target||packet.fx);
+        const n=Number(packet.value);
+        if(!["FX1","FX2"].includes(fx)||!Number.isFinite(n)) return false;
+        effects.fxReturn[fx]=Math.max(0,Math.min(1,n));
+        saveSimulatorState(); return true;
+      }
 
-    if (packet.type === "MASTER") {
-      const n = Number(packet.value);
-      if (!Number.isFinite(n)) return false;
-      active.state.master = Math.max(0, Math.min(100, n));
-      saveSimulatorState();
-      return true;
+      const c=active.state.channels[packet.ch-1];
+      const ranges={fader:[0,100],gain:[0,2],low:[-12,12],mid:[-12,12],high:[-12,12],pan:[-1,1]};
+      if(ranges[packet.param]){
+        const n=Number(packet.value); if(!Number.isFinite(n)) return false;
+        c[packet.param]=Math.max(ranges[packet.param][0],Math.min(ranges[packet.param][1],n));
+      } else c[packet.param]=!!packet.value;
+      saveSimulatorState(); return true;
     }
-
+    if(packet.type==="MASTER"){
+      const n=Number(packet.value); if(!Number.isFinite(n)) return false;
+      active.state.master=Math.max(0,Math.min(100,n)); saveSimulatorState(); return true;
+    }
     return false;
   }
 
   // Hardware -> bridge -> Mixer-Online feedback path.
   // Physical ESP32 will call this with values read from the analog mixer.
   function hardwareFeedback(ch, param, value, extra = {}) {
-    if (!active?.connected || !active?.bridge)
-      return { ok:false, reason:"bridge-offline" };
-
-    const channel = Number(ch);
-    const allowed = PHYSICAL_PARAMS;
-    if (param !== "master" && (!Number.isInteger(channel) || channel < 1 || channel > PHYSICAL_CHANNELS))
-      return { ok:false, reason:"physical-channel-out-of-range" };
-    if (param !== "master" && !allowed.includes(param))
-      return { ok:false, reason:"unsupported-physical-control" };
-
-    const packet = {
-      protocol: PROTOCOL,
-      type: "FEEDBACK",
-      ...(param === "master" ? {} : { ch: channel }),
-      param: String(param),
-      value,
-      source: "hardware",
-      device: "ESP32-BRIDGE",
-      transport: active.transport,
-      ts: Date.now(),
+    if(!active?.connected||!active?.bridge) return {ok:false,reason:"bridge-offline"};
+    const scope=String(extra.scope||"CHANNEL");
+    const packet={
+      protocol:PROTOCOL,type:"FEEDBACK",
+      ...(scope==="CHANNEL"?{ch:Number(ch)}:{}),
+      ...(extra.target?{target:String(extra.target)}:{}),
+      ...(extra.fx?{fx:String(extra.fx)}:{}),
+      ...(extra.bus?{bus:String(extra.bus)}:{}),
+      scope,param:String(param),value,source:"hardware",
+      device:"ESP32-BRIDGE",transport:active.transport,ts:Date.now(),
       ...extra
     };
-
-    active.bridge.feedback = active.bridge.feedback || [];
+    active.bridge.feedback=active.bridge.feedback||[];
     active.bridge.feedback.push(packet);
-    if (active.bridge.feedback.length > 100) active.bridge.feedback.shift();
-    emitRx(packet);
-    return { ok:true, packet };
+    if(active.bridge.feedback.length>100) active.bridge.feedback.shift();
+    emitRx(packet); return {ok:true,packet};
   }
 
   function simulateHardwareChange(ch, param, value) {
@@ -278,99 +336,55 @@ window.MixerAdapters = (() => {
   }
 
   function receiveSimulator(packet) {
-    if (!active?.connected || active.type !== "simulator") return false;
-
-    const mapped = bridgeApply(packet);
-    const ok = mapped.ok && applyPacketToSimulator(packet);
-    const now = Date.now();
-
-    const ack = {
-      protocol: PROTOCOL,
-      type: "ACK",
-      ack: packet.id,
-      ok,
-      ts: now,
-      device: "ESP32-SIMULATOR",
-      transport: "esp32",
-      ...(ok ? {} : { error: mapped.reason || "simulator-rejected" })
-    };
-
-    active.ack.push(ack);
-    active.lastAck = ack;
-    active.pending.delete(packet.id);
-    emitRx(ack);
-
-    if (ok && packet.type === "CONTROL") {
-      emitRx({
-        protocol: PROTOCOL,
-        type: "FEEDBACK",
-        ch: packet.ch,
-        param: packet.param,
-        value: active.state.channels[packet.ch - 1][packet.param],
-        source: "simulator",
-        ack: packet.id,
-        rev: packet.rev,
-        ts: Date.now(),
-        device: "ESP32-SIMULATOR",
-        transport: "esp32"
-      });
-    } else if (ok && packet.type === "MASTER") {
-      emitRx({
-        protocol: PROTOCOL,
-        type: "FEEDBACK",
-        param: "master",
-        value: active.state.master,
-        source: "simulator",
-        ack: packet.id,
-        rev: packet.rev,
-        ts: Date.now(),
-        device: "ESP32-SIMULATOR",
-        transport: "esp32"
-      });
+    if(!active?.connected||active.type!=="simulator") return false;
+    const mapped=bridgeApply(packet);
+    const ok=mapped.ok&&applyPacketToSimulator(packet);
+    const now=Date.now();
+    const ack={protocol:PROTOCOL,type:"ACK",ack:packet.id,ok,ts:now,device:"ESP32-SIMULATOR",transport:"esp32",...(ok?{}:{error:mapped.reason||"simulator-rejected"})};
+    active.ack.push(ack); active.lastAck=ack; active.pending.delete(packet.id); emitRx(ack);
+    if(ok){
+      const fb={
+        protocol:PROTOCOL,type:"FEEDBACK",
+        ...(packet.scope==="CHANNEL"||!packet.scope?{ch:packet.ch}:{}),
+        ...(packet.scope&&packet.scope!=="CHANNEL"?{scope:packet.scope,target:packet.target||packet.fx||packet.bus}:{}),
+        ...(packet.scope==="CHANNEL"?{scope:"CHANNEL"}:{}),
+        param:packet.param,value:mapped.value??packet.value,
+        source:"simulator",ack:packet.id,rev:packet.rev,ts:Date.now(),
+        device:"ESP32-SIMULATOR",transport:"esp32"
+      };
+      emitRx(fb);
     }
-
-    emitStatus();
-    return ok;
+    emitStatus(); return ok;
   }
 
   function sendMapped(command) {
-    if (!active?.connected)
-      return { ok: false, reason: "offline" };
-
-    if (command.type !== "CONTROL" && command.type !== "MASTER")
-      return { ok: false, reason: "unsupported-type" };
-
-    if (command.type === "CONTROL") {
-      const error = validateControl({
-        ch: Number(command.ch ?? command.channel),
-        param: String(command.param ?? command.control)
-      });
-      if (error) return { ok: false, reason: error };
+    if(!active?.connected) return {ok:false,reason:"offline"};
+    if(command.type!=="CONTROL"&&command.type!=="MASTER") return {ok:false,reason:"unsupported-type"};
+    if(command.type==="CONTROL"){
+      const candidate={
+        ch:Number(command.ch??command.channel),
+        param:String(command.param??command.control),
+        scope:String(command.scope||"CHANNEL"),
+        target:command.target||command.fx||command.bus
+      };
+      const error=validateControl(candidate);
+      if(error) return {ok:false,reason:error};
     }
-
-    const packet = makePacket({
-      type: command.type,
-      ch: Number(command.ch ?? command.channel),
-      param: String(command.param ?? command.control),
-      value: command.value,
-      rev: command.rev ?? null
+    const packet=makePacket({
+      type:command.type,
+      ch:Number(command.ch??command.channel),
+      param:String(command.param??command.control),
+      value:command.value,
+      scope:command.scope,
+      target:command.target,
+      fx:command.fx,
+      bus:command.bus,
+      rev:command.rev??null
     });
-
-    active.lastTx = packet;
-    active.tx.push(packet);
-    active.pending.set(packet.id, packet);
-    emitStatus();
-
-    if (active.type === "simulator") {
-      queueMicrotask(() => receiveSimulator(packet));
-      return { ok: true, transport: "esp32", tx: packet };
-    }
-
-    if (active.type === "bluetooth")
-      return sendBluetooth(packet);
-
-    active.pending.delete(packet.id);
-    return { ok: false, reason: "unsupported-transport" };
+    active.lastTx=packet; active.tx.push(packet); active.pending.set(packet.id,packet); emitStatus();
+    if(active.type==="simulator"){queueMicrotask(()=>receiveSimulator(packet));return {ok:true,transport:"esp32",tx:packet};}
+    if(active.type==="bluetooth") return sendBluetooth(packet);
+    active.pending.delete(packet.id); return {ok:false,reason:"unsupported-transport"};
   }
 
   function sendBluetooth(packet) {
