@@ -572,25 +572,25 @@ main.console{width:100%;min-width:0}
 .status-head small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 
-/* === FINAL 9CH LAYOUT ===
-   CH1-9 | MIXER DISPLAY
-   CH10-18 intentionally removed.
+/* === FINAL 16CH LAYOUT ===
+   CH1-8 | MIXER DISPLAY | CH9-16
 */
 .console{display:block;width:100%;min-width:0;max-width:none;padding:7px;box-sizing:border-box}
-#channels.channel-layout{display:grid!important;grid-template-columns:minmax(0,1fr) clamp(300px,28vw,390px)!important;grid-template-rows:auto auto!important;grid-template-areas:"left center" "bottom bottom"!important;gap:7px!important;width:100%!important;min-width:0!important;max-width:none!important;align-items:start!important;box-sizing:border-box}
-#channels.channel-layout>.channel-bank-left{grid-area:left!important;width:100%!important;min-width:0!important;overflow:hidden!important}
+#channels.channel-layout{display:grid!important;grid-template-columns:minmax(0,1fr) clamp(300px,28vw,390px) minmax(0,1fr)!important;grid-template-rows:auto auto!important;grid-template-areas:"left center right" "bottom bottom bottom"!important;gap:7px!important;width:100%!important;min-width:0!important;max-width:none!important;align-items:start!important;box-sizing:border-box}
+#channels.channel-layout>.channel-bank-left{grid-area:left!important}
 #channels.channel-layout>.center-console{grid-area:center!important;width:100%!important;min-width:0!important;max-width:100%!important}
+#channels.channel-layout>.channel-bank-right{grid-area:right!important}
+#channels.channel-layout>.channel-bank-left,#channels.channel-layout>.channel-bank-right{width:100%!important;min-width:0!important;overflow:hidden!important;box-sizing:border-box}
+#channels.channel-layout>.channel-bank-left .channel-side,#channels.channel-layout>.channel-bank-right .channel-side{display:grid!important;grid-template-columns:repeat(8,minmax(0,1fr))!important;grid-template-rows:1fr!important;grid-auto-flow:column!important;gap:2px!important;width:100%!important;min-width:0!important;overflow:hidden!important;padding:3px!important;box-sizing:border-box}
+#channels.channel-layout>.channel-bank-left .channel,#channels.channel-layout>.channel-bank-right .channel{grid-row:1!important;width:100%!important;min-width:0!important;margin:0!important;box-sizing:border-box}
 #channels.channel-layout>.master-rack{grid-area:bottom!important;width:100%!important;min-width:0!important}
-#channels.channel-layout>.channel-bank-left .channel-side{display:grid!important;grid-template-columns:repeat(9,minmax(0,1fr))!important;grid-template-rows:1fr!important;grid-auto-flow:column!important;gap:2px!important;width:100%!important;min-width:0!important;overflow:hidden!important;padding:3px!important;box-sizing:border-box}
-#channels.channel-layout>.channel-bank-left .channel{grid-row:1!important;width:100%!important;min-width:0!important;margin:0!important;box-sizing:border-box}
 @media (orientation:landscape) and (max-width:1199px){
- #channels.channel-layout{grid-template-columns:minmax(0,1fr) clamp(300px,30vw,390px)!important}
- #channels.channel-layout>.channel-bank-left .channel-side{grid-template-columns:repeat(9,minmax(58px,1fr))!important;overflow-x:auto!important;overflow-y:hidden!important}
- #channels.channel-layout>.channel-bank-left .channel{min-width:58px!important}
+ #channels.channel-layout>.channel-bank-left .channel-side,#channels.channel-layout>.channel-bank-right .channel-side{grid-template-columns:repeat(8,minmax(58px,1fr))!important;overflow-x:auto!important;overflow-y:hidden!important}
+ #channels.channel-layout>.channel-bank-left .channel,#channels.channel-layout>.channel-bank-right .channel{min-width:58px!important}
 }
 @media (orientation:portrait),(max-width:699px){
- body{min-width:900px}
- #channels.channel-layout{grid-template-columns:minmax(500px,1fr) 300px!important;grid-template-areas:"left center" "bottom bottom"!important}
- #channels.channel-layout>.channel-bank-left .channel-side{grid-template-columns:repeat(9,minmax(58px,1fr))!important;overflow-x:auto!important;overflow-y:hidden!important}
- #channels.channel-layout>.channel-bank-left .channel{min-width:58px!important}
+ body{min-width:1200px}
+ #channels.channel-layout{grid-template-columns:minmax(460px,1fr) 300px minmax(460px,1fr)!important;grid-template-areas:"left center right" "bottom bottom bottom"!important}
+ #channels.channel-layout>.channel-bank-left .channel-side,#channels.channel-layout>.channel-bank-right .channel-side{grid-template-columns:repeat(8,minmax(58px,1fr))!important;overflow-x:auto!important;overflow-y:hidden!important}
+ #channels.channel-layout>.channel-bank-left .channel,#channels.channel-layout>.channel-bank-right .channel{min-width:58px!important}
 }
