@@ -214,3 +214,109 @@ main.console{width:100%;min-width:0}
   .screen-view.active{min-height:0}
   .screen-view .screen-content{min-height:0}
 }
+
+/* === LANDSCAPE PHONE/TABLET OPTIMIZATION === */
+@media (orientation:landscape) and (max-width:1200px){
+  html,body{width:100%;max-width:100%;overflow-x:hidden}
+  body{font-size:12px}
+  .topbar{
+    display:grid;
+    grid-template-columns:minmax(150px,1fr) auto minmax(180px,1.2fr) auto;
+    gap:5px;
+    min-height:48px;
+    padding:4px 6px;
+  }
+  .brand{grid-column:auto}
+  .clock-head,.status-head{display:block}
+  .console{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(190px,27vw);
+    grid-template-rows:auto auto;
+    gap:5px;
+    width:100%;
+    min-width:0;
+    padding:4px;
+    align-items:start;
+  }
+  .channel-bank{grid-column:1/-1;grid-row:1;min-width:0}
+  .channel-bank>#channels{
+    display:grid;
+    grid-template-columns:repeat(18,78px);
+    width:100%;
+    max-width:100%;
+    overflow-x:auto;
+    overflow-y:hidden;
+    touch-action:pan-x;
+    -webkit-overflow-scrolling:touch;
+  }
+  .center-console{grid-column:1;grid-row:2;min-width:0;width:100%;height:auto}
+  .master-rack{
+    grid-column:2;grid-row:2;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:4px;
+    min-width:0;
+    max-width:100%;
+    padding:3px;
+  }
+  .master-card{min-width:0;max-width:100%;padding:5px}
+  .master-card input{height:min(38vh,190px);max-height:190px}
+  .screen-frame{width:100%;min-width:0}
+  .screen-content{grid-template-columns:minmax(0,1fr);min-width:0}
+  .screen-content .player{display:none}
+  .screen-tabs{
+    display:flex;
+    overflow-x:auto;
+    width:100%;
+    scrollbar-width:none;
+    touch-action:pan-x;
+  }
+  .screen-tabs button{flex:1 0 80px;min-height:34px}
+  .effect-screen-live{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+  .effect-screen-live .fx-screen-select{grid-column:1/-1;grid-template-columns:repeat(4,minmax(0,1fr))}
+  .fx-parameter-grid{grid-template-columns:repeat(4,minmax(90px,1fr));gap:5px}
+  .fx-parameter-grid label{padding:6px}
+  .aux-rack{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+  .right-tools{grid-template-columns:1fr 1fr;gap:5px;width:100%;min-width:0}
+  .connection-test-panel,.bridge-status{max-width:100%;overflow:hidden}
+}
+@media (orientation:landscape) and (max-width:850px){
+  .topbar{
+    grid-template-columns:minmax(120px,1fr) auto auto;
+    min-height:44px;
+  }
+  .brand{grid-column:1}
+  .clock-head{display:none}
+  .status-head{display:block}
+  .bridge-head{grid-column:2/-1}
+  .console{
+    grid-template-columns:minmax(0,1fr) 190px;
+    gap:4px;
+    padding:3px;
+  }
+  .channel-bank>#channels{grid-template-columns:repeat(18,74px)}
+  .center-console{padding:3px}
+  .master-rack{padding:2px}
+  .master-card input{height:145px}
+  .screen-tabs button{min-width:70px;flex-basis:70px;padding:4px}
+  .setup-screen,.effect-screen,.scene-screen{height:auto;min-height:160px;padding:8px}
+  .rta-display{height:170px}
+  .effect-screen-live{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .effect-screen-live .fx-screen-select{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .fx-parameter-grid{grid-template-columns:repeat(2,minmax(90px,1fr))}
+  .master-rack{grid-template-columns:1fr}
+}
+@media (orientation:landscape) and (max-height:520px){
+  .topbar{min-height:40px}
+  .console{gap:3px}
+  .channel-bank>#channels{grid-template-columns:repeat(18,70px)}
+  .channel{min-width:70px}
+  .center-console,.master-rack{padding:2px}
+  .screen-frame{margin:0}
+  .screen-title{padding:4px 6px}
+  .screen-tabs button{min-height:30px}
+  .setup-screen,.effect-screen,.scene-screen{min-height:135px;padding:6px}
+  .rta-display{height:135px}
+  .master-card input{height:125px}
+  .right-tools{padding:3px}
+}
