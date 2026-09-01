@@ -718,3 +718,14 @@ main.console{width:100%;min-width:0}
     min-width:62px;
   }
 }
+
+/* === FINAL FIX 8281: force split banks into one responsive grid === */
+#channels.channel-layout{position:relative;display:grid!important;width:100%!important;max-width:none!important;min-width:0!important;grid-template-columns:minmax(0,1fr) minmax(260px,28vw) minmax(0,1fr)!important;grid-template-areas:"left center right" "bottom bottom bottom"!important;align-items:start!important;}
+#channels.channel-layout > .channel-bank-left{grid-area:left!important;grid-column:auto!important;grid-row:auto!important;}
+#channels.channel-layout > .center-console{grid-area:center!important;grid-column:auto!important;grid-row:auto!important;}
+#channels.channel-layout > .channel-bank-right{grid-area:right!important;grid-column:auto!important;grid-row:auto!important;display:block!important;}
+#channels.channel-layout > .channel-bank-left .channel-side,#channels.channel-layout > .channel-bank-right .channel-side{display:grid!important;grid-template-columns:repeat(9,minmax(0,1fr))!important;grid-auto-flow:row!important;width:100%!important;max-width:100%!important;min-width:0!important;overflow:hidden!important;gap:2px!important;}
+#channels.channel-layout > .channel-bank-left .channel,#channels.channel-layout > .channel-bank-right .channel{grid-column:auto!important;width:100%!important;min-width:0!important;max-width:none!important;}
+#channels.channel-layout > .master-rack{grid-area:bottom!important;grid-column:auto!important;grid-row:auto!important;width:100%!important;}
+@media (orientation:landscape) and (min-width:700px){#channels.channel-layout{grid-template-columns:minmax(0,1fr) clamp(260px,28vw,390px) minmax(0,1fr)!important;grid-template-areas:"left center right" "bottom bottom bottom"!important;}#channels.channel-layout > .channel-bank-left .channel-side,#channels.channel-layout > .channel-bank-right .channel-side{grid-template-columns:repeat(9,minmax(58px,1fr))!important;overflow-x:auto!important;overflow-y:hidden!important;}#channels.channel-layout > .channel-bank-left .channel,#channels.channel-layout > .channel-bank-right .channel{min-width:58px!important;}}
+@media (orientation:landscape) and (min-width:1350px){#channels.channel-layout > .channel-bank-left .channel-side,#channels.channel-layout > .channel-bank-right .channel{grid-template-columns:repeat(9,minmax(0,1fr))!important;overflow:hidden!important;}#channels.channel-layout > .channel-bank-left .channel,#channels.channel-layout > .channel-bank-right .channel{min-width:0!important;}}
