@@ -50,3 +50,41 @@
 .channel-mapper{margin-top:8px;padding:9px;border:1px solid #294854;border-radius:6px;background:linear-gradient(145deg,#0d171b,#05080a);box-shadow:inset 0 0 14px rgba(0,160,220,.08);display:grid;grid-template-columns:1fr auto auto auto;gap:6px;align-items:center}.channel-mapper>b,.channel-mapper div>b{display:block;color:#69dfff;font-size:8px;letter-spacing:.7px}.channel-mapper small{color:#59ef78;font-size:7px}.channel-mapper label{color:#748991;font-size:7px}.channel-mapper select,.channel-mapper button{min-height:28px;font-size:8px}.channel-mapper button{background:linear-gradient(#18313d,#091219);border:1px solid #315362;color:#c7e8f1;border-radius:4px}.channel-mapper button:active{transform:translateY(1px)}#channelMapPreview{grid-column:1/-1;color:#718891;font-size:7px;white-space:nowrap;overflow:auto;padding-top:4px;border-top:1px solid #1c333c}
 
 .channel-bank #channels{transition:all .2s ease}.channel-mapper button{cursor:pointer;touch-action:manipulation}.channel-mapper select{cursor:pointer;touch-action:manipulation}
+
+/* === LIVE FX / 3D CONTROL SURFACE === */
+.effect-screen-live,.fx-rack-live{touch-action:manipulation}
+.effect-screen-live{display:grid;grid-template-columns:1.1fr repeat(4,1fr) auto;gap:10px;align-items:center}
+.fx-screen-select{display:grid;gap:6px}
+.effect-screen-live label,.fx-parameter-grid label{display:grid;gap:5px;min-width:0}
+.effect-screen-live label b,.fx-parameter-grid label{font-size:.72rem;letter-spacing:.08em}
+.effect-screen-live select,.fx-extra select{min-height:34px}
+.effect-screen-live .fx-control,.fx-parameter-grid .fx-control,.aux-live .aux-control{width:100%;accent-color:#1597ff;cursor:pointer;min-height:28px}
+.effect-screen-live strong,.fx-parameter-grid output{font-variant-numeric:tabular-nums;color:#54d7ff;text-align:center}
+#screenFxTap,#fxTap{min-height:42px;font-weight:700}
+.fx-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.fx-toolbar .fx-display{flex:1;min-width:180px}
+.fx-toolbar button{min-height:40px}
+.fx-parameter-grid{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:12px;margin-top:10px}
+.fx-parameter-grid label{padding:10px;border:1px solid rgba(62,190,255,.2);border-radius:8px;background:linear-gradient(145deg,rgba(30,40,45,.95),rgba(5,10,12,.95));box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 4px 12px rgba(0,0,0,.25)}
+.fx-extra{display:flex;gap:10px;margin-top:10px}
+.fx-extra label{display:grid;gap:4px}
+.fx-buttons button.active{box-shadow:0 0 0 1px #1597ff,0 0 14px rgba(21,151,255,.35);color:#65d8ff}
+.aux-live .aux-labels,.aux-live .aux-values{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.aux-live:last-child .aux-labels,.aux-live:last-child .aux-values{grid-template-columns:repeat(2,1fr)}
+.aux-live .mini-knobs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.aux-live:last-child .mini-knobs{grid-template-columns:repeat(2,1fr)}
+.aux-live .aux-control{width:100%;height:70px;writing-mode:vertical-lr;direction:rtl}
+.aux-live .aux-values output{text-align:center;color:#55d98b;font-size:.75rem}
+@media (max-width:900px){
+ .effect-screen-live{grid-template-columns:1fr 1fr}
+ .fx-parameter-grid{grid-template-columns:1fr 1fr}
+ .fx-screen-select{grid-column:1/-1;grid-template-columns:repeat(3,1fr)}
+}
+@media (max-width:560px){
+ .effect-screen-live{grid-template-columns:1fr}
+ .fx-screen-select{grid-template-columns:1fr 1fr}
+ .fx-screen-select b{grid-column:1/-1}
+ .fx-parameter-grid{grid-template-columns:1fr}
+ .fx-extra{flex-direction:column}
+ .aux-live .aux-control{height:82px}
+}
