@@ -64,7 +64,14 @@
     <div class="setup-screen"><b>SYSTEM SETUP</b><div class="setup-grid"><span>CHANNELS <strong class="channel-count-value">18</strong></span><span>TRANSPORT <strong id="setupTransport">OFFLINE</strong></span><span>PROTOCOL <strong>ESP32-MIXER/1</strong></span><span>SYNC <strong>TWO-WAY</strong></span><span>SYSTEM <strong id="setupSystem">OFF</strong></span><span>REMOTE <strong>BLUETOOTH / BRIDGE</strong></span></div><div class="channel-mapper"><div><b>AUTO CHANNEL MAPPER</b><small id="mapperStatus">18 CH • 1:1 READY</small></div><label>CHANNELS <select id="mapperChannels"><option value="4">4</option><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="18" selected>18</option></select></label><button id="autoMapChannels" type="button" onclick="autoMapChannels()">AUTO MAP</button><button id="applyChannelMap" type="button" onclick="applyChannelMap()">APPLY CHANNELS</button><div id="channelMapPreview">CH1→CH1 • CH2→CH2 • CH3→CH3 • CH4→CH4 • … • CH18→CH18</div></div></div></div>
   </section>
   <section class="screen-view" data-view="EFFECT">
-    <div class="effect-screen"><div><b>FX1</b><strong>HALL 1</strong><span>REVERB</span></div><div><b>TIME</b><strong>2.45s</strong></div><div><b>PRE-DELAY</b><strong>32ms</strong></div><div><b>DECAY</b><strong>65%</strong></div><div><b>LEVEL</b><strong>-3.0dB</strong></div><button id="screenFxTap">TAP</button></div>
+    <div class="effect-screen effect-screen-live">
+      <div class="fx-screen-select"><b>FX</b><select id="screenFxSelect"><option value="FX1">FX1</option><option value="FX2">FX2</option></select><select id="screenFxPreset"><option>HALL 1</option><option>ROOM</option><option>PLATE</option><option>DELAY</option><option>CHORUS</option></select><select id="screenFxType"><option>REVERB</option><option>DELAY</option><option>CHORUS</option><option>ECHO</option></select></div>
+      <label><b>TIME</b><input class="fx-control" data-scope="FX" data-target="FX1" data-param="time" type="range" min="0.1" max="10" step="0.01" value="2.45"><strong data-fx-value="time">2.45s</strong></label>
+      <label><b>PRE-DELAY</b><input class="fx-control" data-scope="FX" data-target="FX1" data-param="preDelay" type="range" min="0" max="200" step="1" value="32"><strong data-fx-value="preDelay">32ms</strong></label>
+      <label><b>DECAY</b><input class="fx-control" data-scope="FX" data-target="FX1" data-param="decay" type="range" min="0" max="100" step="1" value="65"><strong data-fx-value="decay">65%</strong></label>
+      <label><b>LEVEL</b><input class="fx-control" data-scope="FX" data-target="FX1" data-param="level" type="range" min="-20" max="6" step="0.1" value="-3"><strong data-fx-value="level">-3.0dB</strong></label>
+      <button id="screenFxTap" type="button">TAP TEMPO</button><span id="screenFxBpm">120 BPM</span>
+    </div>
   </section>
   <section class="screen-view" data-view="SCENE">
     <div class="scene-screen"><b>SCENE MANAGER</b><strong id="sceneName">DEFAULT</strong><div><button id="screenSceneSave">SAVE</button><button id="screenSceneRecall">RECALL</button><button id="screenSceneDefault">DEFAULT</button></div><small>Scene tersimpan di browser dan dapat dipanggil kembali.</small></div>
@@ -72,16 +79,22 @@
 </div>
     </div>
 
-    <div class="fx-rack">
+    <div class="fx-rack fx-rack-live">
       <div class="rack-title">EFFECT PROCESSOR <span>PARAMETER</span></div>
-      <div class="fx-display"><strong>HALL 1</strong><small>REVERB • TIME 2.45s • LEVEL 45%</small></div>
-      <button>TAP</button><div class="fake-knob"></div><button>SELECT</button>
-      <div class="fx-buttons"><button>FX1</button><button>FX2</button><button>AUX1</button><button>AUX2</button><button>AUX3</button><button>AUX4</button></div>
+      <div class="fx-toolbar"><div class="fx-display"><strong id="fxRackPreset">HALL 1</strong><small id="fxRackSummary">REVERB • TIME 2.45s • LEVEL -3.0dB</small></div><button id="fxTap" type="button">TAP</button><span id="fxBpm">120 BPM</span><button id="fxSelect" type="button">SELECT</button></div>
+      <div class="fx-buttons"><button data-fx-select="FX1" class="active">FX1</button><button data-fx-select="FX2">FX2</button><button data-fx-select="AUX1">AUX1</button><button data-fx-select="AUX2">AUX2</button><button data-fx-select="AUX3">AUX3</button><button data-fx-select="AUX4">AUX4</button></div>
+      <div class="fx-parameter-grid">
+        <label>TIME<input class="fx-control" data-scope="FX" data-target="FX1" data-param="time" type="range" min="0.1" max="10" step="0.01" value="2.45"><output data-fx-value="time">2.45s</output></label>
+        <label>PRE-DELAY<input class="fx-control" data-scope="FX" data-target="FX1" data-param="preDelay" type="range" min="0" max="200" step="1" value="32"><output data-fx-value="preDelay">32ms</output></label>
+        <label>DECAY<input class="fx-control" data-scope="FX" data-target="FX1" data-param="decay" type="range" min="0" max="100" step="1" value="65"><output data-fx-value="decay">65%</output></label>
+        <label>LEVEL<input class="fx-control" data-scope="FX" data-target="FX1" data-param="level" type="range" min="-20" max="6" step="0.1" value="-3"><output data-fx-value="level">-3.0dB</output></label>
+      </div>
+      <div class="fx-extra"><label>PRESET<select class="fx-preset" data-target="FX1"><option>HALL 1</option><option>ROOM</option><option>PLATE</option><option>DELAY</option><option>CHORUS</option></select></label><label>TYPE<select class="fx-type" data-target="FX1"><option>REVERB</option><option>DELAY</option><option>CHORUS</option><option>ECHO</option></select></label></div>
     </div>
 
     <div class="aux-rack">
-      <div class="aux-unit"><b>AUX / BUS</b><div><span>AUX1</span><span>AUX2</span><span>AUX3</span><span>AUX4</span></div><div class="mini-knobs"><i></i><i></i><i></i><i></i></div></div>
-      <div class="aux-unit"><b>FX RETURN</b><div><span>FX1</span><span>FX2</span></div><div class="mini-knobs"><i></i><i></i></div></div>
+      <div class="aux-unit aux-live"><b>AUX / BUS</b><div class="aux-labels"><span>AUX1</span><span>AUX2</span><span>AUX3</span><span>AUX4</span></div><div class="mini-knobs"><input class="aux-control" data-target="AUX1" type="range" min="0" max="1" step="0.01" value="0"><input class="aux-control" data-target="AUX2" type="range" min="0" max="1" step="0.01" value="0"><input class="aux-control" data-target="AUX3" type="range" min="0" max="1" step="0.01" value="0"><input class="aux-control" data-target="AUX4" type="range" min="0" max="1" step="0.01" value="0"></div><div class="aux-values"><output data-aux-value="AUX1">0%</output><output data-aux-value="AUX2">0%</output><output data-aux-value="AUX3">0%</output><output data-aux-value="AUX4">0%</output></div></div>
+      <div class="aux-unit aux-live"><b>FX RETURN</b><div class="aux-labels"><span>FX1</span><span>FX2</span></div><div class="mini-knobs"><input class="aux-control" data-scope="FX_RETURN" data-target="FX1" type="range" min="0" max="1" step="0.01" value=".45"><input class="aux-control" data-scope="FX_RETURN" data-target="FX2" type="range" min="0" max="1" step="0.01" value=".45"></div><div class="aux-values"><output data-return-value="FX1">45%</output><output data-return-value="FX2">45%</output></div></div>
     </div>
   </section>
 
