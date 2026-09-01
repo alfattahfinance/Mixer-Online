@@ -156,3 +156,61 @@ body{min-width:0}
   .fx-parameter-grid{grid-template-columns:1fr}
   .master-rack{grid-template-columns:1fr 1fr}
 }
+
+/* === FINAL FLUID PHONE/TABLET LAYOUT === */
+html,body{width:100%;min-width:0;max-width:100%;overflow-x:hidden}
+main.console{width:100%;min-width:0}
+.channel-bank{width:100%;min-width:0}
+#channels{max-width:100%;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.center-console,.master-rack,.right-tools{min-width:0;max-width:100%}
+.screen-frame,.fx-rack-live,.aux-rack{max-width:100%;min-width:0}
+@media (max-width:1100px){
+  .console{grid-template-columns:minmax(0,1fr);grid-template-rows:auto;gap:6px;padding:5px}
+  .channel-bank,.center-console,.master-rack{grid-column:1;grid-row:auto}
+  .center-console{display:block;width:100%}
+  .master-rack{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;width:100%}
+  .master-rack>*{min-width:0}
+  .master-card input{height:220px;max-width:100%}
+  .screen-content{grid-template-columns:1fr}
+  .screen-content .player{display:none}
+  .screen-frame{width:100%}
+  .screen-tabs{overflow-x:auto;scrollbar-width:none}
+  .screen-tabs button{flex:1 0 90px}
+  .fx-parameter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .right-tools{grid-template-columns:repeat(2,minmax(0,1fr));width:100%;padding:5px}
+  .media-rack{grid-column:1/-1}
+}
+@media (max-width:850px){
+  .topbar{grid-template-columns:1fr 1fr}
+  .brand,.bridge-head,.scene-head{grid-column:1/-1}
+  .status-head,.clock-head{display:none}
+  .bridge-head{grid-template-columns:1fr 1fr}
+  .bridge-head .box-title{grid-column:1/-1}
+  .channel-bank>#channels{grid-template-columns:repeat(18,82px);overflow-x:auto}
+  .master-rack{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .right-tools{grid-template-columns:1fr}
+  .media-rack{grid-column:auto}
+}
+@media (max-width:560px){
+  .topbar{grid-template-columns:1fr}
+  .brand,.bridge-head,.scene-head{grid-column:1}
+  .bridge-head{grid-template-columns:1fr 1fr}
+  .console{padding:3px}
+  .channel-bank>#channels{grid-template-columns:repeat(18,78px);padding:3px}
+  .channel{min-width:78px}
+  .screen-tabs button{min-width:78px;flex:1 0 78px}
+  .setup-grid{grid-template-columns:1fr 1fr}
+  .effect-screen-live{grid-template-columns:1fr}
+  .effect-screen-live .fx-screen-select{grid-column:1;grid-template-columns:1fr 1fr}
+  .fx-parameter-grid{grid-template-columns:1fr}
+  .master-rack{grid-template-columns:1fr 1fr}
+  .master-card input{height:190px}
+  .right-tools{padding:3px}
+  .connection-test-panel{margin:0 3px 3px}
+}
+@media (max-width:1100px){
+  .console{align-items:start}
+  .center-console{height:auto}
+  .screen-view.active{min-height:0}
+  .screen-view .screen-content{min-height:0}
+}
