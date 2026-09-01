@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#090b0c">
 <title>MIXER-ONLINE • 18CH Digital Mixer</title>
-<link rel="stylesheet" href="style.css?v=20260901-landscape1">
+<link rel="stylesheet" href="style.css?v=20260902-split18-center-01">
 </head>
 <body>
 <header class="topbar">
@@ -33,8 +33,8 @@
 </header>
 
 <main class="console">
-  <section class="channel-bank">
-    <div class="bank-title"><span>INPUT CHANNELS</span><small>CH1–CH18</small></div>
+  <section class="channel-bank channel-bank-left">
+    <div class="bank-title"><span>INPUT CHANNELS 1–9</span><small>CH1–CH9</small></div>
     <div id="channels"></div>
   </section>
 
@@ -79,6 +79,11 @@
 </div>
     </div>
 
+    <section class="channel-bank channel-bank-right">
+      <div class="bank-title"><span>INPUT CHANNELS 10–18</span><small>CH10–CH18</small></div>
+      <div id="channelsRight"></div>
+    </section>
+
     <div class="fx-rack fx-rack-live">
       <div class="rack-title">EFFECT PROCESSOR <span>PARAMETER</span></div>
       <div class="fx-toolbar"><div class="fx-display"><strong id="fxRackPreset">HALL 1</strong><small id="fxRackSummary">REVERB • TIME 2.45s • LEVEL -3.0dB</small></div><button id="fxTap" type="button">TAP</button><span id="fxBpm">120 BPM</span><button id="fxSelect" type="button">SELECT</button></div>
@@ -112,7 +117,7 @@
 </main>
 
 <nav class="bottom-nav">
-  <button class="active">CH 1–8</button><button>CH 9–16</button><button>CH 17–18</button><button>FX</button><button>MASTER</button><button>SCENE</button><button>SETUP</button><button>SYSTEM</button>
+  <button class="active">CH 1–8</button><button>CH 9–16</button><button>FX</button><button>MASTER</button><button>SCENE</button><button>SETUP</button><button>SYSTEM</button>
 </nav>
 
 <section class="right-tools">
