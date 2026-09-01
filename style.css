@@ -565,3 +565,8 @@ main.console{width:100%;min-width:0}
 .led-meter.signal{filter:brightness(1.08)}
 .channel .led-meter{margin:3px auto 5px}
 @media (max-width:560px){.led-meter{height:72px;width:12px}.led-segments{gap:1px}.led-segments i{min-height:2px}}
+
+/* Targeted fix: compact BRIDGE STATUS card only */
+.status-head{min-width:0;overflow:hidden;padding-left:5px;padding-right:5px}
+.status-head strong{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.status-head small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
