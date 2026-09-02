@@ -87,7 +87,25 @@ function getPreset(){return JSON.parse(JSON.stringify({channels:state.channels,m
 function savePreset(slot="default"){localStorage.setItem("mr16_preset_"+slot,JSON.stringify(getPreset()));$("testResult").textContent="PRESET SAVED: "+slot+" • CH1–CH16 + MASTER";return true}
 function recallPreset(slot="default"){const raw=localStorage.getItem("mr16_preset_"+slot);if(!raw){$("testResult").textContent="RECALL FAILED: preset "+slot+" not found";return false}try{const p=JSON.parse(raw);if(!Array.isArray(p.channels)||p.channels.length!==N)throw new Error("invalid 16-channel preset");state.channels=p.channels.map((c,i)=>({...state.channels[i],...c,id:i+1}));state.master=clamp(Number(p.master),0,100);render();$("master").value=state.master;$("masterVal").textContent=state.master+"%";return true}catch(e){$("testResult").textContent="RECALL FAILED: "+e.message;return false}}
 async function runSaveRecallTest(){if(!state.connected){$("testResult").textContent="SAVE/RECALL TEST FAILED: ESP32 SIMULATOR OFFLINE";return false}const original=getPreset(),pattern={channels:state.channels.map((_,i)=>({id:i+1,fader:(i*11)%101,gain:Number(((i%21)/10).toFixed(2)),low:-12+(i%25),mid:12-(i%25),high:-12+((i*2)%25),pan:Number((-1+(i%18)*2/17).toFixed(2)),mute:i%2===0,solo:i%3===0,level:0})),master:37};let failed=[];try{state.channels=JSON.parse(JSON.stringify(pattern.channels));state.master=pattern.master;render();savePreset("test");state.channels=state.channels.map((c,i)=>({...c,fader:100,gain:2,low:12,mid:-12,high:12,pan:1,mute:false,solo:false}));state.master=100;render();if(!recallPreset("test"))throw new Error("recall operation failed");const got=getPreset();if(JSON.stringify(got)!==JSON.stringify(pattern))failed.push("recalled preset differs from saved preset");const raw=localStorage.getItem("mr16_preset_test");if(!raw)failed.push("preset not persisted");}catch(e){failed.push(e.message)}finally{state.channels=original.channels;state.master=original.master;render();$("master").value=state.master;$("masterVal").textContent=state.master+"%"}$("testResult").textContent=failed.length?"SAVE/RECALL TEST FAILED: "+failed.join(" • "):"SAVE/RECALL TEST PASSED: 16/16 channels + MASTER • save→mutate→recall exact • persistent localStorage preset";return failed.length===0}
-async function bindTestButtons(){const map={runMuteSoloTest:runMuteSoloTest,runTest:runTest,runStressTest:runStressTest,runMasterIsolationTest:runMasterIsolationTest,runFaderTest:runFaderTest,runCombinationTest:runCombinationTest,runBidirectionalSyncTest:runBidirectionalSyncTest,runSaveRecallTest:runSaveRecallTest};for(const id of Object.keys(map)){const b=$(id);if(!b)continue;b.onclick=null;b.addEventListener("click",async e=>{e.preventDefault();e.stopPropagation();$("testResult").textContent="RUNNING: "+id;try{await map[id]()}catch(err){$("testResult").textContent="TEST ERROR: "+(err?.message||err)}},{capture:true})}}
+function bindTestButtons(){
+ const map={simulateRx:"simulateHardwareRx",runTest:"runTest",runStressTest:"runStressTest",runMuteSoloTest:"runMuteSoloTest",runMasterIsolationTest:"runMasterIsolationTest",runFaderTest:"runFaderTest",runCombinationTest:"runCombinationTest",runBidirectionalSyncTest:"runBidirectionalSyncTest",runSaveRecallTest:"runSaveRecallTest"};
+ Object.entries(map).forEach(([id,name])=>{
+   const b=$(id); if(!b)return;
+   b.onclick=async function(e){
+     e.preventDefault(); e.stopPropagation();
+     const out=$("testResult");
+     if(out)out.textContent="RUNNING: "+(b.textContent||id);
+     const fn=window[name];
+     if(typeof fn!=="function"){if(out)out.textContent="TEST ERROR: "+name+" NOT LOADED";return false}
+     b.disabled=true;
+     try{return await fn()}catch(err){if(out)out.textContent="TEST ERROR: "+(err?.message||err);return false}
+     finally{b.disabled=false}
+   };
+ });
+ const save=$("savePreset"),recall=$("recallPreset");
+ if(save)save.onclick=e=>{e.preventDefault();e.stopPropagation();const ok=savePreset("default");if($("testResult"))$("testResult").textContent=ok?"PRESET SAVED: default • CH1–CH16 + MASTER":"PRESET SAVE FAILED";};
+ if(recall)recall.onclick=e=>{e.preventDefault();e.stopPropagation();const ok=recallPreset("default");if($("testResult"))$("testResult").textContent=ok?"PRESET RECALLED: default • CH1–CH16 + MASTER":"PRESET RECALL FAILED";};
+}
 Object.assign(window,{runTest,runStressTest,runMuteSoloTest,runMasterIsolationTest,runFaderTest,runCombinationTest,runBidirectionalSyncTest,runSaveRecallTest,simulateHardwareRx,savePreset,recallPreset});
 
 bindTestButtons();$("savePreset")?.addEventListener("click",()=>savePreset("default"));$("recallPreset")?.addEventListener("click",()=>{if(recallPreset("default"))$("testResult").textContent="PRESET RECALLED: default • CH1–CH16 + MASTER"});
