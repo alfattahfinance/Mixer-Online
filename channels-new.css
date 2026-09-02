@@ -1,25 +1,62 @@
-/* New standalone 16CH panel skin — large screens */
-.new-channel-strip{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  min-width:0;
-  height:680px;
-  padding:5px 3px;
-  box-sizing:border-box;
-  overflow:hidden;
-  border:1px solid #3a3f42;
-  border-radius:4px;
-  background:linear-gradient(180deg,#202427,#101213);
+/* RESET SEMUA CONTAINER CONSOLE UNTUK GRID DESKTOP/TABLET */
+main.console {
+  display: grid !important;
+  grid-template-columns: minmax(300px, 1fr) 340px minmax(300px, 1fr) 140px !important;
+  grid-template-areas:
+    "ch-left center ch-right master"
+    "fx      center ch-right master"
+    "aux     center ch-right master" !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  float: none !important;
+  clear: both !important;
 }
-.new-channel-head{width:100%;font-size:11px;font-weight:700;text-align:center;margin-bottom:4px}
-.new-channel-meter{display:flex;flex-direction:column-reverse;gap:2px;width:10px;height:72px;margin:3px auto}
-.new-channel-meter span{display:block;height:5px;width:10px;background:#555}
-.new-channel-control{width:100%;text-align:center;margin:3px 0}
-.new-channel-control label,.new-channel-fader label{display:block;font-size:7px}
-.new-channel-control input{width:34px;height:34px}
-.new-channel-fader{display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;width:100%}
-.new-channel-fader input{height:190px;writing-mode:vertical-lr;direction:rtl}
-.new-channel-buttons{width:100%;display:flex;flex-direction:column;gap:3px}
-.new-channel-buttons button{width:100%;padding:4px 1px;font-size:7px}
-.new-channel-source{font-size:7px;margin-top:4px}
+
+/* MENETRALISIR STYLING LAMA PADA MINGGIRAN / PENAKARAN */
+main.console > * {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  margin: 0 !important;
+  float: none !important;
+  clear: none !important;
+  width: auto !important;
+  max-width: none !important;
+}
+
+/* PENETAPAN AREA MASING-MASING ELEMEN */
+main.console > .channel-bank-left {
+  grid-area: ch-left !important;
+}
+
+main.console > .center-console {
+  grid-area: center !important;
+}
+
+main.console > .channel-bank-right {
+  grid-area: ch-right !important;
+}
+
+main.console > .master-rack {
+  grid-area: master !important;
+}
+
+main.console > .fx-rack,
+main.console > .fx-rack-live {
+  grid-area: fx !important;
+}
+
+main.console > .aux-rack {
+  grid-area: aux !important;
+}
+
+/* PASTI BISA DIPAKSA SUPAYA TIDAK MELEBAR SECARA RESPONSIF */
+@media screen and (max-width: 1024px) {
+  main.console {
+    overflow-x: auto !important;
+  }
+}
