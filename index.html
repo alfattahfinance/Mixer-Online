@@ -93,7 +93,34 @@
       <div class="fx-extra"><label>PRESET<select class="fx-preset" data-target="FX1"><option>HALL 1</option><option>ROOM</option><option>PLATE</option><option>DELAY</option><option>CHORUS</option></select></label><label>TYPE<select class="fx-type" data-target="FX1"><option>REVERB</option><option>DELAY</option><option>CHORUS</option><option>ECHO</option></select></label></div>
     </div>
 
-    <div class="aux-rack">
+    <style>
+/* Large-screen rack placement: effect/aux/return stay below the main console */
+@media (min-width:700px){
+  main.console{display:flex!important;flex-wrap:wrap!important;align-items:flex-start!important}
+  main.console > .channel-bank-left,
+  main.console > .center-console,
+  main.console > .channel-bank-right,
+  main.console > .master-rack{flex:0 0 auto!important}
+  main.console > .aux-rack{
+    order:10!important;
+    flex:0 0 100%!important;
+    width:100%!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)!important;
+    gap:10px!important;
+    margin-top:12px!important;
+    clear:both!important;
+  }
+  main.console .effect-screen{
+    order:9!important;
+  }
+  main.console .aux-rack .aux-unit{
+    width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+  }
+}
+</style><div class="aux-rack">
       <div class="aux-unit aux-live"><b>AUX / BUS</b><div class="aux-labels"><span>AUX1</span><span>AUX2</span><span>AUX3</span><span>AUX4</span></div><div class="mini-knobs"><input class="aux-control" data-target="AUX1" type="range" min="0" max="1" step="0.01" value="0"><input class="aux-control" data-target="AUX2" type="range" min="0" max="1" step="0.01" value="0"><input class="aux-control" data-target="AUX3" type="range" min="0" max="1" step="0.01" value="0"><input class="aux-control" data-target="AUX4" type="range" min="0" max="1" step="0.01" value="0"></div><div class="aux-values"><output data-aux-value="AUX1">0%</output><output data-aux-value="AUX2">0%</output><output data-aux-value="AUX3">0%</output><output data-aux-value="AUX4">0%</output></div></div>
       <div class="aux-unit aux-live"><b>FX RETURN</b><div class="aux-labels"><span>FX1</span><span>FX2</span></div><div class="mini-knobs"><input class="aux-control" data-scope="FX_RETURN" data-target="FX1" type="range" min="0" max="1" step="0.01" value=".45"><input class="aux-control" data-scope="FX_RETURN" data-target="FX2" type="range" min="0" max="1" step="0.01" value=".45"></div><div class="aux-values"><output data-return-value="FX1">45%</output><output data-return-value="FX2">45%</output></div></div>
     </div>
