@@ -267,13 +267,6 @@ setInterval(updateSkin,400); updateSkin();
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
 })();
 </script><script>
-(function(){
- "use strict";
- function bind(){
-  const b=document.getElementById("connectEsp"),p=document.getElementById("power");
-  if(p)p.onclick=function(e){e.preventDefault();e.stopPropagation();window.state=window.state||{system:false,connected:false,channels:[]};window.state.system=!window.state.system;if(!window.state.system){window.MixerAdapters?.disconnect?.();window.state.connected=false;window.state.sim&&(window.state.sim.online=false);}p.textContent=window.state.system?"SYSTEM ON":"SYSTEM OFF";p.classList.toggle("on",window.state.system);};
-  if(b)b.onclick=async function(e){e.preventDefault();e.stopPropagation();window.state=window.state||{system:false,connected:false,channels:[],sim:{}};if(!window.state.system){const o=document.getElementById("testResult");if(o)o.textContent="DEVICE CONNECTION BLOCKED: SYSTEM OFF";return;}const a=window.MixerAdapters;if(!a){const o=document.getElementById("testResult");if(o)o.textContent="DEVICE ERROR: ADAPTER NOT LOADED";return;}try{if(a.active?.connected){a.disconnect();}const x=await a.simulator();window.state.connected=true;window.state.sim.online=true;document.getElementById("status").textContent="ONLINE";document.getElementById("transportStatus").textContent="ESP32 BRIDGE: ESP32 SIMULATOR";b.textContent="DISCONNECT ESP32";const o=document.getElementById("testResult");if(o)o.textContent="DEVICE CONNECTED: ESP32 SIMULATOR • 16CH • TWO-WAY";}catch(err){const o=document.getElementById("testResult");if(o)o.textContent="DEVICE CONNECTION FAILED: "+(err?.message||err);}};
- }
- if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",bind,{once:true});else bind();
-})();
+/* Keep the dedicated connection handler above as the single owner.
+   No second CONNECT ESP32 handler is allowed to overwrite it. */
 </script></body></html>
