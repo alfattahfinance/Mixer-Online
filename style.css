@@ -156,3 +156,155 @@
   .center-console{max-width:360px!important}
   .master-rack{max-width:125px!important}
 }
+
+
+/* ============================================================
+   16CH LARGE-SCREEN MIXER LAYOUT
+   Scope: tablet landscape / large screens only.
+   Layout only — mixer engine/state is untouched.
+   ============================================================ */
+
+@media screen and (orientation:landscape) and (min-width:700px){
+  html,body{
+    min-width:0!important;
+    width:100%!important;
+    overflow-x:hidden!important;
+  }
+
+  main.console{
+    display:grid!important;
+    grid-template-columns:
+      minmax(0,1fr)
+      minmax(300px,360px)
+      minmax(0,1fr)
+      minmax(110px,125px)!important;
+    grid-template-rows:auto!important;
+    grid-template-areas:"left center right master"!important;
+    gap:7px!important;
+    width:100%!important;
+    min-width:0!important;
+    padding:7px!important;
+    box-sizing:border-box!important;
+    align-items:start!important;
+  }
+
+  main.console > .channel-bank-left{
+    grid-area:left!important;
+  }
+  main.console > .center-console{
+    grid-area:center!important;
+  }
+  main.console > .channel-bank-right{
+    grid-area:right!important;
+  }
+  main.console > .master-rack{
+    grid-area:master!important;
+  }
+
+  main.console > .channel-bank{
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    height:auto!important;
+    overflow:hidden!important;
+    box-sizing:border-box!important;
+  }
+
+  main.console > .channel-bank > .bank-title{
+    width:100%!important;
+    box-sizing:border-box!important;
+  }
+
+  /* 8 strips per side, one horizontal row. */
+  main.console > .channel-bank-left > #channels,
+  main.console > .channel-bank-right > #channelsRight{
+    display:grid!important;
+    grid-template-columns:repeat(8,minmax(0,1fr))!important;
+    grid-template-rows:690px!important;
+    grid-auto-flow:column!important;
+    gap:2px!important;
+    width:100%!important;
+    height:696px!important;
+    min-width:0!important;
+    padding:3px!important;
+    overflow:hidden!important;
+    box-sizing:border-box!important;
+  }
+
+  main.console > .channel-bank-left .channel,
+  main.console > .channel-bank-right .channel{
+    display:flex!important;
+    grid-row:1!important;
+    grid-column:auto!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:none!important;
+    height:690px!important;
+    min-height:690px!important;
+    margin:0!important;
+    box-sizing:border-box!important;
+    visibility:visible!important;
+  }
+
+  /* The 16CH build has no CH17/18 strip. */
+  main.console .channel[data-ch="17"],
+  main.console .channel[data-ch="18"]{
+    display:none!important;
+  }
+
+  main.console > .center-console{
+    width:100%!important;
+    min-width:0!important;
+    max-width:360px!important;
+    box-sizing:border-box!important;
+  }
+
+  main.console > .center-console .screen-frame{
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    margin:0!important;
+    box-sizing:border-box!important;
+  }
+
+  main.console > .master-rack{
+    width:100%!important;
+    min-width:0!important;
+    max-width:125px!important;
+    box-sizing:border-box!important;
+  }
+}
+
+/* Tablet landscape: preserve the same physical mixer arrangement.
+   The page may scroll horizontally only if the tablet is too narrow
+   to physically fit eight full channel strips on each side. */
+@media screen and (orientation:landscape) and (min-width:700px) and (max-width:1199px){
+  html,body{
+    overflow-x:auto!important;
+  }
+
+  main.console{
+    width:max-content!important;
+    min-width:1180px!important;
+    grid-template-columns:420px 320px 420px 120px!important;
+  }
+
+  main.console > .center-console{
+    max-width:320px!important;
+  }
+
+  main.console > .master-rack{
+    max-width:120px!important;
+  }
+
+  main.console > .channel-bank-left > #channels,
+  main.console > .channel-bank-right > #channelsRight{
+    grid-template-columns:repeat(8,50px)!important;
+    width:420px!important;
+  }
+
+  main.console > .channel-bank-left .channel,
+  main.console > .channel-bank-right .channel{
+    width:50px!important;
+  }
+}
