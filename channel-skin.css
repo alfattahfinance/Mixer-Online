@@ -1,0 +1,129 @@
+/* Mixer-Online — dedicated 16CH channel skin
+   Visual/layout layer only. Mixer engine and channel state stay in app.js. */
+
+.channel-bank-left > #channels,
+.channel-bank-right > #channelsRight{
+  display:grid !important;
+  grid-template-columns:repeat(8,minmax(0,1fr)) !important;
+  grid-auto-flow:column !important;
+  gap:3px !important;
+  width:100% !important;
+  min-width:0 !important;
+  padding:4px !important;
+  overflow:hidden !important;
+  box-sizing:border-box !important;
+}
+
+.channel-bank-left > #channels > .channel,
+.channel-bank-right > #channelsRight > .channel{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  width:auto !important;
+  min-width:0 !important;
+  height:680px !important;
+  min-height:680px !important;
+  margin:0 !important;
+  padding:5px 3px !important;
+  overflow:hidden !important;
+  box-sizing:border-box !important;
+  background:linear-gradient(180deg,#202427,#101213) !important;
+  border:1px solid #3a3f42 !important;
+  border-radius:4px !important;
+}
+
+.channel-bank-left .channel h3,
+.channel-bank-right .channel h3{
+  width:100% !important;
+  flex:0 0 auto !important;
+  margin:0 0 4px !important;
+  font-size:11px !important;
+  line-height:1.1 !important;
+}
+
+.channel-bank-left .channel .led-meter,
+.channel-bank-right .channel .led-meter{
+  display:block !important;
+  flex:0 0 78px !important;
+  width:12px !important;
+  height:78px !important;
+  min-height:78px !important;
+  margin:2px auto 4px !important;
+}
+
+.channel-bank-left .channel label,
+.channel-bank-right .channel label{
+  width:100% !important;
+  flex:0 0 auto !important;
+  margin:2px 0 !important;
+  font-size:7px !important;
+}
+
+.channel-bank-left .channel .knob-wrap,
+.channel-bank-right .channel .knob-wrap{
+  width:38px !important;
+  height:38px !important;
+  min-width:38px !important;
+  min-height:38px !important;
+}
+
+.channel-bank-left .channel input.knob,
+.channel-bank-right .channel input.knob{
+  width:38px !important;
+  height:38px !important;
+}
+
+.channel-bank-left .channel .fader-section,
+.channel-bank-right .channel .fader-section{
+  width:100% !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  flex:1 1 auto !important;
+  min-height:150px !important;
+}
+
+.channel-bank-left .channel input.fader,
+.channel-bank-right .channel input.fader{
+  height:170px !important;
+  flex:0 0 170px !important;
+  margin:4px auto !important;
+}
+
+.channel-bank-left .channel button,
+.channel-bank-right .channel button{
+  width:100% !important;
+  flex:0 0 auto !important;
+  padding:4px 1px !important;
+  margin:2px 0 !important;
+  font-size:7px !important;
+}
+
+.channel-bank-left .channel .small,
+.channel-bank-right .channel .small{
+  margin-top:auto !important;
+  font-size:7px !important;
+}
+
+.channel-bank-left .channel[data-ch="17"],
+.channel-bank-left .channel[data-ch="18"],
+.channel-bank-right .channel[data-ch="17"],
+.channel-bank-right .channel[data-ch="18"]{
+  display:none !important;
+}
+
+@media screen and (orientation:landscape) and (min-width:700px){
+  .channel-bank-left > #channels,
+  .channel-bank-right > #channelsRight{
+    min-height:690px !important;
+  }
+}
+
+@media screen and (orientation:landscape) and (min-width:1200px){
+  .channel-bank-left > #channels,
+  .channel-bank-right > #channelsRight{
+    min-height:700px !important;
+  }
+}
