@@ -291,3 +291,78 @@
     grid-row:1!important;
   }
 }
+
+/* FINAL FIX: keep both 8-channel banks on the SAME TOP ROW */
+@media (min-width:700px){
+  main.console{
+    display:grid!important;
+    grid-template-columns:632px 360px 632px 125px!important;
+    grid-template-rows:auto!important;
+    grid-template-areas:"left center right master" "tools tools tools tools"!important;
+    width:max-content!important;
+    min-width:0!important;
+    max-width:none!important;
+    align-items:start!important;
+  }
+  main.console > .channel-bank-left{
+    grid-area:left!important;
+    grid-column:1!important;
+    grid-row:1!important;
+    align-self:start!important;
+    margin:0!important;
+  }
+  main.console > .center-console{
+    grid-area:center!important;
+    grid-column:2!important;
+    grid-row:1!important;
+    align-self:start!important;
+    margin:0!important;
+  }
+  main.console > .channel-bank-right{
+    grid-area:right!important;
+    grid-column:3!important;
+    grid-row:1!important;
+    align-self:start!important;
+    margin:0!important;
+  }
+  main.console > .master-rack{
+    grid-area:master!important;
+    grid-column:4!important;
+    grid-row:1!important;
+    align-self:start!important;
+    margin:0!important;
+  }
+  main.console > .channel-bank-left > #channels,
+  main.console > .channel-bank-right > #channelsRight{
+    display:grid!important;
+    grid-template-columns:repeat(8,78px)!important;
+    grid-template-rows:690px!important;
+    grid-auto-flow:column!important;
+    gap:2px!important;
+    width:632px!important;
+    height:700px!important;
+    padding:3px!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+    align-items:start!important;
+  }
+  main.console > .channel-bank-left > #channels > .new-channel-strip,
+  main.console > .channel-bank-right > #channelsRight > .new-channel-strip{
+    grid-row:1!important;
+    grid-column:auto!important;
+    width:78px!important;
+    height:690px!important;
+    min-height:690px!important;
+    margin:0!important;
+    transform:none!important;
+    position:relative!important;
+    top:0!important;
+    bottom:auto!important;
+  }
+}
+/* Tablet: preserve the same left | center | right geometry; allow horizontal viewing. */
+@media (min-width:700px) and (max-width:1300px){
+  main.console{
+    transform:none!important;
+  }
+}
