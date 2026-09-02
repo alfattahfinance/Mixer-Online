@@ -1,4 +1,4 @@
-/* 16CH test panel — one owner per button, no duplicate listeners. */
+/* 14CH test panel — one owner per button, no duplicate listeners. */
 (function(){
 "use strict";
 const $=id=>document.getElementById(id);
