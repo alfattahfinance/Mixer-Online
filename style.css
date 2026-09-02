@@ -366,3 +366,25 @@
     transform:none!important;
   }
 }
+
+/* FINAL EFFECT PROCESSOR PLACEMENT — large screens */
+@media (min-width:700px){
+  main.console > .fx-rack-live{
+    grid-column:1 / -1!important;
+    grid-row:2!important;
+    width:min(900px,100%)!important;
+    justify-self:center!important;
+    align-self:start!important;
+    margin:14px auto 0!important;
+    box-sizing:border-box!important;
+    order:20!important;
+  }
+  main.console > .aux-rack{
+    grid-column:1 / -1!important;
+    grid-row:3!important;
+    order:21!important;
+    width:min(900px,100%)!important;
+    justify-self:center!important;
+    margin:10px auto 20px!important;
+  }
+}
