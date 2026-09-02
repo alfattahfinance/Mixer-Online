@@ -1,4 +1,4 @@
-/* Dedicated 16CH channel renderer. UI/layout only; mixer engine untouched. */
+/* Dedicated 14CH channel renderer. UI/layout only; mixer engine untouched. */
 (function(){
 "use strict";
 const N=14;
@@ -33,8 +33,8 @@ function build(){
  for(let i=1;i<=N;i++)(i<=7?l:r).appendChild(make(i));
  return true;
 }
-window.buildNew16ChannelPanel=build;
-window.syncNew16ChannelPanel=function(){ensureChannels();document.querySelectorAll(".new-channel-strip").forEach(el=>{const id=+el.dataset.ch,c=state().channels[id-1];if(!c)return;const f=el.querySelector('[data-k="fader"]'),o=el.querySelector("output");if(f)f.value=c.fader;if(o)o.textContent=c.fader+"%";["gain","high","mid","low","pan"].forEach(k=>{const x=el.querySelector('[data-k="'+k+'"]');if(x)x.value=c[k]});["mute","solo"].forEach(k=>{const b=el.querySelector('[data-k="'+k+'"]');if(b){b.classList.toggle("on",!!c[k]);b.textContent=c[k]?(k==="mute"?"UNMUTE":"UNSOLO"):(k==="mute"?"MUTE":"SOLO")}});});};
-function boot(){build();window.syncNew16ChannelPanel();}
+window.buildNew14ChannelPanel=build;
+window.syncNew14ChannelPanel=function(){ensureChannels();document.querySelectorAll(".new-channel-strip").forEach(el=>{const id=+el.dataset.ch,c=state().channels[id-1];if(!c)return;const f=el.querySelector('[data-k="fader"]'),o=el.querySelector("output");if(f)f.value=c.fader;if(o)o.textContent=c.fader+"%";["gain","high","mid","low","pan"].forEach(k=>{const x=el.querySelector('[data-k="'+k+'"]');if(x)x.value=c[k]});["mute","solo"].forEach(k=>{const b=el.querySelector('[data-k="'+k+'"]');if(b){b.classList.toggle("on",!!c[k]);b.textContent=c[k]?(k==="mute"?"UNMUTE":"UNSOLO"):(k==="mute"?"MUTE":"SOLO")}});});};
+function boot(){build();window.syncNew14ChannelPanel();}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
