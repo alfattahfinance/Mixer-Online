@@ -15,7 +15,7 @@
     el.dataset.ch = String(id);
     el.innerHTML = `
       <header class="new-channel-head">CH${id}</header>
-      <div class="new-channel-meter" aria-label="CH${id} level">${"<span></span>".repeat(12)}</div>
+      <div class="led-meter new-channel-meter" data-ch="${id}" role="meter" aria-label="CH${id} level"><span class="led-peak"></span><span class="led-segments">${"<i data-seg=\"0\"></i>".repeat(12)}</span></div>
       <div class="new-channel-control"><label>GAIN</label><input class="new-knob" data-k="gain" type="range" min="0" max="2" step=".01" value="${Number(c.gain ?? 1)}"></div>
       <div class="new-channel-control"><label>HIGH</label><input class="new-knob" data-k="high" type="range" min="-12" max="12" step="1" value="${Number(c.high ?? 0)}"></div>
       <div class="new-channel-control"><label>MID</label><input class="new-knob" data-k="mid" type="range" min="-12" max="12" step="1" value="${Number(c.mid ?? 0)}"></div>
@@ -72,6 +72,7 @@
   }
 
   window.buildNew16ChannelPanel = build;
+  document.addEventListener("click", function(e){ const card=e.target.closest(".new-channel-strip"); if(card && typeof window.selectScreenChannel==="function"){ window.selectScreenChannel(Number(card.dataset.ch)); } });
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", build, { once: true });
   else build();
 })();
