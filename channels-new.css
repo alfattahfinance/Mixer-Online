@@ -5,7 +5,7 @@
 /* 1. LAYOUT CONSOLE GRID UTAMA */
 main.console {
   display: grid !important;
-  grid-template-columns: 580px 320px 580px 110px !important;
+  grid-template-columns: 550px 300px 550px 100px !important;
   grid-template-rows: auto auto auto !important;
   grid-template-areas:
     "ch-left center ch-right master"
