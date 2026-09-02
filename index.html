@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#090b0c">
-<title>MIXER-ONLINE • 16CH Digital Mixer</title>
+<title>MIXER-ONLINE • 14CH Digital Mixer</title>
 <link rel="stylesheet" href="style.css?v=20260903-layout-final">
 <link rel="stylesheet" href="channel-skin.css?v=20260902-01">
 </head>
 <body>
 <header class="topbar">
-  <div class="brand"><b>MIXER-ONLINE</b><span>16CH DIGITAL MIXER</span></div>
+  <div class="brand"><b>MIXER-ONLINE</b><span>14CH DIGITAL MIXER</span></div>
   <div class="system-box">
     <span class="box-title">SYSTEM</span>
     <button id="power" class="power-btn">SYSTEM OFF</button>
@@ -24,7 +24,7 @@
   <div class="status-head">
     <span class="box-title">STATUS</span>
     <strong id="headerBridgeStatus">BRIDGE STANDBY</strong>
-    <small><span class="channel-count-status">16 CHANNELS READY</span> • TWO-WAY SYNC</small>
+    <small><span class="channel-count-status">14 channels READY</span> • TWO-WAY SYNC</small>
   </div>
   <div class="scene-head">
     <span class="box-title">SCENE</span>
@@ -43,7 +43,7 @@
   <!-- 2. CENTER CONSOLE / DISPLAY SCREEN -->
   <section class="center-console">
     <div class="screen-frame">
-      <div class="screen-title"><b>MIXER-ONLINE</b><span>16CH DIGITAL MIXER</span></div>
+      <div class="screen-title"><b>MIXER-ONLINE</b><span>14CH DIGITAL MIXER</span></div>
       <div class="screen-tabs" id="screenTabs">
         <button class="active" data-screen="HOME">HOME</button>
         <button data-screen="METER">METER</button>
@@ -74,7 +74,7 @@
         </section>
 
         <section class="screen-view" data-view="SETUP">
-          <div class="setup-screen"><b>SYSTEM SETUP</b><div class="setup-grid"><span>CHANNELS <strong class="channel-count-value">16</strong></span><span>TRANSPORT <strong id="setupTransport">OFFLINE</strong></span><span>PROTOCOL <strong>ESP32-MIXER/1</strong></span><span>SYNC <strong>TWO-WAY</strong></span><span>SYSTEM <strong id="setupSystem">OFF</strong></span><span>REMOTE <strong>BLUETOOTH / BRIDGE</strong></span></div><div class="channel-mapper"><div><b>AUTO CHANNEL MAPPER</b><small id="mapperStatus">16 CH • 1:1 READY</small></div><label>CHANNELS <select id="mapperChannels"><option value="4">4</option><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="18">18</option><option value="16" selected>16</option></select></label><button id="autoMapChannels" type="button" onclick="autoMapChannels()">AUTO MAP</button><button id="applyChannelMap" type="button" onclick="applyChannelMap()">APPLY CHANNELS</button><div id="channelMapPreview">CH1→CH1 • CH2→CH2 • CH3→CH3 • CH4→CH4 • … • CH16→CH16</div></div></div>
+          <div class="setup-screen"><b>SYSTEM SETUP</b><div class="setup-grid"><span>CHANNELS <strong class="channel-count-value">14</strong></span><span>TRANSPORT <strong id="setupTransport">OFFLINE</strong></span><span>PROTOCOL <strong>ESP32-MIXER/1</strong></span><span>SYNC <strong>TWO-WAY</strong></span><span>SYSTEM <strong id="setupSystem">OFF</strong></span><span>REMOTE <strong>BLUETOOTH / BRIDGE</strong></span></div><div class="channel-mapper"><div><b>AUTO CHANNEL MAPPER</b><small id="mapperStatus">16 CH • 1:1 READY</small></div><label>CHANNELS <select id="mapperChannels"><option value="4">4</option><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="14" selected>14</option></select></label><button id="autoMapChannels" type="button" onclick="autoMapChannels()">AUTO MAP</button><button id="applyChannelMap" type="button" onclick="applyChannelMap()">APPLY CHANNELS</button><div id="channelMapPreview">CH1→CH1 • CH2→CH2 • CH3→CH3 • CH4→CH4 • … • CH14→CH14</div></div></div>
         </section>
 
         <section class="screen-view" data-view="EFFECT">
@@ -136,7 +136,7 @@
 </main>
 
 <nav class="bottom-nav">
-  <button class="active">CH 1–8</button><button>CH 9–16</button><button>FX</button><button>MASTER</button><button>SCENE</button><button>SETUP</button><button>SYSTEM</button>
+  <button class="active">CH 1–7</button><button>CH 8–14</button><button>FX</button><button>MASTER</button><button>SCENE</button><button>SETUP</button><button>SYSTEM</button>
 </nav>
 
 <section class="right-tools">
@@ -167,12 +167,12 @@
   <div id="connectionHint" class="small">Mixer yang menerima remote: Bluetooth langsung. Mixer yang tidak menerima remote: gunakan ESP32 sebagai bridge.</div>
   <pre id="rx">RX: —</pre><pre id="tx">TX: —</pre>
   <div class="test-buttons">
-    <button id="simulateRx">SIMULATE HARDWARE RX</button><button id="runTest">RUN 16CH LOOPBACK TEST</button><button id="runStressTest">RUN REPEAT STRESS TEST</button><button id="runMuteSoloTest">RUN MUTE/SOLO TEST</button><button id="runMasterIsolationTest">RUN MASTER ISOLATION TEST</button><button id="runFaderTest">RUN FADER CH1–CH16 TEST</button><button id="runCombinationTest">RUN COMBINATION CONTROL TEST</button><button id="runBidirectionalSyncTest">RUN TWO-WAY SYNC TEST</button><button id="savePreset">SAVE PRESET</button><button id="recallPreset">RECALL PRESET</button><button id="runSaveRecallTest">RUN SAVE/RECALL TEST</button>
+    <button id="simulateRx">SIMULATE HARDWARE RX</button><button id="runTest">RUN 14CH LOOPBACK TEST</button><button id="runStressTest">RUN REPEAT STRESS TEST</button><button id="runMuteSoloTest">RUN MUTE/SOLO TEST</button><button id="runMasterIsolationTest">RUN MASTER ISOLATION TEST</button><button id="runFaderTest">RUN FADER CH1–CH14 TEST</button><button id="runCombinationTest">RUN COMBINATION CONTROL TEST</button><button id="runBidirectionalSyncTest">RUN TWO-WAY SYNC TEST</button><button id="savePreset">SAVE PRESET</button><button id="recallPreset">RECALL PRESET</button><button id="runSaveRecallTest">RUN SAVE/RECALL TEST</button>
   </div>
   <pre id="testResult">TEST: —</pre>
 </section>
 
-<footer class="status-footer"><span>CONNECTION <b id="footerConnection">● ESP32 SIMULATOR OFFLINE</b></span><span>MODE: <b>TWO-WAY SYNC</b></span><span>SYSTEM STATUS <b class="channel-count-status">16 CHANNELS READY</b></span><span>CPU: <b>18%</b></span><span>MEM: <b>42%</b></span></footer>
+<footer class="status-footer"><span>CONNECTION <b id="footerConnection">● ESP32 SIMULATOR OFFLINE</b></span><span>MODE: <b>TWO-WAY SYNC</b></span><span>SYSTEM STATUS <b class="channel-count-status">14 channels READY</b></span><span>CPU: <b>18%</b></span><span>MEM: <b>42%</b></span></footer>
 
 <script src="connection.js?v=20260903-final16"></script>
 <script src="adapters.js?v=20260902-device03"></script>
@@ -189,7 +189,7 @@
  document.getElementById('savePresetTop')?.addEventListener('click',()=>document.getElementById('savePreset')?.click());
  document.getElementById('recallPresetTop')?.addEventListener('click',()=>document.getElementById('recallPreset')?.click());
  document.getElementById('defaultScene')?.addEventListener('click',()=>{localStorage.removeItem('mr16_preset_default');document.getElementById('testResult').textContent='DEFAULT SCENE: factory state ready';});
- const tabs=document.querySelectorAll('#screenTabs [data-screen]'); const views=document.querySelectorAll('.screen-view'); const setScreen=(name)=>{tabs.forEach(b=>b.classList.toggle('active',b.dataset.screen===name));views.forEach(v=>v.classList.toggle('active',v.dataset.view===name));document.querySelector('.screen-frame')?.setAttribute('data-screen',name);if(name==='METER')buildScreenMeters();if(name==='RTA')buildRta();if(name==='SETUP')updateSetup();};tabs.forEach(b=>b.addEventListener('click',()=>setScreen(b.dataset.screen)));function buildScreenMeters(){const root=document.getElementById('screenChannelMeters');if(!root)return;root.innerHTML='';for(let i=0;i<16;i++){const el=document.createElement('i');el.style.height=(12+((i*17)%70))+'%';el.title='CH'+(i+1);root.appendChild(el)}}function buildRta(){const root=document.getElementById('rtaBars');if(!root)return;root.innerHTML='';for(let i=0;i<16;i++){const b=document.createElement('i');b.style.height=(18+((i*23)%72))+'%';root.appendChild(b)}}function updateSetup(){const a=window.MixerAdapters?.active;const t=document.getElementById('setupTransport');const s=document.getElementById('setupSystem');if(t)t.textContent=a?.connected?(a.transport==='bluetooth'?'BLUETOOTH':'ESP32 BRIDGE'):'OFFLINE';if(s)s.textContent=document.getElementById('power')?.classList.contains('on')?'ON':'OFF'}document.getElementById('screenSceneSave')?.addEventListener('click',()=>document.getElementById('savePreset')?.click());document.getElementById('screenSceneRecall')?.addEventListener('click',()=>document.getElementById('recallPreset')?.click());document.getElementById('screenSceneDefault')?.addEventListener('click',()=>document.getElementById('defaultScene')?.click());function selectScreenChannel(id){const c=window.state?.channels?.[id-1];if(!c)return;const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};set('screenInput','CH'+id);set('screenFader',c.fader+'%');set('screenGain',Number(c.gain).toFixed(2));set('screenPan',c.pan===0?'CENTER':(c.pan<0?'L '+Math.round(Math.abs(c.pan)*100)+'%':'R '+Math.round(c.pan*100)+'%'));set('screenStatus',c.mute?'MUTED':c.solo?'SOLO':'READY');set('meterSelected','CH'+id);set('meterLevel',Math.round((c.level||0)*50)+'%');} window.selectScreenChannel=selectScreenChannel; document.getElementById('channels')?.addEventListener('click',e=>{const ch=e.target.closest('.channel');if(ch){const id=Number(ch.dataset.ch);selectScreenChannel(id);}});document.getElementById('screenFxTap')?.addEventListener('click',()=>window.tapEffectTempo?.());const updateSkin=()=>{const live=document.getElementById('status')?.textContent==='ONLINE';document.getElementById('statusLamp')?.classList.toggle('live',live);document.getElementById('deviceLamp')?.classList.toggle('green',live);document.getElementById('deviceLamp')?.classList.toggle('red',!live);document.getElementById('headerBridgeStatus').textContent=live?'PERMANENT BRIDGE ACTIVE':'BRIDGE STANDBY';document.getElementById('footerConnection').textContent=live?'● ESP32 SIMULATOR ONLINE':'● ESP32 SIMULATOR OFFLINE';};
+ const tabs=document.querySelectorAll('#screenTabs [data-screen]'); const views=document.querySelectorAll('.screen-view'); const setScreen=(name)=>{tabs.forEach(b=>b.classList.toggle('active',b.dataset.screen===name));views.forEach(v=>v.classList.toggle('active',v.dataset.view===name));document.querySelector('.screen-frame')?.setAttribute('data-screen',name);if(name==='METER')buildScreenMeters();if(name==='RTA')buildRta();if(name==='SETUP')updateSetup();};tabs.forEach(b=>b.addEventListener('click',()=>setScreen(b.dataset.screen)));function buildScreenMeters(){const root=document.getElementById('screenChannelMeters');if(!root)return;root.innerHTML='';for(let i=0;i<14;i++){const el=document.createElement('i');el.style.height=(12+((i*17)%70))+'%';el.title='CH'+(i+1);root.appendChild(el)}}function buildRta(){const root=document.getElementById('rtaBars');if(!root)return;root.innerHTML='';for(let i=0;i<14;i++){const b=document.createElement('i');b.style.height=(18+((i*23)%72))+'%';root.appendChild(b)}}function updateSetup(){const a=window.MixerAdapters?.active;const t=document.getElementById('setupTransport');const s=document.getElementById('setupSystem');if(t)t.textContent=a?.connected?(a.transport==='bluetooth'?'BLUETOOTH':'ESP32 BRIDGE'):'OFFLINE';if(s)s.textContent=document.getElementById('power')?.classList.contains('on')?'ON':'OFF'}document.getElementById('screenSceneSave')?.addEventListener('click',()=>document.getElementById('savePreset')?.click());document.getElementById('screenSceneRecall')?.addEventListener('click',()=>document.getElementById('recallPreset')?.click());document.getElementById('screenSceneDefault')?.addEventListener('click',()=>document.getElementById('defaultScene')?.click());function selectScreenChannel(id){const c=window.state?.channels?.[id-1];if(!c)return;const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};set('screenInput','CH'+id);set('screenFader',c.fader+'%');set('screenGain',Number(c.gain).toFixed(2));set('screenPan',c.pan===0?'CENTER':(c.pan<0?'L '+Math.round(Math.abs(c.pan)*100)+'%':'R '+Math.round(c.pan*100)+'%'));set('screenStatus',c.mute?'MUTED':c.solo?'SOLO':'READY');set('meterSelected','CH'+id);set('meterLevel',Math.round((c.level||0)*50)+'%');} window.selectScreenChannel=selectScreenChannel; document.getElementById('channels')?.addEventListener('click',e=>{const ch=e.target.closest('.channel');if(ch){const id=Number(ch.dataset.ch);selectScreenChannel(id);}});document.getElementById('screenFxTap')?.addEventListener('click',()=>window.tapEffectTempo?.());const updateSkin=()=>{const live=document.getElementById('status')?.textContent==='ONLINE';document.getElementById('statusLamp')?.classList.toggle('live',live);document.getElementById('deviceLamp')?.classList.toggle('green',live);document.getElementById('deviceLamp')?.classList.toggle('red',!live);document.getElementById('headerBridgeStatus').textContent=live?'PERMANENT BRIDGE ACTIVE':'BRIDGE STANDBY';document.getElementById('footerConnection').textContent=live?'● ESP32 SIMULATOR ONLINE':'● ESP32 SIMULATOR OFFLINE';};
 window.initEffectEngine?.();
 setInterval(updateSkin,400); updateSkin();
 })();
