@@ -44,3 +44,115 @@
 .setup-screen>b,.scene-screen>b{display:block;color:#64d8ff;font-size:10px;letter-spacing:1px;margin-bottom:12px}.setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.setup-grid span{background:#0a1115;border:1px solid #1d343e;padding:10px;color:#71848c;font-size:8px}.setup-grid strong{display:block;color:#59ef78;font-size:10px;margin-top:3px}
 .effect-screen{display:flex;align-items:center;gap:8px}.effect-screen>div{flex:1;background:#0a1115;border:1px solid #203b46;padding:12px 7px;text-align:center}.effect-screen b{display:block;color:#71858e;font-size:7px}.effect-screen strong{display:block;color:#64ddff;margin:7px 0 0 0}
 \n/* === 16CH SPLIT: CH1-8 | CENTER | CH9-16 === */\n.channel-bank-left{grid-column:1}.center-console{grid-column:2}.channel-bank-right{grid-column:3}.master-rack{grid-column:4}\n@media(max-width:1100px){.console{grid-template-columns:minmax(0,1fr) 360px minmax(0,1fr) 125px}.channel-bank>#channels,.channel-bank>#channelsRight{grid-template-columns:repeat(8,minmax(72px,1fr))}}\n
+
+/* === LARGE SCREEN / TABLET LANDSCAPE 16CH LAYOUT === */
+/* Scope intentionally starts at 1200px: phone layout is NOT part of this change. */
+@media (orientation:landscape) and (min-width:1200px){
+  html,body{
+    width:100%;
+    min-width:0;
+    overflow-x:hidden;
+  }
+
+  main.console{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) 390px minmax(0,1fr) 150px!important;
+    grid-template-areas:"left center right master"!important;
+    gap:7px!important;
+    width:100%!important;
+    min-width:0!important;
+    padding:7px!important;
+    align-items:start!important;
+    box-sizing:border-box!important;
+  }
+
+  .channel-bank-left{grid-area:left!important}
+  .center-console{grid-area:center!important}
+  .channel-bank-right{grid-area:right!important}
+  .master-rack{grid-area:master!important}
+
+  .channel-bank-left,
+  .channel-bank-right{
+    width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    overflow:hidden!important;
+  }
+
+  /* Each side owns exactly eight strips. */
+  .channel-bank-left>#channels,
+  .channel-bank-right>#channelsRight{
+    display:grid!important;
+    grid-template-columns:repeat(8,minmax(0,1fr))!important;
+    grid-template-rows:690px!important;
+    grid-auto-flow:column!important;
+    gap:2px!important;
+    width:100%!important;
+    height:696px!important;
+    min-width:0!important;
+    overflow:hidden!important;
+    padding:3px!important;
+    box-sizing:border-box!important;
+  }
+
+  .channel-bank-left .channel,
+  .channel-bank-right .channel{
+    display:flex!important;
+    grid-row:1!important;
+    min-width:0!important;
+    width:auto!important;
+    height:690px!important;
+    min-height:690px!important;
+    margin:0!important;
+    box-sizing:border-box!important;
+    visibility:visible!important;
+  }
+
+  /* Never allow the legacy 18CH leftovers into this 16CH desktop layout. */
+  .channel-bank-left .channel[data-ch="17"],
+  .channel-bank-left .channel[data-ch="18"],
+  .channel-bank-right .channel[data-ch="17"],
+  .channel-bank-right .channel[data-ch="18"]{
+    display:none!important;
+  }
+
+  .center-console{
+    width:100%!important;
+    min-width:0!important;
+    max-width:390px!important;
+    box-sizing:border-box!important;
+  }
+
+  .center-console .screen-frame{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+    box-sizing:border-box!important;
+  }
+
+  .center-console .fx-rack,
+  .center-console .aux-rack{
+    width:100%!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+  }
+
+  .master-rack{
+    width:100%!important;
+    min-width:0!important;
+    max-width:150px!important;
+    box-sizing:border-box!important;
+  }
+}
+
+/* 1200px+ is the supported large-screen mixer workspace.
+   Do not let the old <=1200 mobile/tablet rules collapse this desktop arrangement. */
+@media (orientation:landscape) and (min-width:1200px) and (max-width:1399px){
+  main.console{
+    grid-template-columns:minmax(0,1fr) 360px minmax(0,1fr) 125px!important;
+  }
+  .center-console{max-width:360px!important}
+  .master-rack{max-width:125px!important}
+}
