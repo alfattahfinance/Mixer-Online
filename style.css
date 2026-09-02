@@ -177,3 +177,57 @@
     min-height:696px!important;
   }
 }
+
+/* AUTHORITATIVE 16CH POSITION — do not collapse or reorder banks */
+@media screen and (min-width:700px){
+  main.console{
+    direction:ltr!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) 360px minmax(0,1fr) 125px!important;
+    grid-template-areas:"left center right master"!important;
+    align-items:start!important;
+  }
+  main.console > .channel-bank-left{
+    grid-column:1!important;grid-row:1!important;grid-area:left!important;
+    order:1!important;direction:ltr!important;
+  }
+  main.console > .center-console{
+    grid-column:2!important;grid-row:1!important;grid-area:center!important;
+    order:2!important;
+  }
+  main.console > .channel-bank-right{
+    grid-column:3!important;grid-row:1!important;grid-area:right!important;
+    order:3!important;direction:ltr!important;
+  }
+  main.console > .master-rack{
+    grid-column:4!important;grid-row:1!important;grid-area:master!important;
+    order:4!important;
+  }
+  .channel-bank-left > #channels,
+  .channel-bank-right > #channelsRight{
+    direction:ltr!important;
+    display:grid!important;
+    grid-template-columns:repeat(8,minmax(0,1fr))!important;
+    grid-template-rows:1fr!important;
+    grid-auto-flow:column!important;
+    width:100%!important;
+    min-width:0!important;
+    overflow:hidden!important;
+  }
+  .channel-bank-left > #channels > .new-channel-strip:nth-child(n+1):nth-child(-n+8),
+  .channel-bank-right > #channelsRight > .new-channel-strip:nth-child(n+1):nth-child(-n+8){
+    grid-row:1!important;
+  }
+}
+@media screen and (min-width:700px) and (max-width:1199px){
+  main.console{
+    width:1180px!important;
+    min-width:1180px!important;
+    grid-template-columns:420px 320px 420px 120px!important;
+    grid-template-areas:"left center right master"!important;
+  }
+  main.console > .channel-bank-left{grid-column:1!important}
+  main.console > .center-console{grid-column:2!important}
+  main.console > .channel-bank-right{grid-column:3!important}
+  main.console > .master-rack{grid-column:4!important}
+}
