@@ -2,7 +2,7 @@
 
 window.MixerAdapters = (() => {
   const PROTOCOL = "ESP32-MIXER/1";
-  const CHANNEL_COUNT = 16;
+  const CHANNEL_COUNT = 14;
   const SIM_KEY = "mixer_online_esp32_simulator_v1";
   const listeners = new Set();
   let active = null;
@@ -232,7 +232,7 @@ window.MixerAdapters = (() => {
     if (scope==="AUX") return ["AUX1","AUX2","AUX3","AUX4"].includes(String(packet.target||packet.bus||"")) ? null : "invalid-aux";
     if (scope==="FX_RETURN") return ["FX1","FX2"].includes(String(packet.target||packet.fx||"")) ? null : "invalid-fx-return";
     const allowed=["fader","gain","low","mid","high","pan","mute","solo"];
-    if(!Number.isInteger(packet.ch)||packet.ch<1||packet.ch>18) return "invalid-channel";
+    if(!Number.isInteger(packet.ch)||packet.ch<1||packet.ch>14) return "invalid-channel";
     if(!allowed.includes(packet.param)) return "unsupported-control";
     return null;
   }
