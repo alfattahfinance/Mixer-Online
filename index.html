@@ -212,44 +212,4 @@ setInterval(updateSkin,400); updateSkin();
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
 })();
-</script><script>
-/* DEVICE CONNECTION — single owner for ESP32 simulator. */
-(function(){
-"use strict";
-function result(msg){var x=document.getElementById("testResult");if(x)x.textContent=msg;}
-function paint(online){
- var b=document.getElementById("connectEsp"),st=document.getElementById("status"),lamp=document.getElementById("statusLamp"),tr=document.getElementById("transportStatus");
- if(b)b.textContent=online?"DISCONNECT ESP32":"CONNECT ESP32";
- if(st)st.textContent=online?"ONLINE":"OFFLINE";
- if(lamp)lamp.classList.toggle("live",online);
- if(tr)tr.textContent=online?"ESP32 BRIDGE: ESP32 SIMULATOR":"OFFLINE";
-}
-function install(){
- var b=document.getElementById("connectEsp");if(!b)return;
- b.onclick=async function(e){
-   e.preventDefault();e.stopImmediatePropagation();
-   window.state=window.state||{system:false,connected:false,channels:[],sim:{online:false}};
-   if(!window.state.system){result("DEVICE CONNECTION BLOCKED: SYSTEM OFF");return false;}
-   var M=window.MixerAdapters;
-   if(!M||typeof M.simulator!=="function"){result("DEVICE CONNECTION FAILED: ADAPTER NOT LOADED");return false;}
-   try{
-     if(M.active&&M.active.connected){if(typeof M.disconnect==="function")M.disconnect();window.state.connected=false;window.state.sim.online=false;paint(false);result("DEVICE DISCONNECTED: ESP32 SIMULATOR");return false;}
-     var r=await M.simulator();
-     if(!r||!r.connected)throw new Error(r&&r.reason||"ESP32 simulator did not connect");
-     window.state.connected=true;window.state.sim.online=true;
-     if(typeof window.hydrateFromSimulator==="function")window.hydrateFromSimulator();
-     paint(true);
-     result("DEVICE CONNECTED: ESP32 SIMULATOR • 16CH • TWO-WAY");
-   }catch(err){
-     window.state.connected=false;window.state.sim.online=false;paint(false);
-     result("DEVICE CONNECTION FAILED: "+(err&&err.message||String(err)));
-   }
-   return false;
- };
-}
-if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
-})();
-</script><script>
-/* Keep the dedicated connection handler above as the single owner.
-   No second CONNECT ESP32 handler is allowed to overwrite it. */
 </script></body></html>
