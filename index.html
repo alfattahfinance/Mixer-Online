@@ -179,40 +179,38 @@ setInterval(updateSkin,400); updateSkin();
 })();
 </script>
 <script>
-/* FINAL HEADER BOOT — direct system control, independent of mixer engine */
+/* SINGLE SOURCE OF TRUTH: SYSTEM ON/OFF.
+   Deliberately independent from connection/test/channel code. */
 (function(){
-  function bootHeader(){
-    var power=document.getElementById("power");
-    if(!power || !window.state) return;
-    window.toggleSystem=function(){
+  function install(){
+    var p=document.getElementById("power");
+    if(!p)return;
+    if(!window.state) window.state={system:false,connected:false,channels:[],sim:{online:false}};
+    function paint(){
+      var on=!!window.state.system;
+      p.textContent=on?"SYSTEM ON":"SYSTEM OFF";
+      p.classList.toggle("on",on);
+      var hs=document.getElementById("headerBridgeStatus"); if(hs)hs.textContent=window.state.connected?"BRIDGE ONLINE":on?"SYSTEM READY":"BRIDGE STANDBY";
+      var ss=document.getElementById("setupSystem"); if(ss)ss.textContent=on?"ON":"OFF";
+      var tr=document.getElementById("transportStatus"); if(tr&&!window.state.connected)tr.textContent="OFFLINE";
+      var st=document.getElementById("status"); if(st&&!window.state.connected)st.textContent="OFFLINE";
+    }
+    p.onclick=function(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
       window.state.system=!window.state.system;
       if(!window.state.system){
-        try{ if(window.MixerAdapters && typeof window.MixerAdapters.disconnect==="function") window.MixerAdapters.disconnect(); }catch(e){}
+        try{window.MixerAdapters&&window.MixerAdapters.disconnect&&window.MixerAdapters.disconnect()}catch(_){}
         window.state.connected=false;
-        if(window.state.sim) window.state.sim.online=false;
+        if(window.state.sim)window.state.sim.online=false;
       }
-      power.textContent=window.state.system?"SYSTEM ON":"SYSTEM OFF";
-      power.classList.toggle("on",!!window.state.system);
-      var hs=document.getElementById("headerBridgeStatus");
-      if(hs) hs.textContent=window.state.system?"SYSTEM READY":"BRIDGE STANDBY";
-      var tr=document.getElementById("transportStatus");
-      if(tr && !window.state.connected) tr.textContent="OFFLINE";
-      var st=document.getElementById("status");
-      if(st && !window.state.connected) st.textContent="OFFLINE";
-      var result=document.getElementById("testResult");
-      if(result) result.textContent=window.state.system?"SYSTEM ON • READY":"SYSTEM OFF";
-      return window.state.system;
-    };
-    power.onclick=function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      window.toggleSystem();
+      paint();
+      try{window.refreshHeaderStatus&&window.refreshHeaderStatus()}catch(_){}
+      try{window.refreshSystemHeader&&window.refreshSystemHeader()}catch(_){}
       return false;
     };
-    power.textContent=window.state.system?"SYSTEM ON":"SYSTEM OFF";
-    power.classList.toggle("on",!!window.state.system);
+    paint();
   }
-  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",bootHeader,{once:true});
-  else bootHeader();
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
 })();
 </script></body></html>
