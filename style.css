@@ -45,3 +45,31 @@
 .setup-screen>b,.scene-screen>b{display:block;color:#64d8ff;font-size:10px;letter-spacing:1px;margin-bottom:12px}.setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.setup-grid span{background:#0a1115;border:1px solid #1d343e;padding:10px;color:#71848c;font-size:8px}.setup-grid strong{display:block;color:#59ef78;font-size:10px;margin-top:3px}
 .effect-screen{display:flex;align-items:center;gap:8px}.effect-screen>div{flex:1;background:#0a1115;border:1px solid #203b46;padding:12px 7px;text-align:center}.effect-screen b{display:block;color:#71858e;font-size:7px}.effect-screen strong{display:block;color:#64ddff;margin:7px 0 0 0}
    
+
+/* STRUCTURAL EFFECT RACK — large screens: below the complete main mixer row */
+@media (min-width:700px){
+  main.console{
+    display:grid!important;
+    grid-template-rows:auto auto auto!important;
+    align-items:start!important;
+  }
+  main.console > .fx-rack-live{
+    grid-column:1 / -1!important;
+    grid-row:2!important;
+    width:min(900px,100%)!important;
+    justify-self:center!important;
+    margin:12px auto 0!important;
+    position:relative!important;
+    float:none!important;
+    clear:both!important;
+    transform:none!important;
+    box-sizing:border-box!important;
+  }
+  main.console > .aux-rack{
+    grid-column:1 / -1!important;
+    grid-row:3!important;
+    width:min(900px,100%)!important;
+    justify-self:center!important;
+    margin:10px auto 20px!important;
+  }
+}
