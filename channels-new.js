@@ -64,14 +64,27 @@
     return el;
   }
 
-  function sync() {\n    for (let id = 1; id <= N; id++) {\n      const c = window.state?.channels?.[id - 1];\n      const el = document.querySelector('.new-channel-strip[data-ch="'+id+'"]');\n      if (!c || !el) continue;\n      el.querySelectorAll("input[data-k]").forEach(x => { if (x.dataset.k in c) x.value = String(c[x.dataset.k]); });\n      const o = el.querySelector("output"); if (o) o.textContent = Number(c.fader ?? 75) + "%";\n      el.querySelectorAll("button[data-k]").forEach(b => { const on=!!c[b.dataset.k]; b.classList.toggle("on",on); b.textContent=on?(b.dataset.k==="mute"?"UNMUTE":"UNSOLO"):(b.dataset.k==="mute"?"MUTE":"SOLO"); });\n      const status=el.querySelector("footer span"); if(status) status.textContent=c.mute?"MUTED":c.solo?"SOLO":"READY";\n    }\n  }\n\n  function build() {
+  function sync() {
+    for (let id = 1; id <= N; id++) {
+      const c = window.state?.channels?.[id - 1];
+      const el = document.querySelector('.new-channel-strip[data-ch="'+id+'"]');
+      if (!c || !el) continue;
+      el.querySelectorAll("input[data-k]").forEach(x => { if (x.dataset.k in c) x.value = String(c[x.dataset.k]); });
+      const o = el.querySelector("output"); if (o) o.textContent = Number(c.fader ?? 75) + "%";
+      el.querySelectorAll("button[data-k]").forEach(b => { const on=!!c[b.dataset.k]; b.classList.toggle("on",on); b.textContent=on?(b.dataset.k==="mute"?"UNMUTE":"UNSOLO"):(b.dataset.k==="mute"?"MUTE":"SOLO"); });
+      const status=el.querySelector("footer span"); if(status) status.textContent=c.mute?"MUTED":c.solo?"SOLO":"READY";
+    }
+  }
+
+  function build() {
     const left = $("channels"), right = $("channelsRight");
     if (!left || !right) return;
     left.innerHTML = ""; right.innerHTML = "";
     for (let i = 1; i <= N; i++) (i <= 8 ? left : right).appendChild(make(i));
   }
 
-  window.buildNew16ChannelPanel = build;\n  window.syncNew16ChannelPanel = sync;
+  window.buildNew16ChannelPanel = build;
+  window.syncNew16ChannelPanel = sync;
   document.addEventListener("click", function(e){ const card=e.target.closest(".new-channel-strip"); if(card && typeof window.selectScreenChannel==="function"){ window.selectScreenChannel(Number(card.dataset.ch)); } });
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", build, { once: true });
   else build();
