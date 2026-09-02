@@ -49,7 +49,13 @@
    Layout/skin only. Mixer engine is untouched.
    ============================================================ */
 
-@media screen and (orientation:landscape) and (min-width:700px){
+
+/* ============================================================
+   FINAL LARGE-SCREEN 16CH LAYOUT — single authoritative layout
+   CH1–8 | SCREEN | CH9–16
+   Channel engine/render logic is intentionally untouched.
+   ============================================================ */
+@media screen and (min-width:700px){
   html,body{
     min-width:0!important;
     width:100%!important;
@@ -58,11 +64,11 @@
 
   main.console{
     display:grid!important;
-    grid-template-columns:minmax(0,1fr) 360px minmax(0,1fr) 125px!important;
+    grid-template-columns:minmax(0,1fr) 390px minmax(0,1fr) 150px!important;
     grid-template-areas:"left center right master"!important;
     gap:7px!important;
     width:100%!important;
-    min-width:1180px!important;
+    min-width:0!important;
     padding:7px!important;
     align-items:start!important;
   }
@@ -72,7 +78,8 @@
   .channel-bank-right{grid-area:right!important}
   .master-rack{grid-area:master!important}
 
-  .channel-bank-left,.channel-bank-right{
+  .channel-bank-left,
+  .channel-bank-right{
     width:100%!important;
     min-width:0!important;
     overflow:hidden!important;
@@ -82,11 +89,10 @@
   .channel-bank-right>#channelsRight{
     display:grid!important;
     grid-template-columns:repeat(8,minmax(0,1fr))!important;
-    grid-template-rows:690px!important;
-    grid-auto-flow:column!important;
+    grid-template-rows:1fr!important;
+    grid-auto-flow:row!important;
     gap:2px!important;
     width:100%!important;
-    height:696px!important;
     min-width:0!important;
     padding:3px!important;
     overflow:hidden!important;
@@ -94,162 +100,80 @@
 
   .new-channel-strip{
     display:flex!important;
-    width:auto!important;
+    width:100%!important;
     min-width:0!important;
+    max-width:none!important;
     height:690px!important;
     min-height:690px!important;
     margin:0!important;
+    padding:5px 2px!important;
     box-sizing:border-box!important;
+    overflow:hidden!important;
   }
 
-  /* If the legacy renderer briefly creates old strips, never show them
-     alongside the new 16CH panel. */
-  .channel-bank .channel[data-ch="17"],
-  .channel-bank .channel[data-ch="18"]{
-    display:none!important;
+  .new-channel-head,
+  .new-channel-control,
+  .new-channel-fader,
+  .new-channel-buttons,
+  .new-channel-source{
+    min-width:0!important;
+    max-width:100%!important;
+  }
+
+  .new-channel-control input.new-knob{
+    width:38px!important;
+    height:38px!important;
+    max-width:100%!important;
+  }
+
+  .new-channel-fader input.new-fader{
+    width:26px!important;
+    height:190px!important;
   }
 
   .center-console{
     grid-area:center!important;
     width:100%!important;
-    max-width:360px!important;
-    min-width:300px!important;
+    min-width:0!important;
+    max-width:390px!important;
     padding:5px!important;
     box-sizing:border-box!important;
   }
 
   .screen-frame{
     width:100%!important;
-    min-height:390px!important;
-    height:auto!important;
     box-sizing:border-box!important;
   }
 
-  .screen-content{
-    display:block!important;
-    width:100%!important;
-    min-height:300px!important;
-  }
-
-  .screen-view{
-    display:none!important;
-    width:100%!important;
-    min-height:280px!important;
-  }
-
-  .screen-view.active{
-    display:block!important;
-  }
-
-  .screen-view[data-view="HOME"].active{
-    min-height:280px!important;
-  }
-
-  .screen-dashboard{
-    display:flex!important;
-    flex-direction:column!important;
-    gap:5px!important;
-  }
-
-  .spectrum{
-    height:180px!important;
-    min-height:180px!important;
-  }
-
-  .screen-readouts{
-    display:grid!important;
-    grid-template-columns:repeat(5,minmax(0,1fr))!important;
-  }
-
-  .player{
-    margin-top:5px!important;
-  }
-
   .master-rack{
-    grid-area:master!important;
     width:100%!important;
-    max-width:125px!important;
-    min-width:110px!important;
-  }
-}
-
-/* The 16 new strips use this class instead of the legacy .channel skin. */
-@media screen and (orientation:landscape) and (min-width:700px){
-  .new-channel-strip{
-    background:linear-gradient(180deg,#202427,#101213)!important;
-    border:1px solid #3a3f42!important;
-    border-radius:4px!important;
-    padding:5px 3px!important;
-    overflow:hidden!important;
-  }
-
-  .new-channel-control input.new-knob{
-    appearance:none!important;
-    -webkit-appearance:none!important;
-    width:42px!important;
-    height:42px!important;
-    border-radius:50%!important;
-    border:2px solid #4b5357!important;
-    background:radial-gradient(circle at 34% 28%,#687276 0,#303638 28%,#141718 62%,#050607 100%)!important;
-    box-shadow:inset 0 2px 4px rgba(255,255,255,.18),inset 0 -3px 5px rgba(0,0,0,.85),0 2px 4px #000!important;
-    margin:1px auto!important;
-  }
-
-  .new-channel-control input.new-knob::-webkit-slider-runnable-track{
-    height:2px!important;
-    background:transparent!important;
-  }
-
-  .new-channel-control input.new-knob::-webkit-slider-thumb{
-    appearance:none!important;
-    -webkit-appearance:none!important;
-    width:4px!important;
-    height:15px!important;
-    border:0!important;
-    border-radius:2px!important;
-    background:#e8edef!important;
-    box-shadow:0 0 4px #fff!important;
-  }
-
-  .new-channel-control input.new-knob::-moz-range-track{background:transparent!important}
-  .new-channel-control input.new-knob::-moz-range-thumb{
-    width:4px!important;height:15px!important;border:0!important;border-radius:2px!important;background:#e8edef!important;
-  }
-
-  .new-channel-fader input.new-fader{
-    appearance:none!important;
-    -webkit-appearance:none!important;
-    width:28px!important;
-    height:190px!important;
-    writing-mode:vertical-lr!important;
-    direction:rtl!important;
-  }
-
-  .new-channel-buttons button.on{
-    border-color:#fff!important;
-    box-shadow:0 0 8px rgba(255,255,255,.25)!important;
-  }
-}
-
-@media screen and (orientation:landscape) and (min-width:1200px){
-  main.console{
+    max-width:150px!important;
     min-width:0!important;
-    grid-template-columns:minmax(0,1fr) 390px minmax(0,1fr) 150px!important;
   }
-  .center-console{max-width:390px!important}
-  .master-rack{max-width:150px!important}
 }
 
-@media screen and (orientation:landscape) and (min-width:700px) and (max-width:1199px){
+/* Tablet landscape: keep the same physical order and proportions.
+   Horizontal overflow is allowed instead of collapsing channel banks. */
+@media screen and (min-width:700px) and (max-width:1199px){
   main.console{
-    min-width:1180px!important;
     width:1180px!important;
+    min-width:1180px!important;
     grid-template-columns:420px 320px 420px 120px!important;
+    grid-template-areas:"left center right master"!important;
   }
   .center-console{max-width:320px!important;min-width:320px!important}
   .master-rack{max-width:120px!important}
   .channel-bank-left>#channels,
   .channel-bank-right>#channelsRight{
     width:420px!important;
+    min-width:420px!important;
+  }
+}
+
+/* Desktop/wide tablet: all eight strips fit inside each bank. */
+@media screen and (min-width:1200px){
+  .channel-bank-left>#channels,
+  .channel-bank-right>#channelsRight{
+    min-height:696px!important;
   }
 }
