@@ -34,7 +34,7 @@ function hydrateFromSimulator(){const s=window.MixerAdapters?.getSimulatorState?
 function send(msg){const active=window.MixerAdapters?.active;if(!active?.connected){state.connected=false;state.sim.online=false;syncHeader();$("tx").textContent="TX: BLOCKED — TRANSPORT OFFLINE";return false}state.connected=true;state.sim.online=active.transport==="esp32";const packet={...msg,rev:++state.revision,ts:Date.now()};const result=window.MixerAdapters?.sendMapped?.(packet);if(!result?.ok){$("tx").textContent="TX: BLOCKED — "+(result?.reason||"TRANSPORT ERROR");return false}state.sim.txCount++;$("tx").textContent="TX: "+JSON.stringify(packet);localStorage.setItem("mr16_last_tx",JSON.stringify(packet));if(window.MixerAdapters?.active?.type==="simulator")bridgePanelEvent(packet);return true}
 $("power").addEventListener("click",e=>{e.preventDefault();toggleSystem()});
 $("master").addEventListener("input",e=>{if(!state.system)return;state.master=Number(e.target.value);$("masterVal").textContent=state.master+"%";send({type:"MASTER",value:state.master})});
-function simulateHardwareRx(){if(!state.connected){$("rx").textContent="RX: BLOCKED — ESP32 OFFLINE";$("testResult").textContent="SIMULATE HARDWARE RX FAILED: ESP32 OFFLINE";return false}let ok=true;for(let ch=1;ch<=N;ch++){const level=Number((Math.random()*2).toFixed(2));ok=simulatorReceive({type:"METER",ch,level,source:"ESP32-HARDWARE"})&&ok}$("rx").textContent=ok?"RX: ESP32-SIMULATOR • CH1–CH16 • 16 METER PACKETS":"RX: SIMULATOR REJECTED";$("testResult").textContent=ok?"SIMULATE HARDWARE RX PASSED: CH1–CH16 • 16 RX packets":"SIMULATE HARDWARE RX FAILED";return ok}
+function simulateHardwareRx(){const ad=window.MixerAdapters;if(!state.connected||!ad?.active?.connected){$("rx").textContent="RX: BLOCKED — ESP32 OFFLINE";$("testResult").textContent="SIMULATE HARDWARE RX FAILED: ESP32 OFFLINE";return false}let ok=true;for(let ch=1;ch<=N;ch++){const level=Number((Math.random()*2).toFixed(2));const r=ad.simulateHardwareChange?.(ch,"level",level);ok=!!r?.ok&&ok}$("rx").textContent=ok?"RX: ESP32-SIMULATOR • CH1–CH16 • HARDWARE FEEDBACK":"RX: SIMULATOR REJECTED";$("testResult").textContent=ok?"SIMULATE HARDWARE RX PASSED: CH1–CH16 • 16 RX packets":"SIMULATE HARDWARE RX FAILED";return ok}
 
 async function showTestControl(ch,param,value){
  const card=document.querySelector('.new-channel-strip[data-ch="'+ch+'"], .channel[data-ch="'+ch+'"]');
@@ -89,22 +89,21 @@ function recallPreset(slot="default"){const raw=localStorage.getItem("mr16_prese
 async function runSaveRecallTest(){if(!state.connected){$("testResult").textContent="SAVE/RECALL TEST FAILED: ESP32 SIMULATOR OFFLINE";return false}const original=getPreset(),pattern={channels:state.channels.map((_,i)=>({id:i+1,fader:(i*11)%101,gain:Number(((i%21)/10).toFixed(2)),low:-12+(i%25),mid:12-(i%25),high:-12+((i*2)%25),pan:Number((-1+(i%18)*2/17).toFixed(2)),mute:i%2===0,solo:i%3===0,level:0})),master:37};let failed=[];try{state.channels=JSON.parse(JSON.stringify(pattern.channels));state.master=pattern.master;render();savePreset("test");state.channels=state.channels.map((c,i)=>({...c,fader:100,gain:2,low:12,mid:-12,high:12,pan:1,mute:false,solo:false}));state.master=100;render();if(!recallPreset("test"))throw new Error("recall operation failed");const got=getPreset();if(JSON.stringify(got)!==JSON.stringify(pattern))failed.push("recalled preset differs from saved preset");const raw=localStorage.getItem("mr16_preset_test");if(!raw)failed.push("preset not persisted");}catch(e){failed.push(e.message)}finally{state.channels=original.channels;state.master=original.master;render();$("master").value=state.master;$("masterVal").textContent=state.master+"%"}$("testResult").textContent=failed.length?"SAVE/RECALL TEST FAILED: "+failed.join(" • "):"SAVE/RECALL TEST PASSED: 16/16 channels + MASTER • save→mutate→recall exact • persistent localStorage preset";return failed.length===0}
 function bindTestButtons(){
  const map={simulateRx:"simulateHardwareRx",runTest:"runTest",runStressTest:"runStressTest",runMuteSoloTest:"runMuteSoloTest",runMasterIsolationTest:"runMasterIsolationTest",runFaderTest:"runFaderTest",runCombinationTest:"runCombinationTest",runBidirectionalSyncTest:"runBidirectionalSyncTest",runSaveRecallTest:"runSaveRecallTest"};
- Object.entries(map).forEach(([id,name])=>{
-   const b=$(id); if(!b)return;
-   b.onclick=async function(e){
-     e.preventDefault(); e.stopPropagation();
-     const out=$("testResult");
-     if(out)out.textContent="RUNNING: "+(b.textContent||id);
-     const fn=window[name];
-     if(typeof fn!=="function"){if(out)out.textContent="TEST ERROR: "+name+" NOT LOADED";return false}
-     b.disabled=true;
-     try{return await fn()}catch(err){if(out)out.textContent="TEST ERROR: "+(err?.message||err);return false}
-     finally{b.disabled=false}
-   };
- });
- const save=$("savePreset"),recall=$("recallPreset");
- if(save)save.onclick=e=>{e.preventDefault();e.stopPropagation();const ok=savePreset("default");if($("testResult"))$("testResult").textContent=ok?"PRESET SAVED: default • CH1–CH16 + MASTER":"PRESET SAVE FAILED";};
- if(recall)recall.onclick=e=>{e.preventDefault();e.stopPropagation();const ok=recallPreset("default");if($("testResult"))$("testResult").textContent=ok?"PRESET RECALLED: default • CH1–CH16 + MASTER":"PRESET RECALL FAILED";};
+ Object.keys(map).forEach(id=>{const b=$(id);if(b)b.onclick=null;});
+ const save=$("savePreset"),recall=$("recallPreset");if(save)save.onclick=null;if(recall)recall.onclick=null;
+ if(window.__mr16TestDelegate)return;window.__mr16TestDelegate=true;
+ document.addEventListener("click",async e=>{
+   const b=e.target?.closest?.("button");if(!b)return;
+   const id=b.id;
+   if(id==="savePreset"){e.preventDefault();e.stopPropagation();const ok=savePreset("default");$("testResult").textContent=ok?"PRESET SAVED: default • CH1–CH16 + MASTER":"PRESET SAVE FAILED";return}
+   if(id==="recallPreset"){e.preventDefault();e.stopPropagation();const ok=recallPreset("default");$("testResult").textContent=ok?"PRESET RECALLED: default • CH1–CH16 + MASTER":"PRESET RECALL FAILED";return}
+   const name=map[id];if(!name)return;
+   e.preventDefault();e.stopPropagation();
+   const out=$("testResult");out.textContent="RUNNING: "+(b.textContent||id);b.disabled=true;
+   try{const fn=window[name];if(typeof fn!=="function")throw new Error(name+" NOT LOADED");const ok=await fn();if(out.textContent.startsWith("RUNNING:"))out.textContent=ok?"PASSED: "+id:"FAILED: "+id;}
+   catch(err){out.textContent="TEST ERROR: "+(err?.message||String(err));}
+   finally{b.disabled=false}
+ },true);
 }
 Object.assign(window,{runTest,runStressTest,runMuteSoloTest,runMasterIsolationTest,runFaderTest,runCombinationTest,runBidirectionalSyncTest,runSaveRecallTest,simulateHardwareRx,savePreset,recallPreset});
 
