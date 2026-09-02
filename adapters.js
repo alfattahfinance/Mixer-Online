@@ -145,7 +145,7 @@ window.MixerAdapters = (() => {
 
   // Physical ESP32 bridge mapping. Values are normalized by protocol;
   // the actual GPIO/ADC/DAC implementation is isolated behind this mapper.
-  const PHYSICAL_CHANNELS = 4;
+  const PHYSICAL_CHANNELS = CHANNEL_COUNT;
   const PHYSICAL_PARAMS = ["fader","gain","low","mid","high","pan","mute","solo"];
 
   function mapRemoteToHardware(packet) {
@@ -500,7 +500,7 @@ window.MixerAdapters = (() => {
         try { notify = await service.getCharacteristic(BLE.UART_TX); } catch {}
       }
 
-      if (!write || !notify) {
+      if (!write) {
         try {
           for (const s of await server.getPrimaryServices()) {
             for (const c of await s.getCharacteristics()) {
