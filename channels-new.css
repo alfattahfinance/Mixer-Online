@@ -1,8 +1,8 @@
 /* =========================================================
-   FIX TOTAL LAYOUT MIXER CONSOLE & CHANNEL STRIP
+   MIXER-ONLINE: COMPLETE CSS FOR NEW-CHANNEL-STRIP & GRID
    ========================================================= */
 
-/* 1. LAYOUT CONSOLE GRID */
+/* 1. GRID CONSOLE UTAMA */
 main.console {
   display: grid !important;
   grid-template-columns: 632px 360px 632px 125px !important;
@@ -20,42 +20,47 @@ main.console {
   clear: both !important;
 }
 
-/* 2. AREA PLACEMENT */
+/* 2. PLACEMENT AREA CONSOLE */
 main.console > .channel-bank-left  { grid-area: ch-left !important; }
 main.console > .center-console      { grid-area: center !important; }
 main.console > .channel-bank-right { grid-area: ch-right !important; }
 main.console > .master-rack        { grid-area: master !important; }
-main.console > .fx-rack-live,
-main.console > .fx-rack            { grid-area: fx !important; width: 100% !important; }
-main.console > .aux-rack           { grid-area: aux !important; width: 100% !important; }
 
-/* 3. PERBAIKAN WADAH BANK CHANNEL */
+main.console > .fx-rack,
+main.console > .fx-rack-live {
+  grid-area: fx !important;
+  width: 100% !important;
+}
+
+main.console > .aux-rack {
+  grid-area: aux !important;
+  width: 100% !important;
+}
+
+/* 3. WADAH CHANNEL BANK (LEFT & RIGHT) */
 .channel-bank {
   display: flex !important;
   flex-direction: column !important;
   background: #111518 !important;
   border: 1px solid #2a3036 !important;
   border-radius: 8px !important;
-  padding: 12px !important;
+  padding: 10px !important;
   box-sizing: border-box !important;
-  height: 680px !important; /* FIXED HEIGHT AGAR TIDAK MENCEPIT */
-  min-height: 680px !important;
-  overflow: visible !important;
+  min-height: 620px !important;
 }
 
 .bank-title {
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
-  height: 30px !important;
+  height: 28px !important;
   margin-bottom: 8px !important;
   border-bottom: 1px solid #2a3036 !important;
   color: #00e5ff !important;
   font-weight: bold !important;
-  flex-shrink: 0 !important;
 }
 
-/* 4. WADAH CHANNEL (JS RENDER TARGET) */
+/* 4. CONTAINER WADAH 8 CHANNEL (#channels & #channelsRight) */
 #channels, 
 #channelsRight {
   display: flex !important;
@@ -63,24 +68,19 @@ main.console > .aux-rack           { grid-area: aux !important; width: 100% !imp
   flex-wrap: nowrap !important;
   justify-content: space-between !important;
   align-items: stretch !important;
-  height: calc(100% - 38px) !important;
   width: 100% !important;
   gap: 4px !important;
   box-sizing: border-box !important;
 }
 
-/* 5. MEMAKSA BENTUK CHANNEL INDIVIDUAL BERDIRI TEGAK */
-.channel, 
-div[class*="channel-strip"],
-#channels > div,
-#channelsRight > div {
+/* 5. FIXING CLASS ASLI DARI JS: .new-channel-strip */
+.new-channel-strip {
   display: flex !important;
   flex-direction: column !important;
-  flex: 1 1 0 !important;
+  flex: 1 1 0px !important;
   width: 72px !important;
-  min-width: 65px !important;
-  height: 100% !important;
-  min-height: 600px !important;
+  min-width: 68px !important;
+  height: 570px !important;
   background: #181d22 !important;
   border: 1px solid #262c33 !important;
   border-radius: 6px !important;
@@ -88,36 +88,117 @@ div[class*="channel-strip"],
   box-sizing: border-box !important;
   justify-content: space-between !important;
   align-items: center !important;
-  overflow: visible !important;
 }
 
-/* 6. PERBAIKAN ELEMEN DI DALAM STRIP CHANNEL */
-.channel * {
-  box-sizing: border-box !important;
+/* Header CH */
+.new-channel-head {
+  font-size: 11px !important;
+  font-weight: bold !important;
+  color: #00e5ff !important;
+  background: #090b0c !important;
+  width: 100% !important;
+  text-align: center !important;
+  padding: 3px 0 !important;
+  border-radius: 3px !important;
 }
 
-/* Fader slider tegak */
-.channel input[type="range"] {
-  -webkit-appearance: slider-vertical !important;
-  writing-mode: bt-lr !important;
-  width: 28px !important;
-  height: 200px !important;
-  min-height: 180px !important;
-  margin: 10px 0 !important;
+/* Control knob (GAIN, HIGH, MID, LOW, PAN) */
+.new-channel-control {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  width: 100% !important;
+  margin: 1px 0 !important;
+}
+
+.new-channel-control label {
+  font-size: 9px !important;
+  color: #8a99a8 !important;
+  margin-bottom: 1px !important;
+}
+
+.new-knob {
+  width: 85% !important;
+  height: 12px !important;
+  accent-color: #00e5ff !important;
   cursor: pointer !important;
 }
 
-/* Tombol / Knob di dalam channel */
-.channel button, 
-.channel .btn {
-  width: 90% !important;
-  font-size: 10px !important;
-  padding: 4px 0 !important;
-  margin: 2px 0 !important;
+/* Fader / Volume Slider Vertical */
+.new-channel-fader {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  width: 100% !important;
+  margin: 4px 0 !important;
 }
 
-.channel .knob, 
-.channel select {
+.new-channel-fader label {
+  font-size: 9px !important;
+  color: #8a99a8 !important;
+}
+
+.new-channel-fader output {
+  font-size: 10px !important;
+  color: #fff !important;
+  font-weight: bold !important;
+  margin-top: 2px !important;
+}
+
+/* Slider Fader Tegak Berdiri */
+.new-fader {
+  -webkit-appearance: slider-vertical !important;
+  writing-mode: bt-lr !important;
+  width: 24px !important;
+  height: 140px !important;
+  margin: 4px 0 !important;
+  cursor: pointer !important;
+  accent-color: #00e5ff !important;
+}
+
+/* Tombol Mute & Solo */
+.new-channel-buttons {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
   width: 90% !important;
-  max-width: 50px !important;
+}
+
+.new-channel-buttons button {
+  width: 100% !important;
+  font-size: 9px !important;
+  font-weight: bold !important;
+  padding: 3px 0 !important;
+  background: #252d35 !important;
+  color: #fff !important;
+  border: 1px solid #3a444f !important;
+  border-radius: 3px !important;
+  cursor: pointer !important;
+}
+
+.new-channel-buttons button.on[data-k="mute"] {
+  background: #d32f2f !important;
+  border-color: #f44336 !important;
+}
+
+.new-channel-buttons button.on[data-k="solo"] {
+  background: #f57c00 !important;
+  border-color: #ff9800 !important;
+}
+
+/* Footer Status */
+.new-channel-source {
+  font-size: 8px !important;
+  color: #5a6978 !important;
+  text-align: center !important;
+}
+
+/* LED Meter Indicator */
+.new-channel-meter {
+  width: 80% !important;
+  height: 8px !important;
+  background: #000 !important;
+  border-radius: 2px !important;
+  margin: 2px 0 !important;
 }
