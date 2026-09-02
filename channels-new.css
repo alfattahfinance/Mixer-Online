@@ -1,20 +1,26 @@
-/* RESET SEMUA CONTAINER CONSOLE UNTUK GRID DESKTOP/TABLET */
+/* =========================================================
+   MIXER-ONLINE: COMPLETE LAYOUT & CHANNEL STRIP STYLES
+   ========================================================= */
+
+/* 1. RESET CONTAINER UTAMA & GRID CONSOLE */
 main.console {
   display: grid !important;
-  grid-template-columns: minmax(300px, 1fr) 340px minmax(300px, 1fr) 140px !important;
+  grid-template-columns: 632px 360px 632px 125px !important;
+  grid-template-rows: auto auto auto !important;
   grid-template-areas:
     "ch-left center ch-right master"
     "fx      center ch-right master"
     "aux     center ch-right master" !important;
-  gap: 12px !important;
-  width: 100% !important;
-  max-width: 100% !important;
+  gap: 16px !important;
+  width: max-content !important;
+  margin: 0 auto !important;
+  align-items: start !important;
   box-sizing: border-box !important;
   float: none !important;
   clear: both !important;
 }
 
-/* MENETRALISIR STYLING LAMA PADA MINGGIRAN / PENAKARAN */
+/* 2. NETRALISIR POSISI ELEMEN ANAK */
 main.console > * {
   position: relative !important;
   top: auto !important;
@@ -24,39 +30,117 @@ main.console > * {
   margin: 0 !important;
   float: none !important;
   clear: none !important;
-  width: auto !important;
-  max-width: none !important;
+  box-sizing: border-box !important;
 }
 
-/* PENETAPAN AREA MASING-MASING ELEMEN */
-main.console > .channel-bank-left {
-  grid-area: ch-left !important;
-}
-
-main.console > .center-console {
-  grid-area: center !important;
-}
-
-main.console > .channel-bank-right {
-  grid-area: ch-right !important;
-}
-
-main.console > .master-rack {
-  grid-area: master !important;
-}
+/* 3. PENETAPAN GRID AREA */
+main.console > .channel-bank-left  { grid-area: ch-left !important; }
+main.console > .center-console      { grid-area: center !important; }
+main.console > .channel-bank-right { grid-area: ch-right !important; }
+main.console > .master-rack        { grid-area: master !important; }
 
 main.console > .fx-rack,
 main.console > .fx-rack-live {
   grid-area: fx !important;
+  width: 100% !important;
 }
 
 main.console > .aux-rack {
   grid-area: aux !important;
+  width: 100% !important;
 }
 
-/* PASTI BISA DIPAKSA SUPAYA TIDAK MELEBAR SECARA RESPONSIF */
-@media screen and (max-width: 1024px) {
-  main.console {
+/* 4. PERBAIKAN WADAH CHANNEL BANK (AGAR TIDAK GEPENG VERTIKAL) */
+.channel-bank {
+  display: flex !important;
+  flex-direction: column !important;
+  background: #111518;
+  border: 1px solid #2a3036;
+  border-radius: 8px;
+  padding: 12px;
+  min-height: 680px !important; /* Mencegah channel ciut ke atas */
+}
+
+.bank-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #2a3036;
+  color: #00e5ff;
+  font-weight: bold;
+}
+
+/* 5. PERBAIKAN WADAH STRIP CHANNEL (#channels & #channelsRight) */
+#channels, 
+#channelsRight {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  justify-content: space-between !important;
+  align-items: stretch !important;
+  height: 100% !important;
+  min-height: 620px !important;
+  gap: 6px !important;
+}
+
+/* 6. PERBAIKAN TIAP-TIAP STRIP CHANNEL */
+.channel {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 0px !important;
+  min-width: 70px !important;
+  background: #181d22;
+  border: 1px solid #262c33;
+  border-radius: 6px;
+  padding: 6px 4px;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.channel .ch-name {
+  font-size: 11px;
+  font-weight: bold;
+  color: #fff;
+  background: #090b0c;
+  width: 100%;
+  text-align: center;
+  padding: 4px 0;
+  border-radius: 4px;
+}
+
+.channel .knob-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.channel .fader-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 1;
+  justify-content: flex-end;
+  width: 100%;
+  padding: 10px 0;
+}
+
+/* Fader slider style */
+.channel input[type="range"] {
+  writing-mode: bt-lr; /* IE/Edge */
+  -webkit-appearance: slider-vertical; /* Webkit */
+  width: 24px;
+  height: 220px !important;
+  padding: 0 5px;
+}
+
+/* 7. SCROLLING RESPONSIF JIKA SCREEN KECIL */
+@media screen and (max-width: 1750px) {
+  body {
     overflow-x: auto !important;
   }
 }
