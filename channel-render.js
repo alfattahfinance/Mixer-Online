@@ -1,7 +1,7 @@
 /* Dedicated 16CH channel renderer. UI/layout only; mixer engine untouched. */
 (function(){
 "use strict";
-const N=16;
+const N=14;
 function state(){return window.state||(window.state={system:false,connected:false,channels:[]});}
 function ensureChannels(){
  const st=state();
@@ -30,7 +30,7 @@ function build(){
  const l=document.getElementById("channels"),r=document.getElementById("channelsRight");
  if(!l||!r)return false;
  l.replaceChildren();r.replaceChildren();
- for(let i=1;i<=N;i++)(i<=8?l:r).appendChild(make(i));
+ for(let i=1;i<=N;i++)(i<=7?l:r).appendChild(make(i));
  return true;
 }
 window.buildNew16ChannelPanel=build;
