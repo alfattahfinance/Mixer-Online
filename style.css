@@ -1091,102 +1091,7 @@ button:disabled {
 @media (min-width: 700px) {
   main.console {
     display: grid !important;
-    grid-template-columns: repeat(8, 78px) 360px repeat(8, 78px) 125px !important;
-    grid-template-rows: auto auto auto !important;
-    grid-template-areas: 
-      "left left left left left left left left center center center center right right right right right right right right master"
-      ". . . . . . . . fx fx fx fx . . . . . . . . ."
-      ". . . . . . . . aux aux aux aux . . . . . . . . ." !important;
-    column-gap: 2px !important;
-    row-gap: 12px !important;
-    width: max-content !important;
-    margin: 0 auto 10px !important;
-    align-items: start !important;
-  }
-
-  main.console > .channel-bank-left { grid-area: left !important; width: 632px !important; margin: 0 !important; }
-  main.console > .center-console { grid-area: center !important; width: 360px !important; margin: 0 !important; }
-  main.console > .channel-bank-right { grid-area: right !important; width: 632px !important; margin: 0 !important; }
-  main.console > .master-rack { grid-area: master !important; width: 125px !important; margin: 0 !important; }
-
-  main.console > .fx-rack-live {
-    grid-column: 9 / 13 !important;
-    grid-row: 2 !important;
-    width: 390px !important;
-    justify-self: center !important;
-    margin: 0 !important;
-  }
-
-  main.console > .aux-rack {
-    grid-column: 9 / 13 !important;
-    grid-row: 3 !important;
-    width: 390px !important;
-    justify-self: center !important;
-    margin: 10px 0 20px !important;
-  }
-
-  .channel-bank-left > #channels,
-  .channel-bank-right > #channelsRight {
-    display: grid !important;
-    grid-template-columns: repeat(8, 78px) !important;
-    grid-auto-flow: column !important;
-    width: 632px !important;
-    min-width: 632px !important;
-  }
-
-  .right-tools {
-    display: grid !important;
-    grid-template-columns: minmax(260px, 1fr) minmax(340px, 1.4fr) minmax(260px, 1fr) !important;
-    gap: 7px !important;
-  }
-}
-
-@media (max-width: 699px) {
-  body { font-size: 11px !important; }
-
-  .topbar {
-    position: relative !important;
-    height: auto !important;
-    padding: 5px !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 5px !important;
-  }
-
-  .topbar > .brand { grid-column: 1/-1 !important; min-height: 58px !important; }
-
-  main.console {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    padding: 5px !important;
-    gap: 7px !important;
-  }
-
-  main.console > .center-console { order: 1 !important; width: 100% !important; }
-  main.console > .channel-bank-left { order: 2 !important; width: 100% !important; }
-  main.console > .channel-bank-right { order: 3 !important; width: 100% !important; }
-  main.console > .master-rack { order: 4 !important; width: 100% !important; display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
-  main.console > .fx-rack-live { order: 5 !important; width: 100% !important; }
-  main.console > .aux-rack { order: 6 !important; width: 100% !important; grid-template-columns: 1fr !important; }
-
-  .channel-bank { overflow-x: auto !important; }
-  .channel-bank > #channels,
-  .channel-bank > #channelsRight {
-    display: grid !important;
-    grid-template-columns: repeat(8, 78px) !important;
-    width: max-content !important;
-  }
-
-  .right-tools { grid-template-columns: 1fr !important; }
-}
-
-/* =========================================================
-   PERBAIKAN TATA LETAK (EFFECT, AUX, FX RETURN DI BAWAH CH 1-8)
-   ========================================================= */
-@media (min-width: 700px) {
-  main.console {
-    display: grid !important;
-    /* Grid 3 kolom utama: Bank Kiri (CH 1-8), Center Screen, Bank Kanan (CH 9-16) + Master */
+    /* Grid 4 Kolom Utama: CH 1-8 (left), Screen (center), CH 9-16 (right), Master (master) */
     grid-template-columns: 632px 360px 632px 125px !important;
     grid-template-rows: auto auto auto !important;
     grid-template-areas: 
@@ -1246,5 +1151,58 @@ button:disabled {
     margin: 0 !important;
     justify-self: start !important;
   }
+
+  .channel-bank-left > #channels,
+  .channel-bank-right > #channelsRight {
+    display: grid !important;
+    grid-template-columns: repeat(8, 78px) !important;
+    grid-auto-flow: column !important;
+    width: 632px !important;
+    min-width: 632px !important;
+  }
+
+  .right-tools {
+    display: grid !important;
+    grid-template-columns: minmax(260px, 1fr) minmax(340px, 1.4fr) minmax(260px, 1fr) !important;
+    gap: 7px !important;
+  }
 }
 
+@media (max-width: 699px) {
+  body { font-size: 11px !important; }
+
+  .topbar {
+    position: relative !important;
+    height: auto !important;
+    padding: 5px !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 5px !important;
+  }
+
+  .topbar > .brand { grid-column: 1/-1 !important; min-height: 58px !important; }
+
+  main.console {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    padding: 5px !important;
+    gap: 7px !important;
+  }
+
+  main.console > .center-console { order: 1 !important; width: 100% !important; }
+  main.console > .channel-bank-left { order: 2 !important; width: 100% !important; }
+  main.console > .channel-bank-right { order: 3 !important; width: 100% !important; }
+  main.console > .master-rack { order: 4 !important; width: 100% !important; display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  main.console > .fx-rack-live { order: 5 !important; width: 100% !important; }
+  main.console > .aux-rack { order: 6 !important; width: 100% !important; grid-template-columns: 1fr !important; }
+
+  .channel-bank { overflow-x: auto !important; }
+  .channel-bank > #channels,
+  .channel-bank > #channelsRight {
+    display: grid !important;
+    grid-template-columns: repeat(8, 78px) !important;
+    width: max-content !important;
+  }
+
+  .right-tools { grid-template-columns: 1fr !important; }
+}
