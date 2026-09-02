@@ -459,3 +459,29 @@ html,body{
     min-width:0!important;
   }
 }
+
+/* FINAL EFFECT LOCATION — centered directly under SCREEN on tablet/large */
+@media (min-width:700px){
+  main.console>.fx-rack-live{
+    grid-column:9 / 13!important;
+    grid-row:2!important;
+    width:390px!important;
+    max-width:100%!important;
+    justify-self:center!important;
+    align-self:start!important;
+    margin:0!important;
+    position:relative!important;
+    left:auto!important;
+    right:auto!important;
+    top:auto!important;
+    transform:none!important;
+  }
+  main.console>.aux-rack{
+    grid-column:9 / 13!important;
+    grid-row:3!important;
+    width:390px!important;
+    max-width:100%!important;
+    justify-self:center!important;
+    margin:10px 0 20px!important;
+  }
+}
