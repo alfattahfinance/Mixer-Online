@@ -370,3 +370,92 @@ html,body{
     grid-template-columns:repeat(2,1fr)!important;
   }
 }
+
+/* =========================================================
+   DASHBOARD ORGANIZATION — DO NOT MOVE CHANNEL BANKS
+   Channels remain CH1-8 | SCREEN | CH9-16 | MASTER.
+   Only secondary dashboard areas are reorganized.
+   ========================================================= */
+.bottom-nav,
+.right-tools,
+.connection-test-panel,
+.status-footer{
+  width:calc(100% - 14px)!important;
+  max-width:none!important;
+  margin-left:7px!important;
+  margin-right:7px!important;
+}
+
+@media (min-width:700px){
+  /* Keep the mixer row intact and visually separate from dashboards below. */
+  main.console{
+    margin-bottom:10px!important;
+  }
+
+  /* Effect processor is a centered lower dashboard, never beside channels. */
+  main.console>.fx-rack-live{
+    width:min(1200px,calc(100% - 24px))!important;
+    justify-self:center!important;
+    align-self:start!important;
+    margin:0 auto!important;
+  }
+  main.console>.aux-rack{
+    width:min(1000px,calc(100% - 24px))!important;
+    justify-self:center!important;
+    align-self:start!important;
+    margin:0 auto 16px!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1.6fr) minmax(280px,1fr)!important;
+    gap:10px!important;
+  }
+
+  /* All secondary dashboards use the full available page width. */
+  .right-tools{
+    display:grid!important;
+    grid-template-columns:minmax(260px,1fr) minmax(340px,1.4fr) minmax(260px,1fr)!important;
+    gap:7px!important;
+    padding:7px!important;
+    align-items:stretch!important;
+  }
+  .right-tools>section{
+    min-width:0!important;
+    width:100%!important;
+    height:100%!important;
+  }
+  .connection-test-panel{
+    min-height:130px!important;
+  }
+  .test-buttons{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:center!important;
+  }
+}
+
+/* Landscape tablet: use the full dashboard width and prevent orphaned panels. */
+@media (min-width:700px) and (max-width:1399px) and (orientation:landscape){
+  .right-tools{
+    grid-template-columns:minmax(240px,1fr) minmax(300px,1.2fr) minmax(240px,1fr)!important;
+  }
+}
+
+/* Phone dashboard: one clean column, no horizontal blank canvas. */
+@media (max-width:699px){
+  .bottom-nav,
+  .right-tools,
+  .connection-test-panel,
+  .status-footer{
+    width:calc(100% - 10px)!important;
+    margin-left:5px!important;
+    margin-right:5px!important;
+  }
+  .right-tools{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:6px!important;
+  }
+  .right-tools>section{
+    width:100%!important;
+    min-width:0!important;
+  }
+}
