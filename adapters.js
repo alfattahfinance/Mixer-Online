@@ -2,6 +2,7 @@
 
 window.MixerAdapters = (() => {
   const PROTOCOL = "ESP32-MIXER/1";
+  const CHANNEL_COUNT = 16;
   const SIM_KEY = "mixer_online_esp32_simulator_v1";
   const listeners = new Set();
   let active = null;
@@ -16,7 +17,7 @@ window.MixerAdapters = (() => {
   };
 
   const defaults = () => ({
-    channels: Array.from({ length: 18 }, (_, i) => ({
+    channels: Array.from({ length: CHANNEL_COUNT }, (_, i) => ({
       ch: i + 1, fader: 75, gain: 1, low: 0, mid: 0, high: 0,
       pan: 0, mute: false, solo: false, level: 0
     })),
@@ -35,7 +36,7 @@ window.MixerAdapters = (() => {
       const raw = localStorage.getItem(SIM_KEY);
       if (!raw) return defaults();
       const saved = JSON.parse(raw);
-      if (!Array.isArray(saved.channels) || saved.channels.length !== 18) return defaults();
+      if (!Array.isArray(saved.channels) || saved.channels.length !== CHANNEL_COUNT) return defaults();
       return {
         channels: saved.channels.map((c, i) => ({
           ch: i + 1,
@@ -459,7 +460,7 @@ window.MixerAdapters = (() => {
       rx: [],
       ack: [],
       pending: new Map(),
-      bridge: { mode:"two-way", target:"analog-mixer", physicalChannels:4, commands:[], feedback:[] },
+      bridge: { mode:"two-way", target:"analog-mixer", physicalChannels:CHANNEL_COUNT, commands:[], feedback:[] },
       startedAt: Date.now(),
       lastTx: null,
       lastRx: null,
