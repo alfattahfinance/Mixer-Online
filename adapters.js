@@ -359,7 +359,7 @@ window.MixerAdapters = (() => {
     emitStatus(); return ok;
   }
 
-  function sendMapped(command) {
+  function getTransportStats(){if(!active)return {connected:false,transport:"none",tx:0,rx:0,ack:0,pending:0};return {connected:!!active.connected,transport:active.transport||active.type||"none",tx:active.tx?.length||0,rx:active.rx?.length||0,ack:active.ack?.length||0,pending:active.pending?.size||0};}\n\n  function sendMapped(command) {
     if(!active?.connected) return {ok:false,reason:"offline"};
     if(command.type!=="CONTROL"&&command.type!=="MASTER") return {ok:false,reason:"unsupported-type"};
     if(command.type==="CONTROL"){
@@ -384,7 +384,7 @@ window.MixerAdapters = (() => {
       rev:command.rev??null
     });
     active.lastTx=packet; active.tx.push(packet); active.pending.set(packet.id,packet); emitStatus();
-    if(active.type==="simulator"){queueMicrotask(()=>receiveSimulator(packet));return {ok:true,transport:"esp32",tx:packet};}
+    if(active.type==="simulator"){const ok=receiveSimulator(packet);if(!ok)return {ok:false,reason:"simulator-rejected",transport:"esp32",tx:packet};return {ok:true,transport:"esp32",tx:packet};}
     if(active.type==="bluetooth") return sendBluetooth(packet);
     active.pending.delete(packet.id); return {ok:false,reason:"unsupported-transport"};
   }
