@@ -127,3 +127,34 @@
     min-height:700px !important;
   }
 }
+
+/* Dedicated 16CH large-screen layout.
+   CH1-8 | SCREEN | CH9-16. No mixer-engine rules. */
+@media screen and (min-width:700px){
+  .console{
+    display:grid !important;
+    grid-template-columns:minmax(0,8fr) minmax(360px,390px) minmax(0,8fr) 150px !important;
+    gap:7px !important;
+    align-items:start !important;
+  }
+  .channel-bank-left,.channel-bank-right{min-width:0 !important;}
+  .channel-bank-left > #channels,
+  .channel-bank-right > #channelsRight{
+    display:grid !important;
+    grid-template-columns:repeat(8,minmax(0,1fr)) !important;
+    grid-auto-flow:row !important;
+    gap:2px !important;
+    overflow:hidden !important;
+    padding:3px !important;
+    width:100% !important;
+    box-sizing:border-box !important;
+  }
+  .new-channel-strip{
+    display:flex !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    width:auto !important;
+    min-width:0 !important;
+    height:680px !important;
+  }
+}
