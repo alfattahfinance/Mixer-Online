@@ -1179,3 +1179,72 @@ button:disabled {
 
   .right-tools { grid-template-columns: 1fr !important; }
 }
+
+/* =========================================================
+   PERBAIKAN TATA LETAK (EFFECT, AUX, FX RETURN DI BAWAH CH 1-8)
+   ========================================================= */
+@media (min-width: 700px) {
+  main.console {
+    display: grid !important;
+    /* Grid 3 kolom utama: Bank Kiri (CH 1-8), Center Screen, Bank Kanan (CH 9-16) + Master */
+    grid-template-columns: 632px 360px 632px 125px !important;
+    grid-template-rows: auto auto auto !important;
+    grid-template-areas: 
+      "left center right master"
+      "fx   .      .     master"
+      "aux  .      .     master" !important;
+    column-gap: 12px !important;
+    row-gap: 12px !important;
+    width: max-content !important;
+    margin: 0 auto 10px !important;
+    align-items: start !important;
+  }
+
+  /* Posisikan Channel Bank Kiri (CH 1-8) */
+  main.console > .channel-bank-left { 
+    grid-area: left !important; 
+    width: 632px !important; 
+    margin: 0 !important; 
+  }
+
+  /* Posisikan Screen Tengah */
+  main.console > .center-console { 
+    grid-area: center !important; 
+    width: 360px !important; 
+    margin: 0 !important; 
+  }
+
+  /* Posisikan Channel Bank Kanan (CH 9-16) */
+  main.console > .channel-bank-right { 
+    grid-area: right !important; 
+    width: 632px !important; 
+    margin: 0 !important; 
+  }
+
+  /* Posisikan Master Rack di Sebelah Kanan */
+  main.console > .master-rack { 
+    grid-area: master !important; 
+    width: 125px !important; 
+    margin: 0 !important; 
+  }
+
+  /* Posisikan Effect Processor Tepat di Bawah Channel 1-8 */
+  main.console > .fx-rack-live,
+  main.console > .fx-rack {
+    grid-area: fx !important;
+    width: 100% !important;
+    max-width: 632px !important;
+    margin: 0 !important;
+    justify-self: start !important;
+  }
+
+  /* Posisikan AUX / BUS & FX Return Tepat di Bawah Effect Processor */
+  main.console > .aux-rack {
+    grid-area: aux !important;
+    width: 100% !important;
+    max-width: 632px !important;
+    margin: 0 !important;
+    justify-self: start !important;
+  }
+}
+
