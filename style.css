@@ -1206,3 +1206,71 @@ button:disabled {
 
   .right-tools { grid-template-columns: 1fr !important; }
 }
+
+/* FORCE GRID LAYOUT FOR MIXER CONSOLE */
+@media (min-width: 700px) {
+  main.console {
+    display: grid !important;
+    grid-template-columns: 632px 360px 632px 125px !important;
+    grid-template-areas: 
+      "ch-left center ch-right master"
+      "fx      center ch-right master"
+      "aux     center ch-right master" !important;
+    column-gap: 12px !important;
+    row-gap: 12px !important;
+    width: max-content !important;
+    margin: 0 auto 10px !important;
+    align-items: start !important;
+  }
+
+  /* Reset positioning bawaan yang merusak Grid */
+  main.console > .fx-rack,
+  main.console > .fx-rack-live,
+  main.console > .aux-rack {
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+    float: none !important;
+    margin: 0 !important;
+  }
+
+  /* Alokasi Area */
+  main.console > .channel-bank-left {
+    grid-area: ch-left !important;
+    width: 632px !important;
+  }
+
+  main.console > .center-console {
+    grid-area: center !important;
+    width: 360px !important;
+  }
+
+  main.console > .channel-bank-right {
+    grid-area: ch-right !important;
+    width: 632px !important;
+  }
+
+  main.console > .master-rack {
+    grid-area: master !important;
+    width: 125px !important;
+  }
+
+  /* Memaksa FX Rack persis di bawah Channel 1-8 */
+  main.console > .fx-rack-live,
+  main.console > .fx-rack {
+    grid-area: fx !important;
+    width: 632px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Memaksa AUX Rack persis di bawah FX Rack */
+  main.console > .aux-rack {
+    grid-area: aux !important;
+    width: 632px !important;
+    box-sizing: border-box !important;
+  }
+}
+
