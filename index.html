@@ -213,4 +213,58 @@ setInterval(updateSkin,400); updateSkin();
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
 })();
+</script><script>
+/* DEVICE CONNECTION — single UI bridge for ESP32/Bluetooth.
+   Does not alter mixer engine or channel state. */
+(function(){
+  "use strict";
+  function paint(s){
+    const live=!!s?.connected, t=s?.transport||"none";
+    const status=document.getElementById("deviceStatus");
+    const btn=document.getElementById("deviceConnect");
+    const disc=document.getElementById("deviceDisconnect");
+    const hint=document.getElementById("deviceHint");
+    const esp=document.getElementById("connectEsp");
+    const ble=document.getElementById("connectBluetooth");
+    const tr=document.getElementById("transportStatus");
+    const head=document.getElementById("status");
+    if(status){status.textContent=live?(t==="bluetooth"?"🟢 BLUETOOTH CONNECTED":"🟢 ESP32 SIMULATOR ONLINE"):"🔴 "+(t==="bluetooth"?"BLUETOOTH OFFLINE":"ESP32 SIMULATOR OFFLINE");status.classList.toggle("online",live);}
+    if(btn)btn.textContent=live?(t==="bluetooth"?"DISCONNECT BLUETOOTH":"DISCONNECT ESP32"):(document.getElementById("transportSelect")?.value==="bluetooth"?"CONNECT BLUETOOTH":"CONNECT ESP32");
+    if(disc)disc.disabled=!live;
+    if(hint)hint.textContent=live?(t==="bluetooth"?"Bluetooth • "+(s.name||"MIXER")+" • ESP32-MIXER/1":"ESP32 Simulator • 16CH • ESP32-MIXER/1"):"Pilih jalur koneksi lalu CONNECT.";
+    if(esp)esp.textContent=live&&t==="esp32"?"DISCONNECT ESP32":"CONNECT ESP32";
+    if(ble)ble.textContent=live&&t==="bluetooth"?"DISCONNECT BLUETOOTH":"CONNECT BLUETOOTH";
+    if(tr)tr.textContent=live?(t==="bluetooth"?"BLUETOOTH: "+(s.name||"MIXER"):"ESP32 BRIDGE: "+(s.name||"ESP32")):"OFFLINE";
+    if(head){head.textContent=live?"ONLINE":"OFFLINE";head.classList.toggle("online",live);}
+  }
+  async function connect(kind){
+    if(!window.state?.system){const r=document.getElementById("testResult");if(r)r.textContent="DEVICE CONNECTION BLOCKED: SYSTEM OFF";return;}
+    const M=window.MixerAdapters;if(!M){const r=document.getElementById("testResult");if(r)r.textContent="DEVICE ERROR: ADAPTER NOT LOADED";return;}
+    try{
+      const active=M.active;
+      if(active?.connected && active.transport===kind){M.disconnect();paint({connected:false});return;}
+      if(active?.connected)M.disconnect();
+      const result=kind==="bluetooth"?await M.connectBluetooth():await M.simulator();
+      if(!result?.connected && !result?.ok)throw new Error(result?.reason||"connection failed");
+      window.state.connected=true;window.state.sim.online=kind==="esp32";
+      if(typeof window.hydrateFromSimulator==="function" && kind==="esp32")window.hydrateFromSimulator();
+      paint({connected:true,transport:kind,name:result.name|| (kind==="esp32"?"ESP32 SIMULATOR":"BLUETOOTH MIXER")});
+      const out=document.getElementById("testResult");if(out)out.textContent=kind==="esp32"?"DEVICE CONNECTED: ESP32 SIMULATOR • 16CH • TWO-WAY":"DEVICE CONNECTED: BLUETOOTH • TWO-WAY";
+    }catch(e){
+      window.state.connected=false;window.state.sim.online=false;paint({connected:false,transport:kind});
+      const out=document.getElementById("testResult");if(out)out.textContent="DEVICE CONNECTION FAILED: "+(e?.message||e);
+    }
+  }
+  function install(){
+    const esp=document.getElementById("connectEsp"),ble=document.getElementById("connectBluetooth"),dc=document.getElementById("deviceConnect"),dd=document.getElementById("deviceDisconnect"),sel=document.getElementById("transportSelect");
+    if(esp)esp.onclick=e=>{e.preventDefault();e.stopPropagation();connect("esp32");};
+    if(ble)ble.onclick=e=>{e.preventDefault();e.stopPropagation();connect("bluetooth");};
+    if(dc)dc.onclick=e=>{e.preventDefault();e.stopPropagation();connect(sel?.value==="bluetooth"?"bluetooth":"esp32");};
+    if(dd)dd.onclick=e=>{e.preventDefault();window.MixerAdapters?.disconnect?.();window.state.connected=false;window.state.sim.online=false;paint({connected:false});};
+    if(sel)sel.onchange=()=>paint({connected:false,transport:sel.value});
+    window.MixerAdapters?.onStatus?.(paint);
+    paint(window.MixerAdapters?.active?{connected:window.MixerAdapters.active.connected,transport:window.MixerAdapters.active.transport,name:window.MixerAdapters.active.name}:{connected:false});
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
+})();
 </script></body></html>
