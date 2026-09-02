@@ -47,7 +47,7 @@ void handleHealth() {
   doc["protocol"] = "ESP32-MIXER/1";
   doc["device"] = "ESP32";
   doc["status"] = WiFi.status() == WL_CONNECTED ? "online" : "offline";
-  doc["channels"] = 18;
+  doc["channels"] = 14;
   doc["ip"] = WiFi.localIP().toString();
   sendJson(doc);
 }
@@ -74,7 +74,7 @@ void handleFeedback() {
     return;
   }
   int ch = in["ch"] | 0;
-  if (ch < 1 || ch > 18) {
+  if (ch < 1 || ch > 14) {
     sendAck(in["id"] | "", false, "invalid-channel");
     return;
   }
@@ -115,7 +115,7 @@ void handleControl() {
     int ch = in["ch"] | 0;
     const char* param = in["param"] | "";
 
-    if (ch < 1 || ch > 18 || strlen(param) == 0) {
+    if (ch < 1 || ch > 14 || strlen(param) == 0) {
       sendAck(id, false, "invalid-control");
       return;
     }
