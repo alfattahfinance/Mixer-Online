@@ -81,34 +81,7 @@
     </div>
 
 
-    <style>
-/* Large-screen rack placement: effect/aux/return stay below the main console */
-@media (min-width:700px){
-  main.console{display:flex!important;flex-wrap:wrap!important;align-items:flex-start!important}
-  main.console > .channel-bank-left,
-  main.console > .center-console,
-  main.console > .channel-bank-right,
-  main.console > .master-rack{flex:0 0 auto!important}
-  main.console > .aux-rack{
-    order:10!important;
-    flex:0 0 100%!important;
-    width:100%!important;
-    display:grid!important;
-    grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)!important;
-    gap:10px!important;
-    margin-top:12px!important;
-    clear:both!important;
-  }
-  main.console .effect-screen{
-    order:9!important;
-  }
-  main.console .aux-rack .aux-unit{
-    width:100%!important;
-    min-width:0!important;
-    box-sizing:border-box!important;
-  }
-}
-</style>  </section>
+  </section>
 
 
 
