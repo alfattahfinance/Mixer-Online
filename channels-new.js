@@ -1,11 +1,11 @@
 /* ============================================================
-   Mixer-Online — 16CH channel panel
+   Mixer-Online — 14CH channel panel
    Owns channel DOM only. Uses the existing MixerControl adapter
    for commands; it does not replace the mixer engine.
    ============================================================ */
 (function () {
   "use strict";
-  const N = 16;
+  const N = 14;
   const $ = id => document.getElementById(id);
 
   function make(id) {
@@ -83,8 +83,8 @@
     for (let i = 1; i <= N; i++) (i <= 8 ? left : right).appendChild(make(i));
   }
 
-  window.buildNew16ChannelPanel = build;
-  window.syncNew16ChannelPanel = sync;
+  window.buildNew14ChannelPanel = build;
+  window.syncNew14ChannelPanel = sync;
   document.addEventListener("click", function(e){ const card=e.target.closest(".new-channel-strip"); if(card && typeof window.selectScreenChannel==="function"){ window.selectScreenChannel(Number(card.dataset.ch)); } });
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", build, { once: true });
   else build();
