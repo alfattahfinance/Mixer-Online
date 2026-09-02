@@ -1,0 +1,18 @@
+/* Header system panel — large-screen presentation */
+@media screen and (orientation:landscape) and (min-width:700px){
+ .topbar{
+  display:grid!important;
+  grid-template-columns:1.1fr 150px 270px 190px 210px 125px!important;
+  gap:6px!important;
+  align-items:stretch!important;
+ }
+ .topbar > *{min-width:0!important;box-sizing:border-box!important}
+ .system-box,.bridge-head,.status-head,.scene-head,.clock-head{
+  min-height:68px!important;padding:7px!important;box-sizing:border-box!important;
+ }
+ .bridge-head{display:grid!important;grid-template-columns:1fr 1fr!important;gap:4px!important}
+ .bridge-head .box-title,.bridge-head .head-status{grid-column:1/-1}
+ .bridge-head button{min-width:0!important;font-size:9px!important}
+ .status-head strong,.status-head small{display:block!important;overflow:hidden;text-overflow:ellipsis}
+ .scene-head button{font-size:9px!important;padding:5px!important}
+}
