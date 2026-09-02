@@ -80,18 +80,6 @@
 </div>
     </div>
 
-    <div class="fx-rack fx-rack-live">
-      <div class="rack-title">EFFECT PROCESSOR <span>PARAMETER</span></div>
-      <div class="fx-toolbar"><div class="fx-display"><strong id="fxRackPreset">HALL 1</strong><small id="fxRackSummary">REVERB • TIME 2.45s • LEVEL -3.0dB</small></div><button id="fxTap" type="button">TAP</button><span id="fxBpm">120 BPM</span><button id="fxSelect" type="button">SELECT</button></div>
-      <div class="fx-buttons"><button data-fx-select="FX1" class="active">FX1</button><button data-fx-select="FX2">FX2</button><button data-fx-select="AUX1">AUX1</button><button data-fx-select="AUX2">AUX2</button><button data-fx-select="AUX3">AUX3</button><button data-fx-select="AUX4">AUX4</button></div>
-      <div class="fx-parameter-grid">
-        <label>TIME<input class="fx-control" data-scope="FX" data-target="FX1" data-param="time" type="range" min="0.1" max="10" step="0.01" value="2.45"><output data-fx-value="time">2.45s</output></label>
-        <label>PRE-DELAY<input class="fx-control" data-scope="FX" data-target="FX1" data-param="preDelay" type="range" min="0" max="200" step="1" value="32"><output data-fx-value="preDelay">32ms</output></label>
-        <label>DECAY<input class="fx-control" data-scope="FX" data-target="FX1" data-param="decay" type="range" min="0" max="100" step="1" value="65"><output data-fx-value="decay">65%</output></label>
-        <label>LEVEL<input class="fx-control" data-scope="FX" data-target="FX1" data-param="level" type="range" min="-20" max="6" step="0.1" value="-3"><output data-fx-value="level">-3.0dB</output></label>
-      </div>
-      <div class="fx-extra"><label>PRESET<select class="fx-preset" data-target="FX1"><option>HALL 1</option><option>ROOM</option><option>PLATE</option><option>DELAY</option><option>CHORUS</option></select></label><label>TYPE<select class="fx-type" data-target="FX1"><option>REVERB</option><option>DELAY</option><option>CHORUS</option><option>ECHO</option></select></label></div>
-    </div>
 
     <style>
 /* Large-screen rack placement: effect/aux/return stay below the main console */
@@ -125,6 +113,20 @@
       <div class="aux-unit aux-live"><b>FX RETURN</b><div class="aux-labels"><span>FX1</span><span>FX2</span></div><div class="mini-knobs"><input class="aux-control" data-scope="FX_RETURN" data-target="FX1" type="range" min="0" max="1" step="0.01" value=".45"><input class="aux-control" data-scope="FX_RETURN" data-target="FX2" type="range" min="0" max="1" step="0.01" value=".45"></div><div class="aux-values"><output data-return-value="FX1">45%</output><output data-return-value="FX2">45%</output></div></div>
     </div>
   </section>
+
+    <div class="fx-rack fx-rack-live">
+      <div class="rack-title">EFFECT PROCESSOR <span>PARAMETER</span></div>
+      <div class="fx-toolbar"><div class="fx-display"><strong id="fxRackPreset">HALL 1</strong><small id="fxRackSummary">REVERB • TIME 2.45s • LEVEL -3.0dB</small></div><button id="fxTap" type="button">TAP</button><span id="fxBpm">120 BPM</span><button id="fxSelect" type="button">SELECT</button></div>
+      <div class="fx-buttons"><button data-fx-select="FX1" class="active">FX1</button><button data-fx-select="FX2">FX2</button><button data-fx-select="AUX1">AUX1</button><button data-fx-select="AUX2">AUX2</button><button data-fx-select="AUX3">AUX3</button><button data-fx-select="AUX4">AUX4</button></div>
+      <div class="fx-parameter-grid">
+        <label>TIME<input class="fx-control" data-scope="FX" data-target="FX1" data-param="time" type="range" min="0.1" max="10" step="0.01" value="2.45"><output data-fx-value="time">2.45s</output></label>
+        <label>PRE-DELAY<input class="fx-control" data-scope="FX" data-target="FX1" data-param="preDelay" type="range" min="0" max="200" step="1" value="32"><output data-fx-value="preDelay">32ms</output></label>
+        <label>DECAY<input class="fx-control" data-scope="FX" data-target="FX1" data-param="decay" type="range" min="0" max="100" step="1" value="65"><output data-fx-value="decay">65%</output></label>
+        <label>LEVEL<input class="fx-control" data-scope="FX" data-target="FX1" data-param="level" type="range" min="-20" max="6" step="0.1" value="-3"><output data-fx-value="level">-3.0dB</output></label>
+      </div>
+      <div class="fx-extra"><label>PRESET<select class="fx-preset" data-target="FX1"><option>HALL 1</option><option>ROOM</option><option>PLATE</option><option>DELAY</option><option>CHORUS</option></select></label><label>TYPE<select class="fx-type" data-target="FX1"><option>REVERB</option><option>DELAY</option><option>CHORUS</option><option>ECHO</option></select></label></div>
+    </div>
+
 
     <section class="channel-bank channel-bank-right">
       <div class="bank-title"><span>INPUT CHANNELS 9–16</span><small>CH9–CH16</small></div>
