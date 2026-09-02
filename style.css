@@ -164,3 +164,209 @@
     margin-right:8px!important;
   }
 }
+
+/* =========================================================
+   RESPONSIVE FINAL PASS
+   Engine untouched. Dashboard/layout only.
+   Large: CH1-8 | SCREEN | CH9-16 | MASTER
+   Smaller screens: no page-wide min-width/overflow.
+   ========================================================= */
+
+/* Base viewport must be allowed to shrink on phones */
+html,body{
+  min-width:0!important;
+  width:100%!important;
+  max-width:100%!important;
+  overflow-x:hidden!important;
+}
+
+/* Tablet portrait / small tablet */
+@media (min-width:700px) and (max-width:1399px){
+  body{overflow-x:auto!important}
+  .topbar{
+    height:auto!important;
+    min-height:88px!important;
+    grid-template-columns:1.3fr 110px 1.55fr 1.45fr!important;
+  }
+  .console{
+    width:max-content!important;
+    min-width:0!important;
+  }
+  .right-tools{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    width:100%!important;
+  }
+  .connection-test-panel{
+    width:calc(100% - 14px)!important;
+  }
+}
+
+/* Phones */
+@media (max-width:699px){
+  body{
+    overflow-x:hidden!important;
+    font-size:11px!important;
+  }
+
+  .topbar{
+    position:relative!important;
+    height:auto!important;
+    min-height:0!important;
+    padding:5px!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:5px!important;
+  }
+  .topbar>.brand{
+    grid-column:1/-1!important;
+    min-height:58px!important;
+  }
+  .brand b{font-size:18px!important}
+  .bridge-head,.status-head,.scene-head,.clock-head,.system-box{min-width:0!important}
+  .bridge-head{
+    grid-template-columns:1fr 1fr!important;
+  }
+  .bridge-head .box-title{grid-column:1/-1!important}
+  .scene-head button{padding:6px 7px!important}
+  .clock-head strong{font-size:14px!important}
+
+  /* Main mixer becomes a vertical, touch-friendly stack on phone.
+     The 16CH data remains intact; only presentation changes. */
+  main.console{
+    display:flex!important;
+    flex-direction:column!important;
+    flex-wrap:nowrap!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    padding:5px!important;
+    gap:7px!important;
+    overflow:visible!important;
+  }
+  main.console>.center-console{
+    order:1!important;
+    width:100%!important;
+    max-width:100%!important;
+  }
+  main.console>.channel-bank-left{
+    order:2!important;
+    width:100%!important;
+    max-width:100%!important;
+  }
+  main.console>.channel-bank-right{
+    order:3!important;
+    width:100%!important;
+    max-width:100%!important;
+  }
+  main.console>.master-rack{
+    order:4!important;
+    width:100%!important;
+    max-width:100%!important;
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  main.console>.fx-rack-live{
+    order:5!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+  }
+  main.console>.aux-rack{
+    order:6!important;
+    width:100%!important;
+    max-width:100%!important;
+    grid-template-columns:1fr!important;
+    margin:0!important;
+  }
+
+  .channel-bank{
+    width:100%!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+  .channel-bank>#channels,
+  .channel-bank>#channelsRight,
+  .channel-bank .channel-grid{
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(78px,1fr))!important;
+    grid-auto-flow:column!important;
+    width:max-content!important;
+    min-width:100%!important;
+    max-width:none!important;
+    overflow:visible!important;
+    padding:3px!important;
+  }
+  .channel{
+    width:78px!important;
+    min-width:78px!important;
+  }
+
+  .center-console{padding:5px!important}
+  .screen-frame{width:100%!important}
+  .screen-tabs{overflow-x:auto!important}
+  .screen-tabs button{min-width:68px!important}
+  .spectrum{height:150px!important}
+
+  .right-tools{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    width:100%!important;
+    padding:5px!important;
+  }
+  .device-connection,.bridge-panel,.media-rack{
+    width:100%!important;
+    min-width:0!important;
+  }
+  .connection-test-panel{
+    width:calc(100% - 10px)!important;
+    margin:0 5px 5px!important;
+  }
+  .test-buttons button{
+    min-height:34px!important;
+    padding:6px 7px!important;
+  }
+  .bottom-nav{
+    width:100%!important;
+    overflow-x:auto!important;
+  }
+  .bottom-nav button{
+    flex:0 0 auto!important;
+    min-width:92px!important;
+  }
+  .status-footer{
+    position:relative!important;
+    flex-wrap:wrap!important;
+    font-size:8px!important;
+  }
+
+  /* Lower racks always fit viewport */
+  .fx-rack-live,.aux-rack{
+    box-sizing:border-box!important;
+  }
+  .fx-buttons{
+    flex-wrap:wrap!important;
+  }
+  .fx-buttons button{
+    min-width:70px!important;
+  }
+  .fx-parameter-grid{
+    grid-template-columns:1fr 1fr!important;
+  }
+}
+
+/* Very narrow phones */
+@media (max-width:420px){
+  .topbar{grid-template-columns:1fr!important}
+  .topbar>.brand,.bridge-head,.status-head,.scene-head,.clock-head,.system-box{
+    grid-column:1!important;
+  }
+  main.console>.master-rack{
+    grid-template-columns:1fr!important;
+  }
+  .fx-parameter-grid{
+    grid-template-columns:1fr!important;
+  }
+  .screen-readouts{
+    grid-template-columns:repeat(2,1fr)!important;
+  }
+}
