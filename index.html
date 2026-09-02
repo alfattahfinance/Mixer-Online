@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#090b0c">
-<title>MIXER-ONLINE • 18CH Digital Mixer</title>
+<title>MIXER-ONLINE • 16CH Digital Mixer</title>
 <link rel="stylesheet" href="style.css?v=20260902-split16-center-01">
 </head>
 <body>
 <header class="topbar">
-  <div class="brand"><b>MIXER-ONLINE</b><span>18CH DIGITAL MIXER</span></div>
+  <div class="brand"><b>MIXER-ONLINE</b><span>16CH DIGITAL MIXER</span></div>
   <div class="system-box">
     <span class="box-title">SYSTEM</span>
     <button id="power" class="power-btn">SYSTEM OFF</button>
@@ -23,7 +23,7 @@
   <div class="status-head">
     <span class="box-title">STATUS</span>
     <strong id="headerBridgeStatus">BRIDGE STANDBY</strong>
-    <small><span class="channel-count-status">18 CHANNELS READY</span> • TWO-WAY SYNC</small>
+    <small><span class="channel-count-status">16 CHANNELS READY</span> • TWO-WAY SYNC</small>
   </div>
   <div class="scene-head">
     <span class="box-title">SCENE</span>
@@ -40,7 +40,7 @@
 
   <section class="center-console">
     <div class="screen-frame">
-      <div class="screen-title"><b>MIXER-ONLINE</b><span>18CH DIGITAL MIXER</span></div>
+      <div class="screen-title"><b>MIXER-ONLINE</b><span>16CH DIGITAL MIXER</span></div>
       <div class="screen-tabs" id="screenTabs"><button class="active" data-screen="HOME">HOME</button><button data-screen="METER">METER</button><button data-screen="RTA">RTA</button><button data-screen="SETUP">SETUP</button><button data-screen="EFFECT">EFFECT</button><button data-screen="SCENE">SCENE</button></div>
       <div class="screen-content" id="screenContent">
   <section class="screen-view active" data-view="HOME">
@@ -61,7 +61,7 @@
     <div class="rta-display"><div class="rta-grid"></div><div class="rta-bars" id="rtaBars"></div><div class="rta-labels"><span>63</span><span>125</span><span>250</span><span>500</span><span>1K</span><span>2K</span><span>4K</span><span>8K</span><span>16K</span></div></div>
   </section>
   <section class="screen-view" data-view="SETUP">
-    <div class="setup-screen"><b>SYSTEM SETUP</b><div class="setup-grid"><span>CHANNELS <strong class="channel-count-value">18</strong></span><span>TRANSPORT <strong id="setupTransport">OFFLINE</strong></span><span>PROTOCOL <strong>ESP32-MIXER/1</strong></span><span>SYNC <strong>TWO-WAY</strong></span><span>SYSTEM <strong id="setupSystem">OFF</strong></span><span>REMOTE <strong>BLUETOOTH / BRIDGE</strong></span></div><div class="channel-mapper"><div><b>AUTO CHANNEL MAPPER</b><small id="mapperStatus">18 CH • 1:1 READY</small></div><label>CHANNELS <select id="mapperChannels"><option value="4">4</option><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="18" selected>18</option></select></label><button id="autoMapChannels" type="button" onclick="autoMapChannels()">AUTO MAP</button><button id="applyChannelMap" type="button" onclick="applyChannelMap()">APPLY CHANNELS</button><div id="channelMapPreview">CH1→CH1 • CH2→CH2 • CH3→CH3 • CH4→CH4 • … • CH18→CH18</div></div></div></div>
+    <div class="setup-screen"><b>SYSTEM SETUP</b><div class="setup-grid"><span>CHANNELS <strong class="channel-count-value">16</strong></span><span>TRANSPORT <strong id="setupTransport">OFFLINE</strong></span><span>PROTOCOL <strong>ESP32-MIXER/1</strong></span><span>SYNC <strong>TWO-WAY</strong></span><span>SYSTEM <strong id="setupSystem">OFF</strong></span><span>REMOTE <strong>BLUETOOTH / BRIDGE</strong></span></div><div class="channel-mapper"><div><b>AUTO CHANNEL MAPPER</b><small id="mapperStatus">16 CH • 1:1 READY</small></div><label>CHANNELS <select id="mapperChannels"><option value="4">4</option><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="18">18</option><option value="16" selected>16</option></select></label><button id="autoMapChannels" type="button" onclick="autoMapChannels()">AUTO MAP</button><button id="applyChannelMap" type="button" onclick="applyChannelMap()">APPLY CHANNELS</button><div id="channelMapPreview">CH1→CH1 • CH2→CH2 • CH3→CH3 • CH4→CH4 • … • CH16→CH16</div></div></div></div>
   </section>
   <section class="screen-view" data-view="EFFECT">
     <div class="effect-screen effect-screen-live">
@@ -99,7 +99,7 @@
   </section>
 
     <section class="channel-bank channel-bank-right">
-      <div class="bank-title"><span>INPUT CHANNELS 9–16</span><small>CH9–CH16</small></div>
+      <div class="bank-title"><span>INPUT INPUT CHANNELS 9–16</span><small>CH9–CH16</small></div>
       <div id="channelsRight"></div>
     </section>
 
