@@ -73,3 +73,94 @@
     margin:10px auto 20px!important;
   }
 }
+
+/* =========================================================
+   TABLET / LARGE SCREEN MASTER LAYOUT
+   CH1-8 | SCREEN | CH9-16 | MASTER
+   Effect/Aux racks are below the complete top row.
+   ========================================================= */
+@media (min-width:700px){
+  main.console{
+    display:grid!important;
+    grid-template-columns:repeat(8,78px) 360px repeat(8,78px) 125px!important;
+    grid-template-rows:auto auto auto!important;
+    grid-template-areas:"left left left left left left left left center center center center right right right right right right right right master"
+                        "fx fx fx fx fx fx fx fx fx fx fx fx fx fx fx fx fx fx fx fx fx"
+                        "aux aux aux aux aux aux aux aux aux aux aux aux aux aux aux aux aux aux aux aux aux"!important;
+    column-gap:2px!important;
+    row-gap:12px!important;
+    width:max-content!important;
+    min-width:0!important;
+    margin:0 auto!important;
+    align-items:start!important;
+  }
+  main.console>.channel-bank-left{
+    grid-area:left!important;
+    width:632px!important;
+    margin:0!important;
+    align-self:start!important;
+  }
+  main.console>.center-console{
+    grid-area:center!important;
+    width:360px!important;
+    margin:0!important;
+    align-self:start!important;
+  }
+  main.console>.channel-bank-right{
+    grid-area:right!important;
+    width:632px!important;
+    margin:0!important;
+    align-self:start!important;
+  }
+  main.console>.master-rack{
+    grid-area:master!important;
+    width:125px!important;
+    margin:0!important;
+    align-self:start!important;
+  }
+  main.console>.fx-rack-live{
+    grid-area:fx!important;
+    width:min(1100px,100%)!important;
+    justify-self:center!important;
+    margin:0!important;
+    position:relative!important;
+    top:auto!important;
+    transform:none!important;
+  }
+  main.console>.aux-rack{
+    grid-area:aux!important;
+    width:min(900px,100%)!important;
+    justify-self:center!important;
+    margin:0 0 20px!important;
+  }
+  .channel-bank-left>#channels,
+  .channel-bank-right>#channelsRight{
+    display:grid!important;
+    grid-template-columns:repeat(8,78px)!important;
+    grid-template-rows:auto!important;
+    grid-auto-flow:column!important;
+    width:632px!important;
+    min-width:632px!important;
+    height:auto!important;
+    overflow:visible!important;
+    margin:0!important;
+    padding:0!important;
+    align-items:start!important;
+  }
+  .channel-bank-left>#channels>.new-channel-strip,
+  .channel-bank-right>#channelsRight>.new-channel-strip{
+    grid-row:1!important;
+    grid-column:auto!important;
+    width:78px!important;
+    margin:0!important;
+    position:relative!important;
+    top:0!important;
+    transform:none!important;
+  }
+}
+@media (min-width:700px) and (max-width:1300px){
+  main.console{
+    margin-left:8px!important;
+    margin-right:8px!important;
+  }
+}
