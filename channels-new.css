@@ -143,13 +143,15 @@ main.console > .aux-rack {
   color: #fff !important;
   font-weight: bold !important;
 }
-
-/* MEMAKSA SLIDER FADER VERTIKAL TEGAK */
+/*FIX DIRECTION FADER (DARI BAWAH KE ATAS) */
 .new-fader,
 .new-channel-fader input[type="range"] {
   -webkit-appearance: slider-vertical !important;
   writing-mode: bt-lr !important;
+   /* Untuk Webkit/Chrome/Safari */
   writing-mode: vertical-lr !important;
+  direction: rtl !important;
+   /* Membalik orientasi slider: Bawah = Min, Atas = Max */
   width: 22px !important;
   height: 160px !important;
   min-height: 140px !important;
