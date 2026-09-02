@@ -1,87 +1,77 @@
 /* ============================================================
-   Mixer-Online — NEW 16 CHANNEL PANEL
-   Visual channel layer only.
-   This file owns the channel DOM/skin. It does NOT replace or
-   modify mixer state, audio, ESP32, Bluetooth, or control engine.
+   Mixer-Online — 16CH channel panel
+   Owns channel DOM only. Uses the existing MixerControl adapter
+   for commands; it does not replace the mixer engine.
    ============================================================ */
 (function () {
   "use strict";
+  const N = 16;
+  const $ = id => document.getElementById(id);
 
-  const CHANNELS = 16;
+  function make(id) {
+    const c = window.state?.channels?.[id - 1] || {};
+    const el = document.createElement("article");
+    el.className = "new-channel-strip";
+    el.dataset.ch = String(id);
+    el.innerHTML = `
+      <header class="new-channel-head">CH${id}</header>
+      <div class="new-channel-meter" aria-label="CH${id} level">${"<span></span>".repeat(12)}</div>
+      <div class="new-channel-control"><label>GAIN</label><input class="new-knob" data-k="gain" type="range" min="0" max="2" step=".01" value="${Number(c.gain ?? 1)}"></div>
+      <div class="new-channel-control"><label>HIGH</label><input class="new-knob" data-k="high" type="range" min="-12" max="12" step="1" value="${Number(c.high ?? 0)}"></div>
+      <div class="new-channel-control"><label>MID</label><input class="new-knob" data-k="mid" type="range" min="-12" max="12" step="1" value="${Number(c.mid ?? 0)}"></div>
+      <div class="new-channel-control"><label>LOW</label><input class="new-knob" data-k="low" type="range" min="-12" max="12" step="1" value="${Number(c.low ?? 0)}"></div>
+      <div class="new-channel-control"><label>PAN</label><input class="new-knob" data-k="pan" type="range" min="-1" max="1" step=".01" value="${Number(c.pan ?? 0)}"></div>
+      <div class="new-channel-fader"><label>VOLUME</label><input class="new-fader" data-k="fader" type="range" min="0" max="100" step="1" value="${Number(c.fader ?? 75)}"><output>${Number(c.fader ?? 75)}%</output></div>
+      <div class="new-channel-buttons">
+        <button type="button" data-k="mute" class="${c.mute ? "on" : ""}">${c.mute ? "UNMUTE" : "MUTE"}</button>
+        <button type="button" data-k="solo" class="${c.solo ? "on" : ""}">${c.solo ? "UNSOLO" : "SOLO"}</button>
+      </div>
+      <footer class="new-channel-source">CH${id} • <span>READY</span></footer>
+    `;
 
-  function channelTemplate(id) {
-    return `
-      <article class="new-channel-strip" data-channel="${id}" data-ch="${id}">
-        <header class="new-channel-head">CH${id}</header>
+    const update = (k, value) => {
+      if (!window.state?.system) {
+        const r = $("testResult"); if (r) r.textContent = "CONTROL BLOCKED: SYSTEM OFF";
+        return;
+      }
+      const n = Number(value);
+      const ch = window.state.channels[id - 1];
+      if (!ch) return;
+      ch[k] = Number.isFinite(n) && k !== "mute" && k !== "solo" ? n : value;
+      if (k === "fader") el.querySelector("output").textContent = n + "%";
+      const result = window.MixerControl?.setControl?.(id, k, value);
+      const r = $("testResult");
+      if (r) r.textContent = result?.ok ? "CH" + id + " " + k.toUpperCase() + " → SENT" : "CH" + id + " " + k.toUpperCase() + " → " + (result?.reason || "OFFLINE");
+      el.querySelector("footer span").textContent = ch.mute ? "MUTED" : ch.solo ? "SOLO" : "READY";
+    };
 
-        <div class="new-channel-meter" aria-label="CH${id} level">
-          <span></span><span></span><span></span><span></span>
-          <span></span><span></span><span></span><span></span>
-          <span></span><span></span><span></span><span></span>
-        </div>
-
-        <div class="new-channel-control">
-          <label>GAIN</label>
-          <input type="range" class="knob gain" min="0" max="2" step="0.01" value="1" aria-label="CH${id} Gain">
-        </div>
-
-        <div class="new-channel-control">
-          <label>HIGH</label>
-          <input type="range" class="knob high" min="-12" max="12" step="0.1" value="0" aria-label="CH${id} High">
-        </div>
-
-        <div class="new-channel-control">
-          <label>MID</label>
-          <input type="range" class="knob mid" min="-12" max="12" step="0.1" value="0" aria-label="CH${id} Mid">
-        </div>
-
-        <div class="new-channel-control">
-          <label>LOW</label>
-          <input type="range" class="knob low" min="-12" max="12" step="0.1" value="0" aria-label="CH${id} Low">
-        </div>
-
-        <div class="new-channel-control">
-          <label>PAN</label>
-          <input type="range" class="knob pan" min="-1" max="1" step="0.01" value="0" aria-label="CH${id} Pan">
-        </div>
-
-        <div class="new-channel-fader">
-          <label>FADER</label>
-          <input type="range" class="fader" min="0" max="100" step="1" value="75" aria-label="CH${id} Fader">
-        </div>
-
-        <div class="new-channel-buttons">
-          <button type="button" class="mute">MUTE</button>
-          <button type="button" class="solo">SOLO</button>
-        </div>
-
-        <footer class="new-channel-source">CH${id}</footer>
-      </article>`;
+    el.querySelectorAll("input").forEach(input => {
+      input.addEventListener("input", () => update(input.dataset.k, input.value));
+    });
+    el.querySelectorAll("button").forEach(button => {
+      button.addEventListener("click", () => {
+        if (!window.state?.system) {
+          const r = $("testResult"); if (r) r.textContent = "CONTROL BLOCKED: SYSTEM OFF";
+          return;
+        }
+        const k = button.dataset.k;
+        const value = !window.state.channels[id - 1][k];
+        button.classList.toggle("on", value);
+        button.textContent = value ? (k === "mute" ? "UNMUTE" : "UNSOLO") : (k === "mute" ? "MUTE" : "SOLO");
+        update(k, value);
+      });
+    });
+    return el;
   }
 
   function build() {
-    const left = document.getElementById("channels");
-    const right = document.getElementById("channelsRight");
+    const left = $("channels"), right = $("channelsRight");
     if (!left || !right) return;
-
-    left.innerHTML = "";
-    right.innerHTML = "";
-
-    for (let id = 1; id <= CHANNELS; id++) {
-      const box = document.createElement("div");
-      box.innerHTML = channelTemplate(id);
-      const channel = box.firstElementChild;
-
-      if (id <= 8) left.appendChild(channel);
-      else right.appendChild(channel);
-    }
+    left.innerHTML = ""; right.innerHTML = "";
+    for (let i = 1; i <= N; i++) (i <= 8 ? left : right).appendChild(make(i));
   }
 
   window.buildNew16ChannelPanel = build;
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", build, { once: true });
-  } else {
-    build();
-  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", build, { once: true });
+  else build();
 })();
