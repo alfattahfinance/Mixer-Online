@@ -1,0 +1,25 @@
+/* New standalone 16CH panel skin — large screens */
+.new-channel-strip{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  min-width:0;
+  height:680px;
+  padding:5px 3px;
+  box-sizing:border-box;
+  overflow:hidden;
+  border:1px solid #3a3f42;
+  border-radius:4px;
+  background:linear-gradient(180deg,#202427,#101213);
+}
+.new-channel-head{width:100%;font-size:11px;font-weight:700;text-align:center;margin-bottom:4px}
+.new-channel-meter{display:flex;flex-direction:column-reverse;gap:2px;width:10px;height:72px;margin:3px auto}
+.new-channel-meter span{display:block;height:5px;width:10px;background:#555}
+.new-channel-control{width:100%;text-align:center;margin:3px 0}
+.new-channel-control label,.new-channel-fader label{display:block;font-size:7px}
+.new-channel-control input{width:34px;height:34px}
+.new-channel-fader{display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;width:100%}
+.new-channel-fader input{height:190px;writing-mode:vertical-lr;direction:rtl}
+.new-channel-buttons{width:100%;display:flex;flex-direction:column;gap:3px}
+.new-channel-buttons button{width:100%;padding:4px 1px;font-size:7px}
+.new-channel-source{font-size:7px;margin-top:4px}
