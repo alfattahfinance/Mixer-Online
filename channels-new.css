@@ -1,8 +1,8 @@
 /* =========================================================
-   MIXER-ONLINE: COMPLETE LAYOUT & CHANNEL STRIP STYLES
+   FIX TOTAL LAYOUT MIXER CONSOLE & CHANNEL STRIP
    ========================================================= */
 
-/* 1. RESET CONTAINER UTAMA & GRID CONSOLE */
+/* 1. LAYOUT CONSOLE GRID */
 main.console {
   display: grid !important;
   grid-template-columns: 632px 360px 632px 125px !important;
@@ -20,59 +20,42 @@ main.console {
   clear: both !important;
 }
 
-/* 2. NETRALISIR POSISI ELEMEN ANAK */
-main.console > * {
-  position: relative !important;
-  top: auto !important;
-  left: auto !important;
-  right: auto !important;
-  bottom: auto !important;
-  margin: 0 !important;
-  float: none !important;
-  clear: none !important;
-  box-sizing: border-box !important;
-}
-
-/* 3. PENETAPAN GRID AREA */
+/* 2. AREA PLACEMENT */
 main.console > .channel-bank-left  { grid-area: ch-left !important; }
 main.console > .center-console      { grid-area: center !important; }
 main.console > .channel-bank-right { grid-area: ch-right !important; }
 main.console > .master-rack        { grid-area: master !important; }
+main.console > .fx-rack-live,
+main.console > .fx-rack            { grid-area: fx !important; width: 100% !important; }
+main.console > .aux-rack           { grid-area: aux !important; width: 100% !important; }
 
-main.console > .fx-rack,
-main.console > .fx-rack-live {
-  grid-area: fx !important;
-  width: 100% !important;
-}
-
-main.console > .aux-rack {
-  grid-area: aux !important;
-  width: 100% !important;
-}
-
-/* 4. PERBAIKAN WADAH CHANNEL BANK (AGAR TIDAK GEPENG VERTIKAL) */
+/* 3. PERBAIKAN WADAH BANK CHANNEL */
 .channel-bank {
   display: flex !important;
   flex-direction: column !important;
-  background: #111518;
-  border: 1px solid #2a3036;
-  border-radius: 8px;
-  padding: 12px;
-  min-height: 680px !important; /* Mencegah channel ciut ke atas */
+  background: #111518 !important;
+  border: 1px solid #2a3036 !important;
+  border-radius: 8px !important;
+  padding: 12px !important;
+  box-sizing: border-box !important;
+  height: 680px !important; /* FIXED HEIGHT AGAR TIDAK MENCEPIT */
+  min-height: 680px !important;
+  overflow: visible !important;
 }
 
 .bank-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 8px;
-  margin-bottom: 8px;
-  border-bottom: 1px solid #2a3036;
-  color: #00e5ff;
-  font-weight: bold;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  height: 30px !important;
+  margin-bottom: 8px !important;
+  border-bottom: 1px solid #2a3036 !important;
+  color: #00e5ff !important;
+  font-weight: bold !important;
+  flex-shrink: 0 !important;
 }
 
-/* 5. PERBAIKAN WADAH STRIP CHANNEL (#channels & #channelsRight) */
+/* 4. WADAH CHANNEL (JS RENDER TARGET) */
 #channels, 
 #channelsRight {
   display: flex !important;
@@ -80,67 +63,61 @@ main.console > .aux-rack {
   flex-wrap: nowrap !important;
   justify-content: space-between !important;
   align-items: stretch !important;
-  height: 100% !important;
-  min-height: 620px !important;
-  gap: 6px !important;
+  height: calc(100% - 38px) !important;
+  width: 100% !important;
+  gap: 4px !important;
+  box-sizing: border-box !important;
 }
 
-/* 6. PERBAIKAN TIAP-TIAP STRIP CHANNEL */
-.channel {
+/* 5. MEMAKSA BENTUK CHANNEL INDIVIDUAL BERDIRI TEGAK */
+.channel, 
+div[class*="channel-strip"],
+#channels > div,
+#channelsRight > div {
   display: flex !important;
   flex-direction: column !important;
-  flex: 1 1 0px !important;
-  min-width: 70px !important;
-  background: #181d22;
-  border: 1px solid #262c33;
-  border-radius: 6px;
-  padding: 6px 4px;
-  align-items: center;
-  justify-content: space-between;
-  box-sizing: border-box;
+  flex: 1 1 0 !important;
+  width: 72px !important;
+  min-width: 65px !important;
+  height: 100% !important;
+  min-height: 600px !important;
+  background: #181d22 !important;
+  border: 1px solid #262c33 !important;
+  border-radius: 6px !important;
+  padding: 6px 2px !important;
+  box-sizing: border-box !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  overflow: visible !important;
 }
 
-.channel .ch-name {
-  font-size: 11px;
-  font-weight: bold;
-  color: #fff;
-  background: #090b0c;
-  width: 100%;
-  text-align: center;
-  padding: 4px 0;
-  border-radius: 4px;
+/* 6. PERBAIKAN ELEMEN DI DALAM STRIP CHANNEL */
+.channel * {
+  box-sizing: border-box !important;
 }
 
-.channel .knob-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  width: 100%;
-}
-
-.channel .fader-area {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex-grow: 1;
-  justify-content: flex-end;
-  width: 100%;
-  padding: 10px 0;
-}
-
-/* Fader slider style */
+/* Fader slider tegak */
 .channel input[type="range"] {
-  writing-mode: bt-lr; /* IE/Edge */
-  -webkit-appearance: slider-vertical; /* Webkit */
-  width: 24px;
-  height: 220px !important;
-  padding: 0 5px;
+  -webkit-appearance: slider-vertical !important;
+  writing-mode: bt-lr !important;
+  width: 28px !important;
+  height: 200px !important;
+  min-height: 180px !important;
+  margin: 10px 0 !important;
+  cursor: pointer !important;
 }
 
-/* 7. SCROLLING RESPONSIF JIKA SCREEN KECIL */
-@media screen and (max-width: 1750px) {
-  body {
-    overflow-x: auto !important;
-  }
+/* Tombol / Knob di dalam channel */
+.channel button, 
+.channel .btn {
+  width: 90% !important;
+  font-size: 10px !important;
+  padding: 4px 0 !important;
+  margin: 2px 0 !important;
+}
+
+.channel .knob, 
+.channel select {
+  width: 90% !important;
+  max-width: 50px !important;
 }
