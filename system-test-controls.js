@@ -1,54 +1,39 @@
-/* Functional test-panel controller.
-   Makes the visible hardware/sync test controls operational in 16CH simulator mode. */
+/* 16CH test panel — one owner per button, no duplicate listeners. */
 (function(){
- "use strict";
- const $=id=>document.getElementById(id);
- const tests={
-  simulateRx:"simulateHardwareRx",
-  runTest:"runTest",
-  runStressTest:"runStressTest",
-  runMuteSoloTest:"runMuteSoloTest",
-  runMasterIsolationTest:"runMasterIsolationTest",
-  runFaderTest:"runFaderTest",
-  runCombinationTest:"runCombinationTest",
-  runBidirectionalSyncTest:"runBidirectionalSyncTest",
-  runSaveRecallTest:"runSaveRecallTest"
- };
- async function ensureReady(){
-  if(!window.state)return false;
-  if(!window.state.system && typeof window.toggleSystem==="function") window.toggleSystem();
-  if(!window.state.connected){
-   if(typeof window.handleEspConnect==="function") await window.handleEspConnect();
-   else if(window.MixerAdapters?.simulator){
-    const r=await window.MixerAdapters.simulator();
-    if(r?.connected){window.state.connected=true;window.state.sim.online=true}
-   }
-  }
-  if(typeof window.syncHeader==="function")window.syncHeader();
-  return !!window.state.connected;
+"use strict";
+const $=id=>document.getElementById(id);
+const map={
+ simulateRx:"simulateHardwareRx",runTest:"runTest",runStressTest:"runStressTest",
+ runMuteSoloTest:"runMuteSoloTest",runMasterIsolationTest:"runMasterIsolationTest",
+ runFaderTest:"runFaderTest",runCombinationTest:"runCombinationTest",
+ runBidirectionalSyncTest:"runBidirectionalSyncTest",runSaveRecallTest:"runSaveRecallTest"
+};
+async function ready(){
+ if(!window.state)return false;
+ if(!window.state.system){$("testResult").textContent="TEST BLOCKED: SYSTEM OFF";return false}
+ if(!window.state.connected){
+   const r=await window.MixerAdapters?.simulator?.();
+   if(!r?.connected){$("testResult").textContent="TEST BLOCKED: ESP32 SIMULATOR OFFLINE";return false}
+   window.state.connected=true;window.state.sim.online=true;
  }
- function bind(){
-  Object.entries(tests).forEach(([id,fn])=>{
-   const b=$(id); if(!b)return;
-   b.onclick=null;
-   b.addEventListener("click",async e=>{
-    e.preventDefault();e.stopImmediatePropagation();
-    const out=$("testResult");
-    if(out)out.textContent="STARTING: "+b.textContent;
-    try{
-     if(fn==="simulateHardwareRx"){
-      const ok=await ensureReady();
-      const r=typeof window.simulateHardwareRx==="function"&&window.simulateHardwareRx();
-      if(out)out.textContent=r?"SIMULATE HARDWARE RX: PASSED":"SIMULATE HARDWARE RX: FAILED";
-      return;
-     }
-     if(!(await ensureReady())){if(out)out.textContent="TEST FAILED: SIMULATOR UNAVAILABLE";return}
-     const f=window[fn];
-     if(typeof f!=="function"){if(out)out.textContent="TEST ERROR: "+fn+" NOT FOUND";return}
-     await f();
-    }catch(err){if(out)out.textContent="TEST ERROR: "+(err?.message||err)}
-   },{capture:true});
-  });
- }
- if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",bind,{once:true});else bind();
+ return true;
+}
+function install(){
+ Object.entries(map).forEach(([id,name])=>{
+   const b=$(id);if(!b)return;
+   b.onclick=async e=>{
+     e.preventDefault();e.stopImmediatePropagation();
+     if(!(await ready()))return;
+     const fn=window[name];
+     if(typeof fn!=="function"){$("testResult").textContent="TEST ERROR: "+name+" NOT LOADED";return}
+     b.disabled=true;$("testResult").textContent="RUNNING: "+b.textContent;
+     try{await fn()}catch(err){$("testResult").textContent="TEST ERROR: "+(err?.message||err)}
+     finally{b.disabled=false}
+   };
+ });
+ const save=$("savePreset"),recall=$("recallPreset");
+ if(save)save.onclick=e=>{e.preventDefault();if(window.savePreset)window.savePreset("default")};
+ if(recall)recall.onclick=e=>{e.preventDefault();if(window.recallPreset)window.recallPreset("default")};
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
 })();
