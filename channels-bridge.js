@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CHANNELS BRIDGE - INSTANT FADER & SCREEN SYNC
+   CHANNELS BRIDGE - INSTANT REAL-TIME RESPONSIVE SYNC
    ========================================================================== */
 (function () {
   "use strict";
@@ -43,7 +43,7 @@
     }
   };
 
-  // Listener input dengan sinkronisasi layar instan otomatis
+  // Penanganan input langsung yang super responsif tanpa jeda
   document.addEventListener("input", (e) => {
     const target = e.target;
     if (!target || !target.dataset || !target.dataset.ch || !target.dataset.param) {
@@ -56,31 +56,35 @@
 
     if (isNaN(chNum) || !param || isNaN(val)) return;
 
+    // Hentikan perambatan agar tidak tercampur dengan fungsi lain
     e.stopImmediatePropagation();
 
-    // 1. Update state lokal
+    // 1. Perbarui state lokal dengan cepat
     if (window.state.channels[chNum - 1]) {
       window.state.channels[chNum - 1][param] = val;
     }
 
-    // 2. OTOMATIS PILIH CHANNEL DAN UPDATE LAYAR TENGAH SECARA INSTAN
+    // 2. Jika layar tengah memuat channel ini, langsung perbarui tampilannya secara instan
     if (typeof window.selectScreenChannel === "function") {
       window.selectScreenChannel(chNum);
     }
 
-    // Pastikan nilai fader langsung ter-update di readout layar
+    // Pembaruan langsung teks readout layar jika parameter fader atau gain yang digeser
     if (param === "fader") {
       const screenFaderEl = document.getElementById("screenFader");
       const screenInputEl = document.getElementById("screenInput");
       if (screenFaderEl) screenFaderEl.textContent = val + "%";
       if (screenInputEl) screenInputEl.textContent = "CH" + chNum;
+    } else if (param === "gain") {
+      const screenGainEl = document.getElementById("screenGain");
+      if (screenGainEl) screenGainEl.textContent = val.toFixed(2);
     }
 
-    // 3. Kirim ke hardware
+    // 3. Kirim data instan ke hardware / bridge
     window.sendChannelParamToHardware(chNum, param, val);
   }, true);
 
-  // Mute / Solo handler
+  // Penanganan tombol Mute / Solo
   document.addEventListener("click", (e) => {
     const target = e.target.closest('[data-action]');
     if (!target || !target.dataset || !target.dataset.ch) return;
