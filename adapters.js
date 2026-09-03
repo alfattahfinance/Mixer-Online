@@ -421,36 +421,75 @@ window.MixerAdapters = (() => {
     return emitRx(packet);
   }
 
+  // ==========================================================================
+  // PERBAIKAN: METER SIMULATION MEMUTAR CHANNEL 1-14 SECA BERGANTIAN
+  // ==========================================================================
   let meterTimer = null;
-  function stopMeterSimulation(){if(meterTimer){clearInterval(meterTimer);meterTimer=null;}}
-  function startMeterSimulation(){
-    stopMeterSimulation();
-    meterTimer=setInterval(()=>{
-      if(!active?.connected||active.type!=="simulator"){stopMeterSimulation();return;}
-      const now=Date.now()/1000;
-      active.state.channels.forEach((c,i)=>{
-        const gate=c.mute?0:1;
-        const base=(Number(c.fader)/100)*(Number(c.gain)/2);
-        const wave=(Math.sin(now*5+i*.71)+1)/2;
-        const level=Math.max(0,Math.min(2,base*(0.25+0.75*wave)*gate));
-        c.level=Number(level.toFixed(3));
-        emitRx({protocol:PROTOCOL,type:"METER",ch:i+1,level:c.level,source:"simulator",device:"ESP32-SIMULATOR",transport:"esp32",ts:Date.now()});
-      });
-      saveSimulatorState();
-    },80);
+  let currentMeterCh = 0;
+
+  function stopMeterSimulation(){
+    if(meterTimer){
+      clearInterval(meterTimer);
+      meterTimer=null;
+    }
   }
 
-  // FUNGSI UTAMA TOGGLE CONNECT ESP32
+  function startMeterSimulation(){
+    stopMeterSimulation();
+    currentMeterCh = 0;
+
+    meterTimer = setInterval(() => {
+      if(!active?.connected || active.type !== "simulator"){
+        stopMeterSimulation();
+        return;
+      }
+      
+      const channels = active.state.channels;
+      if (!channels || !channels.length) return;
+
+      // Ambil channel saat ini secara bergantian (CH1 -> CH14)
+      const c = channels[currentMeterCh];
+      const i = currentMeterCh;
+      const now = Date.now() / 1000;
+
+      const gate = c.mute ? 0 : 1;
+      const base = (Number(c.fader) / 100) * (Number(c.gain) / 2);
+      const wave = (Math.sin(now * 5 + i * 0.71) + 1) / 2;
+      const level = Math.max(0, Math.min(2, base * (0.25 + 0.75 * wave) * gate));
+      
+      c.level = Number(level.toFixed(3));
+
+      // Emit data RX hanya untuk 1 channel pada siklus ini
+      emitRx({
+        protocol: PROTOCOL,
+        type: "METER",
+        ch: c.ch,
+        level: c.level,
+        source: "simulator",
+        device: "ESP32-SIMULATOR",
+        transport: "esp32",
+        ts: Date.now()
+      });
+
+      // Naikkan indeks channel untuk siklus interval berikutnya
+      currentMeterCh = (currentMeterCh + 1) % CHANNEL_COUNT;
+
+      // Simpan state secara berkala
+      if (currentMeterCh === 0) {
+        saveSimulatorState();
+      }
+    }, 50); // Berjalan halus setiap 50ms (bergantian antar channel)
+  }
+
+  // TOGGLE CONNECT ESP32
   async function connectESP32(options = {}) {
     const systemOn = options.systemOn ?? !!window.state?.system;
 
-    // 1. Jika System Mati, paksa Disconnect
     if (!systemOn) {
       disconnect();
       return { ok: false, connected: false, reason: "SYSTEM_OFF", type: "simulator", transport: "esp32", protocol: PROTOCOL, channels: CHANNEL_COUNT };
     }
 
-    // 2. TOGGLE: Jika sedang ONLINE -> Putuskan Koneksi (OFF)
     if (active?.type === "simulator" && active.connected) {
       disconnect();
       return {
@@ -464,7 +503,6 @@ window.MixerAdapters = (() => {
       };
     }
 
-    // 3. Jika sedang OFFLINE -> Dapatkan Koneksi Baru (ON)
     const result = await simulator();
     return result?.connected ? {
       ok: true,
