@@ -418,6 +418,75 @@
       if(hs) hs.textContent = window.state.connected ? "BRIDGE ONLINE" : (on ? "SYSTEM READY" : "BRIDGE STANDBY");
     }
 
+    /* DEVICE CONNECTION / ESP32 BRIDGE — UI-only bridge controller */
+    var deviceConnect = document.getElementById("deviceConnect");
+    var deviceDisconnect = document.getElementById("deviceDisconnect");
+    var transportSelect = document.getElementById("transportSelect");
+
+    function paintDevice(st){
+      st = st || window.MixerAdapters?.status?.() || {};
+      var online = !!st.connected;
+      var espMode = st.transport === "esp32" || st.type === "simulator";
+      var lamp = document.getElementById("deviceLamp");
+      var ds = document.getElementById("deviceStatus");
+      var dp = document.getElementById("deviceProtocol");
+      var ts = document.getElementById("transportStatus");
+      var bridge = document.getElementById("bridgeState");
+      var bt = document.getElementById("bridgeTransport");
+      var bp = document.getElementById("bridgeProtocol");
+      var footer = document.getElementById("footerConnection");
+
+      if (lamp) {
+        lamp.classList.toggle("green", online);
+        lamp.classList.toggle("red", !online);
+      }
+      if (ds) ds.textContent = online
+        ? "🟢 ESP32 SIMULATOR ONLINE"
+        : "🔴 ESP32 SIMULATOR OFFLINE";
+      if (dp) dp.textContent = "Protocol: " + (st.protocol || "ESP32-MIXER/1");
+      if (ts) ts.textContent = online ? "ESP32 BRIDGE ONLINE" : "OFFLINE";
+      if (bridge) bridge.textContent = online ? "ONLINE" : "OFFLINE";
+      if (bt) bt.textContent = online ? "TRANSPORT: ESP32 BRIDGE" : "TRANSPORT: —";
+      if (bp) bp.textContent = "PROTOCOL: " + (st.protocol || "ESP32-MIXER/1");
+      if (footer) footer.textContent = online ? "● ESP32 SIMULATOR ONLINE" : "● ESP32 SIMULATOR OFFLINE";
+      if (deviceConnect) {
+        deviceConnect.disabled = false;
+        deviceConnect.textContent = online ? "ESP32 CONNECTED" : "CONNECT ESP32";
+        deviceConnect.classList.toggle("on", online);
+      }
+      if (deviceDisconnect) deviceDisconnect.disabled = !online;
+      if (transportSelect) transportSelect.value = espMode ? "esp32" : (st.transport === "bluetooth" ? "bluetooth" : "esp32");
+    }
+
+    if (deviceConnect) deviceConnect.addEventListener("click", async function(e){
+      e.preventDefault(); e.stopImmediatePropagation();
+      deviceConnect.disabled = true;
+      deviceConnect.textContent = "CONNECTING...";
+      try {
+        var result = await window.MixerAdapters?.connectESP32?.();
+        if (!result?.ok || !result?.connected) throw new Error(result?.reason || "ESP32 bridge gagal");
+        paintDevice(window.MixerAdapters.status());
+      } catch (err) {
+        paintDevice({connected:false,transport:"esp32",type:"simulator",protocol:"ESP32-MIXER/1"});
+      } finally {
+        deviceConnect.disabled = false;
+      }
+    });
+
+    if (deviceDisconnect) deviceDisconnect.addEventListener("click", function(e){
+      e.preventDefault(); e.stopImmediatePropagation();
+      window.MixerAdapters?.disconnect?.();
+      paintDevice({connected:false,transport:"esp32",type:"simulator",protocol:"ESP32-MIXER/1"});
+    });
+
+    if (transportSelect) transportSelect.addEventListener("change", async function(){
+      if (this.value === "esp32") paintDevice({connected:false,transport:"esp32",type:"simulator",protocol:"ESP32-MIXER/1"});
+      else paintDevice({connected:false,transport:"bluetooth",type:"bluetooth",protocol:"ESP32-MIXER/1"});
+    });
+
+    window.MixerAdapters?.onStatus?.(paintDevice);
+    paintDevice();
+
     var esp = document.getElementById("connectEsp");
     var bt = document.getElementById("connectBluetooth");
 
