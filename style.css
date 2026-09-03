@@ -24,6 +24,7 @@
 
 html, body {
   margin: 0;
+  padding: 0;
   background: radial-gradient(circle at 50% 0, #202427 0, #0b0d0e 42%, #050607 100%);
   color: var(--text);
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -62,6 +63,11 @@ button:active {
 button:disabled {
   opacity: .45;
   cursor: not-allowed;
+}
+
+/* Helper Class untuk Menyembunyikan Tab */
+.tab-hidden {
+  display: none !important;
 }
 
 /* =========================================================
@@ -200,7 +206,7 @@ button:disabled {
 }
 
 /* =========================================================
-   3. CHANNEL STRIP & CONSOLE
+   3. CHANNEL STRIP & CONSOLE LAYOUT
    ========================================================= */
 .console {
   display: grid;
@@ -236,23 +242,27 @@ button:disabled {
   overflow: hidden;
 }
 
-.channel-bank > #channels, .channel-bank .channel-grid {
-  display: grid;
-  grid-template-columns: repeat(9, minmax(72px, 1fr));
-  gap: 2px;
-  padding: 3px;
+.channel-bank > #channels, 
+.channel-bank > #channelsRight, 
+.channel-bank .channel-grid {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  padding: 4px;
   overflow-x: auto;
 }
 
-.channel {
-  min-width: 72px;
-  min-height: 690px;
+/* --- New Channel Strip Component --- */
+.channel, .new-channel-strip {
+  min-width: 80px;
+  max-width: 95px;
+  flex: 1;
   background: linear-gradient(180deg, #181c20 0%, #0d0f11 100%);
   border: 1px solid #2a3035;
   border-radius: 6px;
-  padding: 5px 4px;
+  padding: 6px 4px;
   text-align: center;
-  position: relative;
+  position: relative; /* Penting agar tombol & footer terkunci */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -260,7 +270,7 @@ button:disabled {
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
-.channel:hover {
+.channel:hover, .new-channel-strip:hover {
   border-color: #00b4d8;
   transform: translateY(-2px);
 }
@@ -271,7 +281,7 @@ button:disabled {
 .channel[data-type="drums"] { border-top: 3px solid #22c55e; }
 .channel[data-type="keys"] { border-top: 3px solid #f97316; }
 
-.channel h3 {
+.channel h3, .new-channel-head {
   font-size: 12px;
   margin: 0 0 4px;
   color: #fff;
@@ -284,18 +294,6 @@ button:disabled {
   color: #65cfff;
   font-size: 8px;
   margin-top: 2px;
-}
-
-.channel:before {
-  content: "48V";
-  display: block;
-  background: #581414;
-  border: 1px solid #7d2929;
-  color: #ff756e;
-  border-radius: 2px;
-  font-size: 8px;
-  padding: 2px 5px;
-  margin-bottom: 4px;
 }
 
 /* Thumbnail Kurva EQ Mini */
@@ -334,7 +332,7 @@ button:disabled {
   box-shadow: 0 0 8px var(--green);
 }
 
-.channel label {
+.channel label, .new-channel-control {
   width: 100%;
   font-size: 8px;
   color: #b7c0c3;
@@ -365,7 +363,7 @@ button:disabled {
 .channel label:nth-of-type(5):after { content: "L C R"; }
 
 /* =========================================================
-   4. ROTARY KNOBS & FADERS 3D
+   4. ROTARY KNOBS & FADERS
    ========================================================= */
 .channel .knob-wrap {
   position: relative;
@@ -377,9 +375,7 @@ button:disabled {
   touch-action: none;
   cursor: ns-resize;
   outline: none;
-  -webkit-user-select: none;
   user-select: none;
-  -webkit-tap-highlight-color: transparent;
   will-change: transform;
 }
 
@@ -387,14 +383,11 @@ button:disabled {
   box-shadow: 0 0 0 2px rgba(21, 148, 255, .75), 0 0 10px rgba(21, 148, 255, .35);
 }
 
-.channel input.knob {
-  position: absolute !important;
-  inset: 0;
-  width: 40px !important;
-  height: 40px !important;
-  margin: 0 !important;
-  opacity: 0;
-  pointer-events: none;
+.channel input.knob, .new-knob {
+  width: 100%;
+  height: 4px;
+  accent-color: var(--cyan);
+  cursor: pointer;
 }
 
 .channel .knob-face {
@@ -422,88 +415,60 @@ button:disabled {
   box-shadow: 0 0 4px rgba(255, 255, 255, .55);
 }
 
-.channel label:nth-of-type(1) .knob-face:before { background: #ff4c45; }
-.channel label:nth-of-type(2) .knob-face:before { background: #38e768; }
-.channel label:nth-of-type(3) .knob-face:before { background: #1594ff; }
-.channel label:nth-of-type(4) .knob-face:before { background: #ffd21c; }
-.channel label:nth-of-type(5) .knob-face:before { background: #b9c2c5; }
-
-.channel .knob-wrap.dragging .knob-face {
-  filter: brightness(1.2);
-  box-shadow: inset 0 2px 5px rgba(255, 255, 255, .25), inset 0 -3px 6px rgba(0, 0, 0, .9), 0 0 9px rgba(21, 148, 255, .45), 0 2px 5px #000;
-}
-
-.channel input.fader {
-  appearance: none;
-  width: 28px;
-  height: 195px;
+/* Faders 3D Style */
+.channel input.fader, .new-fader {
+  appearance: slider-vertical;
   writing-mode: vertical-lr;
-  direction: rtl;
+  width: 22px;
+  height: 160px;
   background: #06080a;
   border: 1px solid #282e33;
   border-radius: 4px;
-  margin: 7px auto;
+  margin: 6px auto;
   box-shadow: inset 0 0 8px #000;
-}
-
-.channel input.fader::-webkit-slider-runnable-track {
-  width: 4px;
-  background: linear-gradient(180deg, #00f0ff 0%, #22c55e 70%, #090b0d 100%);
-  border-radius: 2px;
-}
-
-.channel input.fader::-webkit-slider-thumb {
-  appearance: none;
-  width: 22px;
-  height: 34px;
-  border-radius: 4px;
-  background: linear-gradient(180deg, #f8fafc 0%, #94a3b8 50%, #475569 100%);
-  border: 1px solid #0f172a;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.9);
   cursor: pointer;
 }
 
-.channel input.fader::-moz-range-thumb {
-  width: 22px;
-  height: 34px;
-  border-radius: 4px;
-  background: linear-gradient(180deg, #f8fafc 0%, #94a3b8 50%, #475569 100%);
-  border: 1px solid #0f172a;
-}
-
-.channel output {
+.channel output, .new-channel-fader output {
   color: #8eff9e;
   font-weight: 700;
-  margin: 0 0 3px;
+  margin: 2px 0;
   font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
 }
 
-.channel button {
+/* MUTE & SOLO Buttons */
+.channel button, .new-channel-buttons button {
   width: 100%;
   padding: 4px 1px;
   margin: 2px 0;
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 700;
+  border-radius: 4px;
+  border: 1px solid #334155;
 }
 
-.channel button[data-k="mute"].on {
+.channel button[data-k="mute"].on, 
+.new-channel-buttons button[data-k="mute"].on {
   background: linear-gradient(180deg, #ef4444, #991b1b) !important;
   border-color: #f87171 !important;
   color: #fff !important;
   box-shadow: 0 0 10px rgba(239, 68, 68, 0.6) !important;
 }
 
-.channel button[data-k="solo"].on {
+.channel button[data-k="solo"].on, 
+.new-channel-buttons button[data-k="solo"].on {
   background: linear-gradient(180deg, #eab308, #854d0e) !important;
   border-color: #fde047 !important;
   color: #fff !important;
   box-shadow: 0 0 10px rgba(234, 179, 8, 0.6) !important;
 }
 
-.channel .small {
-  font-size: 7px;
+.channel .small, .new-channel-source {
+  font-size: 8px;
   color: #777;
   margin-top: auto;
+  text-transform: uppercase;
 }
 
 /* =========================================================
@@ -665,20 +630,6 @@ button:disabled {
   justify-content: space-between;
   color: #57717c;
   font-size: 7px;
-}
-
-.screen-mini {
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px solid #1e3b4b;
-  padding-bottom: 4px;
-  color: #67cfff;
-  font-size: 8px;
-}
-
-.screen-mini i {
-  font-style: normal;
-  color: #49e877;
 }
 
 .screen-label {
@@ -859,17 +810,18 @@ button:disabled {
 .effect-screen strong { display: block; color: #64ddff; margin: 7px 0 0 0; }
 
 /* =========================================================
-   6. FX & AUX RACKS
+   6. FX, AUX RACKS & MASTER SECTION
    ========================================================= */
 .fx-rack, .aux-rack {
   margin-top: 7px;
   border: 1px solid #363b3e;
   background: #131719;
   padding: 8px;
+  border-radius: 6px;
 }
 
-.rack-title { font-size: 9px; color: #b9c0c3; }
-.rack-title span { float: right; }
+.rack-title { font-size: 9px; color: #b9c0c3; font-weight: bold; }
+.rack-title span { float: right; color: var(--muted); }
 
 .fx-display {
   display: inline-flex;
@@ -894,383 +846,112 @@ button:disabled {
 .fx-buttons { display: flex; gap: 4px; margin-top: 7px; }
 .fx-buttons button { flex: 1; font-size: 8px; }
 
-.aux-rack { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.aux-unit { border: 1px solid #303639; padding: 7px; }
-.aux-unit > b { font-size: 9px; }
-.aux-unit span { display: inline-block; margin: 5px 4px 0 0; font-size: 8px; color: #a9b1b4; }
+.aux-rack { 
+  display: grid; 
+  grid-template-columns: 1fr 1fr; 
+  gap: 8px; 
+}
 
-.mini-knobs { display: flex; gap: 4px; margin-top: 5px; }
-.mini-knobs i { width: 27px; height: 27px; }
+.aux-unit {
+  background: #0a0d0e;
+  border: 1px solid #262a2d;
+  padding: 8px;
+  border-radius: 4px;
+}
 
-/* =========================================================
-   7. MASTER RACK & VU METERS
-   ========================================================= */
+.aux-unit b {
+  display: block;
+  font-size: 9px;
+  color: var(--cyan);
+  margin-bottom: 4px;
+}
+
+.aux-labels, .aux-values {
+  display: flex;
+  justify-content: space-between;
+  font-size: 8px;
+  color: var(--muted);
+}
+
+.mini-knobs {
+  display: flex;
+  gap: 4px;
+  margin: 4px 0;
+}
+
+.mini-knobs input[type="range"] {
+  flex: 1;
+  height: 4px;
+  accent-color: var(--green);
+}
+
+/* Master Rack Section */
 .master-rack {
-  padding: 6px;
+  padding: 8px;
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 10px;
+  align-items: center;
 }
 
-.meter-rack, .master-card, .monitor-card, .phones-card {
-  border: 1px solid #343a3d;
-  background: #111416;
-  border-radius: 4px;
-  padding: 7px;
-  text-align: center;
-}
-
-.main-meters {
+.master-card {
   display: flex;
-  gap: 5px;
-  justify-content: center;
-  margin-top: 5px;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
 
-.meter {
-  height: 140px;
-  width: 12px;
-  background: linear-gradient(to top, 
-    #00f0ff 0%, 
-    #3b82f6 40%, 
-    #10b981 65%, 
-    #f59e0b 85%, 
-    #ef4444 100%
-  );
-  border-radius: 3px;
-  box-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
+.master-card h2 {
+  font-size: 11px;
+  color: var(--red);
+  margin: 0 0 6px;
 }
 
-.master-card { position: relative; }
-.master-card h2 { font-size: 10px; margin: 0 0 4px; }
-.master-card input { height: 240px; writing-mode: vertical-lr; direction: rtl; }
-.master-card output { display: block; color: #7cff8e; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
-.peak-dot { display: block; width: 7px; height: 7px; background: #ff332c; border-radius: 50%; margin: 5px auto; }
-
-.monitor-card { display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 9px; }
-.monitor-knob { width: 35px; height: 35px; }
-
-.phones-card { display: flex; align-items: center; gap: 5px; justify-content: center; }
-.phone-knob { width: 25px; height: 25px; }
+.master-card input[type="range"] {
+  appearance: slider-vertical;
+  writing-mode: vertical-lr;
+  height: 180px;
+  width: 24px;
+  accent-color: var(--red);
+}
 
 /* =========================================================
-   8. FOOTER & TOOLS
+   7. BOTTOM NAVIGATION BAR & FOOTER
    ========================================================= */
 .bottom-nav {
   display: flex;
+  background: #090b0c;
+  border-top: 2px solid #303538;
+  padding: 4px;
   gap: 4px;
-  padding: 5px 7px;
-  background: #080909;
-  border-top: 1px solid #303538;
-  border-bottom: 1px solid #303538;
-  overflow-x: auto;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
 }
 
-.bottom-nav button { flex: 1; min-width: 105px; }
-.bottom-nav button.active { background: #064f8e; border-color: #188cff; }
-
-.right-tools {
-  display: grid;
-  grid-template-columns: 1fr 1.5fr 1fr;
-  gap: 7px;
-  padding: 7px;
-}
-
-.device-connection, .bridge-panel, .media-rack, .connection-test-panel {
-  background: linear-gradient(#151819, #0c0e0f);
-  border: 1px solid #353b3e;
-  border-radius: 6px;
-  padding: 10px;
-  box-shadow: 0 3px 10px #000;
-}
-
-.section-heading { display: flex; justify-content: space-between; align-items: center; }
-.section-heading h2, .device-connection h2, .bridge-panel h2, .media-rack h2, .sim h2 {
+.bottom-nav button {
+  flex: 1;
+  padding: 8px 4px;
   font-size: 10px;
-  letter-spacing: .7px;
-  margin: 0 0 8px;
-  color: #b9c0c3;
+  font-weight: bold;
 }
 
-.device-connection select {
-  padding: 6px;
-  background: #0b0d0e;
-  color: #eee;
-  border: 1px solid #4a5054;
-  border-radius: 4px;
-  width: 100%;
-  margin: 4px 0 7px;
+.bottom-nav button.active {
+  background: linear-gradient(#1589d2, #064b80);
+  border-color: #1b9cff;
+  color: #fff;
 }
-
-.device-connection button { margin: 3px 3px 3px 0; }
-.device-status { font-weight: 700; color: #ff6963; margin: 4px 0; }
-.device-status.online { color: var(--green); }
-
-.bridge-live { color: var(--green); font-size: 9px; }
-.bridge-summary { display: flex; gap: 5px; flex-wrap: wrap; }
-.bridge-summary span, .bridge-counters span {
-  background: #1c2022;
-  border: 1px solid #303538;
-  padding: 4px 6px;
-  border-radius: 4px;
-  font-size: 9px;
-}
-
-.bridge-counters { display: flex; gap: 6px; margin: 8px 0; }
-.bridge-counters b { color: var(--green); }
-.bridge-last { font-size: 9px; color: #a9b1b4; margin-bottom: 5px; }
-
-.bridge-log {
-  background: #050606;
-  min-height: 65px;
-  max-height: 100px;
-  overflow: auto;
-  border: 1px solid #252a2c;
-  padding: 5px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-}
-
-.bridge-log div { padding: 2px 0; border-bottom: 1px solid #141718; }
-.bridge-log .rx { color: #6eea8a; }
-.bridge-log .ack { color: #bfc7ca; }
-.bridge-log .tx { color: #ddd; }
-
-.media-rack > div { display: flex; gap: 6px; }
-.media-rack button { flex: 1; height: 72px; font-size: 22px; }
-.media-rack button small { display: block; font-size: 8px; margin-top: 4px; }
-
-.connection-test-panel { margin: 0 7px 7px; }
-.transport-line { margin-bottom: 5px; }
-
-.sim pre {
-  white-space: pre-wrap;
-  background: #050606;
-  color: #d6dcde;
-  padding: 7px;
-  border: 1px solid #202527;
-  max-height: 140px;
-  overflow: auto;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-}
-
-.test-buttons { display: flex; flex-wrap: wrap; gap: 4px; }
-.test-buttons button { font-size: 9px; }
-.small { font-size: 9px; color: #8e989c; line-height: 1.45; }
 
 .status-footer {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
-  padding: 8px 12px;
-  background: #050606;
-  border-top: 1px solid #303538;
-  color: #858f93;
+  background: #050607;
+  padding: 6px 12px;
   font-size: 9px;
-  position: sticky;
-  bottom: 0;
-  z-index: 15;
+  color: var(--muted);
+  border-top: 1px solid #202427;
 }
 
-.status-footer b { color: var(--green); }
-
-.bottom-nav,
-.right-tools,
-.connection-test-panel,
-.status-footer {
-  width: calc(100% - 14px) !important;
-  max-width: none !important;
-  margin-left: 7px !important;
-  margin-right: 7px !important;
+.status-footer b {
+  color: var(--text);
 }
-
-/* =========================================================
-   9. RESPONSIVE & LAYOUT PASS
-   ========================================================= */
-@media (min-width: 700px) {
-  main.console {
-    display: grid !important;
-    /* Grid 4 Kolom Utama: CH 1-8 (left), Screen (center), CH 9-16 (right), Master (master) */
-    grid-template-columns: 632px 360px 632px 125px !important;
-    grid-template-rows: auto auto auto !important;
-    grid-template-areas: 
-      "left center right master"
-      "fx   .      .     master"
-      "aux  .      .     master" !important;
-    column-gap: 12px !important;
-    row-gap: 12px !important;
-    width: max-content !important;
-    margin: 0 auto 10px !important;
-    align-items: start !important;
-  }
-
-  /* Posisikan Channel Bank Kiri (CH 1-8) */
-  main.console > .channel-bank-left { 
-    grid-area: left !important; 
-    width: 632px !important; 
-    margin: 0 !important; 
-  }
-
-  /* Posisikan Screen Tengah */
-  main.console > .center-console { 
-    grid-area: center !important; 
-    width: 360px !important; 
-    margin: 0 !important; 
-  }
-
-  /* Posisikan Channel Bank Kanan (CH 9-16) */
-  main.console > .channel-bank-right { 
-    grid-area: right !important; 
-    width: 632px !important; 
-    margin: 0 !important; 
-  }
-
-  /* Posisikan Master Rack di Sebelah Kanan */
-  main.console > .master-rack { 
-    grid-area: master !important; 
-    width: 125px !important; 
-    margin: 0 !important; 
-  }
-
-  /* Posisikan Effect Processor Tepat di Bawah Channel 1-8 */
-  main.console > .fx-rack-live,
-  main.console > .fx-rack {
-    grid-area: fx !important;
-    width: 100% !important;
-    max-width: 632px !important;
-    margin: 0 !important;
-    justify-self: start !important;
-  }
-
-  /* Posisikan AUX / BUS & FX Return Tepat di Bawah Effect Processor */
-  main.console > .aux-rack {
-    grid-area: aux !important;
-    width: 100% !important;
-    max-width: 632px !important;
-    margin: 0 !important;
-    justify-self: start !important;
-  }
-
-  .channel-bank-left > #channels,
-  .channel-bank-right > #channelsRight {
-    display: grid !important;
-    grid-template-columns: repeat(8, 78px) !important;
-    grid-auto-flow: column !important;
-    width: 632px !important;
-    min-width: 632px !important;
-  }
-
-  .right-tools {
-    display: grid !important;
-    grid-template-columns: minmax(260px, 1fr) minmax(340px, 1.4fr) minmax(260px, 1fr) !important;
-    gap: 7px !important;
-  }
-}
-
-@media (max-width: 699px) {
-  body { font-size: 11px !important; }
-
-  .topbar {
-    position: relative !important;
-    height: auto !important;
-    padding: 5px !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 5px !important;
-  }
-
-  .topbar > .brand { grid-column: 1/-1 !important; min-height: 58px !important; }
-
-  main.console {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    padding: 5px !important;
-    gap: 7px !important;
-  }
-
-  main.console > .center-console { order: 1 !important; width: 100% !important; }
-  main.console > .channel-bank-left { order: 2 !important; width: 100% !important; }
-  main.console > .channel-bank-right { order: 3 !important; width: 100% !important; }
-  main.console > .master-rack { order: 4 !important; width: 100% !important; display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
-  main.console > .fx-rack-live { order: 5 !important; width: 100% !important; }
-  main.console > .aux-rack { order: 6 !important; width: 100% !important; grid-template-columns: 1fr !important; }
-
-  .channel-bank { overflow-x: auto !important; }
-  .channel-bank > #channels,
-  .channel-bank > #channelsRight {
-    display: grid !important;
-    grid-template-columns: repeat(8, 78px) !important;
-    width: max-content !important;
-  }
-
-  .right-tools { grid-template-columns: 1fr !important; }
-}
-
-/* FORCE GRID LAYOUT FOR MIXER CONSOLE */
-@media (min-width: 700px) {
-  main.console {
-    display: grid !important;
-    grid-template-columns: 632px 360px 632px 125px !important;
-    grid-template-areas: 
-      "ch-left center ch-right master"
-      "fx      center ch-right master"
-      "aux     center ch-right master" !important;
-    column-gap: 12px !important;
-    row-gap: 12px !important;
-    width: max-content !important;
-    margin: 0 auto 10px !important;
-    align-items: start !important;
-  }
-
-  /* Reset positioning bawaan yang merusak Grid */
-  main.console > .fx-rack,
-  main.console > .fx-rack-live,
-  main.console > .aux-rack {
-    position: relative !important;
-    top: auto !important;
-    bottom: auto !important;
-    left: auto !important;
-    right: auto !important;
-    transform: none !important;
-    float: none !important;
-    margin: 0 !important;
-  }
-
-  /* Alokasi Area */
-  main.console > .channel-bank-left {
-    grid-area: ch-left !important;
-    width: 632px !important;
-  }
-
-  main.console > .center-console {
-    grid-area: center !important;
-    width: 360px !important;
-  }
-
-  main.console > .channel-bank-right {
-    grid-area: ch-right !important;
-    width: 632px !important;
-  }
-
-  main.console > .master-rack {
-    grid-area: master !important;
-    width: 125px !important;
-  }
-
-  /* Memaksa FX Rack persis di bawah Channel 1-8 */
-  main.console > .fx-rack-live,
-  main.console > .fx-rack {
-    grid-area: fx !important;
-    width: 632px !important;
-    box-sizing: border-box !important;
-  }
-
-  /* Memaksa AUX Rack persis di bawah FX Rack */
-  main.console > .aux-rack {
-    grid-area: aux !important;
-    width: 632px !important;
-    box-sizing: border-box !important;
-  }
-}
-
