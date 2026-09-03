@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#090b0c">
-<title>MIXER-ONLINE • Midas M32 Style Edition</title>
+<title>MIXER-ONLINE • Midas M32 Pro Edition</title>
 
 <link rel="stylesheet" href="style.css?v=20260903-layout-final">
 <link rel="stylesheet" href="channel-skin.css?v=20260902-01">
@@ -37,7 +37,7 @@
   }
 
   /* ==========================================================
-     MIDAS M32 STYLE SCREEN CONSOLE THEME OVERRIDE
+     MIDAS M32 DETAILED SCREEN & SUB-MENU THEME
      ========================================================== */
   .screen-frame {
     background: #080c10 !important;
@@ -53,7 +53,6 @@
     font-family: 'Segoe UI', Tahoma, sans-serif;
     letter-spacing: 2px;
   }
-  /* Midas Gold/Cyan Tab Styling */
   .screen-tabs {
     background: #05080c !important;
     padding: 3px !important;
@@ -69,6 +68,7 @@
     font-weight: bold;
     padding: 4px 2px !important;
     border-radius: 2px !important;
+    cursor: pointer;
   }
   .screen-tabs button.active {
     background: linear-gradient(180deg, #00a8cc 0%, #00738c 100%) !important;
@@ -76,6 +76,32 @@
     border-color: #00e5ff !important;
     box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
   }
+
+  /* Midas M32 Sub-Menu Bar (CONFIG, GATE, DYN, EQ, SENDS, MAIN) */
+  .m32-submenu-bar {
+    display: flex;
+    background: #06090f;
+    border-bottom: 1px solid #1b2836;
+    padding: 2px 4px;
+    gap: 2px;
+    overflow-x: auto;
+  }
+  .m32-sub-btn {
+    background: #111a24;
+    color: #7b8f9e;
+    border: 1px solid #1f2d3d;
+    font-size: 7px;
+    padding: 2px 6px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .m32-sub-btn.active {
+    background: #00738c;
+    color: #fff;
+    border-color: #00e5ff;
+  }
+
   /* Midas TFT Screen View Area */
   .midas-tft-screen {
     background: #06090f;
@@ -126,6 +152,21 @@
     color: #00e5ff;
     font-family: monospace;
   }
+
+  /* Sub-menu Dynamic Panels inside HOME */
+  .m32-sub-panel {
+    display: none;
+    background: #04060a;
+    border: 1px solid #16222f;
+    padding: 6px;
+    border-radius: 3px;
+    font-size: 8px;
+    color: #a0b0c0;
+  }
+  .m32-sub-panel.active {
+    display: block;
+  }
+
   /* Midas Rotary Encoder Emulation Bar */
   .midas-encoders-bar {
     display: grid;
@@ -183,7 +224,7 @@
     <div id="channels"></div>
   </section>
 
-  <!-- KONSOL TENGAH (MIDAS M32 SCREEN STYLE + PLAYER) -->
+  <!-- KONSOL TENGAH (MIDAS M32 SCREEN STYLE + SUB-MENUS + PLAYER) -->
   <section class="center-console">
     <div class="screen-frame">
       <div class="screen-title"><b>MIDAS M32</b><span>DIGITAL CONSOLE SYSTEM</span></div>
@@ -197,9 +238,19 @@
         <button data-screen="EFFECT">EFFECTS</button>
         <button data-screen="SCENE">LIBRARY</button>
       </div>
+
+      <!-- Midas M32 Sub-Menu Bar khusus di dalam menu HOME -->
+      <div class="m32-submenu-bar" id="m32SubmenuBar">
+        <button class="m32-sub-btn active" data-sub="overview">OVERVIEW</button>
+        <button class="m32-sub-btn" data-sub="config">CONFIG</button>
+        <button class="m32-sub-btn" data-sub="gate">GATE</button>
+        <button class="m32-sub-btn" data-sub="dyn">DYN</button>
+        <button class="m32-sub-btn" data-sub="eq">EQ</button>
+        <button class="m32-sub-btn" data-sub="sends">SENDS</button>
+      </div>
       
       <div class="screen-content" id="screenContent">
-        <!-- VIEW: HOME (Midas TFT Display Layout) -->
+        <!-- VIEW: HOME (Midas TFT Display Layout & Sub-Menus) -->
         <section class="screen-view active" data-view="HOME">
           <div class="midas-tft-screen">
             <!-- Top Channel Info Bar -->
@@ -209,40 +260,97 @@
               <span style="font-size: 9px; color: #2ecc71; font-weight: bold;">[ACTIVE]</span>
             </div>
 
-            <!-- 4 Core Processing Blocks -->
-            <div class="midas-blocks-grid">
-              <div class="midas-block">
-                <span>PREAMP / GAIN</span>
-                <strong id="screenGain">1.00</strong>
+            <!-- SUB-PANEL: OVERVIEW (Default) -->
+            <div class="m32-sub-panel active" data-subpanel="overview">
+              <div class="midas-blocks-grid">
+                <div class="midas-block">
+                  <span>PREAMP / GAIN</span>
+                  <strong id="screenGain">1.00</strong>
+                </div>
+                <div class="midas-block">
+                  <span>PANORAMA</span>
+                  <strong id="screenPan">CENTER</strong>
+                </div>
+                <div class="midas-block">
+                  <span>FADER LEVEL</span>
+                  <strong id="screenFader" style="color: #2ecc71;">75%</strong>
+                </div>
+                <div class="midas-block">
+                  <span>DYNAMICS</span>
+                  <strong style="color: #f39c12;">BYPASS</strong>
+                </div>
               </div>
-              <div class="midas-block">
-                <span>PANORAMA</span>
-                <strong id="screenPan">CENTER</strong>
-              </div>
-              <div class="midas-block">
-                <span>FADER LEVEL</span>
-                <strong id="screenFader" style="color: #2ecc71;">75%</strong>
-              </div>
-              <div class="midas-block">
-                <span>DYNAMICS</span>
-                <strong style="color: #f39c12;">BYPASS</strong>
+              <!-- Mini Spectrum / RTA -->
+              <div class="pro-mini-spectrum" id="visualMeter" style="background: #040609; border: 1px solid #16222f; padding: 3px; border-radius: 3px;">
+                <div class="spectrum-bars-container" style="display: flex; gap: 2px; height: 30px; align-items: flex-end;">
+                  <div class="bar-col" style="flex:1; height: 60%"></div>
+                  <div class="bar-col" style="flex:1; height: 80%"></div>
+                  <div class="bar-col" style="flex:1; height: 45%"></div>
+                  <div class="bar-col" style="flex:1; height: 90%"></div>
+                  <div class="bar-col" style="flex:1; height: 70%"></div>
+                  <div class="bar-col" style="flex:1; height: 55%"></div>
+                  <div class="bar-col" style="flex:1; height: 85%"></div>
+                  <div class="bar-col" style="flex:1; height: 65%"></div>
+                </div>
+                <div class="spectrum-scale-labels" style="font-size: 6px; color: #556677; display: flex; justify-content: space-between; margin-top: 2px;"><span>0dB</span><span>-6</span><span>-12</span><span>-24</span><span>-48</span></div>
               </div>
             </div>
 
-            <!-- Mini RTA / Meter Spectrum Simulation -->
-            <div class="pro-mini-spectrum" id="visualMeter" style="background: #040609; border: 1px solid #16222f; padding: 3px; border-radius: 3px;">
-              <div class="spectrum-bars-container" style="display: flex; gap: 2px; height: 35px; align-items: flex-end;">
-                <div class="bar-col" style="flex:1; height: 60%"></div>
-                <div class="bar-col" style="flex:1; height: 80%"></div>
-                <div class="bar-col" style="flex:1; height: 45%"></div>
-                <div class="bar-col" style="flex:1; height: 90%"></div>
-                <div class="bar-col" style="flex:1; height: 70%"></div>
-                <div class="bar-col" style="flex:1; height: 55%"></div>
-                <div class="bar-col" style="flex:1; height: 85%"></div>
-                <div class="bar-col" style="flex:1; height: 65%"></div>
+            <!-- SUB-PANEL: CONFIG / PREAMP -->
+            <div class="m32-sub-panel" data-subpanel="config">
+              <b>PREAMP / INPUT CONFIG</b>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:4px;">
+                <div style="background:#0c1219; padding:4px; border:1px solid #1b2836;">+48V PHANTOM: <span style="color:#2ecc71;">ON</span></div>
+                <div style="background:#0c1219; padding:4px; border:1px solid #1b2836;">LOW CUT (HPF): <span style="color:#00e5ff;">80 Hz</span></div>
+                <div style="background:#0c1219; padding:4px; border:1px solid #1b2836;">POLARITY: <span style="color:#fff;">NORMAL (+)</span></div>
+                <div style="background:#0c1219; padding:4px; border:1px solid #1b2836;">INSERT POINT: <span style="color:#f39c12;">PRE-EQ</span></div>
               </div>
-              <div class="spectrum-scale-labels" style="font-size: 7px; color: #556677; display: flex; justify-content: space-between; margin-top: 2px;"><span>0dB</span><span>-6</span><span>-12</span><span>-24</span><span>-48</span></div>
             </div>
+
+            <!-- SUB-PANEL: GATE -->
+            <div class="m32-sub-panel" data-subpanel="gate">
+              <b>EXPANDER / NOISE GATE</b>
+              <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:4px; margin-top:4px; text-align:center;">
+                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">THRESHOLD<br><strong style="color:#00e5ff;">-45 dB</strong></div>
+                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">RANGE<br><strong style="color:#00e5ff;">40 dB</strong></div>
+                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">RELEASE<br><strong style="color:#00e5ff;">250 ms</strong></div>
+              </div>
+            </div>
+
+            <!-- SUB-PANEL: DYN (COMPRESSOR) -->
+            <div class="m32-sub-panel" data-subpanel="dyn">
+              <b>DYNAMICS / COMPRESSOR</b>
+              <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:3px; margin-top:4px; text-align:center;">
+                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">THRESH<br><strong style="color:#f39c12;">-18dB</strong></div>
+                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">RATIO<br><strong style="color:#f39c12;">3.1:1</strong></div>
+                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">ATTACK<br><strong style="color:#f39c12;">15ms</strong></div>
+                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">GAIN<br><strong style="color:#f39c12;">+2.5dB</strong></div>
+              </div>
+            </div>
+
+            <!-- SUB-PANEL: EQ -->
+            <div class="m32-sub-panel" data-subpanel="eq">
+              <b>4-BAND PARAMETRIC EQUALIZER</b>
+              <div style="background:#040608; border:1px solid #1a2736; height:36px; display:flex; align-items:flex-end; padding:2px; gap:2px; margin-top:4px;">
+                <div style="flex:1; background:#00e5ff; height:30%; opacity:0.7;" title="Low shelf"></div>
+                <div style="flex:1; background:#00e5ff; height:60%; opacity:0.8;" title="Low-Mid"></div>
+                <div style="flex:1; background:#00e5ff; height:80%; opacity:0.9;" title="High-Mid"></div>
+                <div style="flex:1; background:#00e5ff; height:50%; opacity:0.7;" title="High shelf"></div>
+              </div>
+              <div style="font-size:7px; display:flex; justify-content:space-between; margin-top:2px;"><span>Low: 100Hz</span><span>Mid1: 800Hz</span><span>Mid2: 3.2kHz</span><span>High: 10kHz</span></div>
+            </div>
+
+            <!-- SUB-PANEL: SENDS -->
+            <div class="m32-sub-panel" data-subpanel="sends">
+              <b>BUS / AUX SENDS ROUTING</b>
+              <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:3px; margin-top:4px; text-align:center;">
+                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">BUS 1<br><strong style="color:#2ecc71;">0.0dB</strong></div>
+                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">BUS 2<br><strong style="color:#2ecc71;">-6.0dB</strong></div>
+                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">FX 1<br><strong style="color:#2ecc71;">-3.5dB</strong></div>
+                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">FX 2<br><strong style="color:#2ecc71;">-∞</strong></div>
+              </div>
+            </div>
+
           </div>
         </section>
 
@@ -482,15 +590,36 @@
 
   const tabs = document.querySelectorAll('#screenTabs [data-screen]');
   const views = document.querySelectorAll('.screen-view');
+  const subButtons = document.querySelectorAll('.m32-sub-btn');
+  const subPanels = document.querySelectorAll('.m32-sub-panel');
+  const subBar = document.getElementById('m32SubmenuBar');
+
   const setScreen = (name) => {
     tabs.forEach(b => b.classList.toggle('active', b.dataset.screen === name));
     views.forEach(v => v.classList.toggle('active', v.dataset.view === name));
     document.querySelector('.screen-frame')?.setAttribute('data-screen', name);
+    
+    // Munculkan sub-menu M32 hanya jika berada di menu HOME
+    if(subBar) subBar.style.display = (name === 'HOME') ? 'flex' : 'none';
+
     if (name === 'METER') buildScreenMeters();
     if (name === 'RTA') buildRta();
     if (name === 'SETUP') updateSetup();
   };
+
   tabs.forEach(b => b.addEventListener('click', () => setScreen(b.dataset.screen)));
+
+  // Interaksi Sub-Menu M32 (Overview, Config, Gate, Dyn, EQ, Sends)
+  subButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      subButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const targetSub = btn.dataset.sub;
+      subPanels.forEach(panel => {
+        panel.classList.toggle('active', panel.dataset.subpanel === targetSub);
+      });
+    });
+  });
 
   function buildScreenMeters() {
     const root = document.getElementById('screenChannelMeters');
@@ -563,7 +692,7 @@
 </script>
 
 <script>
-/* SINGLE SOURCE OF TRUTH: SYSTEM ON/OFF & TEST PANEL RX/TX BINDING */
+/* SINGLE SOURCE OF TRUTH: SYSTEM ON/OFF & TEST PANEL RX/TX BINDING + LIVE METER */
 (function(){
   function install(){
     var p = document.getElementById("power");
@@ -782,6 +911,7 @@
   let sourceNode = null;
   let gainNode = null;
   let panNode = null;
+  let analyserNode = null;
   let currentAudioElement = null;
 
   function initAudioEngine(audioElement) {
@@ -796,21 +926,27 @@
     if (!sourceNode) {
       sourceNode = audioCtx.createMediaElementSource(audioElement);
       gainNode = audioCtx.createGain();
+      analyserNode = audioCtx.createAnalyser();
+      analyserNode.fftSize = 64;
       
       if (audioCtx.createStereoPanner) {
         panNode = audioCtx.createStereoPanner();
         sourceNode.connect(gainNode);
         gainNode.connect(panNode);
-        panNode.connect(audioCtx.destination);
+        panNode.connect(analyserNode);
+        analyserNode.connect(audioCtx.destination);
       } else {
         sourceNode.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
+        gainNode.connect(analyserNode);
+        analyserNode.connect(audioCtx.destination);
       }
     }
   }
 
-  // Sinkronisasi indikator channel aktif & nilai parameter layar secara real-time
-  setInterval(() => {
+  // Loop utama untuk menggerakkan indikator, meteran, dan parameter secara real-time
+  function updateIndicators() {
+    requestAnimationFrame(updateIndicators);
+
     const activeInput = document.getElementById('screenInput');
     const screenGain = document.getElementById('screenGain');
     const screenFader = document.getElementById('screenFader');
@@ -833,7 +969,16 @@
         screenPan.textContent = panVal === 0 ? 'CENTER' : (panVal < 0 ? 'L ' + Math.round(Math.abs(panVal) * 100) + '%' : 'R ' + Math.round(panVal * 100) + '%');
       }
 
-      if (currentAudioElement && !currentAudioElement.paused && audioCtx) {
+      if (analyserNode && currentAudioElement && !currentAudioElement.paused) {
+        const dataArray = new Uint8Array(analyserNode.frequencyBinCount);
+        analyserNode.getByteFrequencyData(dataArray);
+
+        const barCols = document.querySelectorAll('.pro-mini-spectrum .bar-col, .rta-bars i');
+        barCols.forEach((bar, idx) => {
+          const val = dataArray[idx % dataArray.length] || 10;
+          bar.style.height = Math.max(10, Math.min(100, (val / 255) * 100)) + '%';
+        });
+
         if (gainNode) {
           const faderScale = (chData.fader || 75) / 100;
           const gainVal = (parseFloat(chData.gain) || 1.0) * faderScale;
@@ -845,7 +990,9 @@
         }
       }
     }
-  }, 100);
+  }
+
+  requestAnimationFrame(updateIndicators);
 
   if(musicBtn) musicBtn.addEventListener('click', () => fileInput?.click());
   if(fileBtn) fileBtn.addEventListener('click', () => fileInput?.click());
@@ -893,7 +1040,7 @@
           playPauseBtn.style.background = '#e74c3c';
         }
         const tr = document.getElementById('testResult');
-        if(tr) tr.textContent = `PLAYER: Memutar "${file.name}" ke Channel ${chNum} (M32 Engine Connected)`;
+        if(tr) tr.textContent = `PLAYER: Memutar "${file.name}" ke Channel ${chNum} (M32 Screen Feature Active)`;
       }).catch(err => {
         console.error("Gagal memutar audio:", err);
       });
