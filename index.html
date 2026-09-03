@@ -299,7 +299,7 @@
 
 <!-- JAVASCRIPT LIBRARIES & MODULES -->
 <script src="connection.js?v=20260903-final16"></script>
-<script src="adapters.js?v=20260902-device03"></script>
+<script src="adapters.js?v=20260903-esp32-responsive"></script>
 <script src="app.js?v=20260903-final16"></script>
 <script src="header-system.js?v=20260902-01"></script>
 <script src="header-controls.js?v=20260902-02"></script>
@@ -450,9 +450,13 @@
       esp.disabled = true;
       esp.textContent = "CONNECTING...";
       try {
-        const result = await window.MixerAdapters?.simulator?.();
-        if(!result?.connected) throw new Error("ESP32 simulator gagal terhubung");
-        paintConnection(window.MixerAdapters.status ? window.MixerAdapters.status() : {connected:true,type:"simulator"});
+        const result = await window.MixerAdapters?.connectESP32?.();
+        if(!result?.ok || !result?.connected) throw new Error(result?.reason || "ESP32 simulator gagal terhubung");
+        window.state = window.state || {};
+        window.state.connected = true;
+        window.state.sim = window.state.sim || {};
+        window.state.sim.online = true;
+        paintConnection({connected:true,type:"simulator",transport:"esp32",name:"ESP32 SIMULATOR"});
       } catch(error) {
         esp.textContent = "CONNECT ESP32";
         var status = document.getElementById("status");
