@@ -413,10 +413,20 @@
     
     function paint(){
       var on = !!window.state.system;
+      var adapter = window.MixerAdapters?.active;
+      var espOnline = !!adapter?.connected && (adapter.type === "simulator" || adapter.transport === "esp32");
+      /* The adapter is the source of truth for ESP32 state. */
+      window.state.connected = espOnline;
+      window.state.sim = window.state.sim || {};
+      window.state.sim.online = espOnline;
       p.textContent = on ? "SYSTEM ON" : "SYSTEM OFF";
       p.classList.toggle("on", on);
-      var hs = document.getElementById("headerBridgeStatus"); 
-      if(hs) hs.textContent = window.state.connected ? "BRIDGE ONLINE" : (on ? "SYSTEM READY" : "BRIDGE STANDBY");
+      var hs = document.getElementById("headerBridgeStatus");
+      if(hs) hs.textContent = espOnline ? "BRIDGE READY" : (on ? "SYSTEM READY" : "BRIDGE STANDBY");
+      if(esp) {
+        esp.textContent = espOnline ? "ESP32 CONNECTED" : "CONNECT ESP32";
+        esp.classList.toggle("on", espOnline);
+      }
     }
 
     /* DEVICE CONNECTION / ESP32 BRIDGE — UI-only bridge controller */
@@ -549,11 +559,12 @@
         }
         if(!result?.ok || result.connected !== true) throw new Error(result?.reason || "ESP32 bridge gagal");
 
-        const live = api.status ? api.status() : result;
+        const live = api.active?.connected ? api.active : result;
         window.state.connected = true;
         window.state.sim.online = true;
         paintConnection(live);
         paintDevice(live);
+        paint();
       } catch(error) {
         window.state.connected = false;
         window.state.sim.online = false;
