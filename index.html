@@ -123,6 +123,151 @@
   .m32-submenu-bar {
     display: flex;
     background: #06090f;
+    
+    
+  <style>
+  /* ==========================================================
+     LAYOUT MUTLAK WIDESCREEN: 14 CHANNEL + MASTER (1 BARIS)
+     ========================================================== */
+  body {
+    background: #090b0c;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+  }
+
+  main.console {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    width: max-content !important;
+    min-width: 100vw !important;
+    box-sizing: border-box !important;
+    padding: 6px !important;
+    gap: 8px !important;
+    align-items: flex-start !important;
+  }
+
+  .channel-bank, 
+  .center-console, 
+  .master-rack {
+    flex-shrink: 0 !important;
+  }
+
+  /* Lebar Bank Channel Kiri (CH 1-7) */
+  .channel-bank-left {
+    width: 530px !important;
+    min-width: 530px !important;
+  }
+
+  /* Lebar Konsol Tengah (Screen + Player + FX + Aux) dikunci pas */
+  .center-console {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 340px !important;
+    min-width: 340px !important;
+    max-width: 340px !important;
+    gap: 6px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Lebar Bank Channel Kanan (CH 8-14) */
+  .channel-bank-right {
+    width: 530px !important;
+    min-width: 530px !important;
+  }
+
+  /* Lebar Master Rack di ujung kanan */
+  .master-rack {
+    width: 120px !important;
+    min-width: 120px !important;
+    height: 690px !important;
+    min-height: 690px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    box-sizing: border-box !important;
+    padding: 8px 4px !important;
+  }
+
+  /* Menyamakan lebar elemen di dalam konsol tengah */
+  .screen-frame, 
+  .media-rack, 
+  .center-console .fx-rack, 
+  .center-console .aux-rack {
+    width: 100% !important;
+    max-width: 340px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Mengatur FX & Aux di dalam konsol tengah agar mengalir ke bawah */
+  .center-console .fx-rack,
+  .center-console .aux-rack {
+    position: static !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    background: #0c1219 !important;
+    border: 1px solid #1a2736 !important;
+    border-radius: 6px !important;
+    padding: 6px !important;
+  }
+
+  /* Sembunyikan elemen duplikat luar */
+  main.console > .fx-rack, 
+  main.console > .aux-rack {
+    display: none !important;
+  }
+
+  /* ==========================================================
+     MIDAS M32 DETAILED SCREEN & SUB-MENU THEME
+     ========================================================== */
+  .screen-frame {
+    background: #080c10 !important;
+    border: 3px solid #1a2530 !important;
+    border-radius: 6px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.9), inset 0 0 20px rgba(0, 168, 204, 0.08) !important;
+    padding: 4px !important;
+  }
+  .screen-title {
+    background: linear-gradient(90deg, #0b131a, #132230, #0b131a) !important;
+    color: #00e5ff !important;
+    border-bottom: 2px solid #1a2530 !important;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    letter-spacing: 2px;
+    font-size: 10px;
+    padding: 4px;
+    text-align: center;
+  }
+  .screen-tabs {
+    background: #05080c !important;
+    padding: 3px !important;
+    display: grid !important;
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: 2px !important;
+  }
+  .screen-tabs button {
+    background: #101820 !important;
+    color: #8899a6 !important;
+    border: 1px solid #1f2d3d !important;
+    font-size: 8px !important;
+    font-weight: bold;
+    padding: 4px 2px !important;
+    border-radius: 2px !important;
+    cursor: pointer;
+  }
+  .screen-tabs button.active {
+    background: linear-gradient(180deg, #00a8cc 0%, #00738c 100%) !important;
+    color: #ffffff !important;
+    border-color: #00e5ff !important;
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+  }
+
+  /* Midas M32 Sub-Menu Bar (CONFIG, GATE, DYN, EQ, SENDS, MAIN) */
+  .m32-submenu-bar {
+    display: flex;
+    background: #06090f;
     border-bottom: 1px solid #1b2836;
     padding: 2px 4px;
     gap: 2px;
@@ -137,6 +282,7 @@
     border-radius: 2px;
     cursor: pointer;
     font-weight: bold;
+    flex-shrink: 0;
   }
   .m32-sub-btn.active {
     background: #00738c;
@@ -230,6 +376,19 @@
     color: #00e5ff;
     line-height: 16px;
     font-weight: bold;
+  }
+
+  /* Master Fader Height Adjustment */
+  .master-card {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .master-card input[type="range"][orient="vertical"],
+  .master-card input[type="range"] {
+    height: 420px !important;
   }
 </style>
 </head>
