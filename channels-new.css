@@ -408,11 +408,15 @@ button:disabled {
 
 /* PERBAIKAN VOLUME: Fader bergerak alami dari BAWAH ke ATAS */
 .channel input.fader, 
+/* =========================================================
+   PERBAIKAN FADER VOLUME (DARI BAWAH KE ATAS)
+   ========================================================= */
+.channel input.fader, 
 .new-fader, 
 .master-card input[type="range"] {
   appearance: slider-vertical;
   writing-mode: vertical-lr;
-  direction: ltr; /* Memastikan titik nol ada di bawah dan nilai maksimum di atas */
+  direction: rtl; /* Membalikkan arah slider: bawah = min (0), atas = max */
   width: 22px;
   height: 160px;
   background: #06080a;
@@ -422,6 +426,7 @@ button:disabled {
   box-shadow: inset 0 0 8px #000;
   cursor: pointer;
 }
+
 
 .channel output, .new-channel-fader output {
   color: #8eff9e;
