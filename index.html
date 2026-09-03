@@ -5,8 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#090b0c">
 <title>MIXER-ONLINE • 14CH Digital Mixer</title>
+<!-- PEMANGGILAN SELURUH CSS DI HEAD AGAR RENDER SELESAI LEBIH CEPAT -->
 <link rel="stylesheet" href="style.css?v=20260903-layout-final">
 <link rel="stylesheet" href="channel-skin.css?v=20260902-01">
+<link rel="stylesheet" href="header-system.css?v=20260902-01">
+<link rel="stylesheet" href="channels-new.css?v=20260903-ULTIMATE">
 </head>
 <body>
 <header class="topbar">
@@ -74,7 +77,7 @@
         </section>
 
         <section class="screen-view" data-view="SETUP">
-          <div class="setup-screen"><b>SYSTEM SETUP</b><div class="setup-grid"><span>CHANNELS <strong class="channel-count-value">14</strong></span><span>TRANSPORT <strong id="setupTransport">OFFLINE</strong></span><span>PROTOCOL <strong>ESP32-MIXER/1</strong></span><span>SYNC <strong>TWO-WAY</strong></span><span>SYSTEM <strong id="setupSystem">OFF</strong></span><span>REMOTE <strong>BLUETOOTH / BRIDGE</strong></span></div><div class="channel-mapper"><div><b>AUTO CHANNEL MAPPER</b><small id="mapperStatus">16 CH • 1:1 READY</small></div><label>CHANNELS <select id="mapperChannels"><option value="4">4</option><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="14" selected>14</option></select></label><button id="autoMapChannels" type="button" onclick="autoMapChannels()">AUTO MAP</button><button id="applyChannelMap" type="button" onclick="applyChannelMap()">APPLY CHANNELS</button><div id="channelMapPreview">CH1→CH1 • CH2→CH2 • CH3→CH3 • CH4→CH4 • … • CH14→CH14</div></div></div>
+          <div class="setup-screen"><b>SYSTEM SETUP</b><div class="setup-grid"><span>CHANNELS <strong class="channel-count-value">14</strong></span><span>TRANSPORT <strong id="setupTransport">OFFLINE</strong></span><span>PROTOCOL <strong>ESP32-MIXER/1</strong></span><span>SYNC <strong>TWO-WAY</strong></span><span>SYSTEM <strong id="setupSystem">OFF</strong></span><span>REMOTE <strong>BLUETOOTH / BRIDGE</strong></span></div><div class="channel-mapper"><div><b>AUTO CHANNEL MAPPER</b><small id="mapperStatus">14 CH • 1:1 READY</small></div><label>CHANNELS <select id="mapperChannels"><option value="4">4</option><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="14" selected>14</option></select></label><button id="autoMapChannels" type="button" onclick="autoMapChannels()">AUTO MAP</button><button id="applyChannelMap" type="button" onclick="applyChannelMap()">APPLY CHANNELS</button><div id="channelMapPreview">CH1→CH1 • CH2→CH2 • CH3→CH3 • CH4→CH4 • … • CH14→CH14</div></div></div>
         </section>
 
         <section class="screen-view" data-view="EFFECT">
@@ -114,8 +117,8 @@
     <div class="phones-card">🎧 <b>PHONES</b><div class="phone-knob"></div><span>●</span></div>
   </aside>
 
-  <!-- 5. EFFECT PROCESSOR (DIWASPADAI: Harus di dalam <main class="console">) -->
-  <div class="fx-rack fx-rack-live">
+  <!-- 5. EFFECT PROCESSOR (Tepat berada di bawah CH 1-7) -->
+  <div class="fx-rack fx-rack-live" id="fxRack">
     <div class="rack-title">EFFECT PROCESSOR <span>PARAMETER</span></div>
     <div class="fx-toolbar"><div class="fx-display"><strong id="fxRackPreset">HALL 1</strong><small id="fxRackSummary">REVERB • TIME 2.45s • LEVEL -3.0dB</small></div><button id="fxTap" type="button">TAP</button><span id="fxBpm">120 BPM</span><button id="fxSelect" type="button">SELECT</button></div>
     <div class="fx-buttons"><button data-fx-select="FX1" class="active">FX1</button><button data-fx-select="FX2">FX2</button><button data-fx-select="AUX1">AUX1</button><button data-fx-select="AUX2">AUX2</button><button data-fx-select="AUX3">AUX3</button><button data-fx-select="AUX4">AUX4</button></div>
@@ -128,8 +131,8 @@
     <div class="fx-extra"><label>PRESET<select class="fx-preset" data-target="FX1"><option>HALL 1</option><option>ROOM</option><option>PLATE</option><option>DELAY</option><option>CHORUS</option></select></label><label>TYPE<select class="fx-type" data-target="FX1"><option>REVERB</option><option>DELAY</option><option>CHORUS</option><option>ECHO</option></select></label></div>
   </div>
 
-  <!-- 6. AUX / BUS & FX RETURN (DIWASPADAI: Harus di dalam <main class="console">) -->
-  <div class="aux-rack">
+  <!-- 6. AUX / BUS & FX RETURN (Tepat berada di bawah FX Processor) -->
+  <div class="aux-rack" id="auxRack">
     <div class="aux-unit aux-live"><b>AUX / BUS</b><div class="aux-labels"><span>AUX1</span><span>AUX2</span><span>AUX3</span><span>AUX4</span></div><div class="mini-knobs"><input class="aux-control" data-target="AUX1" type="range" min="0" max="1" step="0.01" value="0"><input class="aux-control" data-target="AUX2" type="range" min="0" max="1" step="0.01" value="0"><input class="aux-control" data-target="AUX3" type="range" min="0" max="1" step="0.01" value="0"><input class="aux-control" data-target="AUX4" type="range" min="0" max="1" step="0.01" value="0"></div><div class="aux-values"><output data-aux-value="AUX1">0%</output><output data-aux-value="AUX2">0%</output><output data-aux-value="AUX3">0%</output><output data-aux-value="AUX4">0%</output></div></div>
     <div class="aux-unit aux-live"><b>FX RETURN</b><div class="aux-labels"><span>FX1</span><span>FX2</span></div><div class="mini-knobs"><input class="aux-control" data-scope="FX_RETURN" data-target="FX1" type="range" min="0" max="1" step="0.01" value=".45"><input class="aux-control" data-scope="FX_RETURN" data-target="FX2" type="range" min="0" max="1" step="0.01" value=".45"></div><div class="aux-values"><output data-return-value="FX1">45%</output><output data-return-value="FX2">45%</output></div></div>
   </div>
@@ -158,7 +161,7 @@
     <div id="bridgeLog" class="bridge-log"><div>CONTROL → TX → ACK → FEEDBACK → UI</div></div>
   </section>
 
-  <section class="media-rack"><h2>PLAYER / RECORDER</h2><div><button>🎙<small>RECORDER</small></button><button>📁<small>FILE</small></button><button>🎵<small>MUSIC</small></button></div></section>
+  <section class="media-rack">2>PLAYER / RECORDER</h2><div><button>🎙<small>RECORDER</small></button><button>📁<small>FILE</small></button><button>🎵<small>MUSIC</small></button></div></section>
 </section>
 
 <section class="connection-test-panel sim">
@@ -174,11 +177,10 @@
 
 <footer class="status-footer"><span>CONNECTION <b id="footerConnection">● ESP32 SIMULATOR OFFLINE</b></span><span>MODE: <b>TWO-WAY SYNC</b></span><span>SYSTEM STATUS <b class="channel-count-status">14 channels READY</b></span><span>CPU: <b>18%</b></span><span>MEM: <b>42%</b></span></footer>
 
+<!-- SCRIPT FILES -->
 <script src="connection.js?v=20260903-final16"></script>
 <script src="adapters.js?v=20260902-device03"></script>
 <script src="app.js?v=20260903-final16"></script>
-<link rel="stylesheet" href="channels-new.css?v=20260902-01">
-<link rel="stylesheet" href="header-system.css?v=20260902-01">
 <script src="header-system.js?v=20260902-01"></script>
 <script src="header-controls.js?v=20260902-02"></script>
 <script src="channels-new.js?v=20260903-final16"></script>
@@ -194,33 +196,32 @@ window.initEffectEngine?.();
 setInterval(updateSkin,400); updateSkin();
 })();
 </script>
+
 <script>
-/* SINGLE SOURCE OF TRUTH: SYSTEM ON/OFF. */
+/* SINGLE SOURCE OF TRUTH: SYSTEM ON/OFF */
 (function(){
   function install(){
-    var p=document.getElementById("power");
-    if(!p)return;
-    if(!window.state) window.state={system:false,connected:false,channels:[],sim:{online:false}};
+    var p = document.getElementById("power");
+    if(!p) return;
+    if(!window.state) window.state = {system:false, connected:false, channels:[], sim:{online:false}};
+    
     function paint(){
-      var on=!!window.state.system;
-      p.textContent=on?"SYSTEM ON":"SYSTEM OFF";
-      p.classList.toggle("on",on);
-      var hs=document.getElementById("headerBridgeStatus"); if(hs)hs.textContent=window.state.connected?"BRIDGE ONLINE":on?"SYSTEM READY":"BRIDGE STANDBY";
-      var ss=document.getElementById("setupSystem"); if(ss)ss.textContent=on?"ON":"OFF";
-      var tr=document.getElementById("transportStatus"); if(tr&&!window.state.connected)tr.textContent="OFFLINE";
-      var st=document.getElementById("status"); if(st&&!window.state.connected)st.textContent="OFFLINE";
+      var on = !!window.state.system;
+      p.textContent = on ? "SYSTEM ON" : "SYSTEM OFF";
+      p.classList.toggle("on", on);
+      var hs = document.getElementById("headerBridgeStatus"); 
+      if(hs) hs.textContent = window.state.connected ? "BRIDGE ONLINE" : (on ? "SYSTEM READY" : "BRIDGE STANDBY");
     }
-    p.onclick=function(ev){
-      ev.preventDefault();
-      ev.stopPropagation();
-      window.state.system=!window.state.system;
+
+    p.addEventListener("click", function(){
+      window.state.system = !window.state.system;
       paint();
-    };
+    });
     paint();
   }
-  if(document.readyState==="loading"){
-    document.addEventListener("DOMContentLoaded",install);
-  }else{
+  if(document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", install);
+  } else {
     install();
   }
 })();
