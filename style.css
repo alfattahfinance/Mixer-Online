@@ -115,6 +115,34 @@ button[data-k="solo"].on {
 }
 
 /* ==========================================================================
+   STYLING LAMPU INDIKATOR LED CHANNEL (BARU)
+   ========================================================================== */
+.channel-led {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #1a1f24;
+  border: 1px solid #3d464e;
+  margin: 3px auto 6px auto;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.9);
+  transition: all 0.15s ease-in-out;
+}
+
+/* Lampu menyala hijau (Sinyal / Aktif) */
+.channel-led.active.green,
+.channel-led.green {
+  background: #31e66b !important;
+  box-shadow: 0 0 8px #31e66b, inset 0 1px 2px rgba(255,255,255,0.7) !important;
+}
+
+/* Lampu menyala merah (Muted / Warning) */
+.channel-led.active.red,
+.channel-led.red {
+  background: #ff3b30 !important;
+  box-shadow: 0 0 8px #ff3b30, inset 0 1px 2px rgba(255,255,255,0.7) !important;
+}
+
+/* ==========================================================================
    STYLING UI PANEL PENGUJIAN (CONNECTION / TEST PANEL)
    ========================================================================== */
 .connection-test-panel {
