@@ -1,5 +1,5 @@
 /* ==========================================================================
-   WEB AUDIO ENGINE & MUSIC PLAYER ROUTING (Full Integrated)
+   WEB AUDIO ENGINE & MUSIC PLAYER ROUTING (Full Integrated with Screen Input)
    ========================================================================== */
 (function () {
   "use strict";
@@ -100,20 +100,28 @@
     }
   };
 
-  // Fungsi untuk menghubungkan pemutar musik ke Channel 1 sebagai jalur utama
-  window.connectPlayerToChannel1 = function(audioElementOrUrl) {
+  // Fungsi untuk menghubungkan pemutar musik ke Channel tertentu
+  window.connectCustomAudioToChannel = function(chNum, url) {
     initAudioEngine();
-    if (!backgroundMusicElement) {
-      if (audioElementOrUrl instanceof HTMLAudioElement) {
-        backgroundMusicElement = audioElementOrUrl;
-      } else {
-        backgroundMusicElement = new Audio(audioElementOrUrl || "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
-        backgroundMusicElement.loop = true;
-        backgroundMusicElement.crossOrigin = "anonymous";
-      }
+    
+    // Hentikan pemutar musik sebelumnya jika ada
+    if (backgroundMusicElement) {
+      backgroundMusicElement.pause();
     }
-    window.initChannelAudioNode(1, backgroundMusicElement);
-    backgroundMusicElement.play().catch(err => console.log("Autoplay dicegah browser:", err));
+
+    backgroundMusicElement = new Audio(url);
+    backgroundMusicElement.loop = true;
+    backgroundMusicElement.crossOrigin = "anonymous";
+
+    window.initChannelAudioNode(chNum, backgroundMusicElement);
+    
+    backgroundMusicElement.play()
+      .then(() => console.log(`[AUDIO ENGINE] Berhasil memutar audio ke CH${chNum}`))
+      .catch(err => console.log("Autoplay dicegah browser, klik interaksi diperlukan:", err));
+  };
+
+  window.connectPlayerToChannel1 = function(audioElementOrUrl) {
+    window.connectCustomAudioToChannel(1, audioElementOrUrl || "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
   };
 
   // Integrasikan otomatis dengan event input slider/knob pada channel strip
@@ -155,8 +163,33 @@
     }
   }, true);
 
-  // Hubungkan tombol pemutar musik otomatis ke CH1
+  // Event Listener untuk Kotak Input URL Audio di Layar Tengah & Tombol Media Rack
   document.addEventListener("DOMContentLoaded", () => {
+    // Tombol LOAD & PLAY di layar tengah
+    const loadAudioBtn = document.getElementById("screenLoadAudioBtn");
+    const audioInputUrl = document.getElementById("screenAudioInputUrl");
+
+    if (loadAudioBtn && audioInputUrl) {
+      loadAudioBtn.addEventListener("click", () => {
+        const url = audioInputUrl.value.trim();
+        if (!url) return;
+
+        // Ambil nomor channel yang sedang aktif dari layar tengah (misal: "CH 03" -> 3)
+        let targetCh = 1;
+        const screenInputEl = document.getElementById("screenInput");
+        if (screenInputEl && screenInputEl.textContent) {
+          const matchNum = parseInt(screenInputEl.textContent.replace(/\D/g, ""), 10);
+          if (!isNaN(matchNum) && matchNum >= 1 && matchNum <= 14) {
+            targetCh = matchNum;
+          }
+        }
+
+        window.connectCustomAudioToChannel(targetCh, url);
+        console.log(`[SCREEN AUDIO] Memuat & memutar sumber audio ke jalur CH${targetCh}`);
+      });
+    }
+
+    // Tombol musik bawaan di media rack
     const musicBtn = document.querySelector(".media-rack button:nth-child(3), .player button:nth-child(2)");
     if (musicBtn) {
       musicBtn.addEventListener("click", () => {
