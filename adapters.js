@@ -441,6 +441,22 @@ window.MixerAdapters = (() => {
     },80);
   }
 
+  async function connectESP32() {
+    const result = await simulator();
+    if (result?.connected) {
+      return {
+        ok: true,
+        connected: true,
+        type: "simulator",
+        transport: "esp32",
+        name: "ESP32 SIMULATOR",
+        channels: CHANNEL_COUNT,
+        protocol: PROTOCOL
+      };
+    }
+    return { ok:false, connected:false, reason:"esp32-simulator-offline" };
+  }
+
   async function simulator() {
     if (active?.type === "simulator" && active.connected)
       return active;
@@ -566,6 +582,7 @@ window.MixerAdapters = (() => {
 
   return {
     simulator,
+    connectESP32,
     disconnect,
     sendMapped,
     connectBluetooth,
