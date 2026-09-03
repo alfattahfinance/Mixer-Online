@@ -535,7 +535,7 @@
       esp.textContent = "CONNECTING...";
       try {
         if(!api?.connectESP32) throw new Error("ESP32 adapter tidak tersedia");
-        const result = await api.connectESP32();
+        const result = await window.MixerControl?.connectESP32?.();
         if(!result?.ok || result.connected !== true) throw new Error(result?.reason || "ESP32 bridge gagal");
 
         const live = api.status ? api.status() : result;
