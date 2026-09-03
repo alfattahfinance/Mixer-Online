@@ -1,220 +1,183 @@
-/* =========================================================
-   MIXER-ONLINE: 14 CHANNEL COMPLETE CSS
-   ========================================================= */
+/* ============================================================
+   Mixer-Online — 14CH Channel Panel & UI Stylesheet
+   ============================================================ */
 
-/* 1. LAYOUT UTAMA GRID CONSOLE */
-main.console {
-  display: grid !important;
-  /* Disesuaikan untuk 7 CH di kiri & 7 CH di kanan + Center + Master */
-  grid-template-columns: 530px 220px 530px 110px !important;
-  grid-template-rows: auto auto auto !important;
-  grid-template-areas:
-    "ch-left center ch-right master"
-    "fx      center ch-right master"
-    "aux     center ch-right master" !important;
-  gap: 16px !important;
-  width: max-content !important;
-  margin: 0 auto 20px auto !important;
-  align-items: start !important;
-  box-sizing: border-box !important;
-}
-
-/* 2. PLACEMENT AREA */
-main.console > .channel-bank-left { 
-  grid-area: ch-left !important; 
-  z-index: 1 !important;
-}
-
-main.console > .center-console { 
-  grid-area: center !important; 
-  width: 220px !important;
-  max-width: 220px !important;
-  transform: scale(0.8) !important;
-  transform-origin: top center !important;
-  z-index: 10 !important;
-}
-
-main.console > .channel-bank-right { 
-  grid-area: ch-right !important; 
-  margin-left: 10px !important;
-  z-index: 1 !important;
-}
-
-main.console > .master-rack { 
-  grid-area: master !important; 
-  z-index: 1 !important;
-}
-
-/* Rak Effect & AUX di bawah Channel Kiri */
-main.console > .fx-rack,
-main.console > .fx-rack-live {
-  grid-area: fx !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  z-index: 2 !important;
-  margin-top: 8px !important;
-}
-
-main.console > .aux-rack {
-  grid-area: aux !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  z-index: 2 !important;
-  margin-top: 8px !important;
-}
-
-/* 3. WADAH CHANNEL BANK */
-.channel-bank {
-  display: flex !important;
-  flex-direction: column !important;
-  background: #111518 !important;
-  border: 1px solid #2a3036 !important;
-  border-radius: 8px !important;
-  padding: 8px !important;
-  box-sizing: border-box !important;
-}
-
-.bank-title {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  height: 24px !important;
-  margin-bottom: 6px !important;
-  border-bottom: 1px solid #2a3036 !important;
-  color: #00e5ff !important;
-  font-weight: bold !important;
-  font-size: 12px !important;
-}
-
-/* 4. CONTAINER FOR 7 CHANNELS PER BANK */
+/* --- Container Layout Utama --- */
 #channels, 
 #channelsRight {
-  display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: nowrap !important;
-  justify-content: space-between !important;
-  align-items: stretch !important;
-  width: 100% !important;
-  gap: 5px !important;
-  box-sizing: border-box !important;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 8px;
+  align-items: stretch;
+  overflow-x: auto;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
-/* 5. STRIP CHANNEL INDIVIDUAL FOR 14 CH LAYOUT */
+/* Sembunyikan container channel saat berada di tab non-channel (misal: FX, MASTER) */
+.tab-hidden {
+  display: none !important;
+}
+
+/* --- Card Channel Strip --- */
 .new-channel-strip {
-  display: flex !important;
-  flex-direction: column !important;
-  flex: 1 1 0px !important;
-  width: 70px !important;
-  min-width: 62px !important;
-  height: 570px !important;
-  background: #181d22 !important;
-  border: 1px solid #262c33 !important;
-  border-radius: 6px !important;
-  padding: 6px 2px !important;
-  box-sizing: border-box !important;
-  justify-content: space-between !important;
-  align-items: center !important;
+  position: relative; /* Penting: Mengunci posisi tombol & footer di dalam kartu */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 90px;
+  min-width: 90px;
+  background-color: #12181f;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  padding: 8px 4px;
+  box-sizing: border-box;
+  color: #e2e8f0;
+  font-family: system-ui, -apple-system, sans-serif;
+  user-select: none;
 }
 
+/* Header Channel */
 .new-channel-head {
-  font-size: 11px !important;
-  font-weight: bold !important;
-  color: #00e5ff !important;
-  background: #090b0c !important;
-  width: 100% !important;
-  text-align: center !important;
-  padding: 3px 0 !important;
-  border-radius: 3px !important;
+  text-align: center;
+  font-weight: bold;
+  font-size: 13px;
+  color: #38bdf8;
+  margin-bottom: 6px;
+  border-bottom: 1px solid #1e293b;
+  padding-bottom: 4px;
 }
 
-/* Control knob (GAIN, HIGH, MID, LOW, PAN) */
+/* LED Meter */
+.new-channel-meter {
+  height: 10px;
+  background: #0f172a;
+  border-radius: 3px;
+  margin-bottom: 8px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 0 2px;
+}
+
+.led-segments {
+  display: flex;
+  width: 100%;
+  gap: 1px;
+}
+
+.led-segments i {
+  flex: 1;
+  height: 6px;
+  background-color: #334155;
+  border-radius: 1px;
+}
+
+/* Control Sliders / Knobs (Gain, EQ, Pan) */
 .new-channel-control {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  width: 100% !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 6px;
 }
 
 .new-channel-control label {
-  font-size: 8px !important;
-  color: #8a99a8 !important;
-  margin-bottom: 1px !important;
+  font-size: 9px;
+  color: #94a3b8;
+  font-weight: 600;
+  margin-bottom: 2px;
 }
 
 .new-knob {
-  width: 85% !important;
-  height: 10px !important;
-  accent-color: #00e5ff !important;
-  cursor: pointer !important;
+  width: 100%;
+  height: 4px;
+  accent-color: #38bdf8;
+  cursor: pointer;
 }
 
-/* Fader Volume Container */
+/* Fader Volume Utama */
 .new-channel-fader {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  width: 100% !important;
-  flex-grow: 1 !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: auto;
+  margin-bottom: 8px;
 }
 
 .new-channel-fader label {
-  font-size: 8px !important;
-  color: #8a99a8 !important;
+  font-size: 9px;
+  color: #94a3b8;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.new-fader {
+  writing-mode: bt-lr; /* Chrome/Safari vertical slider */
+  appearance: slider-vertical;
+  width: 16px;
+  height: 120px;
+  accent-color: #0ea5e9;
+  cursor: pointer;
 }
 
 .new-channel-fader output {
-  font-size: 10px !important;
-  color: #fff !important;
-  font-weight: bold !important;
+  font-size: 10px;
+  font-weight: bold;
+  color: #38bdf8;
+  margin-top: 4px;
 }
 
-/* SLIDER VOLUME VERTIKAL (BAWAH = 0%, ATAS = 100%) */
-.new-fader,
-.new-channel-fader input[type="range"] {
-  -webkit-appearance: slider-vertical !important;
-  writing-mode: bt-lr !important;
-  writing-mode: vertical-lr !important;
-  direction: rtl !important; /* Membalik orientasi slider */
-  width: 22px !important;
-  height: 150px !important;
-  min-height: 130px !important;
-  margin: 4px 0 !important;
-  cursor: pointer !important;
-  accent-color: #00e5ff !important;
-}
-
-/* Buttons (MUTE / SOLO) */
+/* Tombol Mute & Solo */
 .new-channel-buttons {
-  display: flex !direction: column !important;
-  gap: 3px !important;
-  width: 90% !important;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 6px;
+  width: 100%;
 }
 
 .new-channel-buttons button {
-  width: 100% !important;
-  font-size: 9px !important;
-  font-weight: bold !important;
-  padding: 3px 0 !important;
-  background: #252d35 !important;
-  color: #fff !important;
-  border: 1px solid #3a444f !important;
-  border-radius: 3px !important;
-  cursor: pointer !important;
+  width: 100%;
+  padding: 4px 0;
+  font-size: 10px;
+  font-weight: bold;
+  border: 1px solid #334155;
+  border-radius: 4px;
+  background-color: #1e293b;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-.new-channel-buttons button.on[data-k="mute"] {
-  background: #d32f2f !important;
-  border-color: #f44336 !important;
+.new-channel-buttons button:hover {
+  background-color: #334155;
 }
 
-.new-channel-buttons button.on[data-k="solo"] {
-  background: #f57c00 !important;
-  border-color: #ff9800 !important;
+/* State Aktif Tombol Mute & Solo */
+.new-channel-buttons button[data-k="mute"].on {
+  background-color: #ef4444;
+  color: #ffffff;
+  border-color: #dc2626;
 }
 
+.new-channel-buttons button[data-k="solo"].on {
+  background-color: #eab308;
+  color: #000000;
+  border-color: #ca8a04;
+}
+
+/* Footer Status Channel */
 .new-channel-source {
-  font-size: 8px !important;
-  color: #5a6978 !important;
-  text-align: center !important;
+  font-size: 9px;
+  text-align: center;
+  color: #64748b;
+  border-top: 1px solid #1e293b;
+  padding-top: 4px;
+  text-transform: uppercase;
+}
+
+.new-channel-source span {
+  color: #22c55e;
+  font-weight: 600;
 }
