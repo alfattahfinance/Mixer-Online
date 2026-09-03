@@ -550,13 +550,9 @@
            If the connection layer is not yet exposed, use the same adapter
            through its public API instead of leaving the button dead. */
         var control = window.MixerControl;
-        var result = control?.connectESP32
-          ? await control.connectESP32()
-          : await api.connectESP32({systemOn:true});
-        if(!result?.ok || result.connected !== true){
-          var direct = await api.connectESP32({systemOn:true});
-          if(direct?.ok && direct.connected === true) result = direct;
-        }
+        if(!control?.connectESP32) throw new Error("MixerControl belum siap");
+        /* SINGLE PATH: UI -> MixerControl -> MixerAdapters. */
+        var result = await control.connectESP32();
         if(!result?.ok || result.connected !== true) throw new Error(result?.reason || "ESP32 bridge gagal");
 
         const live = api.active?.connected ? api.active : result;
