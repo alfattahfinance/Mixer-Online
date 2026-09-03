@@ -1,85 +1,174 @@
-/* Mixer-Online — FINAL large-screen layout skin only.
-   Channel/engine logic remains in app.js + channels-new.js. */
+/* Mixer-Online — FINAL 14CH Large-Screen Layout Skin */
 
-@media (min-width:700px){
-  html,body{min-width:0!important;overflow-x:auto!important}
-
-  /* Main row: CH1-8 | SCREEN | CH9-16 | MASTER */
-  main.console{
-    position:relative!important;
-    display:grid!important;
-    grid-template-columns:632px 360px 632px 125px!important;
-    grid-template-rows:700px auto!important;
-    grid-template-areas:"left center right master" "lower lower lower lower"!important;
-    gap:7px!important;
-    width:max-content!important;
-    min-width:100%!important;
-    padding:7px 7px 340px!important;
-    box-sizing:border-box!important;
-    align-items:start!important;
+@media (min-width: 700px) {
+  html, body {
+    min-width: 0 !important;
+    overflow-x: auto !important;
   }
 
-  main.console>.channel-bank-left{grid-area:left!important;grid-column:1!important;grid-row:1!important;width:632px!important;min-width:632px!important;margin:0!important}
-  main.console>.center-console{grid-area:center!important;grid-column:2!important;grid-row:1!important;width:360px!important;min-width:360px!important;max-width:360px!important;margin:0!important;padding:5px!important;box-sizing:border-box!important}
-  main.console>.channel-bank-right{grid-area:right!important;grid-column:3!important;grid-row:1!important;width:632px!important;min-width:632px!important;margin:0!important}
-  main.console>.master-rack{grid-area:master!important;grid-column:4!important;grid-row:1!important;width:125px!important;min-width:125px!important;margin:0!important}
-
-  .channel-bank-left>#channels,
-  .channel-bank-right>#channelsRight{
-    display:grid!important;
-    grid-template-columns:repeat(8,78px)!important;
-    grid-template-rows:690px!important;
-    grid-auto-flow:column!important;
-    gap:2px!important;
-    width:632px!important;
-    min-width:632px!important;
-    height:696px!important;
-    padding:3px!important;
-    overflow:hidden!important;
-    box-sizing:border-box!important;
-    direction:ltr!important;
+  /* Main row: CH1-7 (558px) | SCREEN (360px) | CH8-14 (558px) | MASTER (125px) */
+  main.console {
+    position: relative !important;
+    display: grid !important;
+    grid-template-columns: 558px 360px 558px 125px !important;
+    grid-template-rows: 700px auto !important;
+    grid-template-areas: 
+      "left center right master"
+      "lower lower lower lower" !important;
+    gap: 10px !important;
+    width: max-content !important;
+    min-width: 100% !important;
+    padding: 10px 10px 40px !important;
+    box-sizing: border-box !important;
+    align-items: start !important;
   }
 
-  .channel-bank-left>#channels>.new-channel-strip,
-  .channel-bank-right>#channelsRight>.new-channel-strip{
-    display:flex!important;visibility:visible!important;opacity:1!important;
-    grid-row:1!important;grid-column:auto!important;
-    width:78px!important;min-width:78px!important;max-width:78px!important;
-    height:690px!important;min-height:690px!important;
-    margin:0!important;padding:5px 2px!important;
-    position:relative!important;top:0!important;bottom:auto!important;left:auto!important;right:auto!important;
-    transform:none!important;box-sizing:border-box!important;
+  main.console > .channel-bank-left {
+    grid-area: left !important;
+    width: 558px !important;
+    min-width: 558px !important;
+    margin: 0 !important;
+  }
+  main.console > .center-console {
+    grid-area: center !important;
+    width: 360px !important;
+    min-width: 360px !important;
+    max-width: 360px !important;
+    margin: 0 !important;
+    padding: 5px !important;
+    box-sizing: border-box !important;
+  }
+  main.console > .channel-bank-right {
+    grid-area: right !important;
+    width: 558px !important;
+    min-width: 558px !important;
+    margin: 0 !important;
+  }
+  main.console > .master-rack {
+    grid-area: master !important;
+    width: 125px !important;
+    min-width: 125px !important;
+    margin: 0 !important;
   }
 
-  /* Lower control row. The blocks remain functionally unchanged. */
-  main.console>.center-console>.fx-rack-live{
-    position:absolute!important;
-    top:710px!important;left:7px!important;
-    width:850px!important;max-width:850px!important;
-    margin:0!important;z-index:2!important;
-  }
-  main.console>.center-console>.aux-rack{
-    position:absolute!important;
-    top:710px!important;right:7px!important;
-    width:400px!important;max-width:400px!important;
-    margin:0!important;z-index:2!important;
-    display:grid!important;grid-template-columns:1fr 1fr!important;
-    gap:8px!important;box-sizing:border-box!important;
+  /* Bank Container: 7 Channel Strip @ 78px + Gap 2px = 558px */
+  .channel-bank-left > #channels,
+  .channel-bank-right > #channelsRight {
+    display: grid !important;
+    grid-template-columns: repeat(7, 78px) !important;
+    grid-template-rows: 690px !important;
+    grid-auto-flow: column !important;
+    gap: 2px !important;
+    width: 558px !important;
+    min-width: 558px !important;
+    height: 696px !important;
+    padding: 3px !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    direction: ltr !important;
   }
 
-  .fx-rack-live,.aux-rack,.aux-unit{box-sizing:border-box!important}
-  .fx-rack-live{min-height:150px!important}
-  .aux-unit{min-height:120px!important}
+  .channel-bank-left > #channels > .new-channel-strip,
+  .channel-bank-right > #channelsRight > .new-channel-strip {
+    display: flex !important;
+    flex-direction: column !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    grid-row: 1 !important;
+    width: 78px !important;
+    min-width: 78px !important;
+    max-width: 78px !important;
+    height: 690px !important;
+    min-height: 690px !important;
+    margin: 0 !important;
+    padding: 6px 3px !important;
+    position: relative !important;
+    transform: none !important;
+    box-sizing: border-box !important;
+    pointer-events: auto !important;
+  }
 
-  /* Never show old CH17/18 strips. */
+  /* Memastikan Fader Vertikal & Knob Mudah Ditarik/Digeser */
+  .new-channel-strip input[type="range"] {
+    touch-action: none !important;
+    cursor: pointer !important;
+  }
+
+  .new-channel-fader input[type="range"] {
+    writing-mode: bt-lr; /* IE/Edge */
+    -webkit-appearance: slider-vertical; /* Webkit */
+    width: 100% !important;
+    height: 180px !important;
+  }
+
+  /* Lower Control Row (FX Rack & AUX Rack) */
+  main.console > .center-console > .fx-rack-live {
+    position: absolute !important;
+    top: 715px !important;
+    left: 10px !important;
+    width: 800px !important;
+    max-width: 800px !important;
+    margin: 0 !important;
+    z-index: 2 !important;
+  }
+
+  main.console > .center-console > .aux-rack {
+    position: absolute !important;
+    top: 715px !important;
+    right: 10px !important;
+    width: 400px !important;
+    max-width: 400px !important;
+    margin: 0 !important;
+    z-index: 2 !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    box-sizing: border-box !important;
+  }
+
+  .fx-rack-live, .aux-rack, .aux-unit {
+    box-sizing: border-box !important;
+  }
+  .fx-rack-live { min-height: 150px !important; }
+  .aux-unit { min-height: 120px !important; }
+
+  /* Sembunyikan elemen lama CH17/CH18 jika ada */
   .channel-bank .channel[data-ch="17"],
-  .channel-bank .channel[data-ch="18"]{display:none!important}
+  .channel-bank .channel[data-ch="18"] {
+    display: none !important;
+  }
 }
 
-@media (min-width:700px) and (max-width:1300px){
-  main.console{width:1766px!important;min-width:1766px!important}
+@media (min-width: 700px) and (max-width: 1600px) {
+  main.console {
+    width: 1611px !important;
+    min-width: 1611px !important;
+  }
 }
 
-@media (max-width:699px){
-  .channel-bank-left,.channel-bank-right{width:100%!important;overflow-x:auto!important}
+/* Fallback Tampilan Mobile (< 699px) */
+@media (max-width: 699px) {
+  main.console {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    padding: 10px !important;
+  }
+
+  .channel-bank-left, .channel-bank-right {
+    width: 100% !important;
+    overflow-x: auto !important;
+  }
+
+  .channel-bank-left > #channels,
+  .channel-bank-right > #channelsRight {
+    display: flex !important;
+    width: max-content !important;
+    height: auto !important;
+  }
+
+  .new-channel-strip {
+    min-width: 80px !important;
+    height: 550px !important;
+  }
 }
