@@ -56,17 +56,14 @@
       </div>
       
       <div class="screen-content" id="screenContent">
-        <!-- VIEW: HOME / CHANNEL STRIP OVERVIEW -->
         <section class="screen-view active" data-view="HOME">
           <div class="pro-digital-screen">
-            <!-- Top Channel Banner -->
             <div class="pro-screen-top-bar">
               <div class="pro-ch-badge"><b id="screenInput">CH 01</b><span>MIC / LINE</span></div>
               <div class="pro-ch-title-edit"><input type="text" id="screenChannelName" value="VOCAL MAIN" placeholder="Channel Name"></div>
               <div class="pro-ch-status-badges"><span id="screenStatusBadge" class="badge-ready">READY</span><span class="badge-phantom">+48V</span></div>
             </div>
 
-            <!-- Center Processing Blocks (Preamp, EQ, Dynamics, Fader Readout) -->
             <div class="pro-processing-grid">
               <div class="pro-block">
                 <span class="block-title">PREAMP / GAIN</span>
@@ -90,7 +87,6 @@
               </div>
             </div>
 
-            <!-- Mini RTA / Spectrum Analyzer Simulation -->
             <div class="pro-mini-spectrum" id="visualMeter">
               <div class="spectrum-bars-container">
                 <div class="bar-col" style="height: 60%"></div>
@@ -107,7 +103,6 @@
           </div>
         </section>
 
-        <!-- VIEW: METER -->
         <section class="screen-view" data-view="METER">
           <div class="pro-screen-grid">
             <div class="screen-big-meter">
@@ -123,7 +118,6 @@
           </div>
         </section>
 
-        <!-- VIEW: RTA -->
         <section class="screen-view" data-view="RTA">
           <div class="rta-display">
             <div class="rta-grid"></div>
@@ -132,7 +126,6 @@
           </div>
         </section>
 
-        <!-- VIEW: SETUP -->
         <section class="screen-view" data-view="SETUP">
           <div class="setup-screen">
             <b>CONSOLE SYSTEM SETUP</b>
@@ -162,7 +155,6 @@
           </div>
         </section>
 
-        <!-- VIEW: EFFECT -->
         <section class="screen-view" data-view="EFFECT">
           <div class="effect-screen effect-screen-live">
             <div class="fx-screen-select">
@@ -179,7 +171,6 @@
           </div>
         </section>
 
-        <!-- VIEW: SCENE -->
         <section class="screen-view" data-view="SCENE">
           <div class="scene-screen">
             <b>SCENE MANAGER</b><strong id="sceneName">DEFAULT</strong>
@@ -190,9 +181,8 @@
       </div>
     </div>
 
-    <!-- PLAYER / RECORDER SEKARANG BERADA TEPAT DI BAWAH SCREEN MIXER -->
-        <section class="media-rack" style="margin-top: 6px;">
-      <h2>PLAYER / RECORDER</h2>
+    <section class="media-rack" style="margin-top: 6px;">
+      <h2>PLAYER / RECORDER <span id="activePlayerTarget" style="font-size: 9px; color: #00f0ff; float: right;">[CH 1]</span></h2>
       <div style="display: flex; gap: 4px;">
         <button id="btnPlayerRec" type="button" style="flex: 1;">🎙<small>RECORDER</small></button>
         <button id="btnPlayerFile" type="button" style="flex: 1;">📁<small>FILE</small></button>
@@ -200,7 +190,7 @@
       </div>
       <input type="file" id="localAudioLoader" accept="audio/*" style="display: none;">
     </section>
-
+  </section>
 
   <section class="channel-bank channel-bank-right">
     <div class="bank-title"><span>INPUT CHANNELS 8–14</span><small>CH8–CH14</small></div>
@@ -654,33 +644,42 @@
   const musicBtn = document.getElementById('btnPlayerMusic');
   const fileBtn = document.getElementById('btnPlayerFile');
   const fileInput = document.getElementById('localAudioLoader');
+  const targetLabel = document.getElementById('activePlayerTarget');
 
-  // Ketika tombol MUSIC atau FILE diklik, buka jendela pilih file dari perangkat/SD Card
+  // Sinkronisasi indikator channel aktif secara real-time
+  setInterval(() => {
+    const activeInput = document.getElementById('screenInput');
+    if(activeInput && targetLabel) {
+      targetLabel.textContent = "[" + activeInput.textContent.trim() + "]";
+    }
+  }, 300);
+
+  // Klik tombol MUSIC atau FILE akan membuka dialog pemilihan file dari perangkat
   if(musicBtn) musicBtn.addEventListener('click', () => fileInput?.click());
   if(fileBtn) fileBtn.addEventListener('click', () => fileInput?.click());
 
-  // Saat file audio dipilih dari HP/penyimpanan
+  // Saat file audio dipilih dari penyimpanan HP/perangkat
   if(fileInput) {
     fileInput.addEventListener('change', function(e) {
       const file = e.target.files[0];
       if(!file) return;
       
       const fileObjectURL = URL.createObjectURL(file);
-      console.log("[AUDIO PLAYER] File lokal dimuat:", file.name);
+      const currentChannel = document.getElementById('screenInput')?.textContent || "CH 1";
+      
+      console.log(`[AUDIO PLAYER] Memutar ${file.name} dialirkan ke jalur ${currentChannel}`);
 
-      // Salurkan langsung ke audio engine atau elemen pemutar mixer
+      // Salurkan langsung ke audio engine mixer online
       if(window.MixerAudioEngine && typeof window.MixerAudioEngine.loadAndPlay === 'function') {
-        window.MixerAudioEngine.loadAndPlay(fileObjectURL);
+        window.MixerAudioEngine.loadAndPlay(fileObjectURL, currentChannel);
       } else {
-        // Fallback: Kirim sinyal ke sistem state bahwa audio aktif
         const tr = document.getElementById('testResult');
-        if(tr) tr.textContent = "PLAYER: Memutar " + file.name + " (Masuk ke Mixer Pipeline)";
+        if(tr) tr.textContent = `PLAYER: Memutar ${file.name} ke ${currentChannel} (Active Pipeline)`;
       }
     });
   }
 })();
 </script>
 
-  
 </body>
 </html>
