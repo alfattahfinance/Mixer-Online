@@ -418,6 +418,65 @@
       if(hs) hs.textContent = window.state.connected ? "BRIDGE ONLINE" : (on ? "SYSTEM READY" : "BRIDGE STANDBY");
     }
 
+    var esp = document.getElementById("connectEsp");
+    var bt = document.getElementById("connectBluetooth");
+
+    function paintConnection(st){
+      if(!window.state) window.state = {system:false, connected:false, channels:[], sim:{online:false}};
+      var connected = !!st?.connected;
+      window.state.connected = connected;
+      window.state.sim = window.state.sim || {};
+      window.state.sim.online = connected && st?.type === "simulator";
+      var status = document.getElementById("status");
+      var lamp = document.getElementById("statusLamp");
+      if(status) status.textContent = connected ? "ONLINE" : "OFFLINE";
+      if(lamp) lamp.classList.toggle("on", connected);
+      if(esp){
+        esp.textContent = connected && st?.type === "simulator" ? "ESP32 CONNECTED" : "CONNECT ESP32";
+        esp.classList.toggle("on", connected && st?.type === "simulator");
+      }
+      paint();
+    }
+
+    if(window.MixerAdapters?.onStatus) window.MixerAdapters.onStatus(paintConnection);
+
+    if(esp) esp.addEventListener("click", async function(e){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      if(window.MixerAdapters?.active?.connected && window.MixerAdapters.active?.type === "simulator"){
+        window.MixerAdapters.disconnect();
+        return;
+      }
+      esp.disabled = true;
+      esp.textContent = "CONNECTING...";
+      try {
+        const result = await window.MixerAdapters?.simulator?.();
+        if(!result?.connected) throw new Error("ESP32 simulator gagal terhubung");
+        paintConnection(window.MixerAdapters.status ? window.MixerAdapters.status() : {connected:true,type:"simulator"});
+      } catch(error) {
+        esp.textContent = "CONNECT ESP32";
+        var status = document.getElementById("status");
+        if(status) status.textContent = "OFFLINE";
+      } finally {
+        esp.disabled = false;
+      }
+    });
+
+    if(bt) bt.addEventListener("click", async function(e){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      bt.disabled = true;
+      try {
+        const result = await window.MixerAdapters?.connectBluetooth?.();
+        if(!result?.ok){
+          var status = document.getElementById("status");
+          if(status) status.textContent = "OFFLINE";
+        }
+      } finally {
+        bt.disabled = false;
+      }
+    });
+
     p.addEventListener("click", function(){
       window.state.system = !window.state.system;
       paint();
