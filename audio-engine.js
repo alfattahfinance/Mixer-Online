@@ -29,12 +29,13 @@
       } else if (mediaStreamOrElement instanceof HTMLMediaElement) {
         sourceNode = audioCtx.createMediaElementSource(mediaStreamOrElement);
       } else {
-        // Jika belum ada sumber audio fisik, buat oscillator/buffer kosong sebagai simulasi/line-in
-        sourceNode = audioCtx.createGain(); // Placeholder
+        // Jika belum ada sumber audio fisik, buat gain node kosong sebagai placeholder
+        sourceNode = audioCtx.createGain();
       }
 
       // Buat pemrosesan efek per channel: Gain -> EQ (Low/High) -> Panner -> Fader Volume -> Master Out
       const gainNode = audioCtx.createGain();
+      
       const lowBq = audioCtx.createBiquadFilter();
       lowBq.type = "lowshelf";
       lowBq.frequency.value = 250;
@@ -82,7 +83,7 @@
 
     try {
       if (param === "fader") {
-        // Konversi persentase fader (0 - 100) ke skala gain audio (0.0 - 1.0) secara logarithmic/linear
+        // Konversi persentase fader (0 - 100) ke skala gain audio (0.0 - 1.0)
         nodes.fader.gain.setTargetAtTime(Math.max(0, Math.min(1, val / 100)), audioCtx.currentTime, 0.02);
       } else if (param === "gain") {
         nodes.gain.gain.setTargetAtTime(Math.max(0.1, val), audioCtx.currentTime, 0.02);
@@ -114,7 +115,6 @@
 
     if (!isNaN(chNum) && !isNaN(val)) {
       initAudioEngine();
-      // Jika node audio belum dibuat untuk channel ini, buat node default
       if (!channelNodes[chNum]) {
         window.initChannelAudioNode(chNum, null);
       }
