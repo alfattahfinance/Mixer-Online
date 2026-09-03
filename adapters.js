@@ -78,8 +78,8 @@ window.MixerAdapters = (() => {
   function status() {
     if (!active) {
       return {
-        connected: false, type: "none", transport: "none",
-        name: "OFFLINE", protocol: "none", pending: 0,
+        connected: false, type: "simulator", transport: "esp32",
+        name: "ESP32 SIMULATOR", protocol: PROTOCOL, channels: CHANNEL_COUNT, pending: 0,
         lastTx: null, lastRx: null, lastAck: null, lastError: null
       };
     }
@@ -441,7 +441,9 @@ window.MixerAdapters = (() => {
     },80);
   }
 
-  async function connectESP32() {
+  async function connectESP32(options = {}) {
+    const systemOn = options.systemOn ?? !!window.state?.system;
+    if (!systemOn) return { ok:false, connected:false, reason:"SYSTEM_OFF", type:"simulator", transport:"esp32", protocol:PROTOCOL, channels:CHANNEL_COUNT };
     if (active?.type === "simulator" && active.connected) return {
       ok:true, connected:true, type:"simulator", transport:"esp32",
       name:"ESP32 SIMULATOR", channels:CHANNEL_COUNT, protocol:PROTOCOL
