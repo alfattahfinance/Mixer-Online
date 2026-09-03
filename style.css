@@ -16,7 +16,7 @@ main.console {
   clear: both !important;
 }
 
-/* MENETRALISIR STYLING LAMA PADA MINGGIRAN / PENAKARAN */
+/* MENETRALISIR STYLING LAMA PADA ELEMEN RACK */
 main.console > * {
   position: relative !important;
   top: auto !important;
@@ -64,7 +64,7 @@ main.console > .aux-rack {
 }
 
 /* ==========================================================================
-   STYLING FADER & KONTROL CHANNEL (AGAR BISA BERGERAK VISUALNYA)
+   STYLING FADER & KONTROL CHANNEL (AGAR INTERAKTIF & RESPONSIF)
    ========================================================================== */
 .new-channel-strip {
   display: flex;
@@ -77,28 +77,38 @@ main.console > .aux-rack {
   box-sizing: border-box;
 }
 
-/* Slider Fader Vertikal */
+/* Slider Fader Vertikal (Diperbaiki Selektor .new-fader & .fader) */
+.new-channel-strip input[type="range"].new-fader,
 .new-channel-strip input[type="range"].fader,
 .master-card input[type="range"] {
   -webkit-appearance: slider-vertical;
-  writing-mode: bt-lr;
+  writing-mode: bt-lr; /* IE/Edge fallback */
   width: 24px;
   height: 180px;
   background: #080a0b;
   outline: none;
   cursor: pointer;
-  /* Transisi halus saat nilai diubah via JS/Test */
-  transition: value 0.1s ease, transform 0.05s ease;
+  touch-action: none !important; /* Mencegah layar ikut ter-scroll saat geser fader di HP */
 }
 
-/* Mute & Solo Button Active State */
-.btn-mute.active {
+/* Styling Knob Range Input */
+.new-channel-strip input[type="range"].new-knob {
+  touch-action: none !important;
+  cursor: pointer;
+}
+
+/* Mute & Solo Button Active State (Satu standar dengan class .active & .on) */
+.btn-mute.active,
+.btn-mute.on,
+button[data-k="mute"].on {
   background-color: #e74c3c !important;
   color: #fff !important;
   box-shadow: 0 0 8px rgba(231, 76, 60, 0.8);
 }
 
-.btn-solo.active {
+.btn-solo.active,
+.btn-solo.on,
+button[data-k="solo"].on {
   background-color: #f1c40f !important;
   color: #000 !important;
   box-shadow: 0 0 8px rgba(241, 196, 15, 0.8);
@@ -143,7 +153,7 @@ main.console > .aux-rack {
   font-weight: bold;
   border-radius: 4px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
 }
 
 .connection-test-panel button:hover {
@@ -155,6 +165,12 @@ main.console > .aux-rack {
 .connection-test-panel button:active {
   transform: scale(0.98);
   background: #1f6feb;
+}
+
+.connection-test-panel button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .connection-test-panel pre {
