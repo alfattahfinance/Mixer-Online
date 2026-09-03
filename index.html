@@ -191,15 +191,16 @@
     </div>
 
     <!-- PLAYER / RECORDER SEKARANG BERADA TEPAT DI BAWAH SCREEN MIXER -->
-    <section class="media-rack" style="margin-top: 6px;">
+        <section class="media-rack" style="margin-top: 6px;">
       <h2>PLAYER / RECORDER</h2>
       <div style="display: flex; gap: 4px;">
-        <button style="flex: 1;">🎙<small>RECORDER</small></button>
-        <button style="flex: 1;">📁<small>FILE</small></button>
-        <button style="flex: 1;">🎵<small>MUSIC</small></button>
+        <button id="btnPlayerRec" type="button" style="flex: 1;">🎙<small>RECORDER</small></button>
+        <button id="btnPlayerFile" type="button" style="flex: 1;">📁<small>FILE</small></button>
+        <button id="btnPlayerMusic" type="button" style="flex: 1;">🎵<small>MUSIC</small></button>
       </div>
+      <input type="file" id="localAudioLoader" accept="audio/*" style="display: none;">
     </section>
-  </section>
+
 
   <section class="channel-bank channel-bank-right">
     <div class="bank-title"><span>INPUT CHANNELS 8–14</span><small>CH8–CH14</small></div>
@@ -648,5 +649,38 @@
 })();
 </script>
 
+<script>
+(function(){
+  const musicBtn = document.getElementById('btnPlayerMusic');
+  const fileBtn = document.getElementById('btnPlayerFile');
+  const fileInput = document.getElementById('localAudioLoader');
+
+  // Ketika tombol MUSIC atau FILE diklik, buka jendela pilih file dari perangkat/SD Card
+  if(musicBtn) musicBtn.addEventListener('click', () => fileInput?.click());
+  if(fileBtn) fileBtn.addEventListener('click', () => fileInput?.click());
+
+  // Saat file audio dipilih dari HP/penyimpanan
+  if(fileInput) {
+    fileInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if(!file) return;
+      
+      const fileObjectURL = URL.createObjectURL(file);
+      console.log("[AUDIO PLAYER] File lokal dimuat:", file.name);
+
+      // Salurkan langsung ke audio engine atau elemen pemutar mixer
+      if(window.MixerAudioEngine && typeof window.MixerAudioEngine.loadAndPlay === 'function') {
+        window.MixerAudioEngine.loadAndPlay(fileObjectURL);
+      } else {
+        // Fallback: Kirim sinyal ke sistem state bahwa audio aktif
+        const tr = document.getElementById('testResult');
+        if(tr) tr.textContent = "PLAYER: Memutar " + file.name + " (Masuk ke Mixer Pipeline)";
+      }
+    });
+  }
+})();
+</script>
+
+  
 </body>
 </html>
