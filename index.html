@@ -6,7 +6,6 @@
 <meta name="theme-color" content="#090b0c">
 <title>MIXER-ONLINE • 14CH Digital Mixer</title>
 
-<!-- PEMANGGILAN SELURUH CSS DI HEAD AGAR RENDER CEPAT DAN STABIL -->
 <link rel="stylesheet" href="style.css?v=20260903-layout-final">
 <link rel="stylesheet" href="channel-skin.css?v=20260902-01">
 <link rel="stylesheet" href="header-system.css?v=20260902-01">
@@ -14,7 +13,6 @@
 </head>
 <body>
 
-<!-- TOP HEADER BAR -->
 <header class="topbar">
   <div class="brand"><b>MIXER-ONLINE</b><span>14CH DIGITAL MIXER</span></div>
   <div class="system-box">
@@ -39,15 +37,12 @@
   <div class="clock-head"><span class="box-title">TIME</span><strong id="clock">--:--:--</strong><small>LIVE MIXER</small></div>
 </header>
 
-<!-- MAIN CONSOLE GRID LAYOUT -->
 <main class="console">
-  <!-- 1. INPUT CHANNELS 1–7 (KIRI) -->
   <section class="channel-bank channel-bank-left">
     <div class="bank-title"><span>INPUT CHANNELS 1–7</span><small>CH1–CH7</small></div>
     <div id="channels"></div>
   </section>
 
-  <!-- 2. CENTER CONSOLE / DISPLAY SCREEN -->
   <section class="center-console">
     <div class="screen-frame">
       <div class="screen-title"><b>MIXER-ONLINE</b><span>14CH DIGITAL MIXER</span></div>
@@ -60,7 +55,6 @@
         <button data-screen="SCENE">SCENE</button>
       </div>
       <div class="screen-content" id="screenContent">
-        <!-- SCREEN VIEW: HOME -->
         <section class="screen-view active" data-view="HOME">
           <div class="screen-dashboard">
             <div class="spectrum" id="visualMeter">
@@ -85,7 +79,6 @@
           </div>
         </section>
 
-        <!-- SCREEN VIEW: METER -->
         <section class="screen-view" data-view="METER">
           <div class="pro-screen-grid">
             <div class="screen-big-meter">
@@ -101,7 +94,6 @@
           </div>
         </section>
 
-        <!-- SCREEN VIEW: RTA -->
         <section class="screen-view" data-view="RTA">
           <div class="rta-display">
             <div class="rta-grid"></div>
@@ -110,7 +102,6 @@
           </div>
         </section>
 
-        <!-- SCREEN VIEW: SETUP -->
         <section class="screen-view" data-view="SETUP">
           <div class="setup-screen">
             <b>SYSTEM SETUP</b>
@@ -140,7 +131,6 @@
           </div>
         </section>
 
-        <!-- SCREEN VIEW: EFFECT -->
         <section class="screen-view" data-view="EFFECT">
           <div class="effect-screen effect-screen-live">
             <div class="fx-screen-select">
@@ -157,7 +147,6 @@
           </div>
         </section>
 
-        <!-- SCREEN VIEW: SCENE -->
         <section class="screen-view" data-view="SCENE">
           <div class="scene-screen">
             <b>SCENE MANAGER</b><strong id="sceneName">DEFAULT</strong>
@@ -169,13 +158,11 @@
     </div>
   </section>
 
-  <!-- 3. INPUT CHANNELS 8–14 (KANAN) -->
   <section class="channel-bank channel-bank-right">
     <div class="bank-title"><span>INPUT CHANNELS 8–14</span><small>CH8–CH14</small></div>
     <div id="channelsRight"></div>
   </section>
 
-  <!-- 4. MASTER RACK -->
   <aside class="master-rack">
     <div class="meter-rack"><b>MAIN L&nbsp; R</b><div class="main-meters"><div class="meter"></div><div class="meter"></div></div></div>
     <div class="master-card">
@@ -188,7 +175,6 @@
     <div class="phones-card">🎧 <b>PHONES</b><div class="phone-knob"></div><span>●</span></div>
   </aside>
 
-  <!-- 5. EFFECT PROCESSOR (BERADA DI DALAM MAIN CONSOLE, DI BAWAH CH 1-7) -->
   <div class="fx-rack fx-rack-live" id="fxRack">
     <div class="rack-title">EFFECT PROCESSOR <span>PARAMETER</span></div>
     <div class="fx-toolbar">
@@ -215,7 +201,6 @@
     </div>
   </div>
 
-  <!-- 6. AUX / BUS & FX RETURN (BERADA DI DALAM MAIN CONSOLE, DI BAWAH FX PROCESSOR) -->
   <div class="aux-rack" id="auxRack">
     <div class="aux-unit aux-live">
       <b>AUX / BUS</b>
@@ -248,12 +233,10 @@
   </div>
 </main>
 
-<!-- BOTTOM NAVIGATION BAR -->
 <nav class="bottom-nav">
   <button class="active">CH 1–7</button><button>CH 8–14</button><button>FX</button><button>MASTER</button><button>SCENE</button><button>SETUP</button><button>SYSTEM</button>
 </nav>
 
-<!-- RIGHT SIDE PANEL / TOOLS -->
 <section class="right-tools">
   <section class="device-connection">
     <div class="section-heading"><h2>DEVICE CONNECTION</h2><span id="deviceLamp" class="lamp red"></span></div>
@@ -276,19 +259,32 @@
   <section class="media-rack"><h2>PLAYER / RECORDER</h2><div><button>🎙<small>RECORDER</small></button><button>📁<small>FILE</small></button><button>🎵<small>MUSIC</small></button></div></section>
 </section>
 
-<!-- CONNECTION & TEST PANEL -->
-<section class="connection-test-panel sim">
+<section class="connection-test-panel sim" id="connectionTestPanel">
   <h2>CONNECTION / TEST</h2>
   <div class="transport-line">Transport: <b id="transportStatus">OFFLINE</b></div>
-  <div id="connectionHint" class="small">Mixer yang menerima remote: Bluetooth langsung. Mixer yang tidak menerima remote: gunakan ESP32 sebagai bridge.</div>
-  <pre id="rx">RX: —</pre><pre id="tx">TX: —</pre>
-  <div class="test-buttons">
-    <button id="simulateRx">SIMULATE HARDWARE RX</button><button id="runTest">RUN 14CH LOOPBACK TEST</button><button id="runStressTest">RUN REPEAT STRESS TEST</button><button id="runMuteSoloTest">RUN MUTE/SOLO TEST</button><button id="runMasterIsolationTest">RUN MASTER ISOLATION TEST</button><button id="runFaderTest">RUN FADER CH1–CH14 TEST</button><button id="runCombinationTest">RUN COMBINATION CONTROL TEST</button><button id="runBidirectionalSyncTest">RUN TWO-WAY SYNC TEST</button><button id="savePreset">SAVE PRESET</button><button id="recallPreset">RECALL PRESET</button><button id="runSaveRecallTest">RUN SAVE/RECALL TEST</button>
+  <div id="connectionHint" class="small">
+    Mixer yang menerima remote: Bluetooth langsung. Mixer yang tidak menerima remote: gunakan ESP32 sebagai bridge.
   </div>
+  <pre id="rx">RX: —</pre>
+  <pre id="tx">TX: —</pre>
+  
+  <div class="test-buttons">
+    <button id="simulateRx" type="button">SIMULATE HARDWARE RX</button>
+    <button id="runTest" type="button">RUN 14CH LOOPBACK TEST</button>
+    <button id="runStressTest" type="button">RUN REPEAT STRESS TEST</button>
+    <button id="runMuteSoloTest" type="button">RUN MUTE/SOLO TEST</button>
+    <button id="runMasterIsolationTest" type="button">RUN MASTER ISOLATION TEST</button>
+    <button id="runFaderTest" type="button">RUN FADER CH1–CH14 TEST</button>
+    <button id="runCombinationTest" type="button">RUN COMBINATION CONTROL TEST</button>
+    <button id="runBidirectionalSyncTest" type="button">RUN TWO-WAY SYNC TEST</button>
+    <button id="savePreset" type="button">SAVE PRESET</button>
+    <button id="recallPreset" type="button">RECALL PRESET</button>
+    <button id="runSaveRecallTest" type="button">RUN SAVE/RECALL TEST</button>
+  </div>
+  
   <pre id="testResult">TEST: —</pre>
 </section>
 
-<!-- STATUS FOOTER -->
 <footer class="status-footer">
   <span>CONNECTION <b id="footerConnection">● ESP32 SIMULATOR OFFLINE</b></span>
   <span>MODE: <b>TWO-WAY SYNC</b></span>
@@ -297,7 +293,6 @@
   <span>MEM: <b>42%</b></span>
 </footer>
 
-<!-- JAVASCRIPT LIBRARIES & MODULES -->
 <script src="connection.js?v=20260903-final16"></script>
 <script src="adapters.js?v=20260903-esp32-bridge-final"></script>
 <script src="app.js?v=20260903-final16"></script>
@@ -393,8 +388,6 @@
     document.getElementById('statusLamp')?.classList.toggle('live', live);
     document.getElementById('deviceLamp')?.classList.toggle('green', live);
     document.getElementById('deviceLamp')?.classList.toggle('red', !live);
-    /* Header text is owned by the single SYSTEM/ESP32 state controller below.
-       Do not overwrite it on a timer. */
   };
 
   window.initEffectEngine?.();
@@ -404,7 +397,7 @@
 </script>
 
 <script>
-/* SINGLE SOURCE OF TRUTH: SYSTEM ON/OFF */
+/* SINGLE SOURCE OF TRUTH: SYSTEM ON/OFF & TEST PANEL RX/TX BINDING */
 (function(){
   function install(){
     var p = document.getElementById("power");
@@ -415,7 +408,7 @@
       var on = !!window.state.system;
       var adapter = window.MixerAdapters?.active;
       var espOnline = !!adapter?.connected && (adapter.type === "simulator" || adapter.transport === "esp32");
-      /* The adapter is the source of truth for ESP32 state. */
+      
       window.state.connected = espOnline;
       window.state.sim = window.state.sim || {};
       window.state.sim.online = espOnline;
@@ -429,7 +422,6 @@
       }
     }
 
-    /* DEVICE CONNECTION / ESP32 BRIDGE — UI-only bridge controller */
     var deviceConnect = document.getElementById("deviceConnect") || document.getElementById("connectEsp");
     var deviceDisconnect = document.getElementById("deviceDisconnect");
     var transportSelect = document.getElementById("transportSelect");
@@ -451,9 +443,7 @@
         lamp.classList.toggle("green", online);
         lamp.classList.toggle("red", !online);
       }
-      if (ds) ds.textContent = online
-        ? "🟢 ESP32 SIMULATOR ONLINE"
-        : "🔴 ESP32 SIMULATOR OFFLINE";
+      if (ds) ds.textContent = online ? "🟢 ESP32 SIMULATOR ONLINE" : "🔴 ESP32 SIMULATOR OFFLINE";
       if (dp) dp.textContent = "Protocol: " + (st.protocol || "ESP32-MIXER/1");
       if (ts) ts.textContent = online ? "ESP32 BRIDGE ONLINE" : "OFFLINE";
       if (bridge) bridge.textContent = online ? "ONLINE" : "OFFLINE";
@@ -468,8 +458,6 @@
       if (deviceDisconnect) deviceDisconnect.disabled = !online;
       if (transportSelect) transportSelect.value = espMode ? "esp32" : (st.transport === "bluetooth" ? "bluetooth" : "esp32");
     }
-
-
 
     if (deviceDisconnect) deviceDisconnect.addEventListener("click", function(e){
       e.preventDefault(); e.stopImmediatePropagation();
@@ -500,8 +488,8 @@
       var bridgeState = document.getElementById("bridgeState");
       var bridgeTransport = document.getElementById("bridgeTransport");
       var bridgeProtocol = document.getElementById("bridgeProtocol");
-      var bridge = window.MixerAdapters?.getBridgeStatus?.();
       var stats = window.MixerAdapters?.getTransportStats?.();
+
       if(status) status.textContent = connected ? "ONLINE" : "OFFLINE";
       if(lamp) lamp.classList.toggle("on", connected);
       if(esp){
@@ -511,10 +499,18 @@
       if(bridgeState) bridgeState.textContent = isEsp ? "ONLINE" : "OFFLINE";
       if(bridgeTransport) bridgeTransport.textContent = isEsp ? "TRANSPORT: ESP32" : "TRANSPORT: —";
       if(bridgeProtocol) bridgeProtocol.textContent = st?.protocol || "PROTOCOL: ESP32-MIXER/1";
+      
       var tx=document.getElementById("bridgeTx"), rx=document.getElementById("bridgeRx"), ack=document.getElementById("bridgeAck");
       if(tx && stats) tx.textContent=stats.tx;
       if(rx && stats) rx.textContent=stats.rx;
       if(ack && stats) ack.textContent=stats.ack;
+
+      // Update Teks TX & RX pada Panel Test secara Realtime
+      var txPanel = document.getElementById("tx");
+      var rxPanel = document.getElementById("rx");
+      if (txPanel && st?.lastTx) txPanel.textContent = "TX: " + JSON.stringify(st.lastTx);
+      if (rxPanel && st?.lastRx) rxPanel.textContent = "RX: " + JSON.stringify(st.lastRx);
+
       paint();
     }
 
@@ -527,13 +523,11 @@
       var api = window.MixerAdapters;
       window.state = window.state || {system:false, connected:false, channels:[], sim:{online:false}};
 
-      /* ESP32 may only be connected while SYSTEM is ON. */
       if(!window.state.system){
         paintConnection({connected:false,type:"simulator",transport:"esp32",protocol:"ESP32-MIXER/1",lastError:"SYSTEM_OFF"});
         return;
       }
 
-      /* ON -> OFF: disconnect the simulator cleanly. */
       if(api?.active?.connected && (api.active.type === "simulator" || api.active.transport === "esp32")){
         api.disconnect();
         window.state.connected = false;
@@ -546,12 +540,9 @@
       esp.textContent = "CONNECTING...";
       try {
         if(!api?.connectESP32) throw new Error("ESP32 adapter tidak tersedia");
-        /* Keep the requested chain: UI -> MixerControl -> MixerAdapters.
-           If the connection layer is not yet exposed, use the same adapter
-           through its public API instead of leaving the button dead. */
         var control = window.MixerControl;
         if(!control?.connectESP32) throw new Error("MixerControl belum siap");
-        /* SINGLE PATH: UI -> MixerControl -> MixerAdapters. */
+        
         var result = await control.connectESP32();
         if(!result?.ok || result.connected !== true) throw new Error(result?.reason || "ESP32 bridge gagal");
 
@@ -589,7 +580,6 @@
     p.addEventListener("click", function(){
       window.state.system = !window.state.system;
 
-      /* SYSTEM OFF always forces ESP32 OFF to prevent a stale bridge state. */
       if(!window.state.system && window.MixerAdapters?.active?.connected){
         window.MixerAdapters.disconnect();
         window.state.connected = false;
