@@ -9,7 +9,8 @@ window.MixerControl = (() => {
     transport: "none",
     lastCommand: null,
     lastRx: null,
-    _adapterBound: false
+    _adapterBound: false,
+    stats: { tx: 0, rx: 0 }
   };
 
   const emit = () => listeners.forEach(fn => fn({ ...state }));
@@ -25,23 +26,19 @@ window.MixerControl = (() => {
     return () => cmdListeners.delete(fn);
   };
 
-  // SINKRONISASI STATE INTERNAL & UI
   function setStatus(x) {
     Object.assign(state, x);
 
-    // Sync ke window.state global
     if (window.state) {
       window.state.connected = !!state.connected;
       window.state.sim = window.state.sim || {};
       window.state.sim.online = !!state.connected;
     }
 
-    // Refresh seluruh komponen UI
     updateUI(!!state.connected);
     emit();
   }
 
-  // REFRESH TAMPILAN UI
   function updateUI(isConnected) {
     const statusText = document.getElementById("status");
     const statusLamp = document.getElementById("statusLamp");
@@ -52,13 +49,16 @@ window.MixerControl = (() => {
     const btnConnect = document.getElementById("connectEsp");
     const btnDevice = document.getElementById("deviceConnect");
 
+    // UI Panel Test
+    const transportLabel = document.getElementById("testTransportLabel");
+    const rxCount = document.getElementById("testRxCount");
+    const txCount = document.getElementById("testTxCount");
+
     if (statusText) {
       statusText.textContent = isConnected ? "ONLINE" : "OFFLINE";
       statusText.style.color = isConnected ? "#31e66b" : "";
     }
-    if (statusLamp) {
-      statusLamp.className = isConnected ? "live" : "";
-    }
+    if (statusLamp) statusLamp.className = isConnected ? "live" : "";
     if (bridgeHead) {
       bridgeHead.textContent = isConnected ? "BRIDGE ONLINE" : "BRIDGE STANDBY";
     }
@@ -67,25 +67,26 @@ window.MixerControl = (() => {
         ? "🟢 ESP32 SIMULATOR ONLINE (ACTIVE)"
         : "🔴 ESP32 SIMULATOR OFFLINE";
     }
-    if (deviceLamp) {
-      deviceLamp.className = isConnected ? "lamp green" : "lamp red";
-    }
+    if (deviceLamp) deviceLamp.className = isConnected ? "lamp green" : "lamp red";
     if (footerConn) {
       footerConn.textContent = isConnected
         ? "● ESP32 SIMULATOR ONLINE"
         : "● ESP32 SIMULATOR OFFLINE";
     }
-    if (btnConnect) {
-      btnConnect.textContent = isConnected ? "DISCONNECT ESP32" : "CONNECT ESP32";
+    if (btnConnect) btnConnect.textContent = isConnected ? "DISCONNECT ESP32" : "CONNECT ESP32";
+    if (btnDevice) btnDevice.textContent = isConnected ? "DISCONNECT" : "CONNECT ESP32";
+
+    // Panel Connection/Test Updates
+    if (transportLabel) {
+      transportLabel.textContent = isConnected 
+        ? `ESP32 BRIDGE ${state.transport.toUpperCase()} ONLINE` 
+        : "OFFLINE";
     }
-    if (btnDevice) {
-      btnDevice.textContent = isConnected ? "DISCONNECT" : "CONNECT ESP32";
-    }
+    if (rxCount) rxCount.textContent = state.stats.rx;
+    if (txCount) txCount.textContent = state.stats.tx;
   }
 
-  // LAYER CONTROL: Meneruskan perintah ke MixerAdapters
   async function connectESP32() {
-    // Validasi System Status
     if (!window.state?.system) {
       alert("Nyalakan SYSTEM terlebih dahulu!");
       return { ok: false, connected: false, reason: "SYSTEM_OFF" };
@@ -97,9 +98,7 @@ window.MixerControl = (() => {
     }
 
     try {
-      // Panggil adapter; Pembaruan status UI akan ditangani otomatis via bindAdapterStatus()
-      const adapterResult = await api.connectESP32({ systemOn: true });
-      return adapterResult || { ok: false, connected: false };
+      return await api.connectESP32({ systemOn: true });
     } catch (e) {
       console.warn("Gagal memanggil MixerAdapters.connectESP32:", e);
       return { ok: false, connected: false, reason: e?.message || String(e) };
@@ -111,12 +110,11 @@ window.MixerControl = (() => {
     try {
       api?.disconnect?.();
     } finally {
-      setStatus({ connected: false, transport: "none" });
+      setStatus({ connected: false, transport: "none", stats: { tx: 0, rx: 0 } });
     }
     return { ok: true, connected: false };
   }
 
-  // BINDING KE ADAPTER SEBAGAI SINGLE SOURCE OF TRUTH
   function bindAdapterStatus() {
     const api = window.MixerAdapters;
     if (!api || typeof api.onStatus !== "function") return;
@@ -124,15 +122,16 @@ window.MixerControl = (() => {
     
     state._adapterBound = true;
     api.onStatus(s => {
+      const stats = api.getTransportStats ? api.getTransportStats() : { tx: 0, rx: 0 };
       setStatus({
         connected: !!s?.connected,
         transport: s?.transport || (s?.connected ? "esp32" : "none"),
-        lastRx: s?.lastRx || state.lastRx
+        lastRx: s?.lastRx || state.lastRx,
+        stats: { tx: stats.tx || 0, rx: stats.rx || 0 }
       });
     });
   }
 
-  // Inisialisasi binding adapter
   bindAdapterStatus();
   if (typeof window !== "undefined") {
     window.addEventListener("load", bindAdapterStatus);
