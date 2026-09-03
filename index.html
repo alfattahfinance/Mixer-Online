@@ -10,6 +10,27 @@
 <link rel="stylesheet" href="channel-skin.css?v=20260902-01">
 <link rel="stylesheet" href="header-system.css?v=20260902-01">
 <link rel="stylesheet" href="channels-new.css?v=20260903-ULTIMATE">
+<style>
+  /* Memastikan kontainer utama konsol bisa digeser/scroll horizontal jika layar terlalu kecil, atau menyusuaikan ukuran strip */
+  main.console {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    width: 100%;
+    box-sizing: border-box;
+    padding-bottom: 10px;
+  }
+  .channel-bank {
+    flex-shrink: 0;
+  }
+  .center-console {
+    flex-shrink: 0;
+  }
+  .master-rack {
+    flex-shrink: 0;
+  }
+</style>
+
 </head>
 <body>
 
