@@ -1,21 +1,11 @@
 /* =========================================================
    FIX TOTAL CONSOLE GRID & VERTICAL CHANNEL STRIPS
    ========================================================= */
-
-/* 1. LAYOUT CONSOLE GRID UTAMA */
+/* 1. ATUR ULANG LEBAR KOLOM GRID */
 main.console {
-  display: grid !important;
-  grid-template-columns: 550px 300px 550px 100px !important;
-  grid-template-rows: auto auto auto !important;
-  grid-template-areas:
-    "ch-left center ch-right master"
-    "fx      center ch-right master"
-    "aux     center ch-right master" !important;
-  gap: 12px !important;
-  width: max-content !important;
-  margin: 0 auto 20px auto !important;
-  align-items: start !important;
-  box-sizing: border-box !important;
+  /* Kolom center dibuat 220px, kolom kanan diberi margin aman */
+  grid-template-columns: 520px 220px 520px 110px !important;
+  gap: 16px !important;
 }
 
 /* 2. PLACEMENT AREA */
@@ -37,15 +27,10 @@ main.console > .aux-rack {
   box-sizing: border-box !important;
 }
 
-/* 3. WADAH CHANNEL BANK */
-.channel-bank {
-  display: flex !important;
-  flex-direction: column !important;
-  background: #111518 !important;
-  border: 1px solid #2a3036 !important;
-  border-radius: 8px !important;
-  padding: 8px !important;
-  box-sizing: border-box !important;
+/* 2. GESER CHANNEL KANAN KE KANAN */
+main.console > .channel-bank-right {
+  grid-area: ch-right !important;
+  margin-left: 15px !important; /* Geser bank kanan agar lepas dari center screen */
 }
 
 .bank-title {
