@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CHANNELS BRIDGE - FULL INSTANT UI & HARDWARE SYNC (TX & RX)
+   CHANNELS BRIDGE - FULL INSTANT UI, HARDWARE & LED SYNC (TX & RX)
    ========================================================================== */
 (function () {
   "use strict";
@@ -43,6 +43,26 @@
       window.MixerAdapters.send(payload);
     }
   };
+
+  // Helper fungsi untuk memperbarui status lampu indikator LED secara live
+  function updateChannelLedIndicator(chNum, param, val) {
+    const channelStrip = document.querySelector(`.new-channel-strip[data-ch="${chNum}"]`);
+    if (!channelStrip) return;
+
+    const ledEl = channelStrip.querySelector('.channel-led');
+    if (!ledEl) return;
+
+    const ch = window.state.channels[chNum - 1];
+    if (!ch) return;
+
+    if (ch.mute) {
+      ledEl.className = "channel-led active red";
+    } else if (Number(ch.fader) > 0 || Number(ch.gain) > 0) {
+      ledEl.className = "channel-led active green";
+    } else {
+      ledEl.className = "channel-led";
+    }
+  }
 
   // Helper fungsi untuk memperbarui readout di layar tengah secara instan dan menyeluruh
   function updateScreenReadoutsLive(chNum, param, val) {
@@ -96,8 +116,9 @@
             window.selectScreenChannel(chNum);
           }
 
-          // 4. Perbarui readout layar secara live
+          // 4. Perbarui readout layar & lampu LED secara live
           updateScreenReadoutsLive(chNum, param, val);
+          updateChannelLedIndicator(chNum, param, val);
 
           console.log(`[INPUT/OUTPUT RX SYNC] CH${chNum} [${param}] di-update dari hardware ke -> ${val}`);
         }
@@ -110,15 +131,15 @@
   // Penanganan input langsung di web yang super responsif (TX)
   document.addEventListener("input", (e) => {
     const target = e.target;
-    if (!target || !target.dataset || !target.dataset.ch || !target.dataset.param) {
-      return;
-    }
+    // Perhatikan atribut dataset pada input di channels-new.js menggunakan data-k bukan data-param
+    const param = target.dataset.param || target.dataset.k;
+    const strip = target.closest(".new-channel-strip");
+    if (!strip || !param) return;
 
-    const chNum = parseInt(target.dataset.ch, 10);
-    const param = target.dataset.param;
+    const chNum = parseInt(strip.dataset.ch, 10);
     const val = parseFloat(target.value);
 
-    if (isNaN(chNum) || !param || isNaN(val)) return;
+    if (isNaN(chNum) || isNaN(val)) return;
 
     e.stopImmediatePropagation();
 
@@ -132,8 +153,9 @@
       window.selectScreenChannel(chNum);
     }
 
-    // 3. Perbarui readout teks layar tengah secara instan
+    // 3. Perbarui readout teks layar tengah & lampu LED secara instan
     updateScreenReadoutsLive(chNum, param, val);
+    updateChannelLedIndicator(chNum, param, val);
 
     // 4. Kirim perubahan ke hardware
     window.sendChannelParamToHardware(chNum, param, val);
@@ -141,25 +163,24 @@
 
   // Penanganan tombol Mute / Solo
   document.addEventListener("click", (e) => {
-    const target = e.target.closest('[data-action]');
-    if (!target || !target.dataset || !target.dataset.ch) return;
+    const target = e.target.closest('button[data-k="mute"], button[data-k="solo"]');
+    if (!target) return;
 
-    const chNum = parseInt(target.dataset.ch, 10);
-    const action = target.dataset.action;
+    const strip = target.closest(".new-channel-strip");
+    if (!strip) return;
+
+    const chNum = parseInt(strip.dataset.ch, 10);
+    const action = target.dataset.k;
     
     if (!isNaN(chNum) && (action === "mute" || action === "solo")) {
       e.stopImmediatePropagation();
       const channel = window.state.channels[chNum - 1];
       if (!channel) return;
 
-      channel[action] = !channel[action];
-      target.classList.toggle("active", channel[action]);
-
-      if (typeof window.selectScreenChannel === "function") {
-        window.selectScreenChannel(chNum);
-      }
+      channel[action] = Boolean(target.classList.contains("on"));
 
       updateScreenReadoutsLive(chNum, action, channel[action]);
+      updateChannelLedIndicator(chNum, action, channel[action]);
       window.sendChannelParamToHardware(chNum, action, channel[action]);
     }
   }, true);
