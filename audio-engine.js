@@ -15,7 +15,15 @@
     if (!masterNode) {
       masterNode = audioCtx.createGain();
       masterNode.gain.value = 0.75;
-      masterNode.connect(audioCtx.destination);
+
+      // Master analyser membaca sinyal SETELAH master gain,
+      // tetapi tidak boleh memutus jalur Master -> output.
+      const masterAnalyser = audioCtx.createAnalyser();
+      masterAnalyser.fftSize = 256;
+      masterAnalyser.smoothingTimeConstant = 0.75;
+      masterNode.connect(masterAnalyser);
+      masterAnalyser.connect(audioCtx.destination);
+      masterNode._analyser = masterAnalyser;
     }
     return masterNode;
   }
@@ -116,15 +124,11 @@
       meter.classList.toggle("signal", count > 0);
     });
 
-    if (masterNode) {
-      // Master meter mengikuti sinyal yang benar-benar menuju output.
-      if (!masterNode._analyser) {
-        masterNode._analyser = audioCtx.createAnalyser();
-        masterNode._analyser.fftSize = 256;
-        masterNode.disconnect();
-        masterNode.connect(masterNode._analyser);
-        masterNode._analyser.connect(audioCtx.destination);
-      }
+    if (masterNode?._analyser) {
+      // Master meter membaca output Master tanpa membuat node baru
+      // atau memutus routing audio.
+      const data = new Uint8Array(masterNode._analyser.fftSize);
+      masterNode._analyser.getByteTimeDomainData(data);
     }
     requestAnimationFrame(updateChannelMeters);
   }
