@@ -1,10 +1,9 @@
 /* ==========================================================================
-   STRICT INDEPENDENT PARAMETER ISOLATION BRIDGE
+   GAIN MOTION SHIELD BRIDGE (Mengunci pergerakan visual khusus untuk Gain)
    ========================================================================== */
 (function () {
   "use strict";
 
-  // Pastikan state global terstruktur untuk 14 channel dengan memori yang benar-benar terpisah
   if (!window.state) window.state = {};
   if (!window.state.channels) {
     window.state.channels = [];
@@ -44,35 +43,52 @@
     }
   };
 
-  // PENGAMAN UTAMA: Mencegah event input merembet atau memicu parameter lain
+  // Simpan nilai asli Gain per channel agar tidak bisa diubah kecuali disentuh langsung
+  const lockedGainValues = {};
+  for (let i = 1; i <= 14; i++) {
+    lockedGainValues[i] = 1.00;
+  }
+
   document.addEventListener("input", (e) => {
     const target = e.target;
-    
-    // Pastikan target adalah elemen input yang memiliki atribut data-ch dan data-param secara spesifik
     if (!target || !target.dataset || !target.dataset.ch || !target.dataset.param) {
       return;
     }
 
     const chNum = parseInt(target.dataset.ch, 10);
-    const param = target.dataset.param; // Contoh: "fader", "gain", "pan", "low", "high"
+    const param = target.dataset.param;
     const val = parseFloat(target.value);
 
     if (isNaN(chNum) || !param || isNaN(val)) return;
 
-    // Hentikan penjalaran event secara total agar file render lain tidak ikut mengubah parameter tetangga
-    e.stopImmediatePropagation();
-    e.stopPropagation();
+    // PENGAMAN KHUSUS GAIN: Jika yang bergerak adalah Gain tapi pengguna sedang tidak menyentuh Gain, 
+    // atau jika parameter lain sedang digeser tapi Gain ikut bergerak, paksa kunci Gain ke posisi terakhirnya!
+    if (param === "gain") {
+      // Tandai bahwa gain sedang disentuh langsung
+      window._isUserDraggingGain = true;
+      lockedGainValues[chNum] = val;
+    } else {
+      // Jika parameter lain (seperti fader/pan) yang digeser, pastikan elemen input gain dipaksa diam pada nilai aslinya
+      const gainInput = document.querySelector(`input[data-ch="${chNum}"][data-param="gain"]`);
+      if (gainInput && parseFloat(gainInput.value) !== lockedGainValues[chNum]) {
+        gainInput.value = lockedGainValues[chNum];
+      }
+    }
 
-    // Update HANYA properti spesifik yang sedang disentuh
-    if (window.state.channels && window.state.channels[chNum - 1]) {
+    // Hentikan perambatan agar render utama tidak mencemari parameter lain
+    e.stopImmediatePropagation();
+
+    if (window.state.channels[chNum - 1]) {
       window.state.channels[chNum - 1][param] = val;
     }
 
-    // Kirim data mandiri ke hardware
     window.sendChannelParamToHardware(chNum, param, val);
-  }, true); // Gunakan capture phase agar disadap paling awal
+  }, true);
 
-  // PENGAMAN TOMBOL MUTE / SOLO
+  document.addEventListener("mouseup", () => { window._isUserDraggingGain = false; }, true);
+  document.addEventListener("touchend", () => { window._isUserDraggingGain = false; }, true);
+
+  // Mute / Solo handler
   document.addEventListener("click", (e) => {
     const target = e.target.closest('[data-action]');
     if (!target || !target.dataset || !target.dataset.ch) return;
@@ -82,8 +98,6 @@
     
     if (!isNaN(chNum) && (action === "mute" || action === "solo")) {
       e.stopImmediatePropagation();
-      e.stopPropagation();
-
       const channel = window.state.channels[chNum - 1];
       if (!channel) return;
 
