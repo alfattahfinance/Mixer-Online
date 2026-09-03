@@ -198,3 +198,47 @@
   }, 100);
 
 })();
+
+/* ==========================================================================
+   GLOBAL SYSTEM & DEVICE LIGHTS SYNC
+   ========================================================================== */
+(function () {
+  "use strict";
+
+  function updateAllSystemLights() {
+    const isSystemOn = window.state && window.state.system === true;
+    const adapter = window.MixerAdapters?.active;
+    const isConnected = !!(adapter && adapter.connected);
+
+    // 1. Lampu Status Utama di Topbar (statusLamp)
+    const statusLamp = document.getElementById("statusLamp");
+    if (statusLamp) {
+      statusLamp.classList.toggle("on", isConnected);
+      statusLamp.classList.toggle("live", isConnected);
+    }
+
+    // 2. Lampu Indikator Koneksi Perangkat (deviceLamp)
+    const deviceLamp = document.getElementById("deviceLamp");
+    if (deviceLamp) {
+      deviceLamp.classList.toggle("green", isConnected);
+      deviceLamp.classList.toggle("red", !isConnected);
+    }
+
+    // 3. Status Teks Bridge & Transport
+    const headerStatus = document.getElementById("headerBridgeStatus");
+    if (headerStatus) {
+      headerStatus.textContent = isConnected ? "BRIDGE READY" : (isSystemOn ? "SYSTEM READY" : "BRIDGE STANDBY");
+    }
+  }
+
+  // Jalankan pengecekan status lampu secara berkala dan real-time
+  setInterval(updateAllSystemLights, 300);
+
+  // Hook ke perubahan status adapter jika tersedia
+  if (window.MixerAdapters && typeof window.MixerAdapters.onStatus === "function") {
+    window.MixerAdapters.onStatus(() => {
+      updateAllSystemLights();
+    });
+  }
+})();
+
