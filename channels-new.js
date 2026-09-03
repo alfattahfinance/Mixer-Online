@@ -27,8 +27,20 @@
     const el = document.createElement("article");
     el.className = "new-channel-strip";
     el.dataset.ch = String(id);
+    
+    // Tentukan status awal LED berdasarkan nilai fader/gain/mute
+    const isMuted = Boolean(c.mute);
+    const hasSignal = Number(c.fader) > 0 || Number(c.gain) > 0;
+    let ledClass = "channel-led";
+    if (isMuted) {
+      ledClass += " active red";
+    } else if (hasSignal) {
+      ledClass += " active green";
+    }
+
     el.innerHTML = `
       <header class="new-channel-head">CH${id}</header>
+      <div class="${ledClass}" title="Channel Indicator"></div>
       <div class="led-meter new-channel-meter" data-ch="${id}" role="meter" aria-label="CH${id} level"><span class="led-peak"></span><span class="led-segments">${"<i data-seg=\"0\"></i>".repeat(12)}</span></div>
       <div class="new-channel-control"><label>GAIN</label><input class="new-knob" data-k="gain" type="range" min="0" max="2" step=".01" value="${Number(c.gain ?? 1)}"></div>
       <div class="new-channel-control"><label>HIGH</label><input class="new-knob" data-k="high" type="range" min="-12" max="12" step="1" value="${Number(c.high ?? 0)}"></div>
@@ -60,6 +72,18 @@
         if (k === "fader") {
           const out = el.querySelector("output");
           if (out) out.textContent = Math.round(n) + "%";
+        }
+      }
+
+      // Perbarui status lampu indikator LED secara real-time
+      const ledEl = el.querySelector(".channel-led");
+      if (ledEl) {
+        if (ch.mute) {
+          ledEl.className = "channel-led active red";
+        } else if (Number(ch.fader) > 0 || Number(ch.gain) > 0) {
+          ledEl.className = "channel-led active green";
+        } else {
+          ledEl.className = "channel-led";
         }
       }
 
@@ -119,6 +143,18 @@
 
       const o = el.querySelector("output"); 
       if (o) o.textContent = Math.round(Number(c.fader ?? 75)) + "%";
+
+      // Sinkronisasi status LED saat fungsi sync dipanggil
+      const ledEl = el.querySelector(".channel-led");
+      if (ledEl) {
+        if (c.mute) {
+          ledEl.className = "channel-led active red";
+        } else if (Number(c.fader) > 0 || Number(c.gain) > 0) {
+          ledEl.className = "channel-led active green";
+        } else {
+          ledEl.className = "channel-led";
+        }
+      }
 
       el.querySelectorAll("button[data-k]").forEach(b => { 
         const k = b.dataset.k;
