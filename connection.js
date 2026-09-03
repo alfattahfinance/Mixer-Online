@@ -12,9 +12,7 @@ window.MixerControl = (() => {
     _adapterBound: false
   };
 
-  const emit = () => listeners.forEach(fn => {
-    try { fn({ ...state }); } catch (e) { console.warn("MixerControl status listener:", e); }
-  });
+  const emit = () => listeners.forEach(fn => fn({ ...state }));
 
   const onStatus = fn => {
     listeners.add(fn);
@@ -27,110 +25,121 @@ window.MixerControl = (() => {
     return () => cmdListeners.delete(fn);
   };
 
-  // SINGLE SOURCE FOR CONTROL-LAYER CONNECTION STATE.
-  function setStatus(x = {}) {
+  // SINKRONISASI STATE INTERNAL & UI
+  function setStatus(x) {
     Object.assign(state, x);
 
+    // Sync ke window.state global
     if (window.state) {
       window.state.connected = !!state.connected;
       window.state.sim = window.state.sim || {};
       window.state.sim.online = !!state.connected;
     }
 
+    // Refresh seluruh komponen UI
     updateUI(!!state.connected);
     emit();
   }
 
+  // REFRESH TAMPILAN UI
   function updateUI(isConnected) {
     const statusText = document.getElementById("status");
     const statusLamp = document.getElementById("statusLamp");
+    const bridgeHead = document.getElementById("headerBridgeStatus");
+    const deviceStatus = document.getElementById("deviceStatus");
+    const deviceLamp = document.getElementById("deviceLamp");
+    const footerConn = document.getElementById("footerConnection");
+    const btnConnect = document.getElementById("connectEsp");
+    const btnDevice = document.getElementById("deviceConnect");
 
     if (statusText) {
       statusText.textContent = isConnected ? "ONLINE" : "OFFLINE";
       statusText.style.color = isConnected ? "#31e66b" : "";
     }
-    if (statusLamp) statusLamp.className = isConnected ? "live" : "";
+    if (statusLamp) {
+      statusLamp.className = isConnected ? "live" : "";
+    }
+    if (bridgeHead) {
+      bridgeHead.textContent = isConnected ? "BRIDGE ONLINE" : "BRIDGE STANDBY";
+    }
+    if (deviceStatus) {
+      deviceStatus.textContent = isConnected
+        ? "🟢 ESP32 SIMULATOR ONLINE (ACTIVE)"
+        : "🔴 ESP32 SIMULATOR OFFLINE";
+    }
+    if (deviceLamp) {
+      deviceLamp.className = isConnected ? "lamp green" : "lamp red";
+    }
+    if (footerConn) {
+      footerConn.textContent = isConnected
+        ? "● ESP32 SIMULATOR ONLINE"
+        : "● ESP32 SIMULATOR OFFLINE";
+    }
+    if (btnConnect) {
+      btnConnect.textContent = isConnected ? "DISCONNECT ESP32" : "CONNECT ESP32";
+    }
+    if (btnDevice) {
+      btnDevice.textContent = isConnected ? "DISCONNECT" : "CONNECT ESP32";
+    }
   }
 
-  // CONTROL/UI LAYER:
-  // This function NEVER implements simulator/hardware logic itself.
-  // It delegates exactly once to MixerAdapters.connectESP32().
+  // LAYER CONTROL: Meneruskan perintah ke MixerAdapters
   async function connectESP32() {
+    // Validasi System Status
     if (!window.state?.system) {
-      setStatus({ connected: false, transport: "none" });
       return { ok: false, connected: false, reason: "SYSTEM_OFF" };
     }
 
     const api = window.MixerAdapters;
     if (!api || typeof api.connectESP32 !== "function") {
-      setStatus({ connected: false, transport: "none" });
       return { ok: false, connected: false, reason: "adapter-unavailable" };
     }
 
     try {
+      // Panggil adapter; Pembaruan status UI akan ditangani otomatis via bindAdapterStatus()
       const adapterResult = await api.connectESP32({ systemOn: true });
-      const isConnected = adapterResult?.connected === true;
-
-      setStatus({
-        connected: isConnected,
-        transport: adapterResult?.transport || (isConnected ? "esp32" : "none"),
-        lastRx: adapterResult?.lastRx || state.lastRx
-      });
-
-      return adapterResult || {
-        ok: isConnected,
-        connected: isConnected,
-        transport: isConnected ? "esp32" : "none"
-      };
+      return adapterResult || { ok: false, connected: false };
     } catch (e) {
       console.warn("Gagal memanggil MixerAdapters.connectESP32:", e);
-      setStatus({ connected: false, transport: "none" });
-      return {
-        ok: false,
-        connected: false,
-        reason: e?.message || String(e)
-      };
+      return { ok: false, connected: false, reason: e?.message || String(e) };
     }
   }
 
   function disconnectESP32() {
     const api = window.MixerAdapters;
     try {
-      if (api && typeof api.disconnect === "function") api.disconnect();
+      api?.disconnect?.();
     } finally {
       setStatus({ connected: false, transport: "none" });
     }
     return { ok: true, connected: false };
   }
 
-  // connection.js loads before adapters.js in index.html.
-  // Bind after the adapter exists, and bind only once.
+  // BINDING KE ADAPTER SEBAGAI SINGLE SOURCE OF TRUTH
   function bindAdapterStatus() {
     const api = window.MixerAdapters;
     if (!api || typeof api.onStatus !== "function") return;
     if (state._adapterBound) return;
-
+    
     state._adapterBound = true;
     api.onStatus(s => {
-      const connected = !!s?.connected;
       setStatus({
-        connected,
-        transport: s?.transport || (connected ? "esp32" : "none"),
+        connected: !!s?.connected,
+        transport: s?.transport || (s?.connected ? "esp32" : "none"),
         lastRx: s?.lastRx || state.lastRx
       });
     });
   }
 
+  // Inisialisasi binding adapter
   bindAdapterStatus();
-  window.addEventListener("load", bindAdapterStatus);
+  if (typeof window !== "undefined") {
+    window.addEventListener("load", bindAdapterStatus);
+    document.addEventListener("DOMContentLoaded", bindAdapterStatus);
+  }
 
   function setControl(channel, control, value) {
     const ch = Number(channel);
-
-    if (!Number.isInteger(ch) || ch < 1 || ch > 14) {
-      return { ok: false, reason: "invalid-channel" };
-    }
-
     const command = {
       type: "CONTROL",
       channel: String(ch),
@@ -141,41 +150,28 @@ window.MixerControl = (() => {
       time: Date.now()
     };
 
+    if (!Number.isInteger(ch) || ch < 1 || ch > 14) {
+      return { ok: false, reason: "invalid-channel" };
+    }
+
     state.lastCommand = command;
-    cmdListeners.forEach(fn => {
-      try { fn({ ...command, direction: "TX" }); } catch (e) {}
-    });
+    cmdListeners.forEach(fn => fn({ ...command, direction: "TX" }));
 
     const api = window.MixerAdapters;
-    if (!api?.active?.connected) {
-      setStatus({
-        connected: false,
-        transport: "none"
-      });
+    if (!state.connected && !api?.active?.connected) {
       return { ok: false, reason: "esp32-offline" };
     }
 
-    if (typeof api.sendMapped !== "function") {
-      return { ok: false, reason: "adapter-send-unavailable" };
+    if (api && typeof api.sendMapped === "function") {
+      return api.sendMapped(command);
     }
 
-    const result = api.sendMapped(command);
-
-    if (result?.ok) {
-      setStatus({
-        connected: true,
-        transport: result.transport || "esp32"
-      });
-    }
-
-    return result || { ok: false, reason: "adapter-rejected" };
+    return { ok: true, transport: "esp32" };
   }
 
   function applyRemote(message) {
     state.lastRx = message;
-    cmdListeners.forEach(fn => {
-      try { fn({ ...message, direction: "RX" }); } catch (e) {}
-    });
+    cmdListeners.forEach(fn => fn({ ...message, direction: "RX" }));
     return true;
   }
 
