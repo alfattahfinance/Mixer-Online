@@ -92,7 +92,8 @@
         low: lowBq,
         high: highBq,
         pan: pannerNode,
-        fader: faderNode
+        fader: faderNode,
+        analyser: analyserNode
       };
 
       console.log(`[AUDIO ENGINE] Jalur audio untuk CH${chNum} berhasil diaktifkan.`);
