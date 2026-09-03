@@ -419,7 +419,7 @@
     }
 
     /* DEVICE CONNECTION / ESP32 BRIDGE — UI-only bridge controller */
-    var deviceConnect = document.getElementById("deviceConnect");
+    var deviceConnect = document.getElementById("deviceConnect") || document.getElementById("connectEsp");
     var deviceDisconnect = document.getElementById("deviceDisconnect");
     var transportSelect = document.getElementById("transportSelect");
 
