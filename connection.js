@@ -44,34 +44,11 @@ window.MixerControl = (() => {
   function updateUI(isConnected) {
     const statusText = document.getElementById("status");
     const statusLamp = document.getElementById("statusLamp");
-    const bridgeHead = document.getElementById("headerBridgeStatus");
-    const deviceStatus = document.getElementById("deviceStatus");
-    const deviceLamp = document.getElementById("deviceLamp");
-    const footerConn = document.getElementById("footerConnection");
-
     if (statusText) {
       statusText.textContent = isConnected ? "ONLINE" : "OFFLINE";
       statusText.style.color = isConnected ? "#31e66b" : "";
     }
-    if (statusLamp) {
-      statusLamp.className = isConnected ? "live" : "";
-    }
-    if (bridgeHead) {
-      bridgeHead.textContent = isConnected ? "BRIDGE ONLINE" : "BRIDGE STANDBY";
-    }
-    if (deviceStatus) {
-      deviceStatus.textContent = isConnected 
-        ? "🟢 ESP32 SIMULATOR ONLINE (ACTIVE)" 
-        : "🔴 ESP32 SIMULATOR OFFLINE";
-    }
-    if (deviceLamp) {
-      deviceLamp.className = isConnected ? "lamp green" : "lamp red";
-    }
-    if (footerConn) {
-      footerConn.textContent = isConnected 
-        ? "● ESP32 SIMULATOR ONLINE" 
-        : "● ESP32 SIMULATOR OFFLINE";
-    }
+    if (statusLamp) statusLamp.className = isConnected ? "live" : "";
   }
 
   // FUNGSI LAYER CONTROL/UI — hanya meneruskan ke MixerAdapters.
@@ -116,13 +93,22 @@ window.MixerControl = (() => {
     return { ok: true, connected: false };
   }
 
-  // DENGARKAN STATUS DARI ADAPTER JIKA ADA UPDATE
-  window.MixerAdapters?.onStatus?.(s => {
-    state.connected = !!s?.connected;
-    state.transport = s?.transport || "none";
-    state.lastRx = s?.lastRx || state.lastRx;
-    setStatus({ connected: state.connected, transport: state.transport });
-  });
+  // Status adapter diikat saat adapter sudah tersedia (connection.js dimuat lebih dulu).
+  function bindAdapterStatus() {
+    const api = window.MixerAdapters;
+    if (!api || typeof api.onStatus !== "function") return;
+    if (state._adapterBound) return;
+    state._adapterBound = true;
+    api.onStatus(s => {
+      setStatus({
+        connected: !!s?.connected,
+        transport: s?.transport || (s?.connected ? "esp32" : "none"),
+        lastRx: s?.lastRx || state.lastRx
+      });
+    });
+  }
+  bindAdapterStatus();
+  window.addEventListener("load", bindAdapterStatus);
 
   function setControl(channel, control, value) {
     const ch = Number(channel);
