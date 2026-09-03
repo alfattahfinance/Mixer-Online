@@ -1,11 +1,12 @@
 /* ==========================================================================
-   WEB AUDIO ENGINE (Mengubah suara output secara nyata saat fader/gain/EQ diubah)
+   WEB AUDIO ENGINE & MUSIC PLAYER ROUTING (Full Integrated)
    ========================================================================== */
 (function () {
   "use strict";
 
   let audioCtx = null;
   const channelNodes = {}; // Menyimpan node audio per channel (1-14)
+  let backgroundMusicElement = null;
 
   // Inisialisasi Web Audio Context saat interaksi pertama (mengatasi kebijakan autoplay browser)
   function initAudioEngine() {
@@ -29,8 +30,7 @@
       } else if (mediaStreamOrElement instanceof HTMLMediaElement) {
         sourceNode = audioCtx.createMediaElementSource(mediaStreamOrElement);
       } else {
-        // Jika belum ada sumber audio fisik, buat gain node kosong sebagai placeholder
-        sourceNode = audioCtx.createGain();
+        sourceNode = audioCtx.createGain(); // Placeholder default
       }
 
       // Buat pemrosesan efek per channel: Gain -> EQ (Low/High) -> Panner -> Fader Volume -> Master Out
@@ -83,18 +83,14 @@
 
     try {
       if (param === "fader") {
-        // Konversi persentase fader (0 - 100) ke skala gain audio (0.0 - 1.0)
         nodes.fader.gain.setTargetAtTime(Math.max(0, Math.min(1, val / 100)), audioCtx.currentTime, 0.02);
       } else if (param === "gain") {
         nodes.gain.gain.setTargetAtTime(Math.max(0.1, val), audioCtx.currentTime, 0.02);
       } else if (param === "pan" && nodes.pan) {
-        // Pan bernilai -1 (Kiri) sampai 1 (Kanan)
         nodes.pan.pan.setTargetAtTime(Math.max(-1, Math.min(1, val)), audioCtx.currentTime, 0.02);
       } else if (param === "low") {
-        // Low EQ dalam dB (-12 sampai +12)
         nodes.low.gain.setTargetAtTime(val, audioCtx.currentTime, 0.02);
       } else if (param === "high") {
-        // High EQ dalam dB (-12 sampai +12)
         nodes.high.gain.setTargetAtTime(val, audioCtx.currentTime, 0.02);
       } else if (param === "mute") {
         nodes.fader.gain.setTargetAtTime(val ? 0 : 1, audioCtx.currentTime, 0.01);
@@ -104,13 +100,30 @@
     }
   };
 
-  // Integrasikan otomatis dengan event input yang sudah ada di channels-bridge.js
+  // Fungsi untuk menghubungkan pemutar musik ke Channel 1 sebagai jalur utama
+  window.connectPlayerToChannel1 = function(audioElementOrUrl) {
+    initAudioEngine();
+    if (!backgroundMusicElement) {
+      if (audioElementOrUrl instanceof HTMLAudioElement) {
+        backgroundMusicElement = audioElementOrUrl;
+      } else {
+        backgroundMusicElement = new Audio(audioElementOrUrl || "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
+        backgroundMusicElement.loop = true;
+        backgroundMusicElement.crossOrigin = "anonymous";
+      }
+    }
+    window.initChannelAudioNode(1, backgroundMusicElement);
+    backgroundMusicElement.play().catch(err => console.log("Autoplay dicegah browser:", err));
+  };
+
+  // Integrasikan otomatis dengan event input slider/knob pada channel strip
   document.addEventListener("input", (e) => {
     const target = e.target;
-    if (!target || !target.dataset || !target.dataset.ch || !target.dataset.param) return;
+    const param = target.dataset.param || target.dataset.k;
+    const strip = target.closest(".new-channel-strip");
+    if (!strip || !param) return;
     
-    const chNum = parseInt(target.dataset.ch, 10);
-    const param = target.dataset.param;
+    const chNum = parseInt(strip.dataset.ch, 10);
     const val = parseFloat(target.value);
 
     if (!isNaN(chNum) && !isNaN(val)) {
@@ -124,19 +137,32 @@
 
   // Integrasikan klik Mute/Solo ke audio engine
   document.addEventListener("click", (e) => {
-    const target = e.target.closest('[data-action]');
-    if (!target || !target.dataset || !target.dataset.ch) return;
+    const target = e.target.closest('button[data-k="mute"], button[data-k="solo"], [data-action]');
+    if (!target) return;
 
-    const chNum = parseInt(target.dataset.ch, 10);
-    const action = target.dataset.action;
+    const strip = target.closest(".new-channel-strip");
+    if (!strip) return;
+
+    const chNum = parseInt(strip.dataset.ch, 10);
+    const action = target.dataset.k || target.dataset.action;
 
     if (!isNaN(chNum) && (action === "mute" || action === "solo")) {
       const channelState = window.state && window.state.channels ? window.state.channels[chNum - 1] : null;
       if (channelState && channelNodes[chNum]) {
-        const isMuted = channelState.mute;
+        const isMuted = Boolean(channelState.mute);
         window.updateAudioParamLive(chNum, "mute", isMuted);
       }
     }
   }, true);
+
+  // Hubungkan tombol pemutar musik otomatis ke CH1
+  document.addEventListener("DOMContentLoaded", () => {
+    const musicBtn = document.querySelector(".media-rack button:nth-child(3), .player button:nth-child(2)");
+    if (musicBtn) {
+      musicBtn.addEventListener("click", () => {
+        window.connectPlayerToChannel1();
+      });
+    }
+  });
 
 })();
