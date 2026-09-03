@@ -1,10 +1,10 @@
 /* ==========================================================================
-   ISOLATED CHANNEL PARAMETER BRIDGE (STRICT EVENT FILTERING)
+   ISOLATED CHANNEL PARAMETER BRIDGE (GAIN-LOCK & INDEPENDENT STATE)
    ========================================================================== */
 (function () {
   "use strict";
 
-  // Pastikan struktur state global tersedia untuk 14 channel
+  // Pastikan struktur state global tersedia untuk 14 channel dengan parameter terisolasi
   if (!window.state) window.state = {};
   if (!window.state.channels) {
     window.state.channels = [];
@@ -30,7 +30,7 @@
       id: "cmd-" + Date.now(),
       type: "CONTROL",
       ch: chNum,
-      param: paramName, // Hanya mengirim parameter yang benar-benar diubah
+      param: paramName, 
       value: value,
       rev: 1,
       ts: Date.now(),
@@ -44,45 +44,47 @@
       window.MixerAdapters.send(payload);
     }
 
-    console.log(`[STRICT TX] CH${chNum} -> ${paramName}:`, value);
+    console.log(`[INDEPENDENT TX] CH${chNum} -> ${paramName}:`, value);
   };
 
-  // EVENT LISTENER INPUT: STRICT TARGET CHECK (Mencegah parameter lain ikut terseret)
+  // Mencegah gangguan silang (cross-talk/gain-following) pada tingkat DOM input
   document.addEventListener("input", (e) => {
     const target = e.target;
     
-    // Validasi ketat: pastikan target adalah elemen input/slider yang memiliki data-ch dan data-param
+    // Validasi ketat elemen yang diubah
     if (!target || !target.dataset || !target.dataset.ch || !target.dataset.param) {
       return;
     }
 
     const chNum = parseInt(target.dataset.ch, 10);
-    const param = target.dataset.param; // Contoh: "fader", "gain", "pan", "low", "high"
+    const param = target.dataset.param; // "gain", "fader", "pan", "low", "high", dll.
     const val = parseFloat(target.value);
 
     if (isNaN(chNum) || !param || isNaN(val)) return;
 
-    // Cegah event merembet ke elemen lain
-    e.stopPropagation();
+    // Hentikan perambatan agar script render bawaan channel tidak salah tangkap
+    e.stopImmediatePropagation();
 
-    // Update state lokal HANYA untuk parameter tersebut
+    // Pastikan HANYA parameter yang dimaksud saja yang nilainya berubah di state
     if (window.state.channels[chNum - 1]) {
       window.state.channels[chNum - 1][param] = val;
     }
 
-    // Kirim perubahan parameter secara mandiri
+    // Kirim data parameter spesifik tersebut
     window.sendChannelParamToHardware(chNum, param, val);
-  }, true /* Menggunakan capture phase agar lebih spesifik */);
 
-  // EVENT LISTENER TOMBOL MUTE / SOLO
+  }, true); // Gunakan fase tangkap (capture) terdepan
+
+  // Handler terpisah untuk tombol Mute/Solo
   document.addEventListener("click", (e) => {
     const target = e.target.closest('[data-action]');
     if (!target || !target.dataset || !target.dataset.ch) return;
 
     const chNum = parseInt(target.dataset.ch, 10);
-    const action = target.dataset.action; // "mute" atau "solo"
+    const action = target.dataset.action;
     
     if (!isNaN(chNum) && (action === "mute" || action === "solo")) {
+      e.stopImmediatePropagation();
       const currentState = !!window.state.channels[chNum - 1][action];
       const newState = !currentState;
       
@@ -91,6 +93,6 @@
 
       window.sendChannelParamToHardware(chNum, action, newState);
     }
-  });
+  }, true);
 
 })();
