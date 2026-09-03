@@ -299,7 +299,7 @@
 
 <!-- JAVASCRIPT LIBRARIES & MODULES -->
 <script src="connection.js?v=20260903-final16"></script>
-<script src="adapters.js?v=20260903-esp32-responsive"></script>
+<script src="adapters.js?v=20260903-esp32-bridge-final"></script>
 <script src="app.js?v=20260903-final16"></script>
 <script src="header-system.js?v=20260902-01"></script>
 <script src="header-controls.js?v=20260902-02"></script>
@@ -424,17 +424,30 @@
     function paintConnection(st){
       if(!window.state) window.state = {system:false, connected:false, channels:[], sim:{online:false}};
       var connected = !!st?.connected;
+      var isEsp = connected && (st?.type === "simulator" || st?.transport === "esp32");
       window.state.connected = connected;
       window.state.sim = window.state.sim || {};
-      window.state.sim.online = connected && st?.type === "simulator";
+      window.state.sim.online = isEsp;
       var status = document.getElementById("status");
       var lamp = document.getElementById("statusLamp");
+      var bridgeState = document.getElementById("bridgeState");
+      var bridgeTransport = document.getElementById("bridgeTransport");
+      var bridgeProtocol = document.getElementById("bridgeProtocol");
+      var bridge = window.MixerAdapters?.getBridgeStatus?.();
+      var stats = window.MixerAdapters?.getTransportStats?.();
       if(status) status.textContent = connected ? "ONLINE" : "OFFLINE";
       if(lamp) lamp.classList.toggle("on", connected);
       if(esp){
-        esp.textContent = connected && st?.type === "simulator" ? "ESP32 CONNECTED" : "CONNECT ESP32";
-        esp.classList.toggle("on", connected && st?.type === "simulator");
+        esp.textContent = isEsp ? "ESP32 CONNECTED" : "CONNECT ESP32";
+        esp.classList.toggle("on", isEsp);
       }
+      if(bridgeState) bridgeState.textContent = isEsp ? "ONLINE" : "OFFLINE";
+      if(bridgeTransport) bridgeTransport.textContent = isEsp ? "TRANSPORT: ESP32" : "TRANSPORT: —";
+      if(bridgeProtocol) bridgeProtocol.textContent = st?.protocol || "PROTOCOL: ESP32-MIXER/1";
+      var tx=document.getElementById("bridgeTx"), rx=document.getElementById("bridgeRx"), ack=document.getElementById("bridgeAck");
+      if(tx && stats) tx.textContent=stats.tx;
+      if(rx && stats) rx.textContent=stats.rx;
+      if(ack && stats) ack.textContent=stats.ack;
       paint();
     }
 
