@@ -388,12 +388,16 @@
   document.getElementById('screenFxTap')?.addEventListener('click', () => window.tapEffectTempo?.());
 
   const updateSkin = () => {
-    const live = document.getElementById('status')?.textContent === 'ONLINE';
+    const adapter = window.MixerAdapters?.status?.();
+    const live = !!adapter?.connected;
+    const systemOn = !!window.state?.system;
     document.getElementById('statusLamp')?.classList.toggle('live', live);
     document.getElementById('deviceLamp')?.classList.toggle('green', live);
     document.getElementById('deviceLamp')?.classList.toggle('red', !live);
-    document.getElementById('headerBridgeStatus').textContent = live ? 'PERMANENT BRIDGE ACTIVE' : 'BRIDGE STANDBY';
-    document.getElementById('footerConnection').textContent = live ? '● ESP32 SIMULATOR ONLINE' : '● ESP32 SIMULATOR OFFLINE';
+    const hs = document.getElementById('headerBridgeStatus');
+    if(hs) hs.textContent = live ? 'BRIDGE READY' : (systemOn ? 'BRIDGE STANDBY' : 'BRIDGE STANDBY');
+    const fc = document.getElementById('footerConnection');
+    if(fc) fc.textContent = live ? '● ESP32 SIMULATOR ONLINE' : '● ESP32 SIMULATOR OFFLINE';
   };
 
   window.initEffectEngine?.();
