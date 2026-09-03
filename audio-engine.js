@@ -7,6 +7,17 @@
   let audioCtx = null;
   const channelNodes = {}; // Menyimpan node audio per channel (1-14)
   let backgroundMusicElement = null;
+  let masterNode = null;
+
+  function ensureMaster() {
+    initAudioEngine();
+    if (!masterNode) {
+      masterNode = audioCtx.createGain();
+      masterNode.gain.value = 0.75;
+      masterNode.connect(audioCtx.destination);
+    }
+    return masterNode;
+  }
 
   // Inisialisasi Web Audio Context saat interaksi pertama (mengatasi kebijakan autoplay browser)
   function initAudioEngine() {
@@ -59,7 +70,7 @@
         highBq.connect(faderNode);
       }
 
-      faderNode.connect(audioCtx.destination); // Sambungkan ke Output Speaker / Audio Out
+      faderNode.connect(ensureMaster()); // Channel -> Master -> Audio Output
 
       channelNodes[chNum] = {
         source: sourceNode,
@@ -74,6 +85,12 @@
     } catch (e) {
       console.error(`Gagal menginisialisasi audio untuk CH${chNum}:`, e);
     }
+  };
+
+  window.updateMasterAudioLive = function(val) {
+    ensureMaster();
+    const n = Math.max(0, Math.min(100, Number(val)));
+    masterNode.gain.setTargetAtTime(n / 100, audioCtx.currentTime, 0.02);
   };
 
   // Sinkronisasi perubahan parameter web ke Web Audio API secara real-time
@@ -97,6 +114,18 @@
       }
     } catch (e) {
       console.error("Error updating audio param:", e);
+    }
+  };
+
+  window.connectMediaElementToChannel = function(chNum, mediaElement) {
+    initAudioEngine();
+    if (!mediaElement) return false;
+    try {
+      window.initChannelAudioNode(chNum, mediaElement);
+      return true;
+    } catch (e) {
+      console.error("[AUDIO ENGINE] Gagal menghubungkan input audio:", e);
+      return false;
     }
   };
 
