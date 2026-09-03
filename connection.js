@@ -8,10 +8,13 @@ window.MixerControl = (() => {
     connected: false,
     transport: "none",
     lastCommand: null,
-    lastRx: null
+    lastRx: null,
+    _adapterBound: false
   };
 
-  const emit = () => listeners.forEach(fn => fn({ ...state }));
+  const emit = () => listeners.forEach(fn => {
+    try { fn({ ...state }); } catch (e) { console.warn("MixerControl status listener:", e); }
+  });
 
   const onStatus = fn => {
     listeners.add(fn);
@@ -24,26 +27,24 @@ window.MixerControl = (() => {
     return () => cmdListeners.delete(fn);
   };
 
-  // SINKRONISASI STATUS KONEKSI KE WINDOW.STATE & UI
-  function setStatus(x) {
+  // SINGLE SOURCE FOR CONTROL-LAYER CONNECTION STATE.
+  function setStatus(x = {}) {
     Object.assign(state, x);
-    
-    // Pastikan window.state ikut terupdate
+
     if (window.state) {
       window.state.connected = !!state.connected;
       window.state.sim = window.state.sim || {};
       window.state.sim.online = !!state.connected;
     }
 
-    // Perbarui UI secara langsung
     updateUI(!!state.connected);
     emit();
   }
 
-  // FUNGSI UPDATE TAMPILAN (UI)
   function updateUI(isConnected) {
     const statusText = document.getElementById("status");
     const statusLamp = document.getElementById("statusLamp");
+
     if (statusText) {
       statusText.textContent = isConnected ? "ONLINE" : "OFFLINE";
       statusText.style.color = isConnected ? "#31e66b" : "";
@@ -51,16 +52,18 @@ window.MixerControl = (() => {
     if (statusLamp) statusLamp.className = isConnected ? "live" : "";
   }
 
-  // FUNGSI LAYER CONTROL/UI — hanya meneruskan ke MixerAdapters.
-  // Nama method publik tetap connectESP32 agar index.html tidak perlu diubah.
+  // CONTROL/UI LAYER:
+  // This function NEVER implements simulator/hardware logic itself.
+  // It delegates exactly once to MixerAdapters.connectESP32().
   async function connectESP32() {
     if (!window.state?.system) {
+      setStatus({ connected: false, transport: "none" });
       return { ok: false, connected: false, reason: "SYSTEM_OFF" };
     }
 
     const api = window.MixerAdapters;
     if (!api || typeof api.connectESP32 !== "function") {
-      setStatus({ connected: false, transport: "esp32" });
+      setStatus({ connected: false, transport: "none" });
       return { ok: false, connected: false, reason: "adapter-unavailable" };
     }
 
@@ -70,7 +73,8 @@ window.MixerControl = (() => {
 
       setStatus({
         connected: isConnected,
-        transport: adapterResult?.transport || (isConnected ? "esp32" : "none")
+        transport: adapterResult?.transport || (isConnected ? "esp32" : "none"),
+        lastRx: adapterResult?.lastRx || state.lastRx
       });
 
       return adapterResult || {
@@ -80,38 +84,53 @@ window.MixerControl = (() => {
       };
     } catch (e) {
       console.warn("Gagal memanggil MixerAdapters.connectESP32:", e);
-      setStatus({ connected: false, transport: "esp32" });
-      return { ok: false, connected: false, reason: e?.message || String(e) };
+      setStatus({ connected: false, transport: "none" });
+      return {
+        ok: false,
+        connected: false,
+        reason: e?.message || String(e)
+      };
     }
   }
 
   function disconnectESP32() {
     const api = window.MixerAdapters;
-    try { api?.disconnect?.(); } finally {
+    try {
+      if (api && typeof api.disconnect === "function") api.disconnect();
+    } finally {
       setStatus({ connected: false, transport: "none" });
     }
     return { ok: true, connected: false };
   }
 
-  // Status adapter diikat saat adapter sudah tersedia (connection.js dimuat lebih dulu).
+  // connection.js loads before adapters.js in index.html.
+  // Bind after the adapter exists, and bind only once.
   function bindAdapterStatus() {
     const api = window.MixerAdapters;
     if (!api || typeof api.onStatus !== "function") return;
     if (state._adapterBound) return;
+
     state._adapterBound = true;
     api.onStatus(s => {
+      const connected = !!s?.connected;
       setStatus({
-        connected: !!s?.connected,
-        transport: s?.transport || (s?.connected ? "esp32" : "none"),
+        connected,
+        transport: s?.transport || (connected ? "esp32" : "none"),
         lastRx: s?.lastRx || state.lastRx
       });
     });
   }
+
   bindAdapterStatus();
   window.addEventListener("load", bindAdapterStatus);
 
   function setControl(channel, control, value) {
     const ch = Number(channel);
+
+    if (!Number.isInteger(ch) || ch < 1 || ch > 14) {
+      return { ok: false, reason: "invalid-channel" };
+    }
+
     const command = {
       type: "CONTROL",
       channel: String(ch),
@@ -122,33 +141,52 @@ window.MixerControl = (() => {
       time: Date.now()
     };
 
-    if (!Number.isInteger(ch) || ch < 1 || ch > 14) {
-      return { ok: false, reason: "invalid-channel" };
-    }
-
     state.lastCommand = command;
-    cmdListeners.forEach(fn => fn({ ...command, direction: "TX" }));
+    cmdListeners.forEach(fn => {
+      try { fn({ ...command, direction: "TX" }); } catch (e) {}
+    });
 
     const api = window.MixerAdapters;
-    if (!state.connected && !api?.active?.connected) {
+    if (!api?.active?.connected) {
+      setStatus({
+        connected: false,
+        transport: "none"
+      });
       return { ok: false, reason: "esp32-offline" };
     }
 
-    if (api && typeof api.sendMapped === "function") {
-      const result = api.sendMapped(command);
-      if (result?.ok) {
-        setStatus({ connected: true, transport: result.transport || "esp32" });
-      }
-      return result || { ok: true, transport: "esp32-simulator" };
+    if (typeof api.sendMapped !== "function") {
+      return { ok: false, reason: "adapter-send-unavailable" };
     }
 
-    return { ok: true, transport: "esp32-simulator" };
+    const result = api.sendMapped(command);
+
+    if (result?.ok) {
+      setStatus({
+        connected: true,
+        transport: result.transport || "esp32"
+      });
+    }
+
+    return result || { ok: false, reason: "adapter-rejected" };
   }
 
   function applyRemote(message) {
     state.lastRx = message;
-    cmdListeners.forEach(fn => fn({ ...message, direction: "RX" }));
+    cmdListeners.forEach(fn => {
+      try { fn({ ...message, direction: "RX" }); } catch (e) {}
+    });
     return true;
   }
 
-  // Tombol UI ditangani oleh index.html agar tidak ada listener ganda.\n
+  return {
+    state,
+    onStatus,
+    onCommand,
+    setStatus,
+    setControl,
+    connectESP32,
+    disconnectESP32,
+    applyRemote
+  };
+})();
