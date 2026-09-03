@@ -1,760 +1,169 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap');
-
-/* =========================================================
-   1. VARIABLES & BASE SETUP
-   ========================================================= */
-:root {
-  --bg: #07090a;
-  --panel: #111416;
-  --panel2: #171a1c;
-  --line: #34393d;
-  --text: #e9eeee;
-  --muted: #8c969a;
-  --green: #31e66b;
-  --yellow: #ffd21c;
-  --red: #ff3b30;
-  --blue: #1594ff;
-  --cyan: #00f0ff;
-  --metal: #aeb4b7;
+/* ==========================================================================
+   RESET & LAYOUT GRID UTAMA CONSOLE
+   ========================================================================== */
+main.console {
+  display: grid !important;
+  grid-template-columns: minmax(300px, 1fr) 340px minmax(300px, 1fr) 140px !important;
+  grid-template-areas:
+    "ch-left center ch-right master"
+    "fx      center ch-right master"
+    "aux     center ch-right master" !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  float: none !important;
+  clear: both !important;
 }
 
-* {
+/* MENETRALISIR STYLING LAMA PADA MINGGIRAN / PENAKARAN */
+main.console > * {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  margin: 0 !important;
+  float: none !important;
+  clear: none !important;
+  width: auto !important;
+  max-width: none !important;
+}
+
+/* PENETAPAN AREA MASING-MASING ELEMEN */
+main.console > .channel-bank-left {
+  grid-area: ch-left !important;
+}
+
+main.console > .center-console {
+  grid-area: center !important;
+}
+
+main.console > .channel-bank-right {
+  grid-area: ch-right !important;
+}
+
+main.console > .master-rack {
+  grid-area: master !important;
+}
+
+main.console > .fx-rack,
+main.console > .fx-rack-live {
+  grid-area: fx !important;
+}
+
+main.console > .aux-rack {
+  grid-area: aux !important;
+}
+
+/* RESPONSIVE OVERFLOW UNTUK TABLET/LAYAR KECIL */
+@media screen and (max-width: 1024px) {
+  main.console {
+    overflow-x: auto !important;
+  }
+}
+
+/* ==========================================================================
+   STYLING FADER & KONTROL CHANNEL (AGAR BISA BERGERAK VISUALNYA)
+   ========================================================================== */
+.new-channel-strip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #121619;
+  border: 1px solid #2a323d;
+  border-radius: 6px;
+  padding: 8px 4px;
   box-sizing: border-box;
 }
 
-html, body {
-  margin: 0;
-  padding: 0;
-  background: radial-gradient(circle at 50% 0, #202427 0, #0b0d0e 42%, #050607 100%);
-  color: var(--text);
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-size: 12px;
-  line-height: 1.35;
-  width: 100% !important;
-  max-width: 100% !important;
-  overflow-x: hidden !important;
-}
-
-button, select, input {
-  font: inherit;
-}
-
-button {
-  background: linear-gradient(#292d30, #151719);
-  color: #eee;
-  border: 1px solid #4a5054;
-  border-radius: 5px;
-  padding: 7px 10px;
-  cursor: pointer;
-  box-shadow: inset 0 1px rgba(255, 255, 255, .08), 0 1px 3px #000;
-  transition: all 0.15s ease;
-}
-
-button:hover {
-  border-color: #727b80;
-  background: linear-gradient(#32373b, #1a1d1f);
-}
-
-button:active {
-  transform: translateY(1px);
-}
-
-button:disabled {
-  opacity: .45;
-  cursor: not-allowed;
-}
-
-.tab-hidden {
-  display: none !important;
-}
-
-/* =========================================================
-   2. TOPBAR & BRAND GLOW
-   ========================================================= */
-.topbar {
-  height: 88px;
-  padding: 8px;
-  display: grid;
-  grid-template-columns: 1.3fr 110px 1.55fr 1.45fr 1.25fr 150px;
-  gap: 7px;
-  background: #090a0b;
-  border-bottom: 2px solid #303538;
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  box-shadow: 0 4px 18px #000;
-}
-
-.brand, .system-box, .bridge-head, .status-head, .scene-head, .clock-head {
-  border: 1px solid #353a3d;
-  border-radius: 6px;
-  background: linear-gradient(#171a1c, #0d0f10);
-  padding: 7px;
-}
-
-.brand {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding-left: 14px;
-}
-
-.brand b {
-  font-size: 22px;
-  letter-spacing: 2px;
-  color: var(--cyan);
-  text-shadow: 0 0 12px rgba(0, 240, 255, 0.6), 0 0 25px rgba(0, 240, 255, 0.2);
-}
-
-.brand span, .box-title, .clock-head small, .status-head small {
-  font-size: 9px;
-  color: #90999d;
-  letter-spacing: 1px;
-}
-
-.box-title {
-  display: block;
-  text-align: center;
-  margin-bottom: 5px;
-}
-
-.system-box {
-  text-align: center;
-}
-
-.power-btn.on {
-  background: linear-gradient(#1da949, #0d6d29);
-  border-color: #39f16e;
-  color: #fff;
-  box-shadow: 0 0 10px rgba(49, 230, 107, 0.4);
-}
-
-.bridge-head {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 5px;
-  align-items: center;
-}
-
-.bridge-head .box-title {
-  grid-column: 1/-1;
-}
-
-.head-status {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  color: var(--green);
-  font-weight: 700;
-}
-
-.head-status i, .lamp {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #4b5255;
-  box-shadow: 0 0 4px #000;
-}
-
-.head-status i.live, .lamp.green {
-  background: var(--green);
-  box-shadow: 0 0 10px rgba(49, 230, 107, .8);
-}
-
-.lamp.red {
-  background: var(--red);
-  box-shadow: 0 0 8px rgba(255, 59, 48, .8);
-}
-
-.bluetooth-btn {
-  border-color: #315b83;
-}
-
-.status-head {
-  text-align: center;
-}
-
-.status-head strong {
-  display: block;
-  color: var(--green);
-  font-size: 11px;
-}
-
-.scene-head {
-  text-align: center;
-}
-
-.scene-head button {
-  margin: 0 2px;
-}
-
-.scene-head button:first-child {
-  background: #087c27;
-}
-
-.clock-head {
-  text-align: center;
-}
-
-.clock-head strong {
-  display: block;
-  font-size: 17px;
-  font-family: 'JetBrains Mono', monospace;
-}
-
-/* =========================================================
-   3. CHANNEL STRIP & CONSOLE LAYOUT
-   ========================================================= */
-.console {
-  display: grid;
-  grid-template-columns: 1fr 390px 1fr 150px;
-  gap: 7px;
-  padding: 7px;
-  align-items: start;
-}
-
-.channel-bank, .center-console, .master-rack {
-  background: linear-gradient(#171a1c, #0d0f10);
-  border: 1px solid #34393c;
-  border-radius: 6px;
-  box-shadow: 0 4px 14px #000;
-}
-
-.bank-title {
-  height: 28px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 9px;
-  border-bottom: 1px solid #333;
-  color: #b8c0c3;
-  font-weight: 700;
-}
-
-.bank-title small {
-  color: #707a7e;
-}
-
-.channel-bank {
-  overflow: hidden;
-}
-
-.channel-bank > #channels, 
-.channel-bank > #channelsRight, 
-.channel-bank .channel-grid {
-  display: flex;
-  flex-direction: row;
-  gap: 4px;
-  padding: 4px;
-  overflow-x: auto;
-}
-
-.channel, .new-channel-strip {
-  min-width: 80px;
-  max-width: 95px;
-  flex: 1;
-  background: linear-gradient(180deg, #181c20 0%, #0d0f11 100%);
-  border: 1px solid #2a3035;
-  border-radius: 6px;
-  padding: 6px 4px;
-  text-align: center;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08), 0 4px 10px rgba(0, 0, 0, 0.5);
-  transition: transform 0.2s ease, border-color 0.2s ease;
-}
-
-.channel:hover, .new-channel-strip:hover {
-  border-color: #00b4d8;
-  transform: translateY(-2px);
-}
-
-.channel[data-type="vox"] { border-top: 3px solid #00f0ff; }
-.channel[data-type="guitar"] { border-top: 3px solid #a855f7; }
-.channel[data-type="drums"] { border-top: 3px solid #22c55e; }
-.channel[data-type="keys"] { border-top: 3px solid #f97316; }
-
-.channel h3, .new-channel-head {
-  font-size: 12px;
-  margin: 0 0 4px;
-  color: #fff;
-  font-weight: 700;
-}
-
-.channel h3:after {
-  content: " MIC";
-  display: block;
-  color: #65cfff;
-  font-size: 8px;
-  margin-top: 2px;
-}
-
-.channel-eq-thumb {
-  width: 100%;
-  height: 36px;
-  background: #080b0e;
-  border: 1px solid #1e262c;
-  border-radius: 4px;
-  margin-bottom: 6px;
-  position: relative;
-  overflow: hidden;
-}
-
-.channel-eq-thumb svg {
-  width: 100%;
-  height: 100%;
-  stroke: var(--cyan);
-  stroke-width: 1.5;
-  fill: rgba(0, 240, 255, 0.12);
-  filter: drop-shadow(0px 0px 3px rgba(0, 240, 255, 0.5));
-}
-
-.channel .led {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #202427;
-  border: 1px solid #4c5558;
-  margin: 1px auto 5px;
-  box-shadow: 0 0 2px #000;
-}
-
-.channel .led.active {
-  background: var(--green);
-  box-shadow: 0 0 8px var(--green);
-}
-
-.channel label, .new-channel-control {
-  width: 100%;
-  font-size: 8px;
-  color: #b7c0c3;
-  margin: 3px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  gap: 2px;
-}
-
-.channel label:before {
-  font-weight: 700;
-  color: #dfe4e5;
-}
-
-.channel label:after {
-  display: block;
-  font-size: 7px;
-  color: #7f898d;
-  line-height: 1;
-}
-
-.channel label:nth-of-type(1):after { content: "0–2"; }
-.channel label:nth-of-type(2):after, 
-.channel label:nth-of-type(3):after, 
-.channel label:nth-of-type(4):after { content: "−12 0 +12"; }
-.channel label:nth-of-type(5):after { content: "L C R"; }
-
-/* =========================================================
-   4. ROTARY KNOBS & FADERS (VOLUME DARI BAWAH KE ATAS)
-   ========================================================= */
-.channel .knob-wrap {
-  position: relative;
-  display: block;
-  width: 40px;
-  height: 40px;
-  margin: 1px auto 2px;
-  border-radius: 50%;
-  touch-action: none;
-  cursor: ns-resize;
-  outline: none;
-  user-select: none;
-  will-change: transform;
-}
-
-.channel input.knob, .new-knob {
-  width: 100%;
-  height: 4px;
-  accent-color: var(--cyan);
-  cursor: pointer;
-}
-
-.channel .knob-face {
-  position: absolute;
-  inset: 2px;
-  border-radius: 50%;
-  pointer-events: none;
-  background: radial-gradient(circle at 34% 28%, #6d767a 0, #303638 28%, #141718 62%, #050607 100%);
-  border: 2px solid #555d60;
-  box-shadow: inset 0 2px 4px rgba(255, 255, 255, .18), inset 0 -3px 5px rgba(0, 0, 0, .85), 0 2px 5px #000;
-  transform: rotate(var(--knob-angle, -135deg));
-  transition: transform 20ms linear;
-}
-
-.channel .knob-face:before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 3px;
-  width: 2px;
-  height: 10px;
-  margin-left: -1px;
-  border-radius: 2px;
-  background: #e6ecee;
-  box-shadow: 0 0 4px rgba(255, 255, 255, .55);
-}
-
-/* PERBAIKAN VOLUME: Fader bergerak alami dari BAWAH ke ATAS */
-.channel input.fader, 
-.new-fader, 
+/* Slider Fader Vertikal */
+.new-channel-strip input[type="range"].fader,
 .master-card input[type="range"] {
-  appearance: slider-vertical;
-  writing-mode: vertical-lr;
-  direction: ltr; /* Memastikan titik nol ada di bawah dan nilai maksimum di atas */
-  width: 22px;
-  height: 160px;
-  background: #06080a;
-  border: 1px solid #282e33;
-  border-radius: 4px;
-  margin: 6px auto;
-  box-shadow: inset 0 0 8px #000;
+  -webkit-appearance: slider-vertical;
+  writing-mode: bt-lr;
+  width: 24px;
+  height: 180px;
+  background: #080a0b;
+  outline: none;
   cursor: pointer;
+  /* Transisi halus saat nilai diubah via JS/Test */
+  transition: value 0.1s ease, transform 0.05s ease;
 }
 
-.channel output, .new-channel-fader output {
-  color: #8eff9e;
-  font-weight: 700;
-  margin: 2px 0;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-}
-
-.channel button, .new-channel-buttons button {
-  width: 100%;
-  padding: 4px 1px;
-  margin: 2px 0;
-  font-size: 9px;
-  font-weight: 700;
-  border-radius: 4px;
-  border: 1px solid #334155;
-}
-
-.channel button[data-k="mute"].on, 
-.new-channel-buttons button[data-k="mute"].on {
-  background: linear-gradient(180deg, #ef4444, #991b1b) !important;
-  border-color: #f87171 !important;
+/* Mute & Solo Button Active State */
+.btn-mute.active {
+  background-color: #e74c3c !important;
   color: #fff !important;
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.6) !important;
+  box-shadow: 0 0 8px rgba(231, 76, 60, 0.8);
 }
 
-.channel button[data-k="solo"].on, 
-.new-channel-buttons button[data-k="solo"].on {
-  background: linear-gradient(180deg, #eab308, #854d0e) !important;
-  border-color: #fde047 !important;
-  color: #fff !important;
-  box-shadow: 0 0 10px rgba(234, 179, 8, 0.6) !important;
+.btn-solo.active {
+  background-color: #f1c40f !important;
+  color: #000 !important;
+  box-shadow: 0 0 8px rgba(241, 196, 15, 0.8);
 }
 
-.channel .small, .new-channel-source {
-  font-size: 8px;
-  color: #777;
-  margin-top: auto;
-  text-transform: uppercase;
-}
-
-/* =========================================================
-   5. CENTER CONSOLE & DISPLAY SCREEN
-   ========================================================= */
-.center-console {
-  padding: 7px;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-
-.screen-frame {
-  position: relative;
-  border: 5px solid;
-  border-color: #4b5357 #15191b #090b0c #687176;
-  border-radius: 12px;
-  padding: 8px;
-  background: linear-gradient(145deg, #182125, #030608 55%, #151b1e);
-  box-shadow: inset 0 0 0 2px #050607, inset 0 0 28px rgba(0, 170, 255, .12), 0 8px 18px #000, 0 0 0 1px #7d8588;
-}
-
-.screen-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  text-align: center;
-  padding: 2px 4px 5px;
-}
-
-.screen-title b {
-  font-size: 15px;
-  letter-spacing: 1.5px;
-  text-shadow: 0 0 8px rgba(103, 200, 255, .35);
-}
-
-.screen-title span {
-  font-size: 10px;
-  color: #aab2b5;
-  letter-spacing: 1px;
-}
-
-.screen-tabs {
-  display: flex;
-  gap: 3px;
-  margin: 5px 0;
-  background: linear-gradient(#0e1519, #05080a);
-  padding: 4px;
-  border: 1px solid #263b45;
-  border-radius: 7px;
-  box-shadow: inset 0 1px rgba(255, 255, 255, .08);
-}
-
-.screen-tabs button {
-  flex: 1;
-  padding: 5px 8px;
-  font-size: 9px;
-  min-height: 32px;
-  border-radius: 5px;
-  font-weight: 700;
-  letter-spacing: .5px;
-}
-
-.screen-tabs button.active {
-  background: linear-gradient(#1589d2, #064b80);
-  border-color: #1b9cff;
-  box-shadow: inset 0 1px rgba(255, 255, 255, .35), 0 0 12px rgba(21, 148, 255, .35);
-  text-shadow: 0 1px #000;
-}
-
-.screen-view {
-  display: none;
-  min-height: 230px;
-}
-
-.screen-view.active {
-  display: block;
-}
-
-.screen-dashboard {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.screen-readouts {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 3px;
-}
-
-.screen-readouts div {
-  background: #071017;
-  border: 1px solid #1c3a4b;
-  padding: 5px 3px;
-  text-align: center;
-}
-
-.screen-readouts small {
-  display: block;
-  color: #6f8b98;
-  font-size: 7px;
-}
-
-.screen-readouts b {
-  display: block;
-  color: #67e7ff;
-  font-size: 9px;
-  margin-top: 2px;
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.spectrum {
-  height: 190px;
-  background: repeating-linear-gradient(90deg, #07131d 0 18px, #0a1b27 19px 20px);
-  border: 1px solid #183a4d;
-  position: relative;
-  overflow: hidden;
-}
-
-.bars {
-  position: absolute;
-  inset: 15px 8px 25px;
-  background: linear-gradient(90deg, transparent 0 3%, #1fda52 4% 5%, transparent 6% 9%, #e5d92c 10% 11%, transparent 12% 15%, #1bdc5e 16% 17%, transparent 18% 22%, #ffb21a 23% 24%, transparent 25% 30%, #2ee263 31% 32%, transparent 33% 37%, #f33 38% 39%, transparent 40% 45%, #2fe265 46% 48%, transparent 49% 54%, #ffe41d 55% 56%, transparent 57% 61%, #29dd62 62% 63%, transparent 64% 70%, #f44336 71% 72%, transparent 73% 80%, #2ce261 81% 83%, transparent 84%);
-  opacity: .75;
-}
-
-.grid-lines {
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(0deg, transparent 0 28px, rgba(50, 130, 160, .14) 29px 30px), repeating-linear-gradient(90deg, transparent 0 31px, rgba(50, 130, 160, .11) 32px 33px);
-  pointer-events: none;
-}
-
-/* =========================================================
-   6. FX & AUX RACKS
-   ========================================================= */
-.fx-rack, .aux-rack {
-  margin-top: 7px;
-  border: 1px solid #363b3e;
-  background: #131719;
-  padding: 8px;
-  border-radius: 6px;
-}
-
-.rack-title { font-size: 9px; color: #b9c0c3; font-weight: bold; }
-.rack-title span { float: right; color: var(--muted); }
-
-.fx-display {
-  display: inline-flex;
-  flex-direction: column;
-  margin: 8px 10px 4px 0;
-}
-
-.fx-display strong { color: var(--green); }
-.fx-display small { font-size: 8px; color: #8d969a; }
-
-.aux-rack { 
-  display: grid; 
-  grid-template-columns: 1fr 1fr; 
-  gap: 8px; 
-}
-
-.aux-unit {
-  background: #0a0d0e;
-  border: 1px solid #262a2d;
-  padding: 8px;
-  border-radius: 4px;
-}
-
-.aux-unit b {
-  display: block;
-  font-size: 9px;
-  color: var(--cyan);
-  margin-bottom: 4px;
-}
-
-/* =========================================================
-   7. LATAR BELAKANG SIDE PANEL (DEVICE CONNECTION, BRIDGE, ETC)
-   ========================================================= */
-.right-tools {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 4px;
-}
-
-.device-connection, 
-.bridge-panel, 
-.media-rack, 
+/* ==========================================================================
+   STYLING UI PANEL PENGUJIAN (CONNECTION / TEST PANEL)
+   ========================================================================== */
 .connection-test-panel {
-  background: linear-gradient(180deg, #161a1d 0%, #0d0f11 100%);
-  border: 1px solid #30363a;
-  border-radius: 6px;
-  padding: 10px;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 4px 12px rgba(0,0,0,0.6);
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px auto;
+  max-width: 100%;
+  color: #c9d1d9;
+  font-family: monospace;
+  box-sizing: border-box;
 }
 
-.device-connection h2, 
-.bridge-panel h2, 
-.media-rack h2, 
 .connection-test-panel h2 {
-  font-size: 10px;
-  color: var(--cyan);
-  letter-spacing: 1px;
-  margin: 0 0 8px 0;
-  text-transform: uppercase;
-  border-bottom: 1px solid #282e32;
-  padding-bottom: 4px;
+  margin-top: 0;
+  font-size: 1.1rem;
+  color: #58a6ff;
+  border-bottom: 1px solid #21262d;
+  padding-bottom: 8px;
 }
 
-.device-status, .bridge-summary {
-  background: #090c0d;
-  border: 1px solid #20262a;
-  border-radius: 4px;
-  padding: 6px;
-  margin: 6px 0;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  color: #aeb8bc;
+.connection-test-panel .test-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+  margin: 12px 0;
 }
 
-.bridge-log {
-  background: #050708;
-  border: 1px solid #1c2225;
-  border-radius: 4px;
-  padding: 6px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  color: var(--green);
-  max-height: 80px;
-  overflow-y: auto;
-}
-
-/* Master Rack */
-.master-rack {
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: center;
-}
-
-.master-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
-.master-card h2 {
-  font-size: 11px;
-  color: var(--red);
-  margin: 0 0 6px;
-}
-
-/* =========================================================
-   8. BOTTOM NAVIGATION & FOOTER
-   ========================================================= */
-.bottom-nav {
-  display: flex;
-  background: #090b0c;
-  border-top: 2px solid #303538;
-  padding: 4px;
-  gap: 4px;
-  position: sticky;
-  bottom: 0;
-  z-index: 10;
-}
-
-.bottom-nav button {
-  flex: 1;
-  padding: 8px 4px;
-  font-size: 10px;
+.connection-test-panel button {
+  background: #21262d;
+  color: #c9d1d9;
+  border: 1px solid #363b42;
+  padding: 8px 12px;
+  font-size: 0.75rem;
   font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.bottom-nav button.active {
-  background: linear-gradient(#1589d2, #064b80);
-  border-color: #1b9cff;
-  color: #fff;
+.connection-test-panel button:hover {
+  background: #30363d;
+  border-color: #58a6ff;
+  color: #ffffff;
 }
 
-.status-footer {
-  display: flex;
-  justify-content: space-between;
-  background: #050607;
-  padding: 6px 12px;
-  font-size: 9px;
-  color: var(--muted);
-  border-top: 1px solid #202427;
+.connection-test-panel button:active {
+  transform: scale(0.98);
+  background: #1f6feb;
 }
 
-.status-footer b {
-  color: var(--text);
+.connection-test-panel pre {
+  background: #040d21;
+  border: 1px solid #1b283e;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: #7ee787;
+  overflow-x: auto;
+  margin: 6px 0;
 }
