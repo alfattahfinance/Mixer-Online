@@ -203,15 +203,21 @@
     </div>
 
     <section class="media-rack" style="margin-top: 6px;">
+   <!-- PLAYER / RECORDER DENGAN KONTROL PLAY / PAUSE NYATA -->
+    <section class="media-rack" style="margin-top: 6px;">
       <h2>PLAYER / RECORDER <span id="activePlayerTarget" style="font-size: 9px; color: #00f0ff; float: right;">[CH 1]</span></h2>
-      <div style="display: flex; gap: 4px;">
-        <button id="btnPlayerRec" type="button" style="flex: 1;">🎙<small>RECORDER</small></button>
+      <div style="display: flex; gap: 4px; margin-bottom: 4px;">
+        <button id="btnPlayerRec" type="button" style="flex: 1;">🎙<small>REC</small></button>
         <button id="btnPlayerFile" type="button" style="flex: 1;">📁<small>FILE</small></button>
         <button id="btnPlayerMusic" type="button" style="flex: 1;">🎵<small>MUSIC</small></button>
       </div>
+      <div style="display: flex; gap: 4px; align-items: center; background: #111; padding: 4px; border-radius: 4px;">
+        <span id="playerTrackInfo" style="font-size: 9px; color: #aaa; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">NO FILE SELECTED</span>
+        <button id="btnPlayPauseAudio" type="button" style="background: #00bcd4; color: #000; border: none; padding: 2px 8px; font-weight: bold; border-radius: 3px; cursor: pointer;">▶ PLAY</button>
+      </div>
       <input type="file" id="localAudioLoader" accept="audio/*" style="display: none;">
     </section>
-  </section>
+
 
   <section class="channel-bank channel-bank-right">
     <div class="bank-title"><span>INPUT CHANNELS 8–14</span><small>CH8–CH14</small></div>
