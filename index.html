@@ -54,7 +54,7 @@
         <button data-screen="EFFECT">EFFECT</button>
         <button data-screen="SCENE">SCENE</button>
       </div>
-      <!-- Ganti bagian <div class="screen-content" id="screenContent"> di index.html dengan struktur pro ini -->
+      
 <div class="screen-content" id="screenContent">
   <!-- VIEW: HOME / CHANNEL STRIP OVERVIEW -->
   <section class="screen-view active" data-view="HOME">
@@ -90,10 +90,16 @@
         </div>
       </div>
 
+      <!-- FITUR BARU: KOTAK INPUT AUDIO & PILIH CHANNEL DI LAYAR -->
+      <div class="pro-audio-source-box" style="margin-top: 4px; margin-bottom: 4px; padding: 4px 6px; background: #121619; border: 1px solid #30363d; border-radius: 4px; display: flex; align-items: center; gap: 6px;">
+        <span style="font-size: 8px; color: #00f0ff; font-weight: bold;">AUDIO SRC:</span>
+        <input type="text" id="screenAudioInputUrl" placeholder="Ketik URL audio (MP3/Stream)..." style="flex-grow: 1; background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; font-size: 9px; padding: 2px 5px; border-radius: 3px;" value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">
+        <button id="screenLoadAudioBtn" type="button" style="background: #21262d; color: #31e66b; border: 1px solid #31e66b; padding: 2px 6px; font-size: 8px; font-weight: bold; border-radius: 3px; cursor: pointer;">LOAD & PLAY</button>
+      </div>
+
       <!-- Mini RTA / Spectrum Analyzer Simulation -->
       <div class="pro-mini-spectrum" id="visualMeter">
         <div class="spectrum-bars-container">
-          <!-- Live animated meter representation -->
           <div class="bar-col" style="height: 60%"></div>
           <div class="bar-col" style="height: 80%"></div>
           <div class="bar-col" style="height: 45%"></div>
@@ -388,8 +394,6 @@
 <script src="channels-bridge.js"></script> 
 <script src="audio-engine.js"></script>
 
-
-
 <script>
 (function(){
   const clock = document.getElementById('clock');
@@ -595,7 +599,6 @@
       if(rx && stats) rx.textContent=stats.rx;
       if(ack && stats) ack.textContent=stats.ack;
 
-      // Update Teks TX & RX pada Panel Test secara Realtime
       var txPanel = document.getElementById("tx");
       var rxPanel = document.getElementById("rx");
       if (txPanel && st?.lastTx) txPanel.textContent = "TX: " + JSON.stringify(st.lastTx);
