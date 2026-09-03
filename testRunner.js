@@ -3,11 +3,26 @@
 window.MixerTestRunner = (() => {
   const logTest = (msg) => {
     const testLog = document.getElementById("testOutputLog") || document.getElementById("testResult");
-    if (testLog) testLog.textContent = msg;
+    if (testLog) testLog.textContent = "TEST: " + msg;
     console.log(`[TEST RUNNER] ${msg}`);
   };
 
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  // Helper aman untuk mengeksekusi perintah kontrol & menyinkronkan UI
+  const setControlSafe = (ch, param, value) => {
+    if (window.MixerControl && typeof window.MixerControl.setControl === "function") {
+      window.MixerControl.setControl(ch, param, value);
+    }
+    // Update state global jika ada
+    if (window.state?.channels?.[ch - 1]) {
+      window.state.channels[ch - 1][param] = value;
+    }
+    // Panggil sync UI jika tersedia agar fader/tombol bergerak di layar
+    if (typeof window.syncNew14ChannelPanel === "function") {
+      window.syncNew14ChannelPanel();
+    }
+  };
 
   // Variabel untuk memutar channel secara berurutan saat Simulate RX diklik
   let rxCurrentChannel = 1;
@@ -15,14 +30,11 @@ window.MixerTestRunner = (() => {
   async function run14ChLoopback() {
     logTest("Menjalankan 14CH Loopback Test...");
     for (let ch = 1; ch <= 14; ch++) {
-      if (window.MixerControl?.setControl) {
-        window.MixerControl.setControl(ch, "fader", 100);
-      }
+      setControlSafe(ch, "fader", 100);
       await delay(50);
-      if (window.MixerControl?.setControl) {
-        window.MixerControl.setControl(ch, "fader", 0);
-      }
+      setControlSafe(ch, "fader", 0);
       await delay(50);
+      setControlSafe(ch, "fader", 75); // Reset ke level standar
     }
     logTest("14CH Loopback Test: SELESAI (OK)");
   }
@@ -32,10 +44,8 @@ window.MixerTestRunner = (() => {
     for (let i = 0; i < 100; i++) {
       const randomCh = Math.floor(Math.random() * 14) + 1;
       const randomVal = Math.floor(Math.random() * 100);
-      if (window.MixerControl?.setControl) {
-        window.MixerControl.setControl(randomCh, "fader", randomVal);
-      }
-      await delay(10);
+      setControlSafe(randomCh, "fader", randomVal);
+      await delay(15);
     }
     logTest("Repeat Stress Test: SELESAI (OK)");
   }
@@ -43,36 +53,36 @@ window.MixerTestRunner = (() => {
   async function runMuteSoloTest() {
     logTest("Menjalankan Mute/Solo Test...");
     for (let ch = 1; ch <= 14; ch++) {
-      if (window.MixerControl?.setControl) {
-        window.MixerControl.setControl(ch, "mute", true);
-        window.MixerControl.setControl(ch, "solo", true);
-      }
-      await delay(30);
-      if (window.MixerControl?.setControl) {
-        window.MixerControl.setControl(ch, "mute", false);
-        window.MixerControl.setControl(ch, "solo", false);
-      }
+      setControlSafe(ch, "mute", true);
+      setControlSafe(ch, "solo", true);
+      await delay(40);
+      setControlSafe(ch, "mute", false);
+      setControlSafe(ch, "solo", false);
     }
     logTest("Mute/Solo Test: SELESAI (OK)");
   }
 
-  // PERBAIKAN: Simulasi RX sekarang akan memutar CH1 - CH14 secara bergantian & acak nilainya
+  // Simulasi RX memutar CH1 - CH14 secara bergantian & memperbarui elemen teks RX
   function simulateHardwareRx() {
     const randomVal = Math.floor(Math.random() * 100);
-    const targetCh = rxCurrentChannel; // Bergantian dari 1 sampai 14
+    const targetCh = rxCurrentChannel;
 
-    if (window.MixerAdapters?.simulateHardwareChange) {
+    if (window.MixerAdapters && typeof window.MixerAdapters.simulateHardwareChange === "function") {
       window.MixerAdapters.simulateHardwareChange(targetCh, "fader", randomVal);
       logTest(`Hardware RX: Channel ${targetCh} Fader Set to ${randomVal}%`);
-    } else if (window.MixerControl?.setControl) {
-      // Fallback jika adapter tidak memiliki method simulateHardwareChange
-      window.MixerControl.setControl(targetCh, "fader", randomVal);
-      logTest(`Hardware RX (Fallback): Channel ${targetCh} Fader Set to ${randomVal}%`);
     } else {
-      logTest("Hardware RX: Adapter tidak mendukung");
+      // Fallback menggunakan setControlSafe
+      setControlSafe(targetCh, "fader", randomVal);
+      logTest(`Hardware RX (Fallback): Channel ${targetCh} Fader Set to ${randomVal}%`);
     }
 
-    // Naikkan channel untuk klik berikutnya (kembali ke 1 jika sudah mencapai 14)
+    // Update elemen <pre id="rx"> jika ada di DOM
+    const rxPre = document.getElementById("rx");
+    if (rxPre) {
+      rxPre.textContent = `RX: {"ch":${targetCh},"param":"fader","val":${randomVal}}`;
+    }
+
+    // Rotasi giliran channel (1 - 14)
     rxCurrentChannel = rxCurrentChannel >= 14 ? 1 : rxCurrentChannel + 1;
   }
 
