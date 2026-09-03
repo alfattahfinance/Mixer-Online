@@ -7,6 +7,7 @@
   let audioCtx = null;
   const channelNodes = {}; // Menyimpan node audio per channel (1-14)
   let backgroundMusicElement = null;
+  const channelAudioElements = {};
   let masterNode = null;
 
   function ensureMaster() {
@@ -132,21 +133,35 @@
   // Fungsi untuk menghubungkan pemutar musik ke Channel tertentu
   window.connectCustomAudioToChannel = function(chNum, url) {
     initAudioEngine();
-    
-    // Hentikan pemutar musik sebelumnya jika ada
-    if (backgroundMusicElement) {
-      backgroundMusicElement.pause();
+    const ch = Number(chNum);
+    if (!Number.isInteger(ch) || ch < 1 || ch > 14) return false;
+
+    // Setiap channel mempunyai sumber audio sendiri.
+    if (channelAudioElements[ch]) {
+      channelAudioElements[ch].pause();
+      channelAudioElements[ch].src = "";
     }
 
-    backgroundMusicElement = new Audio(url);
-    backgroundMusicElement.loop = true;
-    backgroundMusicElement.crossOrigin = "anonymous";
+    const audio = new Audio(url);
+    audio.loop = false;
+    audio.crossOrigin = "anonymous";
+    channelAudioElements[ch] = audio;
 
-    window.initChannelAudioNode(chNum, backgroundMusicElement);
-    
-    backgroundMusicElement.play()
-      .then(() => console.log(`[AUDIO ENGINE] Berhasil memutar audio ke CH${chNum}`))
-      .catch(err => console.log("Autoplay dicegah browser, klik interaksi diperlukan:", err));
+    window.initChannelAudioNode(ch, audio);
+
+    audio.play()
+      .then(() => console.log(`[AUDIO ENGINE] Audio CH${ch} PLAY`))
+      .catch(err => console.warn(`[AUDIO ENGINE] CH${ch} perlu klik PLAY lagi:`, err));
+    return true;
+  };
+
+  window.stopChannelAudio = function(chNum) {
+    const ch = Number(chNum);
+    const audio = channelAudioElements[ch];
+    if (!audio) return false;
+    audio.pause();
+    audio.currentTime = 0;
+    return true;
   };
 
   window.connectPlayerToChannel1 = function(audioElementOrUrl) {
