@@ -1,10 +1,9 @@
 /* ==========================================================================
-   ISOLATED CHANNEL PARAMETER BRIDGE (GAIN-LOCK & INDEPENDENT STATE)
+   CHANNELS BRIDGE - FULLY ISOLATED PARAMETER SYNC
    ========================================================================== */
 (function () {
   "use strict";
 
-  // Pastikan struktur state global tersedia untuk 14 channel dengan parameter terisolasi
   if (!window.state) window.state = {};
   if (!window.state.channels) {
     window.state.channels = [];
@@ -23,14 +22,13 @@
     }
   }
 
-  // Fungsi pengiriman parameter ke hardware secara spesifik
   window.sendChannelParamToHardware = function(chNum, paramName, value) {
     const payload = {
       protocol: "ESP32-MIXER/1",
       id: "cmd-" + Date.now(),
       type: "CONTROL",
       ch: chNum,
-      param: paramName, 
+      param: paramName,
       value: value,
       rev: 1,
       ts: Date.now(),
@@ -43,39 +41,31 @@
     if (window.MixerAdapters && typeof window.MixerAdapters.send === "function") {
       window.MixerAdapters.send(payload);
     }
-
-    console.log(`[INDEPENDENT TX] CH${chNum} -> ${paramName}:`, value);
   };
 
-  // Mencegah gangguan silang (cross-talk/gain-following) pada tingkat DOM input
+  // Mengunci event input agar parameter independen satu sama lain
   document.addEventListener("input", (e) => {
     const target = e.target;
-    
-    // Validasi ketat elemen yang diubah
     if (!target || !target.dataset || !target.dataset.ch || !target.dataset.param) {
       return;
     }
 
     const chNum = parseInt(target.dataset.ch, 10);
-    const param = target.dataset.param; // "gain", "fader", "pan", "low", "high", dll.
+    const param = target.dataset.param;
     const val = parseFloat(target.value);
 
     if (isNaN(chNum) || !param || isNaN(val)) return;
 
-    // Hentikan perambatan agar script render bawaan channel tidak salah tangkap
+    // Cegah event merembet ke elemen lain
     e.stopImmediatePropagation();
 
-    // Pastikan HANYA parameter yang dimaksud saja yang nilainya berubah di state
     if (window.state.channels[chNum - 1]) {
       window.state.channels[chNum - 1][param] = val;
     }
 
-    // Kirim data parameter spesifik tersebut
     window.sendChannelParamToHardware(chNum, param, val);
+  }, true);
 
-  }, true); // Gunakan fase tangkap (capture) terdepan
-
-  // Handler terpisah untuk tombol Mute/Solo
   document.addEventListener("click", (e) => {
     const target = e.target.closest('[data-action]');
     if (!target || !target.dataset || !target.dataset.ch) return;
@@ -85,13 +75,13 @@
     
     if (!isNaN(chNum) && (action === "mute" || action === "solo")) {
       e.stopImmediatePropagation();
-      const currentState = !!window.state.channels[chNum - 1][action];
-      const newState = !currentState;
-      
-      window.state.channels[chNum - 1][action] = newState;
-      target.classList.toggle("active", newState);
+      const channel = window.state.channels[chNum - 1];
+      if (!channel) return;
 
-      window.sendChannelParamToHardware(chNum, action, newState);
+      channel[action] = !channel[action];
+      target.classList.toggle("active", channel[action]);
+
+      window.sendChannelParamToHardware(chNum, action, channel[action]);
     }
   }, true);
 
