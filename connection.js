@@ -74,49 +74,45 @@ window.MixerControl = (() => {
     }
   }
 
-  // FUNGSI CONNECT ESP32 (TOGGLE DIRECT & ADAPTER)
-  function connectESP32() {
-    // 1. Cek apakah System Utama (Power) sudah ON
+  // FUNGSI LAYER CONTROL/UI — hanya meneruskan ke MixerAdapters.
+  // Nama method publik tetap connectESP32 agar index.html tidak perlu diubah.
+  async function connectESP32() {
     if (!window.state?.system) {
-      alert("Nyalakan SYSTEM terlebih dahulu!");
-      return { ok: false, reason: "SYSTEM_OFF" };
+      return { ok: false, connected: false, reason: "SYSTEM_OFF" };
     }
 
-    const nextState = !state.connected;
     const api = window.MixerAdapters;
-
-    // 2. Cobalah hubungkan via MixerAdapters jika tersedia
-    if (api && typeof api.connectESP32 === "function") {
-      try {
-        const result = api.connectESP32({ systemOn: true });
-        if (result && typeof result.then === "function") {
-          return result.then(r => {
-            setStatus({ connected: !!r?.connected, transport: r?.transport || "esp32" });
-            return r;
-          });
-        }
-      } catch (e) {
-        console.warn("Adapter connect error, switching to direct simulator:", e);
-      }
+    if (!api || typeof api.connectESP32 !== "function") {
+      setStatus({ connected: false, transport: "esp32" });
+      return { ok: false, connected: false, reason: "adapter-unavailable" };
     }
 
-    // 3. Fallback Simulator Langsung (Memastikan ESP32 BISA ON meskipun adapter tidak merespon)
-    setStatus({
-      connected: nextState,
-      transport: nextState ? "esp32-simulator" : "none"
-    });
+    try {
+      const adapterResult = await api.connectESP32({ systemOn: true });
+      const isConnected = adapterResult?.connected === true;
 
-    if (api && api.active) {
-      api.active.connected = nextState;
-      api.active.transport = nextState ? "esp32-simulator" : "none";
+      setStatus({
+        connected: isConnected,
+        transport: adapterResult?.transport || (isConnected ? "esp32" : "none")
+      });
+
+      return adapterResult || {
+        ok: isConnected,
+        connected: isConnected,
+        transport: isConnected ? "esp32" : "none"
+      };
+    } catch (e) {
+      console.warn("Gagal memanggil MixerAdapters.connectESP32:", e);
+      setStatus({ connected: false, transport: "esp32" });
+      return { ok: false, connected: false, reason: e?.message || String(e) };
     }
-
-    return { ok: true, connected: nextState };
   }
 
   function disconnectESP32() {
-    window.MixerAdapters?.disconnect?.();
-    setStatus({ connected: false, transport: "none" });
+    const api = window.MixerAdapters;
+    try { api?.disconnect?.(); } finally {
+      setStatus({ connected: false, transport: "none" });
+    }
     return { ok: true, connected: false };
   }
 
@@ -169,30 +165,4 @@ window.MixerControl = (() => {
     return true;
   }
 
-  // OTOMATIS HUBUNGKAN EVENT LISTENER TOMBOL KETIKA DOM SIAP
-  if (typeof document !== "undefined") {
-    document.addEventListener("DOMContentLoaded", () => {
-      const btnTop = document.getElementById("connectEsp");
-      const btnDevice = document.getElementById("deviceConnect");
-
-      const handleConnect = (e) => {
-        if (e) e.preventDefault();
-        connectESP32();
-      };
-
-      if (btnTop) btnTop.addEventListener("click", handleConnect);
-      if (btnDevice) btnDevice.addEventListener("click", handleConnect);
-    });
-  }
-
-  return {
-    state,
-    onStatus,
-    onCommand,
-    setStatus,
-    setControl,
-    connectESP32,
-    disconnectESP32,
-    applyRemote
-  };
-})();
+  // Tombol UI ditangani oleh index.html agar tidak ada listener ganda.\n
