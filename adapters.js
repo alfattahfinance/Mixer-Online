@@ -143,8 +143,6 @@ window.MixerAdapters = (() => {
     emitStatus();
   }
 
-  // Physical ESP32 bridge mapping. Values are normalized by protocol;
-  // the actual GPIO/ADC/DAC implementation is isolated behind this mapper.
   const PHYSICAL_CHANNELS = CHANNEL_COUNT;
   const PHYSICAL_PARAMS = ["fader","gain","low","mid","high","pan","mute","solo"];
 
@@ -211,8 +209,6 @@ window.MixerAdapters = (() => {
   function bridgeApply(packet) {
     const mapped = mapRemoteToHardware(packet);
     if (!mapped.ok) return mapped;
-    // The simulator records the hardware-facing command. A future physical
-    // ESP32 can consume exactly this command without changing Mixer-Online.
     active.bridge.commands.push({
       ...mapped,
       sourceId: packet.id,
@@ -289,8 +285,6 @@ window.MixerAdapters = (() => {
     return false;
   }
 
-  // Hardware -> bridge -> Mixer-Online feedback path.
-  // Physical ESP32 will call this with values read from the analog mixer.
   function hardwareFeedback(ch, param, value, extra = {}) {
     if(!active?.connected||!active?.bridge) return {ok:false,reason:"bridge-offline"};
     const scope=String(extra.scope||"CHANNEL");
@@ -359,7 +353,12 @@ window.MixerAdapters = (() => {
     emitStatus(); return ok;
   }
 
-  function getTransportStats(){if(!active)return {connected:false,transport:"none",tx:0,rx:0,ack:0,pending:0};return {connected:!!active.connected,transport:active.transport||active.type||"none",tx:active.tx?.length||0,rx:active.rx?.length||0,ack:active.ack?.length||0,pending:active.pending?.size||0};}\n\n  function sendMapped(command) {
+  function getTransportStats(){
+    if(!active)return {connected:false,transport:"none",tx:0,rx:0,ack:0,pending:0};
+    return {connected:!!active.connected,transport:active.transport||active.type||"none",tx:active.tx?.length||0,rx:active.rx?.length||0,ack:active.ack?.length||0,pending:active.pending?.size||0};
+  }
+
+  function sendMapped(command) {
     if(!active?.connected) return {ok:false,reason:"offline"};
     if(command.type!=="CONTROL"&&command.type!=="MASTER") return {ok:false,reason:"unsupported-type"};
     if(command.type==="CONTROL"){
@@ -441,18 +440,41 @@ window.MixerAdapters = (() => {
     },80);
   }
 
+  // FUNGSI UTAMA TOGGLE CONNECT ESP32
   async function connectESP32(options = {}) {
     const systemOn = options.systemOn ?? !!window.state?.system;
-    if (!systemOn) return { ok:false, connected:false, reason:"SYSTEM_OFF", type:"simulator", transport:"esp32", protocol:PROTOCOL, channels:CHANNEL_COUNT };
-    if (active?.type === "simulator" && active.connected) return {
-      ok:true, connected:true, type:"simulator", transport:"esp32",
-      name:"ESP32 SIMULATOR", channels:CHANNEL_COUNT, protocol:PROTOCOL
-    };
+
+    // 1. Jika System Mati, paksa Disconnect
+    if (!systemOn) {
+      disconnect();
+      return { ok: false, connected: false, reason: "SYSTEM_OFF", type: "simulator", transport: "esp32", protocol: PROTOCOL, channels: CHANNEL_COUNT };
+    }
+
+    // 2. TOGGLE: Jika sedang ONLINE -> Putuskan Koneksi (OFF)
+    if (active?.type === "simulator" && active.connected) {
+      disconnect();
+      return {
+        ok: true,
+        connected: false,
+        type: "simulator",
+        transport: "none",
+        name: "ESP32 SIMULATOR",
+        channels: CHANNEL_COUNT,
+        protocol: PROTOCOL
+      };
+    }
+
+    // 3. Jika sedang OFFLINE -> Dapatkan Koneksi Baru (ON)
     const result = await simulator();
     return result?.connected ? {
-      ok:true, connected:true, type:"simulator", transport:"esp32",
-      name:"ESP32 SIMULATOR", channels:CHANNEL_COUNT, protocol:PROTOCOL
-    } : {ok:false,connected:false,reason:"esp32-simulator-offline"};
+      ok: true,
+      connected: true,
+      type: "simulator",
+      transport: "esp32",
+      name: "ESP32 SIMULATOR",
+      channels: CHANNEL_COUNT,
+      protocol: PROTOCOL
+    } : { ok: false, connected: false, reason: "esp32-simulator-offline" };
   }
 
   async function simulator() {
