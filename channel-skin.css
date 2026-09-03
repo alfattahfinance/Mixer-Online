@@ -1,4 +1,26 @@
-/* Mixer-Online — FINAL 14CH Large-Screen Layout Skin */
+/* ==========================================================================
+   MIXER-ONLINE • ULTIMATE PRO LAYOUT & REALISTIC DIGITAL SKIN
+   ========================================================================== */
+
+:root {
+  --console-bg: #121519;
+  --strip-bg: linear-gradient(180deg, #1b2026 0%, #121518 100%);
+  --strip-border: #2c333d;
+  --accent-cyan: #00f0ff;
+  --accent-green: #2ecc71;
+  --accent-orange: #e67e22;
+  --accent-red: #e74c3c;
+  --text-main: #d1d8e0;
+  --text-dim: #7f8c8d;
+}
+
+body {
+  background-color: #080a0c;
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+}
 
 @media (min-width: 700px) {
   html, body {
@@ -21,6 +43,9 @@
     padding: 10px 10px 40px !important;
     box-sizing: border-box !important;
     align-items: start !important;
+    background: var(--console-bg);
+    border-top: 2px solid #222;
+    box-shadow: inset 0 10px 30px rgba(0,0,0,0.8);
   }
 
   main.console > .channel-bank-left {
@@ -37,6 +62,9 @@
     margin: 0 !important;
     padding: 5px !important;
     box-sizing: border-box !important;
+    background: radial-gradient(circle at center, #181d23 0%, #0d1013 100%);
+    border-left: 2px solid #000;
+    border-right: 2px solid #000;
   }
   main.console > .channel-bank-right {
     grid-area: right !important;
@@ -86,6 +114,9 @@
     transform: none !important;
     box-sizing: border-box !important;
     pointer-events: auto !important;
+    background: var(--strip-bg);
+    border-right: 1px solid var(--strip-border);
+    box-shadow: inset 1px 0 0 rgba(255,255,255,0.03);
   }
 
   /* Memastikan Fader Vertikal & Knob Mudah Ditarik/Digeser */
@@ -95,8 +126,8 @@
   }
 
   .new-channel-fader input[type="range"] {
-    writing-mode: bt-lr; /* IE/Edge */
-    -webkit-appearance: slider-vertical; /* Webkit */
+    writing-mode: bt-lr;
+    -webkit-appearance: slider-vertical;
     width: 100% !important;
     height: 180px !important;
   }
@@ -144,6 +175,160 @@
     width: 1611px !important;
     min-width: 1611px !important;
   }
+}
+
+/* ==========================================================================
+   VISUAL SKIN: TAMPILAN DIGITAL MIXER PRO & REALISTIS
+   ========================================================================== */
+
+/* Bingkai Layar TFT Digital */
+.screen-frame {
+  background: #05070a !important;
+  border: 3px solid #2a313b !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.9), inset 0 0 15px rgba(0,240,255,0.05) !important;
+}
+
+.screen-title {
+  background: linear-gradient(90deg, #0d1218, #1a222c, #0d1218) !important;
+  color: var(--accent-cyan) !important;
+  border-bottom: 1px solid #222 !important;
+  font-size: 11px !important;
+  letter-spacing: 1.5px !important;
+}
+
+.screen-tabs button {
+  background: #151a21 !important;
+  color: var(--text-dim) !important;
+  border: 1px solid #28303b !important;
+  font-weight: 600 !important;
+  transition: all 0.2s !important;
+}
+
+.screen-tabs button.active {
+  background: linear-gradient(180deg, #00b4d8 0%, #0077b6 100%) !important;
+  color: #fff !important;
+  border-color: var(--accent-cyan) !important;
+  box-shadow: 0 0 10px rgba(0,180,216,0.5) !important;
+}
+
+/* Tampilan Layar Pro Home */
+.pro-digital-screen {
+  background: #0a0e12 !important;
+  border: 1px solid #212830 !important;
+  border-radius: 6px !important;
+  padding: 8px !important;
+}
+
+.pro-screen-top-bar {
+  background: #11161d !important;
+  border: 1px solid #242c38 !important;
+  border-radius: 4px !important;
+}
+
+.pro-ch-badge {
+  background: #0077b6 !important;
+  color: #fff !important;
+  font-weight: bold !important;
+}
+
+.pro-processing-grid .pro-block {
+  background: #10141a !important;
+  border: 1px solid #212933 !important;
+  border-radius: 4px !important;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5) !important;
+}
+
+.pro-block .block-value {
+  color: var(--accent-cyan) !important;
+  text-shadow: 0 0 8px rgba(0,240,255,0.3) !important;
+  font-family: monospace !important;
+  font-weight: bold !important;
+}
+
+.pro-block .block-value.highlight {
+  color: var(--accent-green) !important;
+  text-shadow: 0 0 8px rgba(46,204,113,0.3) !important;
+}
+
+/* Spectrum Analyzer & RTA Glowing Bars */
+.spectrum-bars-container, .rta-bars {
+  background: #05070a !important;
+  border: 1px solid #1a222c !important;
+  border-radius: 3px !important;
+  padding: 2px !important;
+}
+
+.bar-col, .rta-bars i {
+  background: linear-gradient(180deg, #ff4757 0%, #ffa502 40%, #2ed573 80%, #00f0ff 100%) !important;
+  border-radius: 1px !important;
+  box-shadow: 0 0 5px rgba(0,240,255,0.4) !important;
+}
+
+/* Media Player / Recorder Rack Widget */
+.media-rack {
+  background: linear-gradient(180deg, #161c23 0%, #0f1318 100%) !important;
+  border: 1px solid #2a333f !important;
+  border-radius: 6px !important;
+  padding: 8px !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5) !important;
+}
+
+.media-rack h2 {
+  font-size: 10px !important;
+  color: var(--accent-cyan) !important;
+  letter-spacing: 1px !important;
+  border-bottom: 1px solid #222 !important;
+  padding-bottom: 4px !important;
+  margin-bottom: 6px !important;
+}
+
+.media-rack button {
+  background: linear-gradient(180deg, #212a35 0%, #151b22 100%) !important;
+  color: #fff !important;
+  border: 1px solid #323e4d !important;
+  border-radius: 4px !important;
+  font-weight: bold !important;
+  font-size: 10px !important;
+  padding: 6px !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
+  cursor: pointer !important;
+  transition: all 0.1s !important;
+}
+
+.media-rack button:active {
+  background: var(--accent-cyan) !important;
+  color: #000 !important;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.6) !important;
+}
+
+/* Topbar & Footer Konsol Pro */
+.topbar {
+  background: linear-gradient(180deg, #151a21 0%, #0b0d10 100%) !important;
+  border-bottom: 2px solid #000 !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.8) !important;
+}
+
+.power-btn {
+  background: #2c1212 !important;
+  color: #ff6b6b !important;
+  border: 1px solid #e74c3c !important;
+  font-weight: bold !important;
+  border-radius: 4px !important;
+}
+
+.power-btn.on {
+  background: #122c1b !important;
+  color: #2ed573 !important;
+  border-color: #2ed573 !important;
+  box-shadow: 0 0 10px rgba(46,204,113,0.4) !important;
+}
+
+.status-footer {
+  background: #090b0e !important;
+  border-top: 1px solid #222 !important;
+  color: #888 !important;
+  font-size: 10px !important;
 }
 
 /* Fallback Tampilan Mobile (< 699px) */
