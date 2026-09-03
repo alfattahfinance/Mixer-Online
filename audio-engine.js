@@ -71,6 +71,11 @@
         highBq.connect(faderNode);
       }
 
+      // Meter tap: baca sinyal SETELAH processing channel dan sebelum master.
+      const analyserNode = audioCtx.createAnalyser();
+      analyserNode.fftSize = 256;
+      analyserNode.smoothingTimeConstant = 0.75;
+      faderNode.connect(analyserNode);
       faderNode.connect(ensureMaster()); // Channel -> Master -> Audio Output
 
       channelNodes[chNum] = {
@@ -87,6 +92,42 @@
       console.error(`Gagal menginisialisasi audio untuk CH${chNum}:`, e);
     }
   };
+
+  function updateChannelMeters() {
+    const strips = document.querySelectorAll(".new-channel-strip");
+    strips.forEach(strip => {
+      const ch = Number(strip.dataset.ch);
+      const nodes = channelNodes[ch];
+      const meter = strip.querySelector(".new-channel-meter");
+      if (!nodes?.analyser || !meter) return;
+      const data = new Uint8Array(nodes.analyser.fftSize);
+      nodes.analyser.getByteTimeDomainData(data);
+      let sum = 0;
+      for (let i = 0; i < data.length; i++) {
+        const v = (data[i] - 128) / 128;
+        sum += v * v;
+      }
+      const rms = Math.sqrt(sum / data.length);
+      const level = Math.max(0, Math.min(1, rms * 3.5));
+      const count = Math.round(level * 12);
+      meter.querySelectorAll("i[data-seg]").forEach((seg, i) => {
+        seg.classList.toggle("active", i < count);
+      });
+      meter.classList.toggle("signal", count > 0);
+    });
+
+    if (masterNode) {
+      // Master meter mengikuti sinyal yang benar-benar menuju output.
+      if (!masterNode._analyser) {
+        masterNode._analyser = audioCtx.createAnalyser();
+        masterNode._analyser.fftSize = 256;
+        masterNode.disconnect();
+        masterNode.connect(masterNode._analyser);
+        masterNode._analyser.connect(audioCtx.destination);
+      }
+    }
+    requestAnimationFrame(updateChannelMeters);
+  }
 
   window.updateMasterAudioLive = function(val) {
     ensureMaster();
@@ -169,7 +210,7 @@
   };
 
   // Integrasikan otomatis dengan event input slider/knob pada channel strip
-  document.addEventListener("input", (e) => {
+  requestAnimationFrame(updateChannelMeters);\n\n  document.addEventListener("input", (e) => {
     const target = e.target;
     const param = target.dataset.param || target.dataset.k;
     const strip = target.closest(".new-channel-strip");
