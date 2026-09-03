@@ -34,11 +34,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const channelNum = strip.dataset?.ch || strip.getAttribute("data-ch");
       if (Number(channelNum) === Number(ch)) {
         if (param === "fader" || param === "gain" || param === "low" || param === "mid" || param === "high" || param === "pan") {
-          const inputEl = strip.querySelector(`input[data-param="${param}"], .${param}-input`);
+          const inputEl = strip.querySelector(`input[data-param="${param}"], input[data-k="${param}"], .${param}-input`);
           if (inputEl) inputEl.value = value;
           
           if (param === "fader") {
-            const rangeFader = strip.querySelector('input[type="range"]:not([data-param])');
+            const rangeFader = strip.querySelector('input[data-k="fader"], input[data-param="fader"], .fader-input');
             if (rangeFader) rangeFader.value = value;
             const outputVal = strip.querySelector('.fader-val, output');
             if (outputVal) outputVal.textContent = value + "%";
@@ -119,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const strip = document.querySelector(`[data-ch="${ch}"]`);
       if (strip) {
         if (data.param === "fader") {
-          const inputFader = strip.querySelector('input[type="range"]');
+          const inputFader = strip.querySelector('input[data-k="fader"], input[data-param="fader"], .fader-input');
           if (inputFader) inputFader.value = data.value;
           const outputVal = strip.querySelector('.fader-val, output');
           if (outputVal) outputVal.textContent = data.value + "%";
