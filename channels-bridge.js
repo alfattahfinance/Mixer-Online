@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CHANNELS BRIDGE - WITH INSTANT SCREEN READOUT SYNC
+   CHANNELS BRIDGE - INSTANT FADER & SCREEN SYNC
    ========================================================================== */
 (function () {
   "use strict";
@@ -43,7 +43,7 @@
     }
   };
 
-  // Listener input dengan pembaru layar instan
+  // Listener input dengan sinkronisasi layar instan otomatis
   document.addEventListener("input", (e) => {
     const target = e.target;
     if (!target || !target.dataset || !target.dataset.ch || !target.dataset.param) {
@@ -58,28 +58,29 @@
 
     e.stopImmediatePropagation();
 
-    // Update state lokal
+    // 1. Update state lokal
     if (window.state.channels[chNum - 1]) {
       window.state.channels[chNum - 1][param] = val;
     }
 
-    // JIKA YANG DIGERAKKAN ADALAH FADER, LANGSUNG UPDATE SCREEN READOUT DI TENGAH
+    // 2. OTOMATIS PILIH CHANNEL DAN UPDATE LAYAR TENGAH SECARA INSTAN
+    if (typeof window.selectScreenChannel === "function") {
+      window.selectScreenChannel(chNum);
+    }
+
+    // Pastikan nilai fader langsung ter-update di readout layar
     if (param === "fader") {
       const screenFaderEl = document.getElementById("screenFader");
       const screenInputEl = document.getElementById("screenInput");
-      
-      // Perbarui teks layar tengah secara instan
-      if (screenFaderEl) {
-        screenFaderEl.textContent = val + "%";
-      }
-      if (screenInputEl) {
-        screenInputEl.textContent = "CH" + chNum;
-      }
+      if (screenFaderEl) screenFaderEl.textContent = val + "%";
+      if (screenInputEl) screenInputEl.textContent = "CH" + chNum;
     }
 
+    // 3. Kirim ke hardware
     window.sendChannelParamToHardware(chNum, param, val);
   }, true);
 
+  // Mute / Solo handler
   document.addEventListener("click", (e) => {
     const target = e.target.closest('[data-action]');
     if (!target || !target.dataset || !target.dataset.ch) return;
@@ -94,6 +95,10 @@
 
       channel[action] = !channel[action];
       target.classList.toggle("active", channel[action]);
+
+      if (typeof window.selectScreenChannel === "function") {
+        window.selectScreenChannel(chNum);
+      }
 
       window.sendChannelParamToHardware(chNum, action, channel[action]);
     }
