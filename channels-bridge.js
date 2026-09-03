@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CHANNELS BRIDGE - INSTANT REAL-TIME RESPONSIVE SYNC
+   CHANNELS BRIDGE - INSTANT REAL-TIME RESPONSIVE SYNC + RX HANDLER
    ========================================================================== */
 (function () {
   "use strict";
@@ -22,6 +22,7 @@
     }
   }
 
+  // Fungsi pengiriman parameter ke hardware (TX)
   window.sendChannelParamToHardware = function(chNum, paramName, value) {
     const payload = {
       protocol: "ESP32-MIXER/1",
@@ -43,7 +44,44 @@
     }
   };
 
-  // Penanganan input langsung yang super responsif tanpa jeda
+  // ==========================================================================
+  // FITUR BARU: VERIFIKASI & PENERIMAAN INPUT/OUTPUT DARI HARDWARE (RX SYNC)
+  // ==========================================================================
+  window.handleIncomingHardwareData = function(incomingJsonString) {
+    try {
+      const data = typeof incomingJsonString === "string" ? JSON.parse(incomingJsonString) : incomingJsonString;
+      if (!data || data.protocol !== "ESP32-MIXER/1") return;
+
+      // Jika data bertipe kontrol dan arahnya dari hardware (RX / FEEDBACK)
+      if (data.type === "CONTROL" && (data.direction === "RX" || data.direction === "FEEDBACK")) {
+        const chNum = parseInt(data.ch, 10);
+        const param = data.param; 
+        const val = data.value;
+
+        if (chNum >= 1 && chNum <= 14 && window.state && window.state.channels) {
+          // 1. Update state lokal
+          window.state.channels[chNum - 1][param] = val;
+
+          // 2. Update posisi slider / kontrol fisik di web secara otomatis
+          const targetElement = document.querySelector(`[data-ch="${chNum}"][data-param="${param}"]`);
+          if (targetElement && parseFloat(targetElement.value) !== parseFloat(val)) {
+            targetElement.value = val;
+          }
+
+          // 3. Update layar tengah jika channel tersebut sedang aktif dilihat
+          if (typeof window.selectScreenChannel === "function") {
+            window.selectScreenChannel(chNum);
+          }
+
+          console.log(`[INPUT/OUTPUT RX SYNC] CH${chNum} [${param}] di-update dari hardware ke -> ${val}`);
+        }
+      }
+    } catch (err) {
+      console.error("Gagal memproses data masuk (RX) mixer:", err);
+    }
+  };
+
+  // Penanganan input langsung di web yang super responsif (TX)
   document.addEventListener("input", (e) => {
     const target = e.target;
     if (!target || !target.dataset || !target.dataset.ch || !target.dataset.param) {
@@ -56,20 +94,16 @@
 
     if (isNaN(chNum) || !param || isNaN(val)) return;
 
-    // Hentikan perambatan agar tidak tercampur dengan fungsi lain
     e.stopImmediatePropagation();
 
-    // 1. Perbarui state lokal dengan cepat
     if (window.state.channels[chNum - 1]) {
       window.state.channels[chNum - 1][param] = val;
     }
 
-    // 2. Jika layar tengah memuat channel ini, langsung perbarui tampilannya secara instan
     if (typeof window.selectScreenChannel === "function") {
       window.selectScreenChannel(chNum);
     }
 
-    // Pembaruan langsung teks readout layar jika parameter fader atau gain yang digeser
     if (param === "fader") {
       const screenFaderEl = document.getElementById("screenFader");
       const screenInputEl = document.getElementById("screenInput");
@@ -80,7 +114,6 @@
       if (screenGainEl) screenGainEl.textContent = val.toFixed(2);
     }
 
-    // 3. Kirim data instan ke hardware / bridge
     window.sendChannelParamToHardware(chNum, param, val);
   }, true);
 
