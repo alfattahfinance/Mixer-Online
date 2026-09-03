@@ -107,6 +107,25 @@
       input.addEventListener("input", () => update(input.dataset.k, input.value));
     });
 
+    const audioFile = el.querySelector("[data-audio-file]");
+    const audioLoad = el.querySelector('[data-audio-action="load"]');
+    const audioStop = el.querySelector('[data-audio-action="stop"]');
+
+    if (audioLoad && audioFile) {
+      audioLoad.addEventListener("click", () => audioFile.click());
+      audioFile.addEventListener("change", () => {
+        const file = audioFile.files && audioFile.files[0];
+        if (!file || !file.type.startsWith("audio/")) return;
+        const url = URL.createObjectURL(file);
+        const ok = window.connectCustomAudioToChannel?.(id, url);
+        const r = $("testResult");
+        if (r) r.textContent = ok ? "CH" + id + " AUDIO → PLAY" : "CH" + id + " AUDIO → ERROR";
+      });
+    }
+    if (audioStop) {
+      audioStop.addEventListener("click", () => window.stopChannelAudio?.(id));
+    }
+
     el.querySelectorAll("button").forEach(button => {
       button.addEventListener("click", () => {
         if (!window.state?.system) {
