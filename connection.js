@@ -130,6 +130,16 @@ window.MixerControl = (() => {
         stats: { tx: stats.tx || 0, rx: stats.rx || 0 }
       });
     });
+
+    // Listen data paket masuk dari Event Custom (ESP32 / Bluetooth)
+    const handleRxEvent = (e) => {
+      if (e.detail) {
+        applyRemote(e.detail);
+      }
+    };
+
+    document.addEventListener("mixer:esp32-rx", handleRxEvent);
+    document.addEventListener("mixer:bluetooth-rx", handleRxEvent);
   }
 
   bindAdapterStatus();
@@ -169,9 +179,57 @@ window.MixerControl = (() => {
     return { ok: true, transport: "esp32" };
   }
 
+  // Fungsi Penerimaan Data RX dari Hardware / Simulator ke Tampilan UI Mixer
   function applyRemote(message) {
     state.lastRx = message;
+
+    // Ambil statistik TX/RX terbaru
+    const api = window.MixerAdapters;
+    if (api && typeof api.getTransportStats === "function") {
+      const stats = api.getTransportStats();
+      state.stats.rx = stats.rx || state.stats.rx;
+      state.stats.tx = stats.tx || state.stats.tx;
+    }
+
+    // Perbarui Teks RX di UI Log Panel
+    const rxLogEl = document.getElementById("rx");
+    if (rxLogEl) {
+      rxLogEl.textContent = `RX: ${JSON.stringify(message)}`;
+    }
+
+    // Perbarui Tampilan VU Meter saat METER Data Diterima
+    if (message.type === "METER" && message.ch) {
+      const chNum = message.ch;
+      const levelPercent = Math.min(100, Math.round((message.level || 0) * 50)); // Normalisasi 0.0 - 2.0 ke 0% - 100%
+
+      // Update Channel Strip Meter
+      const chStrip = document.querySelector(`[data-ch="${chNum}"]`);
+      if (chStrip) {
+        const vuBar = chStrip.querySelector(".vu-meter-fill, .meter-bar");
+        if (vuBar) vuBar.style.height = `${levelPercent}%`;
+      }
+    }
+
+    // Perbarui Fader jika menerima Hardware Feedback / Physical Change
+    if (message.type === "FEEDBACK" && message.ch && message.param) {
+      const chStrip = document.querySelector(`[data-ch="${message.ch}"]`);
+      if (chStrip) {
+        const inputFader = chStrip.querySelector(`input[data-param="${message.param}"], .fader`);
+        if (inputFader && message.param === "fader") {
+          inputFader.value = message.value;
+          const valLabel = chStrip.querySelector(".fader-val");
+          if (valLabel) valLabel.textContent = `${message.value}%`;
+        }
+      }
+    }
+
+    // Panggil Listener Command Tambahan
     cmdListeners.forEach(fn => fn({ ...message, direction: "RX" }));
+    
+    // Perbarui Status Counter RX
+    const rxCount = document.getElementById("testRxCount");
+    if (rxCount) rxCount.textContent = state.stats.rx;
+
     return true;
   }
 
