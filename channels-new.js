@@ -60,21 +60,12 @@
         if (k === "fader") {
           const out = el.querySelector("output");
           if (out) out.textContent = Math.round(n) + "%";
-
-          // VOLUME menjadi gerakan acuan GAIN pada channel yang sama.
-          // Mapping: VOLUME 0-100% -> GAIN 0.00-2.00.
-          const gainValue = Math.max(0, Math.min(2, n / 50));
-          ch.gain = Number(gainValue.toFixed(2));
-          const gainInput = el.querySelector('input[data-k="gain"]');
-          if (gainInput) gainInput.value = String(ch.gain);
         }
       }
 
+      // GAIN dan VOLUME adalah kontrol terpisah.
+      // Menggerakkan VOLUME tidak boleh mengubah GAIN.
       const result = window.MixerControl?.setControl?.(id, k, ch[k]);
-      if (k === "fader") {
-        // Kirim perubahan GAIN yang mengikuti VOLUME ke adapter.
-        window.MixerControl?.setControl?.(id, "gain", ch.gain);
-      }
       const r = $("testResult");
       if (r) {
         r.textContent = result?.ok 
