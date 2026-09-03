@@ -8,8 +8,22 @@
   const N = 14;
   const $ = id => document.getElementById(id);
 
+  // Safely ensure window.state and window.state.channels are initialized
+  function ensureState() {
+    if (!window.state) window.state = {};
+    if (!Array.isArray(window.state.channels)) window.state.channels = [];
+    for (let i = 0; i < N; i++) {
+      if (!window.state.channels[i]) {
+        window.state.channels[i] = {
+          gain: 1, high: 0, mid: 0, low: 0, pan: 0, fader: 75, mute: false, solo: false
+        };
+      }
+    }
+  }
+
   function make(id) {
-    const c = window.state?.channels?.[id - 1] || {};
+    ensureState();
+    const c = window.state.channels[id - 1];
     const el = document.createElement("article");
     el.className = "new-channel-strip";
     el.dataset.ch = String(id);
@@ -26,66 +40,121 @@
         <button type="button" data-k="mute" class="${c.mute ? "on" : ""}">${c.mute ? "UNMUTE" : "MUTE"}</button>
         <button type="button" data-k="solo" class="${c.solo ? "on" : ""}">${c.solo ? "UNSOLO" : "SOLO"}</button>
       </div>
-      <footer class="new-channel-source">CH${id} • <span>READY</span></footer>
+      <footer class="new-channel-source">CH${id} • <span>${c.mute ? "MUTED" : c.solo ? "SOLO" : "READY"}</span></footer>
     `;
 
     const update = (k, value) => {
       if (!window.state?.system) {
-        const r = $("testResult"); if (r) r.textContent = "CONTROL BLOCKED: SYSTEM OFF";
+        const r = $("testResult"); 
+        if (r) r.textContent = "CONTROL BLOCKED: SYSTEM OFF";
         return;
       }
-      const n = Number(value);
       const ch = window.state.channels[id - 1];
       if (!ch) return;
-      ch[k] = Number.isFinite(n) && k !== "mute" && k !== "solo" ? n : value;
-      if (k === "fader") el.querySelector("output").textContent = n + "%";
-      const result = window.MixerControl?.setControl?.(id, k, value);
+
+      if (k === "mute" || k === "solo") {
+        ch[k] = Boolean(value);
+      } else {
+        const n = Number(value);
+        ch[k] = Number.isFinite(n) ? n : value;
+        if (k === "fader") {
+          const out = el.querySelector("output");
+          if (out) out.textContent = Math.round(n) + "%";
+        }
+      }
+
+      const result = window.MixerControl?.setControl?.(id, k, ch[k]);
       const r = $("testResult");
-      if (r) r.textContent = result?.ok ? "CH" + id + " " + k.toUpperCase() + " → SENT" : "CH" + id + " " + k.toUpperCase() + " → " + (result?.reason || "OFFLINE");
-      el.querySelector("footer span").textContent = ch.mute ? "MUTED" : ch.solo ? "SOLO" : "READY";
+      if (r) {
+        r.textContent = result?.ok 
+          ? "CH" + id + " " + k.toUpperCase() + " → SENT" 
+          : "CH" + id + " " + k.toUpperCase() + " → " + (result?.reason || "OFFLINE");
+      }
+
+      const statusSpan = el.querySelector("footer span");
+      if (statusSpan) {
+        statusSpan.textContent = ch.mute ? "MUTED" : ch.solo ? "SOLO" : "READY";
+      }
     };
 
     el.querySelectorAll("input").forEach(input => {
       input.addEventListener("input", () => update(input.dataset.k, input.value));
     });
+
     el.querySelectorAll("button").forEach(button => {
       button.addEventListener("click", () => {
         if (!window.state?.system) {
-          const r = $("testResult"); if (r) r.textContent = "CONTROL BLOCKED: SYSTEM OFF";
+          const r = $("testResult"); 
+          if (r) r.textContent = "CONTROL BLOCKED: SYSTEM OFF";
           return;
         }
         const k = button.dataset.k;
-        const value = !window.state.channels[id - 1][k];
-        button.classList.toggle("on", value);
-        button.textContent = value ? (k === "mute" ? "UNMUTE" : "UNSOLO") : (k === "mute" ? "MUTE" : "SOLO");
-        update(k, value);
+        const ch = window.state.channels[id - 1];
+        const nextValue = !ch[k];
+        
+        button.classList.toggle("on", nextValue);
+        button.textContent = nextValue 
+          ? (k === "mute" ? "UNMUTE" : "UNSOLO") 
+          : (k === "mute" ? "MUTE" : "SOLO");
+          
+        update(k, nextValue);
       });
     });
+
     return el;
   }
 
   function sync() {
+    ensureState();
     for (let id = 1; id <= N; id++) {
-      const c = window.state?.channels?.[id - 1];
-      const el = document.querySelector('.new-channel-strip[data-ch="'+id+'"]');
+      const c = window.state.channels[id - 1];
+      const el = document.querySelector('.new-channel-strip[data-ch="' + id + '"]');
       if (!c || !el) continue;
-      el.querySelectorAll("input[data-k]").forEach(x => { if (x.dataset.k in c) x.value = String(c[x.dataset.k]); });
-      const o = el.querySelector("output"); if (o) o.textContent = Number(c.fader ?? 75) + "%";
-      el.querySelectorAll("button[data-k]").forEach(b => { const on=!!c[b.dataset.k]; b.classList.toggle("on",on); b.textContent=on?(b.dataset.k==="mute"?"UNMUTE":"UNSOLO"):(b.dataset.k==="mute"?"MUTE":"SOLO"); });
-      const status=el.querySelector("footer span"); if(status) status.textContent=c.mute?"MUTED":c.solo?"SOLO":"READY";
+
+      el.querySelectorAll("input[data-k]").forEach(x => { 
+        if (x.dataset.k in c) x.value = String(c[x.dataset.k]); 
+      });
+
+      const o = el.querySelector("output"); 
+      if (o) o.textContent = Math.round(Number(c.fader ?? 75)) + "%";
+
+      el.querySelectorAll("button[data-k]").forEach(b => { 
+        const k = b.dataset.k;
+        const on = !!c[k]; 
+        b.classList.toggle("on", on); 
+        b.textContent = on ? (k === "mute" ? "UNMUTE" : "UNSOLO") : (k === "mute" ? "MUTE" : "SOLO"); 
+      });
+
+      const status = el.querySelector("footer span"); 
+      if (status) status.textContent = c.mute ? "MUTED" : c.solo ? "SOLO" : "READY";
     }
   }
 
   function build() {
     const left = $("channels"), right = $("channelsRight");
     if (!left || !right) return;
-    left.innerHTML = ""; right.innerHTML = "";
-    for (let i = 1; i <= N; i++) (i <= 8 ? left : right).appendChild(make(i));
+    left.innerHTML = ""; 
+    right.innerHTML = "";
+    ensureState();
+    // 7 Channels di kiri (1-7), 7 Channels di kanan (8-14)
+    for (let i = 1; i <= N; i++) {
+      (i <= 7 ? left : right).appendChild(make(i));
+    }
   }
 
   window.buildNew14ChannelPanel = build;
   window.syncNew14ChannelPanel = sync;
-  document.addEventListener("click", function(e){ const card=e.target.closest(".new-channel-strip"); if(card && typeof window.selectScreenChannel==="function"){ window.selectScreenChannel(Number(card.dataset.ch)); } });
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", build, { once: true });
-  else build();
+
+  document.addEventListener("click", function(e) { 
+    const card = e.target.closest(".new-channel-strip"); 
+    if (card && typeof window.selectScreenChannel === "function") { 
+      window.selectScreenChannel(Number(card.dataset.ch)); 
+    } 
+  });
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", build, { once: true });
+  } else {
+    build();
+  }
 })();
