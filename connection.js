@@ -87,6 +87,7 @@ window.MixerControl = (() => {
   async function connectESP32() {
     // Validasi System Status
     if (!window.state?.system) {
+      alert("Nyalakan SYSTEM terlebih dahulu!");
       return { ok: false, connected: false, reason: "SYSTEM_OFF" };
     }
 
