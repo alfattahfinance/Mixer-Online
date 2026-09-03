@@ -1,304 +1,220 @@
-/*
-* new.css
-* Copyright (c) 2019-present Saoud Rizwan
-* Licensed under MIT license (https://github.com/markdowncss/new/blob/master/LICENSE)
-*/
+/* =========================================================
+   MIXER-ONLINE: 14 CHANNEL COMPLETE CSS
+   ========================================================= */
 
-:root {
-  --nc-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-  --nc-font-mono: Consolas, monaco, "Ubuntu Mono", "Liberation Mono", courier, monospace;
-  --nc-bg: #fff;
-  --nc-bg-alt: #f8f9fa;
-  --nc-bg-card: #f8f9fa;
-  --nc-text: #212529;
-  --nc-text-muted: #6c757d;
-  --nc-link: #007bff;
-  --nc-link-hover: #0056b3;
-  --nc-border: #dee2e6;
-  --nc-accent: #007bff;
-  --nc-code-bg: #f8f9fa;
-  --nc-selection-bg: #b3d7ff;
-  --nc-selection-text: #212529;
-  --nc-box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  --nc-transition: 0.2s ease-in-out;
+/* 1. LAYOUT UTAMA GRID CONSOLE */
+main.console {
+  display: grid !important;
+  /* Disesuaikan untuk 7 CH di kiri & 7 CH di kanan + Center + Master */
+  grid-template-columns: 530px 220px 530px 110px !important;
+  grid-template-rows: auto auto auto !important;
+  grid-template-areas:
+    "ch-left center ch-right master"
+    "fx      center ch-right master"
+    "aux     center ch-right master" !important;
+  gap: 16px !important;
+  width: max-content !important;
+  margin: 0 auto 20px auto !important;
+  align-items: start !important;
+  box-sizing: border-box !important;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --nc-bg: #121212;
-    --nc-bg-alt: #1e1e1e;
-    --nc-bg-card: #1e1e1e;
-    --nc-text: #e0e0e0;
-    --nc-text-muted: #a0a0a0;
-    --nc-link: #4dabf7;
-    --nc-link-hover: #74c0fc;
-    --nc-border: #2c2c2c;
-    --nc-accent: #4dabf7;
-    --nc-code-bg: #1a1a1a;
-    --nc-selection-bg: #1864ab;
-    --nc-selection-text: #ffffff;
-    --nc-box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  }
+/* 2. PLACEMENT AREA */
+main.console > .channel-bank-left { 
+  grid-area: ch-left !important; 
+  z-index: 1 !important;
 }
 
-*, *:before, *:after {
-  box-sizing: border-box;
+main.console > .center-console { 
+  grid-area: center !important; 
+  width: 220px !important;
+  max-width: 220px !important;
+  transform: scale(0.8) !important;
+  transform-origin: top center !important;
+  z-index: 10 !important;
 }
 
-html {
-  font-size: 16px;
-  font-family: var(--nc-font-sans);
-  color: var(--nc-text);
-  background-color: var(--nc-bg);
-  -webkit-text-size-adjust: 100%;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+main.console > .channel-bank-right { 
+  grid-area: ch-right !important; 
+  margin-left: 10px !important;
+  z-index: 1 !important;
 }
 
-body {
-  margin: 0;
-  padding: 0;
-  line-height: 1.6;
+main.console > .master-rack { 
+  grid-area: master !important; 
+  z-index: 1 !important;
 }
 
-/* Typography */
-
-h1, h2, h3, h4, h5, h6 {
-  margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
-  font-weight: 700;
-  line-height: 1.25;
-  color: var(--nc-text);
+/* Rak Effect & AUX di bawah Channel Kiri */
+main.console > .fx-rack,
+main.console > .fx-rack-live {
+  grid-area: fx !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  z-index: 2 !important;
+  margin-top: 8px !important;
 }
 
-h1 { font-size: 2.25rem; }
-h2 { font-size: 1.75rem; }
-h3 { font-size: 1.35rem; }
-h4 { font-size: 1.15rem; }
-h5 { font-size: 1rem; }
-h6 { font-size: 0.875rem; }
-
-p {
-  margin-top: 0;
-  margin-bottom: 1rem;
+main.console > .aux-rack {
+  grid-area: aux !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  z-index: 2 !important;
+  margin-top: 8px !important;
 }
 
-small, .text-small {
-  font-size: 0.875rem;
-  color: var(--nc-text-muted);
+/* 3. WADAH CHANNEL BANK */
+.channel-bank {
+  display: flex !important;
+  flex-direction: column !important;
+  background: #111518 !important;
+  border: 1px solid #2a3036 !important;
+  border-radius: 8px !important;
+  padding: 8px !important;
+  box-sizing: border-box !important;
 }
 
-b, strong {
-  font-weight: 600;
+.bank-title {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  height: 24px !important;
+  margin-bottom: 6px !important;
+  border-bottom: 1px solid #2a3036 !important;
+  color: #00e5ff !important;
+  font-weight: bold !important;
+  font-size: 12px !important;
 }
 
-/* Links */
-
-a {
-  color: var(--nc-link);
-  text-decoration: none;
-  transition: color var(--nc-transition);
+/* 4. CONTAINER FOR 7 CHANNELS PER BANK */
+#channels, 
+#channelsRight {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  justify-content: space-between !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  gap: 5px !important;
+  box-sizing: border-box !important;
 }
 
-a:hover {
-  color: var(--nc-link-hover);
-  text-decoration: underline;
+/* 5. STRIP CHANNEL INDIVIDUAL FOR 14 CH LAYOUT */
+.new-channel-strip {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 0px !important;
+  width: 70px !important;
+  min-width: 62px !important;
+  height: 570px !important;
+  background: #181d22 !important;
+  border: 1px solid #262c33 !important;
+  border-radius: 6px !important;
+  padding: 6px 2px !important;
+  box-sizing: border-box !important;
+  justify-content: space-between !important;
+  align-items: center !important;
 }
 
-/* Lists */
-
-ul, ol {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  padding-left: 2rem;
+.new-channel-head {
+  font-size: 11px !important;
+  font-weight: bold !important;
+  color: #00e5ff !important;
+  background: #090b0c !important;
+  width: 100% !important;
+  text-align: center !important;
+  padding: 3px 0 !important;
+  border-radius: 3px !important;
 }
 
-dt {
-  font-weight: 600;
+/* Control knob (GAIN, HIGH, MID, LOW, PAN) */
+.new-channel-control {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  width: 100% !important;
 }
 
-dd {
-  margin-bottom: 0.5rem;
-  margin-left: 0;
+.new-channel-control label {
+  font-size: 8px !important;
+  color: #8a99a8 !important;
+  margin-bottom: 1px !important;
 }
 
-/* Code & Preformatted */
-
-code, kbd, samp, pre {
-  font-family: var(--nc-font-mono);
-  font-size: 0.9em;
+.new-knob {
+  width: 85% !important;
+  height: 10px !important;
+  accent-color: #00e5ff !important;
+  cursor: pointer !important;
 }
 
-code {
-  padding: 0.2rem 0.4rem;
-  background-color: var(--nc-code-bg);
-  border-radius: 4px;
-  border: 1px solid var(--nc-border);
+/* Fader Volume Container */
+.new-channel-fader {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  width: 100% !important;
+  flex-grow: 1 !important;
 }
 
-pre {
-  display: block;
-  margin-top: 0;
-  margin-bottom: 1rem;
-  padding: 1rem;
-  overflow-x: auto;
-  font-size: 0.875rem;
-  line-height: 1.45;
-  background-color: var(--nc-code-bg);
-  border: 1px solid var(--nc-border);
-  border-radius: 6px;
+.new-channel-fader label {
+  font-size: 8px !important;
+  color: #8a99a8 !important;
 }
 
-pre code {
-  padding: 0;
-  background-color: transparent;
-  border: none;
-  border-radius: 0;
+.new-channel-fader output {
+  font-size: 10px !important;
+  color: #fff !important;
+  font-weight: bold !important;
 }
 
-/* Blockquotes */
-
-blockquote {
-  margin: 0 0 1rem 0;
-  padding: 0.5rem 1rem;
-  color: var(--nc-text-muted);
-  border-left: 4px solid var(--nc-accent);
-  background-color: var(--nc-bg-alt);
-  border-radius: 0 4px 4px 0;
+/* SLIDER VOLUME VERTIKAL (BAWAH = 0%, ATAS = 100%) */
+.new-fader,
+.new-channel-fader input[type="range"] {
+  -webkit-appearance: slider-vertical !important;
+  writing-mode: bt-lr !important;
+  writing-mode: vertical-lr !important;
+  direction: rtl !important; /* Membalik orientasi slider */
+  width: 22px !important;
+  height: 150px !important;
+  min-height: 130px !important;
+  margin: 4px 0 !important;
+  cursor: pointer !important;
+  accent-color: #00e5ff !important;
 }
 
-blockquote > :last-child {
-  margin-bottom: 0;
+/* Buttons (MUTE / SOLO) */
+.new-channel-buttons {
+  display: flex !direction: column !important;
+  gap: 3px !important;
+  width: 90% !important;
 }
 
-/* Tables */
-
-table {
-  width: 100%;
-  margin-bottom: 1rem;
-  border-collapse: collapse;
-  border-spacing: 0;
+.new-channel-buttons button {
+  width: 100% !important;
+  font-size: 9px !important;
+  font-weight: bold !important;
+  padding: 3px 0 !important;
+  background: #252d35 !important;
+  color: #fff !important;
+  border: 1px solid #3a444f !important;
+  border-radius: 3px !important;
+  cursor: pointer !important;
 }
 
-th, td {
-  padding: 0.75rem;
-  vertical-align: top;
-  border-bottom: 1px solid var(--nc-border);
-  text-align: left;
+.new-channel-buttons button.on[data-k="mute"] {
+  background: #d32f2f !important;
+  border-color: #f44336 !important;
 }
 
-th {
-  font-weight: 600;
-  background-color: var(--nc-bg-alt);
-  border-bottom: 2px solid var(--nc-border);
+.new-channel-buttons button.on[data-k="solo"] {
+  background: #f57c00 !important;
+  border-color: #ff9800 !important;
 }
 
-/* Forms */
-
-fieldset {
-  margin: 0 0 1rem 0;
-  padding: 1rem;
-  border: 1px solid var(--nc-border);
-  border-radius: 6px;
-  background-color: var(--nc-bg-card);
+.new-channel-source {
+  font-size: 8px !important;
+  color: #5a6978 !important;
+  text-align: center !important;
 }
-
-legend {
-  font-weight: 600;
-  padding: 0 0.5rem;
-}
-
-label {
-  display: inline-block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-}
-
-input, textarea, select {
-  display: block;
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  font-size: 1rem;
-  font-family: inherit;
-  line-height: 1.5;
-  color: var(--nc-text);
-  background-color: var(--nc-bg);
-  background-clip: padding-box;
-  border: 1px solid var(--nc-border);
-  border-radius: 4px;
-  transition: border-color var(--nc-transition), box-shadow var(--nc-transition);
-}
-
-input:focus, textarea:focus, select:focus {
-  outline: none;
-  border-color: var(--nc-accent);
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
-}
-
-input[type="checkbox"], input[type="radio"] {
-  display: inline-block;
-  width: auto;
-  margin-right: 0.5rem;
-}
-
-button, input[type="submit"], input[type="reset"], input[type="button"] {
-  display: inline-block;
-  font-weight: 650;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: middle;
-  user-select: none;
-  border: 1px solid var(--nc-accent);
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  line-height: 1.5;
-  border-radius: 4px;
-  color: #fff;
-  background-color: var(--nc-accent);
-  transition: background-color var(--nc-transition), border-color var(--nc-transition);
-  cursor: pointer;
-}
-
-button:hover, input[type="submit"]:hover, input[type="reset"]:hover, input[type="button"]:hover {
-  background-color: var(--nc-link-hover);
-  border-color: var(--nc-link-hover);
-}
-
-/* Media */
-
-img, video {
-  max-width: 100%;
-  height: auto;
-  border-radius: 4px;
-}
-
-figure {
-  margin: 0 0 1rem 0;
-}
-
-figcaption {
-  font-size: 0.875rem;
-  color: var(--nc-text-muted);
-  text-align: center;
-  margin-top: 0.5rem;
-}
-
-hr {
-  margin: 2rem 0;
-  border: 0;
-  border-top: 1px solid var(--nc-border);
-}
-
-/* Layout helpers for new.css containers */
-
-main {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-}
-
-header, footer {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 1rem;
-   }
