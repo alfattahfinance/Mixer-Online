@@ -71,6 +71,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // Cari elemen strip terdekat untuk mendapatkan nomor Channel (1-14)
     const strip = target.closest("[data-ch]");
     if (!strip) return;
+
+    // The dedicated 14CH renderer owns all channel inputs.
+    // Do not process the same input a second time here.
+    if (target.closest(".new-channel-strip")) return;
+
     const ch = Number(strip.dataset.ch);
 
     if (isNaN(ch) || ch < 1 || ch > 14) return;
