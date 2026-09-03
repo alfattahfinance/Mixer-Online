@@ -13,24 +13,7 @@
 <style>
   /* Memastikan kontainer utama konsol bisa digeser/scroll horizontal jika layar terlalu kecil, atau menyusuaikan ukuran strip */
   main.console {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    width: 100%;
-    box-sizing: border-box;
-    padding-bottom: 10px;
-  }
-  .channel-bank {
-    flex-shrink: 0;
-  }
-  .center-console {
-    flex-shrink: 0;
-  }
-  .master-rack {
-    flex-shrink: 0;
-  }
-</style>
-
+  
 </head>
 <body>
 
@@ -666,7 +649,7 @@
 })();
 </script>
 
-  <script>
+<script>
 (function(){
   const musicBtn = document.getElementById('btnPlayerMusic');
   const fileBtn = document.getElementById('btnPlayerFile');
@@ -675,15 +658,10 @@
   const playPauseBtn = document.getElementById('btnPlayPauseAudio');
   const trackInfo = document.getElementById('playerTrackInfo');
 
-  let audioElement = document.getElementById('mixerInternalAudioPlayer');
-  if (!audioElement) {
-    audioElement = document.createElement('audio');
-    audioElement.id = 'mixerInternalAudioPlayer';
-    audioElement.loop = true;
-    document.body.appendChild(audioElement);
-  }
+  // Objek untuk menyimpan pemutar audio terpisah untuk masing-masing channel (CH 1 sampai CH 14)
+  window.channelAudioPlayers = window.channelAudioPlayers || {};
 
-  // Sinkronisasi channel aktif
+  // Sinkronisasi indikator channel aktif
   setInterval(() => {
     const activeInput = document.getElementById('screenInput');
     if(activeInput && targetLabel) {
@@ -694,64 +672,82 @@
   if(musicBtn) musicBtn.addEventListener('click', () => fileInput?.click());
   if(fileBtn) fileBtn.addEventListener('click', () => fileInput?.click());
 
-  // Saat file dipilih
+  // Saat file dipilih, masukkan HANYA ke channel yang sedang aktif dipilih di layar
   if(fileInput) {
     fileInput.addEventListener('change', function(e) {
       const file = e.target.files[0];
       if(!file) return;
       
       const fileObjectURL = URL.createObjectURL(file);
-      audioElement.src = fileObjectURL;
-      trackInfo.textContent = file.name;
-
       const currentChannelStr = document.getElementById('screenInput')?.textContent || "CH 1";
       const chNum = parseInt(currentChannelStr.replace(/\D/g, ''), 10) || 1;
 
-      console.log(`[AUDIO] Memuat "${file.name}" ke Channel ${chNum}`);
+      trackInfo.textContent = `CH${chNum}: ${file.name}`;
+      console.log(`[CHANNEL ROUTING] Memuat lagu ke Channel ${chNum} saja.`);
 
-      // Paksa putar setelah file dipilih
-      audioElement.play().then(() => {
-        playPauseBtn.textContent = "⏸ PAUSE";
+      // Hentikan pemutar channel lain jika ada, atau buat instance baru khusus channel ini
+      if (window.channelAudioPlayers[chNum]) {
+        window.channelAudioPlayers[chNum].pause();
+      }
+
+      const channelAudio = document.createElement('audio');
+      channelAudio.src = fileObjectURL;
+      channelAudio.loop = true;
+      document.body.appendChild(channelAudio);
+      window.channelAudioPlayers[chNum] = channelAudio;
+
+      // Putar audio
+      channelAudio.play().then(() => {
+        if(playPauseBtn) playPauseBtn.textContent = "⏸ PAUSE";
       }).catch(err => {
-        console.warn("Autoplay dicegah browser, silakan klik tombol PLAY:", err);
-        playPauseBtn.textContent = "▶ PLAY";
+        console.warn("Autoplay diblokir browser, klik Play manual:", err);
+        if(playPauseBtn) playPauseBtn.textContent = "▶ PLAY";
       });
     });
   }
 
-  // Tombol Play / Pause manual untuk mengatasi blokir browser
+  // Tombol Play/Pause mengontrol channel yang sedang aktif dipilih di layar saat itu
   if(playPauseBtn) {
     playPauseBtn.addEventListener('click', () => {
-      if(audioElement.paused) {
-        audioElement.play().then(() => {
-          playPauseBtn.textContent = "⏸ PAUSE";
-        }).catch(e => alert("Pilih file musik terlebih dahulu!"));
+      const currentChannelStr = document.getElementById('screenInput')?.textContent || "CH 1";
+      const chNum = parseInt(currentChannelStr.replace(/\D/g, ''), 10) || 1;
+      const activeAudio = window.channelAudioPlayers[chNum];
+
+      if (!activeAudio) {
+        alert(`Belum ada file musik yang dimuat untuk Channel ${chNum}. Silakan klik tombol MUSIC dulu!`);
+        return;
+      }
+
+      if(activeAudio.paused) {
+        activeAudio.play();
+        playPauseBtn.textContent = "⏸ PAUSE";
       } else {
-        audioElement.pause();
+        activeAudio.pause();
         playPauseBtn.textContent = "▶ PLAY";
       }
     });
   }
 
-  // Hubungkan ke fader channel aktif & master
+  // Perulangan untuk mengatur volume HANYA berdasarkan fader channel yang bersangkutan
   setInterval(() => {
-    if (!audioElement.paused) {
-      const currentChannelStr = document.getElementById('screenInput')?.textContent || "CH 1";
-      const chNum = parseInt(currentChannelStr.replace(/\D/g, ''), 10) || 1;
-      
-      if (window.state && window.state.channels && window.state.channels[chNum - 1]) {
-        const ch = window.state.channels[chNum - 1];
-        // Jika channel di-mute atau volume 0, matikan suara
-        if (ch.mute) {
-          audioElement.volume = 0;
+    if (!window.state || !window.state.channels) return;
+
+    for (let i = 0; i < window.state.channels.length; i++) {
+      const chNum = i + 1;
+      const audio = window.channelAudioPlayers[chNum];
+      const chState = window.state.channels[i];
+
+      if (audio && chState) {
+        if (chState.mute || !window.state.system) {
+          audio.volume = 0;
         } else {
-          const faderVal = (ch.fader || 75) / 100;
+          // Volume dihitung murni dari Fader channel tersebut dikalikan Master
+          const faderVal = (chState.fader || 75) / 100;
           const masterVal = ((document.getElementById('master')?.value) || 75) / 100;
-          audioElement.volume = Math.min(1.0, Math.max(0.0, faderVal * masterVal));
+          audio.volume = Math.min(1.0, Math.max(0.0, faderVal * masterVal));
         }
       }
     }
   }, 200);
 })();
 </script>
-
