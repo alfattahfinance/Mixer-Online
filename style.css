@@ -30,7 +30,6 @@ html, body {
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 12px;
   line-height: 1.35;
-  min-width: 0 !important;
   width: 100% !important;
   max-width: 100% !important;
   overflow-x: hidden !important;
@@ -65,7 +64,6 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* Helper Class untuk Menyembunyikan Tab */
 .tab-hidden {
   display: none !important;
 }
@@ -252,7 +250,6 @@ button:disabled {
   overflow-x: auto;
 }
 
-/* --- New Channel Strip Component --- */
 .channel, .new-channel-strip {
   min-width: 80px;
   max-width: 95px;
@@ -262,7 +259,7 @@ button:disabled {
   border-radius: 6px;
   padding: 6px 4px;
   text-align: center;
-  position: relative; /* Penting agar tombol & footer terkunci */
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -275,7 +272,6 @@ button:disabled {
   transform: translateY(-2px);
 }
 
-/* Color Coding Kategori Instrumen */
 .channel[data-type="vox"] { border-top: 3px solid #00f0ff; }
 .channel[data-type="guitar"] { border-top: 3px solid #a855f7; }
 .channel[data-type="drums"] { border-top: 3px solid #22c55e; }
@@ -289,14 +285,13 @@ button:disabled {
 }
 
 .channel h3:after {
-  content: "  MIC";
+  content: " MIC";
   display: block;
   color: #65cfff;
   font-size: 8px;
   margin-top: 2px;
 }
 
-/* Thumbnail Kurva EQ Mini */
 .channel-eq-thumb {
   width: 100%;
   height: 36px;
@@ -363,7 +358,7 @@ button:disabled {
 .channel label:nth-of-type(5):after { content: "L C R"; }
 
 /* =========================================================
-   4. ROTARY KNOBS & FADERS
+   4. ROTARY KNOBS & FADERS (VOLUME DARI BAWAH KE ATAS)
    ========================================================= */
 .channel .knob-wrap {
   position: relative;
@@ -377,10 +372,6 @@ button:disabled {
   outline: none;
   user-select: none;
   will-change: transform;
-}
-
-.channel .knob-wrap:focus-visible {
-  box-shadow: 0 0 0 2px rgba(21, 148, 255, .75), 0 0 10px rgba(21, 148, 255, .35);
 }
 
 .channel input.knob, .new-knob {
@@ -415,10 +406,13 @@ button:disabled {
   box-shadow: 0 0 4px rgba(255, 255, 255, .55);
 }
 
-/* Faders 3D Style */
-.channel input.fader, .new-fader {
+/* PERBAIKAN VOLUME: Fader bergerak alami dari BAWAH ke ATAS */
+.channel input.fader, 
+.new-fader, 
+.master-card input[type="range"] {
   appearance: slider-vertical;
   writing-mode: vertical-lr;
+  direction: ltr; /* Memastikan titik nol ada di bawah dan nilai maksimum di atas */
   width: 22px;
   height: 160px;
   background: #06080a;
@@ -437,7 +431,6 @@ button:disabled {
   font-size: 10px;
 }
 
-/* MUTE & SOLO Buttons */
 .channel button, .new-channel-buttons button {
   width: 100%;
   padding: 4px 1px;
@@ -472,7 +465,7 @@ button:disabled {
 }
 
 /* =========================================================
-   5. CENTER CONSOLE, DISPLAY SCREEN & RTA
+   5. CENTER CONSOLE & DISPLAY SCREEN
    ========================================================= */
 .center-console {
   padding: 7px;
@@ -489,15 +482,6 @@ button:disabled {
   padding: 8px;
   background: linear-gradient(145deg, #182125, #030608 55%, #151b1e);
   box-shadow: inset 0 0 0 2px #050607, inset 0 0 28px rgba(0, 170, 255, .12), 0 8px 18px #000, 0 0 0 1px #7d8588;
-}
-
-.screen-frame:before {
-  content: "";
-  position: absolute;
-  inset: 3px;
-  border: 1px solid rgba(255, 255, 255, .08);
-  border-radius: 8px;
-  pointer-events: none;
 }
 
 .screen-title {
@@ -557,15 +541,7 @@ button:disabled {
   display: block;
 }
 
-.screen-content {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 5px;
-  min-height: 230px;
-}
-
 .screen-dashboard {
-  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -620,197 +596,8 @@ button:disabled {
   pointer-events: none;
 }
 
-.screen-scale {
-  position: absolute;
-  right: 3px;
-  top: 8px;
-  bottom: 25px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  color: #57717c;
-  font-size: 7px;
-}
-
-.screen-label {
-  position: absolute;
-  bottom: 5px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  color: #b7c0c3;
-  font-size: 9px;
-}
-
-.player {
-  border: 1px solid #28465a;
-  background: #0b1218;
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  min-width: 0;
-}
-
-.player b { color: #66c8ff; font-size: 9px; }
-.player strong { font-size: 12px; }
-.player small { color: #888; }
-.player-buttons { display: flex; gap: 2px; }
-.player-buttons button { padding: 5px; font-size: 10px; }
-.player span { color: #7de890; }
-
-/* SCREEN MODES / RTA / EFFECT SETUP */
-.pro-screen-grid {
-  display: grid;
-  grid-template-columns: 1fr 125px;
-  gap: 6px;
-  height: 230px;
-}
-
-.screen-big-meter {
-  position: relative;
-  border: 1px solid #17445a;
-  background: #030b10;
-  box-shadow: inset 0 0 20px #001923;
-  padding: 12px 10px 20px;
-  overflow: hidden;
-}
-
-.meter-columns {
-  height: 190px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-around;
-  gap: 4px;
-  background: repeating-linear-gradient(0deg, transparent 0 18px, rgba(90, 180, 220, .1) 19px 20px);
-}
-
-.meter-columns i {
-  display: block;
-  width: 7px;
-  min-height: 8px;
-  background: linear-gradient(to top, #1cdb5b 0 55%, #dfe51d 56% 78%, #ffb21b 79% 90%, #ff3b30 91%);
-  box-shadow: 0 0 6px rgba(40, 230, 100, .3);
-  border-radius: 2px 2px 0 0;
-}
-
-.meter-db {
-  position: absolute;
-  right: 4px;
-  top: 7px;
-  bottom: 7px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  color: #647f8b;
-  font-size: 7px;
-}
-
-.screen-info-card {
-  border: 1px solid #29434f;
-  background: linear-gradient(#101c22, #05090c);
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  box-shadow: inset 0 0 15px rgba(0, 150, 220, .08);
-}
-
-.screen-info-card b { color: #aebbc0; font-size: 9px; }
-.screen-info-card strong { font-size: 25px; color: #52d9ff; text-shadow: 0 0 8px rgba(82, 217, 255, .35); font-family: 'JetBrains Mono', monospace; }
-.screen-info-card span { font-size: 8px; color: #7f9097; border-top: 1px solid #1b3039; padding-top: 6px; }
-.screen-info-card em { float: right; color: #61ee7c; font-style: normal; }
-
-.rta-display {
-  height: 230px;
-  position: relative;
-  border: 1px solid #17445a;
-  background: #030b10;
-  overflow: hidden;
-  padding: 10px 12px 22px;
-  box-shadow: inset 0 0 25px #001923;
-}
-
-.rta-grid {
-  position: absolute;
-  inset: 8px 10px 24px;
-  background: repeating-linear-gradient(0deg, transparent 0 28px, rgba(55, 170, 220, .14) 29px), repeating-linear-gradient(90deg, transparent 0 34px, rgba(55, 170, 220, .1) 35px);
-}
-
-.rta-bars {
-  position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: 25px;
-  height: 185px;
-  display: flex;
-  align-items: flex-end;
-  gap: 4px;
-}
-
-.rta-bars i {
-  flex: 1;
-  min-width: 3px;
-  background: linear-gradient(to top, #20df63, #d8df27, #ffb11a, #ff3b30);
-  box-shadow: 0 0 6px rgba(60, 220, 120, .3);
-  border-radius: 2px 2px 0 0;
-}
-
-.rta-labels {
-  position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: 6px;
-  display: flex;
-  justify-content: space-between;
-  color: #687f88;
-  font-size: 7px;
-}
-
-.setup-screen, .effect-screen, .scene-screen {
-  height: 230px;
-  border: 1px solid #254554;
-  background: linear-gradient(145deg, #0d171c, #030709);
-  padding: 15px;
-  box-shadow: inset 0 0 22px rgba(0, 170, 255, .08);
-}
-
-.setup-screen > b, .scene-screen > b {
-  display: block;
-  color: #64d8ff;
-  font-size: 10px;
-  letter-spacing: 1px;
-  margin-bottom: 12px;
-}
-
-.setup-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-}
-
-.setup-grid span {
-  background: #0a1115;
-  border: 1px solid #1d343e;
-  padding: 10px;
-  color: #71848c;
-  font-size: 8px;
-}
-
-.setup-grid strong {
-  display: block;
-  color: #59ef78;
-  font-size: 10px;
-  margin-top: 3px;
-}
-
-.effect-screen { display: flex; align-items: center; gap: 8px; }
-.effect-screen > div { flex: 1; background: #0a1115; border: 1px solid #203b46; padding: 12px 7px; text-align: center; }
-.effect-screen b { display: block; color: #71858e; font-size: 7px; }
-.effect-screen strong { display: block; color: #64ddff; margin: 7px 0 0 0; }
-
 /* =========================================================
-   6. FX, AUX RACKS & MASTER SECTION
+   6. FX & AUX RACKS
    ========================================================= */
 .fx-rack, .aux-rack {
   margin-top: 7px;
@@ -832,20 +619,6 @@ button:disabled {
 .fx-display strong { color: var(--green); }
 .fx-display small { font-size: 8px; color: #8d969a; }
 
-.fake-knob, .monitor-knob, .phone-knob, .mini-knobs i {
-  display: inline-block;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  vertical-align: middle;
-  background: radial-gradient(circle at 35% 30%, #596064, #171a1c 43%, #050607 70%);
-  border: 2px solid #3f4548;
-  box-shadow: inset 0 1px 4px #777, 0 2px 4px #000;
-}
-
-.fx-buttons { display: flex; gap: 4px; margin-top: 7px; }
-.fx-buttons button { flex: 1; font-size: 8px; }
-
 .aux-rack { 
   display: grid; 
   grid-template-columns: 1fr 1fr; 
@@ -866,26 +639,64 @@ button:disabled {
   margin-bottom: 4px;
 }
 
-.aux-labels, .aux-values {
+/* =========================================================
+   7. LATAR BELAKANG SIDE PANEL (DEVICE CONNECTION, BRIDGE, ETC)
+   ========================================================= */
+.right-tools {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px;
+}
+
+.device-connection, 
+.bridge-panel, 
+.media-rack, 
+.connection-test-panel {
+  background: linear-gradient(180deg, #161a1d 0%, #0d0f11 100%);
+  border: 1px solid #30363a;
+  border-radius: 6px;
+  padding: 10px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 4px 12px rgba(0,0,0,0.6);
+}
+
+.device-connection h2, 
+.bridge-panel h2, 
+.media-rack h2, 
+.connection-test-panel h2 {
+  font-size: 10px;
+  color: var(--cyan);
+  letter-spacing: 1px;
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+  border-bottom: 1px solid #282e32;
+  padding-bottom: 4px;
+}
+
+.device-status, .bridge-summary {
+  background: #090c0d;
+  border: 1px solid #20262a;
+  border-radius: 4px;
+  padding: 6px;
+  margin: 6px 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: #aeb8bc;
+}
+
+.bridge-log {
+  background: #050708;
+  border: 1px solid #1c2225;
+  border-radius: 4px;
+  padding: 6px;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 8px;
-  color: var(--muted);
+  color: var(--green);
+  max-height: 80px;
+  overflow-y: auto;
 }
 
-.mini-knobs {
-  display: flex;
-  gap: 4px;
-  margin: 4px 0;
-}
-
-.mini-knobs input[type="range"] {
-  flex: 1;
-  height: 4px;
-  accent-color: var(--green);
-}
-
-/* Master Rack Section */
+/* Master Rack */
 .master-rack {
   padding: 8px;
   display: flex;
@@ -907,16 +718,8 @@ button:disabled {
   margin: 0 0 6px;
 }
 
-.master-card input[type="range"] {
-  appearance: slider-vertical;
-  writing-mode: vertical-lr;
-  height: 180px;
-  width: 24px;
-  accent-color: var(--red);
-}
-
 /* =========================================================
-   7. BOTTOM NAVIGATION BAR & FOOTER
+   8. BOTTOM NAVIGATION & FOOTER
    ========================================================= */
 .bottom-nav {
   display: flex;
