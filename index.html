@@ -688,8 +688,9 @@
   const fileBtn = document.getElementById('btnPlayerFile');
   const fileInput = document.getElementById('localAudioLoader');
   const targetLabel = document.getElementById('activePlayerTarget');
+  const playPauseBtn = document.getElementById('btnPlayPauseAudio');
+  const trackInfo = document.getElementById('playerTrackInfo');
 
-  // Inisialisasi Web Audio Context untuk pemrosesan Gain & Pan secara nyata
   let audioCtx = null;
   let sourceNode = null;
   let gainNode = null;
@@ -709,7 +710,6 @@
       sourceNode = audioCtx.createMediaElementSource(audioElement);
       gainNode = audioCtx.createGain();
       
-      // Buat panner node jika didukung browser untuk efek PAN (kiri/kanan)
       if (audioCtx.createStereoPanner) {
         panNode = audioCtx.createStereoPanner();
         sourceNode.connect(gainNode);
@@ -722,28 +722,39 @@
     }
   }
 
-  // Sinkronisasi indikator channel aktif secara real-time
+  // Sinkronisasi indikator channel aktif & nilai parameter layar secara real-time
   setInterval(() => {
     const activeInput = document.getElementById('screenInput');
+    const screenGain = document.getElementById('screenGain');
+    const screenFader = document.getElementById('screenFader');
+    const screenPan = document.getElementById('screenPan');
+
     if(activeInput && targetLabel) {
       targetLabel.textContent = "[" + activeInput.textContent.trim() + "]";
     }
 
-    // Hubungkan perubahan Gain, Pan, dan Fader secara real-time ke Web Audio Nodes
-    if (currentAudioElement && !currentAudioElement.paused) {
-      const currentChannelStr = document.getElementById('screenInput')?.textContent || "CH 1";
-      const chNum = parseInt(currentChannelStr.replace(/\D/g, ''), 10) || 1;
-      
-      if (window.state && window.state.channels && window.state.channels[chNum - 1]) {
-        const chData = window.state.channels[chNum - 1];
+    const currentChannelStr = activeInput?.textContent || "CH 1";
+    const chNum = parseInt(currentChannelStr.replace(/\D/g, ''), 10) || 1;
 
-        // 1. Atur Gain (Trim)
+    if (window.state && window.state.channels && window.state.channels[chNum - 1]) {
+      const chData = window.state.channels[chNum - 1];
+
+      // Update nilai tampilan teks di screen mixer sesuai state channel aktif
+      if (screenGain) screenGain.textContent = Number(chData.gain || 1.0).toFixed(2);
+      if (screenFader) screenFader.textContent = (chData.fader || 75) + '%';
+      if (screenPan) {
+        const panVal = chData.pan || 0;
+        screenPan.textContent = panVal === 0 ? 'CENTER' : (panVal < 0 ? 'L ' + Math.round(Math.abs(panVal) * 100) + '%' : 'R ' + Math.round(panVal * 100) + '%');
+      }
+
+      // Hubungkan perubahan Gain & Pan ke Web Audio Nodes secara real-time
+      if (currentAudioElement && !currentAudioElement.paused && audioCtx) {
         if (gainNode) {
-          const gainVal = parseFloat(chData.gain) || 1.0;
+          const faderScale = (chData.fader || 75) / 100;
+          const gainVal = (parseFloat(chData.gain) || 1.0) * faderScale;
           gainNode.gain.setValueAtTime(Math.max(0, Math.min(2.0, gainVal)), audioCtx.currentTime);
         }
 
-        // 2. Atur Pan (Kiri -1.0 sampai Kanan 1.0)
         if (panNode && typeof chData.pan !== 'undefined') {
           panNode.pan.setValueAtTime(Math.max(-1.0, Math.min(1.0, chData.pan)), audioCtx.currentTime);
         }
@@ -751,11 +762,30 @@
     }
   }, 100);
 
-  // Klik tombol MUSIC atau FILE membuka dialog file perangkat
+  // Tombol pilih file dari perangkat
   if(musicBtn) musicBtn.addEventListener('click', () => fileInput?.click());
   if(fileBtn) fileBtn.addEventListener('click', () => fileInput?.click());
 
-  // Proses file audio yang dipilih
+  // Tombol Play / Pause interaktif
+  if(playPauseBtn) {
+    playPauseBtn.addEventListener('click', () => {
+      if(!currentAudioElement) {
+        fileInput?.click();
+        return;
+      }
+      if(currentAudioElement.paused) {
+        currentAudioElement.play();
+        playPauseBtn.textContent = '⏸ PAUSE';
+        playPauseBtn.style.background = '#e74c3c';
+      } else {
+        currentAudioElement.pause();
+        playPauseBtn.textContent = '▶ PLAY';
+        playPauseBtn.style.background = '#00bcd4';
+      }
+    });
+  }
+
+  // Proses file audio yang dipilih dari perangkat
   if(fileInput) {
     fileInput.addEventListener('change', function(e) {
       const file = e.target.files[0];
@@ -773,11 +803,15 @@
 
       currentAudioElement.src = fileObjectURL;
       
-      // Inisialisasi Web Audio API saat audio dimainkan
       currentAudioElement.play().then(() => {
         initAudioEngine(currentAudioElement);
+        if(trackInfo) trackInfo.textContent = file.name;
+        if(playPauseBtn) {
+          playPauseBtn.textContent = '⏸ PAUSE';
+          playPauseBtn.style.background = '#e74c3c';
+        }
         const tr = document.getElementById('testResult');
-        if(tr) tr.textContent = `PLAYER: Memutar "${file.name}" aktif di Channel ${chNum} (Audio Node Connected)`;
+        if(tr) tr.textContent = `PLAYER: Memutar "${file.name}" ke Channel ${chNum} (Audio Node Connected)`;
       }).catch(err => {
         console.error("Gagal memutar audio:", err);
       });
@@ -786,3 +820,5 @@
 })();
 </script>
 
+</body>
+</html>
