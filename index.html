@@ -458,20 +458,7 @@
       if (transportSelect) transportSelect.value = espMode ? "esp32" : (st.transport === "bluetooth" ? "bluetooth" : "esp32");
     }
 
-    if (deviceConnect) deviceConnect.addEventListener("click", async function(e){
-      e.preventDefault(); e.stopImmediatePropagation();
-      deviceConnect.disabled = true;
-      deviceConnect.textContent = "CONNECTING...";
-      try {
-        var result = await window.MixerAdapters?.connectESP32?.();
-        if (!result?.ok || !result?.connected) throw new Error(result?.reason || "ESP32 bridge gagal");
-        paintDevice(window.MixerAdapters.status());
-      } catch (err) {
-        paintDevice({connected:false,transport:"esp32",type:"simulator",protocol:"ESP32-MIXER/1"});
-      } finally {
-        deviceConnect.disabled = false;
-      }
-    });
+
 
     if (deviceDisconnect) deviceDisconnect.addEventListener("click", function(e){
       e.preventDefault(); e.stopImmediatePropagation();
@@ -525,24 +512,42 @@
     if(esp) esp.addEventListener("click", async function(e){
       e.preventDefault();
       e.stopImmediatePropagation();
-      if(window.MixerAdapters?.active?.connected && window.MixerAdapters.active?.type === "simulator"){
-        window.MixerAdapters.disconnect();
+
+      var api = window.MixerAdapters;
+      window.state = window.state || {system:false, connected:false, channels:[], sim:{online:false}};
+
+      /* ESP32 may only be connected while SYSTEM is ON. */
+      if(!window.state.system){
+        paintConnection({connected:false,type:"simulator",transport:"esp32",protocol:"ESP32-MIXER/1",lastError:"SYSTEM_OFF"});
         return;
       }
+
+      /* ON -> OFF: disconnect the simulator cleanly. */
+      if(api?.active?.connected && (api.active.type === "simulator" || api.active.transport === "esp32")){
+        api.disconnect();
+        window.state.connected = false;
+        window.state.sim.online = false;
+        paintConnection({connected:false,type:"simulator",transport:"esp32",protocol:"ESP32-MIXER/1"});
+        return;
+      }
+
       esp.disabled = true;
       esp.textContent = "CONNECTING...";
       try {
-        const result = await window.MixerAdapters?.connectESP32?.();
-        if(!result?.ok || !result?.connected) throw new Error(result?.reason || "ESP32 simulator gagal terhubung");
-        window.state = window.state || {};
+        if(!api?.connectESP32) throw new Error("ESP32 adapter tidak tersedia");
+        const result = await api.connectESP32();
+        if(!result?.ok || result.connected !== true) throw new Error(result?.reason || "ESP32 bridge gagal");
+
+        const live = api.status ? api.status() : result;
         window.state.connected = true;
-        window.state.sim = window.state.sim || {};
         window.state.sim.online = true;
-        paintConnection({connected:true,type:"simulator",transport:"esp32",name:"ESP32 SIMULATOR"});
+        paintConnection(live);
+        paintDevice(live);
       } catch(error) {
-        esp.textContent = "CONNECT ESP32";
-        var status = document.getElementById("status");
-        if(status) status.textContent = "OFFLINE";
+        window.state.connected = false;
+        window.state.sim.online = false;
+        paintConnection({connected:false,type:"simulator",transport:"esp32",protocol:"ESP32-MIXER/1",lastError:error?.message || String(error)});
+        paintDevice({connected:false,type:"simulator",transport:"esp32",protocol:"ESP32-MIXER/1"});
       } finally {
         esp.disabled = false;
       }
@@ -565,6 +570,18 @@
 
     p.addEventListener("click", function(){
       window.state.system = !window.state.system;
+
+      /* SYSTEM OFF always forces ESP32 OFF to prevent a stale bridge state. */
+      if(!window.state.system && window.MixerAdapters?.active?.connected){
+        window.MixerAdapters.disconnect();
+        window.state.connected = false;
+        window.state.sim = window.state.sim || {};
+        window.state.sim.online = false;
+      }
+      paintConnection(window.MixerAdapters?.status?.() || {
+        connected:false,type:"none",transport:"none",protocol:"none"
+      });
+      paintDevice(window.MixerAdapters?.status?.());
       paint();
     });
     paint();
