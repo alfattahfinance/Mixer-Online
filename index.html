@@ -25,15 +25,57 @@
   }
   .channel-bank, 
   .center-console, 
-  .master-rack, 
-  .fx-rack, 
-  .aux-rack {
+  .master-rack {
     flex-shrink: 0;
   }
+
+  /* Konsol Tengah: Lebar seragam (340px) menyesuaikan screen mixer */
   .center-console {
     display: flex;
     flex-direction: column;
     width: 340px;
+    gap: 6px;
+  }
+
+  /* Menyamakan lebar screen, media rack, fx rack, dan aux rack di konsol tengah */
+  .screen-frame, .media-rack, .center-console .fx-rack, .center-console .aux-rack {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Mengatur ulang posisi elemen FX & Aux agar berada di dalam konsol tengah */
+  .center-console .fx-rack,
+  .center-console .aux-rack {
+    position: static !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Menyamakan panjang fader & tinggi Master Rack agar sama persis dengan channel bank */
+  .master-rack {
+    height: 690px !important;
+    min-height: 690px !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    padding: 8px 4px;
+  }
+  .master-card {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .master-card input[type="range"][orient="vertical"],
+  .master-card input[type="range"] {
+    height: 420px !important;
+  }
+
+  /* Sembunyikan kontainer absolute lama di luar konsol utama */
+  main.console > .fx-rack, main.console > .aux-rack {
+    display: none !important;
   }
 
   /* ==========================================================
@@ -224,12 +266,12 @@
     <div id="channels"></div>
   </section>
 
-  <!-- KONSOL TENGAH (MIDAS M32 SCREEN STYLE + SUB-MENUS + PLAYER) -->
+  <!-- KONSOL TENGAH (SCREEN M32 + PLAYER + FX RACK + AUX RACK) -->
   <section class="center-console">
+    <!-- 1. Screen Mixer Midas M32 -->
     <div class="screen-frame">
       <div class="screen-title"><b>MIDAS M32</b><span>DIGITAL CONSOLE SYSTEM</span></div>
       
-      <!-- Midas Style Menu Navigation Buttons -->
       <div class="screen-tabs" id="screenTabs">
         <button class="active" data-screen="HOME">HOME</button>
         <button data-screen="METER">METERS</button>
@@ -239,7 +281,6 @@
         <button data-screen="SCENE">LIBRARY</button>
       </div>
 
-      <!-- Midas M32 Sub-Menu Bar khusus di dalam menu HOME -->
       <div class="m32-submenu-bar" id="m32SubmenuBar">
         <button class="m32-sub-btn active" data-sub="overview">OVERVIEW</button>
         <button class="m32-sub-btn" data-sub="config">CONFIG</button>
@@ -250,17 +291,14 @@
       </div>
       
       <div class="screen-content" id="screenContent">
-        <!-- VIEW: HOME (Midas TFT Display Layout & Sub-Menus) -->
         <section class="screen-view active" data-view="HOME">
           <div class="midas-tft-screen">
-            <!-- Top Channel Info Bar -->
             <div class="midas-header-strip">
               <div class="midas-ch-badge" id="screenInput">CH 01</div>
               <input type="text" id="screenChannelName" value="VOCAL MAIN" style="background: #05080c; border: 1px solid #1f2d3d; color: #00e5ff; font-size: 10px; padding: 2px 4px; border-radius: 2px; width: 110px; text-align: center;">
               <span style="font-size: 9px; color: #2ecc71; font-weight: bold;">[ACTIVE]</span>
             </div>
 
-            <!-- SUB-PANEL: OVERVIEW (Default) -->
             <div class="m32-sub-panel active" data-subpanel="overview">
               <div class="midas-blocks-grid">
                 <div class="midas-block">
@@ -280,7 +318,6 @@
                   <strong style="color: #f39c12;">BYPASS</strong>
                 </div>
               </div>
-              <!-- Mini Spectrum / RTA -->
               <div class="pro-mini-spectrum" id="visualMeter" style="background: #040609; border: 1px solid #16222f; padding: 3px; border-radius: 3px;">
                 <div class="spectrum-bars-container" style="display: flex; gap: 2px; height: 30px; align-items: flex-end;">
                   <div class="bar-col" style="flex:1; height: 60%"></div>
@@ -296,65 +333,58 @@
               </div>
             </div>
 
-            <!-- SUB-PANEL: CONFIG / PREAMP -->
             <div class="m32-sub-panel" data-subpanel="config">
               <b>PREAMP / INPUT CONFIG</b>
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:4px;">
-                <div style="background:#0c1219; padding:4px; border:1px solid #1b2836;">+48V PHANTOM: <span style="color:#2ecc71;">ON</span></div>
-                <div style="background:#0c1219; padding:4px; border:1px solid #1b2836;">LOW CUT (HPF): <span style="color:#00e5ff;">80 Hz</span></div>
-                <div style="background:#0c1219; padding:4px; border:1px solid #1b2836;">POLARITY: <span style="color:#fff;">NORMAL (+)</span></div>
-                <div style="background:#0c1219; padding:4px; border:1px solid #1b2836;">INSERT POINT: <span style="color:#f39c12;">PRE-EQ</span></div>
+                <div style="background:#0c1219; padding:4px; border:1px solid #1b2836;">+48V: <span style="color:#2ecc71;">ON</span></div>
+                <div style="background:#0c1219; padding:4px; border:1px solid #1b2836;">HPF: <span style="color:#00e5ff;">80 Hz</span></div>
+                <div style="background:#0c1219; padding:4px; border:1px solid #1b2836;">POL: <span style="color:#fff;">+</span></div>
+                <div style="background:#0c1219; padding:4px; border:1px solid #1b2836;">INSERT: <span style="color:#f39c12;">PRE-EQ</span></div>
               </div>
             </div>
 
-            <!-- SUB-PANEL: GATE -->
             <div class="m32-sub-panel" data-subpanel="gate">
               <b>EXPANDER / NOISE GATE</b>
               <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:4px; margin-top:4px; text-align:center;">
-                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">THRESHOLD<br><strong style="color:#00e5ff;">-45 dB</strong></div>
+                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">THRESH<br><strong style="color:#00e5ff;">-45 dB</strong></div>
                 <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">RANGE<br><strong style="color:#00e5ff;">40 dB</strong></div>
-                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">RELEASE<br><strong style="color:#00e5ff;">250 ms</strong></div>
+                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">REL<br><strong style="color:#00e5ff;">250 ms</strong></div>
               </div>
             </div>
 
-            <!-- SUB-PANEL: DYN (COMPRESSOR) -->
             <div class="m32-sub-panel" data-subpanel="dyn">
               <b>DYNAMICS / COMPRESSOR</b>
               <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:3px; margin-top:4px; text-align:center;">
                 <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">THRESH<br><strong style="color:#f39c12;">-18dB</strong></div>
-                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">RATIO<br><strong style="color:#f39c12;">3.1:1</strong></div>
-                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">ATTACK<br><strong style="color:#f39c12;">15ms</strong></div>
-                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">GAIN<br><strong style="color:#f39c12;">+2.5dB</strong></div>
+                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">RATIO<br><strong style="color:#f39c12;">3.1</strong></div>
+                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">ATT<br><strong style="color:#f39c12;">15ms</strong></div>
+                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">GAIN<br><strong style="color:#f39c12;">+2.5</strong></div>
               </div>
             </div>
 
-            <!-- SUB-PANEL: EQ -->
             <div class="m32-sub-panel" data-subpanel="eq">
-              <b>4-BAND PARAMETRIC EQUALIZER</b>
-              <div style="background:#040608; border:1px solid #1a2736; height:36px; display:flex; align-items:flex-end; padding:2px; gap:2px; margin-top:4px;">
-                <div style="flex:1; background:#00e5ff; height:30%; opacity:0.7;" title="Low shelf"></div>
-                <div style="flex:1; background:#00e5ff; height:60%; opacity:0.8;" title="Low-Mid"></div>
-                <div style="flex:1; background:#00e5ff; height:80%; opacity:0.9;" title="High-Mid"></div>
-                <div style="flex:1; background:#00e5ff; height:50%; opacity:0.7;" title="High shelf"></div>
+              <b>4-BAND PARAMETRIC EQ</b>
+              <div style="background:#040608; border:1px solid #1a2736; height:32px; display:flex; align-items:flex-end; padding:2px; gap:2px; margin-top:4px;">
+                <div style="flex:1; background:#00e5ff; height:30%; opacity:0.7;"></div>
+                <div style="flex:1; background:#00e5ff; height:60%; opacity:0.8;"></div>
+                <div style="flex:1; background:#00e5ff; height:80%; opacity:0.9;"></div>
+                <div style="flex:1; background:#00e5ff; height:50%; opacity:0.7;"></div>
               </div>
-              <div style="font-size:7px; display:flex; justify-content:space-between; margin-top:2px;"><span>Low: 100Hz</span><span>Mid1: 800Hz</span><span>Mid2: 3.2kHz</span><span>High: 10kHz</span></div>
             </div>
 
-            <!-- SUB-PANEL: SENDS -->
             <div class="m32-sub-panel" data-subpanel="sends">
               <b>BUS / AUX SENDS ROUTING</b>
               <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:3px; margin-top:4px; text-align:center;">
-                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">BUS 1<br><strong style="color:#2ecc71;">0.0dB</strong></div>
-                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">BUS 2<br><strong style="color:#2ecc71;">-6.0dB</strong></div>
-                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">FX 1<br><strong style="color:#2ecc71;">-3.5dB</strong></div>
-                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">FX 2<br><strong style="color:#2ecc71;">-∞</strong></div>
+                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">BS1<br><strong style="color:#2ecc71;">0dB</strong></div>
+                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">BS2<br><strong style="color:#2ecc71;">-6d</strong></div>
+                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">FX1<br><strong style="color:#2ecc71;">-3d</strong></div>
+                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">FX2<br><strong style="color:#2ecc71;">-∞</strong></div>
               </div>
             </div>
 
           </div>
         </section>
 
-        <!-- VIEW: METER -->
         <section class="screen-view" data-view="METER">
           <div class="pro-screen-grid" style="background: #06090f; padding: 6px; border-radius: 4px;">
             <div class="screen-big-meter">
@@ -364,7 +394,6 @@
           </div>
         </section>
 
-        <!-- VIEW: RTA -->
         <section class="screen-view" data-view="RTA">
           <div class="rta-display" style="background: #06090f; padding: 6px; border-radius: 4px;">
             <div class="rta-grid"></div>
@@ -373,7 +402,6 @@
           </div>
         </section>
 
-        <!-- VIEW: SETUP -->
         <section class="screen-view" data-view="SETUP">
           <div class="setup-screen" style="background: #06090f; padding: 6px; border-radius: 4px; font-size: 9px;">
             <b>M32 SYSTEM CONFIG</b>
@@ -385,7 +413,6 @@
           </div>
         </section>
 
-        <!-- VIEW: EFFECT -->
         <section class="screen-view" data-view="EFFECT">
           <div class="effect-screen effect-screen-live" style="background: #06090f; padding: 6px; border-radius: 4px; font-size: 9px;">
             <b>VIRTUAL FX RACK</b>
@@ -393,7 +420,6 @@
           </div>
         </section>
 
-        <!-- VIEW: SCENE -->
         <section class="screen-view" data-view="SCENE">
           <div class="scene-screen" style="background: #06090f; padding: 6px; border-radius: 4px; font-size: 9px;">
             <b>SCENE LIBRARY</b>
@@ -402,7 +428,6 @@
         </section>
       </div>
 
-      <!-- Midas Physical Rotary Encoder Bar Below Screen (6 Encoders) -->
       <div class="midas-encoders-bar">
         <div class="mid-encoder">GAIN</div>
         <div class="mid-encoder">HPF</div>
@@ -413,13 +438,13 @@
       </div>
     </div>
 
-    <!-- PLAYER / RECORDER DI BAWAH SCREEN MIXER -->
-    <section class="media-rack" style="margin-top: 4px; background: #0c1219; border: 1px solid #1a2736;">
-      <h2 style="color: #00e5ff; border-bottom: 1px solid #1a2736; margin-bottom: 4px;">USB PLAYER / REC <span id="activePlayerTarget" style="font-size: 9px; color: #2ecc71; float: right;">[CH 1]</span></h2>
+    <!-- 2. Player / Recorder -->
+    <section class="media-rack" style="background: #0c1219; border: 1px solid #1a2736; border-radius: 6px; padding: 6px;">
+      <h2 style="color: #00e5ff; border-bottom: 1px solid #1a2736; margin-bottom: 4px; font-size: 10px;">USB PLAYER / REC <span id="activePlayerTarget" style="font-size: 9px; color: #2ecc71; float: right;">[CH 1]</span></h2>
       <div style="display: flex; gap: 4px; margin-bottom: 4px;">
-        <button id="btnPlayerRec" type="button" style="flex: 1; background: #16222f; color: #fff; border: 1px solid #243447;">🎙<small>REC</small></button>
-        <button id="btnPlayerFile" type="button" style="flex: 1; background: #16222f; color: #fff; border: 1px solid #243447;">📁<small>FILE</small></button>
-        <button id="btnPlayerMusic" type="button" style="flex: 1; background: #16222f; color: #fff; border: 1px solid #243447;">🎵<small>MUSIC</small></button>
+        <button id="btnPlayerRec" type="button" style="flex: 1; background: #16222f; color: #fff; border: 1px solid #243447; font-size: 9px; padding: 4px;">🎙<small>REC</small></button>
+        <button id="btnPlayerFile" type="button" style="flex: 1; background: #16222f; color: #fff; border: 1px solid #243447; font-size: 9px; padding: 4px;">📁<small>FILE</small></button>
+        <button id="btnPlayerMusic" type="button" style="flex: 1; background: #16222f; color: #fff; border: 1px solid #243447; font-size: 9px; padding: 4px;">🎵<small>MUSIC</small></button>
       </div>
       <div style="display: flex; gap: 4px; align-items: center; background: #06090f; padding: 4px; border-radius: 3px; border: 1px solid #1a2736;">
         <span id="playerTrackInfo" style="font-size: 9px; color: #8899a6; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">NO FILE SELECTED</span>
@@ -427,6 +452,56 @@
       </div>
       <input type="file" id="localAudioLoader" accept="audio/*" style="display: none;">
     </section>
+
+    <!-- 3. Effect Processor (Dipindah ke bawah konsol tengah) -->
+    <div class="fx-rack fx-rack-live" id="fxRack" style="background: #0c1219; border: 1px solid #1a2736; border-radius: 6px; padding: 6px;">
+      <div class="rack-title" style="font-size: 9px; color: #00e5ff; margin-bottom: 4px;">EFFECT PROCESSOR <span>PARAMETER</span></div>
+      <div class="fx-toolbar" style="display: flex; align-items: center; gap: 4px; margin-bottom: 4px;">
+        <div class="fx-display" style="background: #06090f; padding: 3px; border: 1px solid #1a2736; flex-grow: 1; border-radius: 3px;">
+          <strong id="fxRackPreset" style="font-size: 9px; color: #fff;">HALL 1</strong>
+          <small id="fxRackSummary" style="font-size: 7px; color: #8899a6; display: block;">REVERB • TIME 2.45s</small>
+        </div>
+        <button id="fxTap" type="button" style="font-size: 8px; padding: 3px 6px;">TAP</button>
+        <span id="fxBpm" style="font-size: 8px; color: #00e5ff;">120 BPM</span>
+        <button id="fxSelect" type="button" style="font-size: 8px; padding: 3px 6px;">SEL</button>
+      </div>
+      <div class="fx-buttons" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; margin-bottom: 4px;">
+        <button data-fx-select="FX1" class="active" style="font-size: 7px; padding: 2px;">FX1</button>
+        <button data-fx-select="FX2" style="font-size: 7px; padding: 2px;">FX2</button>
+        <button data-fx-select="AUX1" style="font-size: 7px; padding: 2px;">AX1</button>
+        <button data-fx-select="AUX2" style="font-size: 7px; padding: 2px;">AX2</button>
+        <button data-fx-select="AUX3" style="font-size: 7px; padding: 2px;">AX3</button>
+        <button data-fx-select="AUX4" style="font-size: 7px; padding: 2px;">AX4</button>
+      </div>
+      <div class="fx-parameter-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 8px;">
+        <label>TIME <input class="fx-control" data-scope="FX" data-target="FX1" data-param="time" type="range" min="0.1" max="10" step="0.01" value="2.45" style="width:100%;"><output data-fx-value="time">2.45s</output></label>
+        <label>PRE-D <input class="fx-control" data-scope="FX" data-target="FX1" data-param="preDelay" type="range" min="0" max="200" step="1" value="32" style="width:100%;"><output data-fx-value="preDelay">32ms</output></label>
+        <label>DECAY <input class="fx-control" data-scope="FX" data-target="FX1" data-param="decay" type="range" min="0" max="100" step="1" value="65" style="width:100%;"><output data-fx-value="decay">65%</output></label>
+        <label>LEVEL <input class="fx-control" data-scope="FX" data-target="FX1" data-param="level" type="range" min="-20" max="6" step="0.1" value="-3" style="width:100%;"><output data-fx-value="level">-3.0dB</output></label>
+      </div>
+    </div>
+
+    <!-- 4. Aux / Bus & FX Return (Dipindah ke bawah konsol tengah) -->
+    <div class="aux-rack" id="auxRack" style="background: #0c1219; border: 1px solid #1a2736; border-radius: 6px; padding: 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+      <div class="aux-unit aux-live" style="background: #06090f; padding: 4px; border: 1px solid #1a2736; border-radius: 4px; font-size: 8px;">
+        <b style="color: #00e5ff; font-size: 8px;">AUX / BUS</b>
+        <div class="aux-labels" style="display:flex; justify-content:space-between; color:#8899a6; font-size:6px; margin:2px 0;"><span>A1</span><span>A2</span><span>A3</span><span>A4</span></div>
+        <div class="mini-knobs" style="display:flex; gap:2px;">
+          <input class="aux-control" data-target="AUX1" type="range" min="0" max="1" step="0.01" value="0" style="width:100%;">
+          <input class="aux-control" data-target="AUX2" type="range" min="0" max="1" step="0.01" value="0" style="width:100%;">
+          <input class="aux-control" data-target="AUX3" type="range" min="0" max="1" step="0.01" value="0" style="width:100%;">
+          <input class="aux-control" data-target="AUX4" type="range" min="0" max="1" step="0.01" value="0" style="width:100%;">
+        </div>
+      </div>
+      <div class="aux-unit aux-live" style="background: #06090f; padding: 4px; border: 1px solid #1a2736; border-radius: 4px; font-size: 8px;">
+        <b style="color: #00e5ff; font-size: 8px;">FX RETURN</b>
+        <div class="aux-labels" style="display:flex; justify-content:space-between; color:#8899a6; font-size:6px; margin:2px 0;"><span>FX1</span><span>FX2</span></div>
+        <div class="mini-knobs" style="display:flex; gap:2px;">
+          <input class="aux-control" data-scope="FX_RETURN" data-target="FX1" type="range" min="0" max="1" step="0.01" value=".45" style="width:100%;">
+          <input class="aux-control" data-scope="FX_RETURN" data-target="FX2" type="range" min="0" max="1" step="0.01" value=".45" style="width:100%;">
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- CHANNEL BANK KANAN (CH 8-14) -->
@@ -435,6 +510,7 @@
     <div id="channelsRight"></div>
   </section>
 
+  <!-- MASTER RACK (Fader diperpanjang menyamai tinggi channel strip) -->
   <aside class="master-rack">
     <div class="meter-rack"><b>MAIN L&nbsp; R</b><div class="main-meters"><div class="meter"></div><div class="meter"></div></div></div>
     <div class="master-card">
@@ -446,63 +522,6 @@
     <div class="monitor-card"><b>MONITOR</b><span>SOURCE</span><button>MAIN L/R</button><div class="monitor-knob"></div><span>LEVEL</span></div>
     <div class="phones-card">🎧 <b>PHONES</b><div class="phone-knob"></div><span>●</span></div>
   </aside>
-
-  <div class="fx-rack fx-rack-live" id="fxRack">
-    <div class="rack-title">EFFECT PROCESSOR <span>PARAMETER</span></div>
-    <div class="fx-toolbar">
-      <div class="fx-display"><strong id="fxRackPreset">HALL 1</strong><small id="fxRackSummary">REVERB • TIME 2.45s • LEVEL -3.0dB</small></div>
-      <button id="fxTap" type="button">TAP</button><span id="fxBpm">120 BPM</span><button id="fxSelect" type="button">SELECT</button>
-    </div>
-    <div class="fx-buttons">
-      <button data-fx-select="FX1" class="active">FX1</button>
-      <button data-fx-select="FX2">FX2</button>
-      <button data-fx-select="AUX1">AUX1</button>
-      <button data-fx-select="AUX2">AUX2</button>
-      <button data-fx-select="AUX3">AUX3</button>
-      <button data-fx-select="AUX4">AUX4</button>
-    </div>
-    <div class="fx-parameter-grid">
-      <label>TIME<input class="fx-control" data-scope="FX" data-target="FX1" data-param="time" type="range" min="0.1" max="10" step="0.01" value="2.45"><output data-fx-value="time">2.45s</output></label>
-      <label>PRE-DELAY<input class="fx-control" data-scope="FX" data-target="FX1" data-param="preDelay" type="range" min="0" max="200" step="1" value="32"><output data-fx-value="preDelay">32ms</output></label>
-      <label>DECAY<input class="fx-control" data-scope="FX" data-target="FX1" data-param="decay" type="range" min="0" max="100" step="1" value="65"><output data-fx-value="decay">65%</output></label>
-      <label>LEVEL<input class="fx-control" data-scope="FX" data-target="FX1" data-param="level" type="range" min="-20" max="6" step="0.1" value="-3"><output data-fx-value="level">-3.0dB</output></label>
-    </div>
-    <div class="fx-extra">
-      <label>PRESET<select class="fx-preset" data-target="FX1"><option>HALL 1</option><option>ROOM</option><option>PLATE</option><option>DELAY</option><option>CHORUS</option></select></label>
-      <label>TYPE<select class="fx-type" data-target="FX1"><option>REVERB</option><option>DELAY</option><option>CHORUS</option><option>ECHO</option></select></label>
-    </div>
-  </div>
-
-  <div class="aux-rack" id="auxRack">
-    <div class="aux-unit aux-live">
-      <b>AUX / BUS</b>
-      <div class="aux-labels"><span>AUX1</span><span>AUX2</span><span>AUX3</span><span>AUX4</span></div>
-      <div class="mini-knobs">
-        <input class="aux-control" data-target="AUX1" type="range" min="0" max="1" step="0.01" value="0">
-        <input class="aux-control" data-target="AUX2" type="range" min="0" max="1" step="0.01" value="0">
-        <input class="aux-control" data-target="AUX3" type="range" min="0" max="1" step="0.01" value="0">
-        <input class="aux-control" data-target="AUX4" type="range" min="0" max="1" step="0.01" value="0">
-      </div>
-      <div class="aux-values">
-        <output data-aux-value="AUX1">0%</output>
-        <output data-aux-value="AUX2">0%</output>
-        <output data-aux-value="AUX3">0%</output>
-        <output data-aux-value="AUX4">0%</output>
-      </div>
-    </div>
-    <div class="aux-unit aux-live">
-      <b>FX RETURN</b>
-      <div class="aux-labels"><span>FX1</span><span>FX2</span></div>
-      <div class="mini-knobs">
-        <input class="aux-control" data-scope="FX_RETURN" data-target="FX1" type="range" min="0" max="1" step="0.01" value=".45">
-        <input class="aux-control" data-scope="FX_RETURN" data-target="FX2" type="range" min="0" max="1" step="0.01" value=".45">
-      </div>
-      <div class="aux-values">
-        <output data-return-value="FX1">45%</output>
-        <output data-return-value="FX2">45%</output>
-      </div>
-    </div>
-  </div>
 </main>
 
 <nav class="bottom-nav">
@@ -599,7 +618,6 @@
     views.forEach(v => v.classList.toggle('active', v.dataset.view === name));
     document.querySelector('.screen-frame')?.setAttribute('data-screen', name);
     
-    // Munculkan sub-menu M32 hanya jika berada di menu HOME
     if(subBar) subBar.style.display = (name === 'HOME') ? 'flex' : 'none';
 
     if (name === 'METER') buildScreenMeters();
@@ -609,7 +627,6 @@
 
   tabs.forEach(b => b.addEventListener('click', () => setScreen(b.dataset.screen)));
 
-  // Interaksi Sub-Menu M32 (Overview, Config, Gate, Dyn, EQ, Sends)
   subButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       subButtons.forEach(b => b.classList.remove('active'));
@@ -943,7 +960,6 @@
     }
   }
 
-  // Loop utama untuk menggerakkan indikator, meteran, dan parameter secara real-time
   function updateIndicators() {
     requestAnimationFrame(updateIndicators);
 
