@@ -1,5 +1,5 @@
 /* ==========================================================================
-   ISOLATED CHANNEL PARAMETER BRIDGE (FIXING PARAMETER CROSS-CONTAMINATION)
+   ISOLATED CHANNEL PARAMETER BRIDGE (STRICT EVENT FILTERING)
    ========================================================================== */
 (function () {
   "use strict";
@@ -14,6 +14,9 @@
         fader: 75.0,
         gain: 1.00,
         pan: 0,
+        low: 0,
+        mid: 0,
+        high: 0,
         mute: false,
         solo: false
       });
@@ -41,47 +44,52 @@
       window.MixerAdapters.send(payload);
     }
 
-    console.log(`[ISOLATED TX] CH${chNum} -> ${paramName}:`, value);
+    console.log(`[STRICT TX] CH${chNum} -> ${paramName}:`, value);
   };
 
-  // EVENT LISTENER UI: STRICT ISOLATION BERDASARKAN ATTRIBUT data-param
+  // EVENT LISTENER INPUT: STRICT TARGET CHECK (Mencegah parameter lain ikut terseret)
   document.addEventListener("input", (e) => {
     const target = e.target;
     
-    // Pastikan elemen memiliki data-ch DAN data-param secara eksplisit
-    if (target && target.dataset && target.dataset.ch && target.dataset.param) {
-      const chNum = parseInt(target.dataset.ch, 10);
-      const param = target.dataset.param; // "fader", "gain", "pan", dll.
-      const val = parseFloat(target.value);
-
-      if (!isNaN(chNum) && param) {
-        // Hanya update state untuk parameter yang spesifik diubah
-        if (window.state.channels[chNum - 1]) {
-          window.state.channels[chNum - 1][param] = val;
-        }
-
-        // Kirim hanya parameter tersebut ke hardware, tanpa menyentuh parameter lain
-        window.sendChannelParamToHardware(chNum, param, val);
-      }
+    // Validasi ketat: pastikan target adalah elemen input/slider yang memiliki data-ch dan data-param
+    if (!target || !target.dataset || !target.dataset.ch || !target.dataset.param) {
+      return;
     }
-  });
 
-  // EVENT LISTENER UNTUK MUTE / SOLO (TERISOLASI)
+    const chNum = parseInt(target.dataset.ch, 10);
+    const param = target.dataset.param; // Contoh: "fader", "gain", "pan", "low", "high"
+    const val = parseFloat(target.value);
+
+    if (isNaN(chNum) || !param || isNaN(val)) return;
+
+    // Cegah event merembet ke elemen lain
+    e.stopPropagation();
+
+    // Update state lokal HANYA untuk parameter tersebut
+    if (window.state.channels[chNum - 1]) {
+      window.state.channels[chNum - 1][param] = val;
+    }
+
+    // Kirim perubahan parameter secara mandiri
+    window.sendChannelParamToHardware(chNum, param, val);
+  }, true /* Menggunakan capture phase agar lebih spesifik */);
+
+  // EVENT LISTENER TOMBOL MUTE / SOLO
   document.addEventListener("click", (e) => {
-    const target = e.target;
-    if (target.dataset && target.dataset.ch && (target.dataset.action === "mute" || target.dataset.action === "solo")) {
-      const chNum = parseInt(target.dataset.ch, 10);
-      const action = target.dataset.action;
-      
-      if (!isNaN(chNum)) {
-        const currentState = window.state.channels[chNum - 1][action];
-        const newState = !currentState;
-        
-        window.state.channels[chNum - 1][action] = newState;
-        target.classList.toggle("active", newState);
+    const target = e.target.closest('[data-action]');
+    if (!target || !target.dataset || !target.dataset.ch) return;
 
-        window.sendChannelParamToHardware(chNum, action, newState);
-      }
+    const chNum = parseInt(target.dataset.ch, 10);
+    const action = target.dataset.action; // "mute" atau "solo"
+    
+    if (!isNaN(chNum) && (action === "mute" || action === "solo")) {
+      const currentState = !!window.state.channels[chNum - 1][action];
+      const newState = !currentState;
+      
+      window.state.channels[chNum - 1][action] = newState;
+      target.classList.toggle("active", newState);
+
+      window.sendChannelParamToHardware(chNum, action, newState);
     }
   });
 
