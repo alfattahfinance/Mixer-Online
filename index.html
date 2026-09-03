@@ -55,117 +55,57 @@
         <button data-screen="SCENE">SCENE</button>
       </div>
       
-<div class="screen-content" id="screenContent">
-  <!-- VIEW: HOME / CHANNEL STRIP OVERVIEW -->
-  <section class="screen-view active" data-view="HOME">
-    <div class="pro-digital-screen">
-      <!-- Top Channel Banner -->
-      <div class="pro-screen-top-bar">
-        <div class="pro-ch-badge"><b id="screenInput">CH 01</b><span>MIC / LINE</span></div>
-        <div class="pro-ch-title-edit"><input type="text" id="screenChannelName" value="VOCAL MAIN" placeholder="Channel Name"></div>
-        <div class="pro-ch-status-badges"><span id="screenStatusBadge" class="badge-ready">READY</span><span class="badge-phantom">+48V</span></div>
-      </div>
-
-      <!-- Center Processing Blocks (Preamp, EQ, Dynamics, Fader Readout) -->
-      <div class="pro-processing-grid">
-        <div class="pro-block">
-          <span class="block-title">PREAMP / GAIN</span>
-          <div class="block-value" id="screenGain">1.00</div>
-          <small>TRIM</small>
-        </div>
-        <div class="pro-block">
-          <span class="block-title">PANORAMA</span>
-          <div class="block-value" id="screenPan">CENTER</div>
-          <small>PAN</small>
-        </div>
-        <div class="pro-block">
-          <span class="block-title">FADER LEVEL</span>
-          <div class="block-value highlight" id="screenFader">75%</div>
-          <small>MAIN OUT</small>
-        </div>
-        <div class="pro-block">
-          <span class="block-title">GATE / COMP</span>
-          <div class="block-value">BYPASS</div>
-          <small>DYNAMICS</small>
-        </div>
-      </div>
-
-      <!-- FITUR BARU: KOTAK INPUT AUDIO & PILIH CHANNEL DI LAYAR -->
-      <div class="pro-audio-source-box" style="margin-top: 4px; margin-bottom: 4px; padding: 4px 6px; background: #121619; border: 1px solid #30363d; border-radius: 4px; display: flex; align-items: center; gap: 6px;">
-        <span style="font-size: 8px; color: #00f0ff; font-weight: bold;">AUDIO SRC:</span>
-        <input type="text" id="screenAudioInputUrl" placeholder="Ketik URL audio (MP3/Stream)..." style="flex-grow: 1; background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; font-size: 9px; padding: 2px 5px; border-radius: 3px;" value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">
-        <button id="screenLoadAudioBtn" type="button" style="background: #21262d; color: #31e66b; border: 1px solid #31e66b; padding: 2px 6px; font-size: 8px; font-weight: bold; border-radius: 3px; cursor: pointer;">LOAD & PLAY</button>
-      </div>
-
-      <!-- Mini RTA / Spectrum Analyzer Simulation -->
-      <div class="pro-mini-spectrum" id="visualMeter">
-        <div class="spectrum-bars-container">
-          <div class="bar-col" style="height: 60%"></div>
-          <div class="bar-col" style="height: 80%"></div>
-          <div class="bar-col" style="height: 45%"></div>
-          <div class="bar-col" style="height: 90%"></div>
-          <div class="bar-col" style="height: 70%"></div>
-          <div class="bar-col" style="height: 55%"></div>
-          <div class="bar-col" style="height: 85%"></div>
-          <div class="bar-col" style="height: 65%"></div>
-        </div>
-        <div class="spectrum-scale-labels"><span>0dB</span><span>-6</span><span>-12</span><span>-24</span><span>-48</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- VIEW: METER -->
-  <section class="screen-view" data-view="METER">
-    <div class="pro-screen-grid">
-      <div class="screen-big-meter">
-        <div class="meter-columns" id="screenChannelMeters"></div>
-        <span class="meter-db">0&nbsp;&nbsp;&nbsp;-6&nbsp;&nbsp;&nbsp;-12&nbsp;&nbsp;&nbsp;-24&nbsp;&nbsp;&nbsp;-48</span>
-      </div>
-      <div class="screen-info-card">
-        <b>MULTIMETER OVERVIEW</b><strong id="meterSelected">CH1</strong>
-        <span>RMS LEVEL <em id="meterLevel">0%</em></span>
-        <span>PEAK HOLD <em id="meterPeak">-∞ dB</em></span>
-        <span>STATUS <em>ACTIVE</em></span>
-      </div>
-    </div>
-  </section>
-
-  <!-- VIEW: RTA -->
-  <section class="screen-view" data-view="RTA">
-    <div class="rta-display">
-      <div class="rta-grid"></div>
-      <div class="rta-bars" id="rtaBars"></div>
-      <div class="rta-labels"><span>63</span><span>125</span><span>250</span><span>500</span><span>1K</span><span>2K</span><span>4K</span><span>8K</span><span>16K</span></div>
-    </div>
-  </section>
-
-  <!-- VIEW: SETUP -->
-  <section class="screen-view" data-view="SETUP">
-    <div class="setup-screen">
-      <b>CONSOLE SYSTEM SETUP</b>
-      <div class="setup-grid">
-        <span>CHANNELS <strong class="channel-count-value">14</strong></span>
-        <span>TRANSPORT <strong id="setupTransport">OFFLINE</strong></span>
-        <span>PROTOCOL <strong>ESP32-MIXER/1</strong></span>
-        <span>SYNC <strong>TWO-WAY</strong></span>
-      </div>
-    </div>
-  </section>
-</div>
-
-            <div class="screen-readouts">
-              <div><small>INPUT</small><b id="screenInput">CH1</b></div>
-              <div><small>FADER</small><b id="screenFader">75%</b></div>
-              <div><small>GAIN</small><b id="screenGain">1.00</b></div>
-              <div><small>PAN</small><b id="screenPan">CENTER</b></div>
-              <div><small>STATUS</small><b id="screenStatus">READY</b></div>
+      <div class="screen-content" id="screenContent">
+        <section class="screen-view active" data-view="HOME">
+          <div class="pro-digital-screen">
+            <div class="pro-screen-top-bar">
+              <div class="pro-ch-badge"><b id="screenInput">CH 01</b><span>MIC / LINE</span></div>
+              <div class="pro-ch-title-edit"><input type="text" id="screenChannelName" value="VOCAL MAIN" placeholder="Channel Name"></div>
+              <div class="pro-ch-status-badges"><span id="screenStatusBadge" class="badge-ready">READY</span><span class="badge-phantom">+48V</span></div>
             </div>
-          </div>
-          <div class="player">
-            <div class="screen-mini"><span>USB / MUSIC</span><i>● READY</i></div>
-            <b>USB PLAYER</b><strong>TRACK 01</strong><small>00:00:00 / 00:00:00</small>
-            <div class="player-buttons"><button>◀</button><button>▶</button><button>▶▶</button><button>▶|</button></div>
-            <span>VOL 75%</span>
+
+            <div class="pro-processing-grid">
+              <div class="pro-block">
+                <span class="block-title">PREAMP / GAIN</span>
+                <div class="block-value" id="screenGain">1.00</div>
+                <small>TRIM</small>
+              </div>
+              <div class="pro-block">
+                <span class="block-title">PANORAMA</span>
+                <div class="block-value" id="screenPan">CENTER</div>
+                <small>PAN</small>
+              </div>
+              <div class="pro-block">
+                <span class="block-title">FADER LEVEL</span>
+                <div class="block-value highlight" id="screenFader">75%</div>
+                <small>MAIN OUT</small>
+              </div>
+              <div class="pro-block">
+                <span class="block-title">GATE / COMP</span>
+                <div class="block-value">BYPASS</div>
+                <small>DYNAMICS</small>
+              </div>
+            </div>
+
+            <div class="pro-audio-source-box" style="margin-top: 4px; margin-bottom: 4px; padding: 4px 6px; background: #121619; border: 1px solid #30363d; border-radius: 4px; display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 8px; color: #00f0ff; font-weight: bold;">AUDIO SRC:</span>
+              <input type="text" id="screenAudioInputUrl" placeholder="Ketik URL audio (MP3/Stream)..." style="flex-grow: 1; background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; font-size: 9px; padding: 2px 5px; border-radius: 3px;" value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">
+              <button id="screenLoadAudioBtn" type="button" style="background: #21262d; color: #31e66b; border: 1px solid #31e66b; padding: 2px 6px; font-size: 8px; font-weight: bold; border-radius: 3px; cursor: pointer;">LOAD & PLAY</button>
+            </div>
+
+            <div class="pro-mini-spectrum" id="visualMeter">
+              <div class="spectrum-bars-container">
+                <div class="bar-col" style="height: 60%"></div>
+                <div class="bar-col" style="height: 80%"></div>
+                <div class="bar-col" style="height: 45%"></div>
+                <div class="bar-col" style="height: 90%"></div>
+                <div class="bar-col" style="height: 70%"></div>
+                <div class="bar-col" style="height: 55%"></div>
+                <div class="bar-col" style="height: 85%"></div>
+                <div class="bar-col" style="height: 65%"></div>
+              </div>
+              <div class="spectrum-scale-labels"><span>0dB</span><span>-6</span><span>-12</span><span>-24</span><span>-48</span></div>
+            </div>
           </div>
         </section>
 
@@ -176,10 +116,10 @@
               <span class="meter-db">0&nbsp;&nbsp;&nbsp;-6&nbsp;&nbsp;&nbsp;-12&nbsp;&nbsp;&nbsp;-24&nbsp;&nbsp;&nbsp;-48</span>
             </div>
             <div class="screen-info-card">
-              <b>METER / INPUT</b><strong id="meterSelected">CH1</strong>
-              <span>LEVEL <em id="meterLevel">0%</em></span>
-              <span>PEAK <em id="meterPeak">-∞ dB</em></span>
-              <span>STATUS <em>LIVE</em></span>
+              <b>MULTIMETER OVERVIEW</b><strong id="meterSelected">CH1</strong>
+              <span>RMS LEVEL <em id="meterLevel">0%</em></span>
+              <span>PEAK HOLD <em id="meterPeak">-∞ dB</em></span>
+              <span>STATUS <em>ACTIVE</em></span>
             </div>
           </div>
         </section>
@@ -194,7 +134,7 @@
 
         <section class="screen-view" data-view="SETUP">
           <div class="setup-screen">
-            <b>SYSTEM SETUP</b>
+            <b>CONSOLE SYSTEM SETUP</b>
             <div class="setup-grid">
               <span>CHANNELS <strong class="channel-count-value">14</strong></span>
               <span>TRANSPORT <strong id="setupTransport">OFFLINE</strong></span>
@@ -510,6 +450,7 @@
       p.classList.toggle("on", on);
       var hs = document.getElementById("headerBridgeStatus");
       if(hs) hs.textContent = espOnline ? "BRIDGE READY" : (on ? "SYSTEM READY" : "BRIDGE STANDBY");
+      var esp = document.getElementById("connectEsp");
       if(esp) {
         esp.textContent = espOnline ? "ESP32 CONNECTED" : "CONNECT ESP32";
         esp.classList.toggle("on", espOnline);
