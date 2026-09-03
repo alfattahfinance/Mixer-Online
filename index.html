@@ -666,14 +666,24 @@
 })();
 </script>
 
-<script>
+  <script>
 (function(){
   const musicBtn = document.getElementById('btnPlayerMusic');
   const fileBtn = document.getElementById('btnPlayerFile');
   const fileInput = document.getElementById('localAudioLoader');
   const targetLabel = document.getElementById('activePlayerTarget');
+  const playPauseBtn = document.getElementById('btnPlayPauseAudio');
+  const trackInfo = document.getElementById('playerTrackInfo');
 
-  // Sinkronisasi indikator channel aktif secara real-time
+  let audioElement = document.getElementById('mixerInternalAudioPlayer');
+  if (!audioElement) {
+    audioElement = document.createElement('audio');
+    audioElement.id = 'mixerInternalAudioPlayer';
+    audioElement.loop = true;
+    document.body.appendChild(audioElement);
+  }
+
+  // Sinkronisasi channel aktif
   setInterval(() => {
     const activeInput = document.getElementById('screenInput');
     if(activeInput && targetLabel) {
@@ -681,32 +691,67 @@
     }
   }, 300);
 
-  // Klik tombol MUSIC atau FILE akan membuka dialog pemilihan file dari perangkat
   if(musicBtn) musicBtn.addEventListener('click', () => fileInput?.click());
   if(fileBtn) fileBtn.addEventListener('click', () => fileInput?.click());
 
-  // Saat file audio dipilih dari penyimpanan HP/perangkat
+  // Saat file dipilih
   if(fileInput) {
     fileInput.addEventListener('change', function(e) {
       const file = e.target.files[0];
       if(!file) return;
       
       const fileObjectURL = URL.createObjectURL(file);
-      const currentChannel = document.getElementById('screenInput')?.textContent || "CH 1";
-      
-      console.log(`[AUDIO PLAYER] Memutar ${file.name} dialirkan ke jalur ${currentChannel}`);
+      audioElement.src = fileObjectURL;
+      trackInfo.textContent = file.name;
 
-      // Salurkan langsung ke audio engine mixer online
-      if(window.MixerAudioEngine && typeof window.MixerAudioEngine.loadAndPlay === 'function') {
-        window.MixerAudioEngine.loadAndPlay(fileObjectURL, currentChannel);
+      const currentChannelStr = document.getElementById('screenInput')?.textContent || "CH 1";
+      const chNum = parseInt(currentChannelStr.replace(/\D/g, ''), 10) || 1;
+
+      console.log(`[AUDIO] Memuat "${file.name}" ke Channel ${chNum}`);
+
+      // Paksa putar setelah file dipilih
+      audioElement.play().then(() => {
+        playPauseBtn.textContent = "⏸ PAUSE";
+      }).catch(err => {
+        console.warn("Autoplay dicegah browser, silakan klik tombol PLAY:", err);
+        playPauseBtn.textContent = "▶ PLAY";
+      });
+    });
+  }
+
+  // Tombol Play / Pause manual untuk mengatasi blokir browser
+  if(playPauseBtn) {
+    playPauseBtn.addEventListener('click', () => {
+      if(audioElement.paused) {
+        audioElement.play().then(() => {
+          playPauseBtn.textContent = "⏸ PAUSE";
+        }).catch(e => alert("Pilih file musik terlebih dahulu!"));
       } else {
-        const tr = document.getElementById('testResult');
-        if(tr) tr.textContent = `PLAYER: Memutar ${file.name} ke ${currentChannel} (Active Pipeline)`;
+        audioElement.pause();
+        playPauseBtn.textContent = "▶ PLAY";
       }
     });
   }
+
+  // Hubungkan ke fader channel aktif & master
+  setInterval(() => {
+    if (!audioElement.paused) {
+      const currentChannelStr = document.getElementById('screenInput')?.textContent || "CH 1";
+      const chNum = parseInt(currentChannelStr.replace(/\D/g, ''), 10) || 1;
+      
+      if (window.state && window.state.channels && window.state.channels[chNum - 1]) {
+        const ch = window.state.channels[chNum - 1];
+        // Jika channel di-mute atau volume 0, matikan suara
+        if (ch.mute) {
+          audioElement.volume = 0;
+        } else {
+          const faderVal = (ch.fader || 75) / 100;
+          const masterVal = ((document.getElementById('master')?.value) || 75) / 100;
+          audioElement.volume = Math.min(1.0, Math.max(0.0, faderVal * masterVal));
+        }
+      }
+    }
+  }, 200);
 })();
 </script>
 
-</body>
-</html>
