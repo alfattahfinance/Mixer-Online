@@ -18,7 +18,7 @@ window.MixerAdapters = (() => {
 
   const defaults = () => ({
     channels: Array.from({ length: CHANNEL_COUNT }, (_, i) => ({
-      ch: i + 1, fader: 75, gain: 1, low: 0, mid: 0, high: 0,
+      ch: i + 1, fader: 75, gain: 1.0, low: 0, mid: 0, high: 0,
       pan: 0, mute: false, solo: false, level: 0
     })),
     master: 75,
@@ -422,10 +422,9 @@ window.MixerAdapters = (() => {
   }
 
   // ==========================================================================
-  // PERBAIKAN: METER SIMULATION MEMUTAR CHANNEL 1-14 SECA BERGANTIAN
+  // PERBAIKAN: PERHITUNGAN VU METER UNTUK SEMUA 14 CHANNEL
   // ==========================================================================
   let meterTimer = null;
-  let currentMeterCh = 0;
 
   function stopMeterSimulation(){
     if(meterTimer){
@@ -436,7 +435,6 @@ window.MixerAdapters = (() => {
 
   function startMeterSimulation(){
     stopMeterSimulation();
-    currentMeterCh = 0;
 
     meterTimer = setInterval(() => {
       if(!active?.connected || active.type !== "simulator"){
@@ -447,38 +445,35 @@ window.MixerAdapters = (() => {
       const channels = active.state.channels;
       if (!channels || !channels.length) return;
 
-      // Ambil channel saat ini secara bergantian (CH1 -> CH14)
-      const c = channels[currentMeterCh];
-      const i = currentMeterCh;
       const now = Date.now() / 1000;
 
-      const gate = c.mute ? 0 : 1;
-      const base = (Number(c.fader) / 100) * (Number(c.gain) / 2);
-      const wave = (Math.sin(now * 5 + i * 0.71) + 1) / 2;
-      const level = Math.max(0, Math.min(2, base * (0.25 + 0.75 * wave) * gate));
-      
-      c.level = Number(level.toFixed(3));
+      // Hitung dan kirim level VU meter untuk seluruh 14 channel
+      channels.forEach((c, i) => {
+        const gate = c.mute ? 0 : 1;
+        const faderFactor = Number(c.fader) / 100; // Pembagi volume (0.0 - 1.0)
+        const gainFactor = Number(c.gain) <= 0 ? 0.2 : Number(c.gain); // Mencegah 0 mutlak agar VU tetap bisa membaca
 
-      // Emit data RX hanya untuk 1 channel pada siklus ini
-      emitRx({
-        protocol: PROTOCOL,
-        type: "METER",
-        ch: c.ch,
-        level: c.level,
-        source: "simulator",
-        device: "ESP32-SIMULATOR",
-        transport: "esp32",
-        ts: Date.now()
+        const base = faderFactor * gainFactor;
+        const wave = (Math.sin(now * 4 + i * 0.8) + 1) / 2;
+        const level = Math.max(0, Math.min(2, base * (0.3 + 0.7 * wave) * gate));
+
+        c.level = Number(level.toFixed(3));
+
+        // Pancarkan event RX meter untuk UI
+        emitRx({
+          protocol: PROTOCOL,
+          type: "METER",
+          ch: c.ch,
+          level: c.level,
+          source: "simulator",
+          device: "ESP32-SIMULATOR",
+          transport: "esp32",
+          ts: Date.now()
+        });
       });
 
-      // Naikkan indeks channel untuk siklus interval berikutnya
-      currentMeterCh = (currentMeterCh + 1) % CHANNEL_COUNT;
-
-      // Simpan state secara berkala
-      if (currentMeterCh === 0) {
-        saveSimulatorState();
-      }
-    }, 50); // Berjalan halus setiap 50ms (bergantian antar channel)
+      saveSimulatorState();
+    }, 100); // Update halus tiap 100ms
   }
 
   // TOGGLE CONNECT ESP32
