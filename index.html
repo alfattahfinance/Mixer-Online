@@ -5,13 +5,16 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#090b0c">
 <title>MIXER-ONLINE • 14CH Digital Mixer</title>
-<!-- PEMANGGILAN SELURUH CSS DI HEAD AGAR RENDER SELESAI LEBIH CEPAT -->
+
+<!-- PEMANGGILAN SELURUH CSS DI HEAD AGAR RENDER CEPAT DAN STABIL -->
 <link rel="stylesheet" href="style.css?v=20260903-layout-final">
 <link rel="stylesheet" href="channel-skin.css?v=20260902-01">
 <link rel="stylesheet" href="header-system.css?v=20260902-01">
 <link rel="stylesheet" href="channels-new.css?v=20260903-ULTIMATE">
 </head>
 <body>
+
+<!-- TOP HEADER BAR -->
 <header class="topbar">
   <div class="brand"><b>MIXER-ONLINE</b><span>14CH DIGITAL MIXER</span></div>
   <div class="system-box">
@@ -36,8 +39,9 @@
   <div class="clock-head"><span class="box-title">TIME</span><strong id="clock">--:--:--</strong><small>LIVE MIXER</small></div>
 </header>
 
+<!-- MAIN CONSOLE GRID LAYOUT -->
 <main class="console">
-  <!-- 1. INPUT CHANNELS 1–7 -->
+  <!-- 1. INPUT CHANNELS 1–7 (KIRI) -->
   <section class="channel-bank channel-bank-left">
     <div class="bank-title"><span>INPUT CHANNELS 1–7</span><small>CH1–CH7</small></div>
     <div id="channels"></div>
@@ -56,33 +60,95 @@
         <button data-screen="SCENE">SCENE</button>
       </div>
       <div class="screen-content" id="screenContent">
+        <!-- SCREEN VIEW: HOME -->
         <section class="screen-view active" data-view="HOME">
           <div class="screen-dashboard">
-            <div class="spectrum" id="visualMeter"><div class="grid-lines"></div><div class="bars"></div><div class="screen-scale"><span>0</span><span>-6</span><span>-12</span><span>-24</span><span>-48</span></div><div class="screen-label">MAIN L&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MAIN R</div></div>
-            <div class="screen-readouts"><div><small>INPUT</small><b id="screenInput">CH1</b></div><div><small>FADER</small><b id="screenFader">75%</b></div><div><small>GAIN</small><b id="screenGain">1.00</b></div><div><small>PAN</small><b id="screenPan">CENTER</b></div><div><small>STATUS</small><b id="screenStatus">READY</b></div></div>
+            <div class="spectrum" id="visualMeter">
+              <div class="grid-lines"></div>
+              <div class="bars"></div>
+              <div class="screen-scale"><span>0</span><span>-6</span><span>-12</span><span>-24</span><span>-48</span></div>
+              <div class="screen-label">MAIN L&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MAIN R</div>
+            </div>
+            <div class="screen-readouts">
+              <div><small>INPUT</small><b id="screenInput">CH1</b></div>
+              <div><small>FADER</small><b id="screenFader">75%</b></div>
+              <div><small>GAIN</small><b id="screenGain">1.00</b></div>
+              <div><small>PAN</small><b id="screenPan">CENTER</b></div>
+              <div><small>STATUS</small><b id="screenStatus">READY</b></div>
+            </div>
           </div>
-          <div class="player"><div class="screen-mini"><span>USB / MUSIC</span><i>● READY</i></div>
+          <div class="player">
+            <div class="screen-mini"><span>USB / MUSIC</span><i>● READY</i></div>
             <b>USB PLAYER</b><strong>TRACK 01</strong><small>00:00:00 / 00:00:00</small>
             <div class="player-buttons"><button>◀</button><button>▶</button><button>▶▶</button><button>▶|</button></div>
             <span>VOL 75%</span>
           </div>
         </section>
 
+        <!-- SCREEN VIEW: METER -->
         <section class="screen-view" data-view="METER">
-          <div class="pro-screen-grid"><div class="screen-big-meter"><div class="meter-columns" id="screenChannelMeters"></div><span class="meter-db">0&nbsp;&nbsp;&nbsp;-6&nbsp;&nbsp;&nbsp;-12&nbsp;&nbsp;&nbsp;-24&nbsp;&nbsp;&nbsp;-48</span></div><div class="screen-info-card"><b>METER / INPUT</b><strong id="meterSelected">CH1</strong><span>LEVEL <em id="meterLevel">0%</em></span><span>PEAK <em id="meterPeak">-∞ dB</em></span><span>STATUS <em>LIVE</em></span></div></div>
+          <div class="pro-screen-grid">
+            <div class="screen-big-meter">
+              <div class="meter-columns" id="screenChannelMeters"></div>
+              <span class="meter-db">0&nbsp;&nbsp;&nbsp;-6&nbsp;&nbsp;&nbsp;-12&nbsp;&nbsp;&nbsp;-24&nbsp;&nbsp;&nbsp;-48</span>
+            </div>
+            <div class="screen-info-card">
+              <b>METER / INPUT</b><strong id="meterSelected">CH1</strong>
+              <span>LEVEL <em id="meterLevel">0%</em></span>
+              <span>PEAK <em id="meterPeak">-∞ dB</em></span>
+              <span>STATUS <em>LIVE</em></span>
+            </div>
+          </div>
         </section>
 
+        <!-- SCREEN VIEW: RTA -->
         <section class="screen-view" data-view="RTA">
-          <div class="rta-display"><div class="rta-grid"></div><div class="rta-bars" id="rtaBars"></div><div class="rta-labels"><span>63</span><span>125</span><span>250</span><span>500</span><span>1K</span><span>2K</span><span>4K</span><span>8K</span><span>16K</span></div></div>
+          <div class="rta-display">
+            <div class="rta-grid"></div>
+            <div class="rta-bars" id="rtaBars"></div>
+            <div class="rta-labels"><span>63</span><span>125</span><span>250</span><span>500</span><span>1K</span><span>2K</span><span>4K</span><span>8K</span><span>16K</span></div>
+          </div>
         </section>
 
+        <!-- SCREEN VIEW: SETUP -->
         <section class="screen-view" data-view="SETUP">
-          <div class="setup-screen"><b>SYSTEM SETUP</b><div class="setup-grid"><span>CHANNELS <strong class="channel-count-value">14</strong></span><span>TRANSPORT <strong id="setupTransport">OFFLINE</strong></span><span>PROTOCOL <strong>ESP32-MIXER/1</strong></span><span>SYNC <strong>TWO-WAY</strong></span><span>SYSTEM <strong id="setupSystem">OFF</strong></span><span>REMOTE <strong>BLUETOOTH / BRIDGE</strong></span></div><div class="channel-mapper"><div><b>AUTO CHANNEL MAPPER</b><small id="mapperStatus">14 CH • 1:1 READY</small></div><label>CHANNELS <select id="mapperChannels"><option value="4">4</option><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="14" selected>14</option></select></label><button id="autoMapChannels" type="button" onclick="autoMapChannels()">AUTO MAP</button><button id="applyChannelMap" type="button" onclick="applyChannelMap()">APPLY CHANNELS</button><div id="channelMapPreview">CH1→CH1 • CH2→CH2 • CH3→CH3 • CH4→CH4 • … • CH14→CH14</div></div></div>
+          <div class="setup-screen">
+            <b>SYSTEM SETUP</b>
+            <div class="setup-grid">
+              <span>CHANNELS <strong class="channel-count-value">14</strong></span>
+              <span>TRANSPORT <strong id="setupTransport">OFFLINE</strong></span>
+              <span>PROTOCOL <strong>ESP32-MIXER/1</strong></span>
+              <span>SYNC <strong>TWO-WAY</strong></span>
+              <span>SYSTEM <strong id="setupSystem">OFF</strong></span>
+              <span>REMOTE <strong>BLUETOOTH / BRIDGE</strong></span>
+            </div>
+            <div class="channel-mapper">
+              <div><b>AUTO CHANNEL MAPPER</b><small id="mapperStatus">14 CH • 1:1 READY</small></div>
+              <label>CHANNELS 
+                <select id="mapperChannels">
+                  <option value="4">4</option>
+                  <option value="8">8</option>
+                  <option value="12">12</option>
+                  <option value="16">16</option>
+                  <option value="14" selected>14</option>
+                </select>
+              </label>
+              <button id="autoMapChannels" type="button" onclick="autoMapChannels()">AUTO MAP</button>
+              <button id="applyChannelMap" type="button" onclick="applyChannelMap()">APPLY CHANNELS</button>
+              <div id="channelMapPreview">CH1→CH1 • CH2→CH2 • CH3→CH3 • CH4→CH4 • … • CH14→CH14</div>
+            </div>
+          </div>
         </section>
 
+        <!-- SCREEN VIEW: EFFECT -->
         <section class="screen-view" data-view="EFFECT">
           <div class="effect-screen effect-screen-live">
-            <div class="fx-screen-select"><b>FX</b><select id="screenFxSelect"><option value="FX1">FX1</option><option value="FX2">FX2</option></select><select id="screenFxPreset"><option>HALL 1</option><option>ROOM</option><option>PLATE</option><option>DELAY</option><option>CHORUS</option></select><select id="screenFxType"><option>REVERB</option><option>DELAY</option><option>CHORUS</option><option>ECHO</option></select></div>
+            <div class="fx-screen-select">
+              <b>FX</b>
+              <select id="screenFxSelect"><option value="FX1">FX1</option><option value="FX2">FX2</option></select>
+              <select id="screenFxPreset"><option>HALL 1</option><option>ROOM</option><option>PLATE</option><option>DELAY</option><option>CHORUS</option></select>
+              <select id="screenFxType"><option>REVERB</option><option>DELAY</option><option>CHORUS</option><option>ECHO</option></select>
+            </div>
             <label><b>TIME</b><input class="fx-control" data-scope="FX" data-target="FX1" data-param="time" type="range" min="0.1" max="10" step="0.01" value="2.45"><strong data-fx-value="time">2.45s</strong></label>
             <label><b>PRE-DELAY</b><input class="fx-control" data-scope="FX" data-target="FX1" data-param="preDelay" type="range" min="0" max="200" step="1" value="32"><strong data-fx-value="preDelay">32ms</strong></label>
             <label><b>DECAY</b><input class="fx-control" data-scope="FX" data-target="FX1" data-param="decay" type="range" min="0" max="100" step="1" value="65"><strong data-fx-value="decay">65%</strong></label>
@@ -91,14 +157,19 @@
           </div>
         </section>
 
+        <!-- SCREEN VIEW: SCENE -->
         <section class="screen-view" data-view="SCENE">
-          <div class="scene-screen"><b>SCENE MANAGER</b><strong id="sceneName">DEFAULT</strong><div><button id="screenSceneSave">SAVE</button><button id="screenSceneRecall">RECALL</button><button id="screenSceneDefault">DEFAULT</button></div><small>Scene tersimpan di browser dan dapat dipanggil kembali.</small></div>
+          <div class="scene-screen">
+            <b>SCENE MANAGER</b><strong id="sceneName">DEFAULT</strong>
+            <div><button id="screenSceneSave">SAVE</button><button id="screenSceneRecall">RECALL</button><button id="screenSceneDefault">DEFAULT</button></div>
+            <small>Scene tersimpan di browser dan dapat dipanggil kembali.</small>
+          </div>
         </section>
       </div>
     </div>
   </section>
 
-  <!-- 3. INPUT CHANNELS 8–14 -->
+  <!-- 3. INPUT CHANNELS 8–14 (KANAN) -->
   <section class="channel-bank channel-bank-right">
     <div class="bank-title"><span>INPUT CHANNELS 8–14</span><small>CH8–CH14</small></div>
     <div id="channelsRight"></div>
@@ -117,31 +188,72 @@
     <div class="phones-card">🎧 <b>PHONES</b><div class="phone-knob"></div><span>●</span></div>
   </aside>
 
-  <!-- 5. EFFECT PROCESSOR (Tepat berada di bawah CH 1-7) -->
+  <!-- 5. EFFECT PROCESSOR (BERADA DI DALAM MAIN CONSOLE, DI BAWAH CH 1-7) -->
   <div class="fx-rack fx-rack-live" id="fxRack">
     <div class="rack-title">EFFECT PROCESSOR <span>PARAMETER</span></div>
-    <div class="fx-toolbar"><div class="fx-display"><strong id="fxRackPreset">HALL 1</strong><small id="fxRackSummary">REVERB • TIME 2.45s • LEVEL -3.0dB</small></div><button id="fxTap" type="button">TAP</button><span id="fxBpm">120 BPM</span><button id="fxSelect" type="button">SELECT</button></div>
-    <div class="fx-buttons"><button data-fx-select="FX1" class="active">FX1</button><button data-fx-select="FX2">FX2</button><button data-fx-select="AUX1">AUX1</button><button data-fx-select="AUX2">AUX2</button><button data-fx-select="AUX3">AUX3</button><button data-fx-select="AUX4">AUX4</button></div>
+    <div class="fx-toolbar">
+      <div class="fx-display"><strong id="fxRackPreset">HALL 1</strong><small id="fxRackSummary">REVERB • TIME 2.45s • LEVEL -3.0dB</small></div>
+      <button id="fxTap" type="button">TAP</button><span id="fxBpm">120 BPM</span><button id="fxSelect" type="button">SELECT</button>
+    </div>
+    <div class="fx-buttons">
+      <button data-fx-select="FX1" class="active">FX1</button>
+      <button data-fx-select="FX2">FX2</button>
+      <button data-fx-select="AUX1">AUX1</button>
+      <button data-fx-select="AUX2">AUX2</button>
+      <button data-fx-select="AUX3">AUX3</button>
+      <button data-fx-select="AUX4">AUX4</button>
+    </div>
     <div class="fx-parameter-grid">
       <label>TIME<input class="fx-control" data-scope="FX" data-target="FX1" data-param="time" type="range" min="0.1" max="10" step="0.01" value="2.45"><output data-fx-value="time">2.45s</output></label>
       <label>PRE-DELAY<input class="fx-control" data-scope="FX" data-target="FX1" data-param="preDelay" type="range" min="0" max="200" step="1" value="32"><output data-fx-value="preDelay">32ms</output></label>
       <label>DECAY<input class="fx-control" data-scope="FX" data-target="FX1" data-param="decay" type="range" min="0" max="100" step="1" value="65"><output data-fx-value="decay">65%</output></label>
       <label>LEVEL<input class="fx-control" data-scope="FX" data-target="FX1" data-param="level" type="range" min="-20" max="6" step="0.1" value="-3"><output data-fx-value="level">-3.0dB</output></label>
     </div>
-    <div class="fx-extra"><label>PRESET<select class="fx-preset" data-target="FX1"><option>HALL 1</option><option>ROOM</option><option>PLATE</option><option>DELAY</option><option>CHORUS</option></select></label><label>TYPE<select class="fx-type" data-target="FX1"><option>REVERB</option><option>DELAY</option><option>CHORUS</option><option>ECHO</option></select></label></div>
+    <div class="fx-extra">
+      <label>PRESET<select class="fx-preset" data-target="FX1"><option>HALL 1</option><option>ROOM</option><option>PLATE</option><option>DELAY</option><option>CHORUS</option></select></label>
+      <label>TYPE<select class="fx-type" data-target="FX1"><option>REVERB</option><option>DELAY</option><option>CHORUS</option><option>ECHO</option></select></label>
+    </div>
   </div>
 
-  <!-- 6. AUX / BUS & FX RETURN (Tepat berada di bawah FX Processor) -->
+  <!-- 6. AUX / BUS & FX RETURN (BERADA DI DALAM MAIN CONSOLE, DI BAWAH FX PROCESSOR) -->
   <div class="aux-rack" id="auxRack">
-    <div class="aux-unit aux-live"><b>AUX / BUS</b><div class="aux-labels"><span>AUX1</span><span>AUX2</span><span>AUX3</span><span>AUX4</span></div><div class="mini-knobs"><input class="aux-control" data-target="AUX1" type="range" min="0" max="1" step="0.01" value="0"><input class="aux-control" data-target="AUX2" type="range" min="0" max="1" step="0.01" value="0"><input class="aux-control" data-target="AUX3" type="range" min="0" max="1" step="0.01" value="0"><input class="aux-control" data-target="AUX4" type="range" min="0" max="1" step="0.01" value="0"></div><div class="aux-values"><output data-aux-value="AUX1">0%</output><output data-aux-value="AUX2">0%</output><output data-aux-value="AUX3">0%</output><output data-aux-value="AUX4">0%</output></div></div>
-    <div class="aux-unit aux-live"><b>FX RETURN</b><div class="aux-labels"><span>FX1</span><span>FX2</span></div><div class="mini-knobs"><input class="aux-control" data-scope="FX_RETURN" data-target="FX1" type="range" min="0" max="1" step="0.01" value=".45"><input class="aux-control" data-scope="FX_RETURN" data-target="FX2" type="range" min="0" max="1" step="0.01" value=".45"></div><div class="aux-values"><output data-return-value="FX1">45%</output><output data-return-value="FX2">45%</output></div></div>
+    <div class="aux-unit aux-live">
+      <b>AUX / BUS</b>
+      <div class="aux-labels"><span>AUX1</span><span>AUX2</span><span>AUX3</span><span>AUX4</span></div>
+      <div class="mini-knobs">
+        <input class="aux-control" data-target="AUX1" type="range" min="0" max="1" step="0.01" value="0">
+        <input class="aux-control" data-target="AUX2" type="range" min="0" max="1" step="0.01" value="0">
+        <input class="aux-control" data-target="AUX3" type="range" min="0" max="1" step="0.01" value="0">
+        <input class="aux-control" data-target="AUX4" type="range" min="0" max="1" step="0.01" value="0">
+      </div>
+      <div class="aux-values">
+        <output data-aux-value="AUX1">0%</output>
+        <output data-aux-value="AUX2">0%</output>
+        <output data-aux-value="AUX3">0%</output>
+        <output data-aux-value="AUX4">0%</output>
+      </div>
+    </div>
+    <div class="aux-unit aux-live">
+      <b>FX RETURN</b>
+      <div class="aux-labels"><span>FX1</span><span>FX2</span></div>
+      <div class="mini-knobs">
+        <input class="aux-control" data-scope="FX_RETURN" data-target="FX1" type="range" min="0" max="1" step="0.01" value=".45">
+        <input class="aux-control" data-scope="FX_RETURN" data-target="FX2" type="range" min="0" max="1" step="0.01" value=".45">
+      </div>
+      <div class="aux-values">
+        <output data-return-value="FX1">45%</output>
+        <output data-return-value="FX2">45%</output>
+      </div>
+    </div>
   </div>
 </main>
 
+<!-- BOTTOM NAVIGATION BAR -->
 <nav class="bottom-nav">
   <button class="active">CH 1–7</button><button>CH 8–14</button><button>FX</button><button>MASTER</button><button>SCENE</button><button>SETUP</button><button>SYSTEM</button>
 </nav>
 
+<!-- RIGHT SIDE PANEL / TOOLS -->
 <section class="right-tools">
   <section class="device-connection">
     <div class="section-heading"><h2>DEVICE CONNECTION</h2><span id="deviceLamp" class="lamp red"></span></div>
@@ -161,9 +273,10 @@
     <div id="bridgeLog" class="bridge-log"><div>CONTROL → TX → ACK → FEEDBACK → UI</div></div>
   </section>
 
-  <section class="media-rack">2>PLAYER / RECORDER</h2><div><button>🎙<small>RECORDER</small></button><button>📁<small>FILE</small></button><button>🎵<small>MUSIC</small></button></div></section>
+  <section class="media-rack"><h2>PLAYER / RECORDER</h2><div><button>🎙<small>RECORDER</small></button><button>📁<small>FILE</small></button><button>🎵<small>MUSIC</small></button></div></section>
 </section>
 
+<!-- CONNECTION & TEST PANEL -->
 <section class="connection-test-panel sim">
   <h2>CONNECTION / TEST</h2>
   <div class="transport-line">Transport: <b id="transportStatus">OFFLINE</b></div>
@@ -175,25 +288,117 @@
   <pre id="testResult">TEST: —</pre>
 </section>
 
-<footer class="status-footer"><span>CONNECTION <b id="footerConnection">● ESP32 SIMULATOR OFFLINE</b></span><span>MODE: <b>TWO-WAY SYNC</b></span><span>SYSTEM STATUS <b class="channel-count-status">14 channels READY</b></span><span>CPU: <b>18%</b></span><span>MEM: <b>42%</b></span></footer>
+<!-- STATUS FOOTER -->
+<footer class="status-footer">
+  <span>CONNECTION <b id="footerConnection">● ESP32 SIMULATOR OFFLINE</b></span>
+  <span>MODE: <b>TWO-WAY SYNC</b></span>
+  <span>SYSTEM STATUS <b class="channel-count-status">14 channels READY</b></span>
+  <span>CPU: <b>18%</b></span>
+  <span>MEM: <b>42%</b></span>
+</footer>
 
-<!-- SCRIPT FILES -->
+<!-- JAVASCRIPT LIBRARIES & MODULES -->
 <script src="connection.js?v=20260903-final16"></script>
 <script src="adapters.js?v=20260902-device03"></script>
 <script src="app.js?v=20260903-final16"></script>
 <script src="header-system.js?v=20260902-01"></script>
 <script src="header-controls.js?v=20260902-02"></script>
 <script src="channels-new.js?v=20260903-final16"></script>
+
 <script>
 (function(){
- const clock=document.getElementById('clock'); const tick=()=>clock&&(clock.textContent=new Date().toLocaleTimeString());
- tick(); setInterval(tick,1000);
- document.getElementById('savePresetTop')?.addEventListener('click',()=>document.getElementById('savePreset')?.click());
- document.getElementById('recallPresetTop')?.addEventListener('click',()=>document.getElementById('recallPreset')?.click());
- document.getElementById('defaultScene')?.addEventListener('click',()=>{localStorage.removeItem('mr16_preset_default');document.getElementById('testResult').textContent='DEFAULT SCENE: factory state ready';});
- const tabs=document.querySelectorAll('#screenTabs [data-screen]'); const views=document.querySelectorAll('.screen-view'); const setScreen=(name)=>{tabs.forEach(b=>b.classList.toggle('active',b.dataset.screen===name));views.forEach(v=>v.classList.toggle('active',v.dataset.view===name));document.querySelector('.screen-frame')?.setAttribute('data-screen',name);if(name==='METER')buildScreenMeters();if(name==='RTA')buildRta();if(name==='SETUP')updateSetup();};tabs.forEach(b=>b.addEventListener('click',()=>setScreen(b.dataset.screen)));function buildScreenMeters(){const root=document.getElementById('screenChannelMeters');if(!root)return;root.innerHTML='';for(let i=0;i<14;i++){const el=document.createElement('i');el.style.height=(12+((i*17)%70))+'%';el.title='CH'+(i+1);root.appendChild(el)}}function buildRta(){const root=document.getElementById('rtaBars');if(!root)return;root.innerHTML='';for(let i=0;i<14;i++){const b=document.createElement('i');b.style.height=(18+((i*23)%72))+'%';root.appendChild(b)}}function updateSetup(){const a=window.MixerAdapters?.active;const t=document.getElementById('setupTransport');const s=document.getElementById('setupSystem');if(t)t.textContent=a?.connected?(a.transport==='bluetooth'?'BLUETOOTH':'ESP32 BRIDGE'):'OFFLINE';if(s)s.textContent=document.getElementById('power')?.classList.contains('on')?'ON':'OFF'}document.getElementById('screenSceneSave')?.addEventListener('click',()=>document.getElementById('savePreset')?.click());document.getElementById('screenSceneRecall')?.addEventListener('click',()=>document.getElementById('recallPreset')?.click());document.getElementById('screenSceneDefault')?.addEventListener('click',()=>document.getElementById('defaultScene')?.click());function selectScreenChannel(id){const c=window.state?.channels?.[id-1];if(!c)return;const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};set('screenInput','CH'+id);set('screenFader',c.fader+'%');set('screenGain',Number(c.gain).toFixed(2));set('screenPan',c.pan===0?'CENTER':(c.pan<0?'L '+Math.round(Math.abs(c.pan)*100)+'%':'R '+Math.round(c.pan*100)+'%'));set('screenStatus',c.mute?'MUTED':c.solo?'SOLO':'READY');set('meterSelected','CH'+id);set('meterLevel',Math.round((c.level||0)*50)+'%');} window.selectScreenChannel=selectScreenChannel; document.getElementById('channels')?.addEventListener('click',e=>{const ch=e.target.closest('.channel');if(ch){const id=Number(ch.dataset.ch);selectScreenChannel(id);}});document.getElementById('screenFxTap')?.addEventListener('click',()=>window.tapEffectTempo?.());const updateSkin=()=>{const live=document.getElementById('status')?.textContent==='ONLINE';document.getElementById('statusLamp')?.classList.toggle('live',live);document.getElementById('deviceLamp')?.classList.toggle('green',live);document.getElementById('deviceLamp')?.classList.toggle('red',!live);document.getElementById('headerBridgeStatus').textContent=live?'PERMANENT BRIDGE ACTIVE':'BRIDGE STANDBY';document.getElementById('footerConnection').textContent=live?'● ESP32 SIMULATOR ONLINE':'● ESP32 SIMULATOR OFFLINE';};
-window.initEffectEngine?.();
-setInterval(updateSkin,400); updateSkin();
+  const clock = document.getElementById('clock');
+  const tick = () => clock && (clock.textContent = new Date().toLocaleTimeString());
+  tick(); setInterval(tick, 1000);
+
+  document.getElementById('savePresetTop')?.addEventListener('click', () => document.getElementById('savePreset')?.click());
+  document.getElementById('recallPresetTop')?.addEventListener('click', () => document.getElementById('recallPreset')?.click());
+  document.getElementById('defaultScene')?.addEventListener('click', () => {
+    localStorage.removeItem('mr16_preset_default');
+    const tr = document.getElementById('testResult');
+    if (tr) tr.textContent = 'DEFAULT SCENE: factory state ready';
+  });
+
+  const tabs = document.querySelectorAll('#screenTabs [data-screen]');
+  const views = document.querySelectorAll('.screen-view');
+  const setScreen = (name) => {
+    tabs.forEach(b => b.classList.toggle('active', b.dataset.screen === name));
+    views.forEach(v => v.classList.toggle('active', v.dataset.view === name));
+    document.querySelector('.screen-frame')?.setAttribute('data-screen', name);
+    if (name === 'METER') buildScreenMeters();
+    if (name === 'RTA') buildRta();
+    if (name === 'SETUP') updateSetup();
+  };
+  tabs.forEach(b => b.addEventListener('click', () => setScreen(b.dataset.screen)));
+
+  function buildScreenMeters() {
+    const root = document.getElementById('screenChannelMeters');
+    if (!root) return;
+    root.innerHTML = '';
+    for (let i = 0; i < 14; i++) {
+      const el = document.createElement('i');
+      el.style.height = (12 + ((i * 17) % 70)) + '%';
+      el.title = 'CH' + (i + 1);
+      root.appendChild(el);
+    }
+  }
+
+  function buildRta() {
+    const root = document.getElementById('rtaBars');
+    if (!root) return;
+    root.innerHTML = '';
+    for (let i = 0; i < 14; i++) {
+      const b = document.createElement('i');
+      b.style.height = (18 + ((i * 23) % 72)) + '%';
+      root.appendChild(b);
+    }
+  }
+
+  function updateSetup() {
+    const a = window.MixerAdapters?.active;
+    const t = document.getElementById('setupTransport');
+    const s = document.getElementById('setupSystem');
+    if (t) t.textContent = a?.connected ? (a.transport === 'bluetooth' ? 'BLUETOOTH' : 'ESP32 BRIDGE') : 'OFFLINE';
+    if (s) s.textContent = document.getElementById('power')?.classList.contains('on') ? 'ON' : 'OFF';
+  }
+
+  document.getElementById('screenSceneSave')?.addEventListener('click', () => document.getElementById('savePreset')?.click());
+  document.getElementById('screenSceneRecall')?.addEventListener('click', () => document.getElementById('recallPreset')?.click());
+  document.getElementById('screenSceneDefault')?.addEventListener('click', () => document.getElementById('defaultScene')?.click());
+
+  function selectScreenChannel(id) {
+    const c = window.state?.channels?.[id - 1];
+    if (!c) return;
+    const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+    set('screenInput', 'CH' + id);
+    set('screenFader', c.fader + '%');
+    set('screenGain', Number(c.gain).toFixed(2));
+    set('screenPan', c.pan === 0 ? 'CENTER' : (c.pan < 0 ? 'L ' + Math.round(Math.abs(c.pan) * 100) + '%' : 'R ' + Math.round(c.pan * 100) + '%'));
+    set('screenStatus', c.mute ? 'MUTED' : c.solo ? 'SOLO' : 'READY');
+    set('meterSelected', 'CH' + id);
+    set('meterLevel', Math.round((c.level || 0) * 50) + '%');
+  }
+  window.selectScreenChannel = selectScreenChannel;
+
+  document.getElementById('channels')?.addEventListener('click', e => {
+    const ch = e.target.closest('.new-channel-strip');
+    if (ch) selectScreenChannel(Number(ch.dataset.ch));
+  });
+
+  document.getElementById('screenFxTap')?.addEventListener('click', () => window.tapEffectTempo?.());
+
+  const updateSkin = () => {
+    const live = document.getElementById('status')?.textContent === 'ONLINE';
+    document.getElementById('statusLamp')?.classList.toggle('live', live);
+    document.getElementById('deviceLamp')?.classList.toggle('green', live);
+    document.getElementById('deviceLamp')?.classList.toggle('red', !live);
+    document.getElementById('headerBridgeStatus').textContent = live ? 'PERMANENT BRIDGE ACTIVE' : 'BRIDGE STANDBY';
+    document.getElementById('footerConnection').textContent = live ? '● ESP32 SIMULATOR ONLINE' : '● ESP32 SIMULATOR OFFLINE';
+  };
+
+  window.initEffectEngine?.();
+  setInterval(updateSkin, 400);
+  updateSkin();
 })();
 </script>
 
@@ -219,6 +424,7 @@ setInterval(updateSkin,400); updateSkin();
     });
     paint();
   }
+
   if(document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", install);
   } else {
@@ -226,5 +432,6 @@ setInterval(updateSkin,400); updateSkin();
   }
 })();
 </script>
+
 </body>
 </html>
