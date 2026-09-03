@@ -76,7 +76,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (isNaN(ch) || ch < 1 || ch > 14) return;
 
     // 1. Tentukan Parameter (fader, gain, low, mid, high, pan)
-    let param = target.dataset.param;
+    // Channel controls expose their parameter as data-k (new panel)
+    // or data-param (legacy/dedicated renderer). Never treat every range
+    // input as a fader: GAIN/EQ/PAN must keep their own parameter.
+    let param = target.dataset.param || target.dataset.k;
     if (!param) {
       if (target.type === "range") param = "fader";
       else return;
