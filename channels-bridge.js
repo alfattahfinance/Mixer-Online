@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CHANNELS BRIDGE - INSTANT REAL-TIME RESPONSIVE SYNC + RX HANDLER
+   CHANNELS BRIDGE - FULL INSTANT UI & HARDWARE SYNC (TX & RX)
    ========================================================================== */
 (function () {
   "use strict";
@@ -44,15 +44,38 @@
     }
   };
 
+  // Helper fungsi untuk memperbarui readout di layar tengah secara instan dan menyeluruh
+  function updateScreenReadoutsLive(chNum, param, val) {
+    const screenInputEl = document.getElementById("screenInput");
+    if (screenInputEl) screenInputEl.textContent = "CH" + chNum;
+
+    if (param === "fader") {
+      const el = document.getElementById("screenFader");
+      if (el) el.textContent = val + "%";
+    } else if (param === "gain") {
+      const el = document.getElementById("screenGain");
+      if (el) el.textContent = Number(val).toFixed(2);
+    } else if (param === "pan") {
+      const el = document.getElementById("screenPan");
+      if (el) {
+        el.textContent = val === 0 ? "CENTER" : (val < 0 ? "L " + Math.round(Math.abs(val) * 100) + "%" : "R " + Math.round(val * 100) + "%");
+      }
+    } else if (param === "mute" || param === "solo") {
+      const el = document.getElementById("screenStatusBadge");
+      if (el) {
+        el.textContent = val ? (param === "mute" ? "MUTED" : "SOLO") : "READY";
+      }
+    }
+  }
+
   // ==========================================================================
-  // FITUR BARU: VERIFIKASI & PENERIMAAN INPUT/OUTPUT DARI HARDWARE (RX SYNC)
+  // PENERIMAAN INPUT/OUTPUT DARI HARDWARE (RX SYNC)
   // ==========================================================================
   window.handleIncomingHardwareData = function(incomingJsonString) {
     try {
       const data = typeof incomingJsonString === "string" ? JSON.parse(incomingJsonString) : incomingJsonString;
       if (!data || data.protocol !== "ESP32-MIXER/1") return;
 
-      // Jika data bertipe kontrol dan arahnya dari hardware (RX / FEEDBACK)
       if (data.type === "CONTROL" && (data.direction === "RX" || data.direction === "FEEDBACK")) {
         const chNum = parseInt(data.ch, 10);
         const param = data.param; 
@@ -72,6 +95,9 @@
           if (typeof window.selectScreenChannel === "function") {
             window.selectScreenChannel(chNum);
           }
+
+          // 4. Perbarui readout layar secara live
+          updateScreenReadoutsLive(chNum, param, val);
 
           console.log(`[INPUT/OUTPUT RX SYNC] CH${chNum} [${param}] di-update dari hardware ke -> ${val}`);
         }
@@ -96,24 +122,20 @@
 
     e.stopImmediatePropagation();
 
+    // 1. Update state lokal
     if (window.state.channels[chNum - 1]) {
       window.state.channels[chNum - 1][param] = val;
     }
 
+    // 2. Pilih channel otomatis di layar
     if (typeof window.selectScreenChannel === "function") {
       window.selectScreenChannel(chNum);
     }
 
-    if (param === "fader") {
-      const screenFaderEl = document.getElementById("screenFader");
-      const screenInputEl = document.getElementById("screenInput");
-      if (screenFaderEl) screenFaderEl.textContent = val + "%";
-      if (screenInputEl) screenInputEl.textContent = "CH" + chNum;
-    } else if (param === "gain") {
-      const screenGainEl = document.getElementById("screenGain");
-      if (screenGainEl) screenGainEl.textContent = val.toFixed(2);
-    }
+    // 3. Perbarui readout teks layar tengah secara instan
+    updateScreenReadoutsLive(chNum, param, val);
 
+    // 4. Kirim perubahan ke hardware
     window.sendChannelParamToHardware(chNum, param, val);
   }, true);
 
@@ -137,6 +159,7 @@
         window.selectScreenChannel(chNum);
       }
 
+      updateScreenReadoutsLive(chNum, action, channel[action]);
       window.sendChannelParamToHardware(chNum, action, channel[action]);
     }
   }, true);
