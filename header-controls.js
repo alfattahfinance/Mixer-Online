@@ -1,4 +1,4 @@
-/* Header status and system display controller */
+/* Header status display for Physical ESP32 Bridge */
 (function () {
   "use strict";
 
@@ -7,33 +7,33 @@
     const system = !!st.system;
     const connected = !!st.connected;
 
-    // Power indicator
+    // Indikator Tombol Power utama
     const power = document.getElementById("power");
     if (power) {
       power.textContent = system ? "SYSTEM ON" : "SYSTEM OFF";
       power.classList.toggle("on", system);
     }
 
-    // Bridge status text
+    // Status Koneksi Hardware ESP32
     const hs = document.getElementById("headerBridgeStatus");
     if (hs) {
       hs.textContent = connected
-        ? "BRIDGE ONLINE"
+        ? "ESP32 ONLINE"
         : system
-        ? "SYSTEM READY"
-        : "BRIDGE STANDBY";
+        ? "WAITING HARDWARE"
+        : "OFFLINE";
     }
 
-    // Settings elements
+    // Pengaturan Panel Opsional
     const setup = document.getElementById("setupSystem");
     if (setup) setup.textContent = system ? "ON" : "OFF";
 
     const transport = document.getElementById("setupTransport");
-    if (transport) transport.textContent = connected ? "ONLINE" : "OFFLINE";
+    if (transport) transport.textContent = connected ? "HTTP/SERIAL ONLINE" : "DISCONNECTED";
   }
 
   window.refreshHeaderStatus = refresh;
-  window.refreshSystemHeader = refresh; // Backwards compatibility for old calls
+  window.refreshSystemHeader = refresh;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", refresh, { once: true });
