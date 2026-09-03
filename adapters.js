@@ -442,19 +442,15 @@ window.MixerAdapters = (() => {
   }
 
   async function connectESP32() {
+    if (active?.type === "simulator" && active.connected) return {
+      ok:true, connected:true, type:"simulator", transport:"esp32",
+      name:"ESP32 SIMULATOR", channels:CHANNEL_COUNT, protocol:PROTOCOL
+    };
     const result = await simulator();
-    if (result?.connected) {
-      return {
-        ok: true,
-        connected: true,
-        type: "simulator",
-        transport: "esp32",
-        name: "ESP32 SIMULATOR",
-        channels: CHANNEL_COUNT,
-        protocol: PROTOCOL
-      };
-    }
-    return { ok:false, connected:false, reason:"esp32-simulator-offline" };
+    return result?.connected ? {
+      ok:true, connected:true, type:"simulator", transport:"esp32",
+      name:"ESP32 SIMULATOR", channels:CHANNEL_COUNT, protocol:PROTOCOL
+    } : {ok:false,connected:false,reason:"esp32-simulator-offline"};
   }
 
   async function simulator() {
