@@ -11,123 +11,8 @@
 <link rel="stylesheet" href="header-system.css?v=20260902-01">
 <link rel="stylesheet" href="channels-new.css?v=20260903-ULTIMATE">
 <style>
-  /* Tata letak konsol berjajar ke samping dengan mulus */
-  main.console {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    width: 100vw;
-    box-sizing: border-box;
-    padding: 4px;
-    gap: 8px;
-    align-items: flex-start;
-  }
-  .channel-bank, 
-  .center-console, 
-  .master-rack {
-    flex-shrink: 0;
-  }
-
-  /* Konsol Tengah: Lebar seragam (340px) menyesuaikan screen mixer */
-  .center-console {
-    display: flex;
-    flex-direction: column;
-    width: 340px;
-    gap: 6px;
-  }
-
-  /* Menyamakan lebar screen, media rack, fx rack, dan aux rack di konsol tengah */
-  .screen-frame, .media-rack, .center-console .fx-rack, .center-console .aux-rack {
-    width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  /* Mengatur ulang posisi elemen FX & Aux agar berada di dalam konsol tengah */
-  .center-console .fx-rack,
-  .center-console .aux-rack {
-    position: static !important;
-    margin: 0 !important;
-    box-shadow: none !important;
-  }
-
-  /* Menyamakan panjang fader & tinggi Master Rack agar sama persis dengan channel bank */
-  .master-rack {
-    height: 690px !important;
-    min-height: 690px !important;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-sizing: border-box;
-    padding: 8px 4px;
-  }
-  .master-card {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  .master-card input[type="range"][orient="vertical"],
-  .master-card input[type="range"] {
-    height: 420px !important;
-  }
-
-  /* Sembunyikan kontainer absolute lama di luar konsol utama */
-  main.console > .fx-rack, main.console > .aux-rack {
-    display: none !important;
-  }
-
   /* ==========================================================
-     MIDAS M32 DETAILED SCREEN & SUB-MENU THEME
-     ========================================================== */
-  .screen-frame {
-    background: #080c10 !important;
-    border: 3px solid #1a2530 !important;
-    border-radius: 6px !important;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.9), inset 0 0 20px rgba(0, 168, 204, 0.08) !important;
-    padding: 4px !important;
-  }
-  .screen-title {
-    background: linear-gradient(90deg, #0b131a, #132230, #0b131a) !important;
-    color: #00e5ff !important;
-    border-bottom: 2px solid #1a2530 !important;
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    letter-spacing: 2px;
-  }
-  .screen-tabs {
-    background: #05080c !important;
-    padding: 3px !important;
-    display: grid !important;
-    grid-template-columns: repeat(6, 1fr) !important;
-    gap: 2px !important;
-  }
-  .screen-tabs button {
-    background: #101820 !important;
-    color: #8899a6 !important;
-    border: 1px solid #1f2d3d !important;
-    font-size: 8px !important;
-    font-weight: bold;
-    padding: 4px 2px !important;
-    border-radius: 2px !important;
-    cursor: pointer;
-  }
-  .screen-tabs button.active {
-    background: linear-gradient(180deg, #00a8cc 0%, #00738c 100%) !important;
-    color: #ffffff !important;
-    border-color: #00e5ff !important;
-    box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
-  }
-
-  /* Midas M32 Sub-Menu Bar (CONFIG, GATE, DYN, EQ, SENDS, MAIN) */
-  .m32-submenu-bar {
-    display: flex;
-    background: #06090f;
-    
-    
-  <style>
-  /* ==========================================================
-     LAYOUT MUTLAK WIDESCREEN: 14 CHANNEL + MASTER (1 BARIS)
+     LAYOUT MUTLAK PRO: 14 CHANNEL + MASTER (1 BARIS HORIZONTAL)
      ========================================================== */
   body {
     background: #090b0c;
@@ -137,6 +22,7 @@
     overflow-x: auto;
   }
 
+  /* Kontainer utama berjajar ke samping secara rapi */
   main.console {
     display: flex !important;
     flex-direction: row !important;
@@ -156,13 +42,13 @@
     flex-shrink: 0 !important;
   }
 
-  /* Lebar Bank Channel Kiri (CH 1-7) */
+  /* Lebar Bank Channel Kiri (CH 1–7) */
   .channel-bank-left {
     width: 530px !important;
     min-width: 530px !important;
   }
 
-  /* Lebar Konsol Tengah (Screen + Player + FX + Aux) dikunci pas */
+  /* Konsol Tengah (Screen + Player + FX + Aux) dikunci lebarnya */
   .center-console {
     display: flex !important;
     flex-direction: column !important;
@@ -173,13 +59,13 @@
     box-sizing: border-box !important;
   }
 
-  /* Lebar Bank Channel Kanan (CH 8-14) */
+  /* Lebar Bank Channel Kanan (CH 8–14) */
   .channel-bank-right {
     width: 530px !important;
     min-width: 530px !important;
   }
 
-  /* Lebar Master Rack di ujung kanan */
+  /* Master Rack di ujung kanan (sejajar penuh) */
   .master-rack {
     width: 120px !important;
     min-width: 120px !important;
@@ -192,7 +78,7 @@
     padding: 8px 4px !important;
   }
 
-  /* Menyamakan lebar elemen di dalam konsol tengah */
+  /* Seragamkan lebar seluruh komponen di dalam konsol tengah */
   .screen-frame, 
   .media-rack, 
   .center-console .fx-rack, 
@@ -202,7 +88,7 @@
     box-sizing: border-box !important;
   }
 
-  /* Mengatur FX & Aux di dalam konsol tengah agar mengalir ke bawah */
+  /* Pastikan FX Rack dan Aux Rack menyatu rapi ke bawah di konsol tengah */
   .center-console .fx-rack,
   .center-console .aux-rack {
     position: static !important;
@@ -214,7 +100,7 @@
     padding: 6px !important;
   }
 
-  /* Sembunyikan elemen duplikat luar */
+  /* Sembunyikan elemen duplikat di luar konsol utama */
   main.console > .fx-rack, 
   main.console > .aux-rack {
     display: none !important;
@@ -264,7 +150,6 @@
     box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
   }
 
-  /* Midas M32 Sub-Menu Bar (CONFIG, GATE, DYN, EQ, SENDS, MAIN) */
   .m32-submenu-bar {
     display: flex;
     background: #06090f;
@@ -290,7 +175,6 @@
     border-color: #00e5ff;
   }
 
-  /* Midas TFT Screen View Area */
   .midas-tft-screen {
     background: #06090f;
     border: 1px solid #1f2d3d;
@@ -341,7 +225,6 @@
     font-family: monospace;
   }
 
-  /* Sub-menu Dynamic Panels inside HOME */
   .m32-sub-panel {
     display: none;
     background: #04060a;
@@ -355,7 +238,6 @@
     display: block;
   }
 
-  /* Midas Rotary Encoder Emulation Bar */
   .midas-encoders-bar {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -378,7 +260,6 @@
     font-weight: bold;
   }
 
-  /* Master Fader Height Adjustment */
   .master-card {
     flex-grow: 1;
     display: flex;
@@ -419,15 +300,15 @@
 </header>
 
 <main class="console">
-  <!-- CHANNEL BANK KIRI (CH 1-7) -->
+  <!-- 1. CHANNEL BANK KIRI (CH 1–7) -->
   <section class="channel-bank channel-bank-left">
     <div class="bank-title"><span>INPUT CHANNELS 1–7</span><small>CH1–CH7</small></div>
     <div id="channels"></div>
   </section>
 
-  <!-- KONSOL TENGAH (SCREEN M32 + PLAYER + FX RACK + AUX RACK) -->
+  <!-- 2. KONSOL TENGAH (SCREEN M32 + PLAYER + FX RACK + AUX RACK) -->
   <section class="center-console">
-    <!-- 1. Screen Mixer Midas M32 -->
+    <!-- Screen M32 -->
     <div class="screen-frame">
       <div class="screen-title"><b>MIDAS M32</b><span>DIGITAL CONSOLE SYSTEM</span></div>
       
@@ -597,7 +478,7 @@
       </div>
     </div>
 
-    <!-- 2. Player / Recorder -->
+    <!-- Player / Recorder -->
     <section class="media-rack" style="background: #0c1219; border: 1px solid #1a2736; border-radius: 6px; padding: 6px;">
       <h2 style="color: #00e5ff; border-bottom: 1px solid #1a2736; margin-bottom: 4px; font-size: 10px;">USB PLAYER / REC <span id="activePlayerTarget" style="font-size: 9px; color: #2ecc71; float: right;">[CH 1]</span></h2>
       <div style="display: flex; gap: 4px; margin-bottom: 4px;">
@@ -612,8 +493,8 @@
       <input type="file" id="localAudioLoader" accept="audio/*" style="display: none;">
     </section>
 
-    <!-- 3. Effect Processor (Dipindah ke bawah konsol tengah) -->
-    <div class="fx-rack fx-rack-live" id="fxRack" style="background: #0c1219; border: 1px solid #1a2736; border-radius: 6px; padding: 6px;">
+    <!-- Effect Processor -->
+    <div class="fx-rack fx-rack-live" id="fxRack">
       <div class="rack-title" style="font-size: 9px; color: #00e5ff; margin-bottom: 4px;">EFFECT PROCESSOR <span>PARAMETER</span></div>
       <div class="fx-toolbar" style="display: flex; align-items: center; gap: 4px; margin-bottom: 4px;">
         <div class="fx-display" style="background: #06090f; padding: 3px; border: 1px solid #1a2736; flex-grow: 1; border-radius: 3px;">
@@ -640,8 +521,8 @@
       </div>
     </div>
 
-    <!-- 4. Aux / Bus & FX Return (Dipindah ke bawah konsol tengah) -->
-    <div class="aux-rack" id="auxRack" style="background: #0c1219; border: 1px solid #1a2736; border-radius: 6px; padding: 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+    <!-- Aux / Bus & FX Return -->
+    <div class="aux-rack" id="auxRack" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
       <div class="aux-unit aux-live" style="background: #06090f; padding: 4px; border: 1px solid #1a2736; border-radius: 4px; font-size: 8px;">
         <b style="color: #00e5ff; font-size: 8px;">AUX / BUS</b>
         <div class="aux-labels" style="display:flex; justify-content:space-between; color:#8899a6; font-size:6px; margin:2px 0;"><span>A1</span><span>A2</span><span>A3</span><span>A4</span></div>
@@ -663,13 +544,13 @@
     </div>
   </section>
 
-  <!-- CHANNEL BANK KANAN (CH 8-14) -->
+  <!-- 3. CHANNEL BANK KANAN (CH 8–14) -->
   <section class="channel-bank channel-bank-right">
     <div class="bank-title"><span>INPUT CHANNELS 8–14</span><small>CH8–CH14</small></div>
     <div id="channelsRight"></div>
   </section>
 
-  <!-- MASTER RACK (Fader diperpanjang menyamai tinggi channel strip) -->
+  <!-- 4. MASTER RACK -->
   <aside class="master-rack">
     <div class="meter-rack"><b>MAIN L&nbsp; R</b><div class="main-meters"><div class="meter"></div><div class="meter"></div></div></div>
     <div class="master-card">
@@ -868,7 +749,6 @@
 </script>
 
 <script>
-/* SINGLE SOURCE OF TRUTH: SYSTEM ON/OFF & TEST PANEL RX/TX BINDING + LIVE METER */
 (function(){
   function install(){
     var p = document.getElementById("power");
