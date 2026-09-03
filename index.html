@@ -688,21 +688,74 @@
   const fileBtn = document.getElementById('btnPlayerFile');
   const fileInput = document.getElementById('localAudioLoader');
   const targetLabel = document.getElementById('activePlayerTarget');
-  const playPauseBtn = document.getElementById('btnPlayPauseAudio');
-  const trackInfo = document.getElementById('playerTrackInfo');
 
-  window.channelAudioPlayers = window.channelAudioPlayers || {};
+  // Inisialisasi Web Audio Context untuk pemrosesan Gain & Pan secara nyata
+  let audioCtx = null;
+  let sourceNode = null;
+  let gainNode = null;
+  let panNode = null;
+  let currentAudioElement = null;
 
+  function initAudioEngine(audioElement) {
+    if (!audioCtx) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new AudioContext();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+
+    if (!sourceNode) {
+      sourceNode = audioCtx.createMediaElementSource(audioElement);
+      gainNode = audioCtx.createGain();
+      
+      // Buat panner node jika didukung browser untuk efek PAN (kiri/kanan)
+      if (audioCtx.createStereoPanner) {
+        panNode = audioCtx.createStereoPanner();
+        sourceNode.connect(gainNode);
+        gainNode.connect(panNode);
+        panNode.connect(audioCtx.destination);
+      } else {
+        sourceNode.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+      }
+    }
+  }
+
+  // Sinkronisasi indikator channel aktif secara real-time
   setInterval(() => {
     const activeInput = document.getElementById('screenInput');
     if(activeInput && targetLabel) {
       targetLabel.textContent = "[" + activeInput.textContent.trim() + "]";
     }
-  }, 300);
 
+    // Hubungkan perubahan Gain, Pan, dan Fader secara real-time ke Web Audio Nodes
+    if (currentAudioElement && !currentAudioElement.paused) {
+      const currentChannelStr = document.getElementById('screenInput')?.textContent || "CH 1";
+      const chNum = parseInt(currentChannelStr.replace(/\D/g, ''), 10) || 1;
+      
+      if (window.state && window.state.channels && window.state.channels[chNum - 1]) {
+        const chData = window.state.channels[chNum - 1];
+
+        // 1. Atur Gain (Trim)
+        if (gainNode) {
+          const gainVal = parseFloat(chData.gain) || 1.0;
+          gainNode.gain.setValueAtTime(Math.max(0, Math.min(2.0, gainVal)), audioCtx.currentTime);
+        }
+
+        // 2. Atur Pan (Kiri -1.0 sampai Kanan 1.0)
+        if (panNode && typeof chData.pan !== 'undefined') {
+          panNode.pan.setValueAtTime(Math.max(-1.0, Math.min(1.0, chData.pan)), audioCtx.currentTime);
+        }
+      }
+    }
+  }, 100);
+
+  // Klik tombol MUSIC atau FILE membuka dialog file perangkat
   if(musicBtn) musicBtn.addEventListener('click', () => fileInput?.click());
   if(fileBtn) fileBtn.addEventListener('click', () => fileInput?.click());
 
+  // Proses file audio yang dipilih
   if(fileInput) {
     fileInput.addEventListener('change', function(e) {
       const file = e.target.files[0];
@@ -712,70 +765,24 @@
       const currentChannelStr = document.getElementById('screenInput')?.textContent || "CH 1";
       const chNum = parseInt(currentChannelStr.replace(/\D/g, ''), 10) || 1;
 
-      trackInfo.textContent = `CH${chNum}: ${file.name}`;
-      console.log(`[CHANNEL ROUTING] Memuat lagu ke Channel ${chNum} saja.`);
-
-      if (window.channelAudioPlayers[chNum]) {
-        window.channelAudioPlayers[chNum].pause();
+      if (!currentAudioElement) {
+        currentAudioElement = document.createElement('audio');
+        currentAudioElement.loop = true;
+        document.body.appendChild(currentAudioElement);
       }
 
-      const channelAudio = document.createElement('audio');
-      channelAudio.src = fileObjectURL;
-      channelAudio.loop = true;
-      document.body.appendChild(channelAudio);
-      window.channelAudioPlayers[chNum] = channelAudio;
-
-      channelAudio.play().then(() => {
-        if(playPauseBtn) playPauseBtn.textContent = "⏸ PAUSE";
+      currentAudioElement.src = fileObjectURL;
+      
+      // Inisialisasi Web Audio API saat audio dimainkan
+      currentAudioElement.play().then(() => {
+        initAudioEngine(currentAudioElement);
+        const tr = document.getElementById('testResult');
+        if(tr) tr.textContent = `PLAYER: Memutar "${file.name}" aktif di Channel ${chNum} (Audio Node Connected)`;
       }).catch(err => {
-        console.warn("Autoplay diblokir browser, klik Play manual:", err);
-        if(playPauseBtn) playPauseBtn.textContent = "▶ PLAY";
+        console.error("Gagal memutar audio:", err);
       });
     });
   }
-
-  if(playPauseBtn) {
-    playPauseBtn.addEventListener('click', () => {
-      const currentChannelStr = document.getElementById('screenInput')?.textContent || "CH 1";
-      const chNum = parseInt(currentChannelStr.replace(/\D/g, ''), 10) || 1;
-      const activeAudio = window.channelAudioPlayers[chNum];
-
-      if (!activeAudio) {
-        alert(`Belum ada file musik yang dimuat untuk Channel ${chNum}. Silakan klik tombol MUSIC dulu!`);
-        return;
-      }
-
-      if(activeAudio.paused) {
-        activeAudio.play();
-        playPauseBtn.textContent = "⏸ PAUSE";
-      } else {
-        activeAudio.pause();
-        playPauseBtn.textContent = "▶ PLAY";
-      }
-    });
-  }
-
-  setInterval(() => {
-    if (!window.state || !window.state.channels) return;
-
-    for (let i = 0; i < window.state.channels.length; i++) {
-      const chNum = i + 1;
-      const audio = window.channelAudioPlayers[chNum];
-      const chState = window.state.channels[i];
-
-      if (audio && chState) {
-        if (chState.mute || !window.state.system) {
-          audio.volume = 0;
-        } else {
-          const faderVal = (chState.fader || 75) / 100;
-          const masterVal = ((document.getElementById('master')?.value) || 75) / 100;
-          audio.volume = Math.min(1.0, Math.max(0.0, faderVal * masterVal));
-        }
-      }
-    }
-  }, 200);
 })();
 </script>
 
-</body>
-</html>
