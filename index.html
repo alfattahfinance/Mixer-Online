@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#090b0c">
-<title>MIXER-ONLINE • 14CH Digital Mixer</title>
+<title>MIXER-ONLINE • Midas M32 Style Edition</title>
 
 <link rel="stylesheet" href="style.css?v=20260903-layout-final">
 <link rel="stylesheet" href="channel-skin.css?v=20260902-01">
 <link rel="stylesheet" href="header-system.css?v=20260902-01">
 <link rel="stylesheet" href="channels-new.css?v=20260903-ULTIMATE">
 <style>
-  /* Memastikan tata letak konsol berjajar ke samping dengan mulus tanpa terpotong */
+  /* Tata letak konsol berjajar ke samping dengan mulus */
   main.console {
     display: flex;
     flex-direction: row;
@@ -33,14 +33,127 @@
   .center-console {
     display: flex;
     flex-direction: column;
-    width: 320px;
+    width: 340px;
+  }
+
+  /* ==========================================================
+     MIDAS M32 STYLE SCREEN CONSOLE THEME OVERRIDE
+     ========================================================== */
+  .screen-frame {
+    background: #080c10 !important;
+    border: 3px solid #1a2530 !important;
+    border-radius: 6px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.9), inset 0 0 20px rgba(0, 168, 204, 0.08) !important;
+    padding: 4px !important;
+  }
+  .screen-title {
+    background: linear-gradient(90deg, #0b131a, #132230, #0b131a) !important;
+    color: #00e5ff !important;
+    border-bottom: 2px solid #1a2530 !important;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    letter-spacing: 2px;
+  }
+  /* Midas Gold/Cyan Tab Styling */
+  .screen-tabs {
+    background: #05080c !important;
+    padding: 3px !important;
+    display: grid !important;
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: 2px !important;
+  }
+  .screen-tabs button {
+    background: #101820 !important;
+    color: #8899a6 !important;
+    border: 1px solid #1f2d3d !important;
+    font-size: 8px !important;
+    font-weight: bold;
+    padding: 4px 2px !important;
+    border-radius: 2px !important;
+  }
+  .screen-tabs button.active {
+    background: linear-gradient(180deg, #00a8cc 0%, #00738c 100%) !important;
+    color: #ffffff !important;
+    border-color: #00e5ff !important;
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+  }
+  /* Midas TFT Screen View Area */
+  .midas-tft-screen {
+    background: #06090f;
+    border: 1px solid #1f2d3d;
+    border-radius: 4px;
+    padding: 6px;
+    margin-top: 2px;
+  }
+  .midas-header-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #0d151d;
+    padding: 4px 8px;
+    border: 1px solid #1a2736;
+    border-radius: 3px;
+    margin-bottom: 6px;
+  }
+  .midas-ch-badge {
+    background: #00738c;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 2px;
+    font-size: 10px;
+    font-weight: bold;
+  }
+  .midas-blocks-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+  .midas-block {
+    background: #0e1620;
+    border: 1px solid #1b2836;
+    border-radius: 3px;
+    padding: 4px;
+    text-align: center;
+  }
+  .midas-block span {
+    display: block;
+    font-size: 7px;
+    color: #7b8f9e;
+    letter-spacing: 1px;
+  }
+  .midas-block strong {
+    font-size: 11px;
+    color: #00e5ff;
+    font-family: monospace;
+  }
+  /* Midas Rotary Encoder Emulation Bar */
+  .midas-encoders-bar {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 2px;
+    background: #05080c;
+    padding: 4px 2px;
+    border-top: 1px solid #1f2d3d;
+    border-radius: 0 0 4px 4px;
+    margin-top: 4px;
+  }
+  .m-encoder {
+    background: #111a24;
+    border: 1px solid #243447;
+    border-radius: 2px;
+    height: 18px;
+    text-align: center;
+    font-size: 7px;
+    color: #00e5ff;
+    line-height: 16px;
+    font-weight: bold;
   }
 </style>
 </head>
 <body>
 
 <header class="topbar">
-  <div class="brand"><b>MIXER-ONLINE</b><span>14CH DIGITAL MIXER</span></div>
+  <div class="brand"><b>MIXER-ONLINE</b><span>MIDAS M32 EDITION</span></div>
   <div class="system-box">
     <span class="box-title">SYSTEM</span>
     <button id="power" class="power-btn">SYSTEM OFF</button>
@@ -70,90 +183,82 @@
     <div id="channels"></div>
   </section>
 
-  <!-- KONSOL TENGAH (SCREEN MIXER + PLAYER) -->
+  <!-- KONSOL TENGAH (MIDAS M32 SCREEN STYLE + PLAYER) -->
   <section class="center-console">
     <div class="screen-frame">
-      <div class="screen-title"><b>MIXER-ONLINE</b><span>14CH DIGITAL MIXER</span></div>
+      <div class="screen-title"><b>MIDAS M32</b><span>DIGITAL CONSOLE SYSTEM</span></div>
+      
+      <!-- Midas Style Menu Navigation Buttons -->
       <div class="screen-tabs" id="screenTabs">
         <button class="active" data-screen="HOME">HOME</button>
-        <button data-screen="METER">METER</button>
+        <button data-screen="METER">METERS</button>
         <button data-screen="RTA">RTA</button>
         <button data-screen="SETUP">SETUP</button>
-        <button data-screen="EFFECT">EFFECT</button>
-        <button data-screen="SCENE">SCENE</button>
+        <button data-screen="EFFECT">EFFECTS</button>
+        <button data-screen="SCENE">LIBRARY</button>
       </div>
       
       <div class="screen-content" id="screenContent">
-        <!-- VIEW: HOME / CHANNEL STRIP OVERVIEW -->
+        <!-- VIEW: HOME (Midas TFT Display Layout) -->
         <section class="screen-view active" data-view="HOME">
-          <div class="pro-digital-screen">
-            <!-- Top Channel Banner -->
-            <div class="pro-screen-top-bar">
-              <div class="pro-ch-badge"><b id="screenInput">CH 01</b><span>MIC / LINE</span></div>
-              <div class="pro-ch-title-edit"><input type="text" id="screenChannelName" value="VOCAL MAIN" placeholder="Channel Name"></div>
-              <div class="pro-ch-status-badges"><span id="screenStatusBadge" class="badge-ready">READY</span><span class="badge-phantom">+48V</span></div>
+          <div class="midas-tft-screen">
+            <!-- Top Channel Info Bar -->
+            <div class="midas-header-strip">
+              <div class="midas-ch-badge" id="screenInput">CH 01</div>
+              <input type="text" id="screenChannelName" value="VOCAL MAIN" style="background: #05080c; border: 1px solid #1f2d3d; color: #00e5ff; font-size: 10px; padding: 2px 4px; border-radius: 2px; width: 110px; text-align: center;">
+              <span style="font-size: 9px; color: #2ecc71; font-weight: bold;">[ACTIVE]</span>
             </div>
 
-            <!-- Center Processing Blocks (Preamp, EQ, Dynamics, Fader Readout) -->
-            <div class="pro-processing-grid">
-              <div class="pro-block">
-                <span class="block-title">PREAMP / GAIN</span>
-                <div class="block-value" id="screenGain">1.00</div>
-                <small>TRIM</small>
+            <!-- 4 Core Processing Blocks -->
+            <div class="midas-blocks-grid">
+              <div class="midas-block">
+                <span>PREAMP / GAIN</span>
+                <strong id="screenGain">1.00</strong>
               </div>
-              <div class="pro-block">
-                <span class="block-title">PANORAMA</span>
-                <div class="block-value" id="screenPan">CENTER</div>
-                <small>PAN</small>
+              <div class="midas-block">
+                <span>PANORAMA</span>
+                <strong id="screenPan">CENTER</strong>
               </div>
-              <div class="pro-block">
-                <span class="block-title">FADER LEVEL</span>
-                <div class="block-value highlight" id="screenFader">75%</div>
-                <small>MAIN OUT</small>
+              <div class="midas-block">
+                <span>FADER LEVEL</span>
+                <strong id="screenFader" style="color: #2ecc71;">75%</strong>
               </div>
-              <div class="pro-block">
-                <span class="block-title">GATE / COMP</span>
-                <div class="block-value">BYPASS</div>
-                <small>DYNAMICS</small>
+              <div class="midas-block">
+                <span>DYNAMICS</span>
+                <strong style="color: #f39c12;">BYPASS</strong>
               </div>
             </div>
 
-            <!-- Mini RTA / Spectrum Analyzer Simulation -->
-            <div class="pro-mini-spectrum" id="visualMeter">
-              <div class="spectrum-bars-container">
-                <div class="bar-col" style="height: 60%"></div>
-                <div class="bar-col" style="height: 80%"></div>
-                <div class="bar-col" style="height: 45%"></div>
-                <div class="bar-col" style="height: 90%"></div>
-                <div class="bar-col" style="height: 70%"></div>
-                <div class="bar-col" style="height: 55%"></div>
-                <div class="bar-col" style="height: 85%"></div>
-                <div class="bar-col" style="height: 65%"></div>
+            <!-- Mini RTA / Meter Spectrum Simulation -->
+            <div class="pro-mini-spectrum" id="visualMeter" style="background: #040609; border: 1px solid #16222f; padding: 3px; border-radius: 3px;">
+              <div class="spectrum-bars-container" style="display: flex; gap: 2px; height: 35px; align-items: flex-end;">
+                <div class="bar-col" style="flex:1; height: 60%"></div>
+                <div class="bar-col" style="flex:1; height: 80%"></div>
+                <div class="bar-col" style="flex:1; height: 45%"></div>
+                <div class="bar-col" style="flex:1; height: 90%"></div>
+                <div class="bar-col" style="flex:1; height: 70%"></div>
+                <div class="bar-col" style="flex:1; height: 55%"></div>
+                <div class="bar-col" style="flex:1; height: 85%"></div>
+                <div class="bar-col" style="flex:1; height: 65%"></div>
               </div>
-              <div class="spectrum-scale-labels"><span>0dB</span><span>-6</span><span>-12</span><span>-24</span><span>-48</span></div>
+              <div class="spectrum-scale-labels" style="font-size: 7px; color: #556677; display: flex; justify-content: space-between; margin-top: 2px;"><span>0dB</span><span>-6</span><span>-12</span><span>-24</span><span>-48</span></div>
             </div>
           </div>
         </section>
 
         <!-- VIEW: METER -->
         <section class="screen-view" data-view="METER">
-          <div class="pro-screen-grid">
+          <div class="pro-screen-grid" style="background: #06090f; padding: 6px; border-radius: 4px;">
             <div class="screen-big-meter">
               <div class="meter-columns" id="screenChannelMeters"></div>
               <span class="meter-db">0&nbsp;&nbsp;&nbsp;-6&nbsp;&nbsp;&nbsp;-12&nbsp;&nbsp;&nbsp;-24&nbsp;&nbsp;&nbsp;-48</span>
-            </div>
-            <div class="screen-info-card">
-              <b>MULTIMETER OVERVIEW</b><strong id="meterSelected">CH1</strong>
-              <span>RMS LEVEL <em id="meterLevel">0%</em></span>
-              <span>PEAK HOLD <em id="meterPeak">-∞ dB</em></span>
-              <span>STATUS <em>ACTIVE</em></span>
             </div>
           </div>
         </section>
 
         <!-- VIEW: RTA -->
         <section class="screen-view" data-view="RTA">
-          <div class="rta-display">
+          <div class="rta-display" style="background: #06090f; padding: 6px; border-radius: 4px;">
             <div class="rta-grid"></div>
             <div class="rta-bars" id="rtaBars"></div>
             <div class="rta-labels"><span>63</span><span>125</span><span>250</span><span>500</span><span>1K</span><span>2K</span><span>4K</span><span>8K</span><span>16K</span></div>
@@ -162,73 +267,55 @@
 
         <!-- VIEW: SETUP -->
         <section class="screen-view" data-view="SETUP">
-          <div class="setup-screen">
-            <b>CONSOLE SYSTEM SETUP</b>
-            <div class="setup-grid">
+          <div class="setup-screen" style="background: #06090f; padding: 6px; border-radius: 4px; font-size: 9px;">
+            <b>M32 SYSTEM CONFIG</b>
+            <div class="setup-grid" style="margin-top: 4px;">
               <span>CHANNELS <strong class="channel-count-value">14</strong></span>
               <span>TRANSPORT <strong id="setupTransport">OFFLINE</strong></span>
-              <span>PROTOCOL <strong>ESP32-MIXER/1</strong></span>
-              <span>SYNC <strong>TWO-WAY</strong></span>
-              <span>SYSTEM <strong id="setupSystem">OFF</strong></span>
-              <span>REMOTE <strong>BLUETOOTH / BRIDGE</strong></span>
-            </div>
-            <div class="channel-mapper">
-              <div><b>AUTO CHANNEL MAPPER</b><small id="mapperStatus">14 CH • 1:1 READY</small></div>
-              <label>CHANNELS 
-                <select id="mapperChannels">
-                  <option value="4">4</option>
-                  <option value="8">8</option>
-                  <option value="12">12</option>
-                  <option value="16">16</option>
-                  <option value="14" selected>14</option>
-                </select>
-              </label>
-              <button id="autoMapChannels" type="button" onclick="autoMapChannels()">AUTO MAP</button>
-              <button id="applyChannelMap" type="button" onclick="applyChannelMap()">APPLY CHANNELS</button>
-              <div id="channelMapPreview">CH1→CH1 • CH2→CH2 • CH3→CH3 • CH4→CH4 • … • CH14→CH14</div>
+              <span>PROTOCOL <strong>AES50 / M32-1</strong></span>
             </div>
           </div>
         </section>
 
         <!-- VIEW: EFFECT -->
         <section class="screen-view" data-view="EFFECT">
-          <div class="effect-screen effect-screen-live">
-            <div class="fx-screen-select">
-              <b>FX</b>
-              <select id="screenFxSelect"><option value="FX1">FX1</option><option value="FX2">FX2</option></select>
-              <select id="screenFxPreset"><option>HALL 1</option><option>ROOM</option><option>PLATE</option><option>DELAY</option><option>CHORUS</option></select>
-              <select id="screenFxType"><option>REVERB</option><option>DELAY</option><option>CHORUS</option><option>ECHO</option></select>
-            </div>
-            <label><b>TIME</b><input class="fx-control" data-scope="FX" data-target="FX1" data-param="time" type="range" min="0.1" max="10" step="0.01" value="2.45"><strong data-fx-value="time">2.45s</strong></label>
-            <label><b>PRE-DELAY</b><input class="fx-control" data-scope="FX" data-target="FX1" data-param="preDelay" type="range" min="0" max="200" step="1" value="32"><strong data-fx-value="preDelay">32ms</strong></label>
-            <label><b>DECAY</b><input class="fx-control" data-scope="FX" data-target="FX1" data-param="decay" type="range" min="0" max="100" step="1" value="65"><strong data-fx-value="decay">65%</strong></label>
-            <label><b>LEVEL</b><input class="fx-control" data-scope="FX" data-target="FX1" data-param="level" type="range" min="-20" max="6" step="0.1" value="-3"><strong data-fx-value="level">-3.0dB</strong></label>
-            <button id="screenFxTap" type="button">TAP TEMPO</button><span id="screenFxBpm">120 BPM</span>
+          <div class="effect-screen effect-screen-live" style="background: #06090f; padding: 6px; border-radius: 4px; font-size: 9px;">
+            <b>VIRTUAL FX RACK</b>
+            <select id="screenFxSelect" style="background: #111; color: #00e5ff; border: 1px solid #333; width: 100%; margin: 4px 0;"><option value="FX1">FX1: Lexicon Reverb</option></select>
           </div>
         </section>
 
         <!-- VIEW: SCENE -->
         <section class="screen-view" data-view="SCENE">
-          <div class="scene-screen">
-            <b>SCENE MANAGER</b><strong id="sceneName">DEFAULT</strong>
-            <div><button id="screenSceneSave">SAVE</button><button id="screenSceneRecall">RECALL</button><button id="screenSceneDefault">DEFAULT</button></div>
-            <small>Scene tersimpan di browser dan dapat dipanggil kembali.</small>
+          <div class="scene-screen" style="background: #06090f; padding: 6px; border-radius: 4px; font-size: 9px;">
+            <b>SCENE LIBRARY</b>
+            <div><button id="screenSceneSave">SAVE</button><button id="screenSceneRecall">RECALL</button></div>
           </div>
         </section>
+      </div>
+
+      <!-- Midas Physical Rotary Encoder Bar Below Screen (6 Encoders) -->
+      <div class="midas-encoders-bar">
+        <div class="mid-encoder">GAIN</div>
+        <div class="mid-encoder">HPF</div>
+        <div class="mid-encoder">GATE</div>
+        <div class="mid-encoder">COMP</div>
+        <div class="mid-encoder">EQ</div>
+        <div class="mid-encoder">PAN</div>
       </div>
     </div>
 
     <!-- PLAYER / RECORDER DI BAWAH SCREEN MIXER -->
-    <section class="media-rack" style="margin-top: 6px;">
-      <h2>PLAYER / RECORDER <span id="activePlayerTarget" style="font-size: 9px; color: #00f0ff; float: right;">[CH 1]</span></h2>
+    <section class="media-rack" style="margin-top: 4px; background: #0c1219; border: 1px solid #1a2736;">
+      <h2 style="color: #00e5ff; border-bottom: 1px solid #1a2736; margin-bottom: 4px;">USB PLAYER / REC <span id="activePlayerTarget" style="font-size: 9px; color: #2ecc71; float: right;">[CH 1]</span></h2>
       <div style="display: flex; gap: 4px; margin-bottom: 4px;">
-        <button id="btnPlayerRec" type="button" style="flex: 1;">🎙<small>REC</small></button>
-        <button id="btnPlayerFile" type="button" style="flex: 1;">📁<small>FILE</small></button>
-        <button id="btnPlayerMusic" type="button" style="flex: 1;">🎵<small>MUSIC</small></button>
+        <button id="btnPlayerRec" type="button" style="flex: 1; background: #16222f; color: #fff; border: 1px solid #243447;">🎙<small>REC</small></button>
+        <button id="btnPlayerFile" type="button" style="flex: 1; background: #16222f; color: #fff; border: 1px solid #243447;">📁<small>FILE</small></button>
+        <button id="btnPlayerMusic" type="button" style="flex: 1; background: #16222f; color: #fff; border: 1px solid #243447;">🎵<small>MUSIC</small></button>
       </div>
-      <div style="display: flex; gap: 4px; align-items: center; background: #111; padding: 4px; border-radius: 4px;">
-        <span id="playerTrackInfo" style="font-size: 9px; color: #aaa; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">NO FILE SELECTED</span>
-        <button id="btnPlayPauseAudio" type="button" style="background: #00bcd4; color: #000; border: none; padding: 2px 8px; font-weight: bold; border-radius: 3px; cursor: pointer;">▶ PLAY</button>
+      <div style="display: flex; gap: 4px; align-items: center; background: #06090f; padding: 4px; border-radius: 3px; border: 1px solid #1a2736;">
+        <span id="playerTrackInfo" style="font-size: 9px; color: #8899a6; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">NO FILE SELECTED</span>
+        <button id="btnPlayPauseAudio" type="button" style="background: #00a8cc; color: #fff; border: none; padding: 2px 8px; font-weight: bold; border-radius: 2px; cursor: pointer; font-size: 9px;">▶ PLAY</button>
       </div>
       <input type="file" id="localAudioLoader" accept="audio/*" style="display: none;">
     </section>
@@ -739,7 +826,6 @@
     if (window.state && window.state.channels && window.state.channels[chNum - 1]) {
       const chData = window.state.channels[chNum - 1];
 
-      // Update nilai tampilan teks di screen mixer sesuai state channel aktif
       if (screenGain) screenGain.textContent = Number(chData.gain || 1.0).toFixed(2);
       if (screenFader) screenFader.textContent = (chData.fader || 75) + '%';
       if (screenPan) {
@@ -747,7 +833,6 @@
         screenPan.textContent = panVal === 0 ? 'CENTER' : (panVal < 0 ? 'L ' + Math.round(Math.abs(panVal) * 100) + '%' : 'R ' + Math.round(panVal * 100) + '%');
       }
 
-      // Hubungkan perubahan Gain & Pan ke Web Audio Nodes secara real-time
       if (currentAudioElement && !currentAudioElement.paused && audioCtx) {
         if (gainNode) {
           const faderScale = (chData.fader || 75) / 100;
@@ -762,11 +847,9 @@
     }
   }, 100);
 
-  // Tombol pilih file dari perangkat
   if(musicBtn) musicBtn.addEventListener('click', () => fileInput?.click());
   if(fileBtn) fileBtn.addEventListener('click', () => fileInput?.click());
 
-  // Tombol Play / Pause interaktif
   if(playPauseBtn) {
     playPauseBtn.addEventListener('click', () => {
       if(!currentAudioElement) {
@@ -780,12 +863,11 @@
       } else {
         currentAudioElement.pause();
         playPauseBtn.textContent = '▶ PLAY';
-        playPauseBtn.style.background = '#00bcd4';
+        playPauseBtn.style.background = '#00a8cc';
       }
     });
   }
 
-  // Proses file audio yang dipilih dari perangkat
   if(fileInput) {
     fileInput.addEventListener('change', function(e) {
       const file = e.target.files[0];
@@ -811,7 +893,7 @@
           playPauseBtn.style.background = '#e74c3c';
         }
         const tr = document.getElementById('testResult');
-        if(tr) tr.textContent = `PLAYER: Memutar "${file.name}" ke Channel ${chNum} (Audio Node Connected)`;
+        if(tr) tr.textContent = `PLAYER: Memutar "${file.name}" ke Channel ${chNum} (M32 Engine Connected)`;
       }).catch(err => {
         console.error("Gagal memutar audio:", err);
       });
