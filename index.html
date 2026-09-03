@@ -11,9 +11,31 @@
 <link rel="stylesheet" href="header-system.css?v=20260902-01">
 <link rel="stylesheet" href="channels-new.css?v=20260903-ULTIMATE">
 <style>
-  /* Memastikan kontainer utama konsol bisa digeser/scroll horizontal jika layar terlalu kecil, atau menyusuaikan ukuran strip */
+  /* Memastikan tata letak konsol berjajar ke samping dengan mulus tanpa terpotong */
   main.console {
-  
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    width: 100vw;
+    box-sizing: border-box;
+    padding: 4px;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .channel-bank, 
+  .center-console, 
+  .master-rack, 
+  .fx-rack, 
+  .aux-rack {
+    flex-shrink: 0;
+  }
+  .center-console {
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+  }
+</style>
 </head>
 <body>
 
@@ -42,11 +64,13 @@
 </header>
 
 <main class="console">
+  <!-- CHANNEL BANK KIRI (CH 1-7) -->
   <section class="channel-bank channel-bank-left">
     <div class="bank-title"><span>INPUT CHANNELS 1–7</span><small>CH1–CH7</small></div>
     <div id="channels"></div>
   </section>
 
+  <!-- KONSOL TENGAH (SCREEN MIXER + PLAYER) -->
   <section class="center-console">
     <div class="screen-frame">
       <div class="screen-title"><b>MIXER-ONLINE</b><span>14CH DIGITAL MIXER</span></div>
@@ -60,14 +84,17 @@
       </div>
       
       <div class="screen-content" id="screenContent">
+        <!-- VIEW: HOME / CHANNEL STRIP OVERVIEW -->
         <section class="screen-view active" data-view="HOME">
           <div class="pro-digital-screen">
+            <!-- Top Channel Banner -->
             <div class="pro-screen-top-bar">
               <div class="pro-ch-badge"><b id="screenInput">CH 01</b><span>MIC / LINE</span></div>
               <div class="pro-ch-title-edit"><input type="text" id="screenChannelName" value="VOCAL MAIN" placeholder="Channel Name"></div>
               <div class="pro-ch-status-badges"><span id="screenStatusBadge" class="badge-ready">READY</span><span class="badge-phantom">+48V</span></div>
             </div>
 
+            <!-- Center Processing Blocks (Preamp, EQ, Dynamics, Fader Readout) -->
             <div class="pro-processing-grid">
               <div class="pro-block">
                 <span class="block-title">PREAMP / GAIN</span>
@@ -91,6 +118,7 @@
               </div>
             </div>
 
+            <!-- Mini RTA / Spectrum Analyzer Simulation -->
             <div class="pro-mini-spectrum" id="visualMeter">
               <div class="spectrum-bars-container">
                 <div class="bar-col" style="height: 60%"></div>
@@ -107,6 +135,7 @@
           </div>
         </section>
 
+        <!-- VIEW: METER -->
         <section class="screen-view" data-view="METER">
           <div class="pro-screen-grid">
             <div class="screen-big-meter">
@@ -122,6 +151,7 @@
           </div>
         </section>
 
+        <!-- VIEW: RTA -->
         <section class="screen-view" data-view="RTA">
           <div class="rta-display">
             <div class="rta-grid"></div>
@@ -130,6 +160,7 @@
           </div>
         </section>
 
+        <!-- VIEW: SETUP -->
         <section class="screen-view" data-view="SETUP">
           <div class="setup-screen">
             <b>CONSOLE SYSTEM SETUP</b>
@@ -159,6 +190,7 @@
           </div>
         </section>
 
+        <!-- VIEW: EFFECT -->
         <section class="screen-view" data-view="EFFECT">
           <div class="effect-screen effect-screen-live">
             <div class="fx-screen-select">
@@ -175,6 +207,7 @@
           </div>
         </section>
 
+        <!-- VIEW: SCENE -->
         <section class="screen-view" data-view="SCENE">
           <div class="scene-screen">
             <b>SCENE MANAGER</b><strong id="sceneName">DEFAULT</strong>
@@ -185,8 +218,7 @@
       </div>
     </div>
 
-    <section class="media-rack" style="margin-top: 6px;">
-   <!-- PLAYER / RECORDER DENGAN KONTROL PLAY / PAUSE NYATA -->
+    <!-- PLAYER / RECORDER DI BAWAH SCREEN MIXER -->
     <section class="media-rack" style="margin-top: 6px;">
       <h2>PLAYER / RECORDER <span id="activePlayerTarget" style="font-size: 9px; color: #00f0ff; float: right;">[CH 1]</span></h2>
       <div style="display: flex; gap: 4px; margin-bottom: 4px;">
@@ -200,8 +232,9 @@
       </div>
       <input type="file" id="localAudioLoader" accept="audio/*" style="display: none;">
     </section>
+  </section>
 
-
+  <!-- CHANNEL BANK KANAN (CH 8-14) -->
   <section class="channel-bank channel-bank-right">
     <div class="bank-title"><span>INPUT CHANNELS 8–14</span><small>CH8–CH14</small></div>
     <div id="channelsRight"></div>
@@ -658,10 +691,8 @@
   const playPauseBtn = document.getElementById('btnPlayPauseAudio');
   const trackInfo = document.getElementById('playerTrackInfo');
 
-  // Objek untuk menyimpan pemutar audio terpisah untuk masing-masing channel (CH 1 sampai CH 14)
   window.channelAudioPlayers = window.channelAudioPlayers || {};
 
-  // Sinkronisasi indikator channel aktif
   setInterval(() => {
     const activeInput = document.getElementById('screenInput');
     if(activeInput && targetLabel) {
@@ -672,7 +703,6 @@
   if(musicBtn) musicBtn.addEventListener('click', () => fileInput?.click());
   if(fileBtn) fileBtn.addEventListener('click', () => fileInput?.click());
 
-  // Saat file dipilih, masukkan HANYA ke channel yang sedang aktif dipilih di layar
   if(fileInput) {
     fileInput.addEventListener('change', function(e) {
       const file = e.target.files[0];
@@ -685,7 +715,6 @@
       trackInfo.textContent = `CH${chNum}: ${file.name}`;
       console.log(`[CHANNEL ROUTING] Memuat lagu ke Channel ${chNum} saja.`);
 
-      // Hentikan pemutar channel lain jika ada, atau buat instance baru khusus channel ini
       if (window.channelAudioPlayers[chNum]) {
         window.channelAudioPlayers[chNum].pause();
       }
@@ -696,7 +725,6 @@
       document.body.appendChild(channelAudio);
       window.channelAudioPlayers[chNum] = channelAudio;
 
-      // Putar audio
       channelAudio.play().then(() => {
         if(playPauseBtn) playPauseBtn.textContent = "⏸ PAUSE";
       }).catch(err => {
@@ -706,7 +734,6 @@
     });
   }
 
-  // Tombol Play/Pause mengontrol channel yang sedang aktif dipilih di layar saat itu
   if(playPauseBtn) {
     playPauseBtn.addEventListener('click', () => {
       const currentChannelStr = document.getElementById('screenInput')?.textContent || "CH 1";
@@ -728,7 +755,6 @@
     });
   }
 
-  // Perulangan untuk mengatur volume HANYA berdasarkan fader channel yang bersangkutan
   setInterval(() => {
     if (!window.state || !window.state.channels) return;
 
@@ -741,7 +767,6 @@
         if (chState.mute || !window.state.system) {
           audio.volume = 0;
         } else {
-          // Volume dihitung murni dari Fader channel tersebut dikalikan Master
           const faderVal = (chState.fader || 75) / 100;
           const masterVal = ((document.getElementById('master')?.value) || 75) / 100;
           audio.volume = Math.min(1.0, Math.max(0.0, faderVal * masterVal));
@@ -751,3 +776,6 @@
   }, 200);
 })();
 </script>
+
+</body>
+</html>
