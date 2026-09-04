@@ -8,7 +8,6 @@
   const N = 14;
   const $ = id => document.getElementById(id);
 
-  // Safely ensure window.state and window.state.channels are initialized
   function ensureState() {
     if (!window.state) window.state = {};
     if (!Array.isArray(window.state.channels)) window.state.channels = [];
@@ -21,6 +20,15 @@
     }
   }
 
+  // Format teks tampilan nilai knob
+  function formatVal(k, val) {
+    const num = Number(val);
+    if (k === "gain") return num.toFixed(2);
+    if (k === "pan") return num === 0 ? "MID" : (num < 0 ? "L" + Math.round(Math.abs(num) * 100) : "R" + Math.round(num * 100));
+    if (["high", "mid", "low"].includes(k)) return (num > 0 ? "+" : "") + num + "dB";
+    return num;
+  }
+
   function make(id) {
     ensureState();
     const c = window.state.channels[id - 1];
@@ -28,7 +36,6 @@
     el.className = "new-channel-strip";
     el.dataset.ch = String(id);
     
-    // Tentukan status awal LED berdasarkan nilai fader/gain/mute
     const isMuted = Boolean(c.mute);
     const hasSignal = Number(c.fader) > 0 || Number(c.gain) > 0;
     let ledClass = "channel-led";
@@ -41,16 +48,39 @@
     el.innerHTML = `
       <header class="new-channel-head">CH${id}</header>
       <div class="${ledClass}" title="Channel Indicator"></div>
+      <div class="ch-top-vu"><div class="ch-top-vu-fill"></div></div>
       <div class="led-meter new-channel-meter" data-ch="${id}" role="meter" aria-label="CH${id} level"><span class="led-peak"></span><span class="led-segments">${"<i data-seg=\"0\"></i>".repeat(12)}</span></div>
-      <div class="new-channel-control"><label>GAIN</label><input class="new-knob" data-k="gain" type="range" min="0" max="2" step=".01" value="${Number(c.gain ?? 1)}"></div>
-      <div class="new-channel-control"><label>HIGH</label><input class="new-knob" data-k="high" type="range" min="-12" max="12" step="1" value="${Number(c.high ?? 0)}"></div>
-      <div class="new-channel-control"><label>MID</label><input class="new-knob" data-k="mid" type="range" min="-12" max="12" step="1" value="${Number(c.mid ?? 0)}"></div>
-      <div class="new-channel-control"><label>LOW</label><input class="new-knob" data-k="low" type="range" min="-12" max="12" step="1" value="${Number(c.low ?? 0)}"></div>
-      <div class="new-channel-control"><label>PAN</label><input class="new-knob" data-k="pan" type="range" min="-1" max="1" step=".01" value="${Number(c.pan ?? 0)}"></div>
+      
+      <div class="new-channel-control">
+        <label>GAIN</label>
+        <input class="new-knob" data-k="gain" type="range" min="0" max="2" step=".01" value="${Number(c.gain ?? 1)}">
+        <span class="knob-val" data-val="gain">${formatVal("gain", c.gain ?? 1)}</span>
+      </div>
+      <div class="new-channel-control">
+        <label>HIGH</label>
+        <input class="new-knob" data-k="high" type="range" min="-12" max="12" step="1" value="${Number(c.high ?? 0)}">
+        <span class="knob-val" data-val="high">${formatVal("high", c.high ?? 0)}</span>
+      </div>
+      <div class="new-channel-control">
+        <label>MID</label>
+        <input class="new-knob" data-k="mid" type="range" min="-12" max="12" step="1" value="${Number(c.mid ?? 0)}">
+        <span class="knob-val" data-val="mid">${formatVal("mid", c.mid ?? 0)}</span>
+      </div>
+      <div class="new-channel-control">
+        <label>LOW</label>
+        <input class="new-knob" data-k="low" type="range" min="-12" max="12" step="1" value="${Number(c.low ?? 0)}">
+        <span class="knob-val" data-val="low">${formatVal("low", c.low ?? 0)}</span>
+      </div>
+      <div class="new-channel-control">
+        <label>PAN</label>
+        <input class="new-knob" data-k="pan" type="range" min="-1" max="1" step=".01" value="${Number(c.pan ?? 0)}">
+        <span class="knob-val" data-val="pan">${formatVal("pan", c.pan ?? 0)}</span>
+      </div>
+
       <div class="fader-area new-channel-fader">
         <label>VOLUME</label>
         <input class="new-fader channel-fader" data-k="fader" type="range" min="0" max="100" step="1" value="${Number(c.fader ?? 75)}">
-        <output class="fader-val">${Number(c.fader ?? 75)}%</output>
+        <output class="fader-val">${Math.round(Number(c.fader ?? 75))}%</output>
       </div>
       <div class="new-channel-buttons">
         <button type="button" data-k="mute" class="${c.mute ? "on" : ""}">${c.mute ? "UNMUTE" : "MUTE"}</button>
@@ -73,18 +103,20 @@
       } else {
         const n = Number(value);
         ch[k] = Number.isFinite(n) ? n : value;
+        
         if (k === "fader") {
           const out = el.querySelector("output");
           if (out) out.textContent = Math.round(n) + "%";
+        } else {
+          const knobTxt = el.querySelector(`.knob-val[data-val="${k}"]`);
+          if (knobTxt) knobTxt.textContent = formatVal(k, n);
         }
       }
 
-      // Otomatis pindahkan Layar M32 ke channel yang sedang diubah & update display
       if (typeof window.selectScreenChannel === "function") {
         window.selectScreenChannel(id);
       }
 
-      // Perbarui status lampu indikator LED secara real-time
       const ledEl = el.querySelector(".channel-led");
       if (ledEl) {
         if (ch.mute) {
@@ -164,11 +196,18 @@
       if (!c || !el) continue;
 
       el.querySelectorAll("input[data-k]").forEach(x => { 
-        if (x.dataset.k in c) x.value = String(c[x.dataset.k]); 
+        if (x.dataset.k in c) {
+          x.value = String(c[x.dataset.k]);
+          const k = x.dataset.k;
+          if (k === "fader") {
+            const out = el.querySelector("output");
+            if (out) out.textContent = Math.round(Number(c.fader ?? 75)) + "%";
+          } else {
+            const knobTxt = el.querySelector(`.knob-val[data-val="${k}"]`);
+            if (knobTxt) knobTxt.textContent = formatVal(k, c[k]);
+          }
+        }
       });
-
-      const o = el.querySelector("output"); 
-      if (o) o.textContent = Math.round(Number(c.fader ?? 75)) + "%";
 
       const ledEl = el.querySelector(".channel-led");
       if (ledEl) {
