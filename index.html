@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="channels-new.css?v=20260903-ULTIMATE">
 <style>
   /* ==========================================================
-     SKIN & THEME VARIATIONS (DENGAN VARIABEL DYNAMIC)
+     SKIN VARIATIONS (DEFINISI VARIABEL WARNA)
      ========================================================== */
   body, body.theme-midas {
     --main-bg: #090b0c;
@@ -23,6 +23,7 @@
     --btn-active: linear-gradient(180deg, #00a8cc 0%, #00738c 100%);
     --text-main: #ffffff;
     --text-dim: #8899a6;
+    --strip-bg: #0b1017;
   }
 
   body.theme-x32 {
@@ -30,10 +31,11 @@
     --panel-bg: #18202a;
     --panel-border: #2c3e50;
     --accent-color: #f39c12;
-    --header-bg: linear-gradient(90deg, #a04000, #d35400, #a04000);
+    --header-bg: linear-gradient(90deg, #2c3e50, #1b222c, #2c3e50);
     --btn-active: linear-gradient(180deg, #e67e22 0%, #d35400 100%);
     --text-main: #ffffff;
     --text-dim: #a0b0c0;
+    --strip-bg: #141b24;
   }
 
   body.theme-gold {
@@ -41,10 +43,11 @@
     --panel-bg: #1c1815;
     --panel-border: #382d24;
     --accent-color: #f1c40f;
-    --header-bg: linear-gradient(90deg, #7d6608, #b7950b, #7d6608);
+    --header-bg: linear-gradient(90deg, #2a221b, #1c1815, #2a221b);
     --btn-active: linear-gradient(180deg, #f39c12 0%, #b7950b 100%);
     --text-main: #fff8e7;
     --text-dim: #9c8a75;
+    --strip-bg: #161310;
   }
 
   body.theme-dark {
@@ -52,14 +55,15 @@
     --panel-bg: #0f0f0f;
     --panel-border: #222222;
     --accent-color: #2ecc71;
-    --header-bg: linear-gradient(90deg, #1e8449, #27ae60, #1e8449);
+    --header-bg: linear-gradient(90deg, #181818, #0f0f0f, #181818);
     --btn-active: linear-gradient(180deg, #2ecc71 0%, #1e8449 100%);
     --text-main: #eeeeee;
     --text-dim: #666666;
+    --strip-bg: #0a0a0a;
   }
 
   /* ==========================================================
-     PENERAPAN VARIABEL SKIN KE SELURUH KOMPONEN MIXER
+     OVERRIDE GLOBAL SKIN KE SELURUH KOMPONEN (TERMASUK CHANNEL STRIP)
      ========================================================== */
   body {
     background: var(--main-bg) !important;
@@ -69,6 +73,52 @@
     overflow-x: auto;
   }
 
+  /* Header Topbar */
+  header.topbar,
+  .topbar > div,
+  .system-box,
+  .bridge-head,
+  .status-head,
+  .scene-head,
+  .clock-head,
+  .skin-head {
+    background: var(--panel-bg) !important;
+    border-color: var(--panel-border) !important;
+    color: var(--text-main) !important;
+  }
+  .topbar .brand b,
+  .topbar .box-title,
+  #clock {
+    color: var(--accent-color) !important;
+  }
+
+  /* Channel Bank & Strips (CH 1–14 & Master) */
+  .channel-bank,
+  .new-channel-strip,
+  .channel-strip,
+  .master-rack,
+  .bank-title {
+    background: var(--strip-bg) !important;
+    border-color: var(--panel-border) !important;
+    color: var(--text-main) !important;
+  }
+
+  .bank-title span,
+  .master-card h2,
+  .monitor-card b,
+  .phones-card b {
+    color: var(--accent-color) !important;
+  }
+
+  .channel-name,
+  .ch-number,
+  .channel-label {
+    background: var(--panel-bg) !important;
+    color: var(--accent-color) !important;
+    border-color: var(--panel-border) !important;
+  }
+
+  /* Center Console (Screen, Media, FX, Aux) */
   .media-rack, 
   .center-console .fx-rack, 
   .center-console .aux-rack,
@@ -76,11 +126,22 @@
   .aux-unit,
   .screen-frame,
   .midas-tft-screen,
-  .m32-sub-panel {
+  .m32-sub-panel,
+  .pro-screen-grid,
+  .rta-display,
+  .setup-screen,
+  .effect-screen,
+  .scene-screen,
+  .device-connection,
+  .bridge-panel,
+  .connection-test-panel,
+  .status-footer {
     background: var(--panel-bg) !important;
     border-color: var(--panel-border) !important;
+    color: var(--text-main) !important;
   }
 
+  /* Screen Title & Badges */
   .screen-title {
     background: var(--header-bg) !important;
     color: #ffffff !important;
@@ -92,6 +153,7 @@
     color: #ffffff !important;
   }
 
+  /* Text Accents & Numbers */
   .midas-block strong,
   .screen-title b,
   .rack-title,
@@ -99,22 +161,31 @@
   #fxBpm,
   .aux-unit b,
   #screenFxSelect,
-  .channel-count-value {
+  .channel-count-value,
+  .section-heading h2,
+  .bridge-live,
+  .status-footer b {
     color: var(--accent-color) !important;
   }
 
+  /* Active Buttons & Tabs */
   .screen-tabs button.active,
   .m32-sub-btn.active,
-  .fx-buttons button.active {
+  .fx-buttons button.active,
+  .bottom-nav button.active {
     background: var(--btn-active) !important;
     border-color: var(--accent-color) !important;
     color: #ffffff !important;
   }
 
+  /* Default Buttons & Encoders */
   .screen-tabs button,
   .m32-sub-btn,
   .mid-encoder,
-  .fx-buttons button {
+  .fx-buttons button,
+  .bottom-nav button,
+  .test-buttons button,
+  .topbar button {
     background: var(--main-bg) !important;
     color: var(--text-dim) !important;
     border-color: var(--panel-border) !important;
@@ -437,7 +508,7 @@
   </div>
   <div class="skin-head">
     <span class="box-title">MIXER SKIN</span>
-    <select id="skinSelect" style="background: #111a24; color: #00e5ff; border: 1px solid #1f2d3d; font-size: 9px; padding: 2px 4px; border-radius: 2px;">
+    <select id="skinSelect" style="background: var(--main-bg); color: var(--accent-color); border: 1px solid var(--panel-border); font-size: 9px; padding: 2px 4px; border-radius: 2px;">
       <option value="theme-midas">MIDAS CYAN (DEFAULT)</option>
       <option value="theme-x32">BEHRINGER X32 (BLUE/YELLOW)</option>
       <option value="theme-gold">PRO VINTAGE (GOLD)</option>
