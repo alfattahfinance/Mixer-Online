@@ -6,121 +6,13 @@
 <meta name="theme-color" content="#090b0c">
 <title>MIXER-ONLINE • Midas M32 Pro Edition</title>
 
-<!-- Pembaruan versi query (Cache-Buster) -->
-<link rel="stylesheet" href="style.css?v=20260904-PERFECT-LAYOUT">
-<link rel="stylesheet" href="channel-skin.css?v=20260904-PERFECT-LAYOUT">
-<link rel="stylesheet" href="header-system.css?v=20260904-PERFECT-LAYOUT">
-<link rel="stylesheet" href="channels-new.css?v=20260904-PERFECT-LAYOUT">
+<!-- CSS External -->
+<link rel="stylesheet" href="style.css?v=20260904-PERFECT-LAYOUT-OVERRIDE">
+<link rel="stylesheet" href="channel-skin.css?v=20260904-PERFECT-LAYOUT-OVERRIDE">
+<link rel="stylesheet" href="header-system.css?v=20260904-PERFECT-LAYOUT-OVERRIDE">
+<link rel="stylesheet" href="channels-new.css?v=20260904-PERFECT-LAYOUT-OVERRIDE">
 
 <style>
-/* ==========================================================
-   PERBAIKAN LAYOUT PRESISI CHANNEL STRIP & KONTROL TENGAH
-   ========================================================== */
-
-/* Pastikan Channel Strip berbentuk Kolom Fleksibel & Rapi */
-.new-channel-strip {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important; /* Memaksa semua elemen tepat ke tengah */
-  justify-content: space-between !important;
-  padding: 6px 2px 4px 2px !important;
-  box-sizing: border-border-box !important;
-  border-right: 1px dashed var(--panel-border, #1a2736) !important;
-}
-
-/* 1. Indikator VU Meter di Atas Gain */
-.ch-top-vu {
-  width: 24px !important;
-  height: 6px !important;
-  background: #0a0f14 !important;
-  border: 1px solid #1e2d3d !important;
-  border-radius: 2px !important;
-  margin: 2px auto 4px auto !important;
-  overflow: hidden !important;
-  display: flex !important;
-  align-items: center !important;
-}
-
-.ch-top-vu-fill {
-  width: 0%;
-  height: 100% !important;
-  background: linear-gradient(90deg, #2ecc71 60%, #f1c40f 85%, #e74c3c 100%) !important;
-  transition: width 0.05s ease-out !important;
-}
-
-/* 2. Group Kontrol (Gain, EQ, Pan) - Rapi di Tengah */
-.ch-controls-group {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 6px !important;
-  width: 100% !important;
-  margin-bottom: 6px !important;
-}
-
-.ch-controls-group label,
-.ch-controls-group div {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 100% !important;
-  text-align: center !important;
-  font-size: 8px !important;
-  color: var(--text-dim, #8899a6) !important;
-}
-
-/* Style Knob & Input Range Kontrol Top */
-.knob-gain, .knob-pan, .knob-eq {
-  width: 28px !important;
-  height: 28px !important;
-  margin: 2px auto !important;
-  display: block !important;
-}
-
-/* 3. Tombol Mute & Solo di Tengah */
-.btn-mute, .btn-solo, .btn-select {
-  width: 85% !important;
-  margin: 2px auto !important;
-  text-align: center !important;
-  font-size: 8px !important;
-  padding: 3px 0 !important;
-  border-radius: 2px !important;
-}
-
-/* 4. Area Fader Geser Pas ke Bawah Sebelum Perbatasan */
-.fader-area {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: flex-end !important; /* Menurunkan fader ke paling bawah */
-  width: 100% !important;
-  flex-grow: 1 !important;
-  padding-bottom: 4px !important; /* Pas sebelum perbatasan bawah */
-  margin-top: 4px !important;
-}
-
-.fader-area input[type="range"],
-.channel-fader {
-  -webkit-appearance: slider-vertical !important;
-  writing-mode: bt-lr !important;
-  width: 18px !important;
-  height: 180px !important; /* Panjang Fader Presisi */
-  margin: 0 auto !important;
-  cursor: pointer !important;
-  accent-color: var(--accent-color, #00e5ff) !important;
-}
-
-.fader-val, .fader-value {
-  font-size: 8px !important;
-  color: var(--accent-color, #00e5ff) !important;
-  margin-top: 4px !important;
-  text-align: center !important;
-  font-weight: bold !important;
-}
-
-  
   /* ==========================================================
      1. DEFINISI VARIABEL WARNA (SKIN)
      ========================================================== */
@@ -173,7 +65,7 @@
   }
 
   /* ==========================================================
-     2. GLOBAL RESET & OVERRIDE
+     2. GLOBAL RESET
      ========================================================== */
   *, *::before, *::after {
     box-sizing: border-box !important;
@@ -253,35 +145,54 @@
 
   .channel-bank {
     flex: 0 0 auto !important;
-    width: 480px !important;
-    min-width: 420px !important;
+    width: 500px !important;
+    min-width: 440px !important;
     background: var(--strip-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 6px !important;
     padding: 8px !important;
   }
 
-  /* Penyesuaian Komponen Dalam Channel Strip */
+  .channel-bank #channels,
+  .channel-bank #channelsRight {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+  }
+
+  /* FORCE RE-ALIGN CHANNEL STRIP */
   .new-channel-strip {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    padding: 4px 2px 8px 2px !important;
+    justify-content: space-between !important;
+    width: 62px !important;
+    padding: 4px 1px 2px 1px !important;
     border-right: 1px dashed var(--panel-border) !important;
+    box-sizing: border-box !important;
   }
 
-  /* Indikator VU Meter Mini di Atas Kontrol Gain Tiap Channel */
+  .ch-number-title {
+    font-size: 9px !important;
+    font-weight: bold !important;
+    color: var(--accent-color) !important;
+    text-align: center !important;
+    margin-bottom: 2px !important;
+  }
+
+  /* Indikator VU Meter Mini Aktif di Atas Gain Tiap Channel */
   .ch-top-vu {
-    width: 22px !important;
+    width: 26px !important;
     height: 6px !important;
-    background: #101721 !important;
+    background: #090f17 !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 2px !important;
-    margin-bottom: 4px !important;
+    margin: 2px auto 4px auto !important;
     overflow: hidden !important;
     display: flex !important;
     align-items: center !important;
-    padding: 1px !important;
+    padding: 0.5px !important;
   }
 
   .ch-top-vu-fill {
@@ -291,29 +202,88 @@
     transition: width 0.05s ease-out !important;
   }
 
+  /* Group Knob Terpenuhi di Tengah */
   .ch-controls-group {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
+    justify-content: center !important;
     gap: 4px !important;
     width: 100% !important;
-    margin-bottom: 8px !important;
   }
 
-  /* Slider Fader Channel Digeser Pas Sebelum Perbatasan Bawah */
+  .ch-row-item {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+  }
+
+  .ch-row-item span {
+    font-size: 7px !important;
+    color: var(--text-dim) !important;
+    text-transform: uppercase !important;
+    margin-bottom: 1px !important;
+  }
+
+  .ch-slider-horizontal {
+    width: 44px !important;
+    height: 12px !important;
+    accent-color: var(--accent-color) !important;
+  }
+
+  .ch-btn-action {
+    width: 44px !important;
+    font-size: 7.5px !important;
+    padding: 2px 0 !important;
+    text-align: center !important;
+    background: var(--main-bg) !important;
+    color: var(--text-main) !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 2px !important;
+    margin-top: 2px !important;
+    cursor: pointer !important;
+  }
+
+  .ch-btn-action.active-mute {
+    background: #e74c3c !important;
+    color: #fff !important;
+  }
+
+  .ch-btn-action.active-solo {
+    background: #f1c40f !important;
+    color: #000 !important;
+  }
+
+  /* Slider Fader Channel Digeser Pas di Atas Perbatasan Bawah */
   .fader-area {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: flex-end !important;
-    flex-grow: 1 !important;
     width: 100% !important;
-    padding-bottom: 2px !important;
+    flex-grow: 1 !important;
+    padding-bottom: 0px !important;
+    margin-top: 6px !important;
   }
 
-  .fader-area input[type="range"] {
-    height: 190px !important; /* Panjang Fader Presisi */
+  .channel-fader {
+    -webkit-appearance: slider-vertical !important;
+    writing-mode: bt-lr !important;
+    width: 18px !important;
+    height: 195px !important;
+    margin: 0 auto !important;
+    cursor: pointer !important;
     accent-color: var(--accent-color) !important;
+  }
+
+  .fader-val {
+    font-size: 8px !important;
+    color: var(--accent-color) !important;
+    margin-top: 2px !important;
+    text-align: center !important;
+    font-weight: bold !important;
   }
 
   .center-console {
@@ -385,9 +355,7 @@
     margin-top: 2px !important;
   }
 
-  /* ==========================================================
-     4. NAVIGATION BAR SCREEN M32 (SEBARIS PRESISI)
-     ========================================================== */
+  /* Navigation Bar Screen M32 */
   .screen-frame {
     display: flex !important;
     flex-direction: column !important;
@@ -531,9 +499,6 @@
     margin-top: 2px;
   }
 
-  /* ==========================================================
-     5. PANEL AUX & FX
-     ========================================================== */
   .center-console .fx-rack,
   .center-console .aux-rack,
   #fxRack, #auxRack {
@@ -565,9 +530,6 @@
     display: none !important;
   }
 
-  /* ==========================================================
-     6. BOTTOM NAV
-     ========================================================== */
   .bottom-nav {
     display: flex !important;
     width: 100% !important;
@@ -982,866 +944,190 @@
   <button class="active">CH 1–7</button><button>CH 8–14</button><button>FX</button><button>MASTER</button><button>SCENE</button><button>SETUP</button><button>SYSTEM</button>
 </nav>
 
-<section class="right-tools">
-  <section class="device-connection">
-    <div class="section-heading"><h2>DEVICE CONNECTION</h2><span id="deviceLamp" class="lamp red"></span></div>
-    <label for="transportSelect">TRANSPORT</label>
-    <select id="transportSelect"><option value="esp32">ESP32 SIMULATOR / BRIDGE</option><option value="bluetooth">BLUETOOTH</option></select>
-    <div id="deviceStatus" class="device-status">🔴 ESP32 SIMULATOR OFFLINE</div>
-    <div id="deviceProtocol">Protocol: ESP32-MIXER/1</div>
-    <button id="deviceConnect">CONNECT ESP32</button><button id="deviceDisconnect">DISCONNECT</button>
-    <div id="deviceHint" class="small">Simulator ESP32 berjalan langsung di Mixer-Online. Bukan Wokwi dan bukan Wi-Fi ke mixer analog.</div>
-  </section>
-
-  <section class="bridge-panel">
-    <div class="section-heading"><h2>ESP32 BRIDGE STATUS</h2><span class="bridge-live">● TWO-WAY</span></div>
-    <div class="bridge-summary"><span id="bridgeState">OFFLINE</span><span id="bridgeTransport">TRANSPORT: —</span><span id="bridgeProtocol">PROTOCOL: ESP32-MIXER/1</span></div>
-    <div class="bridge-counters"><span>TX <b id="bridgeTx">0</b></span><span>ACK <b id="bridgeAck">0</b></span><span>RX/FEEDBACK <b id="bridgeRx">0</b></span></div>
-    <div id="bridgeLast" class="bridge-last">LAST: —</div>
-    <div id="bridgeLog" class="bridge-log"><div>CONTROL → TX → ACK → FEEDBACK → UI</div></div>
-  </section>
-</section>
-
-<section class="connection-test-panel sim" id="connectionTestPanel">
-  <h2>CONNECTION / TEST</h2>
-  <div class="transport-line">Transport: <b id="transportStatus">OFFLINE</b></div>
-  <div id="connectionHint" class="small">
-    Mixer yang menerima remote: Bluetooth langsung. Mixer yang tidak menerima remote: gunakan ESP32 sebagai bridge.
-  </div>
-  <pre id="rx">RX: —</pre>
-  <pre id="tx">TX: —</pre>
-  
-  <div class="test-buttons">
-    <button id="simulateRx" type="button">SIMULATE HARDWARE RX</button>
-    <button id="runTest" type="button">RUN 14CH LOOPBACK TEST</button>
-    <button id="runStressTest" type="button">RUN REPEAT STRESS TEST</button>
-    <button id="runMuteSoloTest" type="button">RUN MUTE/SOLO TEST</button>
-    <button id="runMasterIsolationTest" type="button">RUN MASTER ISOLATION TEST</button>
-    <button id="runFaderTest" type="button">RUN FADER CH1–CH14 TEST</button>
-    <button id="runCombinationTest" type="button">RUN COMBINATION CONTROL TEST</button>
-    <button id="runBidirectionalSyncTest" type="button">RUN TWO-WAY SYNC TEST</button>
-    <button id="savePreset" type="button">SAVE PRESET</button>
-    <button id="recallPreset" type="button">RECALL PRESET</button>
-    <button id="runSaveRecallTest" type="button">RUN SAVE/RECALL TEST</button>
-  </div>
-  
-  <pre id="testResult">TEST: —</pre>
-</section>
-
 <footer class="status-footer">
   <span>CONNECTION <b id="footerConnection">● ESP32 SIMULATOR OFFLINE</b></span>
   <span>MODE: <b>TWO-WAY SYNC</b></span>
   <span>SYSTEM STATUS <b class="channel-count-status">14 channels READY</b></span>
-  <span>CPU: <b>18%</b></span>
-  <span>MEM: <b>42%</b></span>
 </footer>
 
+<!-- External Scripts Loaders -->
 <script src="connection.js?v=20260903-final16"></script>
 <script src="adapters.js?v=20260903-esp32-bridge-final"></script>
 <script src="app.js?v=20260903-final16"></script>
-<script src="header-system.js?v=20260902-01"></script>
-<script src="header-controls.js?v=20260902-02"></script>
-<script src="channels-new.js?v=20260903-final16"></script>
-<script src="bluetooth-bridge.js"></script>
-<script src="player-bridge.js"></script>
-<script src="channels-bridge.js"></script> 
-<script src="audio-engine.js"></script>
 
+<!-- ==========================================================
+     INLINE JS OVERRIDE CHANNELS BUILDER & REALTIME LOGIC
+     ========================================================== -->
 <script>
-(function(){
-  // Jam Realtime
+(function() {
+  // Global State
+  window.state = window.state || { channels: [] };
+  for (let i = 0; i < 14; i++) {
+    if (!window.state.channels[i]) {
+      window.state.channels[i] = { fader: 75, gain: 1.0, pan: 0, mute: false, solo: false };
+    }
+  }
+
+  // FORCE BUILD CHANNEL STRIP BERSIH, RAPI DENGAN KNOB TENGAH & FADER PAS
+  function renderChannelsOverride() {
+    const leftBank = document.getElementById('channels');
+    const rightBank = document.getElementById('channelsRight');
+
+    if (!leftBank || !rightBank) return;
+
+    leftBank.innerHTML = '';
+    rightBank.innerHTML = '';
+
+    for (let ch = 1; ch <= 14; ch++) {
+      const targetContainer = ch <= 7 ? leftBank : rightBank;
+      const cData = window.state.channels[ch - 1];
+
+      const strip = document.createElement('div');
+      strip.className = 'new-channel-strip';
+      strip.dataset.ch = ch;
+
+      strip.innerHTML = `
+        <div class="ch-number-title">CH${ch}</div>
+        <div class="ch-top-vu"><div class="ch-top-vu-fill" id="topVu${ch}"></div></div>
+        
+        <div class="ch-controls-group">
+          <div class="ch-row-item">
+            <span>GAIN</span>
+            <input type="range" min="0" max="2" step="0.05" value="${cData.gain || 1.0}" class="ch-slider-horizontal knob-gain" data-ch="${ch}" data-param="gain">
+          </div>
+          <div class="ch-row-item">
+            <span>HIGH</span>
+            <input type="range" min="-12" max="12" step="0.5" value="0" class="ch-slider-horizontal knob-eq" data-ch="${ch}" data-param="high">
+          </div>
+          <div class="ch-row-item">
+            <span>MID</span>
+            <input type="range" min="-12" max="12" step="0.5" value="0" class="ch-slider-horizontal knob-eq" data-ch="${ch}" data-param="mid">
+          </div>
+          <div class="ch-row-item">
+            <span>LOW</span>
+            <input type="range" min="-12" max="12" step="0.5" value="0" class="ch-slider-horizontal knob-eq" data-ch="${ch}" data-param="low">
+          </div>
+          <div class="ch-row-item">
+            <span>PAN</span>
+            <input type="range" min="-1" max="1" step="0.1" value="${cData.pan || 0}" class="ch-slider-horizontal knob-pan" data-ch="${ch}" data-param="pan">
+          </div>
+          
+          <button type="button" class="ch-btn-action btn-mute ${cData.mute ? 'active-mute' : ''}" data-ch="${ch}">MUTE</button>
+          <button type="button" class="ch-btn-action btn-solo ${cData.solo ? 'active-solo' : ''}" data-ch="${ch}">SOLO</button>
+        </div>
+
+        <div class="fader-area">
+          <input type="range" min="0" max="100" value="${cData.fader !== undefined ? cData.fader : 75}" class="channel-fader" data-ch="${ch}">
+          <div class="fader-val" id="faderValLabel${ch}">${cData.fader !== undefined ? cData.fader : 75}%</div>
+        </div>
+      `;
+
+      targetContainer.appendChild(strip);
+    }
+  }
+
+  // SINKRONISASI UPDATE APABILA FADER / KNOB DIGESER
+  document.addEventListener('input', function(e) {
+    const ch = parseInt(e.target.dataset.ch, 10);
+    if (!ch) return;
+
+    // Fader Volume
+    if (e.target.classList.contains('channel-fader')) {
+      const val = parseInt(e.target.value, 10);
+      window.state.channels[ch - 1].fader = val;
+      
+      const lbl = document.getElementById(`faderValLabel${ch}`);
+      if (lbl) lbl.textContent = val + '%';
+
+      // Update Screen M32 Jika Channel sedang aktif
+      const activeText = document.getElementById('screenInput')?.textContent || '';
+      const activeCh = parseInt(activeText.replace(/\D/g, ''), 10);
+      if (activeCh === ch) {
+        const sf = document.getElementById('screenFader');
+        if (sf) sf.textContent = val + '%';
+      }
+    }
+
+    // Gain
+    if (e.target.dataset.param === 'gain') {
+      const val = parseFloat(e.target.value);
+      window.state.channels[ch - 1].gain = val;
+      const activeText = document.getElementById('screenInput')?.textContent || '';
+      if (parseInt(activeText.replace(/\D/g, ''), 10) === ch) {
+        const sg = document.getElementById('screenGain');
+        if (sg) sg.textContent = val.toFixed(2);
+      }
+    }
+
+    // Pan
+    if (e.target.dataset.param === 'pan') {
+      const val = parseFloat(e.target.value);
+      window.state.channels[ch - 1].pan = val;
+      const activeText = document.getElementById('screenInput')?.textContent || '';
+      if (parseInt(activeText.replace(/\D/g, ''), 10) === ch) {
+        const sp = document.getElementById('screenPan');
+        if (sp) sp.textContent = val === 0 ? 'CENTER' : (val < 0 ? 'L ' + Math.round(Math.abs(val) * 100) + '%' : 'R ' + Math.round(val * 100) + '%');
+      }
+    }
+  });
+
+  // MUTE & SOLO BUTTON HANDLER
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('btn-mute')) {
+      const ch = parseInt(e.target.dataset.ch, 10);
+      const isMute = !window.state.channels[ch - 1].mute;
+      window.state.channels[ch - 1].mute = isMute;
+      e.target.classList.toggle('active-mute', isMute);
+    }
+
+    if (e.target.classList.contains('btn-solo')) {
+      const ch = parseInt(e.target.dataset.ch, 10);
+      const isSolo = !window.state.channels[ch - 1].solo;
+      window.state.channels[ch - 1].solo = isSolo;
+      e.target.classList.toggle('active-solo', isSolo);
+    }
+
+    // Seleksi Channel ke Screen M32
+    const strip = e.target.closest('.new-channel-strip');
+    if (strip) {
+      const ch = parseInt(strip.dataset.ch, 10);
+      selectScreenChannel(ch);
+    }
+  });
+
+  function selectScreenChannel(ch) {
+    const set = (elemId, v) => { const e = document.getElementById(elemId); if (e) e.textContent = v; };
+    const cData = window.state.channels[ch - 1] || {};
+
+    set('screenInput', 'CH ' + (ch < 10 ? '0' + ch : ch));
+    set('screenFader', (cData.fader !== undefined ? cData.fader : 75) + '%');
+    set('screenGain', Number(cData.gain || 1.0).toFixed(2));
+    
+    const panVal = cData.pan || 0;
+    set('screenPan', panVal === 0 ? 'CENTER' : (panVal < 0 ? 'L ' + Math.round(Math.abs(panVal) * 100) + '%' : 'R ' + Math.round(panVal * 100) + '%'));
+  }
+
+  // Tampilan Jam
   const clock = document.getElementById('clock');
   const tick = () => clock && (clock.textContent = new Date().toLocaleTimeString());
   tick(); setInterval(tick, 1000);
 
-  // Tab Layar M32
+  // M32 Tab Navigation
   const tabs = document.querySelectorAll('#screenTabs button');
   const views = document.querySelectorAll('.screen-view');
-  const subButtons = document.querySelectorAll('.m32-sub-btn');
-  const subPanels = document.querySelectorAll('.m32-sub-panel');
-  const subBar = document.getElementById('m32SubmenuBar');
+  tabs.forEach(b => b.addEventListener('click', () => {
+    tabs.forEach(x => x.classList.remove('active'));
+    views.forEach(v => v.classList.remove('active'));
+    b.classList.add('active');
+    const target = document.querySelector(`[data-view="${b.dataset.screen}"]`);
+    if (target) target.classList.add('active');
+  }));
 
-  const setScreen = (name) => {
-    tabs.forEach(b => b.classList.toggle('active', b.dataset.screen === name));
-    views.forEach(v => v.classList.toggle('active', v.dataset.view === name));
-    
-    if(subBar) subBar.style.display = (name === 'HOME') ? 'grid' : 'none';
-
-    if (name === 'METER') buildScreenMeters();
-    if (name === 'RTA') buildRta();
-    if (name === 'SETUP') updateSetup();
-  };
-
-  tabs.forEach(b => b.addEventListener('click', () => setScreen(b.dataset.screen)));
-
-  subButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      subButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const targetSub = btn.dataset.sub;
-      subPanels.forEach(panel => {
-        panel.classList.toggle('active', panel.dataset.subpanel === targetSub);
-      });
-    });
-  });
-
-  function buildScreenMeters() {
-    const root = document.getElementById('screenChannelMeters');
-    if (!root) return;
-    root.innerHTML = '';
-    for (let i = 0; i < 14; i++) {
-      const el = document.createElement('div');
-      el.style.flex = '1';
-      el.style.background = 'var(--accent-color)';
-      el.style.height = (12 + ((i * 17) % 70)) + '%';
-      el.title = 'CH' + (i + 1);
-      root.appendChild(el);
-    }
-  }
-
-  function buildRta() {
-    const root = document.getElementById('rtaBars');
-    if (!root) return;
-    root.innerHTML = '';
-    for (let i = 0; i < 14; i++) {
-      const b = document.createElement('div');
-      b.style.flex = '1';
-      b.style.background = '#2ecc71';
-      b.style.height = (18 + ((i * 23) % 72)) + '%';
-      root.appendChild(b);
-    }
-  }
-
-  function updateSetup() {
-    const a = window.MixerAdapters?.active;
-    const t = document.getElementById('setupTransport');
-    if (t) t.textContent = a?.connected ? (a.transport === 'bluetooth' ? 'BLUETOOTH' : 'ESP32 BRIDGE') : 'OFFLINE';
-  }
-
-  // SCRIPT INTERAKTIF SCREEN SUBPANEL
-  document.getElementById('hpfSlider')?.addEventListener('input', function() {
-    const v = document.getElementById('hpfVal');
-    if (v) v.textContent = this.value + ' Hz';
-  });
-
-  document.getElementById('btnPhantom')?.addEventListener('click', function() {
-    const on = this.textContent === 'ON';
-    this.textContent = on ? 'OFF' : 'ON';
-    this.style.background = on ? 'var(--panel-border)' : '#2ecc71';
-    this.style.color = on ? '#fff' : '#000';
-  });
-
-  document.getElementById('btnPolarity')?.addEventListener('click', function() {
-    const norm = this.textContent.includes('NORM');
-    this.textContent = norm ? 'INV (-)' : 'NORM (+)';
-    this.style.color = norm ? '#e74c3c' : '#fff';
-  });
-
-  document.getElementById('gateThreshSlider')?.addEventListener('input', function() {
-    document.getElementById('gateThreshVal').textContent = this.value + ' dB';
-  });
-  document.getElementById('gateRangeSlider')?.addEventListener('input', function() {
-    document.getElementById('gateRangeVal').textContent = this.value + ' dB';
-  });
-  document.getElementById('gateRelSlider')?.addEventListener('input', function() {
-    document.getElementById('gateRelVal').textContent = this.value + ' ms';
-  });
-
-  document.getElementById('compThreshSlider')?.addEventListener('input', function() {
-    document.getElementById('compThreshVal').textContent = this.value + 'dB';
-  });
-  document.getElementById('compRatioSlider')?.addEventListener('input', function() {
-    document.getElementById('compRatioVal').textContent = this.value;
-  });
-  document.getElementById('compAttSlider')?.addEventListener('input', function() {
-    document.getElementById('compAttVal').textContent = this.value + 'ms';
-  });
-  document.getElementById('compGainSlider')?.addEventListener('input', function() {
-    document.getElementById('compGainVal').textContent = '+' + this.value;
-  });
-
-  ['Low', 'Mid1', 'Mid2', 'High'].forEach(band => {
-    document.getElementById('eq' + band + 'Slider')?.addEventListener('input', function() {
-      const bar = document.getElementById('eqBar' + band);
-      if (bar) bar.style.height = this.value + '%';
-    });
-  });
-
-  document.getElementById('bs1Slider')?.addEventListener('input', function() {
-    document.getElementById('bs1Val').textContent = this.value + 'dB';
-  });
-  document.getElementById('bs2Slider')?.addEventListener('input', function() {
-    document.getElementById('bs2Val').textContent = this.value + 'dB';
-  });
-  document.getElementById('fx1SendSlider')?.addEventListener('input', function() {
-    document.getElementById('fx1Val').textContent = this.value + 'dB';
-  });
-  document.getElementById('fx2SendSlider')?.addEventListener('input', function() {
-    document.getElementById('fx2Val').textContent = this.value === '-40' ? '-∞' : this.value + 'dB';
-  });
-
-  document.getElementById('screenFxSelect')?.addEventListener('change', function() {
-    const details = document.getElementById('fxSlotDetails');
-    if (details) details.innerHTML = `Loaded: <strong style="color:var(--accent-color);">${this.options[this.selectedIndex].text}</strong>`;
-  });
-
-  document.getElementById('screenSceneSave')?.addEventListener('click', function() {
-    const msg = document.getElementById('sceneStatusMsg');
-    if (msg) msg.textContent = "✅ Preset M32 Scene Saved Successfully!";
-  });
-
-  document.getElementById('screenSceneRecall')?.addEventListener('click', function() {
-    const msg = document.getElementById('sceneStatusMsg');
-    if (msg) msg.textContent = "⚡ Preset M32 Scene Recalled!";
-  });
-
-  // METODE UNTUK SINKRONISASI DATA LAYAR M32 & CHANNEL
-  function selectScreenChannel(id) {
-    const c = window.state?.channels?.[id - 1];
-    const set = (elemId, v) => { const e = document.getElementById(elemId); if (e) e.textContent = v; };
-    
-    set('screenInput', 'CH ' + (id < 10 ? '0' + id : id));
-    
-    if (c) {
-      set('screenFader', (c.fader !== undefined ? c.fader : 75) + '%');
-      set('screenGain', Number(c.gain || 1.0).toFixed(2));
-      set('screenPan', c.pan === 0 || c.pan === undefined ? 'CENTER' : (c.pan < 0 ? 'L ' + Math.round(Math.abs(c.pan) * 100) + '%' : 'R ' + Math.round(c.pan * 100) + '%'));
-      
-      const statusElem = document.getElementById('screenStatus');
-      if (statusElem) {
-        if (c.mute) {
-          statusElem.textContent = '[MUTED]';
-          statusElem.style.color = '#e74c3c';
-        } else if (c.solo) {
-          statusElem.textContent = '[SOLO]';
-          statusElem.style.color = '#f1c40f';
-        } else {
-          statusElem.textContent = '[ACTIVE]';
-          statusElem.style.color = '#2ecc71';
-        }
-      }
-    }
-  }
-  window.selectScreenChannel = selectScreenChannel;
-
-  // SINKRONISASI REALTIME SETIAP FADER & KONTROL CHANNEL DENGAN LAYAR M32
-  document.addEventListener('input', function(e) {
-    if (e.target.matches('.fader-area input[type="range"], .channel-fader, input[data-param="fader"]')) {
-      const strip = e.target.closest('.new-channel-strip');
-      if (strip) {
-        const chId = Number(strip.dataset.ch);
-        const val = Number(e.target.value);
-
-        const valDisplay = strip.querySelector('.fader-val, .fader-value, output');
-        if (valDisplay) valDisplay.textContent = val + '%';
-        
-        if (!window.state) window.state = { channels: [] };
-        if (!window.state.channels) window.state.channels = [];
-        if (!window.state.channels[chId - 1]) window.state.channels[chId - 1] = {};
-        window.state.channels[chId - 1].fader = val;
-        
-        const activeInput = document.getElementById('screenInput')?.textContent;
-        if (activeInput && parseInt(activeInput.replace(/\D/g, ''), 10) === chId) {
-          const sf = document.getElementById('screenFader');
-          if (sf) sf.textContent = val + '%';
-        }
-      }
-    }
-
-    if (e.target.matches('.knob-gain, [data-param="gain"]')) {
-      const strip = e.target.closest('.new-channel-strip');
-      if (strip) {
-        const chId = Number(strip.dataset.ch);
-        const val = parseFloat(e.target.value);
-        if (window.state?.channels?.[chId - 1]) {
-          window.state.channels[chId - 1].gain = val;
-        }
-        const activeInput = document.getElementById('screenInput')?.textContent;
-        if (activeInput && parseInt(activeInput.replace(/\D/g, ''), 10) === chId) {
-          const sg = document.getElementById('screenGain');
-          if (sg) sg.textContent = val.toFixed(2);
-        }
-      }
-    }
-    
-    if (e.target.matches('.knob-pan, [data-param="pan"]')) {
-      const strip = e.target.closest('.new-channel-strip');
-      if (strip) {
-        const chId = Number(strip.dataset.ch);
-        const val = parseFloat(e.target.value);
-        if (window.state?.channels?.[chId - 1]) {
-          window.state.channels[chId - 1].pan = val;
-        }
-        const activeInput = document.getElementById('screenInput')?.textContent;
-        if (activeInput && parseInt(activeInput.replace(/\D/g, ''), 10) === chId) {
-          const sp = document.getElementById('screenPan');
-          if (sp) sp.textContent = val === 0 ? 'CENTER' : (val < 0 ? 'L ' + Math.round(Math.abs(val) * 100) + '%' : 'R ' + Math.round(val * 100) + '%');
-        }
-      }
-    }
-  });
-
-  document.getElementById('channels')?.addEventListener('click', e => {
-    const ch = e.target.closest('.new-channel-strip');
-    if (ch) selectScreenChannel(Number(ch.dataset.ch));
-  });
-
-  document.getElementById('channelsRight')?.addEventListener('click', e => {
-    const ch = e.target.closest('.new-channel-strip');
-    if (ch) selectScreenChannel(Number(ch.dataset.ch));
-  });
-
-  const updateSkin = () => {
-    const adapter = window.MixerAdapters?.status?.();
-    const live = !!adapter?.connected;
-    document.getElementById('statusLamp')?.classList.toggle('live', live);
-    document.getElementById('deviceLamp')?.classList.toggle('green', live);
-    document.getElementById('deviceLamp')?.classList.toggle('red', !live);
-  };
-
-  window.initEffectEngine?.();
-  setInterval(updateSkin, 400);
-  updateSkin();
-})();
-</script>
-
-<script>
-(function(){
-  function install(){
-    var p = document.getElementById("power");
-    if(!p) return;
-    if(!window.state) window.state = {system:false, connected:false, channels:[], sim:{online:false}};
-    
-    function paint(){
-      var on = !!window.state.system;
-      var adapter = window.MixerAdapters?.active;
-      var espOnline = !!adapter?.connected && (adapter.type === "simulator" || adapter.transport === "esp32");
-      
-      window.state.connected = espOnline;
-      window.state.sim = window.state.sim || {};
-      window.state.sim.online = espOnline;
-      p.textContent = on ? "SYSTEM ON" : "SYSTEM OFF";
-      p.classList.toggle("on", on);
-      var hs = document.getElementById("headerBridgeStatus");
-      if(hs) hs.textContent = espOnline ? "BRIDGE READY" : (on ? "SYSTEM READY" : "BRIDGE STANDBY");
-      var esp = document.getElementById("connectEsp");
-      if(esp) {
-        esp.textContent = espOnline ? "ESP32 CONNECTED" : "CONNECT ESP32";
-        esp.classList.toggle("on", espOnline);
-      }
-    }
-
-    var deviceConnect = document.getElementById("deviceConnect") || document.getElementById("connectEsp");
-    var deviceDisconnect = document.getElementById("deviceDisconnect");
-    var transportSelect = document.getElementById("transportSelect");
-
-    function paintDevice(st){
-      st = st || window.MixerAdapters?.status?.() || {};
-      var online = !!st.connected;
-      var espMode = st.transport === "esp32" || st.type === "simulator";
-      var lamp = document.getElementById("deviceLamp");
-      var ds = document.getElementById("deviceStatus");
-      var dp = document.getElementById("deviceProtocol");
-      var ts = document.getElementById("transportStatus");
-      var bridge = document.getElementById("bridgeState");
-      var bt = document.getElementById("bridgeTransport");
-      var bp = document.getElementById("bridgeProtocol");
-      var footer = document.getElementById("footerConnection");
-
-      if (lamp) {
-        lamp.classList.toggle("green", online);
-        lamp.classList.toggle("red", !online);
-      }
-      if (ds) ds.textContent = online ? "🟢 ESP32 SIMULATOR ONLINE" : "🔴 ESP32 SIMULATOR OFFLINE";
-      if (dp) dp.textContent = "Protocol: " + (st.protocol || "ESP32-MIXER/1");
-      if (ts) ts.textContent = online ? "ESP32 BRIDGE ONLINE" : "OFFLINE";
-      if (bridge) bridge.textContent = online ? "ONLINE" : "OFFLINE";
-      if (bt) bt.textContent = online ? "TRANSPORT: ESP32 BRIDGE" : "TRANSPORT: —";
-      if (bp) bp.textContent = "PROTOCOL: " + (st.protocol || "ESP32-MIXER/1");
-      if (footer) footer.textContent = online ? "● ESP32 SIMULATOR ONLINE" : "● ESP32 SIMULATOR OFFLINE";
-      if (deviceConnect) {
-        deviceConnect.disabled = false;
-        deviceConnect.textContent = online ? "ESP32 CONNECTED" : "CONNECT ESP32";
-        deviceConnect.classList.toggle("on", online);
-      }
-      if (deviceDisconnect) deviceDisconnect.disabled = !online;
-      if (transportSelect) transportSelect.value = espMode ? "esp32" : (st.transport === "bluetooth" ? "bluetooth" : "esp32");
-    }
-
-    if (deviceDisconnect) deviceDisconnect.addEventListener("click", function(e){
-      e.preventDefault(); e.stopImmediatePropagation();
-      window.MixerAdapters?.disconnect?.();
-      paintDevice({connected:false,transport:"esp32",type:"simulator",protocol:"ESP32-MIXER/1"});
-    });
-
-    if (transportSelect) transportSelect.addEventListener("change", async function(){
-      if (this.value === "esp32") paintDevice({connected:false,transport:"esp32",type:"simulator",protocol:"ESP32-MIXER/1"});
-      else paintDevice({connected:false,transport:"bluetooth",type:"bluetooth",protocol:"ESP32-MIXER/1"});
-    });
-
-    window.MixerAdapters?.onStatus?.(paintDevice);
-    paintDevice();
-
-    var esp = document.getElementById("connectEsp");
-    var bt = document.getElementById("connectBluetooth");
-
-    function paintConnection(st){
-      if(!window.state) window.state = {system:false, connected:false, channels:[], sim:{online:false}};
-      var connected = !!st?.connected;
-      var isEsp = connected && (st?.type === "simulator" || st?.transport === "esp32");
-      window.state.connected = connected;
-      window.state.sim = window.state.sim || {};
-      window.state.sim.online = isEsp;
-      var status = document.getElementById("status");
-      var lamp = document.getElementById("statusLamp");
-      var bridgeState = document.getElementById("bridgeState");
-      var bridgeTransport = document.getElementById("bridgeTransport");
-      var bridgeProtocol = document.getElementById("bridgeProtocol");
-      var stats = window.MixerAdapters?.getTransportStats?.();
-
-      if(status) status.textContent = connected ? "ONLINE" : "OFFLINE";
-      if(lamp) lamp.classList.toggle("on", connected);
-      if(esp){
-        esp.textContent = isEsp ? "ESP32 CONNECTED" : "CONNECT ESP32";
-        esp.classList.toggle("on", isEsp);
-      }
-      if(bridgeState) bridgeState.textContent = isEsp ? "ONLINE" : "OFFLINE";
-      if(bridgeTransport) bridgeTransport.textContent = isEsp ? "TRANSPORT: ESP32" : "TRANSPORT: —";
-      if(bridgeProtocol) bridgeProtocol.textContent = st?.protocol || "PROTOCOL: ESP32-MIXER/1";
-      
-      var tx=document.getElementById("bridgeTx"), rx=document.getElementById("bridgeRx"), ack=document.getElementById("bridgeAck");
-      if(tx && stats) tx.textContent=stats.tx;
-      if(rx && stats) rx.textContent=stats.rx;
-      if(ack && stats) ack.textContent=stats.ack;
-
-      var txPanel = document.getElementById("tx");
-      var rxPanel = document.getElementById("rx");
-      if (txPanel && st?.lastTx) txPanel.textContent = "TX: " + JSON.stringify(st.lastTx);
-      if (rxPanel && st?.lastRx) rxPanel.textContent = "RX: " + JSON.stringify(st.lastRx);
-
-      paint();
-    }
-
-    if(window.MixerAdapters?.onStatus) window.MixerAdapters.onStatus(paintConnection);
-
-    if(esp) esp.addEventListener("click", async function(e){
-      e.preventDefault();
-      e.stopImmediatePropagation();
-
-      var api = window.MixerAdapters;
-      window.state = window.state || {system:false, connected:false, channels:[], sim:{online:false}};
-
-      if(!window.state.system){
-        paintConnection({connected:false,type:"simulator",transport:"esp32",protocol:"ESP32-MIXER/1",lastError:"SYSTEM_OFF"});
-        return;
-      }
-
-      if(api?.active?.connected && (api.active.type === "simulator" || api.active.transport === "esp32")){
-        api.disconnect();
-        window.state.connected = false;
-        window.state.sim.online = false;
-        paintConnection({connected:false,type:"simulator",transport:"esp32",protocol:"ESP32-MIXER/1"});
-        return;
-      }
-
-      esp.disabled = true;
-      esp.textContent = "CONNECTING...";
-      try {
-        if(!api?.connectESP32) throw new Error("ESP32 adapter tidak tersedia");
-        var control = window.MixerControl;
-        if(!control?.connectESP32) throw new Error("MixerControl belum siap");
-        
-        var result = await control.connectESP32();
-        if(!result?.ok || result.connected !== true) throw new Error(result?.reason || "ESP32 bridge gagal");
-
-        const live = api.active?.connected ? api.active : result;
-        window.state.connected = true;
-        window.state.sim.online = true;
-        paintConnection(live);
-        paintDevice(live);
-        paint();
-      } catch(error) {
-        window.state.connected = false;
-        window.state.sim.online = false;
-        paintConnection({connected:false,type:"simulator",transport:"esp32",protocol:"ESP32-MIXER/1",lastError:error?.message || String(error)});
-        paintDevice({connected:false,type:"simulator",transport:"esp32",protocol:"ESP32-MIXER/1"});
-      } finally {
-        esp.disabled = false;
-      }
-    });
-
-    if(bt) bt.addEventListener("click", async function(e){
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      bt.disabled = true;
-      try {
-        const result = await window.MixerAdapters?.connectBluetooth?.();
-        if(!result?.ok){
-          var status = document.getElementById("status");
-          if(status) status.textContent = "OFFLINE";
-        }
-      } finally {
-        bt.disabled = false;
-      }
-    });
-
-    p.addEventListener("click", function(){
-      window.state.system = !window.state.system;
-
-      if(!window.state.system && window.MixerAdapters?.active?.connected){
-        window.MixerAdapters.disconnect();
-        window.state.connected = false;
-        window.state.sim = window.state.sim || {};
-        window.state.sim.online = false;
-      }
-      paintConnection(window.MixerAdapters?.status?.() || {
-        connected:false,type:"none",transport:"none",protocol:"none"
-      });
-      paintDevice(window.MixerAdapters?.status?.());
-      paint();
-    });
-    paint();
-  }
-
-  if(document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", install);
+  // Render Channel saat DOM Loaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderChannelsOverride);
   } else {
-    install();
-  }
-})();
-</script>
-
-<script>
-(function(){
-  const musicBtn = document.getElementById('btnPlayerMusic');
-  const fileBtn = document.getElementById('btnPlayerFile');
-  const fileInput = document.getElementById('localAudioLoader');
-  const targetLabel = document.getElementById('activePlayerTarget');
-  const playPauseBtn = document.getElementById('btnPlayPauseAudio');
-  const trackInfo = document.getElementById('playerTrackInfo');
-  const modeBtn = document.getElementById('btnPlayerMode');
-  const modeText = document.getElementById('modeText');
-
-  const masterMeterL = document.getElementById('masterMeterL');
-  const masterMeterR = document.getElementById('masterMeterR');
-  const masterFader = document.getElementById('master');
-  const masterValElem = document.getElementById('masterVal');
-
-  let audioCtx = null;
-  let sourceNode = null;
-  let gainNode = null;
-  let panNode = null;
-  let analyserNode = null;
-  let currentAudioElement = null;
-
-  let playlist = [];
-  let currentTrackIndex = 0;
-  let isShuffle = false;
-  let lockedMusicChannel = null;
-
-  // SINKRONISASI UPDATE MASTER FADER
-  if (masterFader) {
-    masterFader.addEventListener('input', function() {
-      if (masterValElem) masterValElem.textContent = this.value + '%';
-    });
-  }
-
-  // SUNTIKAN INDIKATOR VU METER MINI DI ATAS GAIN PADA SETIAP CHANNEL
-  function injectTopVuMeters() {
-    const strips = document.querySelectorAll('.new-channel-strip');
-    strips.forEach(strip => {
-      if (!strip.querySelector('.ch-top-vu')) {
-        const topVu = document.createElement('div');
-        topVu.className = 'ch-top-vu';
-        topVu.innerHTML = '<div class="ch-top-vu-fill"></div>';
-        
-        const chNumLabel = strip.querySelector('.ch-number, .channel-label') || strip.firstChild;
-        if (chNumLabel && chNumLabel.parentNode) {
-          chNumLabel.parentNode.insertBefore(topVu, chNumLabel.nextSibling);
-        } else {
-          strip.insertBefore(topVu, strip.firstChild);
-        }
-      }
-    });
-  }
-
-  function initAudioEngine(audioElement) {
-    if (!audioCtx) {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      audioCtx = new AudioContext();
-    }
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
-
-    if (!sourceNode) {
-      sourceNode = audioCtx.createMediaElementSource(audioElement);
-      gainNode = audioCtx.createGain();
-      analyserNode = audioCtx.createAnalyser();
-      analyserNode.fftSize = 64;
-      
-      if (audioCtx.createStereoPanner) {
-        panNode = audioCtx.createStereoPanner();
-        sourceNode.connect(gainNode);
-        gainNode.connect(panNode);
-        panNode.connect(analyserNode);
-        analyserNode.connect(audioCtx.destination);
-      } else {
-        sourceNode.connect(gainNode);
-        gainNode.connect(analyserNode);
-        analyserNode.connect(audioCtx.destination);
-      }
-    }
-  }
-
-  function playTrack(index) {
-    if (playlist.length === 0 || index < 0 || index >= playlist.length) return;
-
-    currentTrackIndex = index;
-    const file = playlist[currentTrackIndex];
-    const fileObjectURL = URL.createObjectURL(file);
-
-    if (!currentAudioElement) {
-      currentAudioElement = document.createElement('audio');
-      currentAudioElement.loop = false;
-      document.body.appendChild(currentAudioElement);
-
-      currentAudioElement.addEventListener('ended', playNextTrack);
-    }
-
-    currentAudioElement.src = fileObjectURL;
-    currentAudioElement.play().then(() => {
-      initAudioEngine(currentAudioElement);
-      
-      if (trackInfo) {
-        trackInfo.textContent = `[${currentTrackIndex + 1}/${playlist.length}] ${file.name}`;
-      }
-      if (playPauseBtn) {
-        playPauseBtn.textContent = '⏸ PAUSE';
-        playPauseBtn.style.background = '#e74c3c';
-      }
-      const tr = document.getElementById('testResult');
-      if(tr) tr.textContent = `PLAYER: Memutar "${file.name}" terkunci di Channel ${lockedMusicChannel}`;
-    }).catch(err => console.error("Gagal memutar audio:", err));
-  }
-
-  function playNextTrack() {
-    if (playlist.length === 0) return;
-
-    if (isShuffle) {
-      let nextIndex = Math.floor(Math.random() * playlist.length);
-      if (playlist.length > 1 && nextIndex === currentTrackIndex) {
-        nextIndex = (currentTrackIndex + 1) % playlist.length;
-      }
-      playTrack(nextIndex);
-    } else {
-      let nextIndex = currentTrackIndex + 1;
-      if (nextIndex < playlist.length) {
-        playTrack(nextIndex);
-      } else {
-        playTrack(0);
-      }
-    }
-  }
-
-  // LOOPING ANIMASI REALTIME UNTUK INDIKATOR VUMETER CHANNEL & MASTER L/R
-  function updateIndicators() {
-    requestAnimationFrame(updateIndicators);
-
-    injectTopVuMeters();
-
-    const activeInput = document.getElementById('screenInput');
-    const screenGain = document.getElementById('screenGain');
-    const screenFader = document.getElementById('screenFader');
-    const screenPan = document.getElementById('screenPan');
-
-    if (targetLabel) {
-      if (lockedMusicChannel !== null) {
-        targetLabel.textContent = "[CH " + lockedMusicChannel + " LOCKED]";
-      } else if (activeInput) {
-        targetLabel.textContent = "[" + activeInput.textContent.trim() + "]";
-      }
-    }
-
-    const currentChannelStr = activeInput?.textContent || "CH 1";
-    const screenChNum = parseInt(currentChannelStr.replace(/\D/g, ''), 10) || 1;
-    const chNum = (lockedMusicChannel !== null) ? lockedMusicChannel : screenChNum;
-
-    if (window.state && window.state.channels) {
-      const chData = window.state.channels[chNum - 1] || {};
-      const screenData = window.state.channels[screenChNum - 1] || {};
-
-      if (screenData) {
-        if (screenGain) screenGain.textContent = Number(screenData.gain || 1.0).toFixed(2);
-        if (screenFader) sfaderText = (screenData.fader !== undefined ? screenData.fader : 75) + '%';
-        if (screenFader) screenFader.textContent = sfaderText;
-        if (screenPan) {
-          const panVal = screenData.pan || 0;
-          screenPan.textContent = panVal === 0 ? 'CENTER' : (panVal < 0 ? 'L ' + Math.round(Math.abs(panVal) * 100) + '%' : 'R ' + Math.round(panVal * 100) + '%');
-        }
-      }
-
-      if (analyserNode && currentAudioElement && !currentAudioElement.paused) {
-        const dataArray = new Uint8Array(analyserNode.frequencyBinCount);
-        analyserNode.getByteFrequencyData(dataArray);
-
-        // Update Spektrum Screen M32 & RTA
-        const barCols = document.querySelectorAll('.pro-mini-spectrum .bar-col, .rta-bars div');
-        barCols.forEach((bar, idx) => {
-          const val = dataArray[idx % dataArray.length] || 10;
-          bar.style.height = Math.max(10, Math.min(100, (val / 255) * 100)) + '%';
-        });
-
-        let avgLevel = 0;
-        for (let i = 0; i < dataArray.length; i++) {
-          avgLevel += dataArray[i];
-        }
-        avgLevel = (avgLevel / dataArray.length) / 255;
-
-        const masterValElem = document.getElementById('masterVal');
-        const masterVolumeScale = masterValElem ? (parseInt(masterValElem.textContent, 10) || 75) / 100 : 0.75;
-        const channelFaderScale = ((chData.fader !== undefined ? chData.fader : 75)) / 100;
-
-        const panVal = chData.pan || 0;
-        const leftPan = panVal <= 0 ? 1 : 1 - panVal;
-        const rightPan = panVal >= 0 ? 1 : 1 + panVal;
-
-        const leftHeight = Math.min(100, avgLevel * 100 * channelFaderScale * masterVolumeScale * leftPan);
-        const rightHeight = Math.min(100, avgLevel * 100 * channelFaderScale * masterVolumeScale * rightPan);
-
-        // Update Indikator Output Master L/R
-        if (masterMeterL) masterMeterL.style.height = leftHeight + '%';
-        if (masterMeterR) masterMeterR.style.height = rightHeight + '%';
-
-        // Update Indikator VU Meter Mini di Atas Gain Setiap Channel (1–14)
-        document.querySelectorAll('.new-channel-strip').forEach(strip => {
-          const cId = Number(strip.dataset.ch);
-          const cState = window.state.channels[cId - 1] || {};
-          const cFaderScale = ((cState.fader !== undefined ? cState.fader : 75)) / 100;
-          const topVuFill = strip.querySelector('.ch-top-vu-fill');
-          
-          if (topVuFill) {
-            topVuFill.style.width = Math.min(100, avgLevel * 100 * cFaderScale) + '%';
-          }
-        });
-
-        if (gainNode) {
-          const gainVal = (parseFloat(chData.gain) || 1.0) * channelFaderScale;
-          gainNode.gain.setValueAtTime(Math.max(0, Math.min(2.0, gainVal)), audioCtx.currentTime);
-        }
-
-        if (panNode && typeof chData.pan !== 'undefined') {
-          panNode.pan.setValueAtTime(Math.max(-1.0, Math.min(1.0, chData.pan)), audioCtx.currentTime);
-        }
-      } else {
-        if (masterMeterL) masterMeterL.style.height = '0%';
-        if (masterMeterR) masterMeterR.style.height = '0%';
-        document.querySelectorAll('.ch-top-vu-fill').forEach(fill => fill.style.width = '0%');
-      }
-    }
-  }
-
-  requestAnimationFrame(updateIndicators);
-
-  if(musicBtn) musicBtn.addEventListener('click', () => fileInput?.click());
-  if(fileBtn) fileBtn.addEventListener('click', () => fileInput?.click());
-
-  if(modeBtn) {
-    modeBtn.addEventListener('click', () => {
-      isShuffle = !isShuffle;
-      if (modeText) modeText.textContent = isShuffle ? 'SHUFFLE' : 'SEQ';
-      modeBtn.style.borderColor = isShuffle ? 'var(--accent-color)' : 'var(--panel-border)';
-    });
-  }
-
-  if(playPauseBtn) {
-    playPauseBtn.addEventListener('click', () => {
-      if(!currentAudioElement || playlist.length === 0) {
-        fileInput?.click();
-        return;
-      }
-      if(currentAudioElement.paused) {
-        currentAudioElement.play();
-        playPauseBtn.textContent = '⏸ PAUSE';
-        playPauseBtn.style.background = '#e74c3c';
-      } else {
-        currentAudioElement.pause();
-        playPauseBtn.textContent = '▶ PLAY';
-        playPauseBtn.style.background = 'var(--accent-color)';
-      }
-    });
-  }
-
-  if(fileInput) {
-    fileInput.addEventListener('change', function(e) {
-      const files = Array.from(e.target.files);
-      if(files.length === 0) return;
-      
-      playlist = files;
-      const currentChannelStr = document.getElementById('screenInput')?.textContent || "CH 1";
-      lockedMusicChannel = parseInt(currentChannelStr.replace(/\D/g, ''), 10) || 1;
-
-      playTrack(0);
-    });
-  }
-
-  const fxButtons = document.querySelectorAll('.fx-buttons button');
-  const fxPresetName = document.getElementById('fxRackPreset');
-
-  fxButtons.forEach(btn => {
-    btn.addEventListener('click', function() {
-      fxButtons.forEach(b => b.classList.remove('active'));
-      this.classList.add('active');
-      const target = this.dataset.fxSelect;
-      if (fxPresetName) fxPresetName.textContent = target + " ACTIVE";
-    });
-  });
-
-  const fxControls = document.querySelectorAll('.fx-control');
-  fxControls.forEach(input => {
-    input.addEventListener('input', function() {
-      const param = this.dataset.param;
-      const val = this.value;
-      const output = this.parentElement.querySelector('output');
-      
-      if (output) {
-        if (param === 'time') output.textContent = val + 's';
-        else if (param === 'preDelay') output.textContent = val + 'ms';
-        else if (param === 'decay') output.textContent = val + '%';
-        else if (param === 'level') output.textContent = val + 'dB';
-        else output.textContent = val;
-      }
-    });
-  });
-
-  const auxControls = document.querySelectorAll('.aux-control');
-  auxControls.forEach(input => {
-    input.addEventListener('input', function() {
-      const target = this.dataset.target;
-      const scope = this.dataset.scope || 'AUX';
-      const val = Math.round(this.value * 100);
-      
-      const tr = document.getElementById('testResult');
-      if (tr) tr.textContent = `${scope} [${target}] Value: ${val}%`;
-    });
-  });
-
-})();
-
-// Switcher Skin Mixer
-(function() {
-  const skinSelect = document.getElementById('skinSelect');
-  
-  const savedSkin = localStorage.getItem('mixer_theme') || 'theme-midas';
-  document.body.className = savedSkin;
-  if (skinSelect) skinSelect.value = savedSkin;
-
-  if (skinSelect) {
-    skinSelect.addEventListener('change', function() {
-      const selectedTheme = this.value;
-      document.body.className = selectedTheme;
-      localStorage.setItem('mixer_theme', selectedTheme);
-    });
+    renderChannelsOverride();
   }
 })();
 </script>
