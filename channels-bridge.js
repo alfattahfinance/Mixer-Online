@@ -64,14 +64,14 @@
     }
   };
 
-  // Helper fungsi untuk memperbarui readout di layar tengah secara instan dan menyeluruh
+  // Helper fungsi untuk memperbarui readout di layar tengah secara instan
   function updateScreenReadoutsLive(chNum, param, val) {
     const screenInputEl = document.getElementById("screenInput");
-    if (screenInputEl) screenInputEl.textContent = "CH" + chNum;
+    if (screenInputEl) screenInputEl.textContent = "CH " + (chNum < 10 ? "0" + chNum : chNum);
 
     if (param === "fader") {
       const el = document.getElementById("screenFader");
-      if (el) el.textContent = val + "%";
+      if (el) el.textContent = Math.round(val) + "%";
     } else if (param === "gain") {
       const el = document.getElementById("screenGain");
       if (el) el.textContent = Number(val).toFixed(2);
@@ -81,9 +81,10 @@
         el.textContent = val === 0 ? "CENTER" : (val < 0 ? "L " + Math.round(Math.abs(val) * 100) + "%" : "R " + Math.round(val * 100) + "%");
       }
     } else if (param === "mute" || param === "solo") {
-      const el = document.getElementById("screenStatusBadge");
+      const el = document.getElementById("screenStatus");
       if (el) {
-        el.textContent = val ? (param === "mute" ? "MUTED" : "SOLO") : "READY";
+        el.textContent = val ? (param === "mute" ? "[MUTED]" : "[SOLO]") : "[ACTIVE]";
+        el.style.color = val ? (param === "mute" ? "#e74c3c" : "#f1c40f") : "#2ecc71";
       }
     }
   }
@@ -105,13 +106,22 @@
           // 1. Update state lokal
           window.state.channels[chNum - 1][param] = val;
 
-          // 2. Update posisi slider / kontrol fisik di web secara otomatis
-          const targetElement = document.querySelector(`[data-ch="${chNum}"][data-param="${param}"]`);
-          if (targetElement && parseFloat(targetElement.value) !== parseFloat(val)) {
-            targetElement.value = val;
+          // 2. Update posisi slider / kontrol fisik di web (mendukung data-param & data-k)
+          const channelStrip = document.querySelector(`.new-channel-strip[data-ch="${chNum}"]`);
+          if (channelStrip) {
+            const targetElement = channelStrip.querySelector(`[data-k="${param}"], [data-param="${param}"]`);
+            if (targetElement && parseFloat(targetElement.value) !== parseFloat(val)) {
+              targetElement.value = val;
+            }
+
+            // Update teks output pada channel strip
+            if (param === "fader") {
+              const out = channelStrip.querySelector("output, .fader-val");
+              if (out) out.textContent = Math.round(val) + "%";
+            }
           }
 
-          // 3. Update layar tengah jika channel tersebut sedang aktif dilihat
+          // 3. Update layar tengah jika channel tersebut aktif
           if (typeof window.selectScreenChannel === "function") {
             window.selectScreenChannel(chNum);
           }
@@ -119,8 +129,6 @@
           // 4. Perbarui readout layar & lampu LED secara live
           updateScreenReadoutsLive(chNum, param, val);
           window.updateAllChannelLeds();
-
-          console.log(`[INPUT/OUTPUT RX SYNC] CH${chNum} [${param}] di-update dari hardware ke -> ${val}`);
         }
       }
     } catch (err) {
@@ -128,7 +136,7 @@
     }
   };
 
-  // Penanganan input langsung di web yang super responsif (TX)
+  // Penanganan input langsung di web (TX)
   document.addEventListener("input", (e) => {
     const target = e.target;
     const param = target.dataset.param || target.dataset.k;
@@ -140,25 +148,29 @@
 
     if (isNaN(chNum) || isNaN(val)) return;
 
-    e.stopImmediatePropagation();
-
     // 1. Update state lokal
     if (window.state.channels[chNum - 1]) {
       window.state.channels[chNum - 1][param] = val;
     }
 
-    // 2. Pilih channel otomatis di layar
+    // 2. Update teks persen fader lokal langsung
+    if (param === "fader") {
+      const out = strip.querySelector("output, .fader-val");
+      if (out) out.textContent = Math.round(val) + "%";
+    }
+
+    // 3. Pilih channel otomatis di layar M32
     if (typeof window.selectScreenChannel === "function") {
       window.selectScreenChannel(chNum);
     }
 
-    // 3. Perbarui readout teks layar tengah & lampu LED secara instan
+    // 4. Perbarui readout teks layar tengah & lampu LED secara instan
     updateScreenReadoutsLive(chNum, param, val);
     window.updateAllChannelLeds();
 
-    // 4. Kirim perubahan ke hardware
+    // 5. Kirim perubahan ke hardware
     window.sendChannelParamToHardware(chNum, param, val);
-  }, true);
+  });
 
   // Penanganan tombol Mute / Solo
   document.addEventListener("click", (e) => {
@@ -172,13 +184,15 @@
     const action = target.dataset.action || target.dataset.k;
     
     if (!isNaN(chNum) && (action === "mute" || action === "solo")) {
-      e.stopImmediatePropagation();
       const channel = window.state.channels[chNum - 1];
       if (!channel) return;
 
       channel[action] = !channel[action];
       target.classList.toggle("active", channel[action]);
       target.classList.toggle("on", channel[action]);
+      target.textContent = channel[action] 
+        ? (action === "mute" ? "UNMUTE" : "UNSOLO") 
+        : (action === "mute" ? "MUTE" : "SOLO");
 
       if (typeof window.selectScreenChannel === "function") {
         window.selectScreenChannel(chNum);
@@ -188,7 +202,7 @@
       window.updateAllChannelLeds();
       window.sendChannelParamToHardware(chNum, action, channel[action]);
     }
-  }, true);
+  });
 
   // Inisialisasi awal lampu LED saat halaman selesai dimuat
   setTimeout(() => {
@@ -241,4 +255,3 @@
     });
   }
 })();
-
