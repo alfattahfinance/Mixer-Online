@@ -22,6 +22,15 @@
     }
   }
 
+  // Helper Format Teks Knob
+  function formatKnobVal(param, val) {
+    const num = Number(val);
+    if (param === "gain") return num.toFixed(2);
+    if (param === "pan") return num === 0 ? "MID" : (num < 0 ? "L" + Math.round(Math.abs(num) * 100) : "R" + Math.round(num * 100));
+    if (["high", "mid", "low"].includes(param)) return (num > 0 ? "+" : "") + num + "dB";
+    return num;
+  }
+
   // Fungsi pengiriman parameter ke hardware (TX)
   window.sendChannelParamToHardware = function(chNum, paramName, value) {
     const payload = {
@@ -44,22 +53,36 @@
     }
   };
 
-  // Fungsi global untuk memperbarui lampu indikator LED pada ke-14 channel
+  // Fungsi global untuk memperbarui lampu LED & VU Meter pada ke-14 channel
   window.updateAllChannelLeds = function() {
     for (let i = 1; i <= 14; i++) {
       const ch = window.state.channels[i - 1];
-      const channelStrip = document.querySelector(`.new-channel-strip[data-ch="${i}"]`);
+      const channelStrip = document.querySelector(`.new-channel-strip[data-ch="${i}"], .channel-strip[data-ch="${i}"]`);
       if (!channelStrip || !ch) continue;
 
+      // 1. Update Lampu LED Indikator Status
       const ledEl = channelStrip.querySelector('.channel-led');
-      if (!ledEl) continue;
+      if (ledEl) {
+        if (ch.mute) {
+          ledEl.className = "channel-led active red";
+        } else if (Number(ch.fader) > 0 || Number(ch.gain) > 0) {
+          ledEl.className = "channel-led active green";
+        } else {
+          ledEl.className = "channel-led";
+        }
+      }
 
-      if (ch.mute) {
-        ledEl.className = "channel-led active red";
-      } else if (Number(ch.fader) > 0 || Number(ch.gain) > 0) {
-        ledEl.className = "channel-led active green";
-      } else {
-        ledEl.className = "channel-led";
+      // 2. Update Isian VU Meter Mini (Hijau-Kuning-Merah)
+      const topVuFill = channelStrip.querySelector('.ch-top-vu-fill');
+      if (topVuFill) {
+        if (ch.mute) {
+          topVuFill.style.width = '0%';
+        } else {
+          const cGain = parseFloat(ch.gain ?? 1.0);
+          const cFader = parseFloat(ch.fader ?? 75) / 100;
+          const level = (cGain * cFader * 65);
+          topVuFill.style.width = Math.min(100, Math.max(0, level)) + '%';
+        }
       }
     }
   };
@@ -106,27 +129,37 @@
           // 1. Update state lokal
           window.state.channels[chNum - 1][param] = val;
 
-          // 2. Update posisi slider / kontrol fisik di web (mendukung data-param & data-k)
-          const channelStrip = document.querySelector(`.new-channel-strip[data-ch="${chNum}"]`);
+          // 2. Update posisi slider & teks di channel strip
+          const channelStrip = document.querySelector(`.new-channel-strip[data-ch="${chNum}"], .channel-strip[data-ch="${chNum}"]`);
           if (channelStrip) {
             const targetElement = channelStrip.querySelector(`[data-k="${param}"], [data-param="${param}"]`);
             if (targetElement && parseFloat(targetElement.value) !== parseFloat(val)) {
               targetElement.value = val;
             }
 
-            // Update teks output pada channel strip
             if (param === "fader") {
               const out = channelStrip.querySelector("output, .fader-val");
               if (out) out.textContent = Math.round(val) + "%";
+            } else {
+              const knobTxt = channelStrip.querySelector(`.knob-val[data-val="${param}"]`);
+              if (knobTxt) knobTxt.textContent = formatKnobVal(param, val);
+            }
+
+            if (param === "mute" || param === "solo") {
+              const btn = channelStrip.querySelector(`button[data-k="${param}"]`);
+              if (btn) {
+                btn.classList.toggle("on", Boolean(val));
+                btn.classList.toggle("active", Boolean(val));
+                btn.textContent = Boolean(val) ? (param === "mute" ? "UNMUTE" : "UNSOLO") : (param === "mute" ? "MUTE" : "SOLO");
+              }
             }
           }
 
-          // 3. Update layar tengah jika channel tersebut aktif
+          // 3. Update layar tengah
           if (typeof window.selectScreenChannel === "function") {
             window.selectScreenChannel(chNum);
           }
 
-          // 4. Perbarui readout layar & lampu LED secara live
           updateScreenReadoutsLive(chNum, param, val);
           window.updateAllChannelLeds();
         }
@@ -136,11 +169,11 @@
     }
   };
 
-  // Penanganan input langsung di web (TX)
+  // Penanganan input slider / knob langsung di web (TX)
   document.addEventListener("input", (e) => {
     const target = e.target;
     const param = target.dataset.param || target.dataset.k;
-    const strip = target.closest(".new-channel-strip");
+    const strip = target.closest(".new-channel-strip, .channel-strip");
     if (!strip || !param) return;
 
     const chNum = parseInt(strip.dataset.ch, 10);
@@ -148,61 +181,74 @@
 
     if (isNaN(chNum) || isNaN(val)) return;
 
-    // 1. Update state lokal
+    // Update state
     if (window.state.channels[chNum - 1]) {
       window.state.channels[chNum - 1][param] = val;
     }
 
-    // 2. Update teks persen fader lokal langsung
+    // Update Teks Label
     if (param === "fader") {
       const out = strip.querySelector("output, .fader-val");
       if (out) out.textContent = Math.round(val) + "%";
+    } else {
+      const knobTxt = strip.querySelector(`.knob-val[data-val="${param}"]`);
+      if (knobTxt) knobTxt.textContent = formatKnobVal(param, val);
     }
 
-    // 3. Pilih channel otomatis di layar M32
     if (typeof window.selectScreenChannel === "function") {
       window.selectScreenChannel(chNum);
     }
 
-    // 4. Perbarui readout teks layar tengah & lampu LED secara instan
     updateScreenReadoutsLive(chNum, param, val);
     window.updateAllChannelLeds();
-
-    // 5. Kirim perubahan ke hardware
     window.sendChannelParamToHardware(chNum, param, val);
   });
 
-  // Penanganan tombol Mute / Solo
+  // Penanganan tombol Mute / Solo SUPER RESPONSIF (Instant UI)
   document.addEventListener("click", (e) => {
-    const target = e.target.closest('[data-action], button[data-k="mute"], button[data-k="solo"]');
+    const target = e.target.closest('button[data-k="mute"], button[data-k="solo"], [data-action="mute"], [data-action="solo"]');
     if (!target) return;
 
-    const strip = target.closest(".new-channel-strip");
+    const strip = target.closest(".new-channel-strip, .channel-strip");
     if (!strip) return;
 
     const chNum = parseInt(strip.dataset.ch, 10);
-    const action = target.dataset.action || target.dataset.k;
+    const action = target.dataset.k || target.dataset.action;
     
     if (!isNaN(chNum) && (action === "mute" || action === "solo")) {
+      e.stopPropagation(); // Hentikan bentrokan event listener lain
+
       const channel = window.state.channels[chNum - 1];
       if (!channel) return;
 
+      // Toggle state lokal
       channel[action] = !channel[action];
-      target.classList.toggle("active", channel[action]);
-      target.classList.toggle("on", channel[action]);
-      target.textContent = channel[action] 
+      const nextState = channel[action];
+
+      // Update UI Tombol Seketika
+      target.classList.toggle("active", nextState);
+      target.classList.toggle("on", nextState);
+      target.textContent = nextState 
         ? (action === "mute" ? "UNMUTE" : "UNSOLO") 
         : (action === "mute" ? "MUTE" : "SOLO");
+
+      // Update Teks Footer
+      const statusSpan = strip.querySelector("footer span");
+      if (statusSpan) {
+        statusSpan.textContent = channel.mute ? "MUTED" : (channel.solo ? "SOLO" : "READY");
+      }
 
       if (typeof window.selectScreenChannel === "function") {
         window.selectScreenChannel(chNum);
       }
 
-      updateScreenReadoutsLive(chNum, action, channel[action]);
+      updateScreenReadoutsLive(chNum, action, nextState);
       window.updateAllChannelLeds();
-      window.sendChannelParamToHardware(chNum, action, channel[action]);
+
+      // Kirim ke ESP32 secara asynchronous
+      window.sendChannelParamToHardware(chNum, action, nextState);
     }
-  });
+  }, true); // High priority event capture
 
   // Inisialisasi awal lampu LED saat halaman selesai dimuat
   setTimeout(() => {
