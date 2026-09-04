@@ -11,6 +11,13 @@
 <link rel="stylesheet" href="channel-skin.css?v=20260904-PERFECT-LAYOUT">
 <link rel="stylesheet" href="header-system.css?v=20260904-PERFECT-LAYOUT">
 <link rel="stylesheet" href="channels-new.css?v=20260904-PERFECT-LAYOUT">
+<link rel="manifest" href="manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
+</script>
+
 
 <style>
   /* ==========================================================
