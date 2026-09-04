@@ -47,7 +47,11 @@
       <div class="new-channel-control"><label>MID</label><input class="new-knob" data-k="mid" type="range" min="-12" max="12" step="1" value="${Number(c.mid ?? 0)}"></div>
       <div class="new-channel-control"><label>LOW</label><input class="new-knob" data-k="low" type="range" min="-12" max="12" step="1" value="${Number(c.low ?? 0)}"></div>
       <div class="new-channel-control"><label>PAN</label><input class="new-knob" data-k="pan" type="range" min="-1" max="1" step=".01" value="${Number(c.pan ?? 0)}"></div>
-      <div class="new-channel-fader"><label>VOLUME</label><input class="new-fader" data-k="fader" type="range" min="0" max="100" step="1" value="${Number(c.fader ?? 75)}"><output>${Number(c.fader ?? 75)}%</output></div>
+      <div class="fader-area new-channel-fader">
+        <label>VOLUME</label>
+        <input class="new-fader channel-fader" data-k="fader" type="range" min="0" max="100" step="1" value="${Number(c.fader ?? 75)}">
+        <output class="fader-val">${Number(c.fader ?? 75)}%</output>
+      </div>
       <div class="new-channel-buttons">
         <button type="button" data-k="mute" class="${c.mute ? "on" : ""}">${c.mute ? "UNMUTE" : "MUTE"}</button>
         <button type="button" data-k="solo" class="${c.solo ? "on" : ""}">${c.solo ? "UNSOLO" : "SOLO"}</button>
@@ -75,6 +79,11 @@
         }
       }
 
+      // Otomatis pindahkan Layar M32 ke channel yang sedang diubah & update display
+      if (typeof window.selectScreenChannel === "function") {
+        window.selectScreenChannel(id);
+      }
+
       // Perbarui status lampu indikator LED secara real-time
       const ledEl = el.querySelector(".channel-led");
       if (ledEl) {
@@ -87,8 +96,6 @@
         }
       }
 
-      // GAIN dan VOLUME adalah kontrol terpisah.
-      // Menggerakkan VOLUME tidak boleh mengubah GAIN.
       const result = window.MixerControl?.setControl?.(id, k, ch[k]);
       const r = $("testResult");
       if (r) {
@@ -163,7 +170,6 @@
       const o = el.querySelector("output"); 
       if (o) o.textContent = Math.round(Number(c.fader ?? 75)) + "%";
 
-      // Sinkronisasi status LED saat fungsi sync dipanggil
       const ledEl = el.querySelector(".channel-led");
       if (ledEl) {
         if (c.mute) {
@@ -193,7 +199,6 @@
     left.innerHTML = ""; 
     right.innerHTML = "";
     ensureState();
-    // 7 Channels di kiri (1-7), 7 Channels di kanan (8-14)
     for (let i = 1; i <= N; i++) {
       (i <= 7 ? left : right).appendChild(make(i));
     }
