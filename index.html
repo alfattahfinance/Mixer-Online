@@ -6,15 +6,15 @@
 <meta name="theme-color" content="#090b0c">
 <title>MIXER-ONLINE • Midas M32 Pro Edition</title>
 
-<!-- Pembaruan versi query (Cache-Buster) agar tablet memaksa muat CSS baru -->
-<link rel="stylesheet" href="style.css?v=20260904-FIX-FINAL">
-<link rel="stylesheet" href="channel-skin.css?v=20260904-FIX-FINAL">
-<link rel="stylesheet" href="header-system.css?v=20260904-FIX-FINAL">
-<link rel="stylesheet" href="channels-new.css?v=20260904-FIX-FINAL">
+<!-- Pembaruan versi query (Cache-Buster) -->
+<link rel="stylesheet" href="style.css?v=20260904-FIX-MASTER">
+<link rel="stylesheet" href="channel-skin.css?v=20260904-FIX-MASTER">
+<link rel="stylesheet" href="header-system.css?v=20260904-FIX-MASTER">
+<link rel="stylesheet" href="channels-new.css?v=20260904-FIX-MASTER">
 
 <style>
   /* ==========================================================
-     DEFINISI VARIABEL WARNA (SKIN)
+     1. DEFINISI VARIABEL WARNA (SKIN)
      ========================================================== */
   body, body.theme-midas {
     --main-bg: #090b0c;
@@ -65,23 +65,22 @@
   }
 
   /* ==========================================================
-     RESET & SKINNER GLOBAL
+     2. GLOBAL RESET & OVERRIDE
      ========================================================== */
-  * {
+  *, *::before, *::after {
     box-sizing: border-box !important;
   }
 
   body {
     background: var(--main-bg) !important;
     color: var(--text-main) !important;
-    margin: 0;
-    padding: 0;
-    font-family: system-ui, -apple-system, sans-serif;
-    overflow-x: auto;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-family: system-ui, -apple-system, sans-serif !important;
+    overflow-x: auto !important; /* Scroll horizontal jika layar kurang lebar */
   }
 
-  header.topbar,
-  .system-box, .bridge-head, .status-head, .scene-head, .clock-head, .skin-head,
+  header.topbar, .system-box, .bridge-head, .status-head, .scene-head, .clock-head, .skin-head,
   .channel-bank, .new-channel-strip, .channel-strip, .master-rack,
   .media-rack, .midas-block, .aux-unit, .screen-frame, .midas-tft-screen,
   .device-connection, .bridge-panel, .connection-test-panel, .status-footer {
@@ -114,45 +113,46 @@
   }
 
   /* ==========================================================
-     LAYOUT KONSOL UTAMA (RESPONSIF TABLET & DESKTOP)
+     3. TATA LETAK MAIN CONSOLE (MENJAMIN MASTER TIDAK TERPOTONG)
      ========================================================== */
   main.console {
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
-    width: 100% !important;
-    max-width: 100vw !important;
+    width: max-content !important;
+    min-width: 100% !important;
     padding: 8px !important;
     gap: 8px !important;
     align-items: stretch !important;
-    overflow-x: auto !important;
+    box-sizing: border-box !important;
   }
 
-  /* Bank Channel Kiri dan Kanan */
+  /* Bank Channel Kiri dan Kanan disesuaikan ukurannya */
   .channel-bank {
-    flex: 1 1 300px !important;
-    min-width: 280px !important;
+    flex: 0 0 auto !important;
+    width: 420px !important;
+    min-width: 380px !important;
     background: var(--strip-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 6px !important;
     padding: 6px !important;
   }
 
-  /* Konsol Tengah (Screen + Player + FX/Aux) */
   .center-console {
-    flex: 1.2 1 340px !important;
+    flex: 0 0 auto !important;
+    width: 340px !important;
     min-width: 320px !important;
-    max-width: 400px !important;
     display: flex !important;
     flex-direction: column !important;
     gap: 8px !important;
-    position: static !important;
+    position: relative !important;
   }
 
-  /* Master Rack Kanan */
+  /* Master Rack Kanan Dibuat Tetap Utuh */
   .master-rack {
-    flex: 0 0 110px !important;
-    min-width: 110px !important;
+    flex: 0 0 auto !important;
+    width: 120px !important;
+    min-width: 120px !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
@@ -160,10 +160,11 @@
     border: 1px solid var(--panel-border) !important;
     border-radius: 6px !important;
     padding: 6px 4px !important;
+    margin-right: 8px !important; /* Memberikan margin aman di ujung kanan */
   }
 
   /* ==========================================================
-     PERBAIKAN INDIKATOR SCREEN M32 (LEBIH TINGGI & PENUH)
+     4. FIXING SCREEN MIXER & LAYAR KOSONG
      ========================================================== */
   .screen-frame {
     display: flex !important;
@@ -172,21 +173,20 @@
     border-radius: 6px !important;
     padding: 4px !important;
     background: var(--panel-bg) !important;
+    width: 100% !important;
   }
 
   .midas-tft-screen {
-    border: 1px solid var(--panel-border);
-    border-radius: 4px;
-    padding: 6px;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 4px !important;
+    padding: 6px !important;
     display: flex !important;
     flex-direction: column !important;
     min-height: 220px !important;
-    flex-grow: 1 !important;
   }
 
-  /* Menghilangkan ruang kosong hitam di bawah grafik */
+  /* Indikator Grafik mengisi area secara vertikal */
   .pro-mini-spectrum, .rta-display, .pro-screen-grid {
-    flex-grow: 1 !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-end !important;
@@ -201,33 +201,31 @@
   .spectrum-bars-container {
     display: flex !important;
     gap: 3px !important;
-    height: 100% !important;
-    min-height: 90px !important;
+    height: 90px !important;
     align-items: flex-end !important;
   }
 
-  .m32-sub-panel.active {
-    display: flex !important;
-    flex-direction: column !important;
-    flex-grow: 1 !important;
-  }
-
   /* ==========================================================
-     PERBAIKAN FX & AUX RACK (MENGHILANGKAN OVERLAP SLIDER)
+     5. MEMBAWA PANEL AUX & FX MASUK KE ALUR NORMAL (TIDAK OVERLAP)
      ========================================================== */
   .center-console .fx-rack,
-  .center-console .aux-rack {
+  .center-console .aux-rack,
+  #fxRack, #auxRack {
     position: static !important;
-    transform: none !important;
     top: auto !important;
     left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: none !important;
     width: 100% !important;
+    max-width: 100% !important;
     margin: 0 !important;
     background: var(--panel-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 6px !important;
     padding: 6px !important;
     box-shadow: none !important;
+    z-index: 1 !important;
   }
 
   .center-console .aux-rack {
@@ -243,39 +241,27 @@
     padding: 4px !important;
   }
 
+  /* Mematikan panel FX/Aux duplikat di luar konsol */
+  main.console > .fx-rack, 
+  main.console > .aux-rack {
+    display: none !important;
+  }
+
   /* ==========================================================
-     ELEMEN LAIN-LAIN & FOOTER
+     6. TAB NAVIGASI & FOOTER
      ========================================================== */
-  .screen-tabs {
-    display: grid !important;
-    grid-template-columns: repeat(6, 1fr) !important;
-    gap: 2px !important;
-  }
-  .screen-tabs button {
-    font-size: 8px !important;
-    padding: 4px 1px !important;
-  }
-
-  .midas-encoders-bar {
-    display: grid !important;
-    grid-template-columns: repeat(6, 1fr) !important;
-    gap: 2px !important;
-    margin-top: 4px !important;
-  }
-  .m-encoder {
-    font-size: 7px !important;
-    text-align: center;
-    background: var(--main-bg);
-    border: 1px solid var(--panel-border);
-    padding: 2px 0;
-  }
-
   .bottom-nav {
     display: flex !important;
+    position: relative !important;
+    z-index: 10 !important;
     width: 100% !important;
     gap: 2px !important;
-    padding: 4px 8px !important;
+    padding: 6px 8px !important;
+    background: var(--panel-bg) !important;
+    border-top: 1px solid var(--panel-border) !important;
+    clear: both !important;
   }
+
   .bottom-nav button {
     flex: 1 !important;
     padding: 8px 2px !important;
@@ -286,13 +272,7 @@
   .aux-control::-webkit-slider-thumb {
     background: var(--accent-color) !important;
   }
-
-  main.console > .fx-rack, 
-  main.console > .aux-rack {
-    display: none !important;
-  }
 </style>
-
 </head>
 <body class="theme-midas">
 
@@ -390,7 +370,7 @@
                 </div>
               </div>
 
-              <div class="pro-mini-spectrum" id="visualMeter" style="background: var(--main-bg); border: 1px solid var(--panel-border); border-radius: 3px;">
+              <div class="pro-mini-spectrum" id="visualMeter">
                 <div class="spectrum-bars-container">
                   <div class="bar-col" style="flex:1; background: var(--accent-color); height: 60%"></div>
                   <div class="bar-col" style="flex:1; background: var(--accent-color); height: 80%"></div>
