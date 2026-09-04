@@ -7,10 +7,10 @@
 <title>MIXER-ONLINE • Midas M32 Pro Edition</title>
 
 <!-- Pembaruan versi query (Cache-Buster) -->
-<link rel="stylesheet" href="style.css?v=20260904-PERFECT-FIX">
-<link rel="stylesheet" href="channel-skin.css?v=20260904-PERFECT-FIX">
-<link rel="stylesheet" href="header-system.css?v=20260904-PERFECT-FIX">
-<link rel="stylesheet" href="channels-new.css?v=20260904-PERFECT-FIX">
+<link rel="stylesheet" href="style.css?v=20260904-PERFECT-LAYOUT">
+<link rel="stylesheet" href="channel-skin.css?v=20260904-PERFECT-LAYOUT">
+<link rel="stylesheet" href="header-system.css?v=20260904-PERFECT-LAYOUT">
+<link rel="stylesheet" href="channels-new.css?v=20260904-PERFECT-LAYOUT">
 
 <style>
   /* ==========================================================
@@ -100,7 +100,6 @@
     color: var(--text-main) !important;
   }
 
-  /* PERBAIKAN 2B: TIME DENGAN TAMPILAN MINIMALIS TANPA KARTU TEBAL */
   .clock-head {
     background: transparent !important;
     border: none !important;
@@ -109,25 +108,22 @@
     flex-direction: column !important;
     align-items: flex-end !important;
     justify-content: center !important;
-    box-shadow: none !important;
   }
 
   .clock-head .box-title {
     font-size: 7px !important;
     color: var(--text-dim) !important;
-    margin: 0 !important;
   }
 
   #clock {
     font-size: 13px !important;
     font-weight: bold !important;
     color: var(--accent-color) !important;
-    line-height: 1.1 !important;
     font-family: monospace, monospace !important;
   }
 
   /* ==========================================================
-     3. TATA LETAK MAIN CONSOLE & RESPONSIVITAS POTRET (2A)
+     3. TATA LETAK MAIN CONSOLE & DESAIN CHANNEL STRIP PRESISI
      ========================================================== */
   main.console {
     display: flex !important;
@@ -147,23 +143,69 @@
     }
   }
 
-  /* PERBAIKAN 1C: MEMPERPANJANG CHANNEL UNTUK MENGATUR GAIN/PAN DENGAN MUDAH */
   .channel-bank {
     flex: 0 0 auto !important;
-    width: 450px !important;
-    min-width: 400px !important;
+    width: 480px !important;
+    min-width: 420px !important;
     background: var(--strip-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 6px !important;
     padding: 8px !important;
   }
 
+  /* Penyesuaian Komponen Dalam Channel Strip */
   .new-channel-strip {
-    padding: 6px 2px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    padding: 4px 2px 8px 2px !important;
+    border-right: 1px dashed var(--panel-border) !important;
+  }
+
+  /* Indikator VU Meter Mini di Atas Kontrol Gain Tiap Channel */
+  .ch-top-vu {
+    width: 22px !important;
+    height: 6px !important;
+    background: #101721 !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 2px !important;
+    margin-bottom: 4px !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 1px !important;
+  }
+
+  .ch-top-vu-fill {
+    width: 0%;
+    height: 100% !important;
+    background: linear-gradient(90deg, #2ecc71 60%, #f1c40f 85%, #e74c3c 100%) !important;
+    transition: width 0.05s ease-out !important;
+  }
+
+  .ch-controls-group {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 4px !important;
+    width: 100% !important;
+    margin-bottom: 8px !important;
+  }
+
+  /* Slider Fader Channel Digeser Pas Sebelum Perbatasan Bawah */
+  .fader-area {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    flex-grow: 1 !important;
+    width: 100% !important;
+    padding-bottom: 2px !important;
   }
 
   .fader-area input[type="range"] {
-    height: 180px !important; /* Memperpanjang track fader */
+    height: 190px !important; /* Panjang Fader Presisi */
+    accent-color: var(--accent-color) !important;
   }
 
   .center-console {
@@ -190,12 +232,12 @@
     margin-right: 8px !important;
   }
 
-  /* PERBAIKAN 1D: INDIKATOR STEREO L/R MASTER / VOLUME OUTPUT */
+  /* Indikator Meter Stereo L/R Output Utama */
   .main-meters {
     display: flex !important;
     gap: 8px !important;
     justify-content: center !important;
-    height: 120px !important;
+    height: 130px !important;
     background: var(--main-bg) !important;
     padding: 6px !important;
     border-radius: 4px !important;
@@ -236,7 +278,7 @@
   }
 
   /* ==========================================================
-     4. PRESISI NAVIGATION BAR SCREEN M32
+     4. NAVIGATION BAR SCREEN M32 (SEBARIS PRESISI)
      ========================================================== */
   .screen-frame {
     display: flex !important;
@@ -467,7 +509,6 @@
     <div><button id="savePresetTop">SAVE</button><button id="recallPresetTop">RECALL</button><button id="defaultScene">DEFAULT</button></div>
   </div>
   
-  <!-- PERBAIKAN 2B: TIME DENGAN TAMPILAN RINGKAS DI LAHAN KOSONG ATAS -->
   <div class="clock-head">
     <span class="box-title">TIME</span>
     <strong id="clock">--:--:--</strong>
@@ -1046,6 +1087,7 @@
     if (msg) msg.textContent = "⚡ Preset M32 Scene Recalled!";
   });
 
+  // METODE UNTUK SINKRONISASI DATA LAYAR M32 & CHANNEL
   function selectScreenChannel(id) {
     const c = window.state?.channels?.[id - 1];
     const set = (elemId, v) => { const e = document.getElementById(elemId); if (e) e.textContent = v; };
@@ -1053,9 +1095,9 @@
     set('screenInput', 'CH ' + (id < 10 ? '0' + id : id));
     
     if (c) {
-      set('screenFader', (c.fader || 75) + '%');
+      set('screenFader', (c.fader !== undefined ? c.fader : 75) + '%');
       set('screenGain', Number(c.gain || 1.0).toFixed(2));
-      set('screenPan', c.pan === 0 ? 'CENTER' : (c.pan < 0 ? 'L ' + Math.round(Math.abs(c.pan) * 100) + '%' : 'R ' + Math.round(c.pan * 100) + '%'));
+      set('screenPan', c.pan === 0 || c.pan === undefined ? 'CENTER' : (c.pan < 0 ? 'L ' + Math.round(Math.abs(c.pan) * 100) + '%' : 'R ' + Math.round(c.pan * 100) + '%'));
       
       const statusElem = document.getElementById('screenStatus');
       if (statusElem) {
@@ -1074,35 +1116,42 @@
   }
   window.selectScreenChannel = selectScreenChannel;
 
-  // PERBAIKAN 1A & 1B: EVENT LISTENER DIBUAT DYNAMIC UNTUK UPDATE NILAI FADER & KNOB
+  // SINKRONISASI REALTIME SETIAP FADER & KONTROL CHANNEL DENGAN LAYAR M32
   document.addEventListener('input', function(e) {
-    // 1B. Jika fader channel digeser, perbarui angka persentase fader secara dinamis
-    if (e.target.matches('.fader-area input[type="range"], .channel-fader')) {
+    if (e.target.matches('.fader-area input[type="range"], .channel-fader, input[data-param="fader"]')) {
       const strip = e.target.closest('.new-channel-strip');
       if (strip) {
-        const valDisplay = strip.querySelector('.fader-val, .fader-value, output');
-        if (valDisplay) valDisplay.textContent = e.target.value + '%';
-        
         const chId = Number(strip.dataset.ch);
-        if (window.state?.channels?.[chId - 1]) {
-          window.state.channels[chId - 1].fader = Number(e.target.value);
-        }
+        const val = Number(e.target.value);
+
+        const valDisplay = strip.querySelector('.fader-val, .fader-value, output');
+        if (valDisplay) valDisplay.textContent = val + '%';
+        
+        if (!window.state) window.state = { channels: [] };
+        if (!window.state.channels) window.state.channels = [];
+        if (!window.state.channels[chId - 1]) window.state.channels[chId - 1] = {};
+        window.state.channels[chId - 1].fader = val;
         
         const activeInput = document.getElementById('screenInput')?.textContent;
         if (activeInput && parseInt(activeInput.replace(/\D/g, ''), 10) === chId) {
           const sf = document.getElementById('screenFader');
-          if (sf) sf.textContent = e.target.value + '%';
+          if (sf) sf.textContent = val + '%';
         }
       }
     }
 
-    // 1A. Perbarui Gain / Pan
     if (e.target.matches('.knob-gain, [data-param="gain"]')) {
       const strip = e.target.closest('.new-channel-strip');
       if (strip) {
         const chId = Number(strip.dataset.ch);
+        const val = parseFloat(e.target.value);
         if (window.state?.channels?.[chId - 1]) {
-          window.state.channels[chId - 1].gain = parseFloat(e.target.value);
+          window.state.channels[chId - 1].gain = val;
+        }
+        const activeInput = document.getElementById('screenInput')?.textContent;
+        if (activeInput && parseInt(activeInput.replace(/\D/g, ''), 10) === chId) {
+          const sg = document.getElementById('screenGain');
+          if (sg) sg.textContent = val.toFixed(2);
         }
       }
     }
@@ -1111,8 +1160,14 @@
       const strip = e.target.closest('.new-channel-strip');
       if (strip) {
         const chId = Number(strip.dataset.ch);
+        const val = parseFloat(e.target.value);
         if (window.state?.channels?.[chId - 1]) {
-          window.state.channels[chId - 1].pan = parseFloat(e.target.value);
+          window.state.channels[chId - 1].pan = val;
+        }
+        const activeInput = document.getElementById('screenInput')?.textContent;
+        if (activeInput && parseInt(activeInput.replace(/\D/g, ''), 10) === chId) {
+          const sp = document.getElementById('screenPan');
+          if (sp) sp.textContent = val === 0 ? 'CENTER' : (val < 0 ? 'L ' + Math.round(Math.abs(val) * 100) + '%' : 'R ' + Math.round(val * 100) + '%');
         }
       }
     }
@@ -1376,23 +1431,28 @@
   let isShuffle = false;
   let lockedMusicChannel = null;
 
-  // PERBAIKAN 1D: LOGIKA UPDATE MASTER FADER & INDIKATOR STEREO L/R
+  // SINKRONISASI UPDATE MASTER FADER
   if (masterFader) {
     masterFader.addEventListener('input', function() {
       if (masterValElem) masterValElem.textContent = this.value + '%';
     });
   }
 
-  function injectChannelVuMeters() {
+  // SUNTIKAN INDIKATOR VU METER MINI DI ATAS GAIN PADA SETIAP CHANNEL
+  function injectTopVuMeters() {
     const strips = document.querySelectorAll('.new-channel-strip');
     strips.forEach(strip => {
-      if (!strip.querySelector('.channel-vu-meter')) {
-        const vuBox = document.createElement('div');
-        vuBox.className = 'channel-vu-meter';
-        vuBox.innerHTML = '<div class="channel-vu-fill"></div>';
+      if (!strip.querySelector('.ch-top-vu')) {
+        const topVu = document.createElement('div');
+        topVu.className = 'ch-top-vu';
+        topVu.innerHTML = '<div class="ch-top-vu-fill"></div>';
         
-        const faderArea = strip.querySelector('.fader-area') || strip;
-        faderArea.insertBefore(vuBox, faderArea.firstChild);
+        const chNumLabel = strip.querySelector('.ch-number, .channel-label') || strip.firstChild;
+        if (chNumLabel && chNumLabel.parentNode) {
+          chNumLabel.parentNode.insertBefore(topVu, chNumLabel.nextSibling);
+        } else {
+          strip.insertBefore(topVu, strip.firstChild);
+        }
       }
     });
   }
@@ -1476,11 +1536,11 @@
     }
   }
 
-  // UPDATE METER DAN SINKRONISASI REALTIME
+  // LOOPING ANIMASI REALTIME UNTUK INDIKATOR VUMETER CHANNEL & MASTER L/R
   function updateIndicators() {
     requestAnimationFrame(updateIndicators);
 
-    injectChannelVuMeters();
+    injectTopVuMeters();
 
     const activeInput = document.getElementById('screenInput');
     const screenGain = document.getElementById('screenGain');
@@ -1499,13 +1559,14 @@
     const screenChNum = parseInt(currentChannelStr.replace(/\D/g, ''), 10) || 1;
     const chNum = (lockedMusicChannel !== null) ? lockedMusicChannel : screenChNum;
 
-    if (window.state && window.state.channels && window.state.channels[chNum - 1]) {
-      const chData = window.state.channels[chNum - 1];
-      const screenData = window.state.channels[screenChNum - 1];
+    if (window.state && window.state.channels) {
+      const chData = window.state.channels[chNum - 1] || {};
+      const screenData = window.state.channels[screenChNum - 1] || {};
 
       if (screenData) {
         if (screenGain) screenGain.textContent = Number(screenData.gain || 1.0).toFixed(2);
-        if (screenFader) screenFader.textContent = (screenData.fader || 75) + '%';
+        if (screenFader) sfaderText = (screenData.fader !== undefined ? screenData.fader : 75) + '%';
+        if (screenFader) screenFader.textContent = sfaderText;
         if (screenPan) {
           const panVal = screenData.pan || 0;
           screenPan.textContent = panVal === 0 ? 'CENTER' : (panVal < 0 ? 'L ' + Math.round(Math.abs(panVal) * 100) + '%' : 'R ' + Math.round(panVal * 100) + '%');
@@ -1516,6 +1577,7 @@
         const dataArray = new Uint8Array(analyserNode.frequencyBinCount);
         analyserNode.getByteFrequencyData(dataArray);
 
+        // Update Spektrum Screen M32 & RTA
         const barCols = document.querySelectorAll('.pro-mini-spectrum .bar-col, .rta-bars div');
         barCols.forEach((bar, idx) => {
           const val = dataArray[idx % dataArray.length] || 10;
@@ -1530,7 +1592,7 @@
 
         const masterValElem = document.getElementById('masterVal');
         const masterVolumeScale = masterValElem ? (parseInt(masterValElem.textContent, 10) || 75) / 100 : 0.75;
-        const channelFaderScale = (chData.fader || 75) / 100;
+        const channelFaderScale = ((chData.fader !== undefined ? chData.fader : 75)) / 100;
 
         const panVal = chData.pan || 0;
         const leftPan = panVal <= 0 ? 1 : 1 - panVal;
@@ -1539,13 +1601,21 @@
         const leftHeight = Math.min(100, avgLevel * 100 * channelFaderScale * masterVolumeScale * leftPan);
         const rightHeight = Math.min(100, avgLevel * 100 * channelFaderScale * masterVolumeScale * rightPan);
 
+        // Update Indikator Output Master L/R
         if (masterMeterL) masterMeterL.style.height = leftHeight + '%';
         if (masterMeterR) masterMeterR.style.height = rightHeight + '%';
 
-        const activeStrip = document.querySelector(`.new-channel-strip[data-ch="${chNum}"] .channel-vu-fill`);
-        if (activeStrip) {
-          activeStrip.style.height = Math.min(100, avgLevel * 100 * channelFaderScale) + '%';
-        }
+        // Update Indikator VU Meter Mini di Atas Gain Setiap Channel (1–14)
+        document.querySelectorAll('.new-channel-strip').forEach(strip => {
+          const cId = Number(strip.dataset.ch);
+          const cState = window.state.channels[cId - 1] || {};
+          const cFaderScale = ((cState.fader !== undefined ? cState.fader : 75)) / 100;
+          const topVuFill = strip.querySelector('.ch-top-vu-fill');
+          
+          if (topVuFill) {
+            topVuFill.style.width = Math.min(100, avgLevel * 100 * cFaderScale) + '%';
+          }
+        });
 
         if (gainNode) {
           const gainVal = (parseFloat(chData.gain) || 1.0) * channelFaderScale;
@@ -1558,7 +1628,7 @@
       } else {
         if (masterMeterL) masterMeterL.style.height = '0%';
         if (masterMeterR) masterMeterR.style.height = '0%';
-        document.querySelectorAll('.channel-vu-fill').forEach(fill => fill.style.height = '0%');
+        document.querySelectorAll('.ch-top-vu-fill').forEach(fill => fill.style.width = '0%');
       }
     }
   }
