@@ -16,15 +16,14 @@
   /* ==========================================================
      1. DEFINISI VARIABEL WARNA (SKIN)
      ========================================================== */
-.knob-val {
-  font-size: 7.5px !important;
-  color: var(--accent-color) !important;
-  font-weight: bold !important;
-  display: block !important;
-  text-align: center !important;
-  margin-top: 1px !important;
-}
-
+  .knob-val {
+    font-size: 8px !important;
+    color: var(--accent-color) !important;
+    font-weight: bold !important;
+    display: block !important;
+    text-align: center !important;
+    margin-top: 1px !important;
+  }
   
   body, body.theme-midas {
     --main-bg: #090b0c;
@@ -179,7 +178,7 @@
     background: #101721 !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 2px !important;
-    margin-bottom: 4px !important;
+    margin: 2px 0 4px 0 !important;
     overflow: hidden !important;
     display: flex !important;
     align-items: center !important;
@@ -191,6 +190,15 @@
     height: 100% !important;
     background: linear-gradient(90deg, #2ecc71 60%, #f1c40f 85%, #e74c3c 100%) !important;
     transition: width 0.05s ease-out !important;
+  }
+
+  .new-channel-control {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    margin-bottom: 2px !important;
   }
 
   .ch-controls-group {
@@ -1131,11 +1139,11 @@
     if (e.target.matches('input[type="range"]')) {
       const container = e.target.parentElement || e.target.closest('div, section');
       
-      // Update otomatis label angka di sekitar fader channel (misal: .fader-val, .fader-value, output, span)
-      if (container) {
-        const valDisplay = container.querySelector('.fader-val, .fader-value, .value, output, span');
-        if (valDisplay && !valDisplay.id) {
-          valDisplay.textContent = e.target.value + '%';
+      // Update khusus label persen Fader
+      if (container && e.target.classList.contains('channel-fader')) {
+        const valDisplay = container.querySelector('.fader-val, output');
+        if (valDisplay) {
+          valDisplay.textContent = Math.round(e.target.value) + '%';
         }
       }
 
@@ -1149,14 +1157,14 @@
           if (!window.state.channels) window.state.channels = [];
           if (!window.state.channels[chId - 1]) window.state.channels[chId - 1] = {};
           
-          if (e.target.classList.contains('channel-fader') || e.target.type === 'range') {
+          if (e.target.classList.contains('channel-fader')) {
             window.state.channels[chId - 1].fader = val;
             
             // Sinkronkan ke Layar M32 jika channel sedang dibuka
             const activeInput = document.getElementById('screenInput')?.textContent;
             if (activeInput && parseInt(activeInput.replace(/\D/g, ''), 10) === chId) {
               const sf = document.getElementById('screenFader');
-              if (sf) sf.textContent = val + '%';
+              if (sf) sf.textContent = Math.round(val) + '%';
             }
           }
         }
@@ -1428,29 +1436,9 @@
   let isShuffle = false;
   let lockedMusicChannel = null;
 
-  // SINKRONISASI UPDATE MASTER FADER
   if (masterFader) {
     masterFader.addEventListener('input', function() {
       if (masterValElem) masterValElem.textContent = this.value + '%';
-    });
-  }
-
-  // SUNTIKAN INDIKATOR VU METER MINI DI ATAS GAIN PADA SETIAP CHANNEL
-  function injectTopVuMeters() {
-    const strips = document.querySelectorAll('.new-channel-strip, .channel-strip, [data-ch]');
-    strips.forEach(strip => {
-      if (!strip.querySelector('.ch-top-vu')) {
-        const topVu = document.createElement('div');
-        topVu.className = 'ch-top-vu';
-        topVu.innerHTML = '<div class="ch-top-vu-fill"></div>';
-        
-        const chNumLabel = strip.querySelector('.ch-number, .channel-label') || strip.firstChild;
-        if (chNumLabel && chNumLabel.parentNode) {
-          chNumLabel.parentNode.insertBefore(topVu, chNumLabel.nextSibling);
-        } else {
-          strip.insertBefore(topVu, strip.firstChild);
-        }
-      }
     });
   }
 
@@ -1533,11 +1521,9 @@
     }
   }
 
-  // LOOPING ANIMASI REALTIME UNTUK INDIKATOR VUMETER CHANNEL & MASTER L/R
+  // ANIMASI REALTIME DENGAN PENENTUAN TARGET VU METER PRESISI
   function updateIndicators() {
     requestAnimationFrame(updateIndicators);
-
-    injectTopVuMeters();
 
     const activeInput = document.getElementById('screenInput');
     const screenGain = document.getElementById('screenGain');
@@ -1562,7 +1548,7 @@
 
       if (screenData) {
         if (screenGain) screenGain.textContent = Number(screenData.gain || 1.0).toFixed(2);
-        if (screenFader) screenFader.textContent = (screenData.fader !== undefined ? screenData.fader : 75) + '%';
+        if (screenFader) screenFader.textContent = Math.round(screenData.fader !== undefined ? screenData.fader : 75) + '%';
         if (screenPan) {
           const panVal = screenData.pan || 0;
           screenPan.textContent = panVal === 0 ? 'CENTER' : (panVal < 0 ? 'L ' + Math.round(Math.abs(panVal) * 100) + '%' : 'R ' + Math.round(panVal * 100) + '%');
@@ -1573,7 +1559,6 @@
         const dataArray = new Uint8Array(analyserNode.frequencyBinCount);
         analyserNode.getByteFrequencyData(dataArray);
 
-        // Update Spektrum Screen M32 & RTA
         const barCols = document.querySelectorAll('.pro-mini-spectrum .bar-col, .rta-bars div');
         barCols.forEach((bar, idx) => {
           const val = dataArray[idx % dataArray.length] || 10;
@@ -1597,11 +1582,10 @@
         const leftHeight = Math.min(100, avgLevel * 100 * channelFaderScale * masterVolumeScale * leftPan);
         const rightHeight = Math.min(100, avgLevel * 100 * channelFaderScale * masterVolumeScale * rightPan);
 
-        // Update Indikator Output Master L/R
         if (masterMeterL) masterMeterL.style.height = leftHeight + '%';
         if (masterMeterR) masterMeterR.style.height = rightHeight + '%';
 
-        // Update Indikator VU Meter Mini di Atas Gain Setiap Channel (1–14)
+        // Update VU meter spesifik per channel
         document.querySelectorAll('.new-channel-strip, .channel-strip, [data-ch]').forEach(strip => {
           const cId = Number(strip.dataset.ch) || parseInt(strip.innerText.match(/CH\s*(\d+)/i)?.[1] || '0', 10);
           if (cId > 0) {
@@ -1610,7 +1594,7 @@
             const topVuFill = strip.querySelector('.ch-top-vu-fill');
             
             if (topVuFill) {
-              topVuFill.style.width = Math.min(100, avgLevel * 100 * cFaderScale) + '%';
+              topVuFill.style.width = (cId === chNum) ? Math.min(100, avgLevel * 100 * cFaderScale) + '%' : '0%';
             }
           }
         });
