@@ -1,0 +1,17 @@
+{
+  "name": "M32 Digital Mixer",
+  "short_name": "M32 Mixer",
+  "description": "Web Mixer Controller",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#121212",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
