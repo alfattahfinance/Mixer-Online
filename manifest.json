@@ -1,11 +1,11 @@
 {
-  "name": "M32 Digital Mixer",
-  "short_name": "M32 Mixer",
-  "description": "Web Mixer Controller",
+  "name": "MIXER-ONLINE M32",
+  "short_name": "Mixer M32",
+  "description": "Midas M32 Pro Edition Web Mixer Controller",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#121212",
-  "theme_color": "#121212",
+  "background_color": "#090b0c",
+  "theme_color": "#090b0c",
   "icons": [
     {
       "src": "https://via.placeholder.com/512.png",
