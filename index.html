@@ -232,8 +232,16 @@
     font-family: monospace;
   }
 
+  /* Manajemen Tampilan Tab Layar & Sub-Panel */
+  .screen-view {
+    display: none !important;
+  }
+  .screen-view.active {
+    display: block !important;
+  }
+
   .m32-sub-panel {
-    display: none;
+    display: none !important;
     background: #04060a;
     border: 1px solid #16222f;
     padding: 6px;
@@ -296,6 +304,12 @@
   .master-card input[type="range"] {
     height: 420px !important;
   }
+  
+  .fx-buttons button.active {
+    background: #00738c !important;
+    color: #fff !important;
+    border-color: #00e5ff !important;
+  }
 </style>
 </head>
 <body>
@@ -356,12 +370,13 @@
       </div>
       
       <div class="screen-content" id="screenContent">
+        <!-- 1. HOME VIEW -->
         <section class="screen-view active" data-view="HOME">
           <div class="midas-tft-screen">
             <div class="midas-header-strip">
               <div class="midas-ch-badge" id="screenInput">CH 01</div>
               <input type="text" id="screenChannelName" value="VOCAL MAIN" style="background: #05080c; border: 1px solid #1f2d3d; color: #00e5ff; font-size: 10px; padding: 2px 4px; border-radius: 2px; width: 110px; text-align: center;">
-              <span style="font-size: 9px; color: #2ecc71; font-weight: bold;">[ACTIVE]</span>
+              <span id="screenStatus" style="font-size: 9px; color: #2ecc71; font-weight: bold;">[ACTIVE]</span>
             </div>
 
             <div class="m32-sub-panel active" data-subpanel="overview">
@@ -384,7 +399,7 @@
                 </div>
               </div>
 
-              <!-- Indikator Spectrum Tinggi dan Pas Sesuai Screen -->
+              <!-- Indikator Spectrum Tinggi -->
               <div class="pro-mini-spectrum" id="visualMeter" style="background: #040609; border: 1px solid #16222f; border-radius: 3px;">
                 <div class="spectrum-bars-container">
                   <div class="bar-col" style="flex:1; background: #00e5ff; height: 60%"></div>
@@ -433,7 +448,7 @@
 
             <div class="m32-sub-panel" data-subpanel="eq">
               <b>4-BAND PARAMETRIC EQ</b>
-              <div style="background:#040608; border:1px solid #1a2736; height:32px; display:flex; align-items:flex-end; padding:2px; gap:2px; margin-top:4px;">
+              <div style="background:#040608; border:1px solid #1a2736; height:60px; display:flex; align-items:flex-end; padding:2px; gap:2px; margin-top:4px;">
                 <div style="flex:1; background:#00e5ff; height:30%; opacity:0.7;"></div>
                 <div style="flex:1; background:#00e5ff; height:60%; opacity:0.8;"></div>
                 <div style="flex:1; background:#00e5ff; height:80%; opacity:0.9;"></div>
@@ -445,8 +460,8 @@
               <b>BUS / AUX SENDS ROUTING</b>
               <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:3px; margin-top:4px; text-align:center;">
                 <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">BS1<br><strong style="color:#2ecc71;">0dB</strong></div>
-                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">BS2<br><strong style="color:#2ecc71;">-6d</strong></div>
-                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">FX1<br><strong style="color:#2ecc71;">-3d</strong></div>
+                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">BS2<br><strong style="color:#2ecc71;">-6dB</strong></div>
+                <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">FX1<br><strong style="color:#2ecc71;">-3dB</strong></div>
                 <div style="background:#0c1219; padding:3px; border:1px solid #1b2836;">FX2<br><strong style="color:#2ecc71;">-∞</strong></div>
               </div>
             </div>
@@ -454,45 +469,52 @@
           </div>
         </section>
 
+        <!-- 2. METERS VIEW -->
         <section class="screen-view" data-view="METER">
-          <div class="pro-screen-grid" style="background: #06090f; padding: 6px; border-radius: 4px;">
-            <div class="screen-big-meter">
-              <div class="meter-columns" id="screenChannelMeters"></div>
-              <span class="meter-db">0&nbsp;&nbsp;&nbsp;-6&nbsp;&nbsp;&nbsp;-12&nbsp;&nbsp;&nbsp;-24&nbsp;&nbsp;&nbsp;-48</span>
-            </div>
+          <div class="pro-screen-grid" style="background: #06090f; padding: 6px; border-radius: 4px; min-height: 200px;">
+            <b style="font-size: 9px; color: #00e5ff; display: block; margin-bottom: 4px;">CHANNEL LEVEL METERS (CH 1–14)</b>
+            <div class="meter-columns" id="screenChannelMeters" style="display: flex; gap: 4px; height: 140px; align-items: flex-end; background: #040609; padding: 4px;"></div>
+            <span class="meter-db" style="font-size: 7px; color: #556677; display: flex; justify-content: space-between; margin-top: 4px;">0dB&nbsp;&nbsp;&nbsp;-6&nbsp;&nbsp;&nbsp;-12&nbsp;&nbsp;&nbsp;-24&nbsp;&nbsp;&nbsp;-48</span>
           </div>
         </section>
 
+        <!-- 3. RTA VIEW -->
         <section class="screen-view" data-view="RTA">
-          <div class="rta-display" style="background: #06090f; padding: 6px; border-radius: 4px;">
-            <div class="rta-grid"></div>
-            <div class="rta-bars" id="rtaBars"></div>
-            <div class="rta-labels"><span>63</span><span>125</span><span>250</span><span>500</span><span>1K</span><span>2K</span><span>4K</span><span>8K</span><span>16K</span></div>
+          <div class="rta-display" style="background: #06090f; padding: 6px; border-radius: 4px; min-height: 200px;">
+            <b style="font-size: 9px; color: #00e5ff; display: block; margin-bottom: 4px;">REAL TIME ANALYZER (RTA)</b>
+            <div class="rta-bars" id="rtaBars" style="display: flex; gap: 3px; height: 140px; align-items: flex-end; background: #040609; padding: 4px;"></div>
+            <div class="rta-labels" style="font-size: 7px; color: #556677; display: flex; justify-content: space-between; margin-top: 4px;"><span>63</span><span>125</span><span>250</span><span>500</span><span>1K</span><span>2K</span><span>4K</span><span>8K</span><span>16K</span></div>
           </div>
         </section>
 
+        <!-- 4. SETUP VIEW -->
         <section class="screen-view" data-view="SETUP">
-          <div class="setup-screen" style="background: #06090f; padding: 6px; border-radius: 4px; font-size: 9px;">
-            <b>M32 SYSTEM CONFIG</b>
-            <div class="setup-grid" style="margin-top: 4px;">
-              <span>CHANNELS <strong class="channel-count-value">14</strong></span>
-              <span>TRANSPORT <strong id="setupTransport">OFFLINE</strong></span>
-              <span>PROTOCOL <strong>AES50 / M32-1</strong></span>
+          <div class="setup-screen" style="background: #06090f; padding: 6px; border-radius: 4px; font-size: 9px; min-height: 200px;">
+            <b style="color: #00e5ff;">M32 SYSTEM CONFIG</b>
+            <div class="setup-grid" style="display: grid; grid-template-columns: 1fr; gap: 6px; margin-top: 8px;">
+              <div style="background: #0c1219; padding: 4px; border: 1px solid #1a2736;">CHANNELS: <strong class="channel-count-value" style="color:#00e5ff;">14</strong></div>
+              <div style="background: #0c1219; padding: 4px; border: 1px solid #1a2736;">TRANSPORT: <strong id="setupTransport" style="color:#2ecc71;">OFFLINE</strong></div>
+              <div style="background: #0c1219; padding: 4px; border: 1px solid #1a2736;">PROTOCOL: <strong style="color:#00e5ff;">AES50 / M32-1</strong></div>
             </div>
           </div>
         </section>
 
+        <!-- 5. EFFECTS VIEW -->
         <section class="screen-view" data-view="EFFECT">
-          <div class="effect-screen effect-screen-live" style="background: #06090f; padding: 6px; border-radius: 4px; font-size: 9px;">
-            <b>VIRTUAL FX RACK</b>
-            <select id="screenFxSelect" style="background: #111; color: #00e5ff; border: 1px solid #333; width: 100%; margin: 4px 0;"><option value="FX1">FX1: Lexicon Reverb</option></select>
+          <div class="effect-screen effect-screen-live" style="background: #06090f; padding: 6px; border-radius: 4px; font-size: 9px; min-height: 200px;">
+            <b style="color: #00e5ff;">VIRTUAL FX RACK ASSIGNMENT</b>
+            <select id="screenFxSelect" style="background: #111; color: #00e5ff; border: 1px solid #333; width: 100%; margin: 8px 0; padding: 4px;"><option value="FX1">FX1: Lexicon Hall Reverb</option><option value="FX2">FX2: Stereo Delay</option></select>
           </div>
         </section>
 
+        <!-- 6. LIBRARY / SCENE VIEW -->
         <section class="screen-view" data-view="SCENE">
-          <div class="scene-screen" style="background: #06090f; padding: 6px; border-radius: 4px; font-size: 9px;">
-            <b>SCENE LIBRARY</b>
-            <div><button id="screenSceneSave">SAVE</button><button id="screenSceneRecall">RECALL</button></div>
+          <div class="scene-screen" style="background: #06090f; padding: 6px; border-radius: 4px; font-size: 9px; min-height: 200px;">
+            <b style="color: #00e5ff;">SCENE LIBRARY PRESETS</b>
+            <div style="display: flex; gap: 6px; margin-top: 8px;">
+              <button id="screenSceneSave" style="flex:1; background:#111a24; color:#fff; border:1px solid #1f2d3d; padding:6px; cursor:pointer;">SAVE PRESET</button>
+              <button id="screenSceneRecall" style="flex:1; background:#111a24; color:#fff; border:1px solid #1f2d3d; padding:6px; cursor:pointer;">RECALL PRESET</button>
+            </div>
           </div>
         </section>
       </div>
@@ -507,7 +529,7 @@
       </div>
     </div>
 
-    <!-- Player / Recorder Ditambah Tombol Mode SEQ/SHUFFLE -->
+    <!-- Player / Recorder -->
     <section class="media-rack" style="background: #0c1219; border: 1px solid #1a2736; border-radius: 6px; padding: 6px;">
       <h2 style="color: #00e5ff; border-bottom: 1px solid #1a2736; margin-bottom: 4px; font-size: 10px;">USB PLAYER / REC <span id="activePlayerTarget" style="font-size: 9px; color: #2ecc71; float: right;">[CH 1]</span></h2>
       <div style="display: flex; gap: 4px; margin-bottom: 4px;">
@@ -523,7 +545,7 @@
       <input type="file" id="localAudioLoader" accept="audio/*" multiple style="display: none;">
     </section>
 
-    <!-- Effect Processor (Telah Diposisikan Dalam Aliran Flex Normal) -->
+    <!-- Effect Processor -->
     <div class="fx-rack fx-rack-live" id="fxRack">
       <div class="rack-title" style="font-size: 9px; color: #00e5ff; margin-bottom: 4px;">EFFECT PROCESSOR <span>PARAMETER</span></div>
       <div class="fx-toolbar" style="display: flex; align-items: center; gap: 4px; margin-bottom: 4px;">
@@ -551,7 +573,7 @@
       </div>
     </div>
 
-    <!-- Aux / Bus & FX Return (Telah Diposisikan Dalam Aliran Flex Normal) -->
+    <!-- Aux / Bus & FX Return -->
     <div class="aux-rack" id="auxRack" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
       <div class="aux-unit aux-live" style="background: #06090f; padding: 4px; border: 1px solid #1a2736; border-radius: 4px; font-size: 8px;">
         <b style="color: #00e5ff; font-size: 8px;">AUX / BUS</b>
@@ -677,7 +699,8 @@
     if (tr) tr.textContent = 'DEFAULT SCENE: factory state ready';
   });
 
-  const tabs = document.querySelectorAll('#screenTabs [data-screen]');
+  // LOGIKA UTAMA LAYAR TABS (HOME, METERS, RTA, SETUP, EFFECTS, LIBRARY)
+  const tabs = document.querySelectorAll('#screenTabs button');
   const views = document.querySelectorAll('.screen-view');
   const subButtons = document.querySelectorAll('.m32-sub-btn');
   const subPanels = document.querySelectorAll('.m32-sub-panel');
@@ -686,8 +709,8 @@
   const setScreen = (name) => {
     tabs.forEach(b => b.classList.toggle('active', b.dataset.screen === name));
     views.forEach(v => v.classList.toggle('active', v.dataset.view === name));
-    document.querySelector('.screen-frame')?.setAttribute('data-screen', name);
     
+    // Tampilkan sub-menu bar (OVERVIEW-SENDS) hanya jika berada di tab HOME
     if(subBar) subBar.style.display = (name === 'HOME') ? 'flex' : 'none';
 
     if (name === 'METER') buildScreenMeters();
@@ -697,6 +720,7 @@
 
   tabs.forEach(b => b.addEventListener('click', () => setScreen(b.dataset.screen)));
 
+  // LOGIKA SUB-MENU LAYAR (OVERVIEW, CONFIG, GATE, DYN, EQ, SENDS)
   subButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       subButtons.forEach(b => b.classList.remove('active'));
@@ -713,7 +737,9 @@
     if (!root) return;
     root.innerHTML = '';
     for (let i = 0; i < 14; i++) {
-      const el = document.createElement('i');
+      const el = document.createElement('div');
+      el.style.flex = '1';
+      el.style.background = '#00e5ff';
       el.style.height = (12 + ((i * 17) % 70)) + '%';
       el.title = 'CH' + (i + 1);
       root.appendChild(el);
@@ -725,7 +751,9 @@
     if (!root) return;
     root.innerHTML = '';
     for (let i = 0; i < 14; i++) {
-      const b = document.createElement('i');
+      const b = document.createElement('div');
+      b.style.flex = '1';
+      b.style.background = '#2ecc71';
       b.style.height = (18 + ((i * 23) % 72)) + '%';
       root.appendChild(b);
     }
@@ -734,26 +762,35 @@
   function updateSetup() {
     const a = window.MixerAdapters?.active;
     const t = document.getElementById('setupTransport');
-    const s = document.getElementById('setupSystem');
     if (t) t.textContent = a?.connected ? (a.transport === 'bluetooth' ? 'BLUETOOTH' : 'ESP32 BRIDGE') : 'OFFLINE';
-    if (s) s.textContent = document.getElementById('power')?.classList.contains('on') ? 'ON' : 'OFF';
   }
 
-  document.getElementById('screenSceneSave')?.addEventListener('click', () => document.getElementById('savePreset')?.click());
-  document.getElementById('screenSceneRecall')?.addEventListener('click', () => document.getElementById('recallPreset')?.click());
-  document.getElementById('screenSceneDefault')?.addEventListener('click', () => document.getElementById('defaultScene')?.click());
-
+  // PILIH CHANNEL PADA SCREEN & PERBARUI STATUS [ACTIVE] / [MUTED] / [SOLO]
   function selectScreenChannel(id) {
     const c = window.state?.channels?.[id - 1];
-    if (!c) return;
-    const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
-    set('screenInput', 'CH' + id);
-    set('screenFader', c.fader + '%');
-    set('screenGain', Number(c.gain).toFixed(2));
-    set('screenPan', c.pan === 0 ? 'CENTER' : (c.pan < 0 ? 'L ' + Math.round(Math.abs(c.pan) * 100) + '%' : 'R ' + Math.round(c.pan * 100) + '%'));
-    set('screenStatus', c.mute ? 'MUTED' : c.solo ? 'SOLO' : 'READY');
-    set('meterSelected', 'CH' + id);
-    set('meterLevel', Math.round((c.level || 0) * 50) + '%');
+    const set = (elemId, v) => { const e = document.getElementById(elemId); if (e) e.textContent = v; };
+    
+    set('screenInput', 'CH ' + (id < 10 ? '0' + id : id));
+    
+    if (c) {
+      set('screenFader', c.fader + '%');
+      set('screenGain', Number(c.gain || 1.0).toFixed(2));
+      set('screenPan', c.pan === 0 ? 'CENTER' : (c.pan < 0 ? 'L ' + Math.round(Math.abs(c.pan) * 100) + '%' : 'R ' + Math.round(c.pan * 100) + '%'));
+      
+      const statusElem = document.getElementById('screenStatus');
+      if (statusElem) {
+        if (c.mute) {
+          statusElem.textContent = '[MUTED]';
+          statusElem.style.color = '#e74c3c';
+        } else if (c.solo) {
+          statusElem.textContent = '[SOLO]';
+          statusElem.style.color = '#f1c40f';
+        } else {
+          statusElem.textContent = '[ACTIVE]';
+          statusElem.style.color = '#2ecc71';
+        }
+      }
+    }
   }
   window.selectScreenChannel = selectScreenChannel;
 
@@ -761,8 +798,6 @@
     const ch = e.target.closest('.new-channel-strip');
     if (ch) selectScreenChannel(Number(ch.dataset.ch));
   });
-
-  document.getElementById('screenFxTap')?.addEventListener('click', () => window.tapEffectTempo?.());
 
   const updateSkin = () => {
     const adapter = window.MixerAdapters?.status?.();
@@ -1002,7 +1037,6 @@
   let analyserNode = null;
   let currentAudioElement = null;
 
-  // VARIABLE PLAYLIST & CHANNEL LOCKING
   let playlist = [];
   let currentTrackIndex = 0;
   let isShuffle = false;
@@ -1082,7 +1116,7 @@
       if (nextIndex < playlist.length) {
         playTrack(nextIndex);
       } else {
-        playTrack(0); // Kembali berurutan dari lagu pertama
+        playTrack(0);
       }
     }
   }
@@ -1124,7 +1158,7 @@
         const dataArray = new Uint8Array(analyserNode.frequencyBinCount);
         analyserNode.getByteFrequencyData(dataArray);
 
-        const barCols = document.querySelectorAll('.pro-mini-spectrum .bar-col, .rta-bars i');
+        const barCols = document.querySelectorAll('.pro-mini-spectrum .bar-col, .rta-bars div');
         barCols.forEach((bar, idx) => {
           const val = dataArray[idx % dataArray.length] || 10;
           bar.style.height = Math.max(10, Math.min(100, (val / 255) * 100)) + '%';
@@ -1186,6 +1220,49 @@
       playTrack(0);
     });
   }
+
+  // LOGIKA UTAMA INTERAKSI EFFECT PROCESSOR & AUX RACK
+  const fxButtons = document.querySelectorAll('.fx-buttons button');
+  const fxPresetName = document.getElementById('fxRackPreset');
+
+  fxButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      fxButtons.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      const target = this.dataset.fxSelect;
+      if (fxPresetName) fxPresetName.textContent = target + " ACTIVE";
+    });
+  });
+
+  const fxControls = document.querySelectorAll('.fx-control');
+  fxControls.forEach(input => {
+    input.addEventListener('input', function() {
+      const param = this.dataset.param;
+      const val = this.value;
+      const output = this.parentElement.querySelector('output');
+      
+      if (output) {
+        if (param === 'time') output.textContent = val + 's';
+        else if (param === 'preDelay') output.textContent = val + 'ms';
+        else if (param === 'decay') output.textContent = val + '%';
+        else if (param === 'level') output.textContent = val + 'dB';
+        else output.textContent = val;
+      }
+    });
+  });
+
+  const auxControls = document.querySelectorAll('.aux-control');
+  auxControls.forEach(input => {
+    input.addEventListener('input', function() {
+      const target = this.dataset.target;
+      const scope = this.dataset.scope || 'AUX';
+      const val = Math.round(this.value * 100);
+      
+      const tr = document.getElementById('testResult');
+      if (tr) tr.textContent = `${scope} [${target}] Value: ${val}%`;
+    });
+  });
+
 })();
 </script>
 
