@@ -80,6 +80,10 @@
     box-sizing: border-box !important;
   }
 
+  html {
+    scroll-behavior: smooth !important;
+  }
+
   body {
     background: var(--main-bg) !important;
     color: var(--text-main) !important;
@@ -162,7 +166,6 @@
     padding: 8px !important;
   }
 
-  /* Penyesuaian Komponen Dalam Channel Strip */
   .new-channel-strip, .channel-strip {
     display: flex !important;
     flex-direction: column !important;
@@ -171,25 +174,25 @@
     border-right: 1px dashed var(--panel-border) !important;
   }
 
-  /* Indikator VU Meter Mini di Atas Kontrol Gain Tiap Channel */
   .ch-top-vu {
-    width: 22px !important;
-    height: 6px !important;
-    background: #101721 !important;
+    width: 26px !important;
+    height: 5px !important;
+    background: #06090c !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 2px !important;
-    margin: 2px 0 4px 0 !important;
+    margin: 3px auto 4px auto !important;
     overflow: hidden !important;
     display: flex !important;
     align-items: center !important;
-    padding: 1px !important;
+    padding: 0 !important;
   }
 
   .ch-top-vu-fill {
     width: 0%;
     height: 100% !important;
-    background: linear-gradient(90deg, #2ecc71 60%, #f1c40f 85%, #e74c3c 100%) !important;
-    transition: width 0.05s ease-out !important;
+    background: linear-gradient(90deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 85%, #e74c3c 100%) !important;
+    transition: width 0.08s ease-out !important;
+    box-shadow: 0 0 4px rgba(46, 204, 113, 0.5) !important;
   }
 
   .new-channel-control {
@@ -210,7 +213,6 @@
     margin-bottom: 8px !important;
   }
 
-  /* Slider Fader Channel Digeser Pas Sebelum Perbatasan Bawah */
   .fader-area {
     display: flex !important;
     flex-direction: column !important;
@@ -222,7 +224,7 @@
   }
 
   .fader-area input[type="range"], .channel-fader {
-    height: 190px !important; /* Panjang Fader Presisi */
+    height: 190px !important;
     accent-color: var(--accent-color) !important;
   }
 
@@ -250,7 +252,6 @@
     margin-right: 8px !important;
   }
 
-  /* Indikator Meter Stereo L/R Output Utama */
   .main-meters {
     display: flex !important;
     gap: 8px !important;
@@ -327,6 +328,12 @@
     white-space: nowrap !important;
   }
 
+  .screen-tabs button.active {
+    background: var(--btn-active) !important;
+    color: #fff !important;
+    border-color: var(--accent-color) !important;
+  }
+
   .m32-submenu-bar {
     display: grid !important;
     grid-template-columns: repeat(6, 1fr) !important;
@@ -344,6 +351,12 @@
     border: 1px solid var(--panel-border) !important;
     cursor: pointer !important;
     white-space: nowrap !important;
+  }
+
+  .m32-sub-btn.active {
+    background: var(--accent-color) !important;
+    color: #000 !important;
+    font-weight: bold !important;
   }
 
   .midas-tft-screen {
@@ -476,12 +489,15 @@
   }
 
   /* ==========================================================
-     6. BOTTOM NAV
+     6. BOTTOM NAV STYLING & ACTIVE STATES
      ========================================================== */
   .bottom-nav {
     display: flex !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 9999 !important;
     width: 100% !important;
-    gap: 2px !important;
+    gap: 4px !important;
     padding: 6px 8px !important;
     background: var(--panel-bg) !important;
     border-top: 1px solid var(--panel-border) !important;
@@ -491,6 +507,20 @@
     flex: 1 !important;
     padding: 8px 2px !important;
     font-size: 9px !important;
+    font-weight: bold !important;
+    background: var(--main-bg) !important;
+    color: var(--text-dim) !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .bottom-nav button.active {
+    background: var(--btn-active) !important;
+    color: #ffffff !important;
+    border-color: var(--accent-color) !important;
+    box-shadow: 0 0 6px var(--accent-color) !important;
   }
 </style>
 </head>
@@ -535,13 +565,13 @@
 
 <main class="console">
   <!-- 1. CHANNEL BANK KIRI (CH 1–7) -->
-  <section class="channel-bank channel-bank-left">
+  <section class="channel-bank channel-bank-left" id="bankLeft">
     <div class="bank-title"><span>INPUT CHANNELS 1–7</span><small>CH1–CH7</small></div>
     <div id="channels"></div>
   </section>
 
   <!-- 2. KONSOL TENGAH (SCREEN M32 + PLAYER + FX RACK + AUX RACK) -->
-  <section class="center-console">
+  <section class="center-console" id="centerConsole">
     <!-- Screen M32 -->
     <div class="screen-frame">
       <div class="screen-title" style="margin-bottom: 4px;"><b>MIDAS M32</b><span>DIGITAL CONSOLE SYSTEM</span></div>
@@ -857,13 +887,13 @@
   </section>
 
   <!-- 3. CHANNEL BANK KANAN (CH 8–14) -->
-  <section class="channel-bank channel-bank-right">
+  <section class="channel-bank channel-bank-right" id="bankRight">
     <div class="bank-title"><span>INPUT CHANNELS 8–14</span><small>CH8–CH14</small></div>
     <div id="channelsRight"></div>
   </section>
 
   <!-- 4. MASTER RACK DENGAN INDIKATOR L/R MASTER STEREO -->
-  <aside class="master-rack">
+  <aside class="master-rack" id="masterRack">
     <div class="meter-rack">
       <b style="font-size: 9px; color: var(--accent-color); display: block; text-align: center; margin-bottom: 4px;">MAIN L / R STEREO</b>
       <div class="main-meters">
@@ -888,11 +918,17 @@
   </aside>
 </main>
 
-<nav class="bottom-nav">
-  <button class="active">CH 1–7</button><button>CH 8–14</button><button>FX</button><button>MASTER</button><button>SCENE</button><button>SETUP</button><button>SYSTEM</button>
+<nav class="bottom-nav" id="bottomNav">
+  <button class="active" data-nav="ch1-7">CH 1–7</button>
+  <button data-nav="ch8-14">CH 8–14</button>
+  <button data-nav="fx">FX</button>
+  <button data-nav="master">MASTER</button>
+  <button data-nav="scene">SCENE</button>
+  <button data-nav="setup">SETUP</button>
+  <button data-nav="system">SYSTEM</button>
 </nav>
 
-<section class="right-tools">
+<section class="right-tools" id="systemPanel">
   <section class="device-connection">
     <div class="section-heading"><h2>DEVICE CONNECTION</h2><span id="deviceLamp" class="lamp red"></span></div>
     <label for="transportSelect">TRANSPORT</label>
@@ -992,6 +1028,36 @@
       subPanels.forEach(panel => {
         panel.classList.toggle('active', panel.dataset.subpanel === targetSub);
       });
+    });
+  });
+
+  // LOGIKA RESPONSIF BOTTOM NAV BAR
+  const bottomNavButtons = document.querySelectorAll('#bottomNav button');
+  bottomNavButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      bottomNavButtons.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+
+      const target = this.dataset.nav;
+
+      if (target === 'ch1-7') {
+        document.getElementById('bankLeft')?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+      } else if (target === 'ch8-14') {
+        document.getElementById('bankRight')?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+      } else if (target === 'fx') {
+        setScreen('EFFECT');
+        document.getElementById('fxRack')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if (target === 'master') {
+        document.getElementById('masterRack')?.scrollIntoView({ behavior: 'smooth', inline: 'end', block: 'nearest' });
+      } else if (target === 'scene') {
+        setScreen('SCENE');
+        document.getElementById('centerConsole')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if (target === 'setup') {
+        setScreen('SETUP');
+        document.getElementById('centerConsole')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if (target === 'system') {
+        document.getElementById('systemPanel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     });
   });
 
@@ -1113,7 +1179,7 @@
     set('screenInput', 'CH ' + (id < 10 ? '0' + id : id));
     
     if (c) {
-      set('screenFader', (c.fader !== undefined ? c.fader : 75) + '%');
+      set('screenFader', Math.round(c.fader !== undefined ? c.fader : 75) + '%');
       set('screenGain', Number(c.gain || 1.0).toFixed(2));
       set('screenPan', c.pan === 0 || c.pan === undefined ? 'CENTER' : (c.pan < 0 ? 'L ' + Math.round(Math.abs(c.pan) * 100) + '%' : 'R ' + Math.round(c.pan * 100) + '%'));
       
@@ -1585,16 +1651,29 @@
         if (masterMeterL) masterMeterL.style.height = leftHeight + '%';
         if (masterMeterR) masterMeterR.style.height = rightHeight + '%';
 
-        // Update VU meter spesifik per channel
+        // Update VU meter di semua channel (1–14)
         document.querySelectorAll('.new-channel-strip, .channel-strip, [data-ch]').forEach(strip => {
           const cId = Number(strip.dataset.ch) || parseInt(strip.innerText.match(/CH\s*(\d+)/i)?.[1] || '0', 10);
           if (cId > 0) {
-            const cState = window.state.channels[cId - 1] || {};
-            const cFaderScale = ((cState.fader !== undefined ? cState.fader : 75)) / 100;
+            const cState = (window.state && window.state.channels) ? window.state.channels[cId - 1] : {};
             const topVuFill = strip.querySelector('.ch-top-vu-fill');
             
             if (topVuFill) {
-              topVuFill.style.width = (cId === chNum) ? Math.min(100, avgLevel * 100 * cFaderScale) + '%' : '0%';
+              if (cState.mute) {
+                topVuFill.style.width = '0%';
+              } else {
+                const cGain = parseFloat(cState.gain ?? 1.0);
+                const cFaderScale = (parseFloat(cState.fader ?? 75)) / 100;
+                
+                let chSignalLevel = 0;
+                if (cId === chNum && analyserNode && currentAudioElement && !currentAudioElement.paused) {
+                  chSignalLevel = avgLevel * 100 * cGain * cFaderScale;
+                } else if (cFaderScale > 0 && cGain > 0 && window.state.system) {
+                  chSignalLevel = Math.min(100, (cGain * cFaderScale * 45) + (Math.random() * 8));
+                }
+
+                topVuFill.style.width = Math.min(100, Math.max(0, chSignalLevel)) + '%';
+              }
             }
           }
         });
