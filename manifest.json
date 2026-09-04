@@ -3,7 +3,9 @@
   "short_name": "Mixer M32",
   "description": "Midas M32 Pro Edition Web Mixer Controller",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "landscape",
   "background_color": "#090b0c",
   "theme_color": "#090b0c",
   "icons": [
