@@ -22,7 +22,6 @@
     overflow-x: auto;
   }
 
-  /* Kontainer utama berjajar ke samping secara rapi */
   main.console {
     display: flex !important;
     flex-direction: row !important;
@@ -42,13 +41,11 @@
     flex-shrink: 0 !important;
   }
 
-  /* Lebar Bank Channel Kiri (CH 1–7) */
   .channel-bank-left {
     width: 530px !important;
     min-width: 530px !important;
   }
 
-  /* Konsol Tengah (Screen + Player + FX + Aux) dikunci lebarnya */
   .center-console {
     display: flex !important;
     flex-direction: column !important;
@@ -59,13 +56,11 @@
     box-sizing: border-box !important;
   }
 
-  /* Lebar Bank Channel Kanan (CH 8–14) */
   .channel-bank-right {
     width: 530px !important;
     min-width: 530px !important;
   }
 
-  /* Master Rack di ujung kanan (sejajar penuh) */
   .master-rack {
     width: 120px !important;
     min-width: 120px !important;
@@ -78,7 +73,6 @@
     padding: 8px 4px !important;
   }
 
-  /* Seragamkan lebar seluruh komponen di dalam konsol tengah */
   .screen-frame, 
   .media-rack, 
   .center-console .fx-rack, 
@@ -88,7 +82,6 @@
     box-sizing: border-box !important;
   }
 
-  /* Pastikan FX Rack dan Aux Rack menyatu rapi ke bawah di konsol tengah tanpa overlapping */
   .center-console .fx-rack,
   .center-console .aux-rack {
     position: relative !important;
@@ -104,7 +97,6 @@
     padding: 6px !important;
   }
 
-  /* Sembunyikan elemen duplikat di luar konsol utama */
   main.console > .fx-rack, 
   main.console > .aux-rack {
     display: none !important;
@@ -232,7 +224,6 @@
     font-family: monospace;
   }
 
-  /* Manajemen Tampilan Tab Layar & Sub-Panel */
   .screen-view {
     display: none !important;
   }
@@ -255,7 +246,6 @@
     flex-grow: 1 !important;
   }
 
-  /* Indikator Screen Mixer Dipertinggi */
   .pro-mini-spectrum {
     flex-grow: 1 !important;
     display: flex !important;
@@ -309,6 +299,68 @@
     background: #00738c !important;
     color: #fff !important;
     border-color: #00e5ff !important;
+  }
+
+  /* INDIKATOR MASTER L / R STEREO */
+  .main-meters {
+    display: flex !important;
+    justify-content: space-around !important;
+    gap: 6px !important;
+    height: 120px !important;
+    background: #040608 !important;
+    border: 1px solid #1a2736 !important;
+    padding: 4px !important;
+    border-radius: 4px !important;
+    align-items: flex-end !important;
+  }
+  .meter-bar-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    flex: 1 !important;
+    height: 100% !important;
+    justify-content: flex-end !important;
+  }
+  .meter-bar-bg {
+    width: 10px !important;
+    height: 100% !important;
+    background: #0c1219 !important;
+    border-radius: 2px !important;
+    display: flex !important;
+    align-items: flex-end !important;
+    overflow: hidden !important;
+    border: 1px solid #1f2d3d !important;
+  }
+  .meter-bar-fill {
+    width: 100% !important;
+    height: 0%;
+    background: linear-gradient(180deg, #e74c3c 0%, #f1c40f 30%, #2ecc71 100%) !important;
+    transition: height 0.05s ease !important;
+  }
+  .meter-label {
+    font-size: 8px !important;
+    font-weight: bold !important;
+    color: #00e5ff !important;
+    margin-top: 2px !important;
+  }
+
+  /* INDIKATOR VU PER CHANNEL STRIP */
+  .channel-vu-meter {
+    width: 6px;
+    height: 60px;
+    background: #05080c;
+    border: 1px solid #1f2d3d;
+    border-radius: 2px;
+    margin: 4px auto;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+  }
+  .channel-vu-fill {
+    width: 100%;
+    height: 0%;
+    background: linear-gradient(180deg, #e74c3c 0%, #2ecc71 100%);
+    transition: height 0.08s ease;
   }
 </style>
 </head>
@@ -399,7 +451,6 @@
                 </div>
               </div>
 
-              <!-- Indikator Spectrum Tinggi -->
               <div class="pro-mini-spectrum" id="visualMeter" style="background: #040609; border: 1px solid #16222f; border-radius: 3px;">
                 <div class="spectrum-bars-container">
                   <div class="bar-col" style="flex:1; background: #00e5ff; height: 60%"></div>
@@ -602,9 +653,21 @@
     <div id="channelsRight"></div>
   </section>
 
-  <!-- 4. MASTER RACK -->
+  <!-- 4. MASTER RACK DENGAN INDIKATOR STEREO L / R -->
   <aside class="master-rack">
-    <div class="meter-rack"><b>MAIN L&nbsp; R</b><div class="main-meters"><div class="meter"></div><div class="meter"></div></div></div>
+    <div class="meter-rack">
+      <b style="font-size: 9px; color: #00e5ff; display: block; text-align: center; margin-bottom: 4px;">MAIN L / R STEREO</b>
+      <div class="main-meters">
+        <div class="meter-bar-container">
+          <div class="meter-bar-bg"><div class="meter-bar-fill" id="masterMeterL"></div></div>
+          <span class="meter-label">L</span>
+        </div>
+        <div class="meter-bar-container">
+          <div class="meter-bar-bg"><div class="meter-bar-fill" id="masterMeterR"></div></div>
+          <span class="meter-label">R</span>
+        </div>
+      </div>
+    </div>
     <div class="master-card">
       <h2>MASTER</h2>
       <input id="master" type="range" min="0" max="100" value="75" orient="vertical">
@@ -699,7 +762,6 @@
     if (tr) tr.textContent = 'DEFAULT SCENE: factory state ready';
   });
 
-  // LOGIKA UTAMA LAYAR TABS (HOME, METERS, RTA, SETUP, EFFECTS, LIBRARY)
   const tabs = document.querySelectorAll('#screenTabs button');
   const views = document.querySelectorAll('.screen-view');
   const subButtons = document.querySelectorAll('.m32-sub-btn');
@@ -710,7 +772,6 @@
     tabs.forEach(b => b.classList.toggle('active', b.dataset.screen === name));
     views.forEach(v => v.classList.toggle('active', v.dataset.view === name));
     
-    // Tampilkan sub-menu bar (OVERVIEW-SENDS) hanya jika berada di tab HOME
     if(subBar) subBar.style.display = (name === 'HOME') ? 'flex' : 'none';
 
     if (name === 'METER') buildScreenMeters();
@@ -720,7 +781,6 @@
 
   tabs.forEach(b => b.addEventListener('click', () => setScreen(b.dataset.screen)));
 
-  // LOGIKA SUB-MENU LAYAR (OVERVIEW, CONFIG, GATE, DYN, EQ, SENDS)
   subButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       subButtons.forEach(b => b.classList.remove('active'));
@@ -765,7 +825,6 @@
     if (t) t.textContent = a?.connected ? (a.transport === 'bluetooth' ? 'BLUETOOTH' : 'ESP32 BRIDGE') : 'OFFLINE';
   }
 
-  // PILIH CHANNEL PADA SCREEN & PERBARUI STATUS [ACTIVE] / [MUTED] / [SOLO]
   function selectScreenChannel(id) {
     const c = window.state?.channels?.[id - 1];
     const set = (elemId, v) => { const e = document.getElementById(elemId); if (e) e.textContent = v; };
@@ -1030,6 +1089,9 @@
   const modeBtn = document.getElementById('btnPlayerMode');
   const modeText = document.getElementById('modeText');
 
+  const masterMeterL = document.getElementById('masterMeterL');
+  const masterMeterR = document.getElementById('masterMeterR');
+
   let audioCtx = null;
   let sourceNode = null;
   let gainNode = null;
@@ -1041,6 +1103,20 @@
   let currentTrackIndex = 0;
   let isShuffle = false;
   let lockedMusicChannel = null;
+
+  function injectChannelVuMeters() {
+    const strips = document.querySelectorAll('.new-channel-strip');
+    strips.forEach(strip => {
+      if (!strip.querySelector('.channel-vu-meter')) {
+        const vuBox = document.createElement('div');
+        vuBox.className = 'channel-vu-meter';
+        vuBox.innerHTML = '<div class="channel-vu-fill"></div>';
+        
+        const faderArea = strip.querySelector('.fader-area') || strip;
+        faderArea.insertBefore(vuBox, faderArea.firstChild);
+      }
+    });
+  }
 
   function initAudioEngine(audioElement) {
     if (!audioCtx) {
@@ -1124,6 +1200,8 @@
   function updateIndicators() {
     requestAnimationFrame(updateIndicators);
 
+    injectChannelVuMeters();
+
     const activeInput = document.getElementById('screenInput');
     const screenGain = document.getElementById('screenGain');
     const screenFader = document.getElementById('screenFader');
@@ -1164,15 +1242,43 @@
           bar.style.height = Math.max(10, Math.min(100, (val / 255) * 100)) + '%';
         });
 
+        let avgLevel = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          avgLevel += dataArray[i];
+        }
+        avgLevel = (avgLevel / dataArray.length) / 255;
+
+        const masterValElem = document.getElementById('masterVal');
+        const masterVolumeScale = masterValElem ? (parseInt(masterValElem.textContent, 10) || 75) / 100 : 0.75;
+        const channelFaderScale = (chData.fader || 75) / 100;
+
+        const panVal = chData.pan || 0;
+        const leftPan = panVal <= 0 ? 1 : 1 - panVal;
+        const rightPan = panVal >= 0 ? 1 : 1 + panVal;
+
+        const leftHeight = Math.min(100, avgLevel * 100 * channelFaderScale * masterVolumeScale * leftPan);
+        const rightHeight = Math.min(100, avgLevel * 100 * channelFaderScale * masterVolumeScale * rightPan);
+
+        if (masterMeterL) masterMeterL.style.height = leftHeight + '%';
+        if (masterMeterR) masterMeterR.style.height = rightHeight + '%';
+
+        const activeStrip = document.querySelector(`.new-channel-strip[data-ch="${chNum}"] .channel-vu-fill`);
+        if (activeStrip) {
+          activeStrip.style.height = Math.min(100, avgLevel * 100 * channelFaderScale) + '%';
+        }
+
         if (gainNode) {
-          const faderScale = (chData.fader || 75) / 100;
-          const gainVal = (parseFloat(chData.gain) || 1.0) * faderScale;
+          const gainVal = (parseFloat(chData.gain) || 1.0) * channelFaderScale;
           gainNode.gain.setValueAtTime(Math.max(0, Math.min(2.0, gainVal)), audioCtx.currentTime);
         }
 
         if (panNode && typeof chData.pan !== 'undefined') {
           panNode.pan.setValueAtTime(Math.max(-1.0, Math.min(1.0, chData.pan)), audioCtx.currentTime);
         }
+      } else {
+        if (masterMeterL) masterMeterL.style.height = '0%';
+        if (masterMeterR) masterMeterR.style.height = '0%';
+        document.querySelectorAll('.channel-vu-fill').forEach(fill => fill.style.height = '0%');
       }
     }
   }
@@ -1221,7 +1327,6 @@
     });
   }
 
-  // LOGIKA UTAMA INTERAKSI EFFECT PROCESSOR & AUX RACK
   const fxButtons = document.querySelectorAll('.fx-buttons button');
   const fxPresetName = document.getElementById('fxRackPreset');
 
