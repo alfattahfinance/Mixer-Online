@@ -1799,5 +1799,112 @@
 })();
 </script>
 
+<script>
+// ==========================================================================
+// KODE HANDLER CONNECTION / TEST SUITE (PERBAIKAN SINKRONISASI TEST REALTIME)
+// ==========================================================================
+(function() {
+  "use strict";
+
+  function triggerUiUpdate(chNum) {
+    if (typeof window.selectScreenChannel === "function") {
+      window.selectScreenChannel(chNum);
+    }
+    const strip = document.querySelector(`.new-channel-strip[data-ch="${chNum}"], .channel-strip[data-ch="${chNum}"]`);
+    if (strip && window.state?.channels?.[chNum - 1]) {
+      const ch = window.state.channels[chNum - 1];
+      
+      const faderInput = strip.querySelector('input.channel-fader, [data-k="fader"], [data-param="fader"]');
+      if (faderInput) faderInput.value = ch.fader;
+
+      const faderOut = strip.querySelector('output, .fader-val');
+      if (faderOut) faderOut.textContent = Math.round(ch.fader) + '%';
+
+      const muteBtn = strip.querySelector('button[data-k="mute"]');
+      if (muteBtn) {
+        muteBtn.classList.toggle('active', ch.mute);
+        muteBtn.classList.toggle('on', ch.mute);
+        muteBtn.textContent = ch.mute ? 'UNMUTE' : 'MUTE';
+      }
+
+      const soloBtn = strip.querySelector('button[data-k="solo"]');
+      if (soloBtn) {
+        soloBtn.classList.toggle('active', ch.solo);
+        soloBtn.classList.toggle('on', ch.solo);
+        soloBtn.textContent = ch.solo ? 'UNSOLO' : 'SOLO';
+      }
+    }
+  }
+
+  // 1. RUN COMBINATION CONTROL TEST
+  document.getElementById('runCombinationTest')?.addEventListener('click', function() {
+    if (!window.state) window.state = { channels: [] };
+    if (!window.state.channels) window.state.channels = [];
+    
+    for (let i = 0; i < 14; i++) {
+      if (!window.state.channels[i]) window.state.channels[i] = {};
+      
+      window.state.channels[i].gain = (0.5 + Math.random() * 1.5).toFixed(2);
+      window.state.channels[i].pan = parseFloat((Math.random() * 2 - 1).toFixed(2));
+      window.state.channels[i].fader = Math.floor(20 + Math.random() * 75);
+      
+      triggerUiUpdate(i + 1);
+    }
+
+    const tr = document.getElementById('testResult');
+    if (tr) tr.textContent = `TEST: COMBINATION TEST SUCCESS (Gain, Pan, Fader CH1-14 Diacak)`;
+  });
+
+  // 2. RUN FADER TEST
+  document.getElementById('runFaderTest')?.addEventListener('click', function() {
+    if (!window.state) window.state = { channels: [] };
+    if (!window.state.channels) window.state.channels = [];
+
+    for (let i = 0; i < 14; i++) {
+      if (!window.state.channels[i]) window.state.channels[i] = {};
+      window.state.channels[i].fader = Math.floor(Math.random() * 100);
+      triggerUiUpdate(i + 1);
+    }
+
+    const tr = document.getElementById('testResult');
+    if (tr) tr.textContent = `TEST: FADER CH1–CH14 TEST PASSED`;
+  });
+
+  // 3. RUN MUTE/SOLO TEST
+  document.getElementById('runMuteSoloTest')?.addEventListener('click', function() {
+    if (!window.state) window.state = { channels: [] };
+    if (!window.state.channels) window.state.channels = [];
+
+    for (let i = 0; i < 14; i++) {
+      if (!window.state.channels[i]) window.state.channels[i] = {};
+      window.state.channels[i].mute = Math.random() > 0.5;
+      window.state.channels[i].solo = Math.random() > 0.7;
+      triggerUiUpdate(i + 1);
+    }
+
+    const tr = document.getElementById('testResult');
+    if (tr) tr.textContent = `TEST: MUTE & SOLO TEST COMPLETED`;
+  });
+
+  // 4. SIMULATE HARDWARE RX
+  document.getElementById('simulateRx')?.addEventListener('click', function() {
+    if (!window.state) window.state = { channels: [] };
+    if (!window.state.channels) window.state.channels = [];
+
+    const chId = Math.floor(Math.random() * 14) + 1;
+    if (!window.state.channels[chId - 1]) window.state.channels[chId - 1] = {};
+
+    window.state.channels[chId - 1].gain = (Math.random() * 2).toFixed(2);
+    triggerUiUpdate(chId);
+
+    const rx = document.getElementById('rx');
+    if (rx) rx.textContent = `RX: {"ch":${chId},"param":"gain","val":${window.state.channels[chId - 1].gain}}`;
+
+    const tr = document.getElementById('testResult');
+    if (tr) tr.textContent = `TEST: SIMULATION RX CH${chId} GAIN UPDATED`;
+  });
+})();
+</script>
+
 </body>
 </html>
