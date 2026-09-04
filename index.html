@@ -63,7 +63,7 @@
   }
 
   /* ==========================================================
-     OVERRIDE GLOBAL SKIN KE SELURUH KOMPONEN (TERMASUK CHANNEL STRIP)
+     OVERRIDE GLOBAL SKIN KE SELURUH KOMPONEN
      ========================================================== */
   body {
     background: var(--main-bg) !important;
@@ -92,7 +92,7 @@
     color: var(--accent-color) !important;
   }
 
-  /* Channel Bank & Strips (CH 1–14 & Master) */
+  /* Channel Bank & Strips */
   .channel-bank,
   .new-channel-strip,
   .channel-strip,
@@ -120,8 +120,6 @@
 
   /* Center Console (Screen, Media, FX, Aux) */
   .media-rack, 
-  .center-console .fx-rack, 
-  .center-console .aux-rack,
   .midas-block,
   .aux-unit,
   .screen-frame,
@@ -192,7 +190,7 @@
   }
 
   /* ==========================================================
-     LAYOUT MUTLAK PRO: 14 CHANNEL + MASTER (1 BARIS HORIZONTAL)
+     LAYOUT CONSOLE 1 BARIS HORIZONTAL
      ========================================================== */
   main.console {
     display: flex !important;
@@ -218,16 +216,6 @@
     min-width: 530px !important;
   }
 
-  .center-console {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 340px !important;
-    min-width: 340px !important;
-    max-width: 340px !important;
-    gap: 8px !important;
-    box-sizing: border-box !important;
-  }
-
   .channel-bank-right {
     width: 530px !important;
     min-width: 530px !important;
@@ -245,6 +233,20 @@
     padding: 8px 4px !important;
   }
 
+  /* ==========================================================
+     FIX UNTUK KONSOL TENGAH (MENGHILANGKAN OVERLAP FX & AUX RACK)
+     ========================================================== */
+  .center-console {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 340px !important;
+    min-width: 340px !important;
+    max-width: 340px !important;
+    gap: 8px !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+  }
+
   .screen-frame, 
   .media-rack, 
   .center-console .fx-rack, 
@@ -254,18 +256,49 @@
     box-sizing: border-box !important;
   }
 
-  .center-console .fx-rack,
-  .center-console .aux-rack {
-    position: relative !important;
+  /* Memaksa posisi FX Rack dan Aux Rack mengalir secara vertikal */
+  .center-console .fx-rack {
+    position: static !important;
     top: auto !important;
     left: auto !important;
     transform: none !important;
     z-index: 1 !important;
     margin: 0 !important;
     box-shadow: none !important;
+    background: var(--panel-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 6px !important;
     padding: 6px !important;
+  }
+
+  .center-console .aux-rack {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    z-index: 1 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    background: var(--panel-bg) !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 6px !important;
+    padding: 6px !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 6px !important;
+  }
+
+  .aux-unit {
+    background: var(--main-bg) !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 4px !important;
+    padding: 4px !important;
+  }
+
+  /* Pengaturan warna slider thumb mengikuti tema aktif */
+  .fx-control::-webkit-slider-thumb,
+  .aux-control::-webkit-slider-thumb {
+    background: var(--accent-color) !important;
   }
 
   main.console > .fx-rack, 
@@ -741,10 +774,10 @@
 
     <!-- Effect Processor -->
     <div class="fx-rack fx-rack-live" id="fxRack">
-      <div class="rack-title" style="font-size: 9px; margin-bottom: 4px;">EFFECT PROCESSOR <span>PARAMETER</span></div>
+      <div class="rack-title" style="font-size: 9px; margin-bottom: 4px;">EFFECT PROCESSOR <span style="color: var(--accent-color);">PARAMETER</span></div>
       <div class="fx-toolbar" style="display: flex; align-items: center; gap: 4px; margin-bottom: 4px;">
         <div class="fx-display" style="background: var(--main-bg); padding: 3px; border: 1px solid var(--panel-border); flex-grow: 1; border-radius: 3px;">
-          <strong id="fxRackPreset" style="font-size: 9px; color: var(--text-main);">HALL 1</strong>
+          <strong id="fxRackPreset" style="font-size: 9px; color: var(--accent-color);">FX1 ACTIVE</strong>
           <small id="fxRackSummary" style="font-size: 7px; color: var(--text-dim); display: block;">REVERB • TIME 2.45s</small>
         </div>
         <button id="fxTap" type="button" style="font-size: 8px; padding: 3px 6px;">TAP</button>
@@ -760,16 +793,16 @@
         <button data-fx-select="AUX4" style="font-size: 7px; padding: 2px;">AX4</button>
       </div>
       <div class="fx-parameter-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 8px;">
-        <label>TIME <input class="fx-control" data-scope="FX" data-target="FX1" data-param="time" type="range" min="0.1" max="10" step="0.01" value="2.45" style="width:100%;"><output data-fx-value="time">2.45s</output></label>
-        <label>PRE-D <input class="fx-control" data-scope="FX" data-target="FX1" data-param="preDelay" type="range" min="0" max="200" step="1" value="32" style="width:100%;"><output data-fx-value="preDelay">32ms</output></label>
-        <label>DECAY <input class="fx-control" data-scope="FX" data-target="FX1" data-param="decay" type="range" min="0" max="100" step="1" value="65" style="width:100%;"><output data-fx-value="decay">65%</output></label>
-        <label>LEVEL <input class="fx-control" data-scope="FX" data-target="FX1" data-param="level" type="range" min="-20" max="6" step="0.1" value="-3" style="width:100%;"><output data-fx-value="level">-3.0dB</output></label>
+        <label>TIME <input class="fx-control" data-scope="FX" data-target="FX1" data-param="time" type="range" min="0.1" max="10" step="0.01" value="2.45" style="width:100%;"><output data-fx-value="time" style="color: var(--accent-color);">2.45s</output></label>
+        <label>PRE-D <input class="fx-control" data-scope="FX" data-target="FX1" data-param="preDelay" type="range" min="0" max="200" step="1" value="32" style="width:100%;"><output data-fx-value="preDelay" style="color: var(--accent-color);">32ms</output></label>
+        <label>DECAY <input class="fx-control" data-scope="FX" data-target="FX1" data-param="decay" type="range" min="0" max="100" step="1" value="65" style="width:100%;"><output data-fx-value="decay" style="color: var(--accent-color);">65%</output></label>
+        <label>LEVEL <input class="fx-control" data-scope="FX" data-target="FX1" data-param="level" type="range" min="-20" max="6" step="0.1" value="-3" style="width:100%;"><output data-fx-value="level" style="color: var(--accent-color);">-3.0dB</output></label>
       </div>
     </div>
 
     <!-- Aux / Bus & FX Return -->
-    <div class="aux-rack" id="auxRack" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
-      <div class="aux-unit aux-live" style="padding: 4px; border: 1px solid var(--panel-border); border-radius: 4px; font-size: 8px;">
+    <div class="aux-rack" id="auxRack">
+      <div class="aux-unit aux-live">
         <b style="font-size: 8px;">AUX / BUS</b>
         <div class="aux-labels" style="display:flex; justify-content:space-between; color:var(--text-dim); font-size:6px; margin:2px 0;"><span>A1</span><span>A2</span><span>A3</span><span>A4</span></div>
         <div class="mini-knobs" style="display:flex; gap:2px;">
@@ -779,7 +812,7 @@
           <input class="aux-control" data-target="AUX4" type="range" min="0" max="1" step="0.01" value="0" style="width:100%;">
         </div>
       </div>
-      <div class="aux-unit aux-live" style="padding: 4px; border: 1px solid var(--panel-border); border-radius: 4px; font-size: 8px;">
+      <div class="aux-unit aux-live">
         <b style="font-size: 8px;">FX RETURN</b>
         <div class="aux-labels" style="display:flex; justify-content:space-between; color:var(--text-dim); font-size:6px; margin:2px 0;"><span>FX1</span><span>FX2</span></div>
         <div class="mini-knobs" style="display:flex; gap:2px;">
@@ -1435,7 +1468,7 @@
     modeBtn.addEventListener('click', () => {
       isShuffle = !isShuffle;
       if (modeText) modeText.textContent = isShuffle ? 'SHUFFLE' : 'SEQ';
-      modeBtn.style.borderColor = isShuffle ? '#00e5ff' : '#243447';
+      modeBtn.style.borderColor = isShuffle ? 'var(--accent-color)' : 'var(--panel-border)';
     });
   }
 
@@ -1452,7 +1485,7 @@
       } else {
         currentAudioElement.pause();
         playPauseBtn.textContent = '▶ PLAY';
-        playPauseBtn.style.background = '#00a8cc';
+        playPauseBtn.style.background = 'var(--accent-color)';
       }
     });
   }
