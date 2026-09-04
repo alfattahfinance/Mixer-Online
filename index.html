@@ -11,6 +11,53 @@
 <link rel="stylesheet" href="header-system.css?v=20260902-01">
 <link rel="stylesheet" href="channels-new.css?v=20260903-ULTIMATE">
 <style>
+/* ==========================================================
+   SKIN & THEME VARIATIONS
+   ========================================================== */
+/* 1. MIDAS CYAN (DEFAULT) */
+body.theme-midas {
+  --main-bg: #090b0c;
+  --accent-color: #00e5ff;
+  --panel-bg: #0c1219;
+  --border-color: #1a2736;
+}
+
+/* 2. BEHRINGER X32 STYLE */
+body.theme-x32 {
+  --main-bg: #11151c;
+  --accent-color: #f39c12;
+  --panel-bg: #1b222c;
+  --border-color: #2c3e50;
+}
+body.theme-x32 .screen-title,
+body.theme-x32 .midas-ch-badge {
+  background: #d35400 !important;
+  color: #fff !important;
+}
+
+/* 3. PRO VINTAGE GOLD */
+body.theme-gold {
+  --main-bg: #12100e;
+  --accent-color: #f1c40f;
+  --panel-bg: #1c1815;
+  --border-color: #382d24;
+}
+body.theme-gold .screen-title,
+body.theme-gold .midas-ch-badge {
+  background: #b7950b !important;
+  color: #000 !important;
+}
+
+/* 4. STEALTH DARK MATTE */
+body.theme-dark {
+  --main-bg: #050505;
+  --accent-color: #2ecc71;
+  --panel-bg: #0d0d0d;
+  --border-color: #222222;
+}
+
+
+  
   /* ==========================================================
      LAYOUT MUTLAK PRO: 14 CHANNEL + MASTER (1 BARIS HORIZONTAL)
      ========================================================== */
@@ -372,6 +419,15 @@
     <span class="box-title">SYSTEM</span>
     <button id="power" class="power-btn">SYSTEM OFF</button>
   </div>
+<div class="skin-head">
+  <span class="box-title">MIXER SKIN</span>
+  <select id="skinSelect" style="background: #111a24; color: #00e5ff; border: 1px solid #1f2d3d; font-size: 9px; padding: 2px 4px; border-radius: 2px;">
+    <option value="theme-midas">MIDAS CYAN (DEFAULT)</option>
+    <option value="theme-x32">BEHRINGER X32 (BLUE/YELLOW)</option>
+    <option value="theme-gold">PRO VINTAGE (GOLD)</option>
+    <option value="theme-dark">STEALTH DARK (MATTE)</option>
+  </select>
+</div>  
   <div class="bridge-head">
     <span class="box-title">ESP32 BRIDGE</span>
     <div class="head-status"><i id="statusLamp"></i><span id="status">OFFLINE</span></div>
@@ -1369,6 +1425,26 @@
   });
 
 })();
+
+  // Logika Switcher Skin Mixer
+(function() {
+  const skinSelect = document.getElementById('skinSelect');
+  
+  // Muat skin dari localStorage jika ada
+  const savedSkin = localStorage.getItem('mixer_theme') || 'theme-midas';
+  document.body.className = savedSkin;
+  if (skinSelect) skinSelect.value = savedSkin;
+
+  // Pasang event listener saat pilihan diubah
+  if (skinSelect) {
+    skinSelect.addEventListener('change', function() {
+      const selectedTheme = this.value;
+      document.body.className = selectedTheme;
+      localStorage.setItem('mixer_theme', selectedTheme);
+    });
+  }
+})();
+
 </script>
 
 </body>
