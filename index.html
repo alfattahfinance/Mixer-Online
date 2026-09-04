@@ -507,19 +507,20 @@
       </div>
     </div>
 
-    <!-- Player / Recorder -->
+    <!-- Player / Recorder Ditambah Tombol Mode SEQ/SHUFFLE -->
     <section class="media-rack" style="background: #0c1219; border: 1px solid #1a2736; border-radius: 6px; padding: 6px;">
       <h2 style="color: #00e5ff; border-bottom: 1px solid #1a2736; margin-bottom: 4px; font-size: 10px;">USB PLAYER / REC <span id="activePlayerTarget" style="font-size: 9px; color: #2ecc71; float: right;">[CH 1]</span></h2>
       <div style="display: flex; gap: 4px; margin-bottom: 4px;">
         <button id="btnPlayerRec" type="button" style="flex: 1; background: #16222f; color: #fff; border: 1px solid #243447; font-size: 9px; padding: 4px;">🎙<small>REC</small></button>
         <button id="btnPlayerFile" type="button" style="flex: 1; background: #16222f; color: #fff; border: 1px solid #243447; font-size: 9px; padding: 4px;">📁<small>FILE</small></button>
         <button id="btnPlayerMusic" type="button" style="flex: 1; background: #16222f; color: #fff; border: 1px solid #243447; font-size: 9px; padding: 4px;">🎵<small>MUSIC</small></button>
+        <button id="btnPlayerMode" type="button" style="flex: 1; background: #16222f; color: #00e5ff; border: 1px solid #243447; font-size: 9px; padding: 4px;">🔀 <small id="modeText">SEQ</small></button>
       </div>
       <div style="display: flex; gap: 4px; align-items: center; background: #06090f; padding: 4px; border-radius: 3px; border: 1px solid #1a2736;">
         <span id="playerTrackInfo" style="font-size: 9px; color: #8899a6; flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">NO FILE SELECTED</span>
         <button id="btnPlayPauseAudio" type="button" style="background: #00a8cc; color: #fff; border: none; padding: 2px 8px; font-weight: bold; border-radius: 2px; cursor: pointer; font-size: 9px;">▶ PLAY</button>
       </div>
-      <input type="file" id="localAudioLoader" accept="audio/*" style="display: none;">
+      <input type="file" id="localAudioLoader" accept="audio/*" multiple style="display: none;">
     </section>
 
     <!-- Effect Processor (Telah Diposisikan Dalam Aliran Flex Normal) -->
@@ -991,6 +992,8 @@
   const targetLabel = document.getElementById('activePlayerTarget');
   const playPauseBtn = document.getElementById('btnPlayPauseAudio');
   const trackInfo = document.getElementById('playerTrackInfo');
+  const modeBtn = document.getElementById('btnPlayerMode');
+  const modeText = document.getElementById('modeText');
 
   let audioCtx = null;
   let sourceNode = null;
@@ -998,6 +1001,12 @@
   let panNode = null;
   let analyserNode = null;
   let currentAudioElement = null;
+
+  // VARIABLE PLAYLIST & CHANNEL LOCKING
+  let playlist = [];
+  let currentTrackIndex = 0;
+  let isShuffle = false;
+  let lockedMusicChannel = null;
 
   function initAudioEngine(audioElement) {
     if (!audioCtx) {
@@ -1028,6 +1037,56 @@
     }
   }
 
+  function playTrack(index) {
+    if (playlist.length === 0 || index < 0 || index >= playlist.length) return;
+
+    currentTrackIndex = index;
+    const file = playlist[currentTrackIndex];
+    const fileObjectURL = URL.createObjectURL(file);
+
+    if (!currentAudioElement) {
+      currentAudioElement = document.createElement('audio');
+      currentAudioElement.loop = false;
+      document.body.appendChild(currentAudioElement);
+
+      currentAudioElement.addEventListener('ended', playNextTrack);
+    }
+
+    currentAudioElement.src = fileObjectURL;
+    currentAudioElement.play().then(() => {
+      initAudioEngine(currentAudioElement);
+      
+      if (trackInfo) {
+        trackInfo.textContent = `[${currentTrackIndex + 1}/${playlist.length}] ${file.name}`;
+      }
+      if (playPauseBtn) {
+        playPauseBtn.textContent = '⏸ PAUSE';
+        playPauseBtn.style.background = '#e74c3c';
+      }
+      const tr = document.getElementById('testResult');
+      if(tr) tr.textContent = `PLAYER: Memutar "${file.name}" terkunci di Channel ${lockedMusicChannel}`;
+    }).catch(err => console.error("Gagal memutar audio:", err));
+  }
+
+  function playNextTrack() {
+    if (playlist.length === 0) return;
+
+    if (isShuffle) {
+      let nextIndex = Math.floor(Math.random() * playlist.length);
+      if (playlist.length > 1 && nextIndex === currentTrackIndex) {
+        nextIndex = (currentTrackIndex + 1) % playlist.length;
+      }
+      playTrack(nextIndex);
+    } else {
+      let nextIndex = currentTrackIndex + 1;
+      if (nextIndex < playlist.length) {
+        playTrack(nextIndex);
+      } else {
+        playTrack(0); // Kembali berurutan dari lagu pertama
+      }
+    }
+  }
+
   function updateIndicators() {
     requestAnimationFrame(updateIndicators);
 
@@ -1036,21 +1095,29 @@
     const screenFader = document.getElementById('screenFader');
     const screenPan = document.getElementById('screenPan');
 
-    if(activeInput && targetLabel) {
-      targetLabel.textContent = "[" + activeInput.textContent.trim() + "]";
+    if (targetLabel) {
+      if (lockedMusicChannel !== null) {
+        targetLabel.textContent = "[CH " + lockedMusicChannel + " LOCKED]";
+      } else if (activeInput) {
+        targetLabel.textContent = "[" + activeInput.textContent.trim() + "]";
+      }
     }
 
     const currentChannelStr = activeInput?.textContent || "CH 1";
-    const chNum = parseInt(currentChannelStr.replace(/\D/g, ''), 10) || 1;
+    const screenChNum = parseInt(currentChannelStr.replace(/\D/g, ''), 10) || 1;
+    const chNum = (lockedMusicChannel !== null) ? lockedMusicChannel : screenChNum;
 
     if (window.state && window.state.channels && window.state.channels[chNum - 1]) {
       const chData = window.state.channels[chNum - 1];
+      const screenData = window.state.channels[screenChNum - 1];
 
-      if (screenGain) screenGain.textContent = Number(chData.gain || 1.0).toFixed(2);
-      if (screenFader) screenFader.textContent = (chData.fader || 75) + '%';
-      if (screenPan) {
-        const panVal = chData.pan || 0;
-        screenPan.textContent = panVal === 0 ? 'CENTER' : (panVal < 0 ? 'L ' + Math.round(Math.abs(panVal) * 100) + '%' : 'R ' + Math.round(panVal * 100) + '%');
+      if (screenData) {
+        if (screenGain) screenGain.textContent = Number(screenData.gain || 1.0).toFixed(2);
+        if (screenFader) screenFader.textContent = (screenData.fader || 75) + '%';
+        if (screenPan) {
+          const panVal = screenData.pan || 0;
+          screenPan.textContent = panVal === 0 ? 'CENTER' : (panVal < 0 ? 'L ' + Math.round(Math.abs(panVal) * 100) + '%' : 'R ' + Math.round(panVal * 100) + '%');
+        }
       }
 
       if (analyserNode && currentAudioElement && !currentAudioElement.paused) {
@@ -1081,9 +1148,17 @@
   if(musicBtn) musicBtn.addEventListener('click', () => fileInput?.click());
   if(fileBtn) fileBtn.addEventListener('click', () => fileInput?.click());
 
+  if(modeBtn) {
+    modeBtn.addEventListener('click', () => {
+      isShuffle = !isShuffle;
+      if (modeText) modeText.textContent = isShuffle ? 'SHUFFLE' : 'SEQ';
+      modeBtn.style.borderColor = isShuffle ? '#00e5ff' : '#243447';
+    });
+  }
+
   if(playPauseBtn) {
     playPauseBtn.addEventListener('click', () => {
-      if(!currentAudioElement) {
+      if(!currentAudioElement || playlist.length === 0) {
         fileInput?.click();
         return;
       }
@@ -1101,33 +1176,14 @@
 
   if(fileInput) {
     fileInput.addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if(!file) return;
+      const files = Array.from(e.target.files);
+      if(files.length === 0) return;
       
-      const fileObjectURL = URL.createObjectURL(file);
+      playlist = files;
       const currentChannelStr = document.getElementById('screenInput')?.textContent || "CH 1";
-      const chNum = parseInt(currentChannelStr.replace(/\D/g, ''), 10) || 1;
+      lockedMusicChannel = parseInt(currentChannelStr.replace(/\D/g, ''), 10) || 1;
 
-      if (!currentAudioElement) {
-        currentAudioElement = document.createElement('audio');
-        currentAudioElement.loop = true;
-        document.body.appendChild(currentAudioElement);
-      }
-
-      currentAudioElement.src = fileObjectURL;
-      
-      currentAudioElement.play().then(() => {
-        initAudioEngine(currentAudioElement);
-        if(trackInfo) trackInfo.textContent = file.name;
-        if(playPauseBtn) {
-          playPauseBtn.textContent = '⏸ PAUSE';
-          playPauseBtn.style.background = '#e74c3c';
-        }
-        const tr = document.getElementById('testResult');
-        if(tr) tr.textContent = `PLAYER: Memutar "${file.name}" ke Channel ${chNum} (M32 Screen Feature Active)`;
-      }).catch(err => {
-        console.error("Gagal memutar audio:", err);
-      });
+      playTrack(0);
     });
   }
 })();
