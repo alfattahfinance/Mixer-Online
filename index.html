@@ -13,6 +13,114 @@
 <link rel="stylesheet" href="channels-new.css?v=20260904-PERFECT-LAYOUT">
 
 <style>
+/* ==========================================================
+   PERBAIKAN LAYOUT PRESISI CHANNEL STRIP & KONTROL TENGAH
+   ========================================================== */
+
+/* Pastikan Channel Strip berbentuk Kolom Fleksibel & Rapi */
+.new-channel-strip {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important; /* Memaksa semua elemen tepat ke tengah */
+  justify-content: space-between !important;
+  padding: 6px 2px 4px 2px !important;
+  box-sizing: border-border-box !important;
+  border-right: 1px dashed var(--panel-border, #1a2736) !important;
+}
+
+/* 1. Indikator VU Meter di Atas Gain */
+.ch-top-vu {
+  width: 24px !important;
+  height: 6px !important;
+  background: #0a0f14 !important;
+  border: 1px solid #1e2d3d !important;
+  border-radius: 2px !important;
+  margin: 2px auto 4px auto !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.ch-top-vu-fill {
+  width: 0%;
+  height: 100% !important;
+  background: linear-gradient(90deg, #2ecc71 60%, #f1c40f 85%, #e74c3c 100%) !important;
+  transition: width 0.05s ease-out !important;
+}
+
+/* 2. Group Kontrol (Gain, EQ, Pan) - Rapi di Tengah */
+.ch-controls-group {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  width: 100% !important;
+  margin-bottom: 6px !important;
+}
+
+.ch-controls-group label,
+.ch-controls-group div {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  text-align: center !important;
+  font-size: 8px !important;
+  color: var(--text-dim, #8899a6) !important;
+}
+
+/* Style Knob & Input Range Kontrol Top */
+.knob-gain, .knob-pan, .knob-eq {
+  width: 28px !important;
+  height: 28px !important;
+  margin: 2px auto !important;
+  display: block !important;
+}
+
+/* 3. Tombol Mute & Solo di Tengah */
+.btn-mute, .btn-solo, .btn-select {
+  width: 85% !important;
+  margin: 2px auto !important;
+  text-align: center !important;
+  font-size: 8px !important;
+  padding: 3px 0 !important;
+  border-radius: 2px !important;
+}
+
+/* 4. Area Fader Geser Pas ke Bawah Sebelum Perbatasan */
+.fader-area {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-end !important; /* Menurunkan fader ke paling bawah */
+  width: 100% !important;
+  flex-grow: 1 !important;
+  padding-bottom: 4px !important; /* Pas sebelum perbatasan bawah */
+  margin-top: 4px !important;
+}
+
+.fader-area input[type="range"],
+.channel-fader {
+  -webkit-appearance: slider-vertical !important;
+  writing-mode: bt-lr !important;
+  width: 18px !important;
+  height: 180px !important; /* Panjang Fader Presisi */
+  margin: 0 auto !important;
+  cursor: pointer !important;
+  accent-color: var(--accent-color, #00e5ff) !important;
+}
+
+.fader-val, .fader-value {
+  font-size: 8px !important;
+  color: var(--accent-color, #00e5ff) !important;
+  margin-top: 4px !important;
+  text-align: center !important;
+  font-weight: bold !important;
+}
+
+  
   /* ==========================================================
      1. DEFINISI VARIABEL WARNA (SKIN)
      ========================================================== */
