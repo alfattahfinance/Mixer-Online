@@ -1801,36 +1801,86 @@
 
 <script>
 // ==========================================================================
-// KODE HANDLER CONNECTION / TEST SUITE (PERBAIKAN SINKRONISASI TEST REALTIME)
+// KODE HANDLER CONNECTION / TEST SUITE (SINKRONISASI PEMBARUAN KNOB & FADER)
 // ==========================================================================
 (function() {
   "use strict";
 
+  // Helper universal untuk memutarkan kontrol knob/fader di channel strip secara visual
   function triggerUiUpdate(chNum) {
     if (typeof window.selectScreenChannel === "function") {
       window.selectScreenChannel(chNum);
     }
-    const strip = document.querySelector(`.new-channel-strip[data-ch="${chNum}"], .channel-strip[data-ch="${chNum}"]`);
+
+    const strip = document.querySelector(`.new-channel-strip[data-ch="${chNum}"], .channel-strip[data-ch="${chNum}"], [data-ch="${chNum}"]`);
     if (strip && window.state?.channels?.[chNum - 1]) {
       const ch = window.state.channels[chNum - 1];
       
-      const faderInput = strip.querySelector('input.channel-fader, [data-k="fader"], [data-param="fader"]');
-      if (faderInput) faderInput.value = ch.fader;
+      // Update Fader Slider
+      const faderInput = strip.querySelector('input.channel-fader, input[data-k="fader"], input[data-param="fader"]');
+      if (faderInput) {
+        faderInput.value = ch.fader;
+        faderInput.dispatchEvent(new Event('input', { bubbles: true }));
+        faderInput.dispatchEvent(new Event('change', { bubbles: true }));
+      }
 
+      // Update Label Fader
       const faderOut = strip.querySelector('output, .fader-val');
       if (faderOut) faderOut.textContent = Math.round(ch.fader) + '%';
 
-      const muteBtn = strip.querySelector('button[data-k="mute"]');
+      // Update Knob Gain
+      const gainInput = strip.querySelector('input[data-k="gain"], input[data-param="gain"], input.gain-knob, .knob[data-param="gain"]');
+      if (gainInput) {
+        gainInput.value = ch.gain;
+        gainInput.dispatchEvent(new Event('input', { bubbles: true }));
+        gainInput.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+
+      // Update Knob Pan
+      const panInput = strip.querySelector('input[data-k="pan"], input[data-param="pan"], input.pan-knob, .knob[data-param="pan"]');
+      if (panInput) {
+        panInput.value = ch.pan;
+        panInput.dispatchEvent(new Event('input', { bubbles: true }));
+        panInput.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+
+      // Update Knob EQ Low
+      const lowInput = strip.querySelector('input[data-k="low"], input[data-param="low"], input.low-knob, .knob[data-param="low"]');
+      if (lowInput && ch.low !== undefined) {
+        lowInput.value = ch.low;
+        lowInput.dispatchEvent(new Event('input', { bubbles: true }));
+        lowInput.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+
+      // Update Knob EQ Mid
+      const midInput = strip.querySelector('input[data-k="mid"], input[data-param="mid"], input.mid-knob, .knob[data-param="mid"]');
+      if (midInput && ch.mid !== undefined) {
+        midInput.value = ch.mid;
+        midInput.dispatchEvent(new Event('input', { bubbles: true }));
+        midInput.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+
+      // Update Knob EQ High
+      const highInput = strip.querySelector('input[data-k="high"], input[data-param="high"], input.high-knob, .knob[data-param="high"]');
+      if (highInput && ch.high !== undefined) {
+        highInput.value = ch.high;
+        highInput.dispatchEvent(new Event('input', { bubbles: true }));
+        highInput.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+
+      // Update Mute Button
+      const muteBtn = strip.querySelector('button[data-k="mute"], button.mute-btn');
       if (muteBtn) {
-        muteBtn.classList.toggle('active', ch.mute);
-        muteBtn.classList.toggle('on', ch.mute);
+        muteBtn.classList.toggle('active', !!ch.mute);
+        muteBtn.classList.toggle('on', !!ch.mute);
         muteBtn.textContent = ch.mute ? 'UNMUTE' : 'MUTE';
       }
 
-      const soloBtn = strip.querySelector('button[data-k="solo"]');
+      // Update Solo Button
+      const soloBtn = strip.querySelector('button[data-k="solo"], button.solo-btn');
       if (soloBtn) {
-        soloBtn.classList.toggle('active', ch.solo);
-        soloBtn.classList.toggle('on', ch.solo);
+        soloBtn.classList.toggle('active', !!ch.solo);
+        soloBtn.classList.toggle('on', !!ch.solo);
         soloBtn.textContent = ch.solo ? 'UNSOLO' : 'SOLO';
       }
     }
@@ -1847,15 +1897,18 @@
       window.state.channels[i].gain = (0.5 + Math.random() * 1.5).toFixed(2);
       window.state.channels[i].pan = parseFloat((Math.random() * 2 - 1).toFixed(2));
       window.state.channels[i].fader = Math.floor(20 + Math.random() * 75);
+      window.state.channels[i].low = Math.floor(Math.random() * 100);
+      window.state.channels[i].mid = Math.floor(Math.random() * 100);
+      window.state.channels[i].high = Math.floor(Math.random() * 100);
       
       triggerUiUpdate(i + 1);
     }
 
     const tr = document.getElementById('testResult');
-    if (tr) tr.textContent = `TEST: COMBINATION TEST SUCCESS (Gain, Pan, Fader CH1-14 Diacak)`;
+    if (tr) tr.textContent = `TEST: COMBINATION CONTROL SUCCESSFUL (Fader, Gain, Pan, EQ CH1-14 Updated)`;
   });
 
-  // 2. RUN FADER TEST
+  // 2. RUN FADER CH1–CH14 TEST
   document.getElementById('runFaderTest')?.addEventListener('click', function() {
     if (!window.state) window.state = { channels: [] };
     if (!window.state.channels) window.state.channels = [];
@@ -1895,13 +1948,15 @@
     if (!window.state.channels[chId - 1]) window.state.channels[chId - 1] = {};
 
     window.state.channels[chId - 1].gain = (Math.random() * 2).toFixed(2);
+    window.state.channels[chId - 1].pan = parseFloat((Math.random() * 2 - 1).toFixed(2));
+    window.state.channels[chId - 1].low = Math.floor(Math.random() * 100);
     triggerUiUpdate(chId);
 
     const rx = document.getElementById('rx');
-    if (rx) rx.textContent = `RX: {"ch":${chId},"param":"gain","val":${window.state.channels[chId - 1].gain}}`;
+    if (rx) rx.textContent = `RX: {"ch":${chId},"gain":${window.state.channels[chId - 1].gain},"pan":${window.state.channels[chId - 1].pan},"low":${window.state.channels[chId - 1].low}}`;
 
     const tr = document.getElementById('testResult');
-    if (tr) tr.textContent = `TEST: SIMULATION RX CH${chId} GAIN UPDATED`;
+    if (tr) tr.textContent = `TEST: HARDWARE RX SIMULATION CH${chId} UPDATED`;
   });
 })();
 </script>
