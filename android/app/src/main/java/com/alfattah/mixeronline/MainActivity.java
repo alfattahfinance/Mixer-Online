@@ -63,7 +63,6 @@ public class MainActivity extends Activity {
         webView.setWebViewClient(new WebViewClient() {
             @Override public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                // Fallback for WebView versions where DOCUMENT_START_SCRIPT is unavailable.
                 installBluetoothShimIntoLoadedPage();
                 installAndroidMixerBluetoothAdapter();
             }
@@ -137,7 +136,6 @@ public class MainActivity extends Activity {
         webView.evaluateJavascript(bluetoothShimScript(), null);
     }
 
-    /** Android-only adapter: bind the existing website Bluetooth button to the native BLE bridge. */
     private void installAndroidMixerBluetoothAdapter() {
         String patch = "(function(){" +
                 "function setStatus(online,text){" +
@@ -187,7 +185,6 @@ public class MainActivity extends Activity {
             fileChooserCallback.onReceiveValue(null);
             fileChooserCallback = null;
         }
-        if (bluetoothBridge != null) bluetoothBridge.disconnect();
         if (webView != null) webView.destroy();
         super.onDestroy();
     }
