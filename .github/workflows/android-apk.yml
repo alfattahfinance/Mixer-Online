@@ -39,6 +39,20 @@ jobs:
 
           find android/app/src/main/assets/web -type f -printf '%P\n' | sort > android/app/src/main/assets/web/.packaged-files.txt
 
+      - name: Prepare APK launcher logo from website icon
+        shell: bash
+        run: |
+          set -euo pipefail
+          LOGO="0000ee48-6213-4183-886c-51bef73798ff_removalai_preview.png"
+          if [ ! -s "android/app/src/main/assets/web/${LOGO}" ]; then
+            echo "ERROR: Website logo ${LOGO} was not found in the packaged website."
+            exit 1
+          fi
+          mkdir -p android/app/src/main/res/drawable
+          cp "android/app/src/main/assets/web/${LOGO}" android/app/src/main/res/drawable/mixer_logo.png
+          test -s android/app/src/main/res/drawable/mixer_logo.png
+          echo "APK launcher logo: OK"
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -82,6 +96,11 @@ jobs:
             exit 1
           fi
 
+          if ! unzip -l "$APK" | grep -q 'res/drawable/mixer_logo.png'; then
+            echo "ERROR: mixer_logo.png is missing from the APK"
+            exit 1
+          fi
+
           APK_ASSET_FILES=$(unzip -Z1 "$APK" | grep '^assets/web/' | wc -l)
           APK_ASSET_BYTES=$(unzip -l "$APK" | awk '/assets\/web\// {sum += $1} END {print sum+0}')
           APK_ASSET_MB=$(awk -v b="$APK_ASSET_BYTES" 'BEGIN {printf "%.2f", b/1048576}')
@@ -89,6 +108,7 @@ jobs:
           echo "assets/web files: ${APK_ASSET_FILES}"
           echo "assets/web size : ${APK_ASSET_MB} MB (${APK_ASSET_BYTES} bytes)"
           echo "index.html      : PRESENT"
+          echo "launcher logo   : PRESENT"
           echo "=========================================="
 
       - name: Rename APK
