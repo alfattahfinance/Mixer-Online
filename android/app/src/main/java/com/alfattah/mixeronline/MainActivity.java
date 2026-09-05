@@ -19,6 +19,11 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
+/**
+ * Android shell for the existing Mixer-Online website.
+ * The website itself is copied unchanged into assets/web by the APK workflow.
+ * Android-only Bluetooth support is injected at runtime from res/raw.
+ */
 public class MainActivity extends Activity {
     private WebView webView;
     private NativeBluetoothBridge bluetoothBridge;
@@ -40,6 +45,7 @@ public class MainActivity extends Activity {
         settings.setAllowContentAccess(true);
         settings.setAllowFileAccessFromFileURLs(true);
         settings.setAllowUniversalAccessFromFileURLs(true);
+        settings.setDatabaseEnabled(true);
 
         webView.setWebChromeClient(new WebChromeClient() {
             @Override public boolean onShowFileChooser(
@@ -68,37 +74,78 @@ public class MainActivity extends Activity {
         webView.setWebViewClient(new WebViewClient() {
             @Override public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                installBluetoothShimIntoLoadedPage();
-                installAndroidMixerBluetoothAdapter();
+                installAndroidMixerStatusPatch();
             }
         });
 
         bluetoothBridge = new NativeBluetoothBridge(this, webView);
         webView.addJavascriptInterface(bluetoothBridge, "AndroidBluetooth");
 
-        installBluetoothShim();
-        loadMixerWebsiteWithEarlyShim();
+        installBluetoothDocumentStart();
+        loadMixerWebsite();
     }
 
-    private void loadMixerWebsiteWithEarlyShim() {
+    /**
+     * Loads the exact website from assets/web, while replacing only the Bluetooth
+     * script at runtime with the Android-only bridge. No repository website file is edited.
+     */
+    private void loadMixerWebsite() {
         try {
             String html = readAssetText("web/index.html");
-            String shimTag = "<script>" + bluetoothShimScript() + "</script>";
+            String androidBluetooth = readRawText(com.alfattah.mixeronline.R.raw.bluetooth_bridge);
+
+            // The Android bridge must execute before adapters.js and the rest of the page.
+            String headTag = "<script>" + androidBluetooth + "</script>";
             int head = html.toLowerCase().indexOf("<head");
             if (head >= 0) {
                 int close = html.indexOf('>', head);
-                if (close >= 0) html = html.substring(0, close + 1) + shimTag + html.substring(close + 1);
-                else html = shimTag + html;
-            } else html = shimTag + html;
+                if (close >= 0) html = html.substring(0, close + 1) + headTag + html.substring(close + 1);
+                else html = headTag + html;
+            } else {
+                html = headTag + html;
+            }
 
-            // Android-only runtime adaptation: inline the existing website adapters.js
-            // after applying two tiny compatibility substitutions. The repository file
-            // itself is never changed, and every other website asset remains untouched.
-            html = inlineAndroidBluetoothAdapter(html);
+            // Patch only the in-memory copy of adapters.js. The repository adapters.js
+            // remains untouched and therefore the live website/engine is unchanged.
+            html = inlinePatchedAdapters(html);
+
+            // Prevent the normal Web Bluetooth-only bridge from showing an unsupported
+            // browser alert inside the APK. The Android bridge above replaces its role.
+            String originalBridgeTag = "<script src=\"bluetooth-bridge.js\"></script>";
+            if (html.contains(originalBridgeTag)) {
+                html = html.replace(originalBridgeTag, "<!-- Android native bluetooth bridge is injected above. -->");
+            }
+
             webView.loadDataWithBaseURL(WEB_BASE_URL, html, "text/html", "UTF-8", null);
         } catch (IOException e) {
             webView.loadUrl(WEB_BASE_URL + "index.html");
         }
+    }
+
+    private String inlinePatchedAdapters(String html) throws IOException {
+        String open = "<script src=\"adapters.js";
+        int start = html.indexOf(open);
+        if (start < 0) return html;
+        int end = html.indexOf("</script>", start);
+        if (end < 0) return html;
+        end += "</script>".length();
+
+        String adapters = readAssetText("web/adapters.js");
+        // Do broad, formatting-independent substitutions so a whitespace/version change
+        // in the website does not silently restore web-bluetooth-unsupported in the APK.
+        adapters = adapters.replace(
+                "if (!navigator.bluetooth)",
+                "if (!navigator.bluetooth && !window.MixerAndroidBluetooth)");
+        adapters = adapters.replace(
+                "navigator.bluetooth.requestDevice(",
+                "(navigator.bluetooth || window.MixerAndroidBluetooth).requestDevice(");
+        adapters = adapters.replace(
+                "supportsBluetooth: () => !!navigator.bluetooth",
+                "supportsBluetooth: () => !!(navigator.bluetooth || window.MixerAndroidBluetooth)");
+
+        return html.substring(0, start)
+                + "<script>\n" + adapters + "\n</script>"
+                + html.substring(end);
     }
 
     private String readAssetText(String path) throws IOException {
@@ -111,27 +158,42 @@ public class MainActivity extends Activity {
         }
     }
 
-    private String inlineAndroidBluetoothAdapter(String html) throws IOException {
-        String open = "<script src=\"adapters.js";
-        int start = html.indexOf(open);
-        if (start < 0) return html;
-        int end = html.indexOf("</script>", start);
-        if (end < 0) return html;
-        end += "</script>".length();
+    private String readRawText(int resourceId) throws IOException {
+        try (InputStream input = getResources().openRawResource(resourceId);
+             ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[8192];
+            int count;
+            while ((count = input.read(buffer)) != -1) output.write(buffer, 0, count);
+            return new String(output.toByteArray(), StandardCharsets.UTF_8);
+        }
+    }
 
-        String adapters = readAssetText("web/adapters.js");
-        adapters = adapters.replace(
-                "if (!navigator.bluetooth)\n      return { ok: false, reason: \"web-bluetooth-unsupported\" };",
-                "if (!navigator.bluetooth && !window.MixerAndroidBluetooth)\n      return { ok: false, reason: \"web-bluetooth-unsupported\" };");
-        adapters = adapters.replace(
-                "const device = await navigator.bluetooth.requestDevice({",
-                "const device = await (navigator.bluetooth || window.MixerAndroidBluetooth).requestDevice({");
-        adapters = adapters.replace(
-                "supportsBluetooth: () => !!navigator.bluetooth",
-                "supportsBluetooth: () => !!(navigator.bluetooth || window.MixerAndroidBluetooth)");
+    private void installBluetoothDocumentStart() {
+        try {
+            String bridge = readRawText(com.alfattah.mixeronline.R.raw.bluetooth_bridge);
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+                WebViewCompat.addDocumentStartJavaScript(webView, bridge, Collections.singleton("*"));
+            }
+        } catch (Exception ignored) {
+            // The bridge is also injected into index.html, so document-start support is optional.
+        }
+    }
 
-        String replacement = "<script>\n" + adapters + "\n</script>";
-        return html.substring(0, start) + replacement + html.substring(end);
+    /** Keeps the existing mixer UI's status indicators synchronized with native BLE. */
+    private void installAndroidMixerStatusPatch() {
+        if (webView == null) return;
+        String js = "(function(){"
+                + "if(window.__mixerAndroidStatusPatch)return;window.__mixerAndroidStatusPatch=true;"
+                + "function sync(s){var on=!!(s&&s.connected);"
+                + "var x=document.getElementById('status');if(x){x.textContent=on?'BLUETOOTH ONLINE':'BRIDGE STANDBY';}"
+                + "var l=document.getElementById('statusLamp');if(l)l.className=on?'live':'';"
+                + "var h=document.getElementById('headerBridgeStatus');if(h)h.textContent=on?'BLUETOOTH ONLINE':'BRIDGE STANDBY';"
+                + "var t=document.getElementById('testTransportLabel');if(t)t.textContent=on?'ESP32 BRIDGE BLUETOOTH ONLINE':'OFFLINE';"
+                + "var f=document.getElementById('footerConnection');if(f)f.textContent=on?'● BLUETOOTH ONLINE':'● BLUETOOTH OFFLINE';}"
+                + "document.addEventListener('mixer:android-bluetooth-status',function(e){sync(e.detail||{});});"
+                + "sync({connected:window.MixerAndroidBluetooth&&window.MixerAndroidBluetooth.isConnected&&window.MixerAndroidBluetooth.isConnected()});"
+                + "})();";
+        webView.evaluateJavascript(js, null);
     }
 
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -143,102 +205,12 @@ public class MainActivity extends Activity {
                 int count = data.getClipData().getItemCount();
                 results = new Uri[count];
                 for (int i = 0; i < count; i++) results[i] = data.getClipData().getItemAt(i).getUri();
-            } else if (data.getData() != null) results = new Uri[]{data.getData()};
+            } else if (data.getData() != null) {
+                results = new Uri[]{data.getData()};
+            }
         }
         fileChooserCallback.onReceiveValue(results);
         fileChooserCallback = null;
-    }
-
-    private String bluetoothShimScript() {
-        return "(function(){" +
-                "if(window.__mixerAndroidBluetoothShim)return;" +
-                "window.__mixerAndroidBluetoothShim=true;" +
-                "var deviceWaiters=[],connectWaiters=[],notifyWaiters=[];" +
-                "var selected=null,connected=false,deviceListeners={},rxListeners=[];" +
-                "function fire(name,event){(deviceListeners[name]||[]).slice().forEach(function(fn){try{fn(event)}catch(e){}})}" +
-                "function b64(a){var s='';for(var i=0;i<a.length;i++)s+=String.fromCharCode(a[i]);return btoa(s)}" +
-                "function bytes(s){var b=atob(s),a=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a}" +
-                "function characteristic(uuid,props){return {uuid:uuid,properties:props||{write:true,writeWithoutResponse:true,notify:true}," +
-                "writeValue:function(data){AndroidBluetooth.write(b64(new Uint8Array(data)));return Promise.resolve()}," +
-                "writeValueWithoutResponse:function(data){AndroidBluetooth.write(b64(new Uint8Array(data)));return Promise.resolve()}," +
-                "startNotifications:function(){return new Promise(function(resolve,reject){notifyWaiters.push({resolve:resolve,reject:reject});AndroidBluetooth.startNotifications()})}," +
-                "addEventListener:function(type,fn){if(type==='characteristicvaluechanged')rxListeners.push(fn)}," +
-                "removeEventListener:function(type,fn){if(type==='characteristicvaluechanged')rxListeners=rxListeners.filter(function(x){return x!==fn})}}}" +
-                "function service(uuid){return {uuid:uuid,getCharacteristic:function(c){return Promise.resolve(characteristic(c,c==='6e400002-b5a3-f393-e0a9-e50e24dcca9e'?{write:true,writeWithoutResponse:true}:c==='6e400003-b5a3-f393-e0a9-e50e24dcca9e'?{notify:true}:{write:true,writeWithoutResponse:true,notify:true}))},getCharacteristics:function(){return Promise.resolve([characteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e',{write:true,writeWithoutResponse:true}),characteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e',{notify:true})])}}}" +
-                "function server(){return {getPrimaryService:function(uuid){return Promise.resolve(service(uuid))},getPrimaryServices:function(){return Promise.resolve([service('6e400001-b5a3-f393-e0a9-e50e24dcca9e')])}}}" +
-                "function dev(address,name){var d={id:address,name:name||'BLUETOOTH MIXER',gatt:{connected:false,connect:function(){return new Promise(function(resolve,reject){connectWaiters.push({resolve:resolve,reject:reject});AndroidBluetooth.connect(address)})},disconnect:function(){AndroidBluetooth.disconnect();d.gatt.connected=false;fire('gattserverdisconnected',{})}}};d.addEventListener=function(type,fn){(deviceListeners[type]||(deviceListeners[type]=[])).push(fn);};return d}" +
-                "window.__mixerBtDeviceSelected=function(address,name){selected=dev(address,name);deviceWaiters.splice(0).forEach(function(w){w.resolve(selected)})}" +
-                "window.__mixerBtDeviceError=function(msg){deviceWaiters.splice(0).forEach(function(w){w.reject(new Error(msg||'Bluetooth scan gagal'))})}" +
-                "window.__mixerBtConnected=function(ok,name){if(!ok){connectWaiters.splice(0).forEach(function(w){w.reject(new Error(name||'Bluetooth connection gagal'))});return}connected=true;if(selected){selected.name=name||selected.name;selected.gatt.connected=true}var s=server();connectWaiters.splice(0).forEach(function(w){w.resolve(s)})}" +
-                "window.__mixerBtDisconnected=function(){connected=false;if(selected){selected.gatt.connected=false;fire('gattserverdisconnected',{})}}" +
-                "window.__mixerBtWriteResult=function(ok,msg){}" +
-                "window.__mixerBtNotifyResult=function(ok,msg){notifyWaiters.splice(0).forEach(function(w){if(ok)w.resolve(true);else w.reject(new Error(msg||'Notification gagal'))})}" +
-                "window.__mixerBtOnRx=function(payload){var a=bytes(payload),ev={target:{value:new DataView(a.buffer)}};rxListeners.slice().forEach(function(fn){try{fn(ev)}catch(e){}})}" +
-                "var api={requestDevice:function(){return new Promise(function(resolve,reject){deviceWaiters.push({resolve:resolve,reject:reject});AndroidBluetooth.requestDevice()})}};" +
-                "function installNavigator(){" +
-                "try{Object.defineProperty(navigator,'bluetooth',{configurable:true,enumerable:true,value:api});return navigator.bluetooth===api}catch(e){}" +
-                "try{var proto=Object.getPrototypeOf(navigator);Object.defineProperty(proto,'bluetooth',{configurable:true,enumerable:true,get:function(){return api;}});return navigator.bluetooth===api}catch(e){}" +
-                "try{navigator.bluetooth=api;return navigator.bluetooth===api}catch(e){}" +
-                "try{Object.defineProperty(window,'navigator',{configurable:true,get:function(){return {bluetooth:api};}});return !!(window.navigator&&window.navigator.bluetooth)}catch(e){}" +
-                "return false;}" +
-                "window.__mixerInstallBluetoothNavigator=installNavigator;" +
-                "installNavigator();" +
-                "window.MixerAndroidBluetooth={native:true,requestDevice:function(){return new Promise(function(resolve,reject){deviceWaiters.push({resolve:resolve,reject:reject});AndroidBluetooth.requestDevice();})}};" +
-                "})();";
-    }
-
-    private void installBluetoothShim() {
-        String shim = bluetoothShimScript();
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
-            try { WebViewCompat.addDocumentStartJavaScript(webView, shim, Collections.singleton("*")); }
-            catch (Exception ignored) { }
-        }
-    }
-
-    private void installBluetoothShimIntoLoadedPage() {
-        if (webView == null) return;
-        webView.evaluateJavascript(bluetoothShimScript(), null);
-        webView.evaluateJavascript("(function(){try{if(window.__mixerInstallBluetoothNavigator)window.__mixerInstallBluetoothNavigator();}catch(e){}})();", null);
-    }
-
-    private void installAndroidMixerBluetoothAdapter() {
-        String patch = "(function(){" +
-                "function setStatus(online,text){" +
-                "var s=document.getElementById('status');if(s){s.textContent=online?'BLUETOOTH ONLINE':(text||'OFFLINE');s.style.color=online?'#31e66b':'';}" +
-                "var l=document.getElementById('statusLamp');if(l)l.className=online?'live':'';" +
-                "var h=document.getElementById('headerBridgeStatus');if(h)h.textContent=online?'BLUETOOTH ONLINE':'BRIDGE STANDBY';" +
-                "var t=document.getElementById('testTransportLabel');if(t)t.textContent=online?'ESP32 BRIDGE BLUETOOTH ONLINE':'OFFLINE';" +
-                "var f=document.getElementById('footerConnection');if(f)f.textContent=online?'● BLUETOOTH ONLINE':'● BLUETOOTH OFFLINE';" +
-                "}" +
-                "function install(){" +
-                "try{if(window.__mixerInstallBluetoothNavigator)window.__mixerInstallBluetoothNavigator();}catch(e){}" +
-                "if(!window.MixerAdapters||typeof window.MixerAdapters.connectBluetooth!=='function')return false;" +
-                "window.MixerAndroidBluetoothReady=!!(window.MixerAndroidBluetooth&&window.MixerAndroidBluetooth.requestDevice);" +
-                "var bt=document.getElementById('connectBluetooth');" +
-                "if(bt&&!bt.__androidMixerBtBound){" +
-                "bt.__androidMixerBtBound=true;bt.setAttribute('data-android-bluetooth','native-ble');" +
-                "bt.addEventListener('click',async function(e){" +
-                "e.preventDefault();e.stopImmediatePropagation();" +
-                "bt.disabled=true;bt.textContent='SCANNING BLUETOOTH...';" +
-                "try{" +
-                "var result=await window.MixerAdapters.connectBluetooth();" +
-                "if(result&&result.ok){setStatus(true);bt.textContent='BLUETOOTH ONLINE';}" +
-                "else{setStatus(false);bt.textContent='CONNECT BLUETOOTH';if(result&&result.reason)alert('Bluetooth: '+result.reason);}" +
-                "}catch(err){setStatus(false);bt.textContent='CONNECT BLUETOOTH';alert('Bluetooth: '+(err&&err.message?err.message:err));}" +
-                "finally{bt.disabled=false;}" +
-                "},true);" +
-                "}" +
-                "if(window.MixerAdapters.onStatus&&!window.__mixerAndroidBtStatusBound){" +
-                "window.__mixerAndroidBtStatusBound=true;window.MixerAdapters.onStatus(function(s){" +
-                "if(s&&s.type==='bluetooth'&&s.connected)setStatus(true);" +
-                "else if(s&&s.type==='bluetooth'&&!s.connected)setStatus(false);" +
-                "});" +
-                "}" +
-                "return true;" +
-                "}" +
-                "if(!install()){var n=0,t=setInterval(function(){if(install()||++n>100)clearInterval(t);},100);}" +
-                "})();";
-        webView.evaluateJavascript(patch, null);
     }
 
     @Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
