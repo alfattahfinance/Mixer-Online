@@ -30,7 +30,14 @@ public class MainActivity extends Activity {
         settings.setAllowFileAccessFromFileURLs(true);
         settings.setAllowUniversalAccessFromFileURLs(true);
 
-        webView.setWebViewClient(new WebViewClient());
+        // Keep the packaged website unchanged. Android only adds the native
+        // Bluetooth compatibility layer after the page is loaded.
+        webView.setWebViewClient(new WebViewClient() {
+            @Override public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                installAndroidMixerBluetoothAdapter();
+            }
+        });
 
         // Native BLE is exposed only to the packaged local website. The page
         // itself remains unchanged; the bridge supplies Web Bluetooth APIs
@@ -79,14 +86,57 @@ public class MainActivity extends Activity {
                     shim,
                     Collections.singleton("file://")
             );
-        } else {
-            // Fallback for older WebView implementations.
-            webView.setWebViewClient(new WebViewClient() {
-                @Override public void onPageFinished(WebView view, String url) {
-                    view.evaluateJavascript(shim, null);
-                }
-            });
         }
+        // The normal WebViewClient above installs the fallback/adapter after
+        // page load. This branch is intentionally empty for modern WebView;
+        // DOCUMENT_START_SCRIPT is used so navigator.bluetooth exists before
+        // the website's scripts execute.
+    }
+
+    /**
+     * Android-only compatibility fix.
+     *
+     * The existing website has two Bluetooth layers: bluetooth-bridge.js
+     * exposes MixerBluetooth, while adapters.js owns the actual mixer TX/RX
+     * state. On Android WebView the old button could connect the raw BLE
+     * characteristic without registering that connection in MixerAdapters.
+     * The result was "connected" UI but mixer controls had no transport.
+     *
+     * Do not modify the website. Instead, after the packaged page loads,
+     * route the website's existing MixerBluetooth API to MixerAdapters only
+     * inside the APK. Desktop/web behavior is untouched.
+     */
+    private void installAndroidMixerBluetoothAdapter() {
+        String patch = "(function(){" +
+                "if(window.__mixerAndroidAdapterPatch)return;" +
+                "window.__mixerAndroidAdapterPatch=true;" +
+                "function install(){" +
+                "if(!window.MixerAdapters||typeof window.MixerAdapters.connectBluetooth!=='function')return false;" +
+                "var old=window.MixerBluetooth||{};" +
+                "window.MixerBluetooth={" +
+                "connect:function(){return window.MixerAdapters.connectBluetooth();}," +
+                "send:function(payload){" +
+                "try{" +
+                "if(payload&&window.MixerAdapters.active&&window.MixerAdapters.active.connected&&typeof window.MixerAdapters.sendMapped==='function')return window.MixerAdapters.sendMapped(payload);" +
+                "}catch(e){}" +
+                "return typeof old.send==='function'?old.send(payload):Promise.resolve({ok:false,reason:'bluetooth-adapter-offline'});" +
+                "}" +
+                "};" +
+                "var bt=document.getElementById('connectBluetooth');" +
+                "if(bt&&!bt.__androidMixerBtBound){" +
+                "bt.__androidMixerBtBound=true;" +
+                "bt.addEventListener('click',function(){setTimeout(function(){" +
+                "try{if(window.MixerAdapters&&window.MixerAdapters.active&&window.MixerAdapters.active.connected)" +
+                "{var s=window.MixerAdapters.active;window.MixerControl&&window.MixerControl.setStatus&&window.MixerControl.setStatus({connected:true,transport:'bluetooth',lastRx:s.lastRx||null});}}catch(e){}" +
+                "},0);},true);" +
+                "}" +
+                "return true;" +
+                "}" +
+                "if(!install()){" +
+                "var n=0,t=setInterval(function(){if(install()||++n>100)clearInterval(t);},100);" +
+                "}" +
+                "})();";
+        webView.evaluateJavascript(patch, null);
     }
 
     @Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
