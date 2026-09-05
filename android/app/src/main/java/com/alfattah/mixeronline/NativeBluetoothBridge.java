@@ -11,6 +11,9 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanResult;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -21,7 +24,6 @@ import android.util.Base64;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
@@ -288,7 +290,6 @@ public final class NativeBluetoothBridge {
     };
 
     private void handleRxBytes(byte[] value) {
-        // Keep Android-side persistence independent from the website's runtime state.
         String chunk = new String(value, StandardCharsets.UTF_8);
         rxBuffer.append(chunk);
         String[] lines = rxBuffer.toString().split("\\r?\\n", -1);
@@ -329,7 +330,7 @@ public final class NativeBluetoothBridge {
             saved.put(key, entry);
             prefs.edit().putString(SAVED_FEEDBACK, saved.toString()).apply();
         } catch (Exception ignored) {
-            // Ignore non-JSON or partial data; the website still receives the RX bytes.
+            // Ignore non-JSON/partial data; the website still receives the RX bytes.
         }
     }
 
