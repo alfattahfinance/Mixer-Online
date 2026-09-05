@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
@@ -28,26 +29,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Android-only BLE bridge for the existing Mixer-Online Web Bluetooth code.
- * It emulates the small Web Bluetooth surface used by adapters.js without
- * changing any website/mixer-engine files.
- */
+/** Android-only BLE bridge for the existing Mixer-Online Web Bluetooth code. */
 public final class NativeBluetoothBridge {
     private static final int REQ_BT = 7001;
     private static final long SCAN_MS = 10000L;
-
     private static final UUID UART_SERVICE = UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
     private static final UUID UART_RX = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e");
     private static final UUID UART_TX = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e");
     private static final UUID HM_SERVICE = UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb");
     private static final UUID HM_CHAR = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");
+    private static final UUID CCCD = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
     private final Activity activity;
     private final WebView webView;
     private final Handler main = new Handler(Looper.getMainLooper());
     private final Map<String, BluetoothDevice> scanDevices = new LinkedHashMap<>();
-
     private BluetoothLeScanner scanner;
     private ScanCallback scanCallback;
     private BluetoothGatt gatt;
@@ -125,8 +121,7 @@ public final class NativeBluetoothBridge {
             }
             try {
                 boolean ok = gatt.setCharacteristicNotification(notifyCharacteristic, true);
-                BluetoothGattService service = notifyCharacteristic.getService();
-                BluetoothGattCharacteristic cccd = service.getCharacteristic(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"));
+                BluetoothGattDescriptor cccd = notifyCharacteristic.getDescriptor(CCCD);
                 if (cccd != null) {
                     cccd.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
                     gatt.writeDescriptor(cccd);
@@ -139,9 +134,7 @@ public final class NativeBluetoothBridge {
     }
 
     @JavascriptInterface
-    public void disconnect() {
-        main.post(this::closeGatt);
-    }
+    public void disconnect() { main.post(this::closeGatt); }
 
     public void onRequestPermissionsResult(int requestCode, int[] grantResults) {
         if (requestCode != REQ_BT) return;
@@ -166,10 +159,7 @@ public final class NativeBluetoothBridge {
 
     private void requestBluetoothPermissions() {
         if (Build.VERSION.SDK_INT >= 31) {
-            activity.requestPermissions(new String[]{
-                    Manifest.permission.BLUETOOTH_SCAN,
-                    Manifest.permission.BLUETOOTH_CONNECT
-            }, REQ_BT);
+            activity.requestPermissions(new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT}, REQ_BT);
         } else {
             activity.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQ_BT);
         }
@@ -193,9 +183,7 @@ public final class NativeBluetoothBridge {
             scanCallback = new ScanCallback() {
                 @Override public void onScanResult(int callbackType, ScanResult result) {
                     BluetoothDevice d = result.getDevice();
-                    if (d == null) return;
-                    String address = d.getAddress();
-                    scanDevices.put(address, d);
+                    if (d != null) scanDevices.put(d.getAddress(), d);
                 }
                 @Override public void onScanFailed(int errorCode) {
                     scanning = false;
@@ -203,7 +191,7 @@ public final class NativeBluetoothBridge {
                 }
             };
             scanner.startScan(scanCallback);
-            main.postDelayed(() -> finishScanDialog(), SCAN_MS);
+            main.postDelayed(this::finishScanDialog, SCAN_MS);
         } catch (SecurityException e) {
             js("window.__mixerBtDeviceError(" + q(e.getMessage()) + ")");
         }
@@ -314,9 +302,7 @@ public final class NativeBluetoothBridge {
         notifyCharacteristic = null;
     }
 
-    private void js(String code) {
-        main.post(() -> webView.evaluateJavascript(code, null));
-    }
+    private void js(String code) { main.post(() -> webView.evaluateJavascript(code, null)); }
 
     private static String q(String value) {
         if (value == null) value = "";
