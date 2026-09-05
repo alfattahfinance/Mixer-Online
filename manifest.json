@@ -1,4 +1,5 @@
-name": "MIXER-ONLINE M32",
+{
+  "name": "MIXER-ONLINE M32",
   "short_name": "Mixer M32",
   "description": "Midas M32 Pro Edition Web Mixer Controller",
   "start_url": "/",
@@ -15,3 +16,4 @@ name": "MIXER-ONLINE M32",
       "purpose": "any maskable"
     }
   ]
+}
