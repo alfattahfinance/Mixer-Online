@@ -13,6 +13,10 @@ import android.webkit.WebViewClient;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 public class MainActivity extends Activity {
@@ -20,6 +24,7 @@ public class MainActivity extends Activity {
     private NativeBluetoothBridge bluetoothBridge;
     private ValueCallback<Uri[]> fileChooserCallback;
     private static final int FILE_CHOOSER_REQUEST = 8101;
+    private static final String WEB_BASE_URL = "file:///android_asset/web/";
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +68,8 @@ public class MainActivity extends Activity {
         webView.setWebViewClient(new WebViewClient() {
             @Override public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+                // The early shim is already installed before page scripts run.
+                // Keep the post-load install as a harmless compatibility fallback.
                 installBluetoothShimIntoLoadedPage();
                 installAndroidMixerBluetoothAdapter();
             }
@@ -70,9 +77,44 @@ public class MainActivity extends Activity {
 
         bluetoothBridge = new NativeBluetoothBridge(this, webView);
         webView.addJavascriptInterface(bluetoothBridge, "AndroidBluetooth");
-        installBluetoothShim();
 
-        webView.loadUrl("file:///android_asset/web/index.html");
+        // Web Bluetooth feature detection happens while the website scripts are loading.
+        // On WebViews without DOCUMENT_START_SCRIPT, injecting from onPageFinished is too late.
+        // Therefore prepend the Android shim to the existing website HTML at runtime.
+        installBluetoothShim();
+        loadMixerWebsiteWithEarlyShim();
+    }
+
+    private void loadMixerWebsiteWithEarlyShim() {
+        try {
+            String html = readAssetText("web/index.html");
+            String shimTag = "<script>" + bluetoothShimScript() + "</script>";
+            int head = html.toLowerCase().indexOf("<head");
+            if (head >= 0) {
+                int close = html.indexOf('>', head);
+                if (close >= 0) {
+                    html = html.substring(0, close + 1) + shimTag + html.substring(close + 1);
+                } else {
+                    html = shimTag + html;
+                }
+            } else {
+                html = shimTag + html;
+            }
+            webView.loadDataWithBaseURL(WEB_BASE_URL, html, "text/html", "UTF-8", null);
+        } catch (IOException e) {
+            // Fallback to the original asset URL if the runtime injection cannot read the asset.
+            webView.loadUrl(WEB_BASE_URL + "index.html");
+        }
+    }
+
+    private String readAssetText(String path) throws IOException {
+        try (InputStream input = getAssets().open(path);
+             ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[8192];
+            int count;
+            while ((count = input.read(buffer)) != -1) output.write(buffer, 0, count);
+            return new String(output.toByteArray(), StandardCharsets.UTF_8);
+        }
     }
 
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
