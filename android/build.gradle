@@ -4,7 +4,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.2.2'
+        // AGP 8.6.1 is the minimum stable AGP line that supports compileSdk 35.
+        classpath 'com.android.tools.build:gradle:8.6.1'
     }
 }
 
