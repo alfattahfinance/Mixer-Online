@@ -45,15 +45,26 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Set up Gradle 8.2.1
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.2.1'
+
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
       - name: Install Android SDK platform
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
+      - name: Verify build toolchain
+        working-directory: android
+        run: |
+          gradle --version
+          gradle :app:tasks --no-daemon >/dev/null
+
       - name: Build debug APK
         working-directory: android
-        run: gradle :app:assembleDebug --stacktrace
+        run: gradle :app:assembleDebug --no-daemon --stacktrace
 
       - name: Verify website is inside APK
         shell: bash
