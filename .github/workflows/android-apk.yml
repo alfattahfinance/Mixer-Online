@@ -64,7 +64,7 @@ jobs:
 
       - name: Build debug APK
         working-directory: android
-        run: gradle :app:assembleDebug --no-daemon --stacktrace
+        run: gradle -Pandroid.useAndroidX=true -Pandroid.enableJetifier=true :app:assembleDebug --no-daemon --stacktrace
 
       - name: Verify website is inside APK
         shell: bash
