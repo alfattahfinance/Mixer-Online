@@ -6,8 +6,14 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import androidx.webkit.WebViewCompat;
+import androidx.webkit.WebViewFeature;
+
+import java.util.Collections;
+
 public class MainActivity extends Activity {
     private WebView webView;
+    private NativeBluetoothBridge bluetoothBridge;
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,9 +32,72 @@ public class MainActivity extends Activity {
 
         webView.setWebViewClient(new WebViewClient());
 
-        // The APK uses the exact website files copied from the repository
-        // by android-apk.yml. There is no second Android mixer UI.
+        // Native BLE is exposed only to the packaged local website. The page
+        // itself remains unchanged; the bridge supplies Web Bluetooth APIs
+        // that Android WebView does not provide natively.
+        bluetoothBridge = new NativeBluetoothBridge(this, webView);
+        webView.addJavascriptInterface(bluetoothBridge, "AndroidBluetooth");
+        installBluetoothShim();
+
+        // The APK continues to load the exact website copied by android-apk.yml.
         webView.loadUrl("file:///android_asset/web/index.html");
+    }
+
+    private void installBluetoothShim() {
+        String shim = "(function(){" +
+                "if(window.__mixerAndroidBluetoothShim)return;" +
+                "window.__mixerAndroidBluetoothShim=true;" +
+                "var deviceWaiters=[];var connectWaiters=[];var notifyWaiters=[];" +
+                "var selected=null;var connected=false;var deviceListeners={};var rxListeners=[];" +
+                "function fire(name,event){(deviceListeners[name]||[]).slice().forEach(function(fn){try{fn(event)}catch(e){}})}" +
+                "function b64(a){var s='';for(var i=0;i<a.length;i++)s+=String.fromCharCode(a[i]);return btoa(s)}" +
+                "function bytes(s){var b=atob(s),a=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a}" +
+                "function characteristic(uuid){return {uuid:uuid,properties:{write:true,writeWithoutResponse:true,notify:true}," +
+                "writeValue:function(data){AndroidBluetooth.write(b64(new Uint8Array(data)));return Promise.resolve()}," +
+                "writeValueWithoutResponse:function(data){AndroidBluetooth.write(b64(new Uint8Array(data)));return Promise.resolve()}," +
+                "startNotifications:function(){return new Promise(function(resolve,reject){notifyWaiters.push({resolve:resolve,reject:reject});AndroidBluetooth.startNotifications()})}," +
+                "addEventListener:function(type,fn){if(type==='characteristicvaluechanged')rxListeners.push(fn)}," +
+                "removeEventListener:function(type,fn){if(type==='characteristicvaluechanged')rxListeners=rxListeners.filter(function(x){return x!==fn})}}}" +
+                "function service(uuid){return {uuid:uuid,getCharacteristic:function(c){return Promise.resolve(characteristic(c))},getCharacteristics:function(){return Promise.resolve([characteristic(uuid)])}}}" +
+                "function server(){return {getPrimaryService:function(uuid){return Promise.resolve(service(uuid))},getPrimaryServices:function(){return Promise.resolve([service('6e400001-b5a3-f393-e0a9-e50e24dcca9e')])}}}" +
+                "function dev(address,name){var d={id:address,name:name||'BLUETOOTH MIXER',gatt:{connected:false,connect:function(){return new Promise(function(resolve,reject){connectWaiters.push({resolve:resolve,reject:reject});AndroidBluetooth.connect(address)})},disconnect:function(){AndroidBluetooth.disconnect();d.gatt.connected=false;fire('gattserverdisconnected',{})}}};d.addEventListener=function(type,fn){(deviceListeners[type]||(deviceListeners[type]=[])).push(fn)};return d}" +
+                "window.__mixerBtDeviceSelected=function(address,name){selected=dev(address,name);deviceWaiters.splice(0).forEach(function(w){w.resolve(selected)})}" +
+                "window.__mixerBtDeviceError=function(msg){deviceWaiters.splice(0).forEach(function(w){w.reject(new Error(msg||'Bluetooth scan gagal'))})}" +
+                "window.__mixerBtConnected=function(ok,name){if(!ok){connectWaiters.splice(0).forEach(function(w){w.reject(new Error(name||'Bluetooth connection gagal'))});return}connected=true;if(selected){selected.name=name||selected.name;selected.gatt.connected=true}var s=server();connectWaiters.splice(0).forEach(function(w){w.resolve(s)})}" +
+                "window.__mixerBtDisconnected=function(){connected=false;if(selected){selected.gatt.connected=false;fire('gattserverdisconnected',{})}}" +
+                "window.__mixerBtWriteResult=function(ok,msg){}" +
+                "window.__mixerBtNotifyResult=function(ok,msg){notifyWaiters.splice(0).forEach(function(w){if(ok)w.resolve(true);else w.reject(new Error(msg||'Notification gagal'))})}" +
+                "window.__mixerBtOnRx=function(payload){var a=bytes(payload);var ev={target:{value:new DataView(a.buffer)}};rxListeners.slice().forEach(function(fn){try{fn(ev)}catch(e){}})}" +
+                "var api={requestDevice:function(){return new Promise(function(resolve,reject){deviceWaiters.push({resolve:resolve,reject:reject});AndroidBluetooth.requestDevice()})}};" +
+                "try{Object.defineProperty(navigator,'bluetooth',{configurable:true,value:api})}catch(e){try{navigator.bluetooth=api}catch(x){}}" +
+                "window.MixerAndroidBluetooth={native:true};" +
+                "})();";
+
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+            WebViewCompat.addDocumentStartJavaScript(
+                    webView,
+                    shim,
+                    Collections.singleton("file://")
+            );
+        } else {
+            // Fallback for older WebView implementations.
+            webView.setWebViewClient(new WebViewClient() {
+                @Override public void onPageFinished(WebView view, String url) {
+                    view.evaluateJavascript(shim, null);
+                }
+            });
+        }
+    }
+
+    @Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (bluetoothBridge != null) bluetoothBridge.onRequestPermissionsResult(requestCode, grantResults);
+    }
+
+    @Override protected void onDestroy() {
+        if (bluetoothBridge != null) bluetoothBridge.disconnect();
+        if (webView != null) webView.destroy();
+        super.onDestroy();
     }
 
     @Override public void onBackPressed() {
