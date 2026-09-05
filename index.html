@@ -7,17 +7,16 @@
 <title>MIXER-ONLINE • Midas M32 Pro Edition</title>
 
 <!-- Pembaruan versi query (Cache-Buster) -->
-<link rel="stylesheet" href="style.css?v=20260904-PERFECT-LAYOUT">
-<link rel="stylesheet" href="channel-skin.css?v=20260904-PERFECT-LAYOUT">
-<link rel="stylesheet" href="header-system.css?v=20260904-PERFECT-LAYOUT">
-<link rel="stylesheet" href="channels-new.css?v=20260904-PERFECT-LAYOUT">
+<link rel="stylesheet" href="style.css?v=20260905-PERFECT-LAYOUT">
+<link rel="stylesheet" href="channel-skin.css?v=20260905-PERFECT-LAYOUT">
+<link rel="stylesheet" href="header-system.css?v=20260905-PERFECT-LAYOUT">
+<link rel="stylesheet" href="channels-new.css?v=20260905-PERFECT-LAYOUT">
 <link rel="manifest" href="manifest.json">
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js');
   }
 </script>
-
 
 <style>
   /* ==========================================================
@@ -181,24 +180,25 @@
     border-right: 1px dashed var(--panel-border) !important;
   }
 
+  /* INDIKATOR LED BERDIRI (VERTIKAL) TEPAT DI ATAS KNOB GAIN DSB */
   .ch-top-vu {
-    width: 26px !important;
-    height: 5px !important;
+    width: 6px !important;
+    height: 45px !important;
     background: #06090c !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 2px !important;
-    margin: 3px auto 4px auto !important;
+    margin: 2px auto 6px auto !important;
     overflow: hidden !important;
     display: flex !important;
-    align-items: center !important;
+    flex-direction: column-reverse !important;
     padding: 0 !important;
   }
 
   .ch-top-vu-fill {
-    width: 0%;
-    height: 100% !important;
-    background: linear-gradient(90deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 85%, #e74c3c 100%) !important;
-    transition: width 0.08s ease-out !important;
+    width: 100% !important;
+    height: 0%;
+    background: linear-gradient(0deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 85%, #e74c3c 100%) !important;
+    transition: height 0.08s ease-out !important;
     box-shadow: 0 0 4px rgba(46, 204, 113, 0.5) !important;
   }
 
@@ -211,13 +211,23 @@
     margin-bottom: 2px !important;
   }
 
+  /* GRUP KONTROL GAIN - PAN (DIPINDAHKAN TEPAT DI ATAS TEKS VOLUME) */
   .ch-controls-group {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     gap: 4px !important;
     width: 100% !important;
-    margin-bottom: 8px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .volume-label-text {
+    font-size: 8px !important;
+    font-weight: bold !important;
+    color: var(--text-dim) !important;
+    text-transform: uppercase !important;
+    margin: 4px 0 2px 0 !important;
+    text-align: center !important;
   }
 
   .fader-area {
@@ -231,7 +241,7 @@
   }
 
   .fader-area input[type="range"], .channel-fader {
-    height: 190px !important;
+    height: 180px !important;
     accent-color: var(--accent-color) !important;
   }
 
@@ -245,27 +255,28 @@
     position: relative !important;
   }
 
+  /* LEBAR MASTER DIPERKECIL DIKIT AGAR CHANNEL TIDAK TERPOTONG */
   .master-rack {
     flex: 0 0 auto !important;
-    width: 130px !important;
-    min-width: 120px !important;
+    width: 95px !important;
+    min-width: 90px !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
     background: var(--strip-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 6px !important;
-    padding: 8px 6px !important;
-    margin-right: 8px !important;
+    padding: 6px 4px !important;
+    margin-right: 4px !important;
   }
 
   .main-meters {
     display: flex !important;
-    gap: 8px !important;
+    gap: 6px !important;
     justify-content: center !important;
-    height: 130px !important;
+    height: 120px !important;
     background: var(--main-bg) !important;
-    padding: 6px !important;
+    padding: 4px !important;
     border-radius: 4px !important;
     border: 1px solid var(--panel-border) !important;
   }
@@ -275,7 +286,7 @@
     flex-direction: column !important;
     align-items: center !important;
     height: 100% !important;
-    width: 12px !important;
+    width: 10px !important;
   }
 
   .meter-bar-bg {
@@ -902,7 +913,7 @@
   <!-- 4. MASTER RACK DENGAN INDIKATOR L/R MASTER STEREO -->
   <aside class="master-rack" id="masterRack">
     <div class="meter-rack">
-      <b style="font-size: 9px; color: var(--accent-color); display: block; text-align: center; margin-bottom: 4px;">MAIN L / R STEREO</b>
+      <b style="font-size: 9px; color: var(--accent-color); display: block; text-align: center; margin-bottom: 4px;">MAIN L / R</b>
       <div class="main-meters">
         <div class="meter-bar-container">
           <div class="meter-bar-bg"><div class="meter-bar-fill" id="masterMeterL"></div></div>
@@ -1594,7 +1605,7 @@
     }
   }
 
-  // ANIMASI REALTIME DENGAN PENENTUAN TARGET VU METER PRESISI
+  // ANIMASI REALTIME DENGAN PENENTUAN TARGET VU METER VERTIKAL PRESISI
   function updateIndicators() {
     requestAnimationFrame(updateIndicators);
 
@@ -1658,7 +1669,7 @@
         if (masterMeterL) masterMeterL.style.height = leftHeight + '%';
         if (masterMeterR) masterMeterR.style.height = rightHeight + '%';
 
-        // Update VU meter di semua channel (1–14)
+        // Update VU meter vertikal di semua channel (1–14)
         document.querySelectorAll('.new-channel-strip, .channel-strip, [data-ch]').forEach(strip => {
           const cId = Number(strip.dataset.ch) || parseInt(strip.innerText.match(/CH\s*(\d+)/i)?.[1] || '0', 10);
           if (cId > 0) {
@@ -1667,7 +1678,7 @@
             
             if (topVuFill) {
               if (cState.mute) {
-                topVuFill.style.width = '0%';
+                topVuFill.style.height = '0%';
               } else {
                 const cGain = parseFloat(cState.gain ?? 1.0);
                 const cFaderScale = (parseFloat(cState.fader ?? 75)) / 100;
@@ -1679,7 +1690,7 @@
                   chSignalLevel = Math.min(100, (cGain * cFaderScale * 45) + (Math.random() * 8));
                 }
 
-                topVuFill.style.width = Math.min(100, Math.max(0, chSignalLevel)) + '%';
+                topVuFill.style.height = Math.min(100, Math.max(0, chSignalLevel)) + '%';
               }
             }
           }
@@ -1696,7 +1707,7 @@
       } else {
         if (masterMeterL) masterMeterL.style.height = '0%';
         if (masterMeterR) masterMeterR.style.height = '0%';
-        document.querySelectorAll('.ch-top-vu-fill').forEach(fill => fill.style.width = '0%');
+        document.querySelectorAll('.ch-top-vu-fill').forEach(fill => fill.style.height = '0%');
       }
     }
   }
@@ -1813,7 +1824,6 @@
 (function() {
   "use strict";
 
-  // Helper universal untuk memutarkan kontrol knob/fader di channel strip secara visual
   function triggerUiUpdate(chNum) {
     if (typeof window.selectScreenChannel === "function") {
       window.selectScreenChannel(chNum);
