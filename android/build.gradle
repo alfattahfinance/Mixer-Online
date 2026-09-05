@@ -1,5 +1,28 @@
 plugins {
-    id 'com.android.application' version '8.7.3' apply false
+    id 'com.android.application'
 }
 
-// APK artifact build trigger: Android-only change; mixer web code remains untouched.
+android {
+    namespace 'com.alfattah.mixeronline'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.alfattah.mixeronline'
+        minSdk 23
+        targetSdk 35
+        versionCode 1
+        versionName '1.0'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+}
