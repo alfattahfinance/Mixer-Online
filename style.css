@@ -1,14 +1,15 @@
 /* ==========================================================================
-   RESET & LAYOUT GRID UTAMA CONSOLE
+   RESET & LAYOUT GRID UTAMA CONSOLE (MASTER DIPERKECIL AGAR CH TIDAK TERPOTONG)
    ========================================================================== */
 main.console {
   display: grid !important;
-  grid-template-columns: minmax(300px, 1fr) 340px minmax(300px, 1fr) 140px !important;
+  /* Lebar master diperkecil dari 140px menjadi 90px */
+  grid-template-columns: minmax(280px, 1fr) 340px minmax(280px, 1fr) 90px !important;
   grid-template-areas:
     "ch-left center ch-right master"
     "fx      center ch-right master"
     "aux     center ch-right master" !important;
-  gap: 12px !important;
+  gap: 8px !important;
   width: 100% !important;
   max-width: 100% !important;
   box-sizing: border-box !important;
@@ -45,6 +46,8 @@ main.console > .channel-bank-right {
 
 main.console > .master-rack {
   grid-area: master !important;
+  width: 100% !important;
+  padding: 4px !important;
 }
 
 main.console > .fx-rack,
@@ -64,7 +67,7 @@ main.console > .aux-rack {
 }
 
 /* ==========================================================================
-   STYLING FADER & KONTROL CHANNEL (AGAR INTERAKTIF & RESPONSIF)
+   STYLING STRIP CHANNEL & URUTAN VERTIKAL BARU
    ========================================================================== */
 .new-channel-strip {
   display: flex;
@@ -73,31 +76,98 @@ main.console > .aux-rack {
   background: #121619;
   border: 1px solid #2a323d;
   border-radius: 6px;
-  padding: 8px 4px;
+  padding: 6px 3px;
   box-sizing: border-box;
+  width: 100%;
 }
 
-/* Slider Fader Vertikal (Diperbaiki Selektor .new-fader & .fader) */
-.new-channel-strip input[type="range"].new-fader,
-.new-channel-strip input[type="range"].fader,
-.master-card input[type="range"] {
-  -webkit-appearance: slider-vertical;
-  writing-mode: bt-lr; /* IE/Edge fallback */
-  width: 24px;
-  height: 180px;
-  background: #080a0b;
-  outline: none;
-  cursor: pointer;
-  touch-action: none !important; /* Mencegah layar ikut ter-scroll saat geser fader di HP */
+/* 1. Lampu Bulat Top */
+.channel-led {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #1a1f24;
+  border: 1px solid #3d464e;
+  margin: 2px auto 4px auto;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.9);
+  transition: all 0.15s ease-in-out;
 }
 
-/* Styling Knob Range Input */
+.channel-led.active.green,
+.channel-led.green {
+  background: #31e66b !important;
+  box-shadow: 0 0 8px #31e66b, inset 0 1px 2px rgba(255,255,255,0.7) !important;
+}
+
+.channel-led.active.red,
+.channel-led.red {
+  background: #ff3b30 !important;
+  box-shadow: 0 0 8px #ff3b30, inset 0 1px 2px rgba(255,255,255,0.7) !important;
+}
+
+/* 2. Indikator Sinyal Berdiri (Vertikal) di Atas Knob Gain */
+.channel-meter-vertical {
+  width: 6px;
+  height: 45px;
+  background: #080a0c;
+  border: 1px solid #1c232b;
+  border-radius: 2px;
+  margin: 2px auto 6px auto;
+  display: flex;
+  flex-direction: column-reverse;
+  overflow: hidden;
+}
+
+.channel-meter-bar {
+  width: 100%;
+  height: 0%; /* Dinamis diatur JS */
+  background: linear-gradient(to top, #31e66b 65%, #ffd21c 85%, #ff3b30 100%);
+  transition: height 0.05s ease-out;
+}
+
+/* 3. Grup Knob Gain - Pan (Diposisikan di Atas Text Volume) */
+.knobs-container,
+.gain-pan-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  margin-bottom: 6px;
+}
+
 .new-channel-strip input[type="range"].new-knob {
   touch-action: none !important;
   cursor: pointer;
 }
 
-/* Mute & Solo Button Active State (Satu standar dengan class .active & .on) */
+/* 4. Label Volume Tepat di Bawah Gain-Pan & di Atas Fader */
+.volume-label,
+.channel-vol-text {
+  font-size: 9px;
+  font-weight: bold;
+  color: #8b949e;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 4px 0 2px 0;
+  text-align: center;
+}
+
+/* 5. Slider Fader Vertikal */
+.new-channel-strip input[type="range"].new-fader,
+.new-channel-strip input[type="range"].fader,
+.master-card input[type="range"] {
+  -webkit-appearance: slider-vertical;
+  writing-mode: bt-lr; /* IE/Edge fallback */
+  width: 20px;
+  height: 160px;
+  background: #080a0b;
+  outline: none;
+  cursor: pointer;
+  touch-action: none !important;
+}
+
+/* Mute & Solo Button Active State */
 .btn-mute.active,
 .btn-mute.on,
 button[data-k="mute"].on {
@@ -112,34 +182,6 @@ button[data-k="solo"].on {
   background-color: #f1c40f !important;
   color: #000 !important;
   box-shadow: 0 0 8px rgba(241, 196, 15, 0.8);
-}
-
-/* ==========================================================================
-   STYLING LAMPU INDIKATOR LED CHANNEL (BARU)
-   ========================================================================== */
-.channel-led {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #1a1f24;
-  border: 1px solid #3d464e;
-  margin: 3px auto 6px auto;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.9);
-  transition: all 0.15s ease-in-out;
-}
-
-/* Lampu menyala hijau (Sinyal / Aktif) */
-.channel-led.active.green,
-.channel-led.green {
-  background: #31e66b !important;
-  box-shadow: 0 0 8px #31e66b, inset 0 1px 2px rgba(255,255,255,0.7) !important;
-}
-
-/* Lampu menyala merah (Muted / Warning) */
-.channel-led.active.red,
-.channel-led.red {
-  background: #ff3b30 !important;
-  box-shadow: 0 0 8px #ff3b30, inset 0 1px 2px rgba(255,255,255,0.7) !important;
 }
 
 /* ==========================================================================
