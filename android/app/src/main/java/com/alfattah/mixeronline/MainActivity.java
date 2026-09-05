@@ -68,8 +68,6 @@ public class MainActivity extends Activity {
         webView.setWebViewClient(new WebViewClient() {
             @Override public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                // The early shim is already installed before page scripts run.
-                // Keep the post-load install as a harmless compatibility fallback.
                 installBluetoothShimIntoLoadedPage();
                 installAndroidMixerBluetoothAdapter();
             }
@@ -78,9 +76,6 @@ public class MainActivity extends Activity {
         bluetoothBridge = new NativeBluetoothBridge(this, webView);
         webView.addJavascriptInterface(bluetoothBridge, "AndroidBluetooth");
 
-        // Web Bluetooth feature detection happens while the website scripts are loading.
-        // On WebViews without DOCUMENT_START_SCRIPT, injecting from onPageFinished is too late.
-        // Therefore prepend the Android shim to the existing website HTML at runtime.
         installBluetoothShim();
         loadMixerWebsiteWithEarlyShim();
     }
@@ -92,17 +87,11 @@ public class MainActivity extends Activity {
             int head = html.toLowerCase().indexOf("<head");
             if (head >= 0) {
                 int close = html.indexOf('>', head);
-                if (close >= 0) {
-                    html = html.substring(0, close + 1) + shimTag + html.substring(close + 1);
-                } else {
-                    html = shimTag + html;
-                }
-            } else {
-                html = shimTag + html;
-            }
+                if (close >= 0) html = html.substring(0, close + 1) + shimTag + html.substring(close + 1);
+                else html = shimTag + html;
+            } else html = shimTag + html;
             webView.loadDataWithBaseURL(WEB_BASE_URL, html, "text/html", "UTF-8", null);
         } catch (IOException e) {
-            // Fallback to the original asset URL if the runtime injection cannot read the asset.
             webView.loadUrl(WEB_BASE_URL + "index.html");
         }
     }
@@ -119,17 +108,14 @@ public class MainActivity extends Activity {
 
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode != FILE_CHOOSER_REQUEST) return;
-        if (fileChooserCallback == null) return;
+        if (requestCode != FILE_CHOOSER_REQUEST || fileChooserCallback == null) return;
         Uri[] results = null;
         if (resultCode == RESULT_OK && data != null) {
             if (data.getClipData() != null) {
                 int count = data.getClipData().getItemCount();
                 results = new Uri[count];
                 for (int i = 0; i < count; i++) results[i] = data.getClipData().getItemAt(i).getUri();
-            } else if (data.getData() != null) {
-                results = new Uri[]{data.getData()};
-            }
+            } else if (data.getData() != null) results = new Uri[]{data.getData()};
         }
         fileChooserCallback.onReceiveValue(results);
         fileChooserCallback = null;
@@ -161,7 +147,13 @@ public class MainActivity extends Activity {
                 "window.__mixerBtNotifyResult=function(ok,msg){notifyWaiters.splice(0).forEach(function(w){if(ok)w.resolve(true);else w.reject(new Error(msg||'Notification gagal'))})}" +
                 "window.__mixerBtOnRx=function(payload){var a=bytes(payload),ev={target:{value:new DataView(a.buffer)}};rxListeners.slice().forEach(function(fn){try{fn(ev)}catch(e){}})}" +
                 "var api={requestDevice:function(){return new Promise(function(resolve,reject){deviceWaiters.push({resolve:resolve,reject:reject});AndroidBluetooth.requestDevice()})}};" +
-                "try{Object.defineProperty(navigator,'bluetooth',{configurable:true,value:api})}catch(e){try{navigator.bluetooth=api}catch(x){}}" +
+                "function installNavigator(){" +
+                "try{Object.defineProperty(navigator,'bluetooth',{configurable:true,enumerable:true,value:api});return navigator.bluetooth===api}catch(e){}" +
+                "try{var proto=Object.getPrototypeOf(navigator);Object.defineProperty(proto,'bluetooth',{configurable:true,enumerable:true,get:function(){return api;}});return navigator.bluetooth===api}catch(e){}" +
+                "try{navigator.bluetooth=api;return navigator.bluetooth===api}catch(e){}" +
+                "return false;}" +
+                "window.__mixerInstallBluetoothNavigator=installNavigator;" +
+                "installNavigator();" +
                 "window.MixerAndroidBluetooth={native:true};" +
                 "})();";
     }
@@ -169,13 +161,15 @@ public class MainActivity extends Activity {
     private void installBluetoothShim() {
         String shim = bluetoothShimScript();
         if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
-            WebViewCompat.addDocumentStartJavaScript(webView, shim, Collections.singleton("file://"));
+            try { WebViewCompat.addDocumentStartJavaScript(webView, shim, Collections.singleton("*")); }
+            catch (Exception ignored) { }
         }
     }
 
     private void installBluetoothShimIntoLoadedPage() {
         if (webView == null) return;
         webView.evaluateJavascript(bluetoothShimScript(), null);
+        webView.evaluateJavascript("(function(){try{if(window.__mixerInstallBluetoothNavigator)window.__mixerInstallBluetoothNavigator();}catch(e){}})();", null);
     }
 
     private void installAndroidMixerBluetoothAdapter() {
@@ -188,8 +182,9 @@ public class MainActivity extends Activity {
                 "var f=document.getElementById('footerConnection');if(f)f.textContent=online?'● BLUETOOTH ONLINE':'● BLUETOOTH OFFLINE';" +
                 "}" +
                 "function install(){" +
+                "try{if(window.__mixerInstallBluetoothNavigator)window.__mixerInstallBluetoothNavigator();}catch(e){}" +
                 "if(!window.MixerAdapters||typeof window.MixerAdapters.connectBluetooth!=='function')return false;" +
-                "window.MixerAndroidBluetoothReady=true;" +
+                "window.MixerAndroidBluetoothReady=!!(navigator.bluetooth&&navigator.bluetooth.requestDevice);" +
                 "var bt=document.getElementById('connectBluetooth');" +
                 "if(bt&&!bt.__androidMixerBtBound){" +
                 "bt.__androidMixerBtBound=true;bt.setAttribute('data-android-bluetooth','native-ble');" +
