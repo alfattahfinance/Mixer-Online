@@ -5,9 +5,6 @@ on:
   push:
     paths:
       - '**'
-      - '!android/**'
-      - '!android/**/**'
-      - 'android/**'
 
 jobs:
   build-apk:
@@ -19,17 +16,28 @@ jobs:
       - name: Prepare complete website for APK
         shell: bash
         run: |
-          set -e
+          set -euo pipefail
           rm -rf android/app/src/main/assets
           mkdir -p android/app/src/main/assets/web
 
-          # Copy the complete website source from the repository.
-          # Android project files are kept separate and are not copied.
+          # Package the complete website from the repository.
+          # The Android project and GitHub workflow files are excluded.
           rsync -a --exclude='.git/' --exclude='.github/' --exclude='android/' ./ android/app/src/main/assets/web/
 
-          test -f android/app/src/main/assets/web/index.html
-          echo "Website files packaged:"
-          find android/app/src/main/assets/web -type f | wc -l
+          test -s android/app/src/main/assets/web/index.html
+
+          WEBSITE_BYTES=$(du -sb android/app/src/main/assets/web | cut -f1)
+          WEBSITE_MB=$(awk -v b="$WEBSITE_BYTES" 'BEGIN {printf "%.2f", b/1048576}')
+          WEBSITE_FILES=$(find android/app/src/main/assets/web -type f | wc -l)
+
+          echo "=========================================="
+          echo "WEBSITE PACKAGING CHECK"
+          echo "Website size : ${WEBSITE_MB} MB (${WEBSITE_BYTES} bytes)"
+          echo "Website files: ${WEBSITE_FILES}"
+          echo "index.html   : OK"
+          echo "=========================================="
+
+          find android/app/src/main/assets/web -type f -printf '%P\n' | sort > android/app/src/main/assets/web/.packaged-files.txt
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -46,6 +54,31 @@ jobs:
       - name: Build debug APK
         working-directory: android
         run: gradle :app:assembleDebug --stacktrace
+
+      - name: Verify website is inside APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK"
+
+          echo "=========================================="
+          echo "APK PACKAGING CHECK"
+          echo "APK size: $(du -h "$APK" | cut -f1)"
+
+          if ! unzip -l "$APK" | grep -q 'assets/web/index.html'; then
+            echo "ERROR: assets/web/index.html is missing from the APK"
+            exit 1
+          fi
+
+          APK_ASSET_FILES=$(unzip -Z1 "$APK" | grep '^assets/web/' | wc -l)
+          APK_ASSET_BYTES=$(unzip -l "$APK" | awk '/assets\/web\// {sum += $1} END {print sum+0}')
+          APK_ASSET_MB=$(awk -v b="$APK_ASSET_BYTES" 'BEGIN {printf "%.2f", b/1048576}')
+
+          echo "assets/web files: ${APK_ASSET_FILES}"
+          echo "assets/web size : ${APK_ASSET_MB} MB (${APK_ASSET_BYTES} bytes)"
+          echo "index.html      : PRESENT"
+          echo "=========================================="
 
       - name: Rename APK
         run: cp android/app/build/outputs/apk/debug/app-debug.apk Mixer-Online.apk
