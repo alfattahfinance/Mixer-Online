@@ -190,8 +190,17 @@ public class MainActivity extends Activity {
                 + "var h=document.getElementById('headerBridgeStatus');if(h)h.textContent=on?'BLUETOOTH ONLINE':'BRIDGE STANDBY';"
                 + "var t=document.getElementById('testTransportLabel');if(t)t.textContent=on?'ESP32 BRIDGE BLUETOOTH ONLINE':'OFFLINE';"
                 + "var f=document.getElementById('footerConnection');if(f)f.textContent=on?'● BLUETOOTH ONLINE':'● BLUETOOTH OFFLINE';}"
+                + "async function connect(){var b=document.getElementById('connectBluetooth');if(!window.MixerAdapters||typeof window.MixerAdapters.connectBluetooth!=='function')return;"
+                + "if(b){b.disabled=true;b.textContent='SCANNING BLUETOOTH...';}"
+                + "try{var r=await window.MixerAdapters.connectBluetooth();if(r&&r.ok){sync({connected:true});if(b)b.textContent='BLUETOOTH ONLINE';}"
+                + "else{sync({connected:false});if(b)b.textContent='CONNECT BLUETOOTH';if(r&&r.reason)alert('Bluetooth: '+r.reason);}}"
+                + "catch(e){sync({connected:false});if(b)b.textContent='CONNECT BLUETOOTH';alert('Bluetooth: '+(e&&e.message?e.message:e));}"
+                + "finally{if(b)b.disabled=false;}}"
+                + "function bind(){var b=document.getElementById('connectBluetooth');if(!b||b.__androidNativeBleBound)return;"
+                + "b.__androidNativeBleBound=true;b.addEventListener('click',function(e){e.preventDefault();e.stopImmediatePropagation();connect();},true);"
+                + "if(window.MixerAdapters&&window.MixerAdapters.onStatus)window.MixerAdapters.onStatus(sync);}"
                 + "document.addEventListener('mixer:android-bluetooth-status',function(e){sync(e.detail||{});});"
-                + "sync({connected:window.MixerAndroidBluetooth&&window.MixerAndroidBluetooth.isConnected&&window.MixerAndroidBluetooth.isConnected()});"
+                + "if(!bind()){var n=0,timer=setInterval(function(){if(bind()||++n>100)clearInterval(timer);},100);}"
                 + "})();";
         webView.evaluateJavascript(js, null);
     }
