@@ -11,10 +11,8 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
-import android.bluetooth.le.BluetoothLeScanner;
-import android.bluetooth.le.ScanCallback;
-import android.bluetooth.le.ScanResult;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
@@ -23,6 +21,10 @@ import android.util.Base64;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,6 +35,8 @@ import java.util.UUID;
 public final class NativeBluetoothBridge {
     private static final int REQ_BT = 7001;
     private static final long SCAN_MS = 10000L;
+    private static final String PREFS = "mixer_online_esp32";
+    private static final String SAVED_FEEDBACK = "saved_feedback_state_v1";
     private static final UUID UART_SERVICE = UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
     private static final UUID UART_RX = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e");
     private static final UUID UART_TX = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e");
@@ -44,6 +48,7 @@ public final class NativeBluetoothBridge {
     private final WebView webView;
     private final Handler main = new Handler(Looper.getMainLooper());
     private final Map<String, BluetoothDevice> scanDevices = new LinkedHashMap<>();
+    private final StringBuilder rxBuffer = new StringBuilder();
     private BluetoothLeScanner scanner;
     private ScanCallback scanCallback;
     private BluetoothGatt gatt;
@@ -133,8 +138,19 @@ public final class NativeBluetoothBridge {
         });
     }
 
+    /** Returns the persistent latest ESP32 feedback snapshot. */
     @JavascriptInterface
-    public void disconnect() { main.post(this::closeGatt); }
+    public String getSavedFeedbackState() {
+        return activity.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                .getString(SAVED_FEEDBACK, "{}");
+    }
+
+    /** Clears the persistent ESP32 feedback snapshot. */
+    @JavascriptInterface
+    public void clearSavedFeedbackState() {
+        activity.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                .edit().remove(SAVED_FEEDBACK).apply();
+    }
 
     public void onRequestPermissionsResult(int requestCode, int[] grantResults) {
         if (requestCode != REQ_BT) return;
@@ -235,6 +251,7 @@ public final class NativeBluetoothBridge {
             main.post(() -> {
                 if (newState == BluetoothGatt.STATE_CONNECTED) {
                     gatt = g;
+                    rxBuffer.setLength(0);
                     try { g.discoverServices(); }
                     catch (SecurityException e) { js("window.__mixerBtConnected(false," + q(e.getMessage()) + ")"); }
                 } else if (newState == BluetoothGatt.STATE_DISCONNECTED) {
@@ -262,13 +279,59 @@ public final class NativeBluetoothBridge {
 
         @Override public void onCharacteristicChanged(BluetoothGatt g, BluetoothGattCharacteristic characteristic) {
             byte[] value = characteristic.getValue();
-            if (value != null) js("window.__mixerBtOnRx('" + Base64.encodeToString(value, Base64.NO_WRAP) + "')");
+            if (value != null) handleRxBytes(value);
         }
 
         @Override public void onCharacteristicChanged(BluetoothGatt g, BluetoothGattCharacteristic characteristic, byte[] value) {
-            if (value != null) js("window.__mixerBtOnRx('" + Base64.encodeToString(value, Base64.NO_WRAP) + "')");
+            if (value != null) handleRxBytes(value);
         }
     };
+
+    private void handleRxBytes(byte[] value) {
+        // Keep Android-side persistence independent from the website's runtime state.
+        String chunk = new String(value, StandardCharsets.UTF_8);
+        rxBuffer.append(chunk);
+        String[] lines = rxBuffer.toString().split("\\r?\\n", -1);
+        rxBuffer.setLength(0);
+        if (lines.length == 0) return;
+        for (int i = 0; i < lines.length - 1; i++) persistFeedbackLine(lines[i]);
+        rxBuffer.append(lines[lines.length - 1]);
+        js("window.__mixerBtOnRx('" + Base64.encodeToString(value, Base64.NO_WRAP) + "')");
+    }
+
+    private void persistFeedbackLine(String line) {
+        if (line == null || line.trim().isEmpty()) return;
+        try {
+            JSONObject packet = new JSONObject(line.trim());
+            if (!"FEEDBACK".equalsIgnoreCase(packet.optString("type"))) return;
+            String scope = packet.optString("scope", "CHANNEL");
+            String key;
+            if ("CHANNEL".equalsIgnoreCase(scope)) {
+                int ch = packet.optInt("ch", 0);
+                String param = packet.optString("param", "");
+                if (ch < 1 || param.isEmpty()) return;
+                key = "CH" + ch + "." + param;
+            } else {
+                String target = packet.optString("target", packet.optString("fx", packet.optString("bus", scope)));
+                String param = packet.optString("param", "");
+                if (param.isEmpty()) return;
+                key = scope + "." + target + "." + param;
+            }
+            SharedPreferences prefs = activity.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+            JSONObject saved;
+            try { saved = new JSONObject(prefs.getString(SAVED_FEEDBACK, "{}")); }
+            catch (Exception ignored) { saved = new JSONObject(); }
+            JSONObject entry = new JSONObject();
+            entry.put("value", packet.opt("value"));
+            entry.put("ts", packet.optLong("ts", System.currentTimeMillis()));
+            entry.put("device", packet.optString("device", "ESP32"));
+            entry.put("transport", packet.optString("transport", "bluetooth"));
+            saved.put(key, entry);
+            prefs.edit().putString(SAVED_FEEDBACK, saved.toString()).apply();
+        } catch (Exception ignored) {
+            // Ignore non-JSON or partial data; the website still receives the RX bytes.
+        }
+    }
 
     private void chooseCharacteristics(BluetoothGatt g) {
         writeCharacteristic = null;
@@ -300,6 +363,7 @@ public final class NativeBluetoothBridge {
         gatt = null;
         writeCharacteristic = null;
         notifyCharacteristic = null;
+        rxBuffer.setLength(0);
     }
 
     private void js(String code) { main.post(() -> webView.evaluateJavascript(code, null)); }
