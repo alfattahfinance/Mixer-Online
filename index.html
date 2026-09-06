@@ -211,28 +211,6 @@
     margin-bottom: 2px !important;
   }
 
-  /* KUSTOMISASI DUDUKAN KNOB DAN GARIS POINTER PRESISI */
-  .knob, .knob-container, .rotary-knob {
-    position: relative !important;
-    width: 28px !important;
-    height: 28px !important;
-    border-radius: 50% !important;
-    overflow: hidden !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    transform-origin: center center !important;
-  }
-
-  .knob-line, .pointer-line, .knob-pointer {
-    width: 2px !important;
-    height: 12px !important;
-    background: var(--accent-color) !important;
-    position: absolute !important;
-    top: 2px !important;
-    transform-origin: bottom center !important;
-  }
-
   /* GRUP KONTROL GAIN - PAN */
   .ch-controls-group {
     display: flex !important;
@@ -1940,7 +1918,7 @@
 
 <script>
 // ==========================================================================
-// KODE HANDLER CONNECTION / TEST SUITE (MEMPERBAIKI ROTASI KNOB DAN RELEASING SCRIPT)
+// KODE HANDLER CONNECTION / TEST SUITE (UPDATE SLIDER HORIZONTAL PRESISI)
 // ==========================================================================
 (function() {
   "use strict";
@@ -1954,27 +1932,16 @@
     if (strip && window.state?.channels?.[chNum - 1]) {
       const ch = window.state.channels[chNum - 1];
       
-      // Helper untuk Update Nilai Input + Rotasi Visual Knob yang Rapi & Terpusat
+      // Helper untuk Update Nilai Input Slider Horizontal (Tanpa Memutar Elemen)
       const updateKnobElement = (selector, val, minVal = 0, maxVal = 100) => {
         const input = strip.querySelector(selector);
         if (input) {
-          input.value = val;
-          
-          let min = parseFloat(input.min) || minVal;
-          let max = parseFloat(input.max) || maxVal;
-          
+          let min = parseFloat(input.min) ?? minVal;
+          let max = parseFloat(input.max) ?? maxVal;
           let clampedVal = Math.max(min, Math.min(max, val));
-          let percentage = (clampedVal - min) / (max - min);
-          let deg = -135 + (percentage * 270);
-          
-          input.style.transformOrigin = 'center center';
-          input.style.transform = `rotate(${deg}deg)`;
-          
-          const parentKnob = input.closest('.knob, .knob-container, .rotary-knob');
-          if (parentKnob) {
-            parentKnob.style.transformOrigin = 'center center';
-            parentKnob.style.transform = `rotate(${deg}deg)`;
-          }
+
+          input.value = clampedVal;
+          input.style.transform = 'none'; // Memastikan tidak ada sisa rotasi CSS
 
           input.dispatchEvent(new Event('input', { bubbles: true }));
           input.dispatchEvent(new Event('change', { bubbles: true }));
