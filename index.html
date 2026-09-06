@@ -837,14 +837,14 @@
       </div>
     </div>
 
-    <!-- Player / Recorder -->
+    <!-- Player / Recorder + Tombol Input Suara Mixer Fisik -->
     <section class="media-rack" style="border: 1px solid var(--panel-border); border-radius: 6px; padding: 6px;">
       <h2 style="color: var(--accent-color); border-bottom: 1px solid var(--panel-border); margin-bottom: 4px; font-size: 10px;">USB PLAYER / REC <span id="activePlayerTarget" style="font-size: 9px; color: #2ecc71; float: right;">[CH 1]</span></h2>
       <div style="display: flex; gap: 4px; margin-bottom: 4px;">
         <button id="btnPlayerRec" type="button" style="flex: 1; background: var(--main-bg); color: var(--text-main); border: 1px solid var(--panel-border); font-size: 9px; padding: 4px;">🎙<small>REC</small></button>
         <button id="btnPlayerFile" type="button" style="flex: 1; background: var(--main-bg); color: var(--text-main); border: 1px solid var(--panel-border); font-size: 9px; padding: 4px;">📁<small>FILE</small></button>
         <button id="btnPlayerMusic" type="button" style="flex: 1; background: var(--main-bg); color: var(--text-main); border: 1px solid var(--panel-border); font-size: 9px; padding: 4px;">🎵<small>MUSIC</small></button>
-        <button id="btnPlayerMode" type="button" style="flex: 1; background: var(--main-bg); color: var(--accent-color); border: 1px solid var(--panel-border); font-size: 9px; padding: 4px;">🔀 <small id="modeText">SEQ</small></button>
+        <button id="btnPhysicalAudioInput" type="button" style="flex: 1; background: var(--main-bg); color: #2ecc71; border: 1px solid var(--panel-border); font-size: 9px; padding: 4px; font-weight: bold;">🎛️ <small>LIVE IN</small></button>
       </div>
       <div style="display: flex; gap: 4px; align-items: center; background: var(--main-bg); padding: 4px; border-radius: 3px; border: 1px solid var(--panel-border);">
         <span id="playerTrackInfo" style="font-size: 9px; color: var(--text-dim); flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">NO FILE SELECTED</span>
@@ -1218,12 +1218,18 @@
   }
   window.selectScreenChannel = selectScreenChannel;
 
-  // SINKRONISASI REALTIME ANGKA/TEKS FADER DAN KONTROL CHANNEL
+  // SINKRONISASI REALTIME ANGKA/TEKS FADER DAN KONTROL CHANNEL + HAPTIC FEEDBACK
   document.addEventListener('input', function(e) {
     if (e.target.matches('input[type="range"]')) {
+      // Pemicu Getar Haptic saat slider/knob digeser
+      if (window.AndroidFeedback && typeof window.AndroidFeedback.triggerHaptic === 'function') {
+        window.AndroidFeedback.triggerHaptic(10);
+      } else if (navigator.vibrate) {
+        navigator.vibrate(10);
+      }
+
       const container = e.target.parentElement || e.target.closest('div, section');
       
-      // Update khusus label persen Fader
       if (container && e.target.classList.contains('channel-fader')) {
         const valDisplay = container.querySelector('.fader-val, output');
         if (valDisplay) {
@@ -1231,7 +1237,6 @@
         }
       }
 
-      // Cari elemen strip terdekat
       const strip = e.target.closest('.new-channel-strip, .channel-strip, [data-ch]');
       if (strip) {
         const chId = Number(strip.dataset.ch) || parseInt(strip.innerText.match(/CH\s*(\d+)/i)?.[1] || '0', 10);
@@ -1244,7 +1249,6 @@
           if (e.target.classList.contains('channel-fader')) {
             window.state.channels[chId - 1].fader = val;
             
-            // Sinkronkan ke Layar M32 jika channel sedang dibuka
             const activeInput = document.getElementById('screenInput')?.textContent;
             if (activeInput && parseInt(activeInput.replace(/\D/g, ''), 10) === chId) {
               const sf = document.getElementById('screenFader');
@@ -1252,6 +1256,17 @@
             }
           }
         }
+      }
+    }
+  });
+
+  // Pemicu Getar Haptic saat tombol diklik
+  document.addEventListener('click', function(e) {
+    if (e.target.tagName === 'BUTTON') {
+      if (window.AndroidFeedback && typeof window.AndroidFeedback.triggerHaptic === 'function') {
+        window.AndroidFeedback.triggerHaptic(20);
+      } else if (navigator.vibrate) {
+        navigator.vibrate(20);
       }
     }
   });
@@ -1496,6 +1511,7 @@
 (function(){
   const musicBtn = document.getElementById('btnPlayerMusic');
   const fileBtn = document.getElementById('btnPlayerFile');
+  const liveInBtn = document.getElementById('btnPhysicalAudioInput');
   const fileInput = document.getElementById('localAudioLoader');
   const targetLabel = document.getElementById('activePlayerTarget');
   const playPauseBtn = document.getElementById('btnPlayPauseAudio');
@@ -1514,6 +1530,7 @@
   let panNode = null;
   let analyserNode = null;
   let currentAudioElement = null;
+  let liveMicStreamNode = null;
 
   let playlist = [];
   let currentTrackIndex = 0;
@@ -1526,7 +1543,7 @@
     });
   }
 
-  function initAudioEngine(audioElement) {
+  function initAudioEngine(elementOrStream) {
     if (!audioCtx) {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       audioCtx = new AudioContext();
@@ -1535,23 +1552,56 @@
       audioCtx.resume();
     }
 
-    if (!sourceNode) {
-      sourceNode = audioCtx.createMediaElementSource(audioElement);
+    if (!gainNode) {
       gainNode = audioCtx.createGain();
       analyserNode = audioCtx.createAnalyser();
       analyserNode.fftSize = 64;
-      
+
       if (audioCtx.createStereoPanner) {
         panNode = audioCtx.createStereoPanner();
-        sourceNode.connect(gainNode);
         gainNode.connect(panNode);
         panNode.connect(analyserNode);
-        analyserNode.connect(audioCtx.destination);
       } else {
-        sourceNode.connect(gainNode);
         gainNode.connect(analyserNode);
-        analyserNode.connect(audioCtx.destination);
       }
+      analyserNode.connect(audioCtx.destination);
+    }
+
+    if (elementOrStream instanceof MediaStream) {
+      if (sourceNode) sourceNode.disconnect();
+      liveMicStreamNode = audioCtx.createMediaStreamSource(elementOrStream);
+      liveMicStreamNode.connect(gainNode);
+    } else if (elementOrStream instanceof HTMLMediaElement) {
+      if (!sourceNode) {
+        sourceNode = audioCtx.createMediaElementSource(elementOrStream);
+        sourceNode.connect(gainNode);
+      }
+    }
+  }
+
+  // TANGKAP INPUT SUARA FISIK DARI MIXER FISIK / OTG SOUNDCARD
+  async function startPhysicalAudioStream() {
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert("Input Audio Fisik tidak didukung oleh browser/perangkat ini.");
+        return;
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      initAudioEngine(stream);
+
+      const activeInputStr = document.getElementById('screenInput')?.textContent || "CH 1";
+      lockedMusicChannel = parseInt(activeInputStr.replace(/\D/g, ''), 10) || 1;
+
+      if (trackInfo) trackInfo.textContent = `[LIVE PHYSICAL MIXER IN] CH ${lockedMusicChannel}`;
+      alert(`✅ Suara Mixer Fisik Berhasil Terhubung ke Channel ${lockedMusicChannel}!`);
+
+      if (window.AndroidFeedback && typeof window.AndroidFeedback.triggerHaptic === 'function') {
+        window.AndroidFeedback.triggerHaptic(50);
+      } else if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+    } catch (err) {
+      alert("Gagal mengambil suara mixer fisik: " + err.message);
     }
   }
 
@@ -1639,7 +1689,7 @@
         }
       }
 
-      if (analyserNode && currentAudioElement && !currentAudioElement.paused) {
+      if (analyserNode && ((currentAudioElement && !currentAudioElement.paused) || liveMicStreamNode)) {
         const dataArray = new Uint8Array(analyserNode.frequencyBinCount);
         analyserNode.getByteFrequencyData(dataArray);
 
@@ -1684,7 +1734,7 @@
                 const cFaderScale = (parseFloat(cState.fader ?? 75)) / 100;
                 
                 let chSignalLevel = 0;
-                if (cId === chNum && analyserNode && currentAudioElement && !currentAudioElement.paused) {
+                if (cId === chNum && analyserNode) {
                   chSignalLevel = avgLevel * 100 * cGain * cFaderScale;
                 } else if (cFaderScale > 0 && cGain > 0 && window.state.system) {
                   chSignalLevel = Math.min(100, (cGain * cFaderScale * 45) + (Math.random() * 8));
@@ -1716,6 +1766,7 @@
 
   if(musicBtn) musicBtn.addEventListener('click', () => fileInput?.click());
   if(fileBtn) fileBtn.addEventListener('click', () => fileInput?.click());
+  if(liveInBtn) liveInBtn.addEventListener('click', startPhysicalAudioStream);
 
   if(modeBtn) {
     modeBtn.addEventListener('click', () => {
