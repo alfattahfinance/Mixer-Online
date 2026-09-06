@@ -1,9 +1,15 @@
 package com.alfattah.mixeronline;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.webkit.JavascriptInterface;
+import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -27,6 +33,7 @@ import java.util.Collections;
 public class MainActivity extends Activity {
     private WebView webView;
     private NativeBluetoothBridge bluetoothBridge;
+    private Vibrator vibrator;
     private ValueCallback<Uri[]> fileChooserCallback;
     private static final int FILE_CHOOSER_REQUEST = 8101;
     private static final String WEB_BASE_URL = "file:///android_asset/web/";
@@ -36,6 +43,9 @@ public class MainActivity extends Activity {
 
         webView = new WebView(this);
         setContentView(webView);
+
+        // Inisialisasi Layanan Hardware Getar (Vibrator)
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -48,6 +58,11 @@ public class MainActivity extends Activity {
         settings.setDatabaseEnabled(true);
 
         webView.setWebChromeClient(new WebChromeClient() {
+            /* Otomatis setujui izin mikrofon/input audio fisik dari Web Audio API */
+            @Override public void onPermissionRequest(final PermissionRequest request) {
+                runOnUiThread(() -> request.grant(request.getResources()));
+            }
+
             @Override public boolean onShowFileChooser(
                     WebView view,
                     ValueCallback<Uri[]> callback,
@@ -78,11 +93,31 @@ public class MainActivity extends Activity {
             }
         });
 
+        // 1. Inisialisasi & registrasi Native Bluetooth Bridge
         bluetoothBridge = new NativeBluetoothBridge(this, webView);
         webView.addJavascriptInterface(bluetoothBridge, "AndroidBluetooth");
 
+        // 2. Registrasi Native Haptic Feedback Bridge
+        webView.addJavascriptInterface(new NativeFeedbackBridge(), "AndroidFeedback");
+
         installBluetoothDocumentStart();
         loadMixerWebsite();
+    }
+
+    /**
+     * Bridge JavaScript untuk memicu getaran Haptic Feedback pada Fader/Knob/Tombol
+     */
+    public class NativeFeedbackBridge {
+        @JavascriptInterface
+        public void triggerHaptic(int durationMs) {
+            if (vibrator != null && vibrator.hasVibrator()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.vibrate(VibrationEffect.createOneShot(durationMs, VibrationEffect.DEFAULT_AMPLITUDE));
+                } else {
+                    vibrator.vibrate(durationMs);
+                }
+            }
+        }
     }
 
     private void loadMixerWebsite() {
