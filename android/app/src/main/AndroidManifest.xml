@@ -6,6 +6,13 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <!-- TAMBAHAN: Izin Input Audio Fisik (Mikrofon / Soundcard OTG / USB Audio Input) -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+    <!-- TAMBAHAN: Izin Haptic Feedback (Getar Tombol & Fader) -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <!-- Android 12+ BLE permissions -->
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
         android:usesPermissionFlags="neverForLocation" />
@@ -19,7 +26,9 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
         android:maxSdkVersion="30" />
 
+    <!-- Deklarasi fitur perangkat keras opsional -->
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
 
     <application
         android:theme="@style/AppTheme"
