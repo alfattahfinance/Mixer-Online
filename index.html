@@ -1579,21 +1579,64 @@
     }
   }
 
-  // TANGKAP INPUT SUARA FISIK DARI MIXER FISIK / OTG SOUNDCARD
+  // TANGKAP INPUT SUARA FISIK DARI MIXER FISIK / OTG SOUNDCARD (DSP OPTIMIZED)
   async function startPhysicalAudioStream() {
     try {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert("Input Audio Fisik tidak didukung oleh browser/perangkat ini.");
+        alert("Browser/APK tidak mendukung pengambilan audio fisik.");
         return;
       }
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-      initAudioEngine(stream);
+
+      // Konfigurasi DSPAudio murni tanpa filter peredam bising bawaan HP
+      const constraints = {
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+          sampleRate: 48000
+        },
+        video: false
+      };
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      }
+
+      if (audioCtx.state === 'suspended') {
+        await audioCtx.resume();
+      }
+
+      if (liveMicStreamNode) {
+        liveMicStreamNode.disconnect();
+      }
+
+      liveMicStreamNode = audioCtx.createMediaStreamSource(stream);
+
+      if (!gainNode) {
+        gainNode = audioCtx.createGain();
+        analyserNode = audioCtx.createAnalyser();
+        analyserNode.fftSize = 64;
+
+        if (audioCtx.createStereoPanner) {
+          panNode = audioCtx.createStereoPanner();
+          gainNode.connect(panNode);
+          panNode.connect(analyserNode);
+        } else {
+          gainNode.connect(analyserNode);
+        }
+        analyserNode.connect(audioCtx.destination);
+      }
+
+      liveMicStreamNode.connect(gainNode);
 
       const activeInputStr = document.getElementById('screenInput')?.textContent || "CH 1";
       lockedMusicChannel = parseInt(activeInputStr.replace(/\D/g, ''), 10) || 1;
 
       if (trackInfo) trackInfo.textContent = `[LIVE PHYSICAL MIXER IN] CH ${lockedMusicChannel}`;
-      alert(`✅ Suara Mixer Fisik Berhasil Terhubung ke Channel ${lockedMusicChannel}!`);
+      alert(`✅ SUARA FISIK TERHUBUNG! Cobalah bicara di Mic Mixer Fisik.`);
 
       if (window.AndroidFeedback && typeof window.AndroidFeedback.triggerHaptic === 'function') {
         window.AndroidFeedback.triggerHaptic(50);
@@ -1601,7 +1644,7 @@
         navigator.vibrate(50);
       }
     } catch (err) {
-      alert("Gagal mengambil suara mixer fisik: " + err.message);
+      alert("Gagal mengambil suara mixer fisik: " + err.message + "\n\nPastikan kabel Aux TRRS / OTG Soundcard sudah tersambung ke HP.");
     }
   }
 
