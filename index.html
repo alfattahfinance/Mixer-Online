@@ -2120,13 +2120,38 @@
     window.state.channels[chId - 1].low = Math.floor(Math.random() * 100);
     triggerUiUpdate(chId);
 
-    const rx = document.getElementById('rx');
-    if (rx) rx.textContent = `RX: {"ch":${chId},"gain":${window.state.channels[chId - 1].gain},"pan":${window.state.channels[chId - 1].pan},"low":${window.state.channels[chId - 1].low}}`;
+          // Helper untuk update Nilai Input + Rotasi Visual Knob yang Rapi
+      const updateKnobElement = (selector, val, minVal = 0, maxVal = 100) => {
+        const input = strip.querySelector(selector);
+        if (input) {
+          input.value = val;
+          
+          let min = parseFloat(input.min) || minVal;
+          let max = parseFloat(input.max) || maxVal;
+          
+          // 1. Batasi nilai masukan agar tidak berputar liar melebihi batas min/max
+          let clampedVal = Math.max(min, Math.min(max, val));
+          
+          // 2. Hitung persentase posisi (0% sampai 100%)
+          let percentage = (clampedVal - min) / (max - min);
+          
+          // 3. Batasi sudut rotasi standar audio mixer (-135 derajat s/d +135 derajat)
+          let deg = -135 + (percentage * 270);
+          
+          // 4. Terapkan rotasi dengan titik tumpu tepat di tengah poros knob (center center)
+          input.style.transformOrigin = 'center center';
+          input.style.transform = `rotate(${deg}deg)`;
+          
+          const parentKnob = input.closest('.knob, .knob-container, .rotary-knob');
+          if (parentKnob) {
+            parentKnob.style.transformOrigin = 'center center';
+            parentKnob.style.transform = `rotate(${deg}deg)`;
+          }
 
-    const tr = document.getElementById('testResult');
-    if (tr) tr.textContent = `TEST: HARDWARE RX SIMULATION CH${chId} UPDATED`;
-  });
-})();
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      };
 </script>
 
 </body>
