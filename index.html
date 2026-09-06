@@ -1107,7 +1107,7 @@
   }
 
   function updateSetup() {
-    const a = window.MixerAdapters?.active;
+    const a = window.MixerAdapters?.status?.();
     const t = document.getElementById('setupTransport');
     if (t) t.textContent = a?.connected ? (a.transport === 'bluetooth' ? 'BLUETOOTH' : 'ESP32 BRIDGE') : 'OFFLINE';
   }
@@ -1537,9 +1537,21 @@
   let isShuffle = false;
   let lockedMusicChannel = null;
 
+  // SINKRONISASI MASTER FADER KELUARAN DSP AUDIO REALTIME
   if (masterFader) {
     masterFader.addEventListener('input', function() {
-      if (masterValElem) masterValElem.textContent = this.value + '%';
+      const val = parseInt(this.value, 10);
+      if (masterValElem) masterValElem.textContent = val + '%';
+
+      // Update Gain Audio Engine Utama secara realtime
+      if (audioCtx && gainNode) {
+        const masterScale = val / 100;
+        gainNode.gain.setValueAtTime(masterScale, audioCtx.currentTime);
+      }
+
+      // Update state global
+      if (!window.state) window.state = {};
+      window.state.masterFader = val;
     });
   }
 
@@ -1748,16 +1760,18 @@
         }
         avgLevel = (avgLevel / dataArray.length) / 255;
 
-        const masterValElem = document.getElementById('masterVal');
-        const masterVolumeScale = masterValElem ? (parseInt(masterValElem.textContent, 10) || 75) / 100 : 0.75;
+        // Ambil skala Fader Master secara realtime dari Input Fader Master
+        const masterFaderElem = document.getElementById('master');
+        const masterVolumeScale = masterFaderElem ? (parseInt(masterFaderElem.value, 10) || 0) / 100 : 0.75;
         const channelFaderScale = ((chData.fader !== undefined ? chData.fader : 75)) / 100;
 
         const panVal = chData.pan || 0;
         const leftPan = panVal <= 0 ? 1 : 1 - panVal;
         const rightPan = panVal >= 0 ? 1 : 1 + panVal;
 
-        const leftHeight = Math.min(100, avgLevel * 100 * channelFaderScale * masterVolumeScale * leftPan);
-        const rightHeight = Math.min(100, avgLevel * 100 * channelFaderScale * masterVolumeScale * rightPan);
+        // Jika Master Fader = 0, sinyal VU Meter Master L/R wajib 0 (Mati)
+        const leftHeight = masterVolumeScale === 0 ? 0 : Math.min(100, avgLevel * 100 * channelFaderScale * masterVolumeScale * leftPan);
+        const rightHeight = masterVolumeScale === 0 ? 0 : Math.min(100, avgLevel * 100 * channelFaderScale * masterVolumeScale * rightPan);
 
         if (masterMeterL) masterMeterL.style.height = leftHeight + '%';
         if (masterMeterR) masterMeterR.style.height = rightHeight + '%';
@@ -1777,10 +1791,13 @@
                 const cFaderScale = (parseFloat(cState.fader ?? 75)) / 100;
                 
                 let chSignalLevel = 0;
+                
+                // HANYA HITUNG SIGNAL JIKA CHANNEL INI ADALAH CHANNEL YANG AKTIF/LOCKED
                 if (cId === chNum && analyserNode) {
                   chSignalLevel = avgLevel * 100 * cGain * cFaderScale;
-                } else if (cFaderScale > 0 && cGain > 0 && window.state.system) {
-                  chSignalLevel = Math.min(100, (cGain * cFaderScale * 45) + (Math.random() * 8));
+                } else {
+                  // Channel lain yang tidak diputarkan audio akan tetap DIAM (0%)
+                  chSignalLevel = 0;
                 }
 
                 topVuFill.style.height = Math.min(100, Math.max(0, chSignalLevel)) + '%';
@@ -1790,7 +1807,7 @@
         });
 
         if (gainNode) {
-          const gainVal = (parseFloat(chData.gain) || 1.0) * channelFaderScale;
+          const gainVal = (parseFloat(chData.gain) || 1.0) * channelFaderScale * masterVolumeScale;
           gainNode.gain.setValueAtTime(Math.max(0, Math.min(2.0, gainVal)), audioCtx.currentTime);
         }
 
@@ -1927,59 +1944,77 @@
     if (strip && window.state?.channels?.[chNum - 1]) {
       const ch = window.state.channels[chNum - 1];
       
-      // Update Fader Slider
+      // Helper untuk update Nilai Input + Efek Rotasi/Transform Visual CSS Knob
+      const updateKnobElement = (selector, val, minVal = 0, maxVal = 100) => {
+        const input = strip.querySelector(selector);
+        if (input) {
+          input.value = val;
+          
+          // Hitung derajat rotasi untuk Knob Bundar (dari -135deg sampai +135deg)
+          let min = parseFloat(input.min) || minVal;
+          let max = parseFloat(input.max) || maxVal;
+          let percentage = (val - min) / (max - min);
+          let deg = -135 + (percentage * 270);
+          
+          // Putar Tampilan Visual Knob secara langsung melalui CSS
+          input.style.transform = `rotate(${deg}deg)`;
+          
+          // Jika ada wrapper/elemen visual lingkaran terpisah di atasnya
+          const parentKnob = input.closest('.knob, .knob-container, .rotary-knob');
+          if (parentKnob) {
+            parentKnob.style.transform = `rotate(${deg}deg)`;
+          }
+
+          // Trigger Event bawaan
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      };
+
+      // 1. Update Fader Slider + Label
       const faderInput = strip.querySelector('input.channel-fader, input[data-k="fader"], input[data-param="fader"]');
       if (faderInput) {
         faderInput.value = ch.fader;
         faderInput.dispatchEvent(new Event('input', { bubbles: true }));
         faderInput.dispatchEvent(new Event('change', { bubbles: true }));
       }
-
-      // Update Label Fader
       const faderOut = strip.querySelector('output, .fader-val');
       if (faderOut) faderOut.textContent = Math.round(ch.fader) + '%';
 
-      // Update Knob Gain
-      const gainInput = strip.querySelector('input[data-k="gain"], input[data-param="gain"], input.gain-knob, .knob[data-param="gain"]');
-      if (gainInput) {
-        gainInput.value = ch.gain;
-        gainInput.dispatchEvent(new Event('input', { bubbles: true }));
-        gainInput.dispatchEvent(new Event('change', { bubbles: true }));
+      // 2. Update Knob Gain (Rentang 0.0 sampai 2.0)
+      updateKnobElement('input[data-k="gain"], input[data-param="gain"], input.gain-knob, .knob[data-param="gain"]', ch.gain, 0, 2);
+      const gainOut = strip.querySelector('.gain-val, output[data-k="gain"]');
+      if (gainOut) gainOut.textContent = Number(ch.gain).toFixed(2);
+
+      // 3. Update Knob Pan (Rentang -1.0 sampai 1.0)
+      updateKnobElement('input[data-k="pan"], input[data-param="pan"], input.pan-knob, .knob[data-param="pan"]', ch.pan, -1, 1);
+      const panOut = strip.querySelector('.pan-val, output[data-k="pan"]');
+      if (panOut) {
+        panOut.textContent = ch.pan == 0 ? 'CENTER' : (ch.pan < 0 ? 'L' + Math.abs(Math.round(ch.pan * 100)) : 'R' + Math.round(ch.pan * 100));
       }
 
-      // Update Knob Pan
-      const panInput = strip.querySelector('input[data-k="pan"], input[data-param="pan"], input.pan-knob, .knob[data-param="pan"]');
-      if (panInput) {
-        panInput.value = ch.pan;
-        panInput.dispatchEvent(new Event('input', { bubbles: true }));
-        panInput.dispatchEvent(new Event('change', { bubbles: true }));
+      // 4. Update Knob EQ Low (0 sampai 100)
+      if (ch.low !== undefined) {
+        updateKnobElement('input[data-k="low"], input[data-param="low"], input.low-knob, .knob[data-param="low"]', ch.low, 0, 100);
+        const lowOut = strip.querySelector('.low-val, output[data-k="low"]');
+        if (lowOut) lowOut.textContent = Math.round(ch.low);
       }
 
-      // Update Knob EQ Low
-      const lowInput = strip.querySelector('input[data-k="low"], input[data-param="low"], input.low-knob, .knob[data-param="low"]');
-      if (lowInput && ch.low !== undefined) {
-        lowInput.value = ch.low;
-        lowInput.dispatchEvent(new Event('input', { bubbles: true }));
-        lowInput.dispatchEvent(new Event('change', { bubbles: true }));
+      // 5. Update Knob EQ Mid (0 sampai 100)
+      if (ch.mid !== undefined) {
+        updateKnobElement('input[data-k="mid"], input[data-param="mid"], input.mid-knob, .knob[data-param="mid"]', ch.mid, 0, 100);
+        const midOut = strip.querySelector('.mid-val, output[data-k="mid"]');
+        if (midOut) midOut.textContent = Math.round(ch.mid);
       }
 
-      // Update Knob EQ Mid
-      const midInput = strip.querySelector('input[data-k="mid"], input[data-param="mid"], input.mid-knob, .knob[data-param="mid"]');
-      if (midInput && ch.mid !== undefined) {
-        midInput.value = ch.mid;
-        midInput.dispatchEvent(new Event('input', { bubbles: true }));
-        midInput.dispatchEvent(new Event('change', { bubbles: true }));
+      // 6. Update Knob EQ High (0 sampai 100)
+      if (ch.high !== undefined) {
+        updateKnobElement('input[data-k="high"], input[data-param="high"], input.high-knob, .knob[data-param="high"]', ch.high, 0, 100);
+        const highOut = strip.querySelector('.high-val, output[data-k="high"]');
+        if (highOut) highOut.textContent = Math.round(ch.high);
       }
 
-      // Update Knob EQ High
-      const highInput = strip.querySelector('input[data-k="high"], input[data-param="high"], input.high-knob, .knob[data-param="high"]');
-      if (highInput && ch.high !== undefined) {
-        highInput.value = ch.high;
-        highInput.dispatchEvent(new Event('input', { bubbles: true }));
-        highInput.dispatchEvent(new Event('change', { bubbles: true }));
-      }
-
-      // Update Mute Button
+      // 7. Update Mute Button
       const muteBtn = strip.querySelector('button[data-k="mute"], button.mute-btn');
       if (muteBtn) {
         muteBtn.classList.toggle('active', !!ch.mute);
@@ -1987,7 +2022,7 @@
         muteBtn.textContent = ch.mute ? 'UNMUTE' : 'MUTE';
       }
 
-      // Update Solo Button
+      // 8. Update Solo Button
       const soloBtn = strip.querySelector('button[data-k="solo"], button.solo-btn');
       if (soloBtn) {
         soloBtn.classList.toggle('active', !!ch.solo);
@@ -2050,7 +2085,29 @@
     if (tr) tr.textContent = `TEST: MUTE & SOLO TEST COMPLETED`;
   });
 
-  // 4. SIMULATE HARDWARE RX
+  // 4. HANDLER MASTER ISOLATION TEST
+  document.getElementById('runMasterIsolationTest')?.addEventListener('click', function() {
+    const masterElem = document.getElementById('master');
+    const masterValElem = document.getElementById('masterVal');
+    
+    // Simulasikan pergerakan acak Fader Master antara 0% - 100%
+    const randomMasterVal = Math.floor(Math.random() * 101);
+    
+    if (masterElem) {
+      masterElem.value = randomMasterVal;
+      masterElem.dispatchEvent(new Event('input', { bubbles: true }));
+      masterElem.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    if (masterValElem) {
+      masterValElem.textContent = randomMasterVal + '%';
+    }
+
+    const tr = document.getElementById('testResult');
+    if (tr) tr.textContent = `TEST: MASTER ISOLATION TEST PASSED (Master Set To: ${randomMasterVal}%)`;
+  });
+
+  // 5. SIMULATE HARDWARE RX
   document.getElementById('simulateRx')?.addEventListener('click', function() {
     if (!window.state) window.state = { channels: [] };
     if (!window.state.channels) window.state.channels = [];
