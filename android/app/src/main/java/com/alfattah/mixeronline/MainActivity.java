@@ -24,7 +24,7 @@ import java.util.Collections;
  * The website itself is copied unchanged into assets/web by the APK workflow.
  * Android-only Bluetooth support is injected at runtime from res/raw.
  */
-public class MainActivity {
+public class MainActivity extends Activity {
     private WebView webView;
     private NativeBluetoothBridge bluetoothBridge;
     private ValueCallback<Uri[]> fileChooserCallback;
@@ -85,16 +85,11 @@ public class MainActivity {
         loadMixerWebsite();
     }
 
-    /**
-     * Loads the exact website from assets/web, while replacing only the Bluetooth
-     * script at runtime with the Android-only bridge. No repository website file is edited.
-     */
     private void loadMixerWebsite() {
         try {
             String html = readAssetText("web/index.html");
             String androidBluetooth = readRawText(com.alfattah.mixeronline.R.raw.bluetooth_bridge);
 
-            // The Android bridge must execute before adapters.js and the rest of the page.
             String headTag = "<script>" + androidBluetooth + "</script>";
             int head = html.toLowerCase().indexOf("<head");
             if (head >= 0) {
@@ -105,14 +100,7 @@ public class MainActivity {
                 html = headTag + html;
             }
 
-            // Patch only the in-memory copy of adapters.js. The repository adapters.js
-            // remains untouched and therefore the live website/engine is unchanged.
             html = inlinePatchedAdapters(html);
-
-            // IMPORTANT: the live website includes bluetooth-bridge.js with a cache-buster
-            // query string. The old exact-string replacement missed that tag, allowing the
-            // browser Bluetooth bridge to load after our native bridge and overwrite
-            // window.MixerBluetooth. Remove that script tag regardless of its query string.
             html = removeWebsiteBluetoothBridgeScript(html);
 
             webView.loadDataWithBaseURL(WEB_BASE_URL, html, "text/html", "UTF-8", null);
@@ -121,13 +109,16 @@ public class MainActivity {
         }
     }
 
+    /** Remove the website Web-Bluetooth bridge even when index.html adds a cache-buster query. */
     private String removeWebsiteBluetoothBridgeScript(String html) {
         String marker = "<script src=\"bluetooth-bridge.js";
         int start;
         while ((start = html.indexOf(marker)) >= 0) {
             int end = html.indexOf("</script>", start);
             if (end < 0) {
-                html = html.substring(0, start) + "<!-- Android native Bluetooth bridge replaces website bridge. -->" + html.substring(start + marker.length());
+                html = html.substring(0, start)
+                        + "<!-- Android native Bluetooth bridge replaces website bridge. -->"
+                        + html.substring(start + marker.length());
                 break;
             }
             end += "</script>".length();
@@ -147,8 +138,6 @@ public class MainActivity {
         end += "</script>".length();
 
         String adapters = readAssetText("web/adapters.js");
-        // Do broad, formatting-independent substitutions so a whitespace/version change
-        // in the website does not silently restore web-bluetooth-unsupported in the APK.
         adapters = adapters.replace(
                 "if (!navigator.bluetooth)",
                 "if (!navigator.bluetooth && !window.MixerAndroidBluetooth)");
@@ -191,11 +180,9 @@ public class MainActivity {
                 WebViewCompat.addDocumentStartJavaScript(webView, bridge, Collections.singleton("*"));
             }
         } catch (Exception ignored) {
-            // The bridge is also injected into index.html, so document-start support is optional.
         }
     }
 
-    /** Keeps the existing mixer UI's status indicators synchronized with native BLE. */
     private void installAndroidMixerStatusPatch() {
         if (webView == null) return;
         String js = "(function(){"
@@ -216,7 +203,7 @@ public class MainActivity {
                 + "b.__androidNativeBleBound=true;b.addEventListener('click',function(e){e.preventDefault();e.stopImmediatePropagation();connect();},true);"
                 + "if(window.MixerAdapters&&window.MixerAdapters.onStatus)window.MixerAdapters.onStatus(sync);}"
                 + "document.addEventListener('mixer:android-bluetooth-status',function(e){sync(e.detail||{});});"
-                + "if(!bind()){var n=0,timer=setInterval(function(){if(bind()||++n>100)clearInterval(timer);},100);}"
+                + "if(!bind()){var n=0,timer=setInterval(function(){if(bind()||++n>100)clearInterval(timer);},100);}" 
                 + "})();";
         webView.evaluateJavascript(js, null);
     }
