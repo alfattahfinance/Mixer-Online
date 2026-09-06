@@ -211,7 +211,29 @@
     margin-bottom: 2px !important;
   }
 
-  /* GRUP KONTROL GAIN - PAN (DIPINDAHKAN TEPAT DI ATAS TEKS VOLUME) */
+  /* KUSTOMISASI DUDUKAN KNOB DAN GARIS POINTER PRESISI */
+  .knob, .knob-container, .rotary-knob {
+    position: relative !important;
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transform-origin: center center !important;
+  }
+
+  .knob-line, .pointer-line, .knob-pointer {
+    width: 2px !important;
+    height: 12px !important;
+    background: var(--accent-color) !important;
+    position: absolute !important;
+    top: 2px !important;
+    transform-origin: bottom center !important;
+  }
+
+  /* GRUP KONTROL GAIN - PAN */
   .ch-controls-group {
     display: flex !important;
     flex-direction: column !important;
@@ -255,7 +277,7 @@
     position: relative !important;
   }
 
-  /* LEBAR MASTER DIPERKECIL DIKIT AGAR CHANNEL TIDAK TERPOTONG */
+  /* MASTER RACK */
   .master-rack {
     flex: 0 0 auto !important;
     width: 95px !important;
@@ -1221,7 +1243,6 @@
   // SINKRONISASI REALTIME ANGKA/TEKS FADER DAN KONTROL CHANNEL + HAPTIC FEEDBACK
   document.addEventListener('input', function(e) {
     if (e.target.matches('input[type="range"]')) {
-      // Pemicu Getar Haptic saat slider/knob digeser
       if (window.AndroidFeedback && typeof window.AndroidFeedback.triggerHaptic === 'function') {
         window.AndroidFeedback.triggerHaptic(10);
       } else if (navigator.vibrate) {
@@ -1543,13 +1564,11 @@
       const val = parseInt(this.value, 10);
       if (masterValElem) masterValElem.textContent = val + '%';
 
-      // Update Gain Audio Engine Utama secara realtime
       if (audioCtx && gainNode) {
         const masterScale = val / 100;
         gainNode.gain.setValueAtTime(masterScale, audioCtx.currentTime);
       }
 
-      // Update state global
       if (!window.state) window.state = {};
       window.state.masterFader = val;
     });
@@ -1591,7 +1610,6 @@
     }
   }
 
-  // TANGKAP INPUT SUARA FISIK DARI MIXER FISIK / OTG SOUNDCARD (DSP OPTIMIZED)
   async function startPhysicalAudioStream() {
     try {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -1599,7 +1617,6 @@
         return;
       }
 
-      // Konfigurasi DSPAudio murni tanpa filter peredam bising bawaan HP
       const constraints = {
         audio: {
           echoCancellation: false,
@@ -1710,7 +1727,6 @@
     }
   }
 
-  // ANIMASI REALTIME DENGAN PENENTUAN TARGET VU METER VERTIKAL PRESISI
   function updateIndicators() {
     requestAnimationFrame(updateIndicators);
 
@@ -1760,7 +1776,6 @@
         }
         avgLevel = (avgLevel / dataArray.length) / 255;
 
-        // Ambil skala Fader Master secara realtime dari Input Fader Master
         const masterFaderElem = document.getElementById('master');
         const masterVolumeScale = masterFaderElem ? (parseInt(masterFaderElem.value, 10) || 0) / 100 : 0.75;
         const channelFaderScale = ((chData.fader !== undefined ? chData.fader : 75)) / 100;
@@ -1769,14 +1784,12 @@
         const leftPan = panVal <= 0 ? 1 : 1 - panVal;
         const rightPan = panVal >= 0 ? 1 : 1 + panVal;
 
-        // Jika Master Fader = 0, sinyal VU Meter Master L/R wajib 0 (Mati)
         const leftHeight = masterVolumeScale === 0 ? 0 : Math.min(100, avgLevel * 100 * channelFaderScale * masterVolumeScale * leftPan);
         const rightHeight = masterVolumeScale === 0 ? 0 : Math.min(100, avgLevel * 100 * channelFaderScale * masterVolumeScale * rightPan);
 
         if (masterMeterL) masterMeterL.style.height = leftHeight + '%';
         if (masterMeterR) masterMeterR.style.height = rightHeight + '%';
 
-        // Update VU meter vertikal di semua channel (1–14)
         document.querySelectorAll('.new-channel-strip, .channel-strip, [data-ch]').forEach(strip => {
           const cId = Number(strip.dataset.ch) || parseInt(strip.innerText.match(/CH\s*(\d+)/i)?.[1] || '0', 10);
           if (cId > 0) {
@@ -1789,14 +1802,11 @@
               } else {
                 const cGain = parseFloat(cState.gain ?? 1.0);
                 const cFaderScale = (parseFloat(cState.fader ?? 75)) / 100;
-                
                 let chSignalLevel = 0;
                 
-                // HANYA HITUNG SIGNAL JIKA CHANNEL INI ADALAH CHANNEL YANG AKTIF/LOCKED
                 if (cId === chNum && analyserNode) {
                   chSignalLevel = avgLevel * 100 * cGain * cFaderScale;
                 } else {
-                  // Channel lain yang tidak diputarkan audio akan tetap DIAM (0%)
                   chSignalLevel = 0;
                 }
 
@@ -1930,7 +1940,7 @@
 
 <script>
 // ==========================================================================
-// KODE HANDLER CONNECTION / TEST SUITE (SINKRONISASI PEMBARUAN KNOB & FADER)
+// KODE HANDLER CONNECTION / TEST SUITE (MEMPERBAIKI ROTASI KNOB DAN RELEASING SCRIPT)
 // ==========================================================================
 (function() {
   "use strict";
@@ -1944,28 +1954,28 @@
     if (strip && window.state?.channels?.[chNum - 1]) {
       const ch = window.state.channels[chNum - 1];
       
-      // Helper untuk update Nilai Input + Efek Rotasi/Transform Visual CSS Knob
+      // Helper untuk Update Nilai Input + Rotasi Visual Knob yang Rapi & Terpusat
       const updateKnobElement = (selector, val, minVal = 0, maxVal = 100) => {
         const input = strip.querySelector(selector);
         if (input) {
           input.value = val;
           
-          // Hitung derajat rotasi untuk Knob Bundar (dari -135deg sampai +135deg)
           let min = parseFloat(input.min) || minVal;
           let max = parseFloat(input.max) || maxVal;
-          let percentage = (val - min) / (max - min);
+          
+          let clampedVal = Math.max(min, Math.min(max, val));
+          let percentage = (clampedVal - min) / (max - min);
           let deg = -135 + (percentage * 270);
           
-          // Putar Tampilan Visual Knob secara langsung melalui CSS
+          input.style.transformOrigin = 'center center';
           input.style.transform = `rotate(${deg}deg)`;
           
-          // Jika ada wrapper/elemen visual lingkaran terpisah di atasnya
           const parentKnob = input.closest('.knob, .knob-container, .rotary-knob');
           if (parentKnob) {
+            parentKnob.style.transformOrigin = 'center center';
             parentKnob.style.transform = `rotate(${deg}deg)`;
           }
 
-          // Trigger Event bawaan
           input.dispatchEvent(new Event('input', { bubbles: true }));
           input.dispatchEvent(new Event('change', { bubbles: true }));
         }
@@ -2090,7 +2100,6 @@
     const masterElem = document.getElementById('master');
     const masterValElem = document.getElementById('masterVal');
     
-    // Simulasikan pergerakan acak Fader Master antara 0% - 100%
     const randomMasterVal = Math.floor(Math.random() * 101);
     
     if (masterElem) {
@@ -2120,38 +2129,14 @@
     window.state.channels[chId - 1].low = Math.floor(Math.random() * 100);
     triggerUiUpdate(chId);
 
-          // Helper untuk update Nilai Input + Rotasi Visual Knob yang Rapi
-      const updateKnobElement = (selector, val, minVal = 0, maxVal = 100) => {
-        const input = strip.querySelector(selector);
-        if (input) {
-          input.value = val;
-          
-          let min = parseFloat(input.min) || minVal;
-          let max = parseFloat(input.max) || maxVal;
-          
-          // 1. Batasi nilai masukan agar tidak berputar liar melebihi batas min/max
-          let clampedVal = Math.max(min, Math.min(max, val));
-          
-          // 2. Hitung persentase posisi (0% sampai 100%)
-          let percentage = (clampedVal - min) / (max - min);
-          
-          // 3. Batasi sudut rotasi standar audio mixer (-135 derajat s/d +135 derajat)
-          let deg = -135 + (percentage * 270);
-          
-          // 4. Terapkan rotasi dengan titik tumpu tepat di tengah poros knob (center center)
-          input.style.transformOrigin = 'center center';
-          input.style.transform = `rotate(${deg}deg)`;
-          
-          const parentKnob = input.closest('.knob, .knob-container, .rotary-knob');
-          if (parentKnob) {
-            parentKnob.style.transformOrigin = 'center center';
-            parentKnob.style.transform = `rotate(${deg}deg)`;
-          }
+    const rx = document.getElementById('rx');
+    if (rx) rx.textContent = `RX: {"ch":${chId},"gain":${window.state.channels[chId - 1].gain},"pan":${window.state.channels[chId - 1].pan},"low":${window.state.channels[chId - 1].low}}`;
 
-          input.dispatchEvent(new Event('input', { bubbles: true }));
-          input.dispatchEvent(new Event('change', { bubbles: true }));
-        }
-      };
+    const tr = document.getElementById('testResult');
+    if (tr) tr.textContent = `TEST: HARDWARE RX SIMULATION CH${chId} UPDATED`;
+  });
+
+})();
 </script>
 
 </body>
