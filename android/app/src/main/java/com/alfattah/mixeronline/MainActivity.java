@@ -24,7 +24,7 @@ import java.util.Collections;
  * The website itself is copied unchanged into assets/web by the APK workflow.
  * Android-only Bluetooth support is injected at runtime from res/raw.
  */
-public class MainActivity extends Activity {
+public class MainActivity {
     private WebView webView;
     private NativeBluetoothBridge bluetoothBridge;
     private ValueCallback<Uri[]> fileChooserCallback;
@@ -109,17 +109,33 @@ public class MainActivity extends Activity {
             // remains untouched and therefore the live website/engine is unchanged.
             html = inlinePatchedAdapters(html);
 
-            // Prevent the normal Web Bluetooth-only bridge from showing an unsupported
-            // browser alert inside the APK. The Android bridge above replaces its role.
-            String originalBridgeTag = "<script src=\"bluetooth-bridge.js\"></script>";
-            if (html.contains(originalBridgeTag)) {
-                html = html.replace(originalBridgeTag, "<!-- Android native bluetooth bridge is injected above. -->");
-            }
+            // IMPORTANT: the live website includes bluetooth-bridge.js with a cache-buster
+            // query string. The old exact-string replacement missed that tag, allowing the
+            // browser Bluetooth bridge to load after our native bridge and overwrite
+            // window.MixerBluetooth. Remove that script tag regardless of its query string.
+            html = removeWebsiteBluetoothBridgeScript(html);
 
             webView.loadDataWithBaseURL(WEB_BASE_URL, html, "text/html", "UTF-8", null);
         } catch (IOException e) {
             webView.loadUrl(WEB_BASE_URL + "index.html");
         }
+    }
+
+    private String removeWebsiteBluetoothBridgeScript(String html) {
+        String marker = "<script src=\"bluetooth-bridge.js";
+        int start;
+        while ((start = html.indexOf(marker)) >= 0) {
+            int end = html.indexOf("</script>", start);
+            if (end < 0) {
+                html = html.substring(0, start) + "<!-- Android native Bluetooth bridge replaces website bridge. -->" + html.substring(start + marker.length());
+                break;
+            }
+            end += "</script>".length();
+            html = html.substring(0, start)
+                    + "<!-- Android native Bluetooth bridge replaces website bridge. -->"
+                    + html.substring(end);
+        }
+        return html;
     }
 
     private String inlinePatchedAdapters(String html) throws IOException {
