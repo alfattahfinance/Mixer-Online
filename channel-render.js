@@ -1,4 +1,4 @@
-/* Dedicated 14CH channel renderer. UI/layout only; mixer engine untouched. */
+/* Dedicated 14CH channel renderer. UI/layout & DOM synchronization. */
 (function(){
 "use strict";
 const N = 14;
@@ -12,11 +12,19 @@ function ensureChannels() {
   while(st.channels.length < N) {
     st.channels.push({
       id: st.channels.length + 1,
-      fader: 75, gain: 1, low: 0, mid: 0, high: 0, pan: 0,
+      fader: 75, gain: 1.0, low: 0, mid: 0, high: 0, pan: 0,
       mute: false, solo: false, level: 0
     });
   }
   st.channels.length = N;
+}
+
+function triggerHaptic(ms) {
+  if (window.AndroidFeedback && typeof window.AndroidFeedback.triggerHaptic === "function") {
+    window.AndroidFeedback.triggerHaptic(ms);
+  } else if (navigator.vibrate) {
+    navigator.vibrate(ms);
+  }
 }
 
 function make(id) {
@@ -27,35 +35,66 @@ function make(id) {
 
   el.innerHTML = 
     '<header class="new-channel-head">CH' + id + '</header>' +
-    '<div class="led-meter new-channel-meter" data-ch="' + id + '">' +
-      '<span class="led-peak"></span>' +
-      '<span class="led-segments">' + Array.from({length: 12}, () => '<i></i>').join("") + '</span>' +
+    /* 1. Lampu Bulat LED Top */
+    '<div class="channel-led ' + (c.mute ? 'red' : 'green on') + '"></div>' +
+    /* 2. VU Meter Vertikal Latar Belakang (Sejajar Area Knob) */
+    '<div class="ch-long-vu"><div class="ch-long-vu-fill"></div></div>' +
+    /* 3. Group Knob Gain, High, Mid, Low, Pan */
+    '<div class="ch-controls-group">' +
+      '<div class="new-channel-control"><label>GAIN</label><input class="new-knob gain-knob" data-k="gain" data-param="gain" type="range" min="0" max="2" step=".01" value="' + c.gain + '"><output class="gain-val">' + Number(c.gain).toFixed(2) + '</output></div>' +
+      '<div class="new-channel-control"><label>HIGH</label><input class="new-knob high-knob" data-k="high" data-param="high" type="range" min="-12" max="12" step="1" value="' + c.high + '"><output class="high-val">' + c.high + '</output></div>' +
+      '<div class="new-channel-control"><label>MID</label><input class="new-knob mid-knob" data-k="mid" data-param="mid" type="range" min="-12" max="12" step="1" value="' + c.mid + '"><output class="mid-val">' + c.mid + '</output></div>' +
+      '<div class="new-channel-control"><label>LOW</label><input class="new-knob low-knob" data-k="low" data-param="low" type="range" min="-12" max="12" step="1" value="' + c.low + '"><output class="low-val">' + c.low + '</output></div>' +
+      '<div class="new-channel-control"><label>PAN</label><input class="new-knob pan-knob" data-k="pan" data-param="pan" type="range" min="-1" max="1" step=".01" value="' + c.pan + '"><output class="pan-val">' + (c.pan == 0 ? 'CENTER' : (c.pan < 0 ? 'L ' + Math.abs(Math.round(c.pan * 100)) + '%' : 'R ' + Math.round(c.pan * 100) + '%')) + '</output></div>' +
     '</div>' +
-    '<div class="new-channel-control"><label>GAIN</label><input class="new-knob" data-k="gain" data-param="gain" type="range" min="0" max="2" step=".01" value="' + c.gain + '"></div>' +
-    '<div class="new-channel-control"><label>HIGH</label><input class="new-knob" data-k="high" data-param="high" type="range" min="-12" max="12" step="1" value="' + c.high + '"></div>' +
-    '<div class="new-channel-control"><label>MID</label><input class="new-knob" data-k="mid" data-param="mid" type="range" min="-12" max="12" step="1" value="' + c.mid + '"></div>' +
-    '<div class="new-channel-control"><label>LOW</label><input class="new-knob" data-k="low" data-param="low" type="range" min="-12" max="12" step="1" value="' + c.low + '"></div>' +
-    '<div class="new-channel-control"><label>PAN</label><input class="new-knob" data-k="pan" data-param="pan" type="range" min="-1" max="1" step=".01" value="' + c.pan + '"></div>' +
-    '<div class="new-channel-fader"><label>VOLUME</label><input class="new-fader" data-k="fader" data-param="fader" type="range" min="0" max="100" step="1" value="' + c.fader + '"><output class="fader-val">' + c.fader + '%</output></div>' +
+    /* 4. Teks Volume & Fader Vertikal (Menempel Rata Bawah) */
+    '<div class="volume-label-text">VOLUME</div>' +
+    '<div class="fader-area">' +
+      '<input class="new-fader channel-fader" data-k="fader" data-param="fader" type="range" min="0" max="100" step="1" value="' + c.fader + '">' +
+      '<output class="fader-val">' + Math.round(c.fader) + '%</output>' +
+    '</div>' +
+    /* 5. Tombol Mute & Solo */
     '<div class="new-channel-buttons">' +
-      '<button type="button" class="btn-mute ' + (c.mute ? 'active on' : '') + '" data-k="mute" data-action="mute">MUTE</button>' +
-      '<button type="button" class="btn-solo ' + (c.solo ? 'active on' : '') + '" data-k="solo" data-action="solo">SOLO</button>' +
+      '<button type="button" class="btn-mute ' + (c.mute ? 'active on' : '') + '" data-k="mute" data-action="mute">' + (c.mute ? 'UNMUTE' : 'MUTE') + '</button>' +
+      '<button type="button" class="btn-solo ' + (c.solo ? 'active on' : '') + '" data-k="solo" data-action="solo">' + (c.solo ? 'UNSOLO' : 'SOLO') + '</button>' +
     '</div>' +
     '<footer class="new-channel-source">CH' + id + ' • <span>' + (c.mute ? 'MUTED' : c.solo ? 'SOLO' : 'READY') + '</span></footer>';
+
+  // Klik Strip untuk Pilih Channel di Layar Center
+  el.addEventListener("click", (e) => {
+    if (!e.target.matches('input, button')) {
+      if (typeof window.selectScreenChannel === "function") {
+        window.selectScreenChannel(id);
+      }
+    }
+  });
 
   // Handler Event Slider / Knob Input
   el.querySelectorAll("input[data-k]").forEach(x => {
     x.addEventListener("input", () => {
+      triggerHaptic(10);
       const k = x.dataset.k;
       const v = Number(x.value);
       state().channels[id - 1][k] = v;
 
-      if (k === "fader") {
-        const out = el.querySelector("output");
-        if (out) out.textContent = v + "%";
+      // Format Tampilan Output Nilai Realtime
+      const parentControl = x.parentElement;
+      if (parentControl) {
+        const out = parentControl.querySelector("output");
+        if (out) {
+          if (k === "fader") out.textContent = Math.round(v) + "%";
+          else if (k === "gain") out.textContent = Number(v).toFixed(2);
+          else if (k === "pan") out.textContent = v === 0 ? 'CENTER' : (v < 0 ? 'L ' + Math.abs(Math.round(v * 100)) + '%' : 'R ' + Math.round(v * 100) + '%');
+          else if (["low", "mid", "high"].includes(k)) out.textContent = Math.round(v);
+        }
       }
 
-      // Kirim langsung ke MixerControl tanpa terhalang state.system
+      // Sync ke Layar M32 Utama
+      if (typeof window.selectScreenChannel === "function") {
+        window.selectScreenChannel(id);
+      }
+
+      // Kirim langsung ke MixerControl / Hardware
       if (window.MixerControl && typeof window.MixerControl.setControl === "function") {
         window.MixerControl.setControl(id, k, v);
       }
@@ -64,14 +103,27 @@ function make(id) {
 
   // Handler Event Button Mute / Solo
   el.querySelectorAll("button[data-k]").forEach(b => {
-    b.addEventListener("click", () => {
+    b.addEventListener("click", (e) => {
+      e.stopPropagation();
+      triggerHaptic(20);
       const k = b.dataset.k;
       const v = !state().channels[id - 1][k];
       state().channels[id - 1][k] = v;
 
-      // Toggle class 'active' dan 'on' untuk fleksibilitas styling CSS
+      // Toggle class 'active' dan 'on'
       b.classList.toggle("active", v);
       b.classList.toggle("on", v);
+      b.textContent = k === "mute" ? (v ? "UNMUTE" : "MUTE") : (v ? "UNSOLO" : "SOLO");
+
+      // Update Indikator LED LED Top
+      const led = el.querySelector(".channel-led");
+      if (led) {
+        if (state().channels[id - 1].mute) {
+          led.className = "channel-led red active";
+        } else {
+          led.className = "channel-led green on";
+        }
+      }
 
       if (window.MixerControl && typeof window.MixerControl.setControl === "function") {
         window.MixerControl.setControl(id, k, v);
@@ -80,6 +132,10 @@ function make(id) {
       const statusSpan = el.querySelector("footer span");
       if (statusSpan) {
         statusSpan.textContent = state().channels[id - 1].mute ? "MUTED" : state().channels[id - 1].solo ? "SOLO" : "READY";
+      }
+
+      if (typeof window.selectScreenChannel === "function") {
+        window.selectScreenChannel(id);
       }
     });
   });
@@ -111,23 +167,48 @@ window.syncNew14ChannelPanel = function() {
     const c = state().channels[id - 1];
     if (!c) return;
 
+    // Fader Update
     const f = el.querySelector('[data-k="fader"]');
-    const o = el.querySelector("output");
+    const oF = el.querySelector('.fader-val, .fader-area output');
     if (f) f.value = c.fader;
-    if (o) o.textContent = c.fader + "%";
+    if (oF) oF.textContent = Math.round(c.fader) + "%";
 
+    // Knobs Update
     ["gain", "high", "mid", "low", "pan"].forEach(k => {
       const x = el.querySelector('[data-k="' + k + '"]');
       if (x) x.value = c[k];
+      
+      const parent = x?.parentElement;
+      if (parent) {
+        const out = parent.querySelector("output");
+        if (out) {
+          if (k === "gain") out.textContent = Number(c[k]).toFixed(2);
+          else if (k === "pan") out.textContent = c[k] === 0 ? 'CENTER' : (c[k] < 0 ? 'L ' + Math.abs(Math.round(c[k] * 100)) + '%' : 'R ' + Math.round(c[k] * 100) + '%');
+          else out.textContent = Math.round(c[k]);
+        }
+      }
     });
 
+    // Mute / Solo Buttons Update
     ["mute", "solo"].forEach(k => {
       const b = el.querySelector('[data-k="' + k + '"]');
       if (b) {
-        b.classList.toggle("active", !!c[k]);
-        b.classList.toggle("on", !!c[k]);
+        const val = !!c[k];
+        b.classList.toggle("active", val);
+        b.classList.toggle("on", val);
+        b.textContent = k === "mute" ? (val ? "UNMUTE" : "MUTE") : (val ? "UNSOLO" : "SOLO");
       }
     });
+
+    // LED Top Status Update
+    const led = el.querySelector(".channel-led");
+    if (led) {
+      if (c.mute) {
+        led.className = "channel-led red active";
+      } else {
+        led.className = "channel-led green on";
+      }
+    }
 
     const statusSpan = el.querySelector("footer span");
     if (statusSpan) {
