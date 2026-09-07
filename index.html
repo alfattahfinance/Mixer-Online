@@ -554,8 +554,15 @@
   }
 
   /* ==========================================================
-     5. PANEL AUX & FX (PENYESUAIAN SEJAJAR BAWAH MENTOK)
+     5. PANEL AUX & FX (PRESISI SEJAJAR DENGAN BATAS BAWAH FADER)
      ========================================================== */
+  .center-console {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    height: 100% !important;
+  }
+
   .center-console .fx-rack,
   .center-console .aux-rack,
   #fxRack, #auxRack {
@@ -566,25 +573,27 @@
     background: var(--panel-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
-    padding: 4px !important;
   }
 
   .center-console .aux-rack {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
     gap: 4px !important;
-    margin-top: auto !important; /* Mendorong AUX Rack persis mentok ke batas bawah */
+    margin-top: auto !important;
+    padding: 4px !important;
   }
 
   .aux-unit {
     background: var(--main-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
-    padding: 3px 4px 4px 4px !important;
+    padding: 6px 4px 8px 4px !important; /* Tambahkan padding atas/bawah agar kartu lebih tinggi */
+    min-height: 58px !important;          /* Kunci tinggi minimal agar sejajar mentok ke bawah */
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
   }
+
 
   main.console > .fx-rack, 
   main.console > .aux-rack {
