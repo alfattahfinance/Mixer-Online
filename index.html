@@ -108,6 +108,8 @@
     padding: 6px 10px !important;
     background: var(--header-bg) !important;
     border-bottom: 1px solid var(--panel-border) !important;
+    position: relative !important;
+    z-index: 100 !important;
   }
 
   header.topbar, .system-box, .bridge-head, .status-head, .scene-head,
@@ -117,6 +119,27 @@
     background: var(--panel-bg) !important;
     border-color: var(--panel-border) !important;
     color: var(--text-main) !important;
+  }
+
+  .scene-head {
+    position: relative !important;
+    z-index: 10 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    padding: 2px 6px !important;
+  }
+
+  .scene-head div {
+    display: flex !important;
+    gap: 3px !important;
+  }
+
+  .scene-head button {
+    font-size: 8px !important;
+    padding: 3px 5px !important;
+    border-radius: 3px !important;
+    cursor: pointer !important;
   }
 
   .clock-head {
@@ -255,28 +278,33 @@
     position: relative !important;
   }
 
-  /* MASTER RACK */
+  /* MASTER RACK (DIRAPIKAN & DIPERKECIL AGAR CH14 MUAT FULL) */
   .master-rack {
     flex: 0 0 auto !important;
-    width: 95px !important;
-    min-width: 90px !important;
+    width: 78px !important;
+    min-width: 75px !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
+    align-items: center !important;
     background: var(--strip-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 6px !important;
-    padding: 6px 4px !important;
-    margin-right: 4px !important;
+    padding: 6px 2px !important;
+    margin-right: 2px !important;
+  }
+
+  .meter-rack {
+    width: 100% !important;
   }
 
   .main-meters {
     display: flex !important;
-    gap: 6px !important;
+    gap: 4px !important;
     justify-content: center !important;
-    height: 120px !important;
+    height: 100px !important;
     background: var(--main-bg) !important;
-    padding: 4px !important;
+    padding: 3px !important;
     border-radius: 4px !important;
     border: 1px solid var(--panel-border) !important;
   }
@@ -286,7 +314,7 @@
     flex-direction: column !important;
     align-items: center !important;
     height: 100% !important;
-    width: 10px !important;
+    width: 8px !important;
   }
 
   .meter-bar-bg {
@@ -312,6 +340,40 @@
     font-weight: bold !important;
     color: var(--accent-color) !important;
     margin-top: 2px !important;
+  }
+
+  .master-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+    margin: 6px 0 !important;
+  }
+
+  .master-card h2 {
+    font-size: 9px !important;
+    margin: 0 0 4px 0 !important;
+    color: #e74c3c !important;
+  }
+
+  .master-card input[type="range"] {
+    height: 150px !important;
+    width: 10px !important;
+    accent-color: #00e5ff !important;
+  }
+
+  .master-card output {
+    font-size: 8px !important;
+    font-weight: bold !important;
+    color: var(--accent-color) !important;
+    margin-top: 4px !important;
+  }
+
+  .monitor-card, .phones-card {
+    font-size: 7px !important;
+    text-align: center !important;
+    width: 100% !important;
+    padding: 2px 0 !important;
   }
 
   /* ==========================================================
@@ -913,7 +975,7 @@
   <!-- 4. MASTER RACK DENGAN INDIKATOR L/R MASTER STEREO -->
   <aside class="master-rack" id="masterRack">
     <div class="meter-rack">
-      <b style="font-size: 9px; color: var(--accent-color); display: block; text-align: center; margin-bottom: 4px;">MAIN L / R</b>
+      <b style="font-size: 8px; color: var(--accent-color); display: block; text-align: center; margin-bottom: 2px;">MAIN L / R</b>
       <div class="main-meters">
         <div class="meter-bar-container">
           <div class="meter-bar-bg"><div class="meter-bar-fill" id="masterMeterL"></div></div>
@@ -931,7 +993,7 @@
       <output id="masterVal">75%</output>
       <span class="peak-dot"></span>
     </div>
-    <div class="monitor-card"><b>MONITOR</b><span>SOURCE</span><button>MAIN L/R</button><div class="monitor-knob"></div><span>LEVEL</span></div>
+    <div class="monitor-card"><b>MONITOR</b><span>SOURCE</span><button style="font-size:6px; padding:1px 2px;">MAIN L/R</button><div class="monitor-knob"></div><span>LEVEL</span></div>
     <div class="phones-card">🎧 <b>PHONES</b><div class="phone-knob"></div><span>●</span></div>
   </aside>
 </main>
@@ -1536,7 +1598,7 @@
   let isShuffle = false;
   let lockedMusicChannel = null;
 
-  // SINKRONISASI MASTER FADER KELUARAN DSP AUDIO REALTIME
+  // SINKRONISASI MASTER FADER REAL-TIME (AUDIO ENGINE + VU METERS)
   if (masterFader) {
     masterFader.addEventListener('input', function() {
       const val = parseInt(this.value, 10);
@@ -1549,6 +1611,11 @@
 
       if (!window.state) window.state = {};
       window.state.masterFader = val;
+
+      if (val === 0) {
+        if (masterMeterL) masterMeterL.style.height = '0%';
+        if (masterMeterR) masterMeterR.style.height = '0%';
+      }
     });
   }
 
@@ -1941,7 +2008,7 @@
           let clampedVal = Math.max(min, Math.min(max, val));
 
           input.value = clampedVal;
-          input.style.transform = 'none'; // Memastikan tidak ada sisa rotasi CSS
+          input.style.transform = 'none';
 
           input.dispatchEvent(new Event('input', { bubbles: true }));
           input.dispatchEvent(new Event('change', { bubbles: true }));
@@ -1958,33 +2025,33 @@
       const faderOut = strip.querySelector('output, .fader-val');
       if (faderOut) faderOut.textContent = Math.round(ch.fader) + '%';
 
-      // 2. Update Knob Gain (Rentang 0.0 sampai 2.0)
+      // 2. Update Knob Gain
       updateKnobElement('input[data-k="gain"], input[data-param="gain"], input.gain-knob, .knob[data-param="gain"]', ch.gain, 0, 2);
       const gainOut = strip.querySelector('.gain-val, output[data-k="gain"]');
       if (gainOut) gainOut.textContent = Number(ch.gain).toFixed(2);
 
-      // 3. Update Knob Pan (Rentang -1.0 sampai 1.0)
+      // 3. Update Knob Pan
       updateKnobElement('input[data-k="pan"], input[data-param="pan"], input.pan-knob, .knob[data-param="pan"]', ch.pan, -1, 1);
       const panOut = strip.querySelector('.pan-val, output[data-k="pan"]');
       if (panOut) {
         panOut.textContent = ch.pan == 0 ? 'CENTER' : (ch.pan < 0 ? 'L' + Math.abs(Math.round(ch.pan * 100)) : 'R' + Math.round(ch.pan * 100));
       }
 
-      // 4. Update Knob EQ Low (0 sampai 100)
+      // 4. Update Knob EQ Low
       if (ch.low !== undefined) {
         updateKnobElement('input[data-k="low"], input[data-param="low"], input.low-knob, .knob[data-param="low"]', ch.low, 0, 100);
         const lowOut = strip.querySelector('.low-val, output[data-k="low"]');
         if (lowOut) lowOut.textContent = Math.round(ch.low);
       }
 
-      // 5. Update Knob EQ Mid (0 sampai 100)
+      // 5. Update Knob EQ Mid
       if (ch.mid !== undefined) {
         updateKnobElement('input[data-k="mid"], input[data-param="mid"], input.mid-knob, .knob[data-param="mid"]', ch.mid, 0, 100);
         const midOut = strip.querySelector('.mid-val, output[data-k="mid"]');
         if (midOut) midOut.textContent = Math.round(ch.mid);
       }
 
-      // 6. Update Knob EQ High (0 sampai 100)
+      // 6. Update Knob EQ High
       if (ch.high !== undefined) {
         updateKnobElement('input[data-k="high"], input[data-param="high"], input.high-knob, .knob[data-param="high"]', ch.high, 0, 100);
         const highOut = strip.querySelector('.high-val, output[data-k="high"]');
