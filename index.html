@@ -165,7 +165,7 @@
   }
 
   /* ==========================================================
-     3. MAIN CONSOLE - KUNCI PRESISI RATA BAWAH & ATAS RAPI
+     3. MAIN CONSOLE & CHANNEL STRIP CUSTOMIZATION
      ========================================================== */
   main.console {
     display: flex !important;
@@ -173,7 +173,7 @@
     flex-wrap: nowrap !important;
     width: max-content !important;
     min-width: 100% !important;
-    padding: 4px 4px 0px 4px !important;
+    padding: 2px 2px 0px 2px !important;
     gap: 4px !important;
     align-items: stretch !important;
   }
@@ -185,7 +185,7 @@
     background: var(--strip-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
-    padding: 6px 2px 0px 2px !important;
+    padding: 2px 2px 0px 2px !important;
     display: flex !important;
     flex-direction: column !important;
     margin: 0 !important;
@@ -197,13 +197,12 @@
   .bank-title {
     padding: 2px 4px 4px 4px !important;
     border-bottom: 1px solid var(--panel-border) !important;
-    margin-bottom: 4px !important;
+    margin-bottom: 2px !important;
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
   }
 
-  /* GRID 7 KOLOM DENGAN PELEBARAN CH7 & CH14 */
   #channels, #channelsRight {
     display: grid !important;
     grid-template-columns: repeat(6, 1fr) 1.25fr !important;
@@ -215,13 +214,14 @@
   }
 
   .new-channel-strip, .channel-strip {
+    position: relative !important; /* Diperlukan untuk VU Meter Latar Belakang */
     width: 100% !important;
     min-width: 0 !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding: 6px 2px 2px 2px !important; /* Menambah padding top agar knob atas terdorong turun */
+    padding: 8px 2px 0px 2px !important; /* Menurunkan seluruh isi channel */
     border-right: 1px dashed var(--panel-border) !important;
     box-sizing: border-box !important;
     height: 100% !important;
@@ -232,9 +232,34 @@
     padding-right: 2px !important;
   }
 
+  /* INDIKATOR PANJANG (VU METER PANJANG SEJAJAR AREA KNOB) */
+  .ch-long-vu {
+    position: absolute !important;
+    top: 25px !important;
+    bottom: 255px !important;
+    left: 2px !important;
+    right: 2px !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: 2px !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column-reverse !important;
+    z-index: 1 !important; /* Di belakang kontrol knob agar knob tetap responsif */
+    pointer-events: none !important;
+  }
+
+  .ch-long-vu-fill {
+    width: 100% !important;
+    height: 0%;
+    background: linear-gradient(0deg, rgba(46, 204, 113, 0.6) 0%, rgba(46, 204, 113, 0.6) 65%, rgba(241, 196, 15, 0.7) 80%, rgba(231, 76, 60, 0.8) 100%) !important;
+    transition: height 0.05s linear !important;
+  }
+
+  /* INDIKATOR BULAT/KECIL ATAS */
   .ch-top-vu {
     width: 6px !important;
-    height: 40px !important;
+    height: 30px !important;
     background: #040608 !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 2px !important;
@@ -243,6 +268,7 @@
     display: flex !important;
     flex-direction: column-reverse !important;
     padding: 0 !important;
+    z-index: 2 !important;
   }
 
   .ch-top-vu-fill {
@@ -252,35 +278,41 @@
     transition: height 0.05s linear !important;
   }
 
-  .new-channel-control {
+  /* KELOMPOK KNOB - DITURUNKAN & DIJAMIN RESPONSIF */
+  .ch-controls-group, .knob-container {
+    position: relative !important;
+    z-index: 2 !important; /* Memastikan Knob di atas VU meter latar */
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: center !important;
+    gap: 6px !important; /* Ditolak/diturunkan sedikit */
     width: 100% !important;
-    margin-bottom: 2px !important;
-  }
-
-  .ch-controls-group {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 4px !important;
-    width: 100% !important;
-    margin-top: 4px !important; /* Jarak atas knob diturunkan */
+    margin-top: 10px !important; /* Kebawahin knob agar tidak mepet header */
     margin-bottom: 4px !important;
   }
 
+  .ch-controls-group input[type="range"],
+  .knob-container input[type="range"] {
+    position: relative !important;
+    z-index: 3 !important;
+    cursor: pointer !important;
+    touch-action: none !important;
+  }
+
   .volume-label-text {
+    position: relative !important;
+    z-index: 2 !important;
     font-size: 7px !important;
     font-weight: bold !important;
     color: var(--text-dim) !important;
     text-transform: uppercase !important;
-    margin: 4px 0 2px 0 !important;
+    margin: 6px 0 2px 0 !important; /* Teks Volume diturunkan sedikit */
     text-align: center !important;
   }
 
   .fader-area {
+    position: relative !important;
+    z-index: 2 !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -292,9 +324,8 @@
     margin-top: auto !important;
   }
 
-  /* KUNCI DITINGKATKAN KE 260px UNTUK MENUTUP CELAH BAWAH SAMPAI SEJAJAR AUX */
   .fader-area input[type="range"], .channel-fader {
-    height: 260px !important;
+    height: 240px !important;
     accent-color: var(--accent-color) !important;
   }
 
@@ -576,7 +607,7 @@
     box-shadow: 0 0 6px var(--accent-color) !important;
   }
 
-  /* MODE LANDSCAPE (MENUTUP TOTAL CELAH BAWAH KONSOL) */
+  /* MODE LANDSCAPE (MENUTUP CELAH BAWAH SAMPAI BARIS BOTTOM NAV) */
   @media screen and (orientation: landscape) {
     .channel-bank {
       display: flex !important;
@@ -615,7 +646,7 @@
     .fader-area input[type="range"], 
     .channel-fader, 
     .new-channel-strip input[type="range"].new-fader {
-      height: 310px !important; /* Ditingkatkan ke 310px agar fader mendorong tombol MUTE/SOLO mentok ke paling bawah */
+      height: 290px !important;
     }
   }
 
@@ -1096,6 +1127,16 @@
   const clock = document.getElementById('clock');
   const tick = () => clock && (clock.textContent = new Date().toLocaleTimeString());
   tick(); setInterval(tick, 1000);
+
+  // Inject VU Meter Panjang secara otomatis jika belum ada di HTML
+  document.querySelectorAll('.new-channel-strip, .channel-strip').forEach(strip => {
+    if (!strip.querySelector('.ch-long-vu')) {
+      const longVu = document.createElement('div');
+      longVu.className = 'ch-long-vu';
+      longVu.innerHTML = '<div class="ch-long-vu-fill"></div>';
+      strip.appendChild(longVu);
+    }
+  });
 
   // Tab Layar M32
   const tabs = document.querySelectorAll('#screenTabs button');
@@ -1858,23 +1899,25 @@
           if (cId > 0) {
             const cState = (window.state && window.state.channels) ? window.state.channels[cId - 1] : {};
             const topVuFill = strip.querySelector('.ch-top-vu-fill');
+            const longVuFill = strip.querySelector('.ch-long-vu-fill');
             
-            if (topVuFill) {
-              if (cState.mute) {
-                topVuFill.style.height = '0%';
+            if (cState.mute) {
+              if (topVuFill) topVuFill.style.height = '0%';
+              if (longVuFill) longVuFill.style.height = '0%';
+            } else {
+              const cGain = parseFloat(cState.gain ?? 1.0);
+              const cFaderScale = (parseFloat(cState.fader ?? 75)) / 100;
+              let chSignalLevel = 0;
+              
+              if (cId === chNum && analyserNode) {
+                chSignalLevel = avgLevel * 100 * cGain * cFaderScale;
               } else {
-                const cGain = parseFloat(cState.gain ?? 1.0);
-                const cFaderScale = (parseFloat(cState.fader ?? 75)) / 100;
-                let chSignalLevel = 0;
-                
-                if (cId === chNum && analyserNode) {
-                  chSignalLevel = avgLevel * 100 * cGain * cFaderScale;
-                } else {
-                  chSignalLevel = 0;
-                }
-
-                topVuFill.style.height = Math.min(100, Math.max(0, chSignalLevel)) + '%';
+                chSignalLevel = 0;
               }
+
+              const targetH = Math.min(100, Math.max(0, chSignalLevel)) + '%';
+              if (topVuFill) topVuFill.style.height = targetH;
+              if (longVuFill) longVuFill.style.height = targetH;
             }
           }
         });
@@ -1890,7 +1933,7 @@
       } else {
         if (masterMeterL) masterMeterL.style.height = '0%';
         if (masterMeterR) masterMeterR.style.height = '0%';
-        document.querySelectorAll('.ch-top-vu-fill').forEach(fill => fill.style.height = '0%');
+        document.querySelectorAll('.ch-top-vu-fill, .ch-long-vu-fill').forEach(fill => fill.style.height = '0%');
       }
     }
   }
