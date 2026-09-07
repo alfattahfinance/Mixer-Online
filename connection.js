@@ -49,10 +49,12 @@ window.MixerControl = (() => {
     const btnConnect = document.getElementById("connectEsp");
     const btnDevice = document.getElementById("deviceConnect");
 
-    // UI Panel Test
+    // UI Panel Test & Transpor
     const transportLabel = document.getElementById("testTransportLabel");
     const rxCount = document.getElementById("testRxCount");
     const txCount = document.getElementById("testTxCount");
+
+    const transportName = (state.transport || "esp32").toUpperCase();
 
     if (statusText) {
       statusText.textContent = isConnected ? "ONLINE" : "OFFLINE";
@@ -60,18 +62,18 @@ window.MixerControl = (() => {
     }
     if (statusLamp) statusLamp.className = isConnected ? "live" : "";
     if (bridgeHead) {
-      bridgeHead.textContent = isConnected ? "BRIDGE ONLINE" : "BRIDGE STANDBY";
+      bridgeHead.textContent = isConnected ? `${transportName} ONLINE` : "BRIDGE STANDBY";
     }
     if (deviceStatus) {
       deviceStatus.textContent = isConnected
-        ? "🟢 ESP32 SIMULATOR ONLINE (ACTIVE)"
-        : "🔴 ESP32 SIMULATOR OFFLINE";
+        ? `🟢 ${transportName} BRIDGE ONLINE (ACTIVE)`
+        : `🔴 ${transportName} BRIDGE OFFLINE`;
     }
     if (deviceLamp) deviceLamp.className = isConnected ? "lamp green" : "lamp red";
     if (footerConn) {
       footerConn.textContent = isConnected
-        ? "● ESP32 SIMULATOR ONLINE"
-        : "● ESP32 SIMULATOR OFFLINE";
+        ? `● ${transportName} BRIDGE ONLINE`
+        : `● ${transportName} BRIDGE OFFLINE`;
     }
     if (btnConnect) btnConnect.textContent = isConnected ? "DISCONNECT ESP32" : "CONNECT ESP32";
     if (btnDevice) btnDevice.textContent = isConnected ? "DISCONNECT" : "CONNECT ESP32";
@@ -79,7 +81,7 @@ window.MixerControl = (() => {
     // Panel Connection/Test Updates
     if (transportLabel) {
       transportLabel.textContent = isConnected 
-        ? `ESP32 BRIDGE ${state.transport.toUpperCase()} ONLINE` 
+        ? `${transportName} BRIDGE ONLINE` 
         : "OFFLINE";
     }
     if (rxCount) rxCount.textContent = state.stats.rx;
@@ -179,8 +181,19 @@ window.MixerControl = (() => {
     return { ok: true, transport: "esp32" };
   }
 
+  // Helper Format Teks Output Nilai Parameter
+  function formatParamValue(param, val) {
+    const n = Number(val);
+    if (param === "gain") return n.toFixed(2);
+    if (param === "pan") return n === 0 ? "CENTER" : (n < 0 ? "L " + Math.round(Math.abs(n) * 100) + "%" : "R " + Math.round(n * 100) + "%");
+    if (["high", "mid", "low"].includes(param)) return (n > 0 ? "+" : "") + Math.round(n) + "dB";
+    if (param === "fader") return Math.round(n) + "%";
+    return val;
+  }
+
   // Fungsi Penerimaan Data RX dari Hardware / Simulator ke Tampilan UI Mixer
   function applyRemote(message) {
+    if (!message) return false;
     state.lastRx = message;
 
     // Ambil statistik TX/RX terbaru
@@ -191,35 +204,82 @@ window.MixerControl = (() => {
       state.stats.tx = stats.tx || state.stats.tx;
     }
 
-    // Perbarui Teks RX di UI Log Panel
-    const rxLogEl = document.getElementById("rx");
+    // Perbarui Log Teks Panel Log
+    const rxLogEl = document.getElementById("rx") || document.getElementById("bridgeLog");
     if (rxLogEl) {
       rxLogEl.textContent = `RX: ${JSON.stringify(message)}`;
     }
 
-    // Perbarui Tampilan VU Meter saat METER Data Diterima
+    // A. METER SIGNAL HANDLING (VU Meter 14 Channel)
     if (message.type === "METER" && message.ch) {
-      const chNum = message.ch;
-      const levelPercent = Math.min(100, Math.round((message.level || 0) * 50)); // Normalisasi 0.0 - 2.0 ke 0% - 100%
+      const chNum = Number(message.ch);
+      const levelPercent = Math.min(100, Math.max(0, (message.level || 0) * 50));
 
-      // Update Channel Strip Meter
-      const chStrip = document.querySelector(`[data-ch="${chNum}"]`);
+      if (window.state && window.state.channels && window.state.channels[chNum - 1]) {
+        window.state.channels[chNum - 1].level = Number(message.level || 0);
+      }
+
+      const chStrip = document.querySelector(`.new-channel-strip[data-ch="${chNum}"], .channel-strip[data-ch="${chNum}"]`);
       if (chStrip) {
-        const vuBar = chStrip.querySelector(".vu-meter-fill, .meter-bar");
-        if (vuBar) vuBar.style.height = `${levelPercent}%`;
+        const vuLongFill = chStrip.querySelector(".ch-long-vu-fill");
+        const vuTopFill = chStrip.querySelector(".ch-top-vu-fill, .channel-meter-bar");
+        if (vuLongFill) vuLongFill.style.height = `${levelPercent}%`;
+        if (vuTopFill) vuTopFill.style.height = `${levelPercent}%`;
       }
     }
 
-    // Perbarui Fader jika menerima Hardware Feedback / Physical Change
-    if (message.type === "FEEDBACK" && message.ch && message.param) {
-      const chStrip = document.querySelector(`[data-ch="${message.ch}"]`);
+    // B. CONTROL / FEEDBACK HANDLING (Perubahan Parameter Fisik)
+    if ((message.type === "FEEDBACK" || message.type === "CONTROL") && message.ch && message.param) {
+      const chNum = Number(message.ch);
+      const param = String(message.param);
+      const val = message.value;
+
+      // Update State Global
+      if (window.state && window.state.channels && window.state.channels[chNum - 1]) {
+        window.state.channels[chNum - 1][param] = val;
+      }
+
+      const chStrip = document.querySelector(`.new-channel-strip[data-ch="${chNum}"], .channel-strip[data-ch="${chNum}"]`);
       if (chStrip) {
-        const inputFader = chStrip.querySelector(`input[data-param="${message.param}"], .fader`);
-        if (inputFader && message.param === "fader") {
-          inputFader.value = message.value;
-          const valLabel = chStrip.querySelector(".fader-val");
-          if (valLabel) valLabel.textContent = `${message.value}%`;
+        // Update Slider / Input Value
+        const inputElem = chStrip.querySelector(`input[data-k="${param}"], input[data-param="${param}"]`);
+        if (inputElem && parseFloat(inputElem.value) !== parseFloat(val)) {
+          inputElem.value = val;
         }
+
+        // Update Label Output Teks Nilai
+        const parent = inputElem?.parentElement;
+        if (parent) {
+          const out = parent.querySelector("output, .fader-val, .knob-val");
+          if (out) out.textContent = formatParamValue(param, val);
+        }
+
+        // Update Button Mute & Solo UI
+        if (param === "mute" || param === "solo") {
+          const btn = chStrip.querySelector(`button[data-k="${param}"], button[data-action="${param}"]`);
+          if (btn) {
+            const isTrue = !!val;
+            btn.classList.toggle("active", isTrue);
+            btn.classList.toggle("on", isTrue);
+            btn.textContent = isTrue ? (param === "mute" ? "UNMUTE" : "UNSOLO") : (param === "mute" ? "MUTE" : "SOLO");
+          }
+        }
+
+        // Update Lampu LED Status Channel
+        const led = chStrip.querySelector(".channel-led");
+        if (led && window.state?.channels[chNum - 1]) {
+          const ch = window.state.channels[chNum - 1];
+          if (ch.mute) {
+            led.className = "channel-led active red";
+          } else {
+            led.className = "channel-led green on";
+          }
+        }
+      }
+
+      // Update Layar Center Screen M32
+      if (typeof window.selectScreenChannel === "function") {
+        window.selectScreenChannel(chNum);
       }
     }
 
