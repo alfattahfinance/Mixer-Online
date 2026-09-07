@@ -1,5 +1,5 @@
 /* ==========================================================================
-   WEB AUDIO ENGINE & MUSIC PLAYER ROUTING (Full Integrated with Screen Input)
+   WEB AUDIO ENGINE & MUSIC PLAYER ROUTING (Full Integrated 3-Band EQ)
    ========================================================================== */
 (function () {
   "use strict";
@@ -16,8 +16,6 @@
       masterNode = audioCtx.createGain();
       masterNode.gain.value = 0.75;
 
-      // Master analyser membaca sinyal SETELAH master gain,
-      // tetapi tidak boleh memutus jalur Master -> output.
       const masterAnalyser = audioCtx.createAnalyser();
       masterAnalyser.fftSize = 256;
       masterAnalyser.smoothingTimeConstant = 0.75;
@@ -28,7 +26,7 @@
     return masterNode;
   }
 
-  // Inisialisasi Web Audio Context saat interaksi pertama (mengatasi kebijakan autoplay browser)
+  // Inisialisasi Web Audio Context
   function initAudioEngine() {
     if (!audioCtx) {
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -53,24 +51,36 @@
         sourceNode = audioCtx.createGain(); // Placeholder default
       }
 
-      // Buat pemrosesan efek per channel: Gain -> EQ (Low/High) -> Panner -> Fader Volume -> Master Out
+      // Buat pemrosesan per channel: Gain -> EQ (Low -> Mid -> High) -> Panner -> Fader Volume -> Master Out
       const gainNode = audioCtx.createGain();
       
+      // 1. Low EQ Filter (Low-shelf 100Hz)
       const lowBq = audioCtx.createBiquadFilter();
       lowBq.type = "lowshelf";
-      lowBq.frequency.value = 250;
+      lowBq.frequency.value = 100;
+      lowBq.gain.value = 0; // Flat (0dB)
 
+      // 2. Mid EQ Filter (Peaking 1000Hz) - TAMBAHAN FIX
+      const midBq = audioCtx.createBiquadFilter();
+      midBq.type = "peaking";
+      midBq.frequency.value = 1000;
+      midBq.Q.value = 1.0;
+      midBq.gain.value = 0; // Flat (0dB)
+
+      // 3. High EQ Filter (High-shelf 8000Hz)
       const highBq = audioCtx.createBiquadFilter();
       highBq.type = "highshelf";
-      highBq.frequency.value = 4000;
+      highBq.frequency.value = 8000;
+      highBq.gain.value = 0; // Flat (0dB)
 
       const pannerNode = audioCtx.createStereoPanner ? audioCtx.createStereoPanner() : null;
       const faderNode = audioCtx.createGain();
 
-      // Hubungkan rantai audio (Chain routing)
+      // Hubungkan rantai audio (Chain routing): Source -> Gain -> Low -> Mid -> High -> Panner -> Fader
       sourceNode.connect(gainNode);
       gainNode.connect(lowBq);
-      lowBq.connect(highBq);
+      lowBq.connect(midBq);
+      midBq.connect(highBq);
       
       if (pannerNode) {
         highBq.connect(pannerNode);
@@ -79,36 +89,38 @@
         highBq.connect(faderNode);
       }
 
-      // Meter tap: baca sinyal SETELAH processing channel dan sebelum master.
+      // Meter tap: baca sinyal SETELAH processing channel
       const analyserNode = audioCtx.createAnalyser();
       analyserNode.fftSize = 256;
       analyserNode.smoothingTimeConstant = 0.75;
       faderNode.connect(analyserNode);
-      faderNode.connect(ensureMaster()); // Channel -> Master -> Audio Output
+      faderNode.connect(ensureMaster()); // Channel -> Master -> Output
 
       channelNodes[chNum] = {
         source: sourceNode,
         gain: gainNode,
         low: lowBq,
+        mid: midBq,   // Simpan reference filter Mid
         high: highBq,
         pan: pannerNode,
         fader: faderNode,
         analyser: analyserNode
       };
 
-      console.log(`[AUDIO ENGINE] Jalur audio untuk CH${chNum} berhasil diaktifkan.`);
+      console.log(`[AUDIO ENGINE] Jalur audio CH${chNum} (Gain -> Low -> Mid -> High) aktif.`);
     } catch (e) {
       console.error(`Gagal menginisialisasi audio untuk CH${chNum}:`, e);
     }
   };
 
   function updateChannelMeters() {
-    const strips = document.querySelectorAll(".new-channel-strip");
+    const strips = document.querySelectorAll(".new-channel-strip, .channel-strip");
     strips.forEach(strip => {
       const ch = Number(strip.dataset.ch);
       const nodes = channelNodes[ch];
-      const meter = strip.querySelector(".new-channel-meter");
+      const meter = strip.querySelector(".new-channel-meter, .ch-top-vu-fill");
       if (!nodes?.analyser || !meter) return;
+
       const data = new Uint8Array(nodes.analyser.fftSize);
       nodes.analyser.getByteTimeDomainData(data);
       let sum = 0;
@@ -118,19 +130,18 @@
       }
       const rms = Math.sqrt(sum / data.length);
       const level = Math.max(0, Math.min(1, rms * 3.5));
-      const count = Math.round(level * 12);
-      meter.querySelectorAll("i[data-seg]").forEach((seg, i) => {
-        seg.classList.toggle("active", i < count);
-      });
-      meter.classList.toggle("signal", count > 0);
+
+      if (meter.classList.contains("ch-top-vu-fill")) {
+        meter.style.height = (level * 100) + "%";
+      } else {
+        const count = Math.round(level * 12);
+        meter.querySelectorAll("i[data-seg]").forEach((seg, i) => {
+          seg.classList.toggle("active", i < count);
+        });
+        meter.classList.toggle("signal", count > 0);
+      }
     });
 
-    if (masterNode?._analyser) {
-      // Master meter membaca output Master tanpa membuat node baru
-      // atau memutus routing audio.
-      const data = new Uint8Array(masterNode._analyser.fftSize);
-      masterNode._analyser.getByteTimeDomainData(data);
-    }
     requestAnimationFrame(updateChannelMeters);
   }
 
@@ -140,7 +151,18 @@
     masterNode.gain.setTargetAtTime(n / 100, audioCtx.currentTime, 0.02);
   };
 
-  // Sinkronisasi perubahan parameter web ke Web Audio API secara real-time
+  // Helper konversi nilai slider/knob (0-100 atau -15 sampai +15) ke dB Gain Filter
+  function parseEqGain(val) {
+    let num = parseFloat(val);
+    if (isNaN(num)) return 0;
+    // Jika slider mengirim rentang 0..100 (di mana 50 adalah flat/0dB)
+    if (num >= 0 && num <= 100) {
+      return ((num - 50) / 50) * 15; // Menghasilkan rentang -15dB s/d +15dB
+    }
+    return Math.max(-24, Math.min(24, num));
+  }
+
+  // Sinkronisasi pemrosesan kontrol audio secara real-time
   window.updateAudioParamLive = function(chNum, param, val) {
     if (!channelNodes[chNum]) return;
     const nodes = channelNodes[chNum];
@@ -152,10 +174,12 @@
         nodes.gain.gain.setTargetAtTime(Math.max(0.1, val), audioCtx.currentTime, 0.02);
       } else if (param === "pan" && nodes.pan) {
         nodes.pan.pan.setTargetAtTime(Math.max(-1, Math.min(1, val)), audioCtx.currentTime, 0.02);
-      } else if (param === "low") {
-        nodes.low.gain.setTargetAtTime(val, audioCtx.currentTime, 0.02);
-      } else if (param === "high") {
-        nodes.high.gain.setTargetAtTime(val, audioCtx.currentTime, 0.02);
+      } else if (param === "low" && nodes.low) {
+        nodes.low.gain.setTargetAtTime(parseEqGain(val), audioCtx.currentTime, 0.02);
+      } else if (param === "mid" && nodes.mid) {
+        nodes.mid.gain.setTargetAtTime(parseEqGain(val), audioCtx.currentTime, 0.02);
+      } else if (param === "high" && nodes.high) {
+        nodes.high.gain.setTargetAtTime(parseEqGain(val), audioCtx.currentTime, 0.02);
       } else if (param === "mute") {
         nodes.fader.gain.setTargetAtTime(val ? 0 : 1, audioCtx.currentTime, 0.01);
       }
@@ -182,7 +206,6 @@
     const ch = Number(chNum);
     if (!Number.isInteger(ch) || ch < 1 || ch > 14) return false;
 
-    // Setiap channel mempunyai sumber audio sendiri.
     if (channelAudioElements[ch]) {
       channelAudioElements[ch].pause();
       channelAudioElements[ch].src = "";
@@ -197,7 +220,7 @@
 
     audio.play()
       .then(() => console.log(`[AUDIO ENGINE] Audio CH${ch} PLAY`))
-      .catch(err => console.warn(`[AUDIO ENGINE] CH${ch} perlu klik PLAY lagi:`, err));
+      .catch(err => console.warn(`[AUDIO ENGINE] CH${ch} perlu interaksi user untuk PLAY:`, err));
     return true;
   };
 
@@ -214,11 +237,13 @@
     window.connectCustomAudioToChannel(1, audioElementOrUrl || "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
   };
 
+  requestAnimationFrame(updateChannelMeters);
+
   // Integrasikan otomatis dengan event input slider/knob pada channel strip
-  requestAnimationFrame(updateChannelMeters);\n\n  document.addEventListener("input", (e) => {
+  document.addEventListener("input", (e) => {
     const target = e.target;
     const param = target.dataset.param || target.dataset.k;
-    const strip = target.closest(".new-channel-strip");
+    const strip = target.closest(".new-channel-strip, .channel-strip");
     if (!strip || !param) return;
     
     const chNum = parseInt(strip.dataset.ch, 10);
@@ -238,7 +263,7 @@
     const target = e.target.closest('button[data-k="mute"], button[data-k="solo"], [data-action]');
     if (!target) return;
 
-    const strip = target.closest(".new-channel-strip");
+    const strip = target.closest(".new-channel-strip, .channel-strip");
     if (!strip) return;
 
     const chNum = parseInt(strip.dataset.ch, 10);
@@ -253,9 +278,8 @@
     }
   }, true);
 
-  // Event Listener untuk Kotak Input URL Audio di Layar Tengah & Tombol Media Rack
+  // Event Listener UI
   document.addEventListener("DOMContentLoaded", () => {
-    // Tombol LOAD & PLAY di layar tengah
     const loadAudioBtn = document.getElementById("screenLoadAudioBtn");
     const audioInputUrl = document.getElementById("screenAudioInputUrl");
 
@@ -264,7 +288,6 @@
         const url = audioInputUrl.value.trim();
         if (!url) return;
 
-        // Ambil nomor channel yang sedang aktif dari layar tengah (misal: "CH 03" -> 3)
         let targetCh = 1;
         const screenInputEl = document.getElementById("screenInput");
         if (screenInputEl && screenInputEl.textContent) {
@@ -275,11 +298,10 @@
         }
 
         window.connectCustomAudioToChannel(targetCh, url);
-        console.log(`[SCREEN AUDIO] Memuat & memutar sumber audio ke jalur CH${targetCh}`);
+        console.log(`[SCREEN AUDIO] Memuat audio ke jalur CH${targetCh}`);
       });
     }
 
-    // Tombol musik bawaan di media rack
     const musicBtn = document.querySelector(".media-rack button:nth-child(3), .player button:nth-child(2)");
     if (musicBtn) {
       musicBtn.addEventListener("click", () => {
