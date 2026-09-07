@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="id">
 <head>
@@ -215,14 +214,14 @@
   }
 
   .new-channel-strip, .channel-strip {
-    position: relative !important; /* Diperlukan untuk VU Meter Latar Belakang */
+    position: relative !important;
     width: 100% !important;
     min-width: 0 !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding: 8px 2px 0px 2px !important; /* Menurunkan seluruh isi channel */
+    padding: 8px 2px 0px 2px !important;
     border-right: 1px dashed var(--panel-border) !important;
     box-sizing: border-box !important;
     height: 100% !important;
@@ -246,7 +245,7 @@
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column-reverse !important;
-    z-index: 1 !important; /* Di belakang kontrol knob agar knob tetap responsif */
+    z-index: 1 !important;
     pointer-events: none !important;
   }
 
@@ -279,16 +278,15 @@
     transition: height 0.05s linear !important;
   }
 
-  /* KELOMPOK KNOB - DITURUNKAN & DIJAMIN RESPONSIF */
   .ch-controls-group, .knob-container {
     position: relative !important;
-    z-index: 2 !important; /* Memastikan Knob di atas VU meter latar */
+    z-index: 2 !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    gap: 6px !important; /* Ditolak/diturunkan sedikit */
+    gap: 6px !important;
     width: 100% !important;
-    margin-top: 10px !important; /* Kebawahin knob agar tidak mepet header */
+    margin-top: 10px !important;
     margin-bottom: 4px !important;
   }
 
@@ -307,7 +305,7 @@
     font-weight: bold !important;
     color: var(--text-dim) !important;
     text-transform: uppercase !important;
-    margin: 6px 0 2px 0 !important; /* Teks Volume diturunkan sedikit */
+    margin: 6px 0 2px 0 !important;
     text-align: center !important;
   }
 
@@ -489,7 +487,7 @@
   }
 
   /* ==========================================================
-     5. PANEL AUX & FX (RATA & SEJAJAR DENGAN DASAR CHANNEL STRIP)
+     5. PANEL AUX & FX
      ========================================================== */
   .center-console .fx-rack,
   .center-console .aux-rack,
@@ -608,7 +606,6 @@
     box-shadow: 0 0 6px var(--accent-color) !important;
   }
 
-  /* MODE LANDSCAPE (MENUTUP CELAH BAWAH SAMPAI BARIS BOTTOM NAV) */
   @media screen and (orientation: landscape) {
     .channel-bank {
       display: flex !important;
@@ -699,13 +696,12 @@
     <div id="channels"></div>
   </section>
 
-  <!-- 2. KONSOL TENGAH (SCREEN M32 + PLAYER + FX RACK + AUX RACK) -->
+  <!-- 2. KONSOL TENGAH -->
   <section class="center-console" id="centerConsole">
     <!-- Screen M32 -->
     <div class="screen-frame">
       <div class="screen-title" style="margin-bottom: 4px;"><b>MIDAS M32</b><span>DIGITAL CONSOLE SYSTEM</span></div>
       
-      <!-- NAVIGASI LAYAR UTAMA -->
       <div class="screen-tabs" id="screenTabs">
         <button class="active" data-screen="HOME">HOME</button>
         <button data-screen="METER">METERS</button>
@@ -715,7 +711,6 @@
         <button data-screen="SCENE">LIBRARY</button>
       </div>
 
-      <!-- SUBMENU BAR -->
       <div class="m32-submenu-bar" id="m32SubmenuBar">
         <button class="m32-sub-btn active" data-sub="overview">OVERVIEW</button>
         <button class="m32-sub-btn" data-sub="config">CONFIG</button>
@@ -726,7 +721,6 @@
       </div>
       
       <div class="screen-content" id="screenContent">
-        <!-- 1. HOME VIEW -->
         <section class="screen-view active" data-view="HOME">
           <div class="midas-tft-screen">
             <div class="midas-header-strip" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
@@ -735,7 +729,6 @@
               <span id="screenStatus" style="font-size: 9px; color: #2ecc71; font-weight: bold;">[ACTIVE]</span>
             </div>
 
-            <!-- SUBPANEL 1: OVERVIEW -->
             <div class="m32-sub-panel active" data-subpanel="overview">
               <div class="midas-blocks-grid">
                 <div class="midas-block">
@@ -773,7 +766,6 @@
               </div>
             </div>
 
-            <!-- SUBPANEL 2: CONFIG -->
             <div class="m32-sub-panel" data-subpanel="config">
               <b style="font-size: 8px; color: var(--accent-color);">PREAMP / INPUT CONFIG</b>
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:6px; font-size: 8px;">
@@ -793,7 +785,6 @@
               </div>
             </div>
 
-            <!-- SUBPANEL 3: GATE -->
             <div class="m32-sub-panel" data-subpanel="gate">
               <b style="font-size: 8px; color: var(--accent-color);">EXPANDER / NOISE GATE</b>
               <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:4px; margin-top:6px; text-align:center; font-size: 8px;">
@@ -812,7 +803,6 @@
               </div>
             </div>
 
-            <!-- SUBPANEL 4: DYN -->
             <div class="m32-sub-panel" data-subpanel="dyn">
               <b style="font-size: 8px; color: var(--accent-color);">DYNAMICS / COMPRESSOR</b>
               <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:3px; margin-top:6px; text-align:center; font-size: 8px;">
@@ -835,7 +825,6 @@
               </div>
             </div>
 
-            <!-- SUBPANEL 5: EQ -->
             <div class="m32-sub-panel" data-subpanel="eq">
               <b style="font-size: 8px; color: var(--accent-color);">4-BAND PARAMETRIC EQ</b>
               <div style="display:flex; gap:2px; height:80px; align-items:flex-end; background:var(--main-bg); padding:4px; margin-top:4px; border:1px solid var(--panel-border);">
@@ -852,7 +841,6 @@
               </div>
             </div>
 
-            <!-- SUBPANEL 6: SENDS -->
             <div class="m32-sub-panel" data-subpanel="sends">
               <b style="font-size: 8px; color: var(--accent-color);">BUS / AUX SENDS ROUTING</b>
               <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:3px; margin-top:6px; text-align:center; font-size: 8px;">
@@ -878,7 +866,6 @@
           </div>
         </section>
 
-        <!-- 2. METERS VIEW -->
         <section class="screen-view" data-view="METER">
           <div class="pro-screen-grid" style="background: var(--panel-bg); padding: 6px; border-radius: 4px; min-height: 200px;">
             <b style="font-size: 9px; color: var(--accent-color); display: block; margin-bottom: 4px;">CHANNEL LEVEL METERS (CH 1–14)</b>
@@ -887,7 +874,6 @@
           </div>
         </section>
 
-        <!-- 3. RTA VIEW -->
         <section class="screen-view" data-view="RTA">
           <div class="rta-display" style="background: var(--panel-bg); padding: 6px; border-radius: 4px; min-height: 200px;">
             <b style="font-size: 9px; color: var(--accent-color); display: block; margin-bottom: 4px;">REAL TIME ANALYZER (RTA)</b>
@@ -896,7 +882,6 @@
           </div>
         </section>
 
-        <!-- 4. SETUP VIEW -->
         <section class="screen-view" data-view="SETUP">
           <div class="setup-screen" style="background: var(--panel-bg); padding: 6px; border-radius: 4px; font-size: 9px; min-height: 200px;">
             <b style="color: var(--accent-color);">M32 SYSTEM CONFIG</b>
@@ -909,7 +894,6 @@
           </div>
         </section>
 
-        <!-- 5. EFFECTS VIEW -->
         <section class="screen-view" data-view="EFFECT">
           <div class="effect-screen effect-screen-live" style="background: var(--panel-bg); padding: 6px; border-radius: 4px; font-size: 9px; min-height: 200px;">
             <b style="color: var(--accent-color);">VIRTUAL FX RACK ASSIGNMENT</b>
@@ -925,7 +909,6 @@
           </div>
         </section>
 
-        <!-- 6. LIBRARY / SCENE VIEW -->
         <section class="screen-view" data-view="SCENE">
           <div class="scene-screen" style="background: var(--panel-bg); padding: 6px; border-radius: 4px; font-size: 9px; min-height: 200px;">
             <b style="color: var(--accent-color);">SCENE LIBRARY PRESETS</b>
@@ -1021,7 +1004,7 @@
     <div id="channelsRight"></div>
   </section>
 
-  <!-- 4. MASTER RACK DENGAN INDIKATOR L/R MASTER STEREO -->
+  <!-- 4. MASTER RACK -->
   <aside class="master-rack" id="masterRack">
     <div class="meter-rack">
       <b style="font-size: 8px; color: var(--accent-color); display: block; text-align: center; margin-bottom: 2px;">MAIN L / R</b>
@@ -1111,6 +1094,7 @@
   <span>MEM: <b>42%</b></span>
 </footer>
 
+<!-- SCRIPT PENDUKUNG -->
 <script src="connection.js?v=20260903-final16"></script>
 <script src="adapters.js?v=20260903-esp32-bridge-final"></script>
 <script src="app.js?v=20260903-final16"></script>
@@ -1310,7 +1294,6 @@
     if (msg) msg.textContent = "⚡ Preset M32 Scene Recalled!";
   });
 
-  // METODE SINKRONISASI DATA LAYAR M32 & CHANNEL
   function selectScreenChannel(id) {
     const c = window.state?.channels?.[id - 1];
     const set = (elemId, v) => { const e = document.getElementById(elemId); if (e) e.textContent = v; };
@@ -1339,7 +1322,6 @@
   }
   window.selectScreenChannel = selectScreenChannel;
 
-  // SINKRONISASI REALTIME FADER DAN KONTROL CHANNEL + HAPTIC FEEDBACK
   document.addEventListener('input', function(e) {
     if (e.target.matches('input[type="range"]')) {
       if (window.AndroidFeedback && typeof window.AndroidFeedback.triggerHaptic === 'function') {
@@ -1380,7 +1362,6 @@
     }
   });
 
-  // Haptic Feedback Klik Button
   document.addEventListener('click', function(e) {
     if (e.target.tagName === 'BUTTON') {
       if (window.AndroidFeedback && typeof window.AndroidFeedback.triggerHaptic === 'function') {
@@ -1627,6 +1608,7 @@
 })();
 </script>
 
+<!-- ENGINE AUDIO, PEMUTAR, LIVE MIC, & VU METER YANG DIPERBAIKI -->
 <script>
 (function(){
   const musicBtn = document.getElementById('btnPlayerMusic');
@@ -1831,7 +1813,6 @@
     }
   }
 
-  /* INTEGRASI VU METER DENGAN ANALYSER AUDIO CONTEXT ASLI */
   function updateIndicators() {
     requestAnimationFrame(updateIndicators);
 
@@ -1988,7 +1969,6 @@
 // Switcher Skin Mixer
 (function() {
   const skinSelect = document.getElementById('skinSelect');
-  
   const savedSkin = localStorage.getItem('mixer_theme') || 'theme-midas';
   document.body.className = savedSkin;
   if (skinSelect) skinSelect.value = savedSkin;
@@ -2219,8 +2199,6 @@
           let clampedVal = Math.max(min, Math.min(max, val));
 
           input.value = clampedVal;
-          input.style.transform = 'none';
-
           input.dispatchEvent(new Event('input', { bubbles: true }));
           input.dispatchEvent(new Event('change', { bubbles: true }));
         }
