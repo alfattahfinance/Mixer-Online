@@ -18,37 +18,65 @@ document.addEventListener("DOMContentLoaded", () => {
   // 3. FUNGSI UTAMA UNTUK MENGGERAKKAN CHANNEL (STATE + VISUAL DOM)
   function updateChannelControl(ch, param, value) {
     // A. Update State Global Jika Ada
-    if (window.state && window.state.channels && window.state.channels[ch - 1]) {
-      window.state.channels[ch - 1][param] = value;
-    }
+    if (!window.state) window.state = { channels: [] };
+    if (!window.state.channels) window.state.channels = [];
+    if (!window.state.channels[ch - 1]) window.state.channels[ch - 1] = {};
+    window.state.channels[ch - 1][param] = value;
 
     // B. Panggil API MixerControl jika tersedia
     if (window.MixerControl && typeof window.MixerControl.setControl === "function") {
       window.MixerControl.setControl(ch, param, value);
     }
 
-    // C. Update Tampilan Fader / Button di DOM secara langsung
-    const channelStrips = document.querySelectorAll(`.new-channel-strip, [data-ch="${ch}"]`);
+    // C. Update Tampilan Fader / Knob / Button di DOM secara langsung
+    const channelStrips = document.querySelectorAll(`.new-channel-strip[data-ch="${ch}"], .channel-strip[data-ch="${ch}"], [data-ch="${ch}"]`);
     
     channelStrips.forEach((strip) => {
-      const channelNum = strip.dataset?.ch || strip.getAttribute("data-ch");
-      if (Number(channelNum) === Number(ch)) {
-        if (param === "fader" || param === "gain" || param === "low" || param === "mid" || param === "high" || param === "pan") {
-          const inputEl = strip.querySelector(`input[data-param="${param}"], input[data-k="${param}"], .${param}-input`);
-          if (inputEl) inputEl.value = value;
+      const channelNum = Number(strip.dataset?.ch || strip.getAttribute("data-ch"));
+      if (channelNum === Number(ch)) {
+        
+        // 1. KONTROL RANGE (Fader, Gain, EQ, Pan)
+        if (["fader", "gain", "low", "mid", "high", "pan"].includes(param)) {
+          const inputEl = strip.querySelector(`input[data-param="${param}"], input[data-k="${param}"], .${param}-input, input.${param}-knob`);
           
-          if (param === "fader") {
-            const rangeFader = strip.querySelector('input[data-k="fader"], input[data-param="fader"], .fader-input');
-            if (rangeFader) rangeFader.value = value;
-            const outputVal = strip.querySelector('.fader-val, output');
-            if (outputVal) outputVal.textContent = value + "%";
+          if (inputEl) {
+            inputEl.value = value;
+            inputEl.dispatchEvent(new Event('input', { bubbles: true }));
           }
+
+          // Format Tampilan Output Nilai
+          if (param === "fader") {
+            const outputVal = strip.querySelector('.fader-val, output[data-k="fader"], output');
+            if (outputVal) outputVal.textContent = Math.round(value) + "%";
+          } else if (param === "gain") {
+            const outputVal = strip.querySelector('.gain-val, output[data-k="gain"]');
+            if (outputVal) outputVal.textContent = Number(value).toFixed(2);
+          } else if (param === "pan") {
+            const outputVal = strip.querySelector('.pan-val, output[data-k="pan"]');
+            if (outputVal) {
+              const numVal = Number(value);
+              outputVal.textContent = numVal === 0 ? "CENTER" : (numVal < 0 ? `L ${Math.abs(Math.round(numVal * 100))}%` : `R ${Math.round(numVal * 100)}%`);
+            }
+          } else if (["low", "mid", "high"].includes(param)) {
+            const outputVal = strip.querySelector(`.${param}-val, output[data-k="${param}"]`);
+            if (outputVal) outputVal.textContent = Math.round(value);
+          }
+
+        // 2. KONTROL BUTTON (Mute & Solo)
         } else if (param === "mute") {
-          const btnMute = strip.querySelector(".btn-mute, button[data-action='mute']");
-          if (btnMute) btnMute.classList.toggle("active", !!value);
+          const btnMute = strip.querySelector(".btn-mute, button[data-action='mute'], button[data-k='mute'], button.mute-btn");
+          if (btnMute) {
+            btnMute.classList.toggle("active", !!value);
+            btnMute.classList.toggle("on", !!value);
+            btnMute.textContent = value ? "UNMUTE" : "MUTE";
+          }
         } else if (param === "solo") {
-          const btnSolo = strip.querySelector(".btn-solo, button[data-action='solo']");
-          if (btnSolo) btnSolo.classList.toggle("active", !!value);
+          const btnSolo = strip.querySelector(".btn-solo, button[data-action='solo'], button[data-k='solo'], button.solo-btn");
+          if (btnSolo) {
+            btnSolo.classList.toggle("active", !!value);
+            btnSolo.classList.toggle("on", !!value);
+            btnSolo.textContent = value ? "UNSOLO" : "SOLO";
+          }
         }
       }
     });
@@ -63,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 4. BINDING EVENT LISTENERS UNTUK INTERAKSI USER DI UI (FADER, GAIN, EQ)
   // ==========================================================================
 
-  // A. Event Listener untuk Slider Fader / Volume
+  // A. Event Listener untuk Slider Fader / Gain / EQ / Pan
   document.addEventListener("input", (e) => {
     const target = e.target;
     if (!target) return;
@@ -72,41 +100,41 @@ document.addEventListener("DOMContentLoaded", () => {
     const strip = target.closest("[data-ch]");
     if (!strip) return;
 
-    // The dedicated 14CH renderer owns all channel inputs.
-    // Do not process the same input a second time here.
-    if (target.closest(".new-channel-strip")) return;
-
     const ch = Number(strip.dataset.ch);
-
     if (isNaN(ch) || ch < 1 || ch > 14) return;
 
-    // 1. Tentukan Parameter (fader, gain, low, mid, high, pan)
-    // Channel controls expose their parameter as data-k (new panel)
-    // or data-param (legacy/dedicated renderer). Never treat every range
-    // input as a fader: GAIN/EQ/PAN must keep their own parameter.
+    // Tentukan Parameter secara akurat (fader, gain, low, mid, high, pan)
     let param = target.dataset.param || target.dataset.k;
     if (!param) {
-      if (target.type === "range") param = "fader";
+      if (target.classList.contains("channel-fader") || target.classList.contains("new-fader")) param = "fader";
+      else if (target.classList.contains("gain-knob")) param = "gain";
+      else if (target.classList.contains("pan-knob")) param = "pan";
+      else if (target.type === "range") param = "fader";
       else return;
     }
 
     const value = target.type === "checkbox" ? target.checked : Number(target.value);
 
-    // 2. Kirim Perubahan ke MixerControl dan Update State UI
+    // Kirim Perubahan ke MixerControl dan Update State UI
     updateChannelControl(ch, param, value);
   });
 
   // B. Event Listener untuk Tombol Mute & Solo
   document.addEventListener("click", (e) => {
-    const btn = e.target.closest("button[data-action]");
+    const btn = e.target.closest("button[data-action], button[data-k='mute'], button[data-k='solo'], button.mute-btn, button.solo-btn");
     if (!btn) return;
 
     const strip = btn.closest("[data-ch]");
     if (!strip) return;
     const ch = Number(strip.dataset.ch);
-    if (isNaN(ch)) return;
+    if (isNaN(ch) || ch < 1 || ch > 14) return;
 
-    const action = btn.dataset.action; // 'mute' atau 'solo'
+    let action = btn.dataset.action || btn.dataset.k;
+    if (!action) {
+      if (btn.classList.contains("btn-mute") || btn.classList.contains("mute-btn")) action = "mute";
+      else if (btn.classList.contains("btn-solo") || btn.classList.contains("solo-btn")) action = "solo";
+    }
+
     if (action === "mute" || action === "solo") {
       const currentState = window.state?.channels?.[ch - 1]?.[action] || false;
       updateChannelControl(ch, action, !currentState);
@@ -120,16 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const ch = Number(data.ch);
     if (ch >= 1 && ch <= 14 && data.param) {
-      // Update UI tanpa memicu siklus loopback berulang
-      const strip = document.querySelector(`[data-ch="${ch}"]`);
-      if (strip) {
-        if (data.param === "fader") {
-          const inputFader = strip.querySelector('input[data-k="fader"], input[data-param="fader"], .fader-input');
-          if (inputFader) inputFader.value = data.value;
-          const outputVal = strip.querySelector('.fader-val, output');
-          if (outputVal) outputVal.textContent = data.value + "%";
-        }
-      }
+      updateChannelControl(ch, data.param, data.value);
     }
   };
 
@@ -137,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("mixer:bluetooth-rx", syncRxToUI);
 
   // ==========================================================================
-  // EVENT LISTENERS UNTUK TOMBOL-TOMBOL DI CONNECTION / TEST PANEL
+  // 5. EVENT LISTENERS UNTUK TOMBOL-TOMBOL DI CONNECTION / TEST PANEL
   // ==========================================================================
 
   // 1. SIMULATE HARDWARE RX
@@ -156,9 +175,9 @@ document.addEventListener("DOMContentLoaded", () => {
     logTest("Memulai 14CH Loopback Test...");
     for (let ch = 1; ch <= 14; ch++) {
       updateChannelControl(ch, "fader", 100);
-      await delay(70);
+      await delay(60);
       updateChannelControl(ch, "fader", 0);
-      await delay(70);
+      await delay(60);
       updateChannelControl(ch, "fader", 75);
     }
     logTest("14CH Loopback Test: SELESAI (Semua 14 Channel Merespons)");
@@ -185,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let ch = 1; ch <= 14; ch++) {
       updateChannelControl(ch, "mute", true);
       updateChannelControl(ch, "solo", true);
-      await delay(60);
+      await delay(50);
       updateChannelControl(ch, "mute", false);
       updateChannelControl(ch, "solo", false);
     }
@@ -199,14 +218,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const masterVal = document.getElementById("masterVal");
 
     const setMaster = (v) => {
-      if (masterEl) masterEl.value = v;
+      if (masterEl) {
+        masterEl.value = v;
+        masterEl.dispatchEvent(new Event("input", { bubbles: true }));
+      }
       if (masterVal) masterVal.textContent = v + "%";
     };
 
     setMaster(0);
-    await delay(250);
+    await delay(200);
     setMaster(100);
-    await delay(250);
+    await delay(200);
     setMaster(75);
 
     logTest("Master Isolation Test: SELESAI");
@@ -219,7 +241,7 @@ document.addEventListener("DOMContentLoaded", () => {
       updateChannelControl(ch, "mute", true);
       updateChannelControl(ch, "fader", 30);
     }
-    await delay(400);
+    await delay(350);
     for (let ch = 1; ch <= 14; ch += 2) {
       updateChannelControl(ch, "mute", false);
       updateChannelControl(ch, "fader", 75);
@@ -248,7 +270,21 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("recallPreset")?.addEventListener("click", () => {
     const saved = localStorage.getItem("mixer_preset_test");
     if (saved) {
-      logTest("Preset Berhasil Dipanggil Kembali (Recalled)");
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          parsed.forEach((chData, idx) => {
+            const ch = idx + 1;
+            if (chData.fader !== undefined) updateChannelControl(ch, "fader", chData.fader);
+            if (chData.gain !== undefined) updateChannelControl(ch, "gain", chData.gain);
+            if (chData.mute !== undefined) updateChannelControl(ch, "mute", chData.mute);
+            if (chData.solo !== undefined) updateChannelControl(ch, "solo", chData.solo);
+          });
+        }
+        logTest("Preset Berhasil Dipanggil Kembali (Recalled)");
+      } catch (err) {
+        logTest("Gagal memformat data preset.");
+      }
     } else {
       logTest("Preset Tidak Ditemukan (Simpan preset terlebih dahulu)");
     }
