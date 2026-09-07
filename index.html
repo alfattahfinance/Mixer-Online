@@ -7,10 +7,10 @@
 <title>MIXER-ONLINE • Midas M32 Pro Edition</title>
 
 <!-- Pembaruan versi query (Cache-Buster) -->
-<link rel="stylesheet" href="style.css?v=20260905-PERFECT-LAYOUT">
-<link rel="stylesheet" href="channel-skin.css?v=20260905-PERFECT-LAYOUT">
-<link rel="stylesheet" href="header-system.css?v=20260905-PERFECT-LAYOUT">
-<link rel="stylesheet" href="channels-new.css?v=20260905-PERFECT-LAYOUT">
+<link rel="stylesheet" href="style.css?v=20260907-FULL-FLEX">
+<link rel="stylesheet" href="channel-skin.css?v=20260907-FULL-FLEX">
+<link rel="stylesheet" href="header-system.css?v=20260907-FULL-FLEX">
+<link rel="stylesheet" href="channels-new.css?v=20260907-FULL-FLEX">
 <link rel="manifest" href="manifest.json">
 <script>
   if ('serviceWorker' in navigator) {
@@ -96,7 +96,7 @@
     margin: 0 !important;
     padding: 0 !important;
     font-family: system-ui, -apple-system, sans-serif !important;
-    overflow-x: auto !important;
+    overflow-x: hidden !important;
   }
 
   header.topbar {
@@ -122,8 +122,8 @@
   }
 
   .scene-head {
-    position: relative !important;
-    z-index: 10 !important;
+    position: static !important;
+    transform: none !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -165,52 +165,63 @@
   }
 
   /* ==========================================================
-     3. TATA LETAK MAIN CONSOLE & DESAIN CHANNEL STRIP PRESISI
+     3. MAIN CONSOLE & DESAIN CHANNEL STRIP MENTOK KONSOL
      ========================================================== */
   main.console {
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
-    width: max-content !important;
-    min-width: 100% !important;
-    padding: 8px !important;
-    gap: 8px !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    padding: 4px !important;
+    gap: 4px !important;
     align-items: stretch !important;
   }
 
-  @media (max-width: 900px) {
-    main.console {
-      flex-wrap: wrap !important;
-      width: 100% !important;
-    }
-  }
-
+  /* BANK CHANNEL MEMANFAATKAN KELUASAN DENGAN FLEX PROPORSI */
   .channel-bank {
-    flex: 0 0 auto !important;
-    width: 480px !important;
-    min-width: 420px !important;
+    flex: 1 1 0% !important;
+    width: auto !important;
+    min-width: 0 !important;
     background: var(--strip-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 6px !important;
-    padding: 8px !important;
+    padding: 4px 2px !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
 
+  #channels, #channelsRight {
+    display: flex !important;
+    width: 100% !important;
+    height: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  /* PEMBAGIAN 7 STRIP SAMA RATA SECARA PRESISI (CH7 & CH14 UTUH) */
   .new-channel-strip, .channel-strip {
+    flex: 1 0 0% !important;
+    width: 0 !important;
+    min-width: 0 !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    padding: 4px 2px 8px 2px !important;
+    padding: 2px 1px 4px 1px !important;
     border-right: 1px dashed var(--panel-border) !important;
   }
 
-  /* INDIKATOR LED BERDIRI (VERTIKAL) TEPAT DI ATAS KNOB GAIN DSB */
+  .new-channel-strip:last-child, .channel-strip:last-child {
+    border-right: none !important;
+  }
+
+  /* INDIKATOR LED VU VERTIKAL */
   .ch-top-vu {
-    width: 6px !important;
-    height: 45px !important;
+    width: 5px !important;
+    height: 38px !important;
     background: #06090c !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 2px !important;
-    margin: 2px auto 6px auto !important;
+    margin: 2px auto 4px auto !important;
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column-reverse !important;
@@ -234,22 +245,21 @@
     margin-bottom: 2px !important;
   }
 
-  /* GRUP KONTROL GAIN - PAN */
   .ch-controls-group {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    gap: 4px !important;
+    gap: 2px !important;
     width: 100% !important;
-    margin-bottom: 4px !important;
+    margin-bottom: 2px !important;
   }
 
   .volume-label-text {
-    font-size: 8px !important;
+    font-size: 7px !important;
     font-weight: bold !important;
     color: var(--text-dim) !important;
     text-transform: uppercase !important;
-    margin: 4px 0 2px 0 !important;
+    margin: 2px 0 !important;
     text-align: center !important;
   }
 
@@ -264,25 +274,26 @@
   }
 
   .fader-area input[type="range"], .channel-fader {
-    height: 180px !important;
+    height: 175px !important;
     accent-color: var(--accent-color) !important;
   }
 
+  /* KONSOL TENGAH DENGAN LEBAR TERKUNCI STABIL */
   .center-console {
-    flex: 0 0 auto !important;
-    width: 360px !important;
-    min-width: 340px !important;
+    flex: 0 0 310px !important;
+    width: 310px !important;
+    min-width: 310px !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 8px !important;
+    gap: 4px !important;
     position: relative !important;
   }
 
-  /* MASTER RACK (DIRAPIKAN & DIPERKECIL AGAR CH14 MUAT FULL) */
+  /* MASTER RACK SLIM */
   .master-rack {
-    flex: 0 0 auto !important;
-    width: 78px !important;
-    min-width: 75px !important;
+    flex: 0 0 68px !important;
+    width: 68px !important;
+    min-width: 68px !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
@@ -290,8 +301,7 @@
     background: var(--strip-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 6px !important;
-    padding: 6px 2px !important;
-    margin-right: 2px !important;
+    padding: 4px 2px !important;
   }
 
   .meter-rack {
@@ -300,11 +310,11 @@
 
   .main-meters {
     display: flex !important;
-    gap: 4px !important;
+    gap: 3px !important;
     justify-content: center !important;
-    height: 100px !important;
+    height: 85px !important;
     background: var(--main-bg) !important;
-    padding: 3px !important;
+    padding: 2px !important;
     border-radius: 4px !important;
     border: 1px solid var(--panel-border) !important;
   }
@@ -314,7 +324,7 @@
     flex-direction: column !important;
     align-items: center !important;
     height: 100% !important;
-    width: 8px !important;
+    width: 6px !important;
   }
 
   .meter-bar-bg {
@@ -336,10 +346,10 @@
   }
 
   .meter-label {
-    font-size: 8px !important;
+    font-size: 7px !important;
     font-weight: bold !important;
     color: var(--accent-color) !important;
-    margin-top: 2px !important;
+    margin-top: 1px !important;
   }
 
   .master-card {
@@ -347,18 +357,18 @@
     flex-direction: column !important;
     align-items: center !important;
     width: 100% !important;
-    margin: 6px 0 !important;
+    margin: 4px 0 !important;
   }
 
   .master-card h2 {
-    font-size: 9px !important;
-    margin: 0 0 4px 0 !important;
+    font-size: 8px !important;
+    margin: 0 0 2px 0 !important;
     color: #e74c3c !important;
   }
 
   .master-card input[type="range"] {
-    height: 150px !important;
-    width: 10px !important;
+    height: 135px !important;
+    width: 8px !important;
     accent-color: #00e5ff !important;
   }
 
@@ -366,25 +376,25 @@
     font-size: 8px !important;
     font-weight: bold !important;
     color: var(--accent-color) !important;
-    margin-top: 4px !important;
+    margin-top: 2px !important;
   }
 
   .monitor-card, .phones-card {
-    font-size: 7px !important;
+    font-size: 6.5px !important;
     text-align: center !important;
     width: 100% !important;
-    padding: 2px 0 !important;
+    padding: 1px 0 !important;
   }
 
   /* ==========================================================
-     4. NAVIGATION BAR SCREEN M32 (SEBARIS PRESISI)
+     4. NAVIGATION BAR SCREEN M32
      ========================================================== */
   .screen-frame {
     display: flex !important;
     flex-direction: column !important;
     border: 2px solid var(--panel-border) !important;
     border-radius: 6px !important;
-    padding: 6px !important;
+    padding: 4px !important;
     background: var(--panel-bg) !important;
     width: 100% !important;
   }
@@ -398,8 +408,8 @@
   }
 
   .screen-tabs button {
-    font-size: 7.5px !important;
-    padding: 5px 0 !important;
+    font-size: 7px !important;
+    padding: 4px 0 !important;
     text-align: center !important;
     text-transform: uppercase !important;
     border-radius: 3px !important;
@@ -419,12 +429,12 @@
     grid-template-columns: repeat(6, 1fr) !important;
     gap: 2px !important;
     width: 100% !important;
-    margin-bottom: 6px !important;
+    margin-bottom: 4px !important;
   }
 
   .m32-sub-btn {
-    font-size: 7.5px !important;
-    padding: 5px 0 !important;
+    font-size: 7px !important;
+    padding: 4px 0 !important;
     text-align: center !important;
     text-transform: uppercase !important;
     border-radius: 3px !important;
@@ -442,10 +452,10 @@
   .midas-tft-screen {
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
-    padding: 6px !important;
+    padding: 4px !important;
     display: flex !important;
     flex-direction: column !important;
-    min-height: 220px !important;
+    min-height: 210px !important;
     background: var(--panel-bg) !important;
   }
 
@@ -473,18 +483,18 @@
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-end !important;
-    min-height: 110px !important;
+    min-height: 100px !important;
     background: var(--main-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
-    padding: 6px !important;
-    margin-top: 6px !important;
+    padding: 4px !important;
+    margin-top: 4px !important;
   }
 
   .spectrum-bars-container {
     display: flex !important;
-    gap: 3px !important;
-    height: 90px !important;
+    gap: 2px !important;
+    height: 80px !important;
     align-items: flex-end !important;
   }
 
@@ -515,7 +525,7 @@
     display: grid !important;
     grid-template-columns: repeat(6, 1fr) !important;
     gap: 2px !important;
-    margin-top: 6px !important;
+    margin-top: 4px !important;
   }
 
   .m-encoder {
@@ -523,7 +533,7 @@
     text-align: center !important;
     background: var(--main-bg) !important;
     border: 1px solid var(--panel-border) !important;
-    padding: 3px 0 !important;
+    padding: 2px 0 !important;
     color: var(--accent-color) !important;
     border-radius: 2px !important;
   }
@@ -547,13 +557,13 @@
     background: var(--panel-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 6px !important;
-    padding: 6px !important;
+    padding: 4px !important;
   }
 
   .center-console .aux-rack {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
-    gap: 6px !important;
+    gap: 4px !important;
   }
 
   .aux-unit {
@@ -1251,7 +1261,7 @@
     if (msg) msg.textContent = "⚡ Preset M32 Scene Recalled!";
   });
 
-  // METODE UNTUK SINKRONISASI DATA LAYAR M32 & CHANNEL
+  // METODE SINKRONISASI DATA LAYAR M32 & CHANNEL
   function selectScreenChannel(id) {
     const c = window.state?.channels?.[id - 1];
     const set = (elemId, v) => { const e = document.getElementById(elemId); if (e) e.textContent = v; };
@@ -1280,7 +1290,7 @@
   }
   window.selectScreenChannel = selectScreenChannel;
 
-  // SINKRONISASI REALTIME ANGKA/TEKS FADER DAN KONTROL CHANNEL + HAPTIC FEEDBACK
+  // SINKRONISASI REALTIME FADER DAN KONTROL CHANNEL + HAPTIC FEEDBACK
   document.addEventListener('input', function(e) {
     if (e.target.matches('input[type="range"]')) {
       if (window.AndroidFeedback && typeof window.AndroidFeedback.triggerHaptic === 'function') {
@@ -1321,7 +1331,7 @@
     }
   });
 
-  // Pemicu Getar Haptic saat tombol diklik
+  // Haptic Feedback Klik Button
   document.addEventListener('click', function(e) {
     if (e.target.tagName === 'BUTTON') {
       if (window.AndroidFeedback && typeof window.AndroidFeedback.triggerHaptic === 'function') {
@@ -1985,7 +1995,7 @@
 
 <script>
 // ==========================================================================
-// KODE HANDLER CONNECTION / TEST SUITE (UPDATE SLIDER HORIZONTAL PRESISI)
+// KODE HANDLER CONNECTION / TEST SUITE
 // ==========================================================================
 (function() {
   "use strict";
@@ -1999,7 +2009,6 @@
     if (strip && window.state?.channels?.[chNum - 1]) {
       const ch = window.state.channels[chNum - 1];
       
-      // Helper untuk Update Nilai Input Slider Horizontal (Tanpa Memutar Elemen)
       const updateKnobElement = (selector, val, minVal = 0, maxVal = 100) => {
         const input = strip.querySelector(selector);
         if (input) {
@@ -2015,7 +2024,6 @@
         }
       };
 
-      // 1. Update Fader Slider + Label
       const faderInput = strip.querySelector('input.channel-fader, input[data-k="fader"], input[data-param="fader"]');
       if (faderInput) {
         faderInput.value = ch.fader;
@@ -2025,40 +2033,34 @@
       const faderOut = strip.querySelector('output, .fader-val');
       if (faderOut) faderOut.textContent = Math.round(ch.fader) + '%';
 
-      // 2. Update Knob Gain
       updateKnobElement('input[data-k="gain"], input[data-param="gain"], input.gain-knob, .knob[data-param="gain"]', ch.gain, 0, 2);
       const gainOut = strip.querySelector('.gain-val, output[data-k="gain"]');
       if (gainOut) gainOut.textContent = Number(ch.gain).toFixed(2);
 
-      // 3. Update Knob Pan
       updateKnobElement('input[data-k="pan"], input[data-param="pan"], input.pan-knob, .knob[data-param="pan"]', ch.pan, -1, 1);
       const panOut = strip.querySelector('.pan-val, output[data-k="pan"]');
       if (panOut) {
         panOut.textContent = ch.pan == 0 ? 'CENTER' : (ch.pan < 0 ? 'L' + Math.abs(Math.round(ch.pan * 100)) : 'R' + Math.round(ch.pan * 100));
       }
 
-      // 4. Update Knob EQ Low
       if (ch.low !== undefined) {
         updateKnobElement('input[data-k="low"], input[data-param="low"], input.low-knob, .knob[data-param="low"]', ch.low, 0, 100);
         const lowOut = strip.querySelector('.low-val, output[data-k="low"]');
         if (lowOut) lowOut.textContent = Math.round(ch.low);
       }
 
-      // 5. Update Knob EQ Mid
       if (ch.mid !== undefined) {
         updateKnobElement('input[data-k="mid"], input[data-param="mid"], input.mid-knob, .knob[data-param="mid"]', ch.mid, 0, 100);
         const midOut = strip.querySelector('.mid-val, output[data-k="mid"]');
         if (midOut) midOut.textContent = Math.round(ch.mid);
       }
 
-      // 6. Update Knob EQ High
       if (ch.high !== undefined) {
         updateKnobElement('input[data-k="high"], input[data-param="high"], input.high-knob, .knob[data-param="high"]', ch.high, 0, 100);
         const highOut = strip.querySelector('.high-val, output[data-k="high"]');
         if (highOut) highOut.textContent = Math.round(ch.high);
       }
 
-      // 7. Update Mute Button
       const muteBtn = strip.querySelector('button[data-k="mute"], button.mute-btn');
       if (muteBtn) {
         muteBtn.classList.toggle('active', !!ch.mute);
@@ -2066,7 +2068,6 @@
         muteBtn.textContent = ch.mute ? 'UNMUTE' : 'MUTE';
       }
 
-      // 8. Update Solo Button
       const soloBtn = strip.querySelector('button[data-k="solo"], button.solo-btn');
       if (soloBtn) {
         soloBtn.classList.toggle('active', !!ch.solo);
@@ -2076,7 +2077,6 @@
     }
   }
 
-  // 1. RUN COMBINATION CONTROL TEST
   document.getElementById('runCombinationTest')?.addEventListener('click', function() {
     if (!window.state) window.state = { channels: [] };
     if (!window.state.channels) window.state.channels = [];
@@ -2095,10 +2095,9 @@
     }
 
     const tr = document.getElementById('testResult');
-    if (tr) tr.textContent = `TEST: COMBINATION CONTROL SUCCESSFUL (Fader, Gain, Pan, EQ CH1-14 Updated)`;
+    if (tr) tr.textContent = `TEST: COMBINATION CONTROL SUCCESSFUL`;
   });
 
-  // 2. RUN FADER CH1–CH14 TEST
   document.getElementById('runFaderTest')?.addEventListener('click', function() {
     if (!window.state) window.state = { channels: [] };
     if (!window.state.channels) window.state.channels = [];
@@ -2113,7 +2112,6 @@
     if (tr) tr.textContent = `TEST: FADER CH1–CH14 TEST PASSED`;
   });
 
-  // 3. RUN MUTE/SOLO TEST
   document.getElementById('runMuteSoloTest')?.addEventListener('click', function() {
     if (!window.state) window.state = { channels: [] };
     if (!window.state.channels) window.state.channels = [];
@@ -2129,7 +2127,6 @@
     if (tr) tr.textContent = `TEST: MUTE & SOLO TEST COMPLETED`;
   });
 
-  // 4. HANDLER MASTER ISOLATION TEST
   document.getElementById('runMasterIsolationTest')?.addEventListener('click', function() {
     const masterElem = document.getElementById('master');
     const masterValElem = document.getElementById('masterVal');
@@ -2147,10 +2144,9 @@
     }
 
     const tr = document.getElementById('testResult');
-    if (tr) tr.textContent = `TEST: MASTER ISOLATION TEST PASSED (Master Set To: ${randomMasterVal}%)`;
+    if (tr) tr.textContent = `TEST: MASTER ISOLATION TEST PASSED`;
   });
 
-  // 5. SIMULATE HARDWARE RX
   document.getElementById('simulateRx')?.addEventListener('click', function() {
     if (!window.state) window.state = { channels: [] };
     if (!window.state.channels) window.state.channels = [];
