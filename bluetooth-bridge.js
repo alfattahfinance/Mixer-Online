@@ -1,97 +1,219 @@
 /* ==========================================================================
-   WEB BLUETOOTH CONTROLLER FOR MIXER-ONLINE
+   WEB BLUETOOTH CONTROLLER FOR MIXER-ONLINE (FINAL PRO EDITION)
    ========================================================================== */
 (function () {
   "use strict";
 
   let bluetoothDevice = null;
-  let btCharacteristic = null;
+  let btWriteChar = null;
+  let btNotifyChar = null;
+  let rxBuffer = "";
 
-  // UUID standar untuk modul Serial Bluetooth (seperti HC-05 atau ESP32 SPP Service)
-  const SERVICE_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb";
-  const CHARACTERISTIC_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
+  // UUID Service & Characteristic (HM-10 / CC2541 & Nordic UART Service untuk ESP32)
+  const BLE_CONFIG = {
+    HM_SERVICE: "0000ffe0-0000-1000-8000-00805f9b34fb",
+    HM_CHAR: "0000ffe1-0000-1000-8000-00805f9b34fb",
+    UART_SERVICE: "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
+    UART_RX: "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
+    UART_TX: "6e400003-b5a3-f393-e0a9-e50e24dcca9e"
+  };
 
   async function connectBluetoothMixer() {
+    if (!navigator.bluetooth) {
+      alert("Browser tidak mendukung Web Bluetooth API. Gunakan Chrome, Edge, atau Browser Android yang mendukung.");
+      return { ok: false, reason: "web-bluetooth-unsupported" };
+    }
+
     try {
-      console.log("Mencari perangkat Bluetooth...");
+      console.log("[BT] Membuka dialog pemindaian Bluetooth...");
       
-      // Membuka dialog pemindaian Bluetooth di browser (Chrome/Edge)
       bluetoothDevice = await navigator.bluetooth.requestDevice({
         acceptAllDevices: true,
-        optionalServices: [SERVICE_UUID]
+        optionalServices: [BLE_CONFIG.HM_SERVICE, BLE_CONFIG.UART_SERVICE]
       });
 
-      console.log("Menghubungkan ke:", bluetoothDevice.name);
-      const server = await bluetoothDevice.gatt.connect();
+      console.log("[BT] Menghubungkan ke:", bluetoothDevice.name || "Perangkat Bluetooth");
       
-      const service = await server.getPrimaryService(SERVICE_UUID);
-      btCharacteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
+      bluetoothDevice.addEventListener('gattserverdisconnected', handleDisconnect);
 
-      console.log("Koneksi Bluetooth Berhasil!");
+      const server = await bluetoothDevice.gatt.connect();
+      let service = null;
 
-      // Update state global aplikasi web
+      // Cari Service HM-10 atau UART Service
+      try {
+        service = await server.getPrimaryService(BLE_CONFIG.HM_SERVICE);
+      } catch (e) {
+        try {
+          service = await server.getPrimaryService(BLE_CONFIG.UART_SERVICE);
+        } catch (err) {}
+      }
+
+      if (!service) {
+        // Dynamic Fallback Search Service
+        const services = await server.getPrimaryServices();
+        if (services.length > 0) service = services[0];
+      }
+
+      if (!service) throw new Error("Service GATT Bluetooth tidak ditemukan.");
+
+      // Cari Characteristic Write & Notify
+      const characteristics = await service.getCharacteristics();
+      for (const char of characteristics) {
+        if (char.properties.write || char.properties.writeWithoutResponse) {
+          btWriteChar = char;
+        }
+        if (char.properties.notify) {
+          btNotifyChar = char;
+        }
+      }
+
+      if (!btWriteChar) {
+        throw new Error("Characteristic WRITE tidak ditemukan pada modul Bluetooth ini.");
+      }
+
+      console.log("[BT] Koneksi Bluetooth Berhasil!");
+
+      // Dengarkan Data Masuk (Feedback)
+      if (btNotifyChar) {
+        await btNotifyChar.startNotifications();
+        btNotifyChar.addEventListener('characteristicvaluechanged', handleIncomingData);
+      }
+
+      // Sync State Global Aplikasi
       if (!window.state) window.state = {};
       window.state.connected = true;
-      
+      window.state.bluetoothConnected = true;
+
+      if (window.MixerAdapters && typeof window.MixerAdapters.connectBluetooth === "function") {
+        await window.MixerAdapters.connectBluetooth();
+      }
+
       if (typeof window.refreshHeaderStatus === "function") {
         window.refreshHeaderStatus();
       }
 
-      // Mendengarkan data masuk dari ESP32 (jika ada feedback)
-      await btCharacteristic.startNotifications();
-      btCharacteristic.addEventListener('characteristicvaluechanged', handleIncomingData);
+      updateUIState(true);
+      return { ok: true, name: bluetoothDevice.name };
 
     } catch (err) {
-      console.error("Gagal terhubung via Bluetooth:", err);
+      console.error("[BT Error]:", err);
+      updateUIState(false);
       alert("Koneksi Bluetooth gagal: " + err.message);
+      return { ok: false, reason: err.message };
     }
   }
 
-  // Fungsi untuk mengirim perintah kontrol ke hardware via Bluetooth
+  // Fungsi Kirim Perintah
   async function sendBluetoothCommand(payload) {
-    if (!btCharacteristic) {
-      console.warn("Bluetooth belum terhubung!");
-      return;
+    if (!btWriteChar || !bluetoothDevice?.gatt?.connected) {
+      console.warn("[BT] Bluetooth belum terhubung!");
+      return { ok: false, reason: "disconnected" };
     }
 
     try {
-      const jsonString = JSON.stringify(payload) + "\n";
+      const jsonString = typeof payload === "string" ? payload + "\n" : JSON.stringify(payload) + "\n";
       const encoder = new TextEncoder();
-      await btCharacteristic.writeValue(encoder.encode(jsonString));
+      const data = encoder.encode(jsonString);
+
+      if (btWriteChar.writeValueWithoutResponse) {
+        await btWriteChar.writeValueWithoutResponse(data);
+      } else {
+        await btWriteChar.writeValue(data);
+      }
+
+      return { ok: true };
     } catch (err) {
-      console.error("Gagal mengirim data Bluetooth:", err);
+      console.error("[BT Tx Error]:", err);
+      return { ok: false, reason: err.message };
     }
   }
 
-  // Menerima data umpan balik (feedback/ACK) dari hardware
+  // Menerima Data Chunks & Buffer Parsing
   function handleIncomingData(event) {
     const value = event.target.value;
     const decoder = new TextDecoder();
-    const rxString = decoder.decode(value);
+    const chunk = decoder.decode(value);
     
-    try {
-      const data = JSON.parse(rxString.trim());
-      console.log("[BT-ACK Received]:", data);
-    } catch (e) {
-      // Mengabaikan baris teks mentah non-json
+    rxBuffer += chunk;
+    const lines = rxBuffer.split(/\r?\n/);
+    rxBuffer = lines.pop() || ""; // Simpan sisa string potongan terakhir
+
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      try {
+        const data = JSON.parse(line.trim());
+        console.log("[BT Rx Received]:", data);
+
+        // Pancarkan Event ke Aplikasi
+        document.dispatchEvent(new CustomEvent("mixer:bluetooth-rx", { detail: data }));
+      } catch (e) {
+        console.log("[BT Raw Text]:", line);
+      }
     }
   }
 
-  // Ekspor fungsi agar bisa dipicu dari tombol di UI web
+  // Handling Disconnect
+  function handleDisconnect() {
+    console.warn("[BT] Disconnected dari Perangkat.");
+    btWriteChar = null;
+    btNotifyChar = null;
+    rxBuffer = "";
+
+    if (window.state) {
+      window.state.connected = false;
+      window.state.bluetoothConnected = false;
+    }
+
+    if (typeof window.refreshHeaderStatus === "function") {
+      window.refreshHeaderStatus();
+    }
+
+    updateUIState(false);
+  }
+
+  function disconnectBluetooth() {
+    if (bluetoothDevice && bluetoothDevice.gatt.connected) {
+      bluetoothDevice.gatt.disconnect();
+    }
+    handleDisconnect();
+  }
+
+  // Sync UI Status Bluetooth
+  function updateUIState(isConnected) {
+    const btn = document.getElementById("connectBluetooth") || document.getElementById("btnBluetoothConnect");
+    if (btn) {
+      btn.textContent = isConnected ? "BLUETOOTH CONNECTED" : "CONNECT BLUETOOTH";
+      btn.classList.toggle("on", isConnected);
+      btn.classList.toggle("active", isConnected);
+    }
+
+    const statusElem = document.getElementById("headerBridgeStatus") || document.getElementById("status");
+    if (statusElem && isConnected) {
+      statusElem.textContent = "BLUETOOTH ONLINE";
+    }
+  }
+
+  // Ekspor API
   window.MixerBluetooth = {
     connect: connectBluetoothMixer,
-    send: sendBluetoothCommand
+    disconnect: disconnectBluetooth,
+    send: sendBluetoothCommand,
+    isConnected: () => !!(bluetoothDevice && bluetoothDevice.gatt.connected)
   };
 
-  // Auto-bind ke tombol dengan ID #btnBluetoothConnect jika ada di HTML
+  // Auto-bind Event Listener
   document.addEventListener("DOMContentLoaded", () => {
-    const btn = document.getElementById("btnBluetoothConnect");
-    if (btn) {
-      btn.addEventListener("click", (e) => {
+    const btButtons = document.querySelectorAll("#connectBluetooth, #btnBluetoothConnect");
+    btButtons.forEach(btn => {
+      btn.addEventListener("click", async (e) => {
         e.preventDefault();
-        connectBluetoothMixer();
+        if (window.MixerBluetooth.isConnected()) {
+          disconnectBluetooth();
+        } else {
+          await connectBluetoothMixer();
+        }
       });
-    }
+    });
   });
 
 })();
