@@ -642,33 +642,35 @@
   }
 
   /* ==========================================================
-   FIX KHUSUS MODE LANDSCAPE (MENUTUP CELAH MERAH SEPENUHNYA)
+   FIX PERSIS UNTUK LANDSCAPE (MENUTUP CELAH BAWAH TOTAL)
    ========================================================== */
 @media screen and (orientation: landscape) {
-  /* 1. Paksa container bank channel mengisi tinggi 100% penuh */
+  /* 1. Paksa bank channel kiri dan kanan mengikuti tinggi konsol tengah */
   .channel-bank {
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
     height: 100% !important;
-    padding-bottom: 4px !important;
+    padding-bottom: 0px !important;
+    margin-bottom: 0px !important;
   }
 
-  /* 2. Paksa grid channel dan setiap strip channel memanjang ke bawah */
   #channels, #channelsRight {
-    height: 100% !important;
     display: grid !important;
+    grid-template-columns: repeat(6, 1fr) 1.25fr !important;
+    height: 100% !important;
     align-items: stretch !important;
   }
 
   .new-channel-strip, .channel-strip {
-    height: 100% !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
+    height: 100% !important;
+    padding-bottom: 2px !important;
   }
 
-  /* 3. Dorong area fader agar mengisi penuh sisa celah kosong */
+  /* 2. Isi sisa celah kosong secara dinamis */
   .fader-area {
     display: flex !important;
     flex-direction: column !important;
@@ -676,13 +678,14 @@
     flex-grow: 1 !important;
     width: 100% !important;
     margin-top: auto !important;
+    padding-bottom: 0px !important;
   }
 
-  /* 4. Naikkan tinggi fader agar tombol MUTE & SOLO terdorong mentok rata bawah sejajar AUX */
+  /* 3. Tingkatkan tinggi fader agar mendorong tombol MUTE/SOLO mentok ke garis bawah AUX */
   .fader-area input[type="range"], 
   .channel-fader, 
   .new-channel-strip input[type="range"].new-fader {
-    height: 250px !important; /* Ditingkatkan dari 195px/220px ke 250px untuk menutup celah */
+    height: 295px !important; /* Ditingkatkan dari 250px ke 295px */
   }
 }
 
