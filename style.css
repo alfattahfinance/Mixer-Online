@@ -12,6 +12,7 @@ main.console {
   gap: 6px !important;
   width: 100% !important;
   max-width: 100% !important;
+  padding: 4px 4px 0px 4px !important;
   box-sizing: border-box !important;
   float: none !important;
   clear: both !important;
@@ -36,6 +37,8 @@ main.console > * {
 /* PENETAPAN AREA MASING-MASING ELEMEN */
 main.console > .channel-bank-left {
   grid-area: ch-left !important;
+  height: 100% !important;
+  margin-bottom: 0 !important;
 }
 
 main.console > .center-console {
@@ -44,6 +47,8 @@ main.console > .center-console {
 
 main.console > .channel-bank-right {
   grid-area: ch-right !important;
+  height: 100% !important;
+  margin-bottom: 0 !important;
 }
 
 main.console > .master-rack {
@@ -69,7 +74,7 @@ main.console > .aux-rack {
     overflow-x: auto !important;
     width: max-content !important;
     min-width: 100% !important;
-    padding-bottom: 8px !important;
+    padding-bottom: 0px !important;
   }
 
   main.console > .channel-bank-left,
@@ -91,21 +96,25 @@ main.console > .aux-rack {
    ========================================================================== */
 .new-channel-strip,
 .channel-strip {
+  position: relative !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: space-between !important;
   background: var(--strip-bg, #121619) !important;
   border: 1px solid var(--panel-border, #2a323d) !important;
-  border-radius: 6px !important;
-  padding: 6px 3px !important;
+  border-radius: 6px 6px 0 0 !important;
+  padding: 6px 3px 0px 3px !important; /* Bottom padding 0 agar pas menempel di dasar */
   box-sizing: border-box !important;
   width: 100% !important;
   height: 100% !important;
+  margin-bottom: 0 !important;
 }
 
 /* 1. Lampu Bulat LED Top */
 .channel-led {
+  position: relative !important;
+  z-index: 2 !important;
   width: 10px !important;
   height: 10px !important;
   border-radius: 50% !important;
@@ -130,15 +139,20 @@ main.console > .aux-rack {
   box-shadow: 0 0 8px #ff3b30, inset 0 1px 2px rgba(255, 255, 255, 0.7) !important;
 }
 
-/* 2. Indikator Sinyal Berdiri (Vertikal) di Atas Knob Gain */
+/* 2. Indikator Sinyal Berdiri (Vertikal) di Belakang/Samping Area Knob */
 .channel-meter-vertical,
-.ch-top-vu {
+.ch-top-vu,
+.ch-long-vu {
+  position: absolute !important;
+  z-index: 1 !important; /* Berada di belakang knob agar interaksi bebas */
+  pointer-events: none !important;
   width: 6px !important;
-  height: 42px !important;
+  top: 24px !important;
+  bottom: 250px !important; /* Panjang menjangkau sejajar area knob */
   background: #080a0c !important;
   border: 1px solid var(--panel-border, #1c232b) !important;
   border-radius: 2px !important;
-  margin: 2px auto 6px auto !important;
+  margin: 0 auto !important;
   display: flex !important;
   flex-direction: column-reverse !important;
   overflow: hidden !important;
@@ -146,54 +160,67 @@ main.console > .aux-rack {
 }
 
 .channel-meter-bar,
-.ch-top-vu-fill {
+.ch-top-vu-fill,
+.ch-long-vu-fill {
   width: 100% !important;
-  height: 0%; /* Dinamis diatur JS */
+  height: 0%; /* Dinamis diatur via JS */
   background: linear-gradient(to top, #31e66b 65%, #ffd21c 85%, #ff3b30 100%) !important;
   transition: height 0.05s ease-out !important;
 }
 
-/* 3. Grup Knob Gain - Pan (Diposisikan di Atas Text Volume) */
+/* 3. Grup Knob Gain - Pan (Diposisikan Diturunkan Sedikit) */
 .knobs-container,
 .gain-pan-group,
 .ch-controls-group {
+  position: relative !important;
+  z-index: 2 !important; /* Memastikan Knob selalu di atas VU meter & bisa digeser */
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
-  gap: 4px !important;
+  gap: 6px !important;
   width: 100% !important;
+  margin-top: 8px !important; /* Menurunkan seluruh knob agar rapi */
   margin-bottom: 4px !important;
 }
 
 .new-channel-strip input[type="range"].new-knob,
-.channel-strip input[type="range"] {
+.channel-strip input[type="range"],
+.knobs-container input[type="range"] {
+  position: relative !important;
+  z-index: 3 !important;
   touch-action: none !important;
   cursor: pointer !important;
 }
 
-/* 4. Label Volume Tepat di Bawah Gain-Pan & di Atas Fader */
+/* 4. Label Volume Tepat di Bawah Gain-Pan & Diturunkan Sedikit di Atas Fader */
 .volume-label,
 .channel-vol-text,
 .volume-label-text {
+  position: relative !important;
+  z-index: 2 !important;
   font-size: 8px !important;
   font-weight: bold !important;
   color: var(--text-dim, #8b949e) !important;
   text-transform: uppercase !important;
   letter-spacing: 0.5px !important;
-  margin: 4px 0 2px 0 !important;
+  margin: 8px 0 2px 0 !important; /* Posisi teks diturunkan */
   text-align: center !important;
   user-select: none !important;
 }
 
-/* 5. Slider Fader Vertikal (Cross-Browser Fix) */
+/* 5. Slider Fader Vertikal (Ditata Pas Sampai Baris Bawah) */
 .fader-area {
+  position: relative !important;
+  z-index: 2 !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: flex-end !important;
   flex-grow: 1 !important;
   width: 100% !important;
-  padding-bottom: 2px !important;
+  padding-bottom: 0px !important;
+  margin-bottom: 0px !important;
+  margin-top: auto !important;
 }
 
 .new-channel-strip input[type="range"].new-fader,
@@ -205,7 +232,7 @@ main.console > .aux-rack {
   appearance: slider-vertical !important;
   writing-mode: bt-lr !important; /* WebKit/Legacy Fallback */
   width: 18px !important;
-  height: 180px !important;
+  height: 230px !important; /* Menutup celah bawah secara presisi */
   background: #080a0b !important;
   outline: none !important;
   cursor: pointer !important;
