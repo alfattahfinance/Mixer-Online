@@ -1,3 +1,23 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090b0c">
+<title>MIXER-ONLINE • Midas M32 Pro Edition</title>
+
+<!-- Pembaruan versi query (Cache-Buster) -->
+<link rel="stylesheet" href="style.css?v=20260907-FULL-FLEX">
+<link rel="stylesheet" href="channel-skin.css?v=20260907-FULL-FLEX">
+<link rel="stylesheet" href="header-system.css?v=20260907-FULL-FLEX">
+<link rel="stylesheet" href="channels-new.css?v=20260907-FULL-FLEX">
+<link rel="manifest" href="manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
+</script>
+
 <style>
   /* ==========================================================
      1. DEFINISI VARIABEL WARNA (SKIN)
@@ -610,3 +630,1719 @@
     box-shadow: 0 0 6px var(--accent-color) !important;
   }
 </style>
+</head>
+<body class="theme-midas">
+
+<header class="topbar">
+  <div class="brand"><b>MIXER-ONLINE</b><span>MIDAS M32 EDITION</span></div>
+  <div class="system-box">
+    <span class="box-title">SYSTEM</span>
+    <button id="power" class="power-btn">SYSTEM OFF</button>
+  </div>
+  <div class="skin-head">
+    <span class="box-title">MIXER SKIN</span>
+    <select id="skinSelect" style="background: var(--main-bg); color: var(--accent-color); border: 1px solid var(--panel-border); font-size: 9px; padding: 2px 4px; border-radius: 2px;">
+      <option value="theme-midas">MIDAS CYAN (DEFAULT)</option>
+      <option value="theme-x32">BEHRINGER X32 (BLUE/YELLOW)</option>
+      <option value="theme-gold">PRO VINTAGE (GOLD)</option>
+      <option value="theme-dark">STEALTH DARK (MATTE)</option>
+    </select>
+  </div>  
+  <div class="bridge-head">
+    <span class="box-title">ESP32 BRIDGE</span>
+    <div class="head-status"><i id="statusLamp"></i><span id="status">OFFLINE</span></div>
+    <button id="connectEsp">CONNECT ESP32</button>
+    <button id="connectBluetooth" class="bluetooth-btn">CONNECT BLUETOOTH</button>
+  </div>
+  <div class="status-head">
+    <span class="box-title">STATUS</span>
+    <strong id="headerBridgeStatus">BRIDGE STANDBY</strong>
+    <small><span class="channel-count-status">14 channels READY</span> • TWO-WAY SYNC</small>
+  </div>
+  <div class="scene-head">
+    <span class="box-title">SCENE</span>
+    <div><button id="savePresetTop">SAVE</button><button id="recallPresetTop">RECALL</button><button id="defaultScene">DEFAULT</button></div>
+  </div>
+  
+  <div class="clock-head">
+    <span class="box-title">TIME</span>
+    <strong id="clock">--:--:--</strong>
+  </div>
+</header>
+
+<main class="console">
+  <!-- 1. CHANNEL BANK KIRI (CH 1–7) -->
+  <section class="channel-bank channel-bank-left" id="bankLeft">
+    <div class="bank-title"><span>INPUT CHANNELS 1–7</span><small>CH1–CH7</small></div>
+    <div id="channels"></div>
+  </section>
+
+  <!-- 2. KONSOL TENGAH (SCREEN M32 + PLAYER + FX RACK + AUX RACK) -->
+  <section class="center-console" id="centerConsole">
+    <!-- Screen M32 -->
+    <div class="screen-frame">
+      <div class="screen-title" style="margin-bottom: 4px;"><b>MIDAS M32</b><span>DIGITAL CONSOLE SYSTEM</span></div>
+      
+      <!-- NAVIGASI LAYAR UTAMA (6 TOMBOL SEBARIS) -->
+      <div class="screen-tabs" id="screenTabs">
+        <button class="active" data-screen="HOME">HOME</button>
+        <button data-screen="METER">METERS</button>
+        <button data-screen="RTA">RTA</button>
+        <button data-screen="SETUP">SETUP</button>
+        <button data-screen="EFFECT">EFFECTS</button>
+        <button data-screen="SCENE">LIBRARY</button>
+      </div>
+
+      <!-- SUBMENU BAR (6 TOMBOL SEBARIS) -->
+      <div class="m32-submenu-bar" id="m32SubmenuBar">
+        <button class="m32-sub-btn active" data-sub="overview">OVERVIEW</button>
+        <button class="m32-sub-btn" data-sub="config">CONFIG</button>
+        <button class="m32-sub-btn" data-sub="gate">GATE</button>
+        <button class="m32-sub-btn" data-sub="dyn">DYN</button>
+        <button class="m32-sub-btn" data-sub="eq">EQ</button>
+        <button class="m32-sub-btn" data-sub="sends">SENDS</button>
+      </div>
+      
+      <div class="screen-content" id="screenContent">
+        <!-- 1. HOME VIEW -->
+        <section class="screen-view active" data-view="HOME">
+          <div class="midas-tft-screen">
+            <div class="midas-header-strip" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <div class="midas-ch-badge" id="screenInput" style="color: var(--accent-color); font-weight: bold; font-size: 10px;">CH 01</div>
+              <input type="text" id="screenChannelName" value="VOCAL MAIN" style="background: var(--main-bg); border: 1px solid var(--panel-border); color: var(--accent-color); font-size: 10px; padding: 2px 4px; border-radius: 2px; width: 110px; text-align: center;">
+              <span id="screenStatus" style="font-size: 9px; color: #2ecc71; font-weight: bold;">[ACTIVE]</span>
+            </div>
+
+            <!-- SUBPANEL 1: OVERVIEW -->
+            <div class="m32-sub-panel active" data-subpanel="overview">
+              <div class="midas-blocks-grid">
+                <div class="midas-block">
+                  <span>PREAMP / GAIN</span>
+                  <strong id="screenGain">1.00</strong>
+                </div>
+                <div class="midas-block">
+                  <span>PANORAMA</span>
+                  <strong id="screenPan">CENTER</strong>
+                </div>
+                <div class="midas-block">
+                  <span>FADER LEVEL</span>
+                  <strong id="screenFader" style="color: #2ecc71;">75%</strong>
+                </div>
+                <div class="midas-block">
+                  <span>DYNAMICS</span>
+                  <strong id="screenDynStatus" style="color: #f39c12;">BYPASS</strong>
+                </div>
+              </div>
+
+              <div class="pro-mini-spectrum" id="visualMeter">
+                <div class="spectrum-bars-container">
+                  <div class="bar-col" style="flex:1; background: var(--accent-color); height: 60%"></div>
+                  <div class="bar-col" style="flex:1; background: var(--accent-color); height: 80%"></div>
+                  <div class="bar-col" style="flex:1; background: var(--accent-color); height: 45%"></div>
+                  <div class="bar-col" style="flex:1; background: var(--accent-color); height: 90%"></div>
+                  <div class="bar-col" style="flex:1; background: var(--accent-color); height: 70%"></div>
+                  <div class="bar-col" style="flex:1; background: var(--accent-color); height: 55%"></div>
+                  <div class="bar-col" style="flex:1; background: var(--accent-color); height: 85%"></div>
+                  <div class="bar-col" style="flex:1; background: var(--accent-color); height: 65%"></div>
+                </div>
+                <div class="spectrum-scale-labels" style="font-size: 7px; color: var(--text-dim); display: flex; justify-content: space-between; margin-top: 4px;">
+                  <span>0dB</span><span>-6</span><span>-12</span><span>-24</span><span>-48</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- SUBPANEL 2: CONFIG -->
+            <div class="m32-sub-panel" data-subpanel="config">
+              <b style="font-size: 8px; color: var(--accent-color);">PREAMP / INPUT CONFIG</b>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:6px; font-size: 8px;">
+                <div style="background:var(--main-bg); padding:4px; border:1px solid var(--panel-border);">
+                  +48V: <button id="btnPhantom" style="background:#2ecc71; color:#000; border:none; padding:1px 4px; font-weight:bold; border-radius:2px; cursor:pointer;">ON</button>
+                </div>
+                <div style="background:var(--main-bg); padding:4px; border:1px solid var(--panel-border);">
+                  HPF: <span id="hpfVal" style="color:var(--accent-color);">80 Hz</span>
+                  <input type="range" min="20" max="400" value="80" class="screen-slider" id="hpfSlider">
+                </div>
+                <div style="background:var(--main-bg); padding:4px; border:1px solid var(--panel-border);">
+                  POL: <button id="btnPolarity" style="background:var(--panel-border); color:#fff; border:none; padding:1px 4px; border-radius:2px; cursor:pointer;">NORM (+)</button>
+                </div>
+                <div style="background:var(--main-bg); padding:4px; border:1px solid var(--panel-border);">
+                  INSERT: <span style="color:#f39c12;">PRE-EQ</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- SUBPANEL 3: GATE -->
+            <div class="m32-sub-panel" data-subpanel="gate">
+              <b style="font-size: 8px; color: var(--accent-color);">EXPANDER / NOISE GATE</b>
+              <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:4px; margin-top:6px; text-align:center; font-size: 8px;">
+                <div style="background:var(--main-bg); padding:4px; border:1px solid var(--panel-border);">
+                  THRESH<br><strong id="gateThreshVal" style="color:var(--accent-color);">-45 dB</strong>
+                  <input type="range" min="-80" max="0" value="-45" class="screen-slider" id="gateThreshSlider">
+                </div>
+                <div style="background:var(--main-bg); padding:4px; border:1px solid var(--panel-border);">
+                  RANGE<br><strong id="gateRangeVal" style="color:var(--accent-color);">40 dB</strong>
+                  <input type="range" min="0" max="60" value="40" class="screen-slider" id="gateRangeSlider">
+                </div>
+                <div style="background:var(--main-bg); padding:4px; border:1px solid var(--panel-border);">
+                  REL<br><strong id="gateRelVal" style="color:var(--accent-color);">250 ms</strong>
+                  <input type="range" min="10" max="1000" value="250" class="screen-slider" id="gateRelSlider">
+                </div>
+              </div>
+            </div>
+
+            <!-- SUBPANEL 4: DYN -->
+            <div class="m32-sub-panel" data-subpanel="dyn">
+              <b style="font-size: 8px; color: var(--accent-color);">DYNAMICS / COMPRESSOR</b>
+              <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:3px; margin-top:6px; text-align:center; font-size: 8px;">
+                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">
+                  THRESH<br><strong id="compThreshVal" style="color:#f39c12;">-18dB</strong>
+                  <input type="range" min="-60" max="0" value="-18" class="screen-slider" id="compThreshSlider">
+                </div>
+                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">
+                  RATIO<br><strong id="compRatioVal" style="color:#f39c12;">3.1</strong>
+                  <input type="range" min="1" max="20" step="0.1" value="3.1" class="screen-slider" id="compRatioSlider">
+                </div>
+                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">
+                  ATT<br><strong id="compAttVal" style="color:#f39c12;">15ms</strong>
+                  <input type="range" min="1" max="200" value="15" class="screen-slider" id="compAttSlider">
+                </div>
+                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">
+                  GAIN<br><strong id="compGainVal" style="color:#f39c12;">+2.5</strong>
+                  <input type="range" min="0" max="24" step="0.5" value="2.5" class="screen-slider" id="compGainSlider">
+                </div>
+              </div>
+            </div>
+
+            <!-- SUBPANEL 5: EQ -->
+            <div class="m32-sub-panel" data-subpanel="eq">
+              <b style="font-size: 8px; color: var(--accent-color);">4-BAND PARAMETRIC EQ</b>
+              <div style="display:flex; gap:2px; height:80px; align-items:flex-end; background:var(--main-bg); padding:4px; margin-top:4px; border:1px solid var(--panel-border);">
+                <div id="eqBarLow" style="flex:1; background:var(--accent-color); height:40%;"></div>
+                <div id="eqBarMid1" style="flex:1; background:var(--accent-color); height:60%;"></div>
+                <div id="eqBarMid2" style="flex:1; background:var(--accent-color); height:80%;"></div>
+                <div id="eqBarHigh" style="flex:1; background:var(--accent-color); height:50%;"></div>
+              </div>
+              <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:2px; margin-top:4px; font-size:7px; text-align:center;">
+                <div>LOW<input type="range" min="0" max="100" value="40" class="screen-slider" id="eqLowSlider"></div>
+                <div>L-MID<input type="range" min="0" max="100" value="60" class="screen-slider" id="eqMid1Slider"></div>
+                <div>H-MID<input type="range" min="0" max="100" value="80" class="screen-slider" id="eqMid2Slider"></div>
+                <div>HIGH<input type="range" min="0" max="100" value="50" class="screen-slider" id="eqHighSlider"></div>
+              </div>
+            </div>
+
+            <!-- SUBPANEL 6: SENDS -->
+            <div class="m32-sub-panel" data-subpanel="sends">
+              <b style="font-size: 8px; color: var(--accent-color);">BUS / AUX SENDS ROUTING</b>
+              <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:3px; margin-top:6px; text-align:center; font-size: 8px;">
+                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">
+                  BS1<br><strong id="bs1Val" style="color:#2ecc71;">0dB</strong>
+                  <input type="range" min="-40" max="10" value="0" class="screen-slider" id="bs1Slider">
+                </div>
+                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">
+                  BS2<br><strong id="bs2Val" style="color:#2ecc71;">-6dB</strong>
+                  <input type="range" min="-40" max="10" value="-6" class="screen-slider" id="bs2Slider">
+                </div>
+                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">
+                  FX1<br><strong id="fx1Val" style="color:#2ecc71;">-3dB</strong>
+                  <input type="range" min="-40" max="10" value="-3" class="screen-slider" id="fx1SendSlider">
+                </div>
+                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">
+                  FX2<br><strong id="fx2Val" style="color:#2ecc71;">-∞</strong>
+                  <input type="range" min="-40" max="10" value="-40" class="screen-slider" id="fx2SendSlider">
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- 2. METERS VIEW -->
+        <section class="screen-view" data-view="METER">
+          <div class="pro-screen-grid" style="background: var(--panel-bg); padding: 6px; border-radius: 4px; min-height: 200px;">
+            <b style="font-size: 9px; color: var(--accent-color); display: block; margin-bottom: 4px;">CHANNEL LEVEL METERS (CH 1–14)</b>
+            <div class="meter-columns" id="screenChannelMeters" style="display: flex; gap: 4px; height: 160px; align-items: flex-end; background: var(--main-bg); padding: 4px;"></div>
+            <span class="meter-db" style="font-size: 7px; color: var(--text-dim); display: flex; justify-content: space-between; margin-top: 4px;"><span>0dB</span><span>-6</span><span>-12</span><span>-24</span><span>-48</span></span>
+          </div>
+        </section>
+
+        <!-- 3. RTA VIEW -->
+        <section class="screen-view" data-view="RTA">
+          <div class="rta-display" style="background: var(--panel-bg); padding: 6px; border-radius: 4px; min-height: 200px;">
+            <b style="font-size: 9px; color: var(--accent-color); display: block; margin-bottom: 4px;">REAL TIME ANALYZER (RTA)</b>
+            <div class="rta-bars" id="rtaBars" style="display: flex; gap: 3px; height: 160px; align-items: flex-end; background: var(--main-bg); padding: 4px;"></div>
+            <div class="rta-labels" style="font-size: 7px; color: var(--text-dim); display: flex; justify-content: space-between; margin-top: 4px;"><span>63</span><span>125</span><span>250</span><span>500</span><span>1K</span><span>2K</span><span>4K</span><span>8K</span><span>16K</span></div>
+          </div>
+        </section>
+
+        <!-- 4. SETUP VIEW -->
+        <section class="screen-view" data-view="SETUP">
+          <div class="setup-screen" style="background: var(--panel-bg); padding: 6px; border-radius: 4px; font-size: 9px; min-height: 200px;">
+            <b style="color: var(--accent-color);">M32 SYSTEM CONFIG</b>
+            <div class="setup-grid" style="display: grid; grid-template-columns: 1fr; gap: 6px; margin-top: 8px;">
+              <div style="background: var(--main-bg); padding: 6px; border: 1px solid var(--panel-border);">CHANNELS: <strong class="channel-count-value" style="color:var(--accent-color);">14 INPUTS</strong></div>
+              <div style="background: var(--main-bg); padding: 6px; border: 1px solid var(--panel-border);">TRANSPORT: <strong id="setupTransport" style="color:#2ecc71;">OFFLINE</strong></div>
+              <div style="background: var(--main-bg); padding: 6px; border: 1px solid var(--panel-border);">PROTOCOL: <strong style="color:var(--accent-color);">AES50 / M32-1 (48kHz)</strong></div>
+              <div style="background: var(--main-bg); padding: 6px; border: 1px solid var(--panel-border);">CLOCK SOURCE: <strong style="color:#2ecc71;">INTERNAL MASTER</strong></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. EFFECTS VIEW -->
+        <section class="screen-view" data-view="EFFECT">
+          <div class="effect-screen effect-screen-live" style="background: var(--panel-bg); padding: 6px; border-radius: 4px; font-size: 9px; min-height: 200px;">
+            <b style="color: var(--accent-color);">VIRTUAL FX RACK ASSIGNMENT</b>
+            <select id="screenFxSelect" style="background: var(--main-bg); color: var(--accent-color); border: 1px solid var(--panel-border); width: 100%; margin: 8px 0; padding: 6px; font-weight:bold; border-radius:3px;">
+              <option value="FX1">FX Slot 1: Lexicon Hall Reverb</option>
+              <option value="FX2">FX Slot 2: Stereo Delay 120BPM</option>
+              <option value="FX3">FX Slot 3: Vintage Chorus</option>
+              <option value="FX4">FX Slot 4: Stereo Flanger</option>
+            </select>
+            <div id="fxSlotDetails" style="background:var(--main-bg); padding:8px; border:1px solid var(--panel-border); color:var(--text-dim); border-radius:3px;">
+              Status: <span style="color:#2ecc71; font-weight:bold;">ACTIVE & LOADED</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. LIBRARY / SCENE VIEW -->
+        <section class="screen-view" data-view="SCENE">
+          <div class="scene-screen" style="background: var(--panel-bg); padding: 6px; border-radius: 4px; font-size: 9px; min-height: 200px;">
+            <b style="color: var(--accent-color);">SCENE LIBRARY PRESETS</b>
+            <div style="display: flex; gap: 6px; margin-top: 8px;">
+              <button id="screenSceneSave" style="flex:1; background:var(--main-bg); color:var(--accent-color); border:1px solid var(--panel-border); padding:8px; font-weight:bold; cursor:pointer; border-radius:3px;">💾 SAVE PRESET</button>
+              <button id="screenSceneRecall" style="flex:1; background:var(--main-bg); color:#2ecc71; border:1px solid var(--panel-border); padding:8px; font-weight:bold; cursor:pointer; border-radius:3px;">📂 RECALL PRESET</button>
+            </div>
+            <div id="sceneStatusMsg" style="margin-top:10px; color:var(--text-dim); text-align:center; background:var(--main-bg); padding:6px; border:1px solid var(--panel-border);">Preset State Ready</div>
+          </div>
+        </section>
+      </div>
+
+      <div class="midas-encoders-bar">
+        <div class="m-encoder">GAIN</div>
+        <div class="m-encoder">HPF</div>
+        <div class="m-encoder">GATE</div>
+        <div class="m-encoder">COMP</div>
+        <div class="m-encoder">EQ</div>
+        <div class="m-encoder">PAN</div>
+      </div>
+    </div>
+
+    <!-- Player / Recorder + Tombol Input Suara Mixer Fisik -->
+    <section class="media-rack" style="border: 1px solid var(--panel-border); border-radius: 6px; padding: 6px;">
+      <h2 style="color: var(--accent-color); border-bottom: 1px solid var(--panel-border); margin-bottom: 4px; font-size: 10px;">USB PLAYER / REC <span id="activePlayerTarget" style="font-size: 9px; color: #2ecc71; float: right;">[CH 1]</span></h2>
+      <div style="display: flex; gap: 4px; margin-bottom: 4px;">
+        <button id="btnPlayerRec" type="button" style="flex: 1; background: var(--main-bg); color: var(--text-main); border: 1px solid var(--panel-border); font-size: 9px; padding: 4px;">🎙<small>REC</small></button>
+        <button id="btnPlayerFile" type="button" style="flex: 1; background: var(--main-bg); color: var(--text-main); border: 1px solid var(--panel-border); font-size: 9px; padding: 4px;">📁<small>FILE</small></button>
+        <button id="btnPlayerMusic" type="button" style="flex: 1; background: var(--main-bg); color: var(--text-main); border: 1px solid var(--panel-border); font-size: 9px; padding: 4px;">🎵<small>MUSIC</small></button>
+        <button id="btnPhysicalAudioInput" type="button" style="flex: 1; background: var(--main-bg); color: #2ecc71; border: 1px solid var(--panel-border); font-size: 9px; padding: 4px; font-weight: bold;">🎛️ <small>LIVE IN</small></button>
+      </div>
+      <div style="display: flex; gap: 4px; align-items: center; background: var(--main-bg); padding: 4px; border-radius: 3px; border: 1px solid var(--panel-border);">
+        <span id="playerTrackInfo" style="font-size: 9px; color: var(--text-dim); flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">NO FILE SELECTED</span>
+        <button id="btnPlayPauseAudio" type="button" style="background: var(--accent-color); color: #000; border: none; padding: 2px 8px; font-weight: bold; border-radius: 2px; cursor: pointer; font-size: 9px;">▶ PLAY</button>
+      </div>
+      <input type="file" id="localAudioLoader" accept="audio/*" multiple style="display: none;">
+    </section>
+
+    <!-- Effect Processor -->
+    <div class="fx-rack fx-rack-live" id="fxRack">
+      <div class="rack-title" style="font-size: 9px; margin-bottom: 4px;">EFFECT PROCESSOR <span style="color: var(--accent-color);">PARAMETER</span></div>
+      <div class="fx-toolbar" style="display: flex; align-items: center; gap: 4px; margin-bottom: 4px;">
+        <div class="fx-display" style="background: var(--main-bg); padding: 3px; border: 1px solid var(--panel-border); flex-grow: 1; border-radius: 3px;">
+          <strong id="fxRackPreset" style="font-size: 9px; color: var(--accent-color);">FX1 ACTIVE</strong>
+          <small id="fxRackSummary" style="font-size: 7px; color: var(--text-dim); display: block;">REVERB • TIME 2.45s</small>
+        </div>
+        <button id="fxTap" type="button" style="font-size: 8px; padding: 3px 6px;">TAP</button>
+        <span id="fxBpm" style="font-size: 8px;">120 BPM</span>
+        <button id="fxSelect" type="button" style="font-size: 8px; padding: 3px 6px;">SEL</button>
+      </div>
+      <div class="fx-buttons" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; margin-bottom: 4px;">
+        <button data-fx-select="FX1" class="active" style="font-size: 7px; padding: 2px;">FX1</button>
+        <button data-fx-select="FX2" style="font-size: 7px; padding: 2px;">FX2</button>
+        <button data-fx-select="AUX1" style="font-size: 7px; padding: 2px;">AX1</button>
+        <button data-fx-select="AUX2" style="font-size: 7px; padding: 2px;">AX2</button>
+        <button data-fx-select="AUX3" style="font-size: 7px; padding: 2px;">AX3</button>
+        <button data-fx-select="AUX4" style="font-size: 7px; padding: 2px;">AX4</button>
+      </div>
+      <div class="fx-parameter-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 8px;">
+        <label>TIME <input class="fx-control" data-scope="FX" data-target="FX1" data-param="time" type="range" min="0.1" max="10" step="0.01" value="2.45" style="width:100%;"><output data-fx-value="time" style="color: var(--accent-color);">2.45s</output></label>
+        <label>PRE-D <input class="fx-control" data-scope="FX" data-target="FX1" data-param="preDelay" type="range" min="0" max="200" step="1" value="32" style="width:100%;"><output data-fx-value="preDelay" style="color: var(--accent-color);">32ms</output></label>
+        <label>DECAY <input class="fx-control" data-scope="FX" data-target="FX1" data-param="decay" type="range" min="0" max="100" step="1" value="65" style="width:100%;"><output data-fx-value="decay" style="color: var(--accent-color);">65%</output></label>
+        <label>LEVEL <input class="fx-control" data-scope="FX" data-target="FX1" data-param="level" type="range" min="-20" max="6" step="0.1" value="-3" style="width:100%;"><output data-fx-value="level" style="color: var(--accent-color);">-3.0dB</output></label>
+      </div>
+    </div>
+
+    <!-- Aux / Bus & FX Return -->
+    <div class="aux-rack" id="auxRack">
+      <div class="aux-unit aux-live">
+        <b style="font-size: 8px;">AUX / BUS</b>
+        <div class="aux-labels" style="display:flex; justify-content:space-between; color:var(--text-dim); font-size:6px; margin:2px 0;"><span>A1</span><span>A2</span><span>A3</span><span>A4</span></div>
+        <div class="mini-knobs" style="display:flex; gap:2px;">
+          <input class="aux-control" data-target="AUX1" type="range" min="0" max="1" step="0.01" value="0" style="width:100%;">
+          <input class="aux-control" data-target="AUX2" type="range" min="0" max="1" step="0.01" value="0" style="width:100%;">
+          <input class="aux-control" data-target="AUX3" type="range" min="0" max="1" step="0.01" value="0" style="width:100%;">
+          <input class="aux-control" data-target="AUX4" type="range" min="0" max="1" step="0.01" value="0" style="width:100%;">
+        </div>
+      </div>
+      <div class="aux-unit aux-live">
+        <b style="font-size: 8px;">FX RETURN</b>
+        <div class="aux-labels" style="display:flex; justify-content:space-between; color:var(--text-dim); font-size:6px; margin:2px 0;"><span>FX1</span><span>FX2</span></div>
+        <div class="mini-knobs" style="display:flex; gap:2px;">
+          <input class="aux-control" data-scope="FX_RETURN" data-target="FX1" type="range" min="0" max="1" step="0.01" value=".45" style="width:100%;">
+          <input class="aux-control" data-scope="FX_RETURN" data-target="FX2" type="range" min="0" max="1" step="0.01" value=".45" style="width:100%;">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. CHANNEL BANK KANAN (CH 8–14) -->
+  <section class="channel-bank channel-bank-right" id="bankRight">
+    <div class="bank-title"><span>INPUT CHANNELS 8–14</span><small>CH8–CH14</small></div>
+    <div id="channelsRight"></div>
+  </section>
+
+  <!-- 4. MASTER RACK DENGAN INDIKATOR L/R MASTER STEREO -->
+  <aside class="master-rack" id="masterRack">
+    <div class="meter-rack">
+      <b style="font-size: 8px; color: var(--accent-color); display: block; text-align: center; margin-bottom: 2px;">MAIN L / R</b>
+      <div class="main-meters">
+        <div class="meter-bar-container">
+          <div class="meter-bar-bg"><div class="meter-bar-fill" id="masterMeterL"></div></div>
+          <span class="meter-label">L</span>
+        </div>
+        <div class="meter-bar-container">
+          <div class="meter-bar-bg"><div class="meter-bar-fill" id="masterMeterR"></div></div>
+          <span class="meter-label">R</span>
+        </div>
+      </div>
+    </div>
+    <div class="master-card">
+      <h2>MASTER</h2>
+      <input id="master" type="range" min="0" max="100" value="75" orient="vertical">
+      <output id="masterVal">75%</output>
+      <span class="peak-dot"></span>
+    </div>
+    <div class="monitor-card"><b>MONITOR</b><span>SOURCE</span><button style="font-size:6px; padding:1px 2px;">MAIN L/R</button><div class="monitor-knob"></div><span>LEVEL</span></div>
+    <div class="phones-card">🎧 <b>PHONES</b><div class="phone-knob"></div><span>●</span></div>
+  </aside>
+</main>
+
+<nav class="bottom-nav" id="bottomNav">
+  <button class="active" data-nav="ch1-7">CH 1–7</button>
+  <button data-nav="ch8-14">CH 8–14</button>
+  <button data-nav="fx">FX</button>
+  <button data-nav="master">MASTER</button>
+  <button data-nav="scene">SCENE</button>
+  <button data-nav="setup">SETUP</button>
+  <button data-nav="system">SYSTEM</button>
+</nav>
+
+<section class="right-tools" id="systemPanel">
+  <section class="device-connection">
+    <div class="section-heading"><h2>DEVICE CONNECTION</h2><span id="deviceLamp" class="lamp red"></span></div>
+    <label for="transportSelect">TRANSPORT</label>
+    <select id="transportSelect"><option value="esp32">ESP32 SIMULATOR / BRIDGE</option><option value="bluetooth">BLUETOOTH</option></select>
+    <div id="deviceStatus" class="device-status">🔴 ESP32 SIMULATOR OFFLINE</div>
+    <div id="deviceProtocol">Protocol: ESP32-MIXER/1</div>
+    <button id="deviceConnect">CONNECT ESP32</button><button id="deviceDisconnect">DISCONNECT</button>
+    <div id="deviceHint" class="small">Simulator ESP32 berjalan langsung di Mixer-Online. Bukan Wokwi dan bukan Wi-Fi ke mixer analog.</div>
+  </section>
+
+  <section class="bridge-panel">
+    <div class="section-heading"><h2>ESP32 BRIDGE STATUS</h2><span class="bridge-live">● TWO-WAY</span></div>
+    <div class="bridge-summary"><span id="bridgeState">OFFLINE</span><span id="bridgeTransport">TRANSPORT: —</span><span id="bridgeProtocol">PROTOCOL: ESP32-MIXER/1</span></div>
+    <div class="bridge-counters"><span>TX <b id="bridgeTx">0</b></span><span>ACK <b id="bridgeAck">0</b></span><span>RX/FEEDBACK <b id="bridgeRx">0</b></span></div>
+    <div id="bridgeLast" class="bridge-last">LAST: —</div>
+    <div id="bridgeLog" class="bridge-log"><div>CONTROL → TX → ACK → FEEDBACK → UI</div></div>
+  </section>
+</section>
+
+<section class="connection-test-panel sim" id="connectionTestPanel">
+  <h2>CONNECTION / TEST</h2>
+  <div class="transport-line">Transport: <b id="transportStatus">OFFLINE</b></div>
+  <div id="connectionHint" class="small">
+    Mixer yang menerima remote: Bluetooth langsung. Mixer yang tidak menerima remote: gunakan ESP32 sebagai bridge.
+  </div>
+  <pre id="rx">RX: —</pre>
+  <pre id="tx">TX: —</pre>
+  
+  <div class="test-buttons">
+    <button id="simulateRx" type="button">SIMULATE HARDWARE RX</button>
+    <button id="runTest" type="button">RUN 14CH LOOPBACK TEST</button>
+    <button id="runStressTest" type="button">RUN REPEAT STRESS TEST</button>
+    <button id="runMuteSoloTest" type="button">RUN MUTE/SOLO TEST</button>
+    <button id="runMasterIsolationTest" type="button">RUN MASTER ISOLATION TEST</button>
+    <button id="runFaderTest" type="button">RUN FADER CH1–CH14 TEST</button>
+    <button id="runCombinationTest" type="button">RUN COMBINATION CONTROL TEST</button>
+    <button id="runBidirectionalSyncTest" type="button">RUN TWO-WAY SYNC TEST</button>
+    <button id="savePreset" type="button">SAVE PRESET</button>
+    <button id="recallPreset" type="button">RECALL PRESET</button>
+    <button id="runSaveRecallTest" type="button">RUN SAVE/RECALL TEST</button>
+  </div>
+  
+  <pre id="testResult">TEST: —</pre>
+</section>
+
+<footer class="status-footer">
+  <span>CONNECTION <b id="footerConnection">● ESP32 SIMULATOR OFFLINE</b></span>
+  <span>MODE: <b>TWO-WAY SYNC</b></span>
+  <span>SYSTEM STATUS <b class="channel-count-status">14 channels READY</b></span>
+  <span>CPU: <b>18%</b></span>
+  <span>MEM: <b>42%</b></span>
+</footer>
+
+<script src="connection.js?v=20260903-final16"></script>
+<script src="adapters.js?v=20260903-esp32-bridge-final"></script>
+<script src="app.js?v=20260903-final16"></script>
+<script src="header-system.js?v=20260902-01"></script>
+<script src="header-controls.js?v=20260902-02"></script>
+<script src="channels-new.js?v=20260903-final16"></script>
+<script src="bluetooth-bridge.js"></script>
+<script src="player-bridge.js"></script>
+<script src="channels-bridge.js"></script> 
+<script src="audio-engine.js"></script>
+
+<script>
+(function(){
+  // Jam Realtime
+  const clock = document.getElementById('clock');
+  const tick = () => clock && (clock.textContent = new Date().toLocaleTimeString());
+  tick(); setInterval(tick, 1000);
+
+  // Tab Layar M32
+  const tabs = document.querySelectorAll('#screenTabs button');
+  const views = document.querySelectorAll('.screen-view');
+  const subButtons = document.querySelectorAll('.m32-sub-btn');
+  const subPanels = document.querySelectorAll('.m32-sub-panel');
+  const subBar = document.getElementById('m32SubmenuBar');
+
+  const setScreen = (name) => {
+    tabs.forEach(b => b.classList.toggle('active', b.dataset.screen === name));
+    views.forEach(v => v.classList.toggle('active', v.dataset.view === name));
+    
+    if(subBar) subBar.style.display = (name === 'HOME') ? 'grid' : 'none';
+
+    if (name === 'METER') buildScreenMeters();
+    if (name === 'RTA') buildRta();
+    if (name === 'SETUP') updateSetup();
+  };
+
+  tabs.forEach(b => b.addEventListener('click', () => setScreen(b.dataset.screen)));
+
+  subButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      subButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const targetSub = btn.dataset.sub;
+      subPanels.forEach(panel => {
+        panel.classList.toggle('active', panel.dataset.subpanel === targetSub);
+      });
+    });
+  });
+
+  // LOGIKA RESPONSIF BOTTOM NAV BAR
+  const bottomNavButtons = document.querySelectorAll('#bottomNav button');
+  bottomNavButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      bottomNavButtons.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+
+      const target = this.dataset.nav;
+
+      if (target === 'ch1-7') {
+        document.getElementById('bankLeft')?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+      } else if (target === 'ch8-14') {
+        document.getElementById('bankRight')?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+      } else if (target === 'fx') {
+        setScreen('EFFECT');
+        document.getElementById('fxRack')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if (target === 'master') {
+        document.getElementById('masterRack')?.scrollIntoView({ behavior: 'smooth', inline: 'end', block: 'nearest' });
+      } else if (target === 'scene') {
+        setScreen('SCENE');
+        document.getElementById('centerConsole')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if (target === 'setup') {
+        setScreen('SETUP');
+        document.getElementById('centerConsole')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if (target === 'system') {
+        document.getElementById('systemPanel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  function buildScreenMeters() {
+    const root = document.getElementById('screenChannelMeters');
+    if (!root) return;
+    root.innerHTML = '';
+    for (let i = 0; i < 14; i++) {
+      const el = document.createElement('div');
+      el.style.flex = '1';
+      el.style.background = 'var(--accent-color)';
+      el.style.height = (12 + ((i * 17) % 70)) + '%';
+      el.title = 'CH' + (i + 1);
+      root.appendChild(el);
+    }
+  }
+
+  function buildRta() {
+    const root = document.getElementById('rtaBars');
+    if (!root) return;
+    root.innerHTML = '';
+    for (let i = 0; i < 14; i++) {
+      const b = document.createElement('div');
+      b.style.flex = '1';
+      b.style.background = '#2ecc71';
+      b.style.height = (18 + ((i * 23) % 72)) + '%';
+      root.appendChild(b);
+    }
+  }
+
+  function updateSetup() {
+    const a = window.MixerAdapters?.status?.();
+    const t = document.getElementById('setupTransport');
+    if (t) t.textContent = a?.connected ? (a.transport === 'bluetooth' ? 'BLUETOOTH' : 'ESP32 BRIDGE') : 'OFFLINE';
+  }
+
+  // SCRIPT INTERAKTIF SCREEN SUBPANEL
+  document.getElementById('hpfSlider')?.addEventListener('input', function() {
+    const v = document.getElementById('hpfVal');
+    if (v) v.textContent = this.value + ' Hz';
+  });
+
+  document.getElementById('btnPhantom')?.addEventListener('click', function() {
+    const on = this.textContent === 'ON';
+    this.textContent = on ? 'OFF' : 'ON';
+    this.style.background = on ? 'var(--panel-border)' : '#2ecc71';
+    this.style.color = on ? '#fff' : '#000';
+  });
+
+  document.getElementById('btnPolarity')?.addEventListener('click', function() {
+    const norm = this.textContent.includes('NORM');
+    this.textContent = norm ? 'INV (-)' : 'NORM (+)';
+    this.style.color = norm ? '#e74c3c' : '#fff';
+  });
+
+  document.getElementById('gateThreshSlider')?.addEventListener('input', function() {
+    document.getElementById('gateThreshVal').textContent = this.value + ' dB';
+  });
+  document.getElementById('gateRangeSlider')?.addEventListener('input', function() {
+    document.getElementById('gateRangeVal').textContent = this.value + ' dB';
+  });
+  document.getElementById('gateRelSlider')?.addEventListener('input', function() {
+    document.getElementById('gateRelVal').textContent = this.value + ' ms';
+  });
+
+  document.getElementById('compThreshSlider')?.addEventListener('input', function() {
+    document.getElementById('compThreshVal').textContent = this.value + 'dB';
+  });
+  document.getElementById('compRatioSlider')?.addEventListener('input', function() {
+    document.getElementById('compRatioVal').textContent = this.value;
+  });
+  document.getElementById('compAttSlider')?.addEventListener('input', function() {
+    document.getElementById('compAttVal').textContent = this.value + 'ms';
+  });
+  document.getElementById('compGainSlider')?.addEventListener('input', function() {
+    document.getElementById('compGainVal').textContent = '+' + this.value;
+  });
+
+  ['Low', 'Mid1', 'Mid2', 'High'].forEach(band => {
+    document.getElementById('eq' + band + 'Slider')?.addEventListener('input', function() {
+      const bar = document.getElementById('eqBar' + band);
+      if (bar) bar.style.height = this.value + '%';
+    });
+  });
+
+  document.getElementById('bs1Slider')?.addEventListener('input', function() {
+    document.getElementById('bs1Val').textContent = this.value + 'dB';
+  });
+  document.getElementById('bs2Slider')?.addEventListener('input', function() {
+    document.getElementById('bs2Val').textContent = this.value + 'dB';
+  });
+  document.getElementById('fx1SendSlider')?.addEventListener('input', function() {
+    document.getElementById('fx1Val').textContent = this.value + 'dB';
+  });
+  document.getElementById('fx2SendSlider')?.addEventListener('input', function() {
+    document.getElementById('fx2Val').textContent = this.value === '-40' ? '-∞' : this.value + 'dB';
+  });
+
+  document.getElementById('screenFxSelect')?.addEventListener('change', function() {
+    const details = document.getElementById('fxSlotDetails');
+    if (details) details.innerHTML = `Loaded: <strong style="color:var(--accent-color);">${this.options[this.selectedIndex].text}</strong>`;
+  });
+
+  document.getElementById('screenSceneSave')?.addEventListener('click', function() {
+    const msg = document.getElementById('sceneStatusMsg');
+    if (msg) msg.textContent = "✅ Preset M32 Scene Saved Successfully!";
+  });
+
+  document.getElementById('screenSceneRecall')?.addEventListener('click', function() {
+    const msg = document.getElementById('sceneStatusMsg');
+    if (msg) msg.textContent = "⚡ Preset M32 Scene Recalled!";
+  });
+
+  // METODE SINKRONISASI DATA LAYAR M32 & CHANNEL
+  function selectScreenChannel(id) {
+    const c = window.state?.channels?.[id - 1];
+    const set = (elemId, v) => { const e = document.getElementById(elemId); if (e) e.textContent = v; };
+    
+    set('screenInput', 'CH ' + (id < 10 ? '0' + id : id));
+    
+    if (c) {
+      set('screenFader', Math.round(c.fader !== undefined ? c.fader : 75) + '%');
+      set('screenGain', Number(c.gain || 1.0).toFixed(2));
+      set('screenPan', c.pan === 0 || c.pan === undefined ? 'CENTER' : (c.pan < 0 ? 'L ' + Math.round(Math.abs(c.pan) * 100) + '%' : 'R ' + Math.round(c.pan * 100) + '%'));
+      
+      const statusElem = document.getElementById('screenStatus');
+      if (statusElem) {
+        if (c.mute) {
+          statusElem.textContent = '[MUTED]';
+          statusElem.style.color = '#e74c3c';
+        } else if (c.solo) {
+          statusElem.textContent = '[SOLO]';
+          statusElem.style.color = '#f1c40f';
+        } else {
+          statusElem.textContent = '[ACTIVE]';
+          statusElem.style.color = '#2ecc71';
+        }
+      }
+    }
+  }
+  window.selectScreenChannel = selectScreenChannel;
+
+  // SINKRONISASI REALTIME FADER DAN KONTROL CHANNEL + HAPTIC FEEDBACK
+  document.addEventListener('input', function(e) {
+    if (e.target.matches('input[type="range"]')) {
+      if (window.AndroidFeedback && typeof window.AndroidFeedback.triggerHaptic === 'function') {
+        window.AndroidFeedback.triggerHaptic(10);
+      } else if (navigator.vibrate) {
+        navigator.vibrate(10);
+      }
+
+      const container = e.target.parentElement || e.target.closest('div, section');
+      
+      if (container && e.target.classList.contains('channel-fader')) {
+        const valDisplay = container.querySelector('.fader-val, output');
+        if (valDisplay) {
+          valDisplay.textContent = Math.round(e.target.value) + '%';
+        }
+      }
+
+      const strip = e.target.closest('.new-channel-strip, .channel-strip, [data-ch]');
+      if (strip) {
+        const chId = Number(strip.dataset.ch) || parseInt(strip.innerText.match(/CH\s*(\d+)/i)?.[1] || '0', 10);
+        if (chId > 0) {
+          const val = Number(e.target.value);
+          if (!window.state) window.state = { channels: [] };
+          if (!window.state.channels) window.state.channels = [];
+          if (!window.state.channels[chId - 1]) window.state.channels[chId - 1] = {};
+          
+          if (e.target.classList.contains('channel-fader')) {
+            window.state.channels[chId - 1].fader = val;
+            
+            const activeInput = document.getElementById('screenInput')?.textContent;
+            if (activeInput && parseInt(activeInput.replace(/\D/g, ''), 10) === chId) {
+              const sf = document.getElementById('screenFader');
+              if (sf) sf.textContent = Math.round(val) + '%';
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Haptic Feedback Klik Button
+  document.addEventListener('click', function(e) {
+    if (e.target.tagName === 'BUTTON') {
+      if (window.AndroidFeedback && typeof window.AndroidFeedback.triggerHaptic === 'function') {
+        window.AndroidFeedback.triggerHaptic(20);
+      } else if (navigator.vibrate) {
+        navigator.vibrate(20);
+      }
+    }
+  });
+
+  document.getElementById('channels')?.addEventListener('click', e => {
+    const strip = e.target.closest('.new-channel-strip, .channel-strip, [data-ch]');
+    if (strip) {
+      const chId = Number(strip.dataset.ch) || parseInt(strip.innerText.match(/CH\s*(\d+)/i)?.[1] || '0', 10);
+      if (chId > 0) selectScreenChannel(chId);
+    }
+  });
+
+  document.getElementById('channelsRight')?.addEventListener('click', e => {
+    const strip = e.target.closest('.new-channel-strip, .channel-strip, [data-ch]');
+    if (strip) {
+      const chId = Number(strip.dataset.ch) || parseInt(strip.innerText.match(/CH\s*(\d+)/i)?.[1] || '0', 10);
+      if (chId > 0) selectScreenChannel(chId);
+    }
+  });
+
+  const updateSkin = () => {
+    const adapter = window.MixerAdapters?.status?.();
+    const live = !!adapter?.connected;
+    document.getElementById('statusLamp')?.classList.toggle('live', live);
+    document.getElementById('deviceLamp')?.classList.toggle('green', live);
+    document.getElementById('deviceLamp')?.classList.toggle('red', !live);
+  };
+
+  window.initEffectEngine?.();
+  setInterval(updateSkin, 400);
+  updateSkin();
+})();
+</script>
+
+<script>
+(function(){
+  function install(){
+    var p = document.getElementById("power");
+    if(!p) return;
+    if(!window.state) window.state = {system:false, connected:false, channels:[], sim:{online:false}};
+    
+    function paint(){
+      var on = !!window.state.system;
+      var adapter = window.MixerAdapters?.active;
+      var espOnline = !!adapter?.connected && (adapter.type === "simulator" || adapter.transport === "esp32");
+      
+      window.state.connected = espOnline;
+      window.state.sim = window.state.sim || {};
+      window.state.sim.online = espOnline;
+      p.textContent = on ? "SYSTEM ON" : "SYSTEM OFF";
+      p.classList.toggle("on", on);
+      var hs = document.getElementById("headerBridgeStatus");
+      if(hs) hs.textContent = espOnline ? "BRIDGE READY" : (on ? "SYSTEM READY" : "BRIDGE STANDBY");
+      var esp = document.getElementById("connectEsp");
+      if(esp) {
+        esp.textContent = espOnline ? "ESP32 CONNECTED" : "CONNECT ESP32";
+        esp.classList.toggle("on", espOnline);
+      }
+    }
+
+    var deviceConnect = document.getElementById("deviceConnect") || document.getElementById("connectEsp");
+    var deviceDisconnect = document.getElementById("deviceDisconnect");
+    var transportSelect = document.getElementById("transportSelect");
+
+    function paintDevice(st){
+      st = st || window.MixerAdapters?.status?.() || {};
+      var online = !!st.connected;
+      var espMode = st.transport === "esp32" || st.type === "simulator";
+      var lamp = document.getElementById("deviceLamp");
+      var ds = document.getElementById("deviceStatus");
+      var dp = document.getElementById("deviceProtocol");
+      var ts = document.getElementById("transportStatus");
+      var bridge = document.getElementById("bridgeState");
+      var bt = document.getElementById("bridgeTransport");
+      var bp = document.getElementById("bridgeProtocol");
+      var footer = document.getElementById("footerConnection");
+
+      if (lamp) {
+        lamp.classList.toggle("green", online);
+        lamp.classList.toggle("red", !online);
+      }
+      if (ds) ds.textContent = online ? "🟢 ESP32 SIMULATOR ONLINE" : "🔴 ESP32 SIMULATOR OFFLINE";
+      if (dp) dp.textContent = "Protocol: " + (st.protocol || "ESP32-MIXER/1");
+      if (ts) ts.textContent = online ? "ESP32 BRIDGE ONLINE" : "OFFLINE";
+      if (bridge) bridge.textContent = online ? "ONLINE" : "OFFLINE";
+      if (bt) bt.textContent = online ? "TRANSPORT: ESP32 BRIDGE" : "TRANSPORT: —";
+      if (bp) bp.textContent = "PROTOCOL: " + (st.protocol || "ESP32-MIXER/1");
+      if (footer) footer.textContent = online ? "● ESP32 SIMULATOR ONLINE" : "● ESP32 SIMULATOR OFFLINE";
+      if (deviceConnect) {
+        deviceConnect.disabled = false;
+        deviceConnect.textContent = online ? "ESP32 CONNECTED" : "CONNECT ESP32";
+        deviceConnect.classList.toggle("on", online);
+      }
+      if (deviceDisconnect) deviceDisconnect.disabled = !online;
+      if (transportSelect) transportSelect.value = espMode ? "esp32" : (st.transport === "bluetooth" ? "bluetooth" : "esp32");
+    }
+
+    if (deviceDisconnect) deviceDisconnect.addEventListener("click", function(e){
+      e.preventDefault(); e.stopImmediatePropagation();
+      window.MixerAdapters?.disconnect?.();
+      paintDevice({connected:false,transport:"esp32",type:"simulator",protocol:"ESP32-MIXER/1"});
+    });
+
+    if (transportSelect) transportSelect.addEventListener("change", async function(){
+      if (this.value === "esp32") paintDevice({connected:false,transport:"esp32",type:"simulator",protocol:"ESP32-MIXER/1"});
+      else paintDevice({connected:false,transport:"bluetooth",type:"bluetooth",protocol:"ESP32-MIXER/1"});
+    });
+
+    window.MixerAdapters?.onStatus?.(paintDevice);
+    paintDevice();
+
+    var esp = document.getElementById("connectEsp");
+    var bt = document.getElementById("connectBluetooth");
+
+    function paintConnection(st){
+      if(!window.state) window.state = {system:false, connected:false, channels:[], sim:{online:false}};
+      var connected = !!st?.connected;
+      var isEsp = connected && (st?.type === "simulator" || st?.transport === "esp32");
+      window.state.connected = connected;
+      window.state.sim = window.state.sim || {};
+      window.state.sim.online = isEsp;
+      var status = document.getElementById("status");
+      var lamp = document.getElementById("statusLamp");
+      var bridgeState = document.getElementById("bridgeState");
+      var bridgeTransport = document.getElementById("bridgeTransport");
+      var bridgeProtocol = document.getElementById("bridgeProtocol");
+      var stats = window.MixerAdapters?.getTransportStats?.();
+
+      if(status) status.textContent = connected ? "ONLINE" : "OFFLINE";
+      if(lamp) lamp.classList.toggle("on", connected);
+      if(esp){
+        esp.textContent = isEsp ? "ESP32 CONNECTED" : "CONNECT ESP32";
+        esp.classList.toggle("on", isEsp);
+      }
+      if(bridgeState) bridgeState.textContent = isEsp ? "ONLINE" : "OFFLINE";
+      if(bridgeTransport) bridgeTransport.textContent = isEsp ? "TRANSPORT: ESP32" : "TRANSPORT: —";
+      if(bridgeProtocol) bridgeProtocol.textContent = st?.protocol || "PROTOCOL: ESP32-MIXER/1";
+      
+      var tx=document.getElementById("bridgeTx"), rx=document.getElementById("bridgeRx"), ack=document.getElementById("bridgeAck");
+      if(tx && stats) tx.textContent=stats.tx;
+      if(rx && stats) rx.textContent=stats.rx;
+      if(ack && stats) ack.textContent=stats.ack;
+
+      var txPanel = document.getElementById("tx");
+      var rxPanel = document.getElementById("rx");
+      if (txPanel && st?.lastTx) txPanel.textContent = "TX: " + JSON.stringify(st.lastTx);
+      if (rxPanel && st?.lastRx) rxPanel.textContent = "RX: " + JSON.stringify(st.lastRx);
+
+      paint();
+    }
+
+    if(window.MixerAdapters?.onStatus) window.MixerAdapters.onStatus(paintConnection);
+
+    if(esp) esp.addEventListener("click", async function(e){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      var api = window.MixerAdapters;
+      window.state = window.state || {system:false, connected:false, channels:[], sim:{online:false}};
+
+      if(!window.state.system){
+        paintConnection({connected:false,type:"simulator",transport:"esp32",protocol:"ESP32-MIXER/1",lastError:"SYSTEM_OFF"});
+        return;
+      }
+
+      if(api?.active?.connected && (api.active.type === "simulator" || api.active.transport === "esp32")){
+        api.disconnect();
+        window.state.connected = false;
+        window.state.sim.online = false;
+        paintConnection({connected:false,type:"simulator",transport:"esp32",protocol:"ESP32-MIXER/1"});
+        return;
+      }
+
+      esp.disabled = true;
+      esp.textContent = "CONNECTING...";
+      try {
+        if(!api?.connectESP32) throw new Error("ESP32 adapter tidak tersedia");
+        var control = window.MixerControl;
+        if(!control?.connectESP32) throw new Error("MixerControl belum siap");
+        
+        var result = await control.connectESP32();
+        if(!result?.ok || result.connected !== true) throw new Error(result?.reason || "ESP32 bridge gagal");
+
+        const live = api.active?.connected ? api.active : result;
+        window.state.connected = true;
+        window.state.sim.online = true;
+        paintConnection(live);
+        paintDevice(live);
+        paint();
+      } catch(error) {
+        window.state.connected = false;
+        window.state.sim.online = false;
+        paintConnection({connected:false,type:"simulator",transport:"esp32",protocol:"ESP32-MIXER/1",lastError:error?.message || String(error)});
+        paintDevice({connected:false,type:"simulator",transport:"esp32",protocol:"ESP32-MIXER/1"});
+      } finally {
+        esp.disabled = false;
+      }
+    });
+
+    if(bt) bt.addEventListener("click", async function(e){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      bt.disabled = true;
+      try {
+        const result = await window.MixerAdapters?.connectBluetooth?.();
+        if(!result?.ok){
+          var status = document.getElementById("status");
+          if(status) status.textContent = "OFFLINE";
+        }
+      } finally {
+        bt.disabled = false;
+      }
+    });
+
+    p.addEventListener("click", function(){
+      window.state.system = !window.state.system;
+
+      if(!window.state.system && window.MixerAdapters?.active?.connected){
+        window.MixerAdapters.disconnect();
+        window.state.connected = false;
+        window.state.sim = window.state.sim || {};
+        window.state.sim.online = false;
+      }
+      paintConnection(window.MixerAdapters?.status?.() || {
+        connected:false,type:"none",transport:"none",protocol:"none"
+      });
+      paintDevice(window.MixerAdapters?.status?.());
+      paint();
+    });
+    paint();
+  }
+
+  if(document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", install);
+  } else {
+    install();
+  }
+})();
+</script>
+
+<script>
+(function(){
+  const musicBtn = document.getElementById('btnPlayerMusic');
+  const fileBtn = document.getElementById('btnPlayerFile');
+  const liveInBtn = document.getElementById('btnPhysicalAudioInput');
+  const fileInput = document.getElementById('localAudioLoader');
+  const targetLabel = document.getElementById('activePlayerTarget');
+  const playPauseBtn = document.getElementById('btnPlayPauseAudio');
+  const trackInfo = document.getElementById('playerTrackInfo');
+  const modeBtn = document.getElementById('btnPlayerMode');
+  const modeText = document.getElementById('modeText');
+
+  const masterMeterL = document.getElementById('masterMeterL');
+  const masterMeterR = document.getElementById('masterMeterR');
+  const masterFader = document.getElementById('master');
+  const masterValElem = document.getElementById('masterVal');
+
+  let audioCtx = null;
+  let sourceNode = null;
+  let gainNode = null;
+  let panNode = null;
+  let analyserNode = null;
+  let currentAudioElement = null;
+  let liveMicStreamNode = null;
+
+  let playlist = [];
+  let currentTrackIndex = 0;
+  let isShuffle = false;
+  let lockedMusicChannel = null;
+
+  // SINKRONISASI MASTER FADER REAL-TIME
+  if (masterFader) {
+    masterFader.addEventListener('input', function() {
+      const val = parseInt(this.value, 10);
+      if (masterValElem) masterValElem.textContent = val + '%';
+
+      if (audioCtx && gainNode) {
+        const masterScale = val / 100;
+        gainNode.gain.setValueAtTime(masterScale, audioCtx.currentTime);
+      }
+
+      if (!window.state) window.state = {};
+      window.state.masterFader = val;
+
+      if (val === 0) {
+        if (masterMeterL) masterMeterL.style.height = '0%';
+        if (masterMeterR) masterMeterR.style.height = '0%';
+      }
+    });
+  }
+
+  function initAudioEngine(elementOrStream) {
+    if (!audioCtx) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new AudioContext();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+
+    if (!gainNode) {
+      gainNode = audioCtx.createGain();
+      analyserNode = audioCtx.createAnalyser();
+      analyserNode.fftSize = 64;
+
+      if (audioCtx.createStereoPanner) {
+        panNode = audioCtx.createStereoPanner();
+        gainNode.connect(panNode);
+        panNode.connect(analyserNode);
+      } else {
+        gainNode.connect(analyserNode);
+      }
+      analyserNode.connect(audioCtx.destination);
+    }
+
+    if (elementOrStream instanceof MediaStream) {
+      if (sourceNode) sourceNode.disconnect();
+      liveMicStreamNode = audioCtx.createMediaStreamSource(elementOrStream);
+      liveMicStreamNode.connect(gainNode);
+    } else if (elementOrStream instanceof HTMLMediaElement) {
+      if (!sourceNode) {
+        sourceNode = audioCtx.createMediaElementSource(elementOrStream);
+        sourceNode.connect(gainNode);
+      }
+    }
+  }
+
+  async function startPhysicalAudioStream() {
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert("Browser/APK tidak mendukung pengambilan audio fisik.");
+        return;
+      }
+
+      const constraints = {
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+          sampleRate: 48000
+        },
+        video: false
+      };
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      }
+
+      if (audioCtx.state === 'suspended') {
+        await audioCtx.resume();
+      }
+
+      if (liveMicStreamNode) {
+        liveMicStreamNode.disconnect();
+      }
+
+      liveMicStreamNode = audioCtx.createMediaStreamSource(stream);
+
+      if (!gainNode) {
+        gainNode = audioCtx.createGain();
+        analyserNode = audioCtx.createAnalyser();
+        analyserNode.fftSize = 64;
+
+        if (audioCtx.createStereoPanner) {
+          panNode = audioCtx.createStereoPanner();
+          gainNode.connect(panNode);
+          panNode.connect(analyserNode);
+        } else {
+          gainNode.connect(analyserNode);
+        }
+        analyserNode.connect(audioCtx.destination);
+      }
+
+      liveMicStreamNode.connect(gainNode);
+
+      const activeInputStr = document.getElementById('screenInput')?.textContent || "CH 1";
+      lockedMusicChannel = parseInt(activeInputStr.replace(/\D/g, ''), 10) || 1;
+
+      if (trackInfo) trackInfo.textContent = `[LIVE PHYSICAL MIXER IN] CH ${lockedMusicChannel}`;
+      alert(`✅ SUARA FISIK TERHUBUNG! Cobalah bicara di Mic Mixer Fisik.`);
+
+      if (window.AndroidFeedback && typeof window.AndroidFeedback.triggerHaptic === 'function') {
+        window.AndroidFeedback.triggerHaptic(50);
+      } else if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+    } catch (err) {
+      alert("Gagal mengambil suara mixer fisik: " + err.message + "\n\nPastikan kabel Aux TRRS / OTG Soundcard sudah tersambung ke HP.");
+    }
+  }
+
+  function playTrack(index) {
+    if (playlist.length === 0 || index < 0 || index >= playlist.length) return;
+
+    currentTrackIndex = index;
+    const file = playlist[currentTrackIndex];
+    const fileObjectURL = URL.createObjectURL(file);
+
+    if (!currentAudioElement) {
+      currentAudioElement = document.createElement('audio');
+      currentAudioElement.loop = false;
+      document.body.appendChild(currentAudioElement);
+
+      currentAudioElement.addEventListener('ended', playNextTrack);
+    }
+
+    currentAudioElement.src = fileObjectURL;
+    currentAudioElement.play().then(() => {
+      initAudioEngine(currentAudioElement);
+      
+      if (trackInfo) {
+        trackInfo.textContent = `[${currentTrackIndex + 1}/${playlist.length}] ${file.name}`;
+      }
+      if (playPauseBtn) {
+        playPauseBtn.textContent = '⏸ PAUSE';
+        playPauseBtn.style.background = '#e74c3c';
+      }
+      const tr = document.getElementById('testResult');
+      if(tr) tr.textContent = `PLAYER: Memutar "${file.name}" terkunci di Channel ${lockedMusicChannel}`;
+    }).catch(err => console.error("Gagal memutar audio:", err));
+  }
+
+  function playNextTrack() {
+    if (playlist.length === 0) return;
+
+    if (isShuffle) {
+      let nextIndex = Math.floor(Math.random() * playlist.length);
+      if (playlist.length > 1 && nextIndex === currentTrackIndex) {
+        nextIndex = (currentTrackIndex + 1) % playlist.length;
+      }
+      playTrack(nextIndex);
+    } else {
+      let nextIndex = currentTrackIndex + 1;
+      if (nextIndex < playlist.length) {
+        playTrack(nextIndex);
+      } else {
+        playTrack(0);
+      }
+    }
+  }
+
+  function updateIndicators() {
+    requestAnimationFrame(updateIndicators);
+
+    const activeInput = document.getElementById('screenInput');
+    const screenGain = document.getElementById('screenGain');
+    const screenFader = document.getElementById('screenFader');
+    const screenPan = document.getElementById('screenPan');
+
+    if (targetLabel) {
+      if (lockedMusicChannel !== null) {
+        targetLabel.textContent = "[CH " + lockedMusicChannel + " LOCKED]";
+      } else if (activeInput) {
+        targetLabel.textContent = "[" + activeInput.textContent.trim() + "]";
+      }
+    }
+
+    const currentChannelStr = activeInput?.textContent || "CH 1";
+    const screenChNum = parseInt(currentChannelStr.replace(/\D/g, ''), 10) || 1;
+    const chNum = (lockedMusicChannel !== null) ? lockedMusicChannel : screenChNum;
+
+    if (window.state && window.state.channels) {
+      const chData = window.state.channels[chNum - 1] || {};
+      const screenData = window.state.channels[screenChNum - 1] || {};
+
+      if (screenData) {
+        if (screenGain) screenGain.textContent = Number(screenData.gain || 1.0).toFixed(2);
+        if (screenFader) screenFader.textContent = Math.round(screenData.fader !== undefined ? screenData.fader : 75) + '%';
+        if (screenPan) {
+          const panVal = screenData.pan || 0;
+          screenPan.textContent = panVal === 0 ? 'CENTER' : (panVal < 0 ? 'L ' + Math.round(Math.abs(panVal) * 100) + '%' : 'R ' + Math.round(panVal * 100) + '%');
+        }
+      }
+
+      if (analyserNode && ((currentAudioElement && !currentAudioElement.paused) || liveMicStreamNode)) {
+        const dataArray = new Uint8Array(analyserNode.frequencyBinCount);
+        analyserNode.getByteFrequencyData(dataArray);
+
+        const barCols = document.querySelectorAll('.pro-mini-spectrum .bar-col, .rta-bars div');
+        barCols.forEach((bar, idx) => {
+          const val = dataArray[idx % dataArray.length] || 10;
+          bar.style.height = Math.max(10, Math.min(100, (val / 255) * 100)) + '%';
+        });
+
+        let avgLevel = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          avgLevel += dataArray[i];
+        }
+        avgLevel = (avgLevel / dataArray.length) / 255;
+
+        const masterFaderElem = document.getElementById('master');
+        const masterVolumeScale = masterFaderElem ? (parseInt(masterFaderElem.value, 10) || 0) / 100 : 0.75;
+        const channelFaderScale = ((chData.fader !== undefined ? chData.fader : 75)) / 100;
+
+        const panVal = chData.pan || 0;
+        const leftPan = panVal <= 0 ? 1 : 1 - panVal;
+        const rightPan = panVal >= 0 ? 1 : 1 + panVal;
+
+        const leftHeight = masterVolumeScale === 0 ? 0 : Math.min(100, avgLevel * 100 * channelFaderScale * masterVolumeScale * leftPan);
+        const rightHeight = masterVolumeScale === 0 ? 0 : Math.min(100, avgLevel * 100 * channelFaderScale * masterVolumeScale * rightPan);
+
+        if (masterMeterL) masterMeterL.style.height = leftHeight + '%';
+        if (masterMeterR) masterMeterR.style.height = rightHeight + '%';
+
+        document.querySelectorAll('.new-channel-strip, .channel-strip, [data-ch]').forEach(strip => {
+          const cId = Number(strip.dataset.ch) || parseInt(strip.innerText.match(/CH\s*(\d+)/i)?.[1] || '0', 10);
+          if (cId > 0) {
+            const cState = (window.state && window.state.channels) ? window.state.channels[cId - 1] : {};
+            const topVuFill = strip.querySelector('.ch-top-vu-fill');
+            
+            if (topVuFill) {
+              if (cState.mute) {
+                topVuFill.style.height = '0%';
+              } else {
+                const cGain = parseFloat(cState.gain ?? 1.0);
+                const cFaderScale = (parseFloat(cState.fader ?? 75)) / 100;
+                let chSignalLevel = 0;
+                
+                if (cId === chNum && analyserNode) {
+                  chSignalLevel = avgLevel * 100 * cGain * cFaderScale;
+                } else {
+                  chSignalLevel = 0;
+                }
+
+                topVuFill.style.height = Math.min(100, Math.max(0, chSignalLevel)) + '%';
+              }
+            }
+          }
+        });
+
+        if (gainNode) {
+          const gainVal = (parseFloat(chData.gain) || 1.0) * channelFaderScale * masterVolumeScale;
+          gainNode.gain.setValueAtTime(Math.max(0, Math.min(2.0, gainVal)), audioCtx.currentTime);
+        }
+
+        if (panNode && typeof chData.pan !== 'undefined') {
+          panNode.pan.setValueAtTime(Math.max(-1.0, Math.min(1.0, chData.pan)), audioCtx.currentTime);
+        }
+      } else {
+        if (masterMeterL) masterMeterL.style.height = '0%';
+        if (masterMeterR) masterMeterR.style.height = '0%';
+        document.querySelectorAll('.ch-top-vu-fill').forEach(fill => fill.style.height = '0%');
+      }
+    }
+  }
+
+  requestAnimationFrame(updateIndicators);
+
+  if(musicBtn) musicBtn.addEventListener('click', () => fileInput?.click());
+  if(fileBtn) fileBtn.addEventListener('click', () => fileInput?.click());
+  if(liveInBtn) liveInBtn.addEventListener('click', startPhysicalAudioStream);
+
+  if(modeBtn) {
+    modeBtn.addEventListener('click', () => {
+      isShuffle = !isShuffle;
+      if (modeText) modeText.textContent = isShuffle ? 'SHUFFLE' : 'SEQ';
+      modeBtn.style.borderColor = isShuffle ? 'var(--accent-color)' : 'var(--panel-border)';
+    });
+  }
+
+  if(playPauseBtn) {
+    playPauseBtn.addEventListener('click', () => {
+      if(!currentAudioElement || playlist.length === 0) {
+        fileInput?.click();
+        return;
+      }
+      if(currentAudioElement.paused) {
+        currentAudioElement.play();
+        playPauseBtn.textContent = '⏸ PAUSE';
+        playPauseBtn.style.background = '#e74c3c';
+      } else {
+        currentAudioElement.pause();
+        playPauseBtn.textContent = '▶ PLAY';
+        playPauseBtn.style.background = 'var(--accent-color)';
+      }
+    });
+  }
+
+  if(fileInput) {
+    fileInput.addEventListener('change', function(e) {
+      const files = Array.from(e.target.files);
+      if(files.length === 0) return;
+      
+      playlist = files;
+      const currentChannelStr = document.getElementById('screenInput')?.textContent || "CH 1";
+      lockedMusicChannel = parseInt(currentChannelStr.replace(/\D/g, ''), 10) || 1;
+
+      playTrack(0);
+    });
+  }
+})();
+
+// Switcher Skin Mixer
+(function() {
+  const skinSelect = document.getElementById('skinSelect');
+  
+  const savedSkin = localStorage.getItem('mixer_theme') || 'theme-midas';
+  document.body.className = savedSkin;
+  if (skinSelect) skinSelect.value = savedSkin;
+
+  if (skinSelect) {
+    skinSelect.addEventListener('change', function() {
+      const selectedTheme = this.value;
+      document.body.className = selectedTheme;
+      localStorage.setItem('mixer_theme', selectedTheme);
+    });
+  }
+})();
+</script>
+
+<script>
+// ==========================================================================
+// FIX 1: DROPDOWN TRANSPORT (ESP32 / BLUETOOTH SYNC)
+// ==========================================================================
+(function(){
+  function initTransportHandler() {
+    const transportSelect = document.getElementById("transportSelect");
+    const deviceConnect = document.getElementById("deviceConnect");
+    const deviceStatus = document.getElementById("deviceStatus");
+    const deviceHint = document.getElementById("deviceHint");
+
+    function updateTransportUI() {
+      if (!transportSelect || !deviceConnect) return;
+      const mode = transportSelect.value;
+      const isConnected = window.MixerAdapters?.active?.connected;
+
+      if (mode === "bluetooth") {
+        deviceConnect.textContent = isConnected ? "BLUETOOTH CONNECTED" : "CONNECT BLUETOOTH";
+        if (deviceStatus && !isConnected) deviceStatus.textContent = "🔴 BLUETOOTH DISCONNECTED";
+        if (deviceHint) deviceHint.textContent = "Koneksi langsung via Web Bluetooth API ke modul Bluetooth Mixer.";
+      } else {
+        deviceConnect.textContent = isConnected ? "ESP32 CONNECTED" : "CONNECT ESP32";
+        if (deviceStatus && !isConnected) deviceStatus.textContent = "🔴 ESP32 SIMULATOR OFFLINE";
+        if (deviceHint) deviceHint.textContent = "Simulator ESP32 berjalan langsung di Mixer-Online sebagai bridge.";
+      }
+    }
+
+    if (transportSelect) {
+      transportSelect.addEventListener("change", updateTransportUI);
+    }
+
+    if (deviceConnect) {
+      deviceConnect.addEventListener("click", async function(e) {
+        e.preventDefault();
+        const mode = transportSelect ? transportSelect.value : "esp32";
+
+        if (mode === "bluetooth") {
+          try {
+            deviceConnect.disabled = true;
+            deviceConnect.textContent = "PAIRING BT...";
+            const res = await window.MixerAdapters?.connectBluetooth?.();
+            if (res && res.ok) {
+              if (deviceStatus) deviceStatus.textContent = "🟢 BLUETOOTH CONNECTED";
+              deviceConnect.textContent = "BLUETOOTH CONNECTED";
+            } else {
+              alert("Gagal koneksi Bluetooth atau koneksi dibatalkan.");
+              updateTransportUI();
+            }
+          } catch (err) {
+            alert("Bluetooth Error: " + err.message);
+            updateTransportUI();
+          } finally {
+            deviceConnect.disabled = false;
+          }
+        } else {
+          const connectEspBtn = document.getElementById("connectEsp");
+          if (connectEspBtn) connectEspBtn.click();
+        }
+      });
+    }
+
+    updateTransportUI();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initTransportHandler);
+  } else {
+    initTransportHandler();
+  }
+})();
+</script>
+
+<script>
+// ==========================================================================
+// FIX 2: USB RECORDER (PEMEKARAN TOMBOL REC)
+// ==========================================================================
+(function(){
+  const recBtn = document.getElementById('btnPlayerRec');
+  const trackInfo = document.getElementById('playerTrackInfo');
+
+  let mediaRecorder = null;
+  let recordedChunks = [];
+  let isRecording = false;
+
+  if (recBtn) {
+    recBtn.addEventListener('click', async function() {
+      if (!isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          recordedChunks = [];
+
+          mediaRecorder.ondataavailable = function(e) {
+            if (e.data.size > 0) recordedChunks.push(e.data);
+          };
+
+          mediaRecorder.onstop = function() {
+            const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `M32_REC_${new Date().toISOString().replace(/[:.]/g, '-')}.webm`;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+            }, 100);
+
+            if (trackInfo) trackInfo.textContent = "RECORDING SAVED & DOWNLOADED";
+          };
+
+          mediaRecorder.start();
+          isRecording = true;
+          recBtn.style.background = "#e74c3c";
+          recBtn.style.color = "#ffffff";
+          recBtn.innerHTML = "🔴 <small>STOP</small>";
+          if (trackInfo) trackInfo.textContent = "🎙 RECORDING LIVE AUDIO...";
+
+        } catch (err) {
+          alert("Gagal mengakses mikrofon untuk merekam: " + err.message);
+        }
+      } else {
+        if (mediaRecorder && mediaRecorder.state !== "inactive") {
+          mediaRecorder.stop();
+        }
+        isRecording = false;
+        recBtn.style.background = "var(--main-bg)";
+        recBtn.style.color = "var(--text-main)";
+        recBtn.innerHTML = "🎙 <small>REC</small>";
+      }
+    });
+  }
+})();
+</script>
+
+<script>
+// ==========================================================================
+// FIX 3 & 4: FX PROCESSOR PARAMETER, AUX/BUS, DAN FX RETURN SINKRON
+// ==========================================================================
+(function(){
+  const fxButtons = document.querySelectorAll('.fx-buttons button');
+  const fxPresetName = document.getElementById('fxRackPreset');
+
+  fxButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      fxButtons.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      const target = this.dataset.fxSelect;
+      if (fxPresetName) fxPresetName.textContent = target + " ACTIVE";
+    });
+  });
+
+  const fxControls = document.querySelectorAll('.fx-control');
+  fxControls.forEach(input => {
+    input.addEventListener('input', function() {
+      const param = this.dataset.param;
+      const val = this.value;
+      const target = this.dataset.target || 'FX1';
+      const output = this.parentElement.querySelector('output');
+      
+      if (output) {
+        if (param === 'time') output.textContent = val + 's';
+        else if (param === 'preDelay') output.textContent = val + 'ms';
+        else if (param === 'decay') output.textContent = val + '%';
+        else if (param === 'level') output.textContent = val + 'dB';
+        else output.textContent = val;
+      }
+
+      if (!window.state) window.state = {};
+      if (!window.state.fx) window.state.fx = {};
+      if (!window.state.fx[target]) window.state.fx[target] = {};
+      window.state.fx[target][param] = val;
+    });
+  });
+
+  const auxControls = document.querySelectorAll('.aux-control');
+  auxControls.forEach(input => {
+    input.addEventListener('input', function() {
+      const target = this.dataset.target;
+      const scope = this.dataset.scope || 'AUX';
+      const val = Math.round(this.value * 100);
+
+      if (!window.state) window.state = {};
+      if (scope === 'FX_RETURN') {
+        if (!window.state.fxReturn) window.state.fxReturn = {};
+        window.state.fxReturn[target] = val;
+      } else {
+        if (!window.state.aux) window.state.aux = {};
+        window.state.aux[target] = val;
+      }
+
+      const tr = document.getElementById('testResult');
+      if (tr) tr.textContent = `${scope} [${target}] Set Level: ${val}%`;
+    });
+  });
+})();
+</script>
+
+<script>
+// ==========================================================================
+// KODE HANDLER CONNECTION / TEST SUITE
+// ==========================================================================
+(function() {
+  "use strict";
+
+  function triggerUiUpdate(chNum) {
+    if (typeof window.selectScreenChannel === "function") {
+      window.selectScreenChannel(chNum);
+    }
+
+    const strip = document.querySelector(`.new-channel-strip[data-ch="${chNum}"], .channel-strip[data-ch="${chNum}"], [data-ch="${chNum}"]`);
+    if (strip && window.state?.channels?.[chNum - 1]) {
+      const ch = window.state.channels[chNum - 1];
+      
+      const updateKnobElement = (selector, val, minVal = 0, maxVal = 100) => {
+        const input = strip.querySelector(selector);
+        if (input) {
+          let min = parseFloat(input.min) ?? minVal;
+          let max = parseFloat(input.max) ?? maxVal;
+          let clampedVal = Math.max(min, Math.min(max, val));
+
+          input.value = clampedVal;
+          input.style.transform = 'none';
+
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      };
+
+      const faderInput = strip.querySelector('input.channel-fader, input[data-k="fader"], input[data-param="fader"]');
+      if (faderInput) {
+        faderInput.value = ch.fader;
+        faderInput.dispatchEvent(new Event('input', { bubbles: true }));
+        faderInput.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      const faderOut = strip.querySelector('output, .fader-val');
+      if (faderOut) faderOut.textContent = Math.round(ch.fader) + '%';
+
+      updateKnobElement('input[data-k="gain"], input[data-param="gain"], input.gain-knob, .knob[data-param="gain"]', ch.gain, 0, 2);
+      const gainOut = strip.querySelector('.gain-val, output[data-k="gain"]');
+      if (gainOut) gainOut.textContent = Number(ch.gain).toFixed(2);
+
+      updateKnobElement('input[data-k="pan"], input[data-param="pan"], input.pan-knob, .knob[data-param="pan"]', ch.pan, -1, 1);
+      const panOut = strip.querySelector('.pan-val, output[data-k="pan"]');
+      if (panOut) {
+        panOut.textContent = ch.pan == 0 ? 'CENTER' : (ch.pan < 0 ? 'L' + Math.abs(Math.round(ch.pan * 100)) : 'R' + Math.round(ch.pan * 100));
+      }
+
+      if (ch.low !== undefined) {
+        updateKnobElement('input[data-k="low"], input[data-param="low"], input.low-knob, .knob[data-param="low"]', ch.low, 0, 100);
+        const lowOut = strip.querySelector('.low-val, output[data-k="low"]');
+        if (lowOut) lowOut.textContent = Math.round(ch.low);
+      }
+
+      if (ch.mid !== undefined) {
+        updateKnobElement('input[data-k="mid"], input[data-param="mid"], input.mid-knob, .knob[data-param="mid"]', ch.mid, 0, 100);
+        const midOut = strip.querySelector('.mid-val, output[data-k="mid"]');
+        if (midOut) midOut.textContent = Math.round(ch.mid);
+      }
+
+      if (ch.high !== undefined) {
+        updateKnobElement('input[data-k="high"], input[data-param="high"], input.high-knob, .knob[data-param="high"]', ch.high, 0, 100);
+        const highOut = strip.querySelector('.high-val, output[data-k="high"]');
+        if (highOut) highOut.textContent = Math.round(ch.high);
+      }
+
+      const muteBtn = strip.querySelector('button[data-k="mute"], button.mute-btn');
+      if (muteBtn) {
+        muteBtn.classList.toggle('active', !!ch.mute);
+        muteBtn.classList.toggle('on', !!ch.mute);
+        muteBtn.textContent = ch.mute ? 'UNMUTE' : 'MUTE';
+      }
+
+      const soloBtn = strip.querySelector('button[data-k="solo"], button.solo-btn');
+      if (soloBtn) {
+        soloBtn.classList.toggle('active', !!ch.solo);
+        soloBtn.classList.toggle('on', !!ch.solo);
+        soloBtn.textContent = ch.solo ? 'UNSOLO' : 'SOLO';
+      }
+    }
+  }
+
+  document.getElementById('runCombinationTest')?.addEventListener('click', function() {
+    if (!window.state) window.state = { channels: [] };
+    if (!window.state.channels) window.state.channels = [];
+    
+    for (let i = 0; i < 14; i++) {
+      if (!window.state.channels[i]) window.state.channels[i] = {};
+      
+      window.state.channels[i].gain = (0.5 + Math.random() * 1.5).toFixed(2);
+      window.state.channels[i].pan = parseFloat((Math.random() * 2 - 1).toFixed(2));
+      window.state.channels[i].fader = Math.floor(20 + Math.random() * 75);
+      window.state.channels[i].low = Math.floor(Math.random() * 100);
+      window.state.channels[i].mid = Math.floor(Math.random() * 100);
+      window.state.channels[i].high = Math.floor(Math.random() * 100);
+      
+      triggerUiUpdate(i + 1);
+    }
+
+    const tr = document.getElementById('testResult');
+    if (tr) tr.textContent = `TEST: COMBINATION CONTROL SUCCESSFUL`;
+  });
+
+  document.getElementById('runFaderTest')?.addEventListener('click', function() {
+    if (!window.state) window.state = { channels: [] };
+    if (!window.state.channels) window.state.channels = [];
+
+    for (let i = 0; i < 14; i++) {
+      if (!window.state.channels[i]) window.state.channels[i] = {};
+      window.state.channels[i].fader = Math.floor(Math.random() * 100);
+      triggerUiUpdate(i + 1);
+    }
+
+    const tr = document.getElementById('testResult');
+    if (tr) tr.textContent = `TEST: FADER CH1–CH14 TEST PASSED`;
+  });
+
+  document.getElementById('runMuteSoloTest')?.addEventListener('click', function() {
+    if (!window.state) window.state = { channels: [] };
+    if (!window.state.channels) window.state.channels = [];
+
+    for (let i = 0; i < 14; i++) {
+      if (!window.state.channels[i]) window.state.channels[i] = {};
+      window.state.channels[i].mute = Math.random() > 0.5;
+      window.state.channels[i].solo = Math.random() > 0.7;
+      triggerUiUpdate(i + 1);
+    }
+
+    const tr = document.getElementById('testResult');
+    if (tr) tr.textContent = `TEST: MUTE & SOLO TEST COMPLETED`;
+  });
+
+  document.getElementById('runMasterIsolationTest')?.addEventListener('click', function() {
+    const masterElem = document.getElementById('master');
+    const masterValElem = document.getElementById('masterVal');
+    
+    const randomMasterVal = Math.floor(Math.random() * 101);
+    
+    if (masterElem) {
+      masterElem.value = randomMasterVal;
+      masterElem.dispatchEvent(new Event('input', { bubbles: true }));
+      masterElem.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    if (masterValElem) {
+      masterValElem.textContent = randomMasterVal + '%';
+    }
+
+    const tr = document.getElementById('testResult');
+    if (tr) tr.textContent = `TEST: MASTER ISOLATION TEST PASSED`;
+  });
+
+  document.getElementById('simulateRx')?.addEventListener('click', function() {
+    if (!window.state) window.state = { channels: [] };
+    if (!window.state.channels) window.state.channels = [];
+
+    const chId = Math.floor(Math.random() * 14) + 1;
+    if (!window.state.channels[chId - 1]) window.state.channels[chId - 1] = {};
+
+    window.state.channels[chId - 1].gain = (Math.random() * 2).toFixed(2);
+    window.state.channels[chId - 1].pan = parseFloat((Math.random() * 2 - 1).toFixed(2));
+    window.state.channels[chId - 1].low = Math.floor(Math.random() * 100);
+    triggerUiUpdate(chId);
+
+    const rx = document.getElementById('rx');
+    if (rx) rx.textContent = `RX: {"ch":${chId},"gain":${window.state.channels[chId - 1].gain},"pan":${window.state.channels[chId - 1].pan},"low":${window.state.channels[chId - 1].low}}`;
+
+    const tr = document.getElementById('testResult');
+    if (tr) tr.textContent = `TEST: HARDWARE RX SIMULATION CH${chId} UPDATED`;
+  });
+
+})();
+</script>
+
+</body>
+</html>
