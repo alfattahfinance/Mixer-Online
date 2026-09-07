@@ -647,6 +647,7 @@ window.MixerAdapters = (() => {
     getBridgeStatus: () => active?.bridge ? { ...active.bridge, commands: active.bridge.commands.slice(-50), feedback: (active.bridge.feedback||[]).slice(-50) } : null,
     hardwareFeedback,
     simulateHardwareChange,
+    getTransportStats,
     resetSimulatorState: () => {
       try { localStorage.removeItem(SIM_KEY); } catch {}
       if (active?.type === "simulator") {
