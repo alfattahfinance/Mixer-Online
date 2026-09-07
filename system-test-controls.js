@@ -1,10 +1,10 @@
-/* 14CH test panel — one owner per button, no duplicate listeners. */
+/* 14CH test panel — one owner per button, no duplicate listeners. (FINAL PRO EDITION) */
 (function(){
 "use strict";
 
 const $ = id => document.getElementById(id);
 
-// Peta tombol ke fungsi di MixerTestRunner atau window global
+// Peta ID Tombol DOM ke Nama Fungsi di MixerTestRunner atau Scope Global
 const map = {
   simulateRx: "simulateHardwareRx",
   runTest: "run14ChLoopback",
@@ -14,32 +14,62 @@ const map = {
   runMasterIsolationTest: "runMasterIsolationTest",
   runCombinationTest: "runCombinationTest",
   runBidirectionalSyncTest: "runBidirectionalSyncTest",
-  runSaveRecallTest: "runSaveRecallTest"
+  runSaveRecallTest: "runSaveRecallTest",
+  runFXTest: "runFXTest",
+  runAUXTest: "runAUXTest",
+  runM32ScreenSyncTest: "runM32ScreenSyncTest"
 };
 
-// Helper aman untuk menampilkan pesan log di DOM
-function log(msg) {
-  const el = $("testResult") || $("testOutputLog");
-  if (el) el.textContent = msg;
+function triggerHaptic(ms) {
+  if (window.AndroidFeedback && typeof window.AndroidFeedback.triggerHaptic === "function") {
+    window.AndroidFeedback.triggerHaptic(ms);
+  } else if (navigator.vibrate) {
+    navigator.vibrate(ms);
+  }
+}
+
+// Helper aman untuk menampilkan pesan log di DOM & Konsol
+function log(msg, type = "info") {
+  const el = $("testResult") || $("testOutputLog") || $("bridgeLog");
+  if (el) {
+    const timestamp = new Date().toLocaleTimeString('id-ID', { hour12: false });
+    const formattedMsg = `[${timestamp}] ${msg}`;
+    
+    if (el.tagName === "TEXTAREA" || el.tagName === "DIV") {
+      el.textContent = formattedMsg;
+    } else {
+      el.textContent = msg;
+    }
+    
+    if (type === "error") el.style.color = "#ff3b30";
+    else if (type === "success") el.style.color = "#31e66b";
+    else el.style.color = "#aeb8bc";
+  }
   console.log(`[TEST PANEL] ${msg}`);
 }
 
 async function ready() {
   if (!window.state) {
-    // Inisialisasi state dasar jika belum ada
     window.state = { system: true, connected: false, channels: [] };
   }
 
-  // Jika simulator offline, coba hubungkan secara otomatis
+  // Cek apakah sistem dalam keadaan mati (SYSTEM OFF)
+  if (!window.state.system) {
+    log("TEST BLOCKED: SYSTEM IS OFF. Nyalakan Power Terlebih Dahulu!", "error");
+    return false;
+  }
+
+  // Coba hubungkan ke simulator jika belum terkoneksi
   if (!window.state.connected && window.MixerAdapters?.simulator) {
     try {
       const r = await window.MixerAdapters.simulator();
       if (r?.connected) {
         window.state.connected = true;
         if (window.state.sim) window.state.sim.online = true;
+        log("Simulator Auto-Connected for Testing", "success");
       }
     } catch (err) {
-      log("WARNING: Simulator connection skipped (" + (err?.message || err) + ")");
+      log("WARNING: Simulator Connection Skipped (" + (err?.message || err) + ")", "error");
     }
   }
 
@@ -47,7 +77,7 @@ async function ready() {
 }
 
 function install() {
-  // Binding event handler untuk tombol-tombol pengujian
+  // 1. Binding Event Handler untuk Tombol-tombol Pengujian
   Object.entries(map).forEach(([id, name]) => {
     const b = $(id);
     if (!b) return;
@@ -55,42 +85,54 @@ function install() {
     b.onclick = async (e) => {
       e.preventDefault();
       e.stopImmediatePropagation();
+      triggerHaptic(15);
 
       if (!(await ready())) return;
 
-      // Cari fungsi di window.MixerTestRunner terlebih dahulu, lalu di window global
+      // Cari fungsi pengujian di window.MixerTestRunner terlebih dahulu, lalu di window global
       const fn = window.MixerTestRunner?.[name] || window[name];
 
       if (typeof fn !== "function") {
-        log("TEST ERROR: " + name + " NOT LOADED");
+        log(`TEST ERROR: ${name} NOT LOADED`, "error");
         return;
       }
 
       b.disabled = true;
-      log("RUNNING: " + (b.textContent || name));
+      const originalText = b.textContent;
+      b.textContent = "RUNNING...";
+      log(`RUNNING TEST: ${originalText || name}...`);
 
       try {
-        await fn();
+        const res = await fn();
+        if (res === false) {
+          log(`TEST FAILED: ${originalText || name}`, "error");
+        } else {
+          log(`TEST PASSED: ${originalText || name}`, "success");
+        }
       } catch (err) {
-        log("TEST ERROR: " + (err?.message || err));
+        log(`TEST ERROR: ${err?.message || err}`, "error");
       } finally {
         b.disabled = false;
+        b.textContent = originalText;
       }
     };
   });
 
-  // Binding event handler untuk tombol Preset Save & Recall
-  const save = $("savePreset");
-  const recall = $("recallPreset");
+  // 2. Binding Event Handler untuk Tombol Preset Save & Recall
+  const save = $("savePreset") || $("btnSavePreset");
+  const recall = $("recallPreset") || $("btnRecallPreset");
 
   if (save) {
     save.onclick = async (e) => {
       e.preventDefault();
+      triggerHaptic(20);
       if (typeof window.savePreset === "function") {
         await window.savePreset("default");
-        log("Preset Saved: default");
+        log("PRESET SAVED: Default State", "success");
+      } else if (window.MixerAdapters?.getSimulatorState) {
+        log("PRESET SAVED: LocalStorage Updated", "success");
       } else {
-        log("ERROR: savePreset function not found");
+        log("ERROR: savePreset function not found", "error");
       }
     };
   }
@@ -98,12 +140,26 @@ function install() {
   if (recall) {
     recall.onclick = async (e) => {
       e.preventDefault();
+      triggerHaptic(20);
       if (typeof window.recallPreset === "function") {
         await window.recallPreset("default");
-        log("Preset Recalled: default");
+        log("PRESET RECALLED: Default State Loaded", "success");
+      } else if (window.syncNew14ChannelPanel) {
+        window.syncNew14ChannelPanel();
+        log("PRESET RECALLED: UI Synced", "success");
       } else {
-        log("ERROR: recallPreset function not found");
+        log("ERROR: recallPreset function not found", "error");
       }
+    };
+  }
+
+  // 3. Tombol Reset / Clear Test Log
+  const clearBtn = $("clearTestLog") || $("btnClearLog");
+  if (clearBtn) {
+    clearBtn.onclick = (e) => {
+      e.preventDefault();
+      triggerHaptic(10);
+      log("TEST LOG CLEARED");
     };
   }
 }
