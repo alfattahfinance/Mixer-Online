@@ -91,7 +91,7 @@
     height: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
-    overflow-x: auto !important;
+    overflow-x: hidden !important;
     overflow-y: hidden !important;
     background: var(--main-bg) !important;
     color: var(--text-main) !important;
@@ -165,25 +165,24 @@
   }
 
   /* ==========================================================
-     3. MAIN CONSOLE - PRESISI PRESISI RATA ATAS & RATA BAWAH
+     3. MAIN CONSOLE - BISA DIGESER KIRI KANAN (HORIZONTAL SCROLL)
      ========================================================== */
-    
   main.console {
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
-    width: max-content !important;
-    min-width: 100% !important;
-    height: calc(100vh - 82px) !important; /* Terkunci penuh di antara Header & Bottom Nav */
+    width: 100% !important;
+    height: calc(100vh - 80px) !important;
     padding: 2px !important;
     gap: 2px !important;
     align-items: stretch !important;
 
-    /* PROPERTI KUNCI AGAR BISA DIGESER DENGAN JARI/MOUSE */
+    /* DUKUNGAN SWIPE & SCROLL KIRI KANAN */
     overflow-x: auto !important;
     overflow-y: hidden !important;
-    -webkit-overflow-scrolling: touch !important; /* Geseran mulus di iOS/Android */
-    touch-action: pan-x !important;               /* Mengizinkan swiping horizontal */
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-x !important;
+    scroll-behavior: smooth !important;
   }
 
   .channel-bank {
@@ -562,7 +561,7 @@
   }
 
   /* ==========================================================
-     5. PANEL AUX & FX (AKURAT DENGAN ALIGN-SELF & MARGIN AUTO)
+     5. PANEL AUX & FX
      ========================================================== */
   .center-console .media-rack,
   .center-console .fx-rack,
@@ -581,7 +580,7 @@
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
     gap: 4px !important;
-    margin-top: auto !important; /* Mendorong Aux Rack persis rapat ke garis paling bawah */
+    margin-top: auto !important;
     padding: 3px !important;
   }
 
@@ -639,9 +638,6 @@
     box-shadow: 0 0 6px var(--accent-color) !important;
   }
 </style>
-
-
-
 </head>
 <body class="theme-midas">
 
@@ -695,7 +691,7 @@
     <div class="screen-frame">
       <div class="screen-title" style="margin-bottom: 4px;"><b>MIDAS M32</b><span>DIGITAL CONSOLE SYSTEM</span></div>
       
-      <!-- NAVIGASI LAYAR UTAMA (6 TOMBOL SEBARIS) -->
+      <!-- NAVIGASI LAYAR UTAMA -->
       <div class="screen-tabs" id="screenTabs">
         <button class="active" data-screen="HOME">HOME</button>
         <button data-screen="METER">METERS</button>
@@ -705,7 +701,7 @@
         <button data-screen="SCENE">LIBRARY</button>
       </div>
 
-      <!-- SUBMENU BAR (6 TOMBOL SEBARIS) -->
+      <!-- SUBMENU BAR -->
       <div class="m32-submenu-bar" id="m32SubmenuBar">
         <button class="m32-sub-btn active" data-sub="overview">OVERVIEW</button>
         <button class="m32-sub-btn" data-sub="config">CONFIG</button>
@@ -938,7 +934,7 @@
       </div>
     </div>
 
-    <!-- Player / Recorder + Tombol Input Suara Mixer Fisik -->
+    <!-- Player / Recorder -->
     <section class="media-rack" style="border: 1px solid var(--panel-border); border-radius: 6px; padding: 6px;">
       <h2 style="color: var(--accent-color); border-bottom: 1px solid var(--panel-border); margin-bottom: 4px; font-size: 10px;">USB PLAYER / REC <span id="activePlayerTarget" style="font-size: 9px; color: #2ecc71; float: right;">[CH 1]</span></h2>
       <div style="display: flex; gap: 4px; margin-bottom: 4px;">
@@ -1150,7 +1146,7 @@
     });
   });
 
-  // LOGIKA RESPONSIF BOTTOM NAV BAR
+  // LOGIKA RESPONSIF BOTTOM NAV BAR DENGAN SCROLL HORIZONTAL PROPOSIONAL
   const bottomNavButtons = document.querySelectorAll('#bottomNav button');
   bottomNavButtons.forEach(btn => {
     btn.addEventListener('click', function() {
@@ -1162,18 +1158,18 @@
       if (target === 'ch1-7') {
         document.getElementById('bankLeft')?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
       } else if (target === 'ch8-14') {
-        document.getElementById('bankRight')?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+        document.getElementById('bankRight')?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
       } else if (target === 'fx') {
         setScreen('EFFECT');
-        document.getElementById('fxRack')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        document.getElementById('centerConsole')?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
       } else if (target === 'master') {
         document.getElementById('masterRack')?.scrollIntoView({ behavior: 'smooth', inline: 'end', block: 'nearest' });
       } else if (target === 'scene') {
         setScreen('SCENE');
-        document.getElementById('centerConsole')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById('centerConsole')?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
       } else if (target === 'setup') {
         setScreen('SETUP');
-        document.getElementById('centerConsole')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById('centerConsole')?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
       } else if (target === 'system') {
         document.getElementById('systemPanel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
@@ -2054,7 +2050,7 @@
 
 <script>
 // ==========================================================================
-// FIX 2: USB RECORDER (PEMEKARAN TOMBOL REC)
+// FIX 2: USB RECORDER
 // ==========================================================================
 (function(){
   const recBtn = document.getElementById('btnPlayerRec');
