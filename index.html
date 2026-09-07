@@ -16,8 +16,6 @@
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js');
   }
-</script>
-
 <style>
   /* ==========================================================
      1. DEFINISI VARIABEL WARNA (SKIN)
@@ -165,7 +163,7 @@
   }
 
   /* ==========================================================
-     3. MAIN CONSOLE - PRESISI TANPA CELAH & SEJAJAR
+     3. MAIN CONSOLE - PRESISI MENTOK BATAS BAWAH SEJAJAR AUX
      ========================================================== */
   main.console {
     display: flex !important;
@@ -174,32 +172,34 @@
     width: max-content !important;
     min-width: 100% !important;
     padding: 2px !important;
-    gap: 0px !important;     /* MENGHILANGKAN CELAH ANTAR BANK DENGAN SCREEN */
-    align-items: stretch !important;
+    gap: 0px !important;
+    align-items: stretch !important; /* Memaksa seluruh kolom dari Kiri ke Kanan memiliki tinggi sama persis */
   }
 
   .channel-bank {
     flex: 0 0 auto !important;
-    width: 505px !important;  /* Diberi ruang lebar ekstra */
+    width: 505px !important;
     min-width: 480px !important;
     background: var(--strip-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
-    padding: 4px 2px 0px 2px !important; /* Bottom padding 0px agar rapat ke bawah */
+    padding: 4px 2px 0px 2px !important; /* Padding bawah 0px agar mentok ke garis bawah */
     display: flex !important;
     flex-direction: column !important;
     margin: 0 !important;
     justify-content: space-between !important;
+    height: 100% !important; /* Mengisi penuh tinggi container halaman */
   }
 
-  /* GRID 7 KOLOM DENGAN PELEBARAN KHUSUS CH7 & CH14 */
+  /* GRID 7 KOLOM DENGAN PELEBARAN CH7 & CH14 */
   #channels, #channelsRight {
     display: grid !important;
-    grid-template-columns: repeat(6, 1fr) 1.25fr !important; /* CH7 & CH14 lebih lebar ke kanan */
+    grid-template-columns: repeat(6, 1fr) 1.25fr !important;
     width: 100% !important;
     height: 100% !important;
     flex-grow: 1 !important;
     gap: 0 !important;
+    align-items: stretch !important;
   }
 
   .new-channel-strip, .channel-strip {
@@ -208,14 +208,13 @@
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: space-between !important;
+    justify-content: space-between !important; /* Mendorong tombol SOLO & Fader ke paling bawah */
     padding: 2px 2px 2px 2px !important;
     border-right: 1px dashed var(--panel-border) !important;
     box-sizing: border-box !important;
-    height: 100% !important;
+    height: 100% !important; /* Memanjang penuh sampai batas bawah */
   }
 
-  /* CH7 & CH14 TIDAK TERPOTONG */
   .new-channel-strip:last-child, .channel-strip:last-child {
     border-right: none !important;
     padding-right: 4px !important;
@@ -275,7 +274,7 @@
     justify-content: flex-end !important;
     flex-grow: 1 !important;
     width: 100% !important;
-    padding-bottom: 0px !important; /* Menghapus celah di bawah fader */
+    padding-bottom: 0px !important;
     margin-bottom: 0px !important;
   }
 
@@ -284,20 +283,21 @@
     accent-color: var(--accent-color) !important;
   }
 
-  /* KONSOL TENGAH (M32 SCREEN + PLAYER) */
+  /* KONSOL TENGAH (M32 SCREEN + PLAYER + AUX) */
   .center-console {
     flex: 0 0 320px !important;
     width: 320px !important;
     min-width: 320px !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important; /* Memastikan AUX/BUS mentok sejajar bawah */
+    justify-content: space-between !important; /* Menyebar elemen sehingga AUX didorong penuh ke bawah */
     gap: 4px !important;
     position: relative !important;
     margin: 0 !important;
+    height: 100% !important;
   }
 
-  /* MASTER RACK (Ujung Kanan Console) */
+  /* MASTER RACK */
   .master-rack {
     flex: 0 0 72px !important;
     width: 72px !important;
@@ -311,6 +311,7 @@
     border-radius: 4px !important;
     padding: 4px 2px 2px 2px !important;
     margin: 0 !important;
+    height: 100% !important;
   }
 
   .meter-rack {
@@ -554,15 +555,8 @@
   }
 
   /* ==========================================================
-     5. PANEL AUX & FX (PRESISI SEJAJAR DENGAN BATAS BAWAH FADER)
+     5. PANEL AUX & FX (RATA & SEJAJAR DENGAN DASAR CHANNEL STRIP)
      ========================================================== */
-  .center-console {
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    height: 100% !important;
-  }
-
   .center-console .fx-rack,
   .center-console .aux-rack,
   #fxRack, #auxRack {
@@ -579,7 +573,7 @@
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
     gap: 4px !important;
-    margin-top: auto !important;
+    margin-top: auto !important; /* PATOKAN: Mendorong posisi kartu ke paling bawah */
     padding: 4px !important;
   }
 
@@ -587,13 +581,12 @@
     background: var(--main-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
-    padding: 6px 4px 8px 4px !important; /* Tambahkan padding atas/bawah agar kartu lebih tinggi */
-    min-height: 58px !important;          /* Kunci tinggi minimal agar sejajar mentok ke bawah */
+    padding: 6px 4px 8px 4px !important;
+    min-height: 58px !important; /* Kunci tinggi presisi agar sejajar rata fader */
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
   }
-
 
   main.console > .fx-rack, 
   main.console > .aux-rack {
@@ -635,6 +628,7 @@
     box-shadow: 0 0 6px var(--accent-color) !important;
   }
 </style>
+
 
 </head>
 <body class="theme-midas">
