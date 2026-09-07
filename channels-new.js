@@ -7,14 +7,16 @@
   "use strict";
 
   /* ============================================================
-     CHANNEL STATUS LED SKIN ONLY
+     CHANNEL INDICATOR SKIN ONLY
+     Lampu hijau kecil tetap dipertahankan.
+     Indikator lama diganti menjadi LED bar vertikal kecil.
      Tidak mengubah state, kontrol, audio, atau ESP32 Bridge.
-     Hanya mengganti tampilan lampu indikator .channel-led.
      ============================================================ */
   if (!document.getElementById("mixer-channel-led-skin")) {
     const style = document.createElement("style");
     style.id = "mixer-channel-led-skin";
     style.textContent = `
+      /* Lampu status lama: TETAP ADA sebagai LED hijau kecil */
       .new-channel-strip .channel-led,
       .channel-strip .channel-led {
         position: relative !important;
@@ -23,21 +25,20 @@
         height: 7px !important;
         min-width: 24px !important;
         min-height: 7px !important;
-        margin: 3px auto 4px !important;
+        margin: 3px auto 3px !important;
         border-radius: 999px !important;
-        border: 1px solid rgba(255,255,255,.16) !important;
-        background: linear-gradient(180deg,#1c252d,#080c10) !important;
-        box-shadow: inset 0 1px 2px rgba(0,0,0,.9), 0 0 0 1px rgba(0,0,0,.35) !important;
-        opacity: .9 !important;
-        transition: background .12s ease, box-shadow .12s ease, opacity .12s ease !important;
+        border: 1px solid rgba(255,255,255,.14) !important;
+        background: #182127 !important;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,.9) !important;
+        opacity: .65 !important;
       }
 
       .new-channel-strip .channel-led::before,
       .channel-strip .channel-led::before {
         content: "" !important;
         position: absolute !important;
-        left: 2px !important;
-        right: 2px !important;
+        left: 3px !important;
+        right: 3px !important;
         top: 1px !important;
         height: 2px !important;
         border-radius: 999px !important;
@@ -49,47 +50,106 @@
       .channel-strip .channel-led::after {
         content: "" !important;
         position: absolute !important;
-        left: 4px !important;
+        left: 5px !important;
         top: 2px !important;
-        width: 4px !important;
+        width: 14px !important;
         height: 2px !important;
         border-radius: 999px !important;
         background: #39444d !important;
-        box-shadow: 0 0 2px rgba(255,255,255,.12) !important;
-        transition: all .12s ease !important;
         pointer-events: none !important;
       }
 
       .new-channel-strip .channel-led.active.green,
       .channel-strip .channel-led.active.green {
         opacity: 1 !important;
-        background: linear-gradient(180deg,#7dffad 0%,#20d968 42%,#0b7e3b 100%) !important;
-        border-color: rgba(46,255,128,.72) !important;
-        box-shadow: inset 0 1px 1px rgba(255,255,255,.35), 0 0 5px rgba(46,255,128,.55), 0 0 11px rgba(46,255,128,.18) !important;
+        background: linear-gradient(180deg,#8dffb7,#20d968 48%,#0a7135) !important;
+        border-color: rgba(46,255,128,.65) !important;
+        box-shadow: 0 0 5px rgba(46,255,128,.55), inset 0 1px 1px rgba(255,255,255,.35) !important;
       }
 
       .new-channel-strip .channel-led.active.green::after,
       .channel-strip .channel-led.active.green::after {
-        left: 5px !important;
-        width: 14px !important;
         background: #caffdd !important;
-        box-shadow: 0 0 5px #63ff9a, 0 0 9px rgba(46,255,128,.7) !important;
+        box-shadow: 0 0 5px #63ff9a !important;
       }
 
       .new-channel-strip .channel-led.active.red,
       .channel-strip .channel-led.active.red {
         opacity: 1 !important;
-        background: linear-gradient(180deg,#ff8a84 0%,#ff3b30 42%,#9c1610 100%) !important;
-        border-color: rgba(255,82,73,.78) !important;
-        box-shadow: inset 0 1px 1px rgba(255,255,255,.35), 0 0 6px rgba(255,59,48,.7), 0 0 12px rgba(255,59,48,.2) !important;
+        background: linear-gradient(180deg,#ff918b,#ff3b30 48%,#8d120d) !important;
+        border-color: rgba(255,82,73,.75) !important;
+        box-shadow: 0 0 6px rgba(255,59,48,.65), inset 0 1px 1px rgba(255,255,255,.35) !important;
       }
 
       .new-channel-strip .channel-led.active.red::after,
       .channel-strip .channel-led.active.red::after {
-        left: 5px !important;
-        width: 14px !important;
         background: #ffe1df !important;
-        box-shadow: 0 0 5px #ff6961, 0 0 10px rgba(255,59,48,.75) !important;
+        box-shadow: 0 0 6px #ff6961 !important;
+      }
+
+      /* LED BAR BARU: menggantikan indikator lama, ukurannya kecil */
+      .new-channel-strip .ch-top-vu {
+        position: relative !important;
+        display: flex !important;
+        align-items: flex-end !important;
+        justify-content: center !important;
+        width: 8px !important;
+        height: 62px !important;
+        min-width: 8px !important;
+        margin: 1px auto 5px !important;
+        padding: 1px !important;
+        box-sizing: border-box !important;
+        border: 1px solid rgba(255,255,255,.16) !important;
+        border-radius: 2px !important;
+        background: #090e12 !important;
+        box-shadow: inset 0 0 4px rgba(0,0,0,.95), 0 0 2px rgba(0,0,0,.6) !important;
+        overflow: hidden !important;
+      }
+
+      .new-channel-strip .ch-top-vu::before {
+        content: "" !important;
+        position: absolute !important;
+        inset: 2px !important;
+        background: repeating-linear-gradient(
+          to top,
+          rgba(255,255,255,.08) 0,
+          rgba(255,255,255,.08) 2px,
+          transparent 2px,
+          transparent 5px
+        ) !important;
+        pointer-events: none !important;
+        z-index: 2 !important;
+      }
+
+      .new-channel-strip .ch-top-vu-fill {
+        position: absolute !important;
+        left: 1px !important;
+        right: 1px !important;
+        bottom: 1px !important;
+        width: auto !important;
+        height: 0% !important;
+        min-height: 0 !important;
+        background: linear-gradient(to top,
+          #24e66b 0%,
+          #24e66b 62%,
+          #ffd21c 78%,
+          #ff9f00 88%,
+          #ff3b30 100%
+        ) !important;
+        border-radius: 1px !important;
+        box-shadow: 0 0 4px rgba(40,255,110,.45) !important;
+        transition: height .06s linear !important;
+        z-index: 1 !important;
+      }
+
+      /* Tetap kompatibel jika selector lama mengatur width */
+      .new-channel-strip .ch-top-vu .ch-top-vu-fill {
+        width: auto !important;
+      }
+
+      /* Meter segmented tambahan tetap kecil; tidak mengambil ruang layout */
+      .new-channel-strip .new-channel-meter {
+        display: none !important;
       }
 
       @media (max-width:699px) {
@@ -97,6 +157,11 @@
         .channel-strip .channel-led {
           width: 22px !important;
           min-width: 22px !important;
+        }
+        .new-channel-strip .ch-top-vu {
+          width: 7px !important;
+          min-width: 7px !important;
+          height: 56px !important;
         }
       }
     `;
