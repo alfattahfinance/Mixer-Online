@@ -1,20 +1,21 @@
 /* ==========================================================================
-   RESET & LAYOUT GRID UTAMA CONSOLE (MASTER DIPERKECIL AGAR CH TIDAK TERPOTONG)
+   1. RESET & LAYOUT GRID UTAMA CONSOLE (FIXED RESPONSIVE & ALIGNMENT)
    ========================================================================== */
 main.console {
   display: grid !important;
-  /* Lebar master diperkecil dari 140px menjadi 90px */
-  grid-template-columns: minmax(280px, 1fr) 340px minmax(280px, 1fr) 90px !important;
+  /* Grid 4 Kolom: Bank Left | Center Console | Bank Right | Master Rack */
+  grid-template-columns: minmax(260px, 1fr) 320px minmax(260px, 1fr) 85px !important;
   grid-template-areas:
     "ch-left center ch-right master"
     "fx      center ch-right master"
     "aux     center ch-right master" !important;
-  gap: 8px !important;
+  gap: 6px !important;
   width: 100% !important;
   max-width: 100% !important;
   box-sizing: border-box !important;
   float: none !important;
   clear: both !important;
+  align-items: stretch !important;
 }
 
 /* MENETRALISIR STYLING LAMA PADA ELEMEN RACK */
@@ -29,6 +30,7 @@ main.console > * {
   clear: none !important;
   width: auto !important;
   max-width: none !important;
+  box-sizing: border-box !important;
 }
 
 /* PENETAPAN AREA MASING-MASING ELEMEN */
@@ -62,332 +64,384 @@ main.console > .aux-rack {
 /* RESPONSIVE OVERFLOW UNTUK TABLET/LAYAR KECIL */
 @media screen and (max-width: 1024px) {
   main.console {
+    display: flex !important;
+    flex-wrap: nowrap !important;
     overflow-x: auto !important;
+    width: max-content !important;
+    min-width: 100% !important;
+    padding-bottom: 8px !important;
+  }
+
+  main.console > .channel-bank-left,
+  main.console > .channel-bank-right {
+    min-width: 480px !important;
+  }
+
+  main.console > .center-console {
+    min-width: 320px !important;
+  }
+
+  main.console > .master-rack {
+    min-width: 75px !important;
   }
 }
 
 /* ==========================================================================
-   STYLING STRIP CHANNEL & URUTAN VERTIKAL BARU
+   2. STYLING STRIP CHANNEL & URUTAN VERTIKAL BARU
    ========================================================================== */
-.new-channel-strip {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: #121619;
-  border: 1px solid #2a323d;
-  border-radius: 6px;
-  padding: 6px 3px;
-  box-sizing: border-box;
-  width: 100%;
+.new-channel-strip,
+.channel-strip {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  background: var(--strip-bg, #121619) !important;
+  border: 1px solid var(--panel-border, #2a323d) !important;
+  border-radius: 6px !important;
+  padding: 6px 3px !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
-/* 1. Lampu Bulat Top */
+/* 1. Lampu Bulat LED Top */
 .channel-led {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #1a1f24;
-  border: 1px solid #3d464e;
-  margin: 2px auto 4px auto;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.9);
-  transition: all 0.15s ease-in-out;
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50% !important;
+  background: #1a1f24 !important;
+  border: 1px solid #3d464e !important;
+  margin: 2px auto 4px auto !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.9) !important;
+  transition: all 0.15s ease-in-out !important;
+  flex-shrink: 0 !important;
 }
 
 .channel-led.active.green,
-.channel-led.green {
+.channel-led.green,
+.channel-led.on {
   background: #31e66b !important;
-  box-shadow: 0 0 8px #31e66b, inset 0 1px 2px rgba(255,255,255,0.7) !important;
+  box-shadow: 0 0 8px #31e66b, inset 0 1px 2px rgba(255, 255, 255, 0.7) !important;
 }
 
 .channel-led.active.red,
 .channel-led.red {
   background: #ff3b30 !important;
-  box-shadow: 0 0 8px #ff3b30, inset 0 1px 2px rgba(255,255,255,0.7) !important;
+  box-shadow: 0 0 8px #ff3b30, inset 0 1px 2px rgba(255, 255, 255, 0.7) !important;
 }
 
 /* 2. Indikator Sinyal Berdiri (Vertikal) di Atas Knob Gain */
-.channel-meter-vertical {
-  width: 6px;
-  height: 45px;
-  background: #080a0c;
-  border: 1px solid #1c232b;
-  border-radius: 2px;
-  margin: 2px auto 6px auto;
-  display: flex;
-  flex-direction: column-reverse;
-  overflow: hidden;
+.channel-meter-vertical,
+.ch-top-vu {
+  width: 6px !important;
+  height: 42px !important;
+  background: #080a0c !important;
+  border: 1px solid var(--panel-border, #1c232b) !important;
+  border-radius: 2px !important;
+  margin: 2px auto 6px auto !important;
+  display: flex !important;
+  flex-direction: column-reverse !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
 }
 
-.channel-meter-bar {
-  width: 100%;
+.channel-meter-bar,
+.ch-top-vu-fill {
+  width: 100% !important;
   height: 0%; /* Dinamis diatur JS */
-  background: linear-gradient(to top, #31e66b 65%, #ffd21c 85%, #ff3b30 100%);
-  transition: height 0.05s ease-out;
+  background: linear-gradient(to top, #31e66b 65%, #ffd21c 85%, #ff3b30 100%) !important;
+  transition: height 0.05s ease-out !important;
 }
 
 /* 3. Grup Knob Gain - Pan (Diposisikan di Atas Text Volume) */
 .knobs-container,
-.gain-pan-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  width: 100%;
-  margin-bottom: 6px;
+.gain-pan-group,
+.ch-controls-group {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 4px !important;
+  width: 100% !important;
+  margin-bottom: 4px !important;
 }
 
-.new-channel-strip input[type="range"].new-knob {
+.new-channel-strip input[type="range"].new-knob,
+.channel-strip input[type="range"] {
   touch-action: none !important;
-  cursor: pointer;
+  cursor: pointer !important;
 }
 
 /* 4. Label Volume Tepat di Bawah Gain-Pan & di Atas Fader */
 .volume-label,
-.channel-vol-text {
-  font-size: 9px;
-  font-weight: bold;
-  color: #8b949e;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin: 4px 0 2px 0;
-  text-align: center;
+.channel-vol-text,
+.volume-label-text {
+  font-size: 8px !important;
+  font-weight: bold !important;
+  color: var(--text-dim, #8b949e) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  margin: 4px 0 2px 0 !important;
+  text-align: center !important;
+  user-select: none !important;
 }
 
-/* 5. Slider Fader Vertikal */
+/* 5. Slider Fader Vertikal (Cross-Browser Fix) */
+.fader-area {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  flex-grow: 1 !important;
+  width: 100% !important;
+  padding-bottom: 2px !important;
+}
+
 .new-channel-strip input[type="range"].new-fader,
 .new-channel-strip input[type="range"].fader,
+.channel-fader,
 .master-card input[type="range"] {
-  -webkit-appearance: slider-vertical;
-  writing-mode: bt-lr; /* IE/Edge fallback */
-  width: 20px;
-  height: 160px;
-  background: #080a0b;
-  outline: none;
-  cursor: pointer;
+  -webkit-appearance: slider-vertical !important;
+  -moz-appearance: slider-vertical !important;
+  appearance: slider-vertical !important;
+  writing-mode: bt-lr !important; /* WebKit/Legacy Fallback */
+  width: 18px !important;
+  height: 180px !important;
+  background: #080a0b !important;
+  outline: none !important;
+  cursor: pointer !important;
   touch-action: none !important;
+  margin: 0 auto !important;
+  accent-color: var(--accent-color, #00e5ff) !important;
 }
 
-/* Mute & Solo Button Active State */
+/* Mute & Solo Button Styling & Active State */
 .btn-mute.active,
 .btn-mute.on,
-button[data-k="mute"].on {
-  background-color: #e74c3c !important;
-  color: #fff !important;
-  box-shadow: 0 0 8px rgba(231, 76, 60, 0.8);
+button[data-k="mute"].on,
+button.mute-btn.active {
+  background-color: #ff3b30 !important;
+  color: #ffffff !important;
+  border-color: #ff3b30 !important;
+  box-shadow: 0 0 8px rgba(255, 59, 48, 0.8) !important;
 }
 
 .btn-solo.active,
 .btn-solo.on,
-button[data-k="solo"].on {
+button[data-k="solo"].on,
+button.solo-btn.active {
   background-color: #f1c40f !important;
-  color: #000 !important;
-  box-shadow: 0 0 8px rgba(241, 196, 15, 0.8);
+  color: #000000 !important;
+  border-color: #f1c40f !important;
+  font-weight: bold !important;
+  box-shadow: 0 0 8px rgba(241, 196, 15, 0.8) !important;
 }
 
 /* ==========================================================================
-   STYLING UI PANEL PENGUJIAN (CONNECTION / TEST PANEL)
+   3. STYLING UI PANEL PENGUJIAN (CONNECTION / TEST PANEL)
    ========================================================================== */
 .connection-test-panel {
-  background: #0d1117;
-  border: 1px solid #30363d;
-  border-radius: 8px;
-  padding: 16px;
-  margin: 16px auto;
-  max-width: 100%;
-  color: #c9d1d9;
-  font-family: monospace;
-  box-sizing: border-box;
+  background: var(--panel-bg, #0d1117) !important;
+  border: 1px solid var(--panel-border, #30363d) !important;
+  border-radius: 8px !important;
+  padding: 12px !important;
+  margin: 12px auto !important;
+  width: 100% !important;
+  color: var(--text-main, #c9d1d9) !important;
+  font-family: monospace, monospace !important;
+  box-sizing: border-box !important;
 }
 
 .connection-test-panel h2 {
-  margin-top: 0;
-  font-size: 1.1rem;
-  color: #58a6ff;
-  border-bottom: 1px solid #21262d;
-  padding-bottom: 8px;
+  margin-top: 0 !important;
+  font-size: 1rem !important;
+  color: var(--accent-color, #58a6ff) !important;
+  border-bottom: 1px solid var(--panel-border, #21262d) !important;
+  padding-bottom: 6px !important;
 }
 
 .connection-test-panel .test-buttons {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 8px;
-  margin: 12px 0;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
+  gap: 6px !important;
+  margin: 10px 0 !important;
 }
 
 .connection-test-panel button {
-  background: #21262d;
-  color: #c9d1d9;
-  border: 1px solid #363b42;
-  padding: 8px 12px;
-  font-size: 0.75rem;
-  font-weight: bold;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+  background: var(--main-bg, #21262d) !important;
+  color: var(--text-main, #c9d1d9) !important;
+  border: 1px solid var(--panel-border, #363b42) !important;
+  padding: 6px 10px !important;
+  font-size: 0.75rem !important;
+  font-weight: bold !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
 }
 
 .connection-test-panel button:hover {
-  background: #30363d;
-  border-color: #58a6ff;
-  color: #ffffff;
+  background: var(--panel-border, #30363d) !important;
+  border-color: var(--accent-color, #58a6ff) !important;
+  color: #ffffff !important;
 }
 
 .connection-test-panel button:active {
-  transform: scale(0.98);
-  background: #1f6feb;
+  transform: scale(0.97) !important;
+  background: var(--btn-active, #1f6feb) !important;
 }
 
 .connection-test-panel button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
 }
 
 .connection-test-panel pre {
-  background: #040d21;
-  border: 1px solid #1b283e;
-  padding: 8px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  color: #7ee787;
-  overflow-x: auto;
-  margin: 6px 0;
+  background: var(--main-bg, #040d21) !important;
+  border: 1px solid var(--panel-border, #1b283e) !important;
+  padding: 8px !important;
+  border-radius: 4px !important;
+  font-size: 0.75rem !important;
+  color: #7ee787 !important;
+  overflow-x: auto !important;
+  margin: 4px 0 !important;
 }
 
 /* ==========================================================================
-   DIGITAL CONSOLE PRO SCREEN STYLING (LAYAR TENGAH)
+   4. DIGITAL CONSOLE PRO SCREEN STYLING (LAYAR TENGAH)
    ========================================================================== */
 .pro-digital-screen {
-  display: flex;
-  flex-direction: column;
-  height: 220px;
-  background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
-  border: 1px solid #30363d;
-  border-radius: 6px;
-  padding: 8px;
-  color: #c9d1d9;
-  font-family: 'JetBrains Mono', monospace;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 200px !important;
+  background: linear-gradient(135deg, #0d1117 0%, #161b22 100%) !important;
+  border: 1px solid var(--panel-border, #30363d) !important;
+  border-radius: 6px !important;
+  padding: 6px !important;
+  color: #c9d1d9 !important;
+  font-family: system-ui, monospace !important;
+  box-sizing: border-box !important;
 }
 
 .pro-screen-top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #21262d;
-  padding: 5px 10px;
-  border-radius: 4px;
-  border-left: 4px solid #00f0ff;
-  margin-bottom: 6px;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  background: #21262d !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  border-left: 4px solid var(--accent-color, #00f0ff) !important;
+  margin-bottom: 6px !important;
 }
 
 .pro-ch-badge b {
-  font-size: 14px;
-  color: #00f0ff;
+  font-size: 13px !important;
+  color: var(--accent-color, #00f0ff) !important;
 }
 
 .pro-ch-badge span {
-  font-size: 8px;
-  display: block;
-  color: #8b949e;
+  font-size: 8px !important;
+  display: block !important;
+  color: #8b949e !important;
 }
 
 .pro-ch-title-edit input {
-  background: #0d1117;
-  border: 1px solid #30363d;
-  color: #f0f6fc;
-  padding: 3px 6px;
-  border-radius: 3px;
-  font-weight: bold;
-  text-align: center;
-  font-size: 11px;
+  background: #0d1117 !important;
+  border: 1px solid #30363d !important;
+  color: #f0f6fc !important;
+  padding: 2px 6px !important;
+  border-radius: 3px !important;
+  font-weight: bold !important;
+  text-align: center !important;
+  font-size: 10px !important;
 }
 
 .pro-ch-status-badges {
-  display: flex;
-  gap: 4px;
+  display: flex !important;
+  gap: 4px !important;
 }
 
 .pro-ch-status-badges span {
-  font-size: 8px;
-  padding: 2px 5px;
-  border-radius: 3px;
-  font-weight: bold;
+  font-size: 8px !important;
+  padding: 2px 5px !important;
+  border-radius: 3px !important;
+  font-weight: bold !important;
 }
 
 .badge-ready {
-  background: rgba(49, 230, 107, 0.2);
-  color: #31e66b;
-  border: 1px solid #31e66b;
+  background: rgba(49, 230, 107, 0.2) !important;
+  color: #31e66b !important;
+  border: 1px solid #31e66b !important;
 }
 
 .badge-phantom {
-  background: rgba(255, 210, 28, 0.2);
-  color: #ffd21c;
-  border: 1px solid #ffd21c;
+  background: rgba(255, 210, 28, 0.2) !important;
+  color: #ffd21c !important;
+  border: 1px solid #ffd21c !important;
 }
 
 .pro-processing-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 5px;
-  margin-bottom: 6px;
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 4px !important;
+  margin-bottom: 6px !important;
 }
 
 .pro-block {
-  background: #161b22;
-  border: 1px solid #30363d;
-  border-radius: 4px;
-  padding: 6px;
-  text-align: center;
+  background: #161b22 !important;
+  border: 1px solid #30363d !important;
+  border-radius: 4px !important;
+  padding: 4px !important;
+  text-align: center !important;
 }
 
 .pro-block .block-title {
-  font-size: 8px;
-  color: #8b949e;
-  display: block;
-  margin-bottom: 3px;
+  font-size: 8px !important;
+  color: #8b949e !important;
+  display: block !important;
+  margin-bottom: 2px !important;
 }
 
 .pro-block .block-value {
-  font-size: 13px;
-  font-weight: bold;
-  color: #e9eeee;
+  font-size: 11px !important;
+  font-weight: bold !important;
+  color: #e9eeee !important;
 }
 
 .pro-block .block-value.highlight {
-  color: #31e66b;
-  text-shadow: 0 0 8px rgba(49, 230, 107, 0.4);
+  color: #31e66b !important;
+  text-shadow: 0 0 6px rgba(49, 230, 107, 0.4) !important;
 }
 
 .pro-block small {
-  font-size: 7px;
-  color: #555;
+  font-size: 7px !important;
+  color: #666666 !important;
 }
 
 .pro-mini-spectrum {
-  flex-grow: 1;
-  background: #010409;
-  border: 1px solid #202830;
-  border-radius: 4px;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: flex-end;
-  padding: 3px;
+  flex-grow: 1 !important;
+  background: #010409 !important;
+  border: 1px solid #202830 !important;
+  border-radius: 4px !important;
+  position: relative !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  padding: 3px !important;
+  min-height: 60px !important;
 }
 
 .spectrum-bars-container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: space-around;
-  align-items: flex-end;
-  gap: 2px;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  justify-content: space-around !important;
+  align-items: flex-end !important;
+  gap: 2px !important;
 }
 
 .bar-col {
-  width: 100%;
-  background: linear-gradient(to top, #1589d2, #31e66b, #ff3b30);
-  border-radius: 2px 2px 0 0;
-  opacity: 0.85;
+  width: 100% !important;
+  background: linear-gradient(to top, #1589d2, #31e66b, #ff3b30) !important;
+  border-radius: 2px 2px 0 0 !important;
+  opacity: 0.85 !important;
 }
