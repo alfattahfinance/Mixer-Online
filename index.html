@@ -163,8 +163,9 @@
     color: var(--accent-color) !important;
     font-family: monospace, monospace !important;
   }
+
   /* ==========================================================
-     3. MAIN CONSOLE - PRESISI MENTOK BATAS BAWAH SEJAJAR AUX
+     3. MAIN CONSOLE - PRESISI MENTOK BATAS BAWAH SEJAJAR AUX & MASTER
      ========================================================== */
   main.console {
     display: flex !important;
@@ -172,8 +173,8 @@
     flex-wrap: nowrap !important;
     width: max-content !important;
     min-width: 100% !important;
-    padding: 2px !important;
-    gap: 0px !important;
+    padding: 2px 2px 0px 2px !important;
+    gap: 4px !important;
     align-items: stretch !important; /* Memaksa seluruh kolom dari Kiri ke Kanan memiliki tinggi sama persis */
   }
 
@@ -184,12 +185,12 @@
     background: var(--strip-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
-    padding: 4px 2px 2px 2px !important; /* Disesuaikan agar border bawah menutup sempurna */
+    padding: 4px 2px 0px 2px !important;
     display: flex !important;
     flex-direction: column !important;
     margin: 0 !important;
     justify-content: space-between !important;
-    height: auto !important; /* Mengikuti tinggi maksimum parent secara alami */
+    height: 100% !important;
   }
 
   /* GRID 7 KOLOM DENGAN PELEBARAN CH7 & CH14 */
@@ -210,7 +211,7 @@
     flex-direction: column !important;
     align-items: center !important;
     justify-content: space-between !important; /* Mendorong tombol SOLO & Fader ke paling bawah */
-    padding: 2px 2px 2px 2px !important;
+    padding: 2px 2px 0px 2px !important;
     border-right: 1px dashed var(--panel-border) !important;
     box-sizing: border-box !important;
     height: 100% !important;
@@ -218,7 +219,7 @@
 
   .new-channel-strip:last-child, .channel-strip:last-child {
     border-right: none !important;
-    padding-right: 4px !important;
+    padding-right: 2px !important;
   }
 
   .ch-top-vu {
@@ -279,13 +280,33 @@
     margin-bottom: 0px !important;
   }
 
-  /* PENYESUAIAN TINGGI FADER SUPAYA MENTOK PAS DI GARIS BAWAH SEJAJAR AUX */
+  /* PENYESUAIAN TINGGI FADER SUPAYA MENTOK PAS DI GARIS BAWAH SEJAJAR NAV BAR */
   .fader-area input[type="range"], .channel-fader {
-    height: 195px !important; /* Ditingkatkan dari 175px ke 195px untuk menutup celah */
+    height: 205px !important; /* Ditingkatkan dari 195px ke 205px untuk menutup seluruh celah bawah */
     accent-color: var(--accent-color) !important;
   }
 
+  /* MASTER RACK MENEPATKAN TINGGI MENTOK KEBUTUHAN GARIS BAWAH */
+  .master-rack {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    height: 100% !important;
+    padding-bottom: 2px !important;
+  }
 
+  .master-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    flex-grow: 1 !important;
+  }
+
+  .master-card input[type="range"] {
+    height: 165px !important; /* Menyamakan posisi fader master dengan channel fader */
+    accent-color: var(--accent-color) !important;
+  }
 
   /* ==========================================================
      4. NAVIGATION BAR SCREEN M32
@@ -932,7 +953,7 @@
     <div id="deviceStatus" class="device-status">🔴 ESP32 SIMULATOR OFFLINE</div>
     <div id="deviceProtocol">Protocol: ESP32-MIXER/1</div>
     <button id="deviceConnect">CONNECT ESP32</button><button id="deviceDisconnect">DISCONNECT</button>
-    <div id="deviceHint" class="small">Simulator ESP32 berjalan langsung di Mixer-Online. Bukan Wokwi dan bukan Wi-Fi ke mixer analog.</div>
+    <div id="deviceHint" class="small">Simulator ESP32 berjalan langsung di Mixer-Online sebagai bridge.</div>
   </section>
 
   <section class="bridge-panel">
