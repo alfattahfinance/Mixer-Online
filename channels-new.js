@@ -87,15 +87,15 @@
         box-shadow: 0 0 6px #ff6961 !important;
       }
 
-      /* LED BAR BARU: menggantikan indikator lama, ukurannya kecil */
+      /* LED BAR BARU: horizontal internal meter diputar menjadi vertikal.
+         Bridge lama mengirim level melalui style.width, jadi mekanisme RX/TX
+         tidak perlu disentuh. */
       .new-channel-strip .ch-top-vu {
         position: relative !important;
-        display: flex !important;
-        align-items: flex-end !important;
-        justify-content: center !important;
-        width: 8px !important;
-        height: 62px !important;
-        min-width: 8px !important;
+        display: block !important;
+        width: 62px !important;
+        height: 8px !important;
+        min-width: 62px !important;
         margin: 1px auto 5px !important;
         padding: 1px !important;
         box-sizing: border-box !important;
@@ -104,18 +104,20 @@
         background: #090e12 !important;
         box-shadow: inset 0 0 4px rgba(0,0,0,.95), 0 0 2px rgba(0,0,0,.6) !important;
         overflow: hidden !important;
+        transform: rotate(-90deg) !important;
+        transform-origin: center center !important;
       }
 
       .new-channel-strip .ch-top-vu::before {
         content: "" !important;
         position: absolute !important;
-        inset: 2px !important;
+        inset: 1px !important;
         background: repeating-linear-gradient(
-          to top,
-          rgba(255,255,255,.08) 0,
-          rgba(255,255,255,.08) 2px,
+          to right,
+          rgba(255,255,255,.10) 0,
+          rgba(255,255,255,.10) 2px,
           transparent 2px,
-          transparent 5px
+          transparent 6px
         ) !important;
         pointer-events: none !important;
         z-index: 2 !important;
@@ -124,12 +126,11 @@
       .new-channel-strip .ch-top-vu-fill {
         position: absolute !important;
         left: 1px !important;
-        right: 1px !important;
         bottom: 1px !important;
-        width: auto !important;
-        height: 0% !important;
+        width: 0% !important;
+        height: 100% !important;
         min-height: 0 !important;
-        background: linear-gradient(to top,
+        background: linear-gradient(to right,
           #24e66b 0%,
           #24e66b 62%,
           #ffd21c 78%,
@@ -138,16 +139,17 @@
         ) !important;
         border-radius: 1px !important;
         box-shadow: 0 0 4px rgba(40,255,110,.45) !important;
-        transition: height .06s linear !important;
+        transition: width .06s linear !important;
         z-index: 1 !important;
       }
 
-      /* Tetap kompatibel jika selector lama mengatur width */
+      /* Jangan memaksa width menjadi auto: channels-bridge.js menggunakan
+         width % sebagai sumber level VU. */
       .new-channel-strip .ch-top-vu .ch-top-vu-fill {
-        width: auto !important;
+        height: 100% !important;
       }
 
-      /* Meter segmented tambahan tetap kecil; tidak mengambil ruang layout */
+      /* Meter segmented lama disembunyikan agar hanya LED bar baru yang tampil. */
       .new-channel-strip .new-channel-meter {
         display: none !important;
       }
@@ -159,9 +161,9 @@
           min-width: 22px !important;
         }
         .new-channel-strip .ch-top-vu {
-          width: 7px !important;
-          min-width: 7px !important;
-          height: 56px !important;
+          width: 56px !important;
+          min-width: 56px !important;
+          height: 7px !important;
         }
       }
     `;
