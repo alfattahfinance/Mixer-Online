@@ -165,7 +165,7 @@
   }
 
   /* ==========================================================
-     3. MAIN CONSOLE - FLEXIBLE & UNLOCKED SCROLL
+     3. MAIN CONSOLE - PRESISI TANPA CELAH & SEJAJAR
      ========================================================== */
   main.console {
     display: flex !important;
@@ -173,30 +173,32 @@
     flex-wrap: nowrap !important;
     width: max-content !important;
     min-width: 100% !important;
-    padding: 6px !important;
-    gap: 6px !important;
+    padding: 2px !important;
+    gap: 0px !important;     /* MENGHILANGKAN CELAH ANTAR BANK DENGAN SCREEN */
     align-items: stretch !important;
   }
 
   .channel-bank {
     flex: 0 0 auto !important;
-    width: 490px !important;
-    min-width: 440px !important;
+    width: 505px !important;  /* Diberi ruang lebar ekstra */
+    min-width: 480px !important;
     background: var(--strip-bg) !important;
     border: 1px solid var(--panel-border) !important;
-    border-radius: 6px !important;
-    padding: 4px 6px 4px 4px !important;
+    border-radius: 4px !important;
+    padding: 4px 2px 0px 2px !important; /* Bottom padding 0px agar rapat ke bawah */
     display: flex !important;
     flex-direction: column !important;
     margin: 0 !important;
+    justify-content: space-between !important;
   }
 
-  /* GRID 7 KOLOM DENGAN EKSTRA SPASI KOLOM TERAKHIR (CH7 & CH14) */
+  /* GRID 7 KOLOM DENGAN PELEBARAN KHUSUS CH7 & CH14 */
   #channels, #channelsRight {
     display: grid !important;
-    grid-template-columns: repeat(6, 1fr) 1.15fr !important;
+    grid-template-columns: repeat(6, 1fr) 1.25fr !important; /* CH7 & CH14 lebih lebar ke kanan */
     width: 100% !important;
     height: 100% !important;
+    flex-grow: 1 !important;
     gap: 0 !important;
   }
 
@@ -206,14 +208,17 @@
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    padding: 2px 2px 4px 2px !important;
+    justify-content: space-between !important;
+    padding: 2px 2px 2px 2px !important;
     border-right: 1px dashed var(--panel-border) !important;
     box-sizing: border-box !important;
+    height: 100% !important;
   }
 
+  /* CH7 & CH14 TIDAK TERPOTONG */
   .new-channel-strip:last-child, .channel-strip:last-child {
     border-right: none !important;
-    padding-right: 6px !important;
+    padding-right: 4px !important;
   }
 
   .ch-top-vu {
@@ -270,7 +275,8 @@
     justify-content: flex-end !important;
     flex-grow: 1 !important;
     width: 100% !important;
-    padding-bottom: 2px !important;
+    padding-bottom: 0px !important; /* Menghapus celah di bawah fader */
+    margin-bottom: 0px !important;
   }
 
   .fader-area input[type="range"], .channel-fader {
@@ -278,19 +284,20 @@
     accent-color: var(--accent-color) !important;
   }
 
-  /* KONSOL TENGAH */
+  /* KONSOL TENGAH (M32 SCREEN + PLAYER) */
   .center-console {
     flex: 0 0 320px !important;
     width: 320px !important;
     min-width: 320px !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 6px !important;
+    justify-content: space-between !important; /* Memastikan AUX/BUS mentok sejajar bawah */
+    gap: 4px !important;
     position: relative !important;
     margin: 0 !important;
   }
 
-  /* MASTER RACK */
+  /* MASTER RACK (Ujung Kanan Console) */
   .master-rack {
     flex: 0 0 72px !important;
     width: 72px !important;
@@ -301,8 +308,8 @@
     align-items: center !important;
     background: var(--strip-bg) !important;
     border: 1px solid var(--panel-border) !important;
-    border-radius: 6px !important;
-    padding: 4px 2px !important;
+    border-radius: 4px !important;
+    padding: 4px 2px 2px 2px !important;
     margin: 0 !important;
   }
 
@@ -457,7 +464,7 @@
     padding: 4px !important;
     display: flex !important;
     flex-direction: column !important;
-    min-height: 210px !important;
+    min-height: 200px !important;
     background: var(--panel-bg) !important;
   }
 
@@ -485,7 +492,7 @@
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-end !important;
-    min-height: 100px !important;
+    min-height: 95px !important;
     background: var(--main-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
@@ -496,7 +503,7 @@
   .spectrum-bars-container {
     display: flex !important;
     gap: 2px !important;
-    height: 80px !important;
+    height: 75px !important;
     align-items: flex-end !important;
   }
 
@@ -547,7 +554,7 @@
   }
 
   /* ==========================================================
-     5. PANEL AUX & FX
+     5. PANEL AUX & FX (PENYESUAIAN SEJAJAR BAWAH MENTOK)
      ========================================================== */
   .center-console .fx-rack,
   .center-console .aux-rack,
@@ -558,7 +565,7 @@
     margin: 0 !important;
     background: var(--panel-bg) !important;
     border: 1px solid var(--panel-border) !important;
-    border-radius: 6px !important;
+    border-radius: 4px !important;
     padding: 4px !important;
   }
 
@@ -566,13 +573,17 @@
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
     gap: 4px !important;
+    margin-top: auto !important; /* Mendorong AUX Rack persis mentok ke batas bawah */
   }
 
   .aux-unit {
     background: var(--main-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
-    padding: 4px !important;
+    padding: 3px 4px 4px 4px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
   }
 
   main.console > .fx-rack, 
