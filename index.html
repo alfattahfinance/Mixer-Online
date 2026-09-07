@@ -17,6 +17,7 @@
     navigator.serviceWorker.register('/sw.js');
   }
 </script>
+
 <style>
   /* ==========================================================
      1. DEFINISI VARIABEL WARNA (SKIN)
@@ -95,7 +96,6 @@
     margin: 0 !important;
     padding: 0 !important;
     font-family: system-ui, -apple-system, sans-serif !important;
-    /* DIBUKA: BISA DIGESER SECARA HORIZONTAL */
     overflow-x: auto !important;
   }
 
@@ -165,13 +165,12 @@
   }
 
   /* ==========================================================
-     3. MAIN CONSOLE - BISA DIGESER (BEBAS UNLOCKED)
+     3. MAIN CONSOLE - FLEXIBLE & UNLOCKED SCROLL
      ========================================================== */
   main.console {
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
-    /* DIBUKA: Ukuran konten fleksibel mengikuti isi & bisa digeser halus */
     width: max-content !important;
     min-width: 100% !important;
     padding: 6px !important;
@@ -181,7 +180,7 @@
 
   .channel-bank {
     flex: 0 0 auto !important;
-    width: 490px !important; /* Diberikan ruang lebar yang cukup */
+    width: 490px !important;
     min-width: 440px !important;
     background: var(--strip-bg) !important;
     border: 1px solid var(--panel-border) !important;
@@ -192,10 +191,9 @@
     margin: 0 !important;
   }
 
-  /* KONSOL ELEMEN CHANNEL TERPISAH 7 KOLOM */
+  /* GRID 7 KOLOM DENGAN EKSTRA SPASI KOLOM TERAKHIR (CH7 & CH14) */
   #channels, #channelsRight {
     display: grid !important;
-    /* Memberikan bobot sedikit lebih lebar pada kolom ke-7 (CH7 & CH14) */
     grid-template-columns: repeat(6, 1fr) 1.15fr !important;
     width: 100% !important;
     height: 100% !important;
@@ -213,10 +211,9 @@
     box-sizing: border-box !important;
   }
 
-  /* PELEBARAN KHUSUS UNTUK CHANNEL 7 DAN 14 */
   .new-channel-strip:last-child, .channel-strip:last-child {
     border-right: none !important;
-    padding-right: 6px !important; /* Memberikan keleluasaan ke kanan */
+    padding-right: 6px !important;
   }
 
   .ch-top-vu {
@@ -281,7 +278,7 @@
     accent-color: var(--accent-color) !important;
   }
 
-  /* KONSOL TENGAH (M32 SCREEN + PLAYER) */
+  /* KONSOL TENGAH */
   .center-console {
     flex: 0 0 320px !important;
     width: 320px !important;
@@ -293,7 +290,7 @@
     margin: 0 !important;
   }
 
-  /* MASTER RACK (Ujung Kanan Console) */
+  /* MASTER RACK */
   .master-rack {
     flex: 0 0 72px !important;
     width: 72px !important;
@@ -1614,7 +1611,7 @@
   let isShuffle = false;
   let lockedMusicChannel = null;
 
-  // SINKRONISASI MASTER FADER REAL-TIME (AUDIO ENGINE + VU METERS)
+  // SINKRONISASI MASTER FADER REAL-TIME
   if (masterFader) {
     masterFader.addEventListener('input', function() {
       const val = parseInt(this.value, 10);
@@ -1937,48 +1934,6 @@
       playTrack(0);
     });
   }
-
-  const fxButtons = document.querySelectorAll('.fx-buttons button');
-  const fxPresetName = document.getElementById('fxRackPreset');
-
-  fxButtons.forEach(btn => {
-    btn.addEventListener('click', function() {
-      fxButtons.forEach(b => b.classList.remove('active'));
-      this.classList.add('active');
-      const target = this.dataset.fxSelect;
-      if (fxPresetName) fxPresetName.textContent = target + " ACTIVE";
-    });
-  });
-
-  const fxControls = document.querySelectorAll('.fx-control');
-  fxControls.forEach(input => {
-    input.addEventListener('input', function() {
-      const param = this.dataset.param;
-      const val = this.value;
-      const output = this.parentElement.querySelector('output');
-      
-      if (output) {
-        if (param === 'time') output.textContent = val + 's';
-        else if (param === 'preDelay') output.textContent = val + 'ms';
-        else if (param === 'decay') output.textContent = val + '%';
-        else if (param === 'level') output.textContent = val + 'dB';
-        else output.textContent = val;
-      }
-    });
-  });
-
-  const auxControls = document.querySelectorAll('.aux-control');
-  auxControls.forEach(input => {
-    input.addEventListener('input', function() {
-      const target = this.dataset.target;
-      const scope = this.dataset.scope || 'AUX';
-      const val = Math.round(this.value * 100);
-      
-      const tr = document.getElementById('testResult');
-      if (tr) tr.textContent = `${scope} [${target}] Value: ${val}%`;
-    });
-  });
-
 })();
 
 // Switcher Skin Mixer
@@ -1996,6 +1951,206 @@
       localStorage.setItem('mixer_theme', selectedTheme);
     });
   }
+})();
+</script>
+
+<script>
+// ==========================================================================
+// FIX 1: DROPDOWN TRANSPORT (ESP32 / BLUETOOTH SYNC)
+// ==========================================================================
+(function(){
+  function initTransportHandler() {
+    const transportSelect = document.getElementById("transportSelect");
+    const deviceConnect = document.getElementById("deviceConnect");
+    const deviceStatus = document.getElementById("deviceStatus");
+    const deviceHint = document.getElementById("deviceHint");
+
+    function updateTransportUI() {
+      if (!transportSelect || !deviceConnect) return;
+      const mode = transportSelect.value;
+      const isConnected = window.MixerAdapters?.active?.connected;
+
+      if (mode === "bluetooth") {
+        deviceConnect.textContent = isConnected ? "BLUETOOTH CONNECTED" : "CONNECT BLUETOOTH";
+        if (deviceStatus && !isConnected) deviceStatus.textContent = "🔴 BLUETOOTH DISCONNECTED";
+        if (deviceHint) deviceHint.textContent = "Koneksi langsung via Web Bluetooth API ke modul Bluetooth Mixer.";
+      } else {
+        deviceConnect.textContent = isConnected ? "ESP32 CONNECTED" : "CONNECT ESP32";
+        if (deviceStatus && !isConnected) deviceStatus.textContent = "🔴 ESP32 SIMULATOR OFFLINE";
+        if (deviceHint) deviceHint.textContent = "Simulator ESP32 berjalan langsung di Mixer-Online sebagai bridge.";
+      }
+    }
+
+    if (transportSelect) {
+      transportSelect.addEventListener("change", updateTransportUI);
+    }
+
+    if (deviceConnect) {
+      deviceConnect.addEventListener("click", async function(e) {
+        e.preventDefault();
+        const mode = transportSelect ? transportSelect.value : "esp32";
+
+        if (mode === "bluetooth") {
+          try {
+            deviceConnect.disabled = true;
+            deviceConnect.textContent = "PAIRING BT...";
+            const res = await window.MixerAdapters?.connectBluetooth?.();
+            if (res && res.ok) {
+              if (deviceStatus) deviceStatus.textContent = "🟢 BLUETOOTH CONNECTED";
+              deviceConnect.textContent = "BLUETOOTH CONNECTED";
+            } else {
+              alert("Gagal koneksi Bluetooth atau koneksi dibatalkan.");
+              updateTransportUI();
+            }
+          } catch (err) {
+            alert("Bluetooth Error: " + err.message);
+            updateTransportUI();
+          } finally {
+            deviceConnect.disabled = false;
+          }
+        } else {
+          const connectEspBtn = document.getElementById("connectEsp");
+          if (connectEspBtn) connectEspBtn.click();
+        }
+      });
+    }
+
+    updateTransportUI();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initTransportHandler);
+  } else {
+    initTransportHandler();
+  }
+})();
+</script>
+
+<script>
+// ==========================================================================
+// FIX 2: USB RECORDER (PEMEKARAN TOMBOL REC)
+// ==========================================================================
+(function(){
+  const recBtn = document.getElementById('btnPlayerRec');
+  const trackInfo = document.getElementById('playerTrackInfo');
+
+  let mediaRecorder = null;
+  let recordedChunks = [];
+  let isRecording = false;
+
+  if (recBtn) {
+    recBtn.addEventListener('click', async function() {
+      if (!isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          recordedChunks = [];
+
+          mediaRecorder.ondataavailable = function(e) {
+            if (e.data.size > 0) recordedChunks.push(e.data);
+          };
+
+          mediaRecorder.onstop = function() {
+            const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `M32_REC_${new Date().toISOString().replace(/[:.]/g, '-')}.webm`;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+            }, 100);
+
+            if (trackInfo) trackInfo.textContent = "RECORDING SAVED & DOWNLOADED";
+          };
+
+          mediaRecorder.start();
+          isRecording = true;
+          recBtn.style.background = "#e74c3c";
+          recBtn.style.color = "#ffffff";
+          recBtn.innerHTML = "🔴 <small>STOP</small>";
+          if (trackInfo) trackInfo.textContent = "🎙 RECORDING LIVE AUDIO...";
+
+        } catch (err) {
+          alert("Gagal mengakses mikrofon untuk merekam: " + err.message);
+        }
+      } else {
+        if (mediaRecorder && mediaRecorder.state !== "inactive") {
+          mediaRecorder.stop();
+        }
+        isRecording = false;
+        recBtn.style.background = "var(--main-bg)";
+        recBtn.style.color = "var(--text-main)";
+        recBtn.innerHTML = "🎙 <small>REC</small>";
+      }
+    });
+  }
+})();
+</script>
+
+<script>
+// ==========================================================================
+// FIX 3 & 4: FX PROCESSOR PARAMETER, AUX/BUS, DAN FX RETURN SINKRON
+// ==========================================================================
+(function(){
+  const fxButtons = document.querySelectorAll('.fx-buttons button');
+  const fxPresetName = document.getElementById('fxRackPreset');
+
+  fxButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      fxButtons.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      const target = this.dataset.fxSelect;
+      if (fxPresetName) fxPresetName.textContent = target + " ACTIVE";
+    });
+  });
+
+  const fxControls = document.querySelectorAll('.fx-control');
+  fxControls.forEach(input => {
+    input.addEventListener('input', function() {
+      const param = this.dataset.param;
+      const val = this.value;
+      const target = this.dataset.target || 'FX1';
+      const output = this.parentElement.querySelector('output');
+      
+      if (output) {
+        if (param === 'time') output.textContent = val + 's';
+        else if (param === 'preDelay') output.textContent = val + 'ms';
+        else if (param === 'decay') output.textContent = val + '%';
+        else if (param === 'level') output.textContent = val + 'dB';
+        else output.textContent = val;
+      }
+
+      if (!window.state) window.state = {};
+      if (!window.state.fx) window.state.fx = {};
+      if (!window.state.fx[target]) window.state.fx[target] = {};
+      window.state.fx[target][param] = val;
+    });
+  });
+
+  const auxControls = document.querySelectorAll('.aux-control');
+  auxControls.forEach(input => {
+    input.addEventListener('input', function() {
+      const target = this.dataset.target;
+      const scope = this.dataset.scope || 'AUX';
+      const val = Math.round(this.value * 100);
+
+      if (!window.state) window.state = {};
+      if (scope === 'FX_RETURN') {
+        if (!window.state.fxReturn) window.state.fxReturn = {};
+        window.state.fxReturn[target] = val;
+      } else {
+        if (!window.state.aux) window.state.aux = {};
+        window.state.aux[target] = val;
+      }
+
+      const tr = document.getElementById('testResult');
+      if (tr) tr.textContent = `${scope} [${target}] Set Level: ${val}%`;
+    });
+  });
 })();
 </script>
 
