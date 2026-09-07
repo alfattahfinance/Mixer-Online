@@ -17,7 +17,8 @@
         mid: 0,
         high: 0,
         mute: false,
-        solo: false
+        solo: false,
+        level: 0
       });
     }
   }
@@ -27,7 +28,7 @@
     const num = Number(val);
     if (param === "gain") return num.toFixed(2);
     if (param === "pan") return num === 0 ? "MID" : (num < 0 ? "L" + Math.round(Math.abs(num) * 100) : "R" + Math.round(num * 100));
-    if (["high", "mid", "low"].includes(param)) return (num > 0 ? "+" : "") + num + "dB";
+    if (["high", "mid", "low"].includes(param)) return (num > 0 ? "+" : "") + Math.round(num) + "dB";
     return num;
   }
 
@@ -48,8 +49,8 @@
     if (window.MixerBluetooth && typeof window.MixerBluetooth.send === "function") {
       window.MixerBluetooth.send(payload);
     }
-    if (window.MixerAdapters && typeof window.MixerAdapters.send === "function") {
-      window.MixerAdapters.send(payload);
+    if (window.MixerAdapters && typeof window.MixerAdapters.sendMapped === "function") {
+      window.MixerAdapters.sendMapped(payload);
     }
   };
 
@@ -66,23 +67,23 @@
         if (ch.mute) {
           ledEl.className = "channel-led active red";
         } else if (Number(ch.fader) > 0 || Number(ch.gain) > 0) {
-          ledEl.className = "channel-led active green";
+          ledEl.className = "channel-led active green on";
         } else {
           ledEl.className = "channel-led";
         }
       }
 
-      // 2. Update Isian VU Meter Mini (Hijau-Kuning-Merah)
-      const topVuFill = channelStrip.querySelector('.ch-top-vu-fill');
-      if (topVuFill) {
-        if (ch.mute) {
-          topVuFill.style.width = '0%';
-        } else {
-          const cGain = parseFloat(ch.gain ?? 1.0);
-          const cFader = parseFloat(ch.fader ?? 75) / 100;
-          const level = (cGain * cFader * 65);
-          topVuFill.style.width = Math.min(100, Math.max(0, level)) + '%';
-        }
+      // 2. Update Isian VU Meter Vertikal (Panjang & Top)
+      const topVuFill = channelStrip.querySelector('.ch-top-vu-fill, .channel-meter-bar');
+      const longVuFill = channelStrip.querySelector('.ch-long-vu-fill');
+      
+      if (ch.mute) {
+        if (topVuFill) topVuFill.style.height = '0%';
+        if (longVuFill) longVuFill.style.height = '0%';
+      } else {
+        const levelPct = Math.min(100, Math.max(0, (ch.level || 0) * 50)) + '%';
+        if (topVuFill) topVuFill.style.height = levelPct;
+        if (longVuFill) longVuFill.style.height = levelPct;
       }
     }
   };
@@ -113,14 +114,25 @@
   }
 
   // ==========================================================================
-  // PENERIMAAN INPUT/OUTPUT DARI HARDWARE (RX SYNC)
+  // PENERIMAAN INPUT/OUTPUT DARI HARDWARE (RX SYNC & METER)
   // ==========================================================================
-  window.handleIncomingHardwareData = function(incomingJsonString) {
+  window.handleIncomingHardwareData = function(incomingData) {
     try {
-      const data = typeof incomingJsonString === "string" ? JSON.parse(incomingJsonString) : incomingJsonString;
+      const data = typeof incomingData === "string" ? JSON.parse(incomingData) : incomingData;
       if (!data || data.protocol !== "ESP32-MIXER/1") return;
 
-      if (data.type === "CONTROL" && (data.direction === "RX" || data.direction === "FEEDBACK")) {
+      // A. METER SIGNAL SYNC
+      if (data.type === "METER") {
+        const chNum = parseInt(data.ch, 10);
+        if (chNum >= 1 && chNum <= 14 && window.state?.channels) {
+          window.state.channels[chNum - 1].level = Number(data.level || 0);
+          window.updateAllChannelLeds();
+        }
+        return;
+      }
+
+      // B. CONTROL FEEDBACK SYNC
+      if (data.type === "CONTROL" || data.type === "FEEDBACK") {
         const chNum = parseInt(data.ch, 10);
         const param = data.param; 
         const val = data.value;
@@ -137,16 +149,19 @@
               targetElement.value = val;
             }
 
-            if (param === "fader") {
-              const out = channelStrip.querySelector("output, .fader-val");
-              if (out) out.textContent = Math.round(val) + "%";
-            } else {
-              const knobTxt = channelStrip.querySelector(`.knob-val[data-val="${param}"]`);
-              if (knobTxt) knobTxt.textContent = formatKnobVal(param, val);
+            const parentControl = targetElement?.parentElement;
+            if (parentControl) {
+              const out = parentControl.querySelector("output, .fader-val");
+              if (out) {
+                if (param === "fader") out.textContent = Math.round(val) + "%";
+                else if (param === "gain") out.textContent = Number(val).toFixed(2);
+                else if (param === "pan") out.textContent = val === 0 ? "CENTER" : (val < 0 ? "L " + Math.round(Math.abs(val) * 100) + "%" : "R " + Math.round(val * 100) + "%");
+                else if (["high", "mid", "low"].includes(param)) out.textContent = Math.round(val);
+              }
             }
 
             if (param === "mute" || param === "solo") {
-              const btn = channelStrip.querySelector(`button[data-k="${param}"]`);
+              const btn = channelStrip.querySelector(`button[data-k="${param}"], button[data-action="${param}"]`);
               if (btn) {
                 btn.classList.toggle("on", Boolean(val));
                 btn.classList.toggle("active", Boolean(val));
@@ -169,6 +184,10 @@
     }
   };
 
+  // Event Listener Sinkronisasi RX Event Global
+  document.addEventListener("mixer:esp32-rx", (e) => window.handleIncomingHardwareData(e.detail));
+  document.addEventListener("mixer:bluetooth-rx", (e) => window.handleIncomingHardwareData(e.detail));
+
   // Penanganan input slider / knob langsung di web (TX)
   document.addEventListener("input", (e) => {
     const target = e.target;
@@ -186,13 +205,16 @@
       window.state.channels[chNum - 1][param] = val;
     }
 
-    // Update Teks Label
-    if (param === "fader") {
-      const out = strip.querySelector("output, .fader-val");
-      if (out) out.textContent = Math.round(val) + "%";
-    } else {
-      const knobTxt = strip.querySelector(`.knob-val[data-val="${param}"]`);
-      if (knobTxt) knobTxt.textContent = formatKnobVal(param, val);
+    // Update Teks Label Output
+    const parentControl = target.parentElement;
+    if (parentControl) {
+      const out = parentControl.querySelector("output, .fader-val");
+      if (out) {
+        if (param === "fader") out.textContent = Math.round(val) + "%";
+        else if (param === "gain") out.textContent = Number(val).toFixed(2);
+        else if (param === "pan") out.textContent = val === 0 ? "CENTER" : (val < 0 ? "L " + Math.round(Math.abs(val) * 100) + "%" : "R " + Math.round(val * 100) + "%");
+        else if (["high", "mid", "low"].includes(param)) out.textContent = Math.round(val);
+      }
     }
 
     if (typeof window.selectScreenChannel === "function") {
@@ -216,7 +238,7 @@
     const action = target.dataset.k || target.dataset.action;
     
     if (!isNaN(chNum) && (action === "mute" || action === "solo")) {
-      e.stopPropagation(); // Hentikan bentrokan event listener lain
+      e.stopPropagation();
 
       const channel = window.state.channels[chNum - 1];
       if (!channel) return;
@@ -248,9 +270,9 @@
       // Kirim ke ESP32 secara asynchronous
       window.sendChannelParamToHardware(chNum, action, nextState);
     }
-  }, true); // High priority event capture
+  }, true);
 
-  // Inisialisasi awal lampu LED saat halaman selesai dimuat
+  // Inisialisasi awal lampu LED
   setTimeout(() => {
     if (typeof window.updateAllChannelLeds === "function") {
       window.updateAllChannelLeds();
@@ -291,10 +313,8 @@
     }
   }
 
-  // Jalankan pengecekan status lampu secara berkala dan real-time
   setInterval(updateAllSystemLights, 300);
 
-  // Hook ke perubahan status adapter jika tersedia
   if (window.MixerAdapters && typeof window.MixerAdapters.onStatus === "function") {
     window.MixerAdapters.onStatus(() => {
       updateAllSystemLights();
