@@ -5,6 +5,104 @@
    ============================================================ */
 (function () {
   "use strict";
+
+  /* ============================================================
+     CHANNEL STATUS LED SKIN ONLY
+     Tidak mengubah state, kontrol, audio, atau ESP32 Bridge.
+     Hanya mengganti tampilan lampu indikator .channel-led.
+     ============================================================ */
+  if (!document.getElementById("mixer-channel-led-skin")) {
+    const style = document.createElement("style");
+    style.id = "mixer-channel-led-skin";
+    style.textContent = `
+      .new-channel-strip .channel-led,
+      .channel-strip .channel-led {
+        position: relative !important;
+        display: block !important;
+        width: 24px !important;
+        height: 7px !important;
+        min-width: 24px !important;
+        min-height: 7px !important;
+        margin: 3px auto 4px !important;
+        border-radius: 999px !important;
+        border: 1px solid rgba(255,255,255,.16) !important;
+        background: linear-gradient(180deg,#1c252d,#080c10) !important;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,.9), 0 0 0 1px rgba(0,0,0,.35) !important;
+        opacity: .9 !important;
+        transition: background .12s ease, box-shadow .12s ease, opacity .12s ease !important;
+      }
+
+      .new-channel-strip .channel-led::before,
+      .channel-strip .channel-led::before {
+        content: "" !important;
+        position: absolute !important;
+        left: 2px !important;
+        right: 2px !important;
+        top: 1px !important;
+        height: 2px !important;
+        border-radius: 999px !important;
+        background: rgba(255,255,255,.10) !important;
+        pointer-events: none !important;
+      }
+
+      .new-channel-strip .channel-led::after,
+      .channel-strip .channel-led::after {
+        content: "" !important;
+        position: absolute !important;
+        left: 4px !important;
+        top: 2px !important;
+        width: 4px !important;
+        height: 2px !important;
+        border-radius: 999px !important;
+        background: #39444d !important;
+        box-shadow: 0 0 2px rgba(255,255,255,.12) !important;
+        transition: all .12s ease !important;
+        pointer-events: none !important;
+      }
+
+      .new-channel-strip .channel-led.active.green,
+      .channel-strip .channel-led.active.green {
+        opacity: 1 !important;
+        background: linear-gradient(180deg,#7dffad 0%,#20d968 42%,#0b7e3b 100%) !important;
+        border-color: rgba(46,255,128,.72) !important;
+        box-shadow: inset 0 1px 1px rgba(255,255,255,.35), 0 0 5px rgba(46,255,128,.55), 0 0 11px rgba(46,255,128,.18) !important;
+      }
+
+      .new-channel-strip .channel-led.active.green::after,
+      .channel-strip .channel-led.active.green::after {
+        left: 5px !important;
+        width: 14px !important;
+        background: #caffdd !important;
+        box-shadow: 0 0 5px #63ff9a, 0 0 9px rgba(46,255,128,.7) !important;
+      }
+
+      .new-channel-strip .channel-led.active.red,
+      .channel-strip .channel-led.active.red {
+        opacity: 1 !important;
+        background: linear-gradient(180deg,#ff8a84 0%,#ff3b30 42%,#9c1610 100%) !important;
+        border-color: rgba(255,82,73,.78) !important;
+        box-shadow: inset 0 1px 1px rgba(255,255,255,.35), 0 0 6px rgba(255,59,48,.7), 0 0 12px rgba(255,59,48,.2) !important;
+      }
+
+      .new-channel-strip .channel-led.active.red::after,
+      .channel-strip .channel-led.active.red::after {
+        left: 5px !important;
+        width: 14px !important;
+        background: #ffe1df !important;
+        box-shadow: 0 0 5px #ff6961, 0 0 10px rgba(255,59,48,.75) !important;
+      }
+
+      @media (max-width:699px) {
+        .new-channel-strip .channel-led,
+        .channel-strip .channel-led {
+          width: 22px !important;
+          min-width: 22px !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   const N = 14;
   const $ = id => document.getElementById(id);
 
@@ -250,7 +348,7 @@
     const card = e.target.closest(".new-channel-strip"); 
     if (card && typeof window.selectScreenChannel === "function") { 
       window.selectScreenChannel(Number(card.dataset.ch)); 
-    } 
+    }
   });
 
   if (document.readyState === "loading") {
