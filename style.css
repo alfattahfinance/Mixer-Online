@@ -241,26 +241,67 @@ main.console > .aux-rack {
   accent-color: var(--accent-color, #00e5ff) !important;
 }
 
-/* Mute & Solo Button Styling & Active State */
+/* 6. Tombol Mute & Solo */
+.new-channel-buttons,
+.channel-buttons-group {
+  position: relative !important;
+  z-index: 2 !important;
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  margin-top: 4px !important;
+}
+
+.new-channel-buttons button,
+.channel-buttons-group button,
+.btn-mute,
+.btn-solo {
+  width: 100% !important;
+  padding: 4px 1px !important;
+  font-size: 8px !important;
+  font-weight: bold !important;
+  border-radius: 3px !important;
+  border: 1px solid #334155 !important;
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important;
+  color: #94a3b8 !important;
+  cursor: pointer !important;
+  transition: all 0.1s ease !important;
+}
+
 .btn-mute.active,
 .btn-mute.on,
 button[data-k="mute"].on,
 button.mute-btn.active {
-  background-color: #ff3b30 !important;
+  background: linear-gradient(180deg, #ef4444 0%, #991b1b 100%) !important;
   color: #ffffff !important;
-  border-color: #ff3b30 !important;
-  box-shadow: 0 0 8px rgba(255, 59, 48, 0.8) !important;
+  border-color: #f87171 !important;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.8) !important;
 }
 
 .btn-solo.active,
 .btn-solo.on,
 button[data-k="solo"].on,
 button.solo-btn.active {
-  background-color: #f1c40f !important;
+  background: linear-gradient(180deg, #f1c40f 0%, #b7950b 100%) !important;
   color: #000000 !important;
   border-color: #f1c40f !important;
   font-weight: bold !important;
   box-shadow: 0 0 8px rgba(241, 196, 15, 0.8) !important;
+}
+
+/* Footer Channel Source Readout */
+.new-channel-source,
+.channel-footer-text {
+  font-size: 7.5px !important;
+  color: var(--text-dim, #6e7681) !important;
+  margin-top: 3px !important;
+  padding-bottom: 2px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.3px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 /* ==========================================================================
