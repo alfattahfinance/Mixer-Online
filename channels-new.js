@@ -7,190 +7,164 @@
   "use strict";
 
   /* ============================================================
-     CHANNEL INDICATOR SKIN & LAYOUT OVERRIDE
+     CHANNEL INDICATOR SKIN ONLY
+     Lampu hijau kecil tetap dipertahankan.
+     Indikator lama diganti menjadi LED bar vertikal kecil.
+     Tidak mengubah state, kontrol, audio, atau ESP32 Bridge.
      ============================================================ */
   if (!document.getElementById("mixer-channel-led-skin")) {
     const style = document.createElement("style");
     style.id = "mixer-channel-led-skin";
     style.textContent = `
-      /* 1. Strip Channel Container */
-      .new-channel-strip,
-      .channel-strip {
-        position: relative !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-        background: var(--strip-bg, #121619) !important;
-        border-right: 1px dashed var(--panel-border, #2a323d) !important;
-        padding: 8px 3px 0px 3px !important;
-        box-sizing: border-box !important;
-        height: 100% !important;
-        margin-bottom: 0 !important;
-      }
-
-      /* 2. Lampu LED Status Atas (Hijau / Merah) */
+      /* Lampu status lama: TETAP ADA sebagai LED hijau kecil */
       .new-channel-strip .channel-led,
       .channel-strip .channel-led {
         position: relative !important;
-        z-index: 2 !important;
         display: block !important;
-        width: 10px !important;
-        height: 10px !important;
-        margin: 2px auto 4px auto !important;
-        border-radius: 50% !important;
-        border: 1px solid rgba(255,255,255,.2) !important;
+        width: 24px !important;
+        height: 7px !important;
+        min-width: 24px !important;
+        min-height: 7px !important;
+        margin: 3px auto 3px !important;
+        border-radius: 999px !important;
+        border: 1px solid rgba(255,255,255,.14) !important;
         background: #182127 !important;
         box-shadow: inset 0 1px 2px rgba(0,0,0,.9) !important;
+        opacity: .65 !important;
+      }
+
+      .new-channel-strip .channel-led::before,
+      .channel-strip .channel-led::before {
+        content: "" !important;
+        position: absolute !important;
+        left: 3px !important;
+        right: 3px !important;
+        top: 1px !important;
+        height: 2px !important;
+        border-radius: 999px !important;
+        background: rgba(255,255,255,.10) !important;
+        pointer-events: none !important;
+      }
+
+      .new-channel-strip .channel-led::after,
+      .channel-strip .channel-led::after {
+        content: "" !important;
+        position: absolute !important;
+        left: 5px !important;
+        top: 2px !important;
+        width: 14px !important;
+        height: 2px !important;
+        border-radius: 999px !important;
+        background: #39444d !important;
+        pointer-events: none !important;
       }
 
       .new-channel-strip .channel-led.active.green,
-      .channel-strip .channel-led.active.green,
-      .channel-led.green.on {
-        background: #31e66b !important;
-        border-color: #31e66b !important;
-        box-shadow: 0 0 8px #31e66b, inset 0 1px 1px rgba(255,255,255,.5) !important;
+      .channel-strip .channel-led.active.green {
+        opacity: 1 !important;
+        background: linear-gradient(180deg,#8dffb7,#20d968 48%,#0a7135) !important;
+        border-color: rgba(46,255,128,.65) !important;
+        box-shadow: 0 0 5px rgba(46,255,128,.55), inset 0 1px 1px rgba(255,255,255,.35) !important;
+      }
+
+      .new-channel-strip .channel-led.active.green::after,
+      .channel-strip .channel-led.active.green::after {
+        background: #caffdd !important;
+        box-shadow: 0 0 5px #63ff9a !important;
       }
 
       .new-channel-strip .channel-led.active.red,
       .channel-strip .channel-led.active.red {
-        background: #ff3b30 !important;
-        border-color: #ff3b30 !important;
-        box-shadow: 0 0 8px #ff3b30, inset 0 1px 1px rgba(255,255,255,.5) !important;
+        opacity: 1 !important;
+        background: linear-gradient(180deg,#ff918b,#ff3b30 48%,#8d120d) !important;
+        border-color: rgba(255,82,73,.75) !important;
+        box-shadow: 0 0 6px rgba(255,59,48,.65), inset 0 1px 1px rgba(255,255,255,.35) !important;
       }
 
-      /* 3. Indikator VU Meter Vertikal Panjang (Latar Belakang Knob) */
-      .new-channel-strip .ch-top-vu,
-      .channel-strip .ch-top-vu,
-      .ch-long-vu {
-        position: absolute !important;
-        z-index: 1 !important; /* Di belakang knob agar tidak menghalangi sentuhan */
-        pointer-events: none !important;
-        width: 6px !important;
-        top: 26px !important;
-        bottom: 250px !important;
-        margin: 0 auto !important;
-        border: 1px solid rgba(255,255,255,.1) !important;
-        border-radius: 2px !important;
-        background: #080a0c !important;
-        overflow: hidden !important;
-        display: flex !important;
-        flex-direction: column-reverse !important;
+      .new-channel-strip .channel-led.active.red::after,
+      .channel-strip .channel-led.active.red::after {
+        background: #ffe1df !important;
+        box-shadow: 0 0 6px #ff6961 !important;
       }
 
-      .new-channel-strip .ch-top-vu-fill,
-      .channel-strip .ch-top-vu-fill,
-      .ch-long-vu-fill {
-        width: 100% !important;
-        height: 0%;
-        background: linear-gradient(to top, #31e66b 65%, #ffd21c 85%, #ff3b30 100%) !important;
-        transition: height .05s linear !important;
-      }
-
-      /* 4. Kelompok Knob Gain, High, Mid, Low, Pan (Diturunkan & Responsif) */
-      .new-channel-control,
-      .ch-controls-group {
+      /* LED BAR BARU: horizontal internal meter diputar menjadi vertikal.
+         Bridge lama mengirim level melalui style.width, jadi mekanisme RX/TX
+         tidak perlu disentuh. */
+      .new-channel-strip .ch-top-vu {
         position: relative !important;
-        z-index: 2 !important; /* Memastikan Knob di atas VU meter */
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        gap: 4px !important;
-        width: 100% !important;
-        margin-top: 6px !important;
-      }
-
-      .new-channel-strip input[type="range"].new-knob {
-        position: relative !important;
-        z-index: 3 !important;
-        touch-action: none !important;
-        cursor: pointer !important;
-        width: 100% !important;
-      }
-
-      .knob-val {
-        font-size: 8px !important;
-        color: var(--accent-cyan, #00e5ff) !important;
-        font-weight: bold !important;
         display: block !important;
-        text-align: center !important;
-        margin-top: 1px !important;
+        width: 62px !important;
+        height: 8px !important;
+        min-width: 62px !important;
+        margin: 1px auto 5px !important;
+        padding: 1px !important;
+        box-sizing: border-box !important;
+        border: 1px solid rgba(255,255,255,.16) !important;
+        border-radius: 2px !important;
+        background: #090e12 !important;
+        box-shadow: inset 0 0 4px rgba(0,0,0,.95), 0 0 2px rgba(0,0,0,.6) !important;
+        overflow: hidden !important;
+        transform: rotate(-90deg) !important;
+        transform-origin: center center !important;
       }
 
-      /* 5. Teks Volume & Slider Fader Vertikal (Ditata Pas Sampai Dasar) */
-      .volume-label-text,
-      .new-channel-fader label {
-        position: relative !important;
+      .new-channel-strip .ch-top-vu::before {
+        content: "" !important;
+        position: absolute !important;
+        inset: 1px !important;
+        background: repeating-linear-gradient(
+          to right,
+          rgba(255,255,255,.10) 0,
+          rgba(255,255,255,.10) 2px,
+          transparent 2px,
+          transparent 6px
+        ) !important;
+        pointer-events: none !important;
         z-index: 2 !important;
-        font-size: 8px !important;
-        font-weight: bold !important;
-        color: var(--text-dim, #8b949e) !important;
-        text-transform: uppercase !important;
-        margin: 8px 0 2px 0 !important;
-        text-align: center !important;
       }
 
-      .fader-area,
-      .new-channel-fader {
-        position: relative !important;
-        z-index: 2 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: flex-end !important;
-        flex-grow: 1 !important;
-        width: 100% !important;
-        margin-top: auto !important;
-        padding-bottom: 0px !important;
+      .new-channel-strip .ch-top-vu-fill {
+        position: absolute !important;
+        left: 1px !important;
+        bottom: 1px !important;
+        width: 0% !important;
+        height: 100% !important;
+        min-height: 0 !important;
+        background: linear-gradient(to right,
+          #24e66b 0%,
+          #24e66b 62%,
+          #ffd21c 78%,
+          #ff9f00 88%,
+          #ff3b30 100%
+        ) !important;
+        border-radius: 1px !important;
+        box-shadow: 0 0 4px rgba(40,255,110,.45) !important;
+        transition: width .06s linear !important;
+        z-index: 1 !important;
       }
 
-      .new-channel-strip input[type="range"].new-fader,
-      .channel-fader {
-        -webkit-appearance: slider-vertical !important;
-        -moz-appearance: slider-vertical !important;
-        appearance: slider-vertical !important;
-        writing-mode: bt-lr !important;
-        width: 18px !important;
-        height: 230px !important; /* Menutup celah kosong bagian bawah */
-        background: #080a0b !important;
-        border: 1px solid var(--panel-border, #2a323d) !important;
-        border-radius: 3px !important;
-        margin: 0 auto !important;
-        accent-color: var(--accent-color, #00e5ff) !important;
-        touch-action: none !important;
-        cursor: pointer !important;
+      /* Jangan memaksa width menjadi auto: channels-bridge.js menggunakan
+         width % sebagai sumber level VU. */
+      .new-channel-strip .ch-top-vu .ch-top-vu-fill {
+        height: 100% !important;
       }
 
-      /* 6. Tombol Mute & Solo */
-      .new-channel-buttons {
-        position: relative !important;
-        z-index: 2 !important;
-        width: 100% !important;
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 2px !important;
-        margin-top: 4px !important;
-      }
-
-      .new-channel-buttons button[data-k="mute"].on,
-      .btn-mute.active {
-        background: linear-gradient(180deg, #ef4444, #991b1b) !important;
-        border-color: #f87171 !important;
-        color: #fff !important;
-        box-shadow: 0 0 8px rgba(239, 68, 68, 0.6) !important;
-      }
-
-      .new-channel-buttons button[data-k="solo"].on,
-      .btn-solo.active {
-        background: linear-gradient(180deg, #eab308, #854d0e) !important;
-        border-color: #fde047 !important;
-        color: #fff !important;
-        box-shadow: 0 0 8px rgba(234, 179, 8, 0.6) !important;
-      }
-
-      /* Sembunyikan meter segmented lama */
+      /* Meter segmented lama disembunyikan agar hanya LED bar baru yang tampil. */
       .new-channel-strip .new-channel-meter {
         display: none !important;
+      }
+
+      @media (max-width:699px) {
+        .new-channel-strip .channel-led,
+        .channel-strip .channel-led {
+          width: 22px !important;
+          min-width: 22px !important;
+        }
+        .new-channel-strip .ch-top-vu {
+          width: 56px !important;
+          min-width: 56px !important;
+          height: 7px !important;
+        }
       }
     `;
     document.head.appendChild(style);
@@ -199,21 +173,13 @@
   const N = 14;
   const $ = id => document.getElementById(id);
 
-  function triggerHaptic(ms) {
-    if (window.AndroidFeedback && typeof window.AndroidFeedback.triggerHaptic === "function") {
-      window.AndroidFeedback.triggerHaptic(ms);
-    } else if (navigator.vibrate) {
-      navigator.vibrate(ms);
-    }
-  }
-
   function ensureState() {
     if (!window.state) window.state = {};
     if (!Array.isArray(window.state.channels)) window.state.channels = [];
     for (let i = 0; i < N; i++) {
       if (!window.state.channels[i]) {
         window.state.channels[i] = {
-          gain: 1.0, high: 0, mid: 0, low: 0, pan: 0, fader: 75, mute: false, solo: false, level: 0
+          gain: 1, high: 0, mid: 0, low: 0, pan: 0, fader: 75, mute: false, solo: false
         };
       }
     }
@@ -224,7 +190,7 @@
     const num = Number(val);
     if (k === "gain") return num.toFixed(2);
     if (k === "pan") return num === 0 ? "MID" : (num < 0 ? "L" + Math.round(Math.abs(num) * 100) : "R" + Math.round(num * 100));
-    if (["high", "mid", "low"].includes(k)) return (num > 0 ? "+" : "") + Math.round(num) + "dB";
+    if (["high", "mid", "low"].includes(k)) return (num > 0 ? "+" : "") + num + "dB";
     return num;
   }
 
@@ -248,6 +214,7 @@
       <header class="new-channel-head">CH${id}</header>
       <div class="${ledClass}" title="Channel Indicator"></div>
       <div class="ch-top-vu"><div class="ch-top-vu-fill"></div></div>
+      <div class="led-meter new-channel-meter" data-ch="${id}" role="meter" aria-label="CH${id} level"><span class="led-peak"></span><span class="led-segments">${"<i data-seg=\"0\"></i>".repeat(12)}</span></div>
       
       <div class="new-channel-control">
         <label>GAIN</label>
@@ -275,8 +242,8 @@
         <span class="knob-val" data-val="pan">${formatVal("pan", c.pan ?? 0)}</span>
       </div>
 
-      <div class="volume-label-text">VOLUME</div>
       <div class="fader-area new-channel-fader">
+        <label>VOLUME</label>
         <input class="new-fader channel-fader" data-k="fader" type="range" min="0" max="100" step="1" value="${Number(c.fader ?? 75)}">
         <output class="fader-val">${Math.round(Number(c.fader ?? 75))}%</output>
       </div>
@@ -288,7 +255,6 @@
     `;
 
     const update = (k, value) => {
-      triggerHaptic(10);
       if (!window.state?.system) {
         const r = $("testResult"); 
         if (r) r.textContent = "CONTROL BLOCKED: SYSTEM OFF";
@@ -345,9 +311,27 @@
       input.addEventListener("input", () => update(input.dataset.k, input.value));
     });
 
+    const audioFile = el.querySelector("[data-audio-file]");
+    const audioLoad = el.querySelector('[data-audio-action="load"]');
+    const audioStop = el.querySelector('[data-audio-action="stop"]');
+
+    if (audioLoad && audioFile) {
+      audioLoad.addEventListener("click", () => audioFile.click());
+      audioFile.addEventListener("change", () => {
+        const file = audioFile.files && audioFile.files[0];
+        if (!file || !file.type.startsWith("audio/")) return;
+        const url = URL.createObjectURL(file);
+        const ok = window.connectCustomAudioToChannel?.(id, url);
+        const r = $("testResult");
+        if (r) r.textContent = ok ? "CH" + id + " AUDIO → PLAY" : "CH" + id + " AUDIO → ERROR";
+      });
+    }
+    if (audioStop) {
+      audioStop.addEventListener("click", () => window.stopChannelAudio?.(id));
+    }
+
     el.querySelectorAll("button").forEach(button => {
       button.addEventListener("click", () => {
-        triggerHaptic(20);
         if (!window.state?.system) {
           const r = $("testResult"); 
           if (r) r.textContent = "CONTROL BLOCKED: SYSTEM OFF";
