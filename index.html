@@ -3036,6 +3036,74 @@ aside.master-rack {
 })();
 </script>
 
+<script>
+(function() {
+  "use strict";
+
+  // Injeksi otomatis elemen VU meter panjang ke dalam setiap area fader channel
+  function injectLongVuToFaders() {
+    const strips = document.querySelectorAll('.new-channel-strip, .channel-strip');
+    
+    strips.forEach(strip => {
+      const faderArea = strip.querySelector('.fader-area');
+      if (faderArea && !faderArea.querySelector('.ch-long-vu')) {
+        const vuContainer = document.createElement('div');
+        vuContainer.className = 'ch-long-vu';
+        
+        const vuFill = document.createElement('div');
+        vuFill.className = 'ch-long-vu-fill';
+        vuContainer.appendChild(vuFill);
+        
+        // Masukkan ke dalam fader-area agar posisinya berada tepat di jalur fader
+        faderArea.insertBefore(vuContainer, faderArea.firstChild);
+      }
+    });
+  }
+
+  // Jalankan saat DOM siap
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', injectLongVuToFaders);
+  } else {
+    injectLongVuToFaders();
+  }
+
+  // Update pergerakan tinggi level VU meter secara dinamis berdasarkan state channel
+  function updateFaderMetersLoop() {
+    requestAnimationFrame(updateFaderMetersLoop);
+
+    if (!window.state || !window.state.channels) return;
+
+    document.querySelectorAll('.new-channel-strip, .channel-strip').forEach(strip => {
+      const chId = Number(strip.dataset.ch) || parseInt(strip.innerText.match(/CH\s*(\d+)/i)?.[1] || '0', 10);
+      if (chId <= 0) return;
+
+      const chData = window.state.channels[chId - 1] || {};
+      const longVuFill = strip.querySelector('.ch-long-vu-fill');
+      if (!longVuFill) return;
+
+      if (chData.mute) {
+        longVuFill.style.height = '0%';
+        return;
+      }
+
+      const faderVal = chData.fader !== undefined ? chData.fader : 75;
+      const gainVal = parseFloat(chData.gain || 1.0);
+
+      if (faderVal > 0) {
+        const randomFluq = Math.random() * 20;
+        const targetHeight = Math.min(100, Math.max(5, (faderVal * 0.75) * (gainVal * 0.5) + randomFluq));
+        longVuFill.style.height = targetHeight + '%';
+      } else {
+        longVuFill.style.height = '0%';
+      }
+    });
+  }
+
+  requestAnimationFrame(updateFaderMetersLoop);
+
+})();
+</script>
+  
 
 </body>
 </html>
