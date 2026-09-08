@@ -117,12 +117,21 @@ window.MixerControl = (() => {
     return { ok: true, connected: false };
   }
 
+  // Handle event RX agar tidak terdaftar ganda (Cegah Memory Leak & Lag)
+  const handleRxEvent = (e) => {
+    if (e.detail) {
+      applyRemote(e.detail);
+    }
+  };
+
   function bindAdapterStatus() {
-    const api = window.MixerAdapters;
-    if (!api || typeof api.onStatus !== "function") return;
     if (state._adapterBound) return;
     
+    const api = window.MixerAdapters;
+    if (!api || typeof api.onStatus !== "function") return;
+    
     state._adapterBound = true;
+    
     api.onStatus(s => {
       const stats = api.getTransportStats ? api.getTransportStats() : { tx: 0, rx: 0 };
       setStatus({
@@ -133,21 +142,20 @@ window.MixerControl = (() => {
       });
     });
 
-    // Listen data paket masuk dari Event Custom (ESP32 / Bluetooth)
-    const handleRxEvent = (e) => {
-      if (e.detail) {
-        applyRemote(e.detail);
-      }
-    };
-
+    // Daftarkan listener sekali saja
+    document.removeEventListener("mixer:esp32-rx", handleRxEvent);
+    document.removeEventListener("mixer:bluetooth-rx", handleRxEvent);
     document.addEventListener("mixer:esp32-rx", handleRxEvent);
     document.addEventListener("mixer:bluetooth-rx", handleRxEvent);
   }
 
-  bindAdapterStatus();
+  // Inisialisasi aman terhadap kesiapan DOM
   if (typeof window !== "undefined") {
-    window.addEventListener("load", bindAdapterStatus);
-    document.addEventListener("DOMContentLoaded", bindAdapterStatus);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", bindAdapterStatus);
+    } else {
+      bindAdapterStatus();
+    }
   }
 
   function setControl(channel, control, value) {
@@ -191,7 +199,7 @@ window.MixerControl = (() => {
     return val;
   }
 
-  // Fungsi Penerimaan Data RX dari Hardware / Simulator ke Tampilan UI Mixer
+  // Fungsi Penerimaan Data RX dari Hardware / Simulator ke Tampilan UI Mixer (Dioptimalkan)
   function applyRemote(message) {
     if (!message) return false;
     state.lastRx = message;
@@ -241,7 +249,7 @@ window.MixerControl = (() => {
 
       const chStrip = document.querySelector(`.new-channel-strip[data-ch="${chNum}"], .channel-strip[data-ch="${chNum}"]`);
       if (chStrip) {
-        // Update Slider / Input Value
+        // Update Slider / Input Value (Hindari trigger event input loop)
         const inputElem = chStrip.querySelector(`input[data-k="${param}"], input[data-param="${param}"]`);
         if (inputElem && parseFloat(inputElem.value) !== parseFloat(val)) {
           inputElem.value = val;
