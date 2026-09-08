@@ -2209,19 +2209,49 @@
 (function() {
   "use strict";
 
-  // Inisialisasi state system awal OFF (menunggu tombol power ditekan)
+  // 1. Inisialisasi state system awal OFF (menunggu tombol power ditekan)
   window.state = window.state || {};
   if (window.state.system === undefined) {
     window.state.system = false; 
   }
   window.state.connected = false;
 
-  // Selektor Akurat sesuai struktur HTML M32 Pro Edition
+  // 2. Selektor Akurat sesuai struktur HTML M32 Pro Edition
   const tabs = document.querySelectorAll('#screenTabs button');
   const views = document.querySelectorAll('.screen-content .screen-view');
   const subButtons = document.querySelectorAll('#m32SubmenuBar .m32-sub-btn');
   const subPanels = document.querySelectorAll('.midas-tft-screen .m32-sub-panel');
   const subBar = document.getElementById('m32SubmenuBar');
+
+  // Fungsi Generator Grafik untuk Tab METERS dan RTA agar tampil dinamis
+  function buildScreenMeters() {
+    const root = document.getElementById('screenChannelMeters');
+    if (!root) return;
+    root.innerHTML = '';
+    for (let i = 0; i < 14; i++) {
+      const el = document.createElement('div');
+      el.style.flex = '1';
+      el.style.background = 'var(--accent-color)';
+      el.style.height = (15 + ((i * 17) % 75)) + '%';
+      el.style.borderRadius = '2px';
+      el.title = 'CH' + (i + 1);
+      root.appendChild(el);
+    }
+  }
+
+  function buildRta() {
+    const root = document.getElementById('rtaBars');
+    if (!root) return;
+    root.innerHTML = '';
+    for (let i = 0; i < 14; i++) {
+      const b = document.createElement('div');
+      b.style.flex = '1';
+      b.style.background = '#2ecc71';
+      b.style.height = (20 + ((i * 23) % 70)) + '%';
+      b.style.borderRadius = '2px';
+      root.appendChild(b);
+    }
+  }
 
   function switchScreen(targetScreen) {
     // Kelola tombol tab utama
@@ -2252,10 +2282,16 @@
     if (subBar) {
       subBar.style.display = (targetScreen === 'HOME') ? 'grid' : 'none';
     }
+
+    // Panggil fungsi render khusus jika tab METERS atau RTA dibuka
+    if (targetScreen === 'METER') {
+      buildScreenMeters();
+    } else if (targetScreen === 'RTA') {
+      buildRta();
+    }
   }
 
   function switchSubPanel(targetSub) {
-    // Kelola tombol submenu (overview, config, gate, dyn, eq, sends)
     subButtons.forEach(b => {
       if (b.dataset.sub === targetSub) {
         b.classList.add('active');
@@ -2264,7 +2300,6 @@
       }
     });
 
-    // Kelola tampilan panel submenu di dalam layar TFT (.m32-sub-panel)
     subPanels.forEach(panel => {
       if (panel.dataset.subpanel === targetSub) {
         panel.classList.add('active');
@@ -2280,7 +2315,7 @@
     });
   }
 
-  // Pasang event listener untuk tab layar utama dengan tangkapan penuh (capture)
+  // Pasang event listener untuk tab layar utama
   tabs.forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.preventDefault();
@@ -2324,6 +2359,7 @@
 
 })();
 </script>
+
 
 </body>
 </html>
