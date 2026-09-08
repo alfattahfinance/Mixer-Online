@@ -422,7 +422,7 @@ window.MixerAdapters = (() => {
   }
 
   // ==========================================================================
-  // PERBAIKAN: PERHITUNGAN VU METER UNTUK SEMUA 14 CHANNEL
+  // OPTIMASI: VU METER TERPISAH (150ms interval, bebas kedip/glitch status bridge)
   // ==========================================================================
   let meterTimer = null;
 
@@ -447,11 +447,10 @@ window.MixerAdapters = (() => {
 
       const now = Date.now() / 1000;
 
-      // Hitung dan kirim level VU meter untuk seluruh 14 channel
       channels.forEach((c, i) => {
         const gate = c.mute ? 0 : 1;
-        const faderFactor = Number(c.fader) / 100; // Pembagi volume (0.0 - 1.0)
-        const gainFactor = Number(c.gain) <= 0 ? 0.2 : Number(c.gain); // Mencegah 0 mutlak agar VU tetap bisa membaca
+        const faderFactor = Number(c.fader) / 100;
+        const gainFactor = Number(c.gain) <= 0 ? 0.2 : Number(c.gain);
 
         const base = faderFactor * gainFactor;
         const wave = (Math.sin(now * 4 + i * 0.8) + 1) / 2;
@@ -459,8 +458,7 @@ window.MixerAdapters = (() => {
 
         c.level = Number(level.toFixed(3));
 
-        // Pancarkan event RX meter untuk UI
-        emitRx({
+        const meterPacket = {
           protocol: PROTOCOL,
           type: "METER",
           ch: c.ch,
@@ -469,11 +467,21 @@ window.MixerAdapters = (() => {
           device: "ESP32-SIMULATOR",
           transport: "esp32",
           ts: Date.now()
-        });
+        };
+
+        // Simpan senyap di riwayat rx tanpa mentrigger perubahan status koneksi utama
+        if (active && active.rx) {
+          active.rx.push(meterPacket);
+          if (active.rx.length > 150) active.rx.shift();
+          active.lastRx = meterPacket;
+        }
+
+        // Dispatch khusus event meter agar hanya komponen VU meter yang menangkapnya
+        document.dispatchEvent(new CustomEvent("mixer:esp32-meter", { detail: meterPacket }));
       });
 
       saveSimulatorState();
-    }, 100); // Update halus tiap 100ms
+    }, 150); // Interval 150ms sangat stabil, halus, dan menghemat CPU
   }
 
   // TOGGLE CONNECT ESP32
