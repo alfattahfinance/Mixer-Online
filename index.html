@@ -2205,5 +2205,116 @@
 
 })();
 </script>
+<script>
+(function() {
+  "use strict";
+
+  // 1. Atur state system awal menjadi OFF secara default (menunggu tombol power diklik)
+  window.state = window.state || {};
+  if (window.state.system === undefined) {
+    window.state.system = false; 
+  }
+  window.state.connected = false;
+
+  // 2. Perbaikan Total Navigasi Layar TFT & Render Konten Tiap Tab
+  const tabs = document.querySelectorAll('#screenTabs button');
+  const views = document.querySelectorAll('.screen-view');
+  const subButtons = document.querySelectorAll('.m32-sub-btn');
+  const subPanels = document.querySelectorAll('.m32-sub-panel');
+  const subBar = document.getElementById('m32SubmenuBar');
+
+  function switchScreen(targetScreen) {
+    tabs.forEach(b => {
+      if (b.dataset.screen === targetScreen) {
+        b.classList.add('active');
+      } else {
+        b.classList.remove('active');
+      }
+    });
+
+    views.forEach(v => {
+      if (v.dataset.view === targetScreen) {
+        v.classList.add('active');
+        v.style.display = 'flex';
+        v.style.visibility = 'visible';
+        v.style.opacity = '1';
+      } else {
+        v.classList.remove('active');
+        v.style.display = 'none';
+      }
+    });
+
+    if (subBar) {
+      subBar.style.display = (targetScreen === 'HOME') ? 'grid' : 'none';
+    }
+  }
+
+  function switchSubPanel(targetSub) {
+    subButtons.forEach(b => {
+      if (b.dataset.sub === targetSub) {
+        b.classList.add('active');
+      } else {
+        b.classList.remove('active');
+      }
+    });
+
+    subPanels.forEach(panel => {
+      if (panel.dataset.subpanel === targetSub) {
+        panel.classList.add('active');
+        panel.style.display = 'flex';
+        panel.style.visibility = 'visible';
+        panel.style.opacity = '1';
+      } else {
+        panel.classList.remove('active');
+        panel.style.display = 'none';
+      }
+    });
+  }
+
+  // Pasang event listener dengan pencegahan propagasi untuk tab layar
+  tabs.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      switchScreen(this.dataset.screen);
+    }, true);
+  });
+
+  subButtons.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      switchSubPanel(this.dataset.sub);
+    }, true);
+  });
+
+  // Sinkronisasi tombol power fisik di header (harus diklik dulu baru ON)
+  const powerBtn = document.getElementById("power");
+  if (powerBtn) {
+    powerBtn.textContent = window.state.system ? "SYSTEM ON" : "SYSTEM OFF";
+    powerBtn.classList.toggle("on", window.state.system);
+    
+    powerBtn.addEventListener("click", function(e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      window.state.system = !window.state.system;
+      this.textContent = window.state.system ? "SYSTEM ON" : "SYSTEM OFF";
+      this.classList.toggle("on", window.state.system);
+
+      var hs = document.getElementById("headerBridgeStatus");
+      if (hs) hs.textContent = window.state.system ? "SYSTEM READY" : "BRIDGE STANDBY";
+    });
+  }
+
+  // Jalankan pengaturan awal layar saat halaman dimuat
+  window.addEventListener("DOMContentLoaded", () => {
+    switchScreen('HOME');
+    switchSubPanel('overview');
+  });
+
+})();
+</script>
+
+  
 </body>
 </html>
