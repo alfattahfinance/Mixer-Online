@@ -647,6 +647,39 @@
       height: 290px !important;
     }
   }
+
+  /* Menyelaraskan tinggi Master Rack agar sejajar sempurna dengan Channel Bank */
+aside.master-rack {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  height: 100% !important;
+  min-height: 520px !important; /* Menyesuaikan tinggi standar strip channel */
+  background: var(--panel-bg) !important;
+  border: 1px solid var(--panel-border) !important;
+  border-radius: 4px !important;
+  padding: 4px !important;
+  box-sizing: border-box !important;
+}
+
+/* Penyesuaian area fader master agar proporsional */
+.master-card {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  flex-grow: 1 !important;
+  justify-content: flex-end !important;
+  margin: 4px 0 !important;
+}
+
+.master-card input[type="range"] {
+  height: 240px !important;
+  accent-color: var(--accent-color) !important;
+  writing-mode: bt-lr; /* Dukungan orientasi vertikal */
+  -webkit-appearance: slider-vertical;
+  width: 20px !important;
+}
+
 </style>
 </head>
 <body class="theme-midas">
@@ -2355,6 +2388,257 @@
   window.addEventListener("DOMContentLoaded", () => {
     switchScreen('HOME');
     switchSubPanel('overview');
+  });
+
+})();
+</script>
+<script>
+(function() {
+  "use strict";
+
+  // Pastikan state global terdefinisi dengan aman
+  window.state = window.state || { system: false, connected: false, channels: [] };
+
+  // 1. Fungsi Interaksi Tombol Phantom (+48V)
+  const btnPhantom = document.getElementById('btnPhantom');
+  if (btnPhantom) {
+    btnPhantom.addEventListener('click', function(e) {
+      e.preventDefault();
+      const isOn = this.textContent.trim() === 'ON';
+      this.textContent = isOn ? 'OFF' : 'ON';
+      this.style.background = isOn ? 'var(--panel-border)' : '#2ecc71';
+      this.style.color = isOn ? '#fff' : '#000';
+      
+      const tr = document.getElementById('testResult');
+      if (tr) tr.textContent = `CONFIG: +48V Phantom Power set to ${this.textContent}`;
+    });
+  }
+
+  // 2. Fungsi Interaksi Tombol Polarity (INV / NORM)
+  const btnPolarity = document.getElementById('btnPolarity');
+  if (btnPolarity) {
+    btnPolarity.addEventListener('click', function(e) {
+      e.preventDefault();
+      const isNorm = this.textContent.includes('NORM');
+      this.textContent = isNorm ? 'INV (-)' : 'NORM (+)';
+      this.style.color = isNorm ? '#e74c3c' : '#fff';
+      this.style.background = isNorm ? 'var(--main-bg)' : 'var(--panel-border)';
+
+      const tr = document.getElementById('testResult');
+      if (tr) tr.textContent = `CONFIG: Input Polarity set to ${this.textContent}`;
+    });
+  }
+
+  // 3. Sinkronisasi Slider Parameter (HPF, Gate, Compressor, EQ, Sends) dengan Label Nilainya
+  const slidersWithOutputs = [
+    { slider: 'hpfSlider', val: 'hpfVal', unit: ' Hz' },
+    { slider: 'gateThreshSlider', val: 'gateThreshVal', unit: ' dB' },
+    { slider: 'gateRangeSlider', val: 'gateRangeVal', unit: ' dB' },
+    { slider: 'gateRelSlider', val: 'gateRelVal', unit: ' ms' },
+    { slider: 'compThreshSlider', val: 'compThreshVal', unit: 'dB' },
+    { slider: 'compRatioSlider', val: 'compRatioVal', unit: '' },
+    { slider: 'compAttSlider', val: 'compAttVal', unit: 'ms' },
+    { slider: 'compGainSlider', val: 'compGainVal', unit: '' },
+    { slider: 'bs1Slider', val: 'bs1Val', unit: 'dB' },
+    { slider: 'bs2Slider', val: 'bs2Val', unit: 'dB' },
+    { slider: 'fx1SendSlider', val: 'fx1Val', unit: 'dB' },
+    { slider: 'fx2SendSlider', val: 'fx2Val', unit: 'dB' }
+  ];
+
+  slidersWithOutputs.forEach(item => {
+    const sliderEl = document.getElementById(item.slider);
+    const valEl = document.getElementById(item.val);
+    if (sliderEl && valEl) {
+      sliderEl.addEventListener('input', function() {
+        let displayVal = this.value;
+        if (item.slider === 'fx2SendSlider' && displayVal === '-40') {
+          displayVal = '-∞';
+          valEl.textContent = displayVal;
+        } else if (item.slider === 'compGainSlider') {
+          valEl.textContent = '+' + displayVal;
+        } else {
+          valEl.textContent = displayVal + item.unit;
+        }
+      });
+    }
+  });
+
+  // 4. Interaksi Grafik/Slider EQ 4-Band
+  const eqBands = ['Low', 'Mid1', 'Mid2', 'High'];
+  eqBands.forEach(band => {
+    const slider = document.getElementById('eq' + band + 'Slider');
+    const bar = document.getElementById('eqBar' + band);
+    if (slider && bar) {
+      slider.addEventListener('input', function() {
+        bar.style.height = this.value + '%';
+      });
+    }
+  });
+
+  // 5. Interaksi Tombol Save / Recall Preset Scene
+  const sceneSave = document.getElementById('screenSceneSave');
+  const sceneRecall = document.getElementById('screenSceneRecall');
+  const sceneMsg = document.getElementById('sceneStatusMsg');
+
+  if (sceneSave) {
+    sceneSave.addEventListener('click', () => {
+      if (sceneMsg) sceneMsg.textContent = "✅ Preset M32 Scene Saved Successfully!";
+    });
+  }
+  if (sceneRecall) {
+    sceneRecall.addEventListener('click', () => {
+      if (sceneMsg) sceneMsg.textContent = "⚡ Preset M32 Scene Recalled!";
+    });
+  }
+
+})();
+</script>
+<script>
+(function() {
+  "use strict";
+
+  // 1. Interaksi Tombol Pemilih Slot Efek di Panel FX (FX1, FX2, AUX1-AUX4)
+  const fxRackButtons = document.querySelectorAll('.fx-buttons button');
+  const fxRackPreset = document.getElementById('fxRackPreset');
+  const fxRackSummary = document.getElementById('fxRackSummary');
+
+  const fxPresetDescriptions = {
+    "FX1": "REVERB • TIME 2.45s",
+    "FX2": "STEREO DELAY • 120 BPM",
+    "AUX1": "GRAPHIC EQ • 31-BAND",
+    "AUX2": "PARAMETRIC EQ • 4-BAND",
+    "AUX3": "VINTAGE COMPRESSOR • 2:1",
+    "AUX4": "STEREO CHORUS • WIDE"
+  };
+
+  fxRackButtons.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      fxRackButtons.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+
+      const target = this.dataset.fxSelect;
+      if (fxRackPreset) fxRackPreset.textContent = target + " ACTIVE & RUNNING";
+      if (fxRackSummary) fxRackSummary.textContent = fxPresetDescriptions[target] || "PROCESSOR ACTIVE";
+
+      const tr = document.getElementById('testResult');
+      if (tr) tr.textContent = `FX RACK: Slot ${target} dipilih dan diaktifkan.`;
+    });
+  });
+
+  // 2. Interaksi Tombol Pilihan Dropdown Efek di Layar TFT (Tab EFFECTS)
+  const screenFxSelect = document.getElementById('screenFxSelect');
+  const fxSlotDetails = document.getElementById('fxSlotDetails');
+
+  if (screenFxSelect) {
+    screenFxSelect.addEventListener('change', function() {
+      const selectedText = this.options[this.selectedIndex].text;
+      const selectedVal = this.value;
+
+      if (fxSlotDetails) {
+        fxSlotDetails.innerHTML = `Loaded Slot <strong style="color:var(--accent-color);">${selectedVal}</strong>: <span style="color:#2ecc71; font-weight:bold;">${selectedText}</span>`;
+      }
+
+      const tr = document.getElementById('testResult');
+      if (tr) tr.textContent = `SCREEN FX: Berhasil memuat ${selectedText}`;
+    });
+  }
+
+  // 3. Interaksi Tombol Kontrol Cepat (TAP, SEL) pada Effect Rack
+  const fxTapBtn = document.getElementById('fxTap');
+  const fxSelBtn = document.getElementById('fxSelect');
+  const fxBpmDisplay = document.getElementById('fxBpm');
+
+  let tapTimes = [];
+  if (fxTapBtn) {
+    fxTapBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const now = Date.now();
+      tapTimes.push(now);
+      if (tapTimes.length > 3) tapTimes.shift();
+
+      if (tapTimes.length >= 2) {
+        const diff = (tapTimes[tapTimes.length - 1] - tapTimes[0]) / (tapTimes.length - 1);
+        const calculatedBpm = Math.round(60000 / diff);
+        if (calculatedBpm >= 40 && calculatedBpm <= 240) {
+          if (fxBpmDisplay) fxBpmDisplay.textContent = calculatedBpm + " BPM";
+          const tr = document.getElementById('testResult');
+          if (tr) tr.textContent = `FX TAP TEMPO: Sinkron ke ${calculatedBpm} BPM`;
+        }
+      }
+    });
+  }
+
+  if (fxSelBtn) {
+    fxSelBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      alert("⚙️ Pengaturan Parameter Lanjutan FX Terbuka.");
+    });
+  }
+
+  // 4. Sinkronisasi Slider Parameter Efek (Time, Pre-Delay, Decay, Level) secara Real-Time
+  const fxSliders = document.querySelectorAll('.fx-control');
+  fxSliders.forEach(input => {
+    input.addEventListener('input', function() {
+      const param = this.dataset.param;
+      const val = this.value;
+      const output = this.parentElement.querySelector('output');
+
+      if (output) {
+        if (param === 'time') output.textContent = val + 's';
+        else if (param === 'preDelay') output.textContent = val + 'ms';
+        else if (param === 'decay') output.textContent = val + '%';
+        else if (param === 'level') output.textContent = val + 'dB';
+        else output.textContent = val;
+      }
+
+      const tr = document.getElementById('testResult');
+      if (tr) tr.textContent = `FX PARAM: ${param.toUpperCase()} diatur ke ${val}`;
+    });
+  });
+
+})();
+</script>
+<script>
+(function() {
+  "use strict";
+
+  // Inisialisasi state global jika belum ada
+  window.state = window.state || { aux: {}, fxReturn: {} };
+
+  // Interaksi Slider Aux / Bus & FX Return
+  const auxReturnControls = document.querySelectorAll('.aux-control');
+
+  auxReturnControls.forEach(input => {
+    input.addEventListener('input', function() {
+      const target = this.dataset.target || 'AUX1';
+      const scope = this.dataset.scope || 'AUX';
+      const rawVal = parseFloat(this.value);
+      const percentVal = Math.round(rawVal <= 1 ? rawVal * 100 : rawVal);
+
+      // Simpan nilai ke state global aplikasi
+      if (!window.state) window.state = {};
+      if (scope === 'FX_RETURN') {
+        if (!window.state.fxReturn) window.state.fxReturn = {};
+        window.state.fxReturn[target] = rawVal;
+      } else {
+        if (!window.state.aux) window.state.aux = {};
+        window.state.aux[target] = rawVal;
+      }
+
+      // Tampilkan umpan balik teks log di panel bawah (testResult)
+      const testResult = document.getElementById('testResult');
+      if (testResult) {
+        testResult.textContent = `ROUTING: ${scope} [${target}] Level diatur ke ${percentVal}%`;
+      }
+
+      // Kirim perintah terpetakan ke mixer control jika tersedia
+      if (window.MixerControl && typeof window.MixerControl.setControl === "function") {
+        window.MixerControl.setControl(target, scope.toLowerCase(), rawVal);
+      }
+    });
   });
 
 })();
