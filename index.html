@@ -581,6 +581,104 @@ header.topbar > div {
     margin-top: 2px !important;
   }
 
+  /* Perbaikan Total Tata Letak Master Rack agar Rapi dan Tidak Bertabrakan */
+aside.master-rack {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  width: 110px !important;
+  min-width: 110px !important;
+  height: 100% !important;
+  background: var(--panel-bg) !important;
+  border: 1px solid var(--panel-border) !important;
+  border-radius: 4px !important;
+  padding: 4px !important;
+  gap: 6px !important;
+  box-sizing: border-box !important;
+}
+
+/* Bagian Meter L/R di atas Master */
+.master-rack .meter-rack {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+.master-rack .main-meters {
+  width: 100% !important;
+  height: 90px !important;
+  display: flex !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  background: #040608 !important;
+  border: 1px solid var(--panel-border) !important;
+  border-radius: 3px !important;
+  padding: 2px !important;
+}
+
+/* Kartu Master Fader */
+.master-rack .master-card {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  padding: 4px 0 !important;
+  border-top: 1px solid var(--panel-border) !important;
+  border-bottom: 1px solid var(--panel-border) !important;
+}
+
+.master-rack .master-card h2 {
+  font-size: 8px !important;
+  margin: 0 0 2px 0 !important;
+  color: var(--accent-color) !important;
+}
+
+.master-rack .master-card input[type="range"] {
+  height: 140px !important;
+  width: 16px !important;
+  accent-color: var(--accent-color) !important;
+}
+
+/* Kartu Monitor & Phones di Bagian Bawah Master */
+.master-rack .monitor-card, 
+.master-rack .phones-card {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  background: var(--main-bg) !important;
+  border: 1px solid var(--panel-border) !important;
+  border-radius: 3px !important;
+  padding: 4px !important;
+  font-size: 7px !important;
+  gap: 2px !important;
+  width: 100% !important;
+}
+
+.master-rack .monitor-card button {
+  font-size: 7px !important;
+  padding: 2px 4px !important;
+  background: var(--panel-border) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 2px !important;
+  cursor: pointer !important;
+  width: 100% !important;
+}
+
+.master-rack .monitor-knob, 
+.master-rack .phone-knob {
+  width: 16px !important;
+  height: 16px !important;
+  background: var(--accent-color) !important;
+  border-radius: 50% !important;
+  margin: 2px auto !important;
+}
+
+
   /* ==========================================================
      7. BOTTOM NAV STYLING & ACTIVE STATES
      ========================================================== */
