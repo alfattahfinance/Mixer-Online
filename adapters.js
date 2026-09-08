@@ -73,8 +73,8 @@ window.MixerControl = (() => {
     if (deviceLamp) deviceLamp.className = isConnected ? "lamp green" : "lamp red";
     if (footerConn) {
       footerConn.textContent = isConnected
-        ? "● ESP32 SIMULATOR ONLINE"
-        : "● ESP32 SIMULATOR OFFLINE";
+        ? "🟢 ESP32 SIMULATOR ONLINE"
+        : "🔴 ESP32 SIMULATOR OFFLINE";
     }
     if (btnConnect) {
       btnConnect.textContent = isConnected ? "DISCONNECT ESP32" : "CONNECT ESP32";
