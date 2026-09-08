@@ -37,7 +37,9 @@ function make(id) {
     '<header class="new-channel-head">CH' + id + '</header>' +
     /* 1. Lampu Bulat LED Top */
     '<div class="channel-led ' + (c.mute ? 'red' : 'green on') + '"></div>' +
-    /* 2. Group Knob Gain, High, Mid, Low, Pan */
+    /* 2. VU Meter Vertikal Latar Belakang (Sejajar Area Knob) */
+    '<div class="ch-long-vu"><div class="ch-long-vu-fill"></div></div>' +
+    /* 3. Group Knob Gain, High, Mid, Low, Pan */
     '<div class="ch-controls-group">' +
       '<div class="new-channel-control"><label>GAIN</label><input class="new-knob gain-knob" data-k="gain" data-param="gain" type="range" min="0" max="2" step=".01" value="' + c.gain + '"><output class="gain-val">' + Number(c.gain).toFixed(2) + '</output></div>' +
       '<div class="new-channel-control"><label>HIGH</label><input class="new-knob high-knob" data-k="high" data-param="high" type="range" min="-12" max="12" step="1" value="' + c.high + '"><output class="high-val">' + c.high + '</output></div>' +
@@ -45,14 +47,13 @@ function make(id) {
       '<div class="new-channel-control"><label>LOW</label><input class="new-knob low-knob" data-k="low" data-param="low" type="range" min="-12" max="12" step="1" value="' + c.low + '"><output class="low-val">' + c.low + '</output></div>' +
       '<div class="new-channel-control"><label>PAN</label><input class="new-knob pan-knob" data-k="pan" data-param="pan" type="range" min="-1" max="1" step=".01" value="' + c.pan + '"><output class="pan-val">' + (c.pan == 0 ? 'CENTER' : (c.pan < 0 ? 'L ' + Math.abs(Math.round(c.pan * 100)) + '%' : 'R ' + Math.round(c.pan * 100) + '%')) + '</output></div>' +
     '</div>' +
-    /* 3. Teks Volume & Fader Vertikal (Dilengkapi VU Meter Panjang di Dalamnya) */
+    /* 4. Teks Volume & Fader Vertikal (Menempel Rata Bawah) */
     '<div class="volume-label-text">VOLUME</div>' +
     '<div class="fader-area">' +
-      '<div class="ch-long-vu"><div class="ch-long-vu-fill"></div></div>' +
       '<input class="new-fader channel-fader" data-k="fader" data-param="fader" type="range" min="0" max="100" step="1" value="' + c.fader + '">' +
       '<output class="fader-val">' + Math.round(c.fader) + '%</output>' +
     '</div>' +
-    /* 4. Tombol Mute & Solo */
+    /* 5. Tombol Mute & Solo */
     '<div class="new-channel-buttons">' +
       '<button type="button" class="btn-mute ' + (c.mute ? 'active on' : '') + '" data-k="mute" data-action="mute">' + (c.mute ? 'UNMUTE' : 'MUTE') + '</button>' +
       '<button type="button" class="btn-solo ' + (c.solo ? 'active on' : '') + '" data-k="solo" data-action="solo">' + (c.solo ? 'UNSOLO' : 'SOLO') + '</button>' +
