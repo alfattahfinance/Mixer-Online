@@ -1,4 +1,6 @@
-/* 14CH test panel — one owner per button, no duplicate listeners. (FINAL PRO EDITION) */
+/* ==========================================================================
+   14CH TEST PANEL CONTROLLER (OPTIMIZED PRO EDITION)
+   ========================================================================== */
 (function(){
 "use strict";
 
@@ -59,14 +61,17 @@ async function ready() {
     return false;
   }
 
-  // Coba hubungkan ke simulator jika belum terkoneksi
-  if (!window.state.connected && window.MixerAdapters?.simulator) {
+  // Coba hubungkan ke simulator jika belum terkoneksi (Diamankan dengan pengecekan fungsi yang valid)
+  if (!window.state.connected) {
     try {
-      const r = await window.MixerAdapters.simulator();
-      if (r?.connected) {
-        window.state.connected = true;
-        if (window.state.sim) window.state.sim.online = true;
-        log("Simulator Auto-Connected for Testing", "success");
+      const simFunc = window.MixerAdapters?.connectSimulator || window.MixerAdapters?.simulator;
+      if (typeof simFunc === "function") {
+        const r = await simFunc();
+        if (r?.connected) {
+          window.state.connected = true;
+          if (window.state.sim) window.state.sim.online = true;
+          log("Simulator Auto-Connected for Testing", "success");
+        }
       }
     } catch (err) {
       log("WARNING: Simulator Connection Skipped (" + (err?.message || err) + ")", "error");
