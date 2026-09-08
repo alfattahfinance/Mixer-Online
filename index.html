@@ -1030,7 +1030,7 @@
 </section>
 
 <footer class="status-footer">
-  <span>CONNECTION <b id="footerConnection">● ESP32 SIMULATOR OFFLINE</b></span>
+  <span>CONNECTION <b id="footerConnection">🔴 ESP32 SIMULATOR OFFLINE</b></span>
   <span>MODE: <b>TWO-WAY SYNC</b></span>
   <span>SYSTEM STATUS <b class="channel-count-status">14 channels READY</b></span>
   <span>CPU: <b>18%</b></span>
@@ -1228,7 +1228,7 @@
 
       if (lamp) {
         lamp.classList.toggle("green", online);
-        lamp.classList.toggle("red", !online);
+        lamp.classList.toggle("red", !offline);
       }
       if (ds) ds.textContent = online ? "🟢 ESP32 SIMULATOR ONLINE" : "🔴 ESP32 SIMULATOR OFFLINE";
       if (dp) dp.textContent = "Protocol: " + (st.protocol || "ESP32-MIXER/1");
@@ -1530,7 +1530,7 @@
       lockedMusicChannel = parseInt(activeInputStr.replace(/\D/g, ''), 10) || 1;
 
       if (trackInfo) trackInfo.textContent = `[LIVE PHYSICAL MIXER IN] CH ${lockedMusicChannel}`;
-      alert(`✅ SUARA FISIK TERHUBUNG! Cobalah bicara di Mic Mixer Fisik.`);
+      alert(`✅ SUARA FISIK TERHUBUNG! Cobalah bicara di Mic Mixer Anda.`);
 
       if (window.AndroidFeedback && typeof window.AndroidFeedback.triggerHaptic === 'function') {
         window.AndroidFeedback.triggerHaptic(50);
@@ -2129,6 +2129,81 @@
 
 })();
 </script>
+  <script>
+(function() {
+  "use strict";
 
+  const tabs = document.querySelectorAll('#screenTabs button');
+  const views = document.querySelectorAll('.screen-view');
+  const subButtons = document.querySelectorAll('.m32-sub-btn');
+  const subPanels = document.querySelectorAll('.m32-sub-panel');
+  const subBar = document.getElementById('m32SubmenuBar');
+
+  function switchScreen(targetScreen) {
+    tabs.forEach(b => {
+      if (b.dataset.screen === targetScreen) {
+        b.classList.add('active');
+      } else {
+        b.classList.remove('active');
+      }
+    });
+
+    views.forEach(v => {
+      if (v.dataset.view === targetScreen) {
+        v.classList.add('active');
+        v.style.display = 'flex';
+      } else {
+        v.classList.remove('active');
+        v.style.display = 'none';
+      }
+    });
+
+    if (subBar) {
+      subBar.style.display = (targetScreen === 'HOME') ? 'grid' : 'none';
+    }
+  }
+
+  function switchSubPanel(targetSub) {
+    subButtons.forEach(b => {
+      if (b.dataset.sub === targetSub) {
+        b.classList.add('active');
+      } else {
+        b.classList.remove('active');
+      }
+    });
+
+    subPanels.forEach(panel => {
+      if (panel.dataset.subpanel === targetSub) {
+        panel.classList.add('active');
+        panel.style.display = 'flex';
+      } else {
+        panel.classList.remove('active');
+        panel.style.display = 'none';
+      }
+    });
+  }
+
+  tabs.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      switchScreen(this.dataset.screen);
+    });
+  });
+
+  subButtons.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      switchSubPanel(this.dataset.sub);
+    });
+  });
+
+  // Inisialisasi awal agar kondisi tampilan sesuai (HOME & overview aktif)
+  switchScreen('HOME');
+  switchSubPanel('overview');
+
+})();
+</script>
 </body>
 </html>
