@@ -9,7 +9,7 @@
   /* ============================================================
      CHANNEL INDICATOR SKIN ONLY
      Lampu hijau kecil tetap dipertahankan.
-     Indikator lama diganti menjadi LED bar vertikal kecil.
+     Indikator VU panjang diposisikan di dalam fader-area.
      Tidak mengubah state, kontrol, audio, atau ESP32 Bridge.
      ============================================================ */
   if (!document.getElementById("mixer-channel-led-skin")) {
@@ -87,25 +87,29 @@
         box-shadow: 0 0 6px #ff6961 !important;
       }
 
-      /* LED BAR BARU: horizontal internal meter diputar menjadi vertikal.
-         Bridge lama mengirim level melalui style.width, jadi mekanisme RX/TX
-         tidak perlu disentuh. */
-      .new-channel-strip .ch-top-vu {
+      /* FADER AREA: Mengatur posisi relatif agar VU meter panjang berada tepat di dalam jalur fader */
+      .new-channel-strip .fader-area {
         position: relative !important;
-        display: block !important;
-        width: 62px !important;
-        height: 8px !important;
-        min-width: 62px !important;
-        margin: 1px auto 5px !important;
-        padding: 1px !important;
-        box-sizing: border-box !important;
+      }
+
+      /* LED BAR / VU PANJANG DI DALAM FADER:
+         Bridge mengirim level melalui style.width atau style.height, mekanisme RX/TX aman. */
+      .new-channel-strip .ch-top-vu {
+        position: absolute !important;
+        top: 25px !important;
+        bottom: 35px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 6px !important;
+        background: #090e12 !important;
         border: 1px solid rgba(255,255,255,.16) !important;
         border-radius: 2px !important;
-        background: #090e12 !important;
         box-shadow: inset 0 0 4px rgba(0,0,0,.95), 0 0 2px rgba(0,0,0,.6) !important;
         overflow: hidden !important;
-        transform: rotate(-90deg) !important;
-        transform-origin: center center !important;
+        display: flex !important;
+        flex-direction: column-reverse !important;
+        z-index: 1 !important;
+        pointer-events: none !important;
       }
 
       .new-channel-strip .ch-top-vu::before {
@@ -113,7 +117,7 @@
         position: absolute !important;
         inset: 1px !important;
         background: repeating-linear-gradient(
-          to right,
+          to bottom,
           rgba(255,255,255,.10) 0,
           rgba(255,255,255,.10) 2px,
           transparent 2px,
@@ -124,47 +128,34 @@
       }
 
       .new-channel-strip .ch-top-vu-fill {
-        position: absolute !important;
-        left: 1px !important;
-        bottom: 1px !important;
-        width: 0% !important;
-        height: 100% !important;
+        width: 100% !important;
+        height: 0% !important;
         min-height: 0 !important;
-        background: linear-gradient(to right,
+        background: linear-gradient(0deg,
           #24e66b 0%,
-          #24e66b 62%,
-          #ffd21c 78%,
-          #ff9f00 88%,
-          #ff3b30 100%
+          #24e66b 65%,
+          #ffd21c 66%,
+          #ff9f00 85%,
+          #ff3b30 86%,
+          #ff0000 100%
         ) !important;
         border-radius: 1px !important;
         box-shadow: 0 0 4px rgba(40,255,110,.45) !important;
-        transition: width .06s linear !important;
+        transition: height .06s linear !important;
         z-index: 1 !important;
       }
 
-      /* Jangan memaksa width menjadi auto: channels-bridge.js menggunakan
-         width % sebagai sumber level VU. */
-      .new-channel-strip .ch-top-vu .ch-top-vu-fill {
-        height: 100% !important;
+      /* Pastikan elemen fader dan output tampil di atas layer VU meter */
+      .new-channel-strip .fader-area input[type="range"],
+      .new-channel-strip .fader-area output,
+      .new-channel-strip .fader-area label {
+        position: relative !important;
+        z-index: 2 !important;
       }
 
-      /* Meter segmented lama disembunyikan agar hanya LED bar baru yang tampil. */
+      /* Meter segmented lama disembunyikan agar hanya LED bar fader baru yang tampil. */
       .new-channel-strip .new-channel-meter {
         display: none !important;
-      }
-
-      @media (max-width:699px) {
-        .new-channel-strip .channel-led,
-        .channel-strip .channel-led {
-          width: 22px !important;
-          min-width: 22px !important;
-        }
-        .new-channel-strip .ch-top-vu {
-          width: 56px !important;
-          min-width: 56px !important;
-          height: 7px !important;
-        }
       }
     `;
     document.head.appendChild(style);
@@ -213,7 +204,6 @@
     el.innerHTML = `
       <header class="new-channel-head">CH${id}</header>
       <div class="${ledClass}" title="Channel Indicator"></div>
-      <div class="ch-top-vu"><div class="ch-top-vu-fill"></div></div>
       <div class="led-meter new-channel-meter" data-ch="${id}" role="meter" aria-label="CH${id} level"><span class="led-peak"></span><span class="led-segments">${"<i data-seg=\"0\"></i>".repeat(12)}</span></div>
       
       <div class="new-channel-control">
@@ -243,6 +233,8 @@
       </div>
 
       <div class="fader-area new-channel-fader">
+        <!-- Indikator VU panjang dipindahkan ke dalam fader-area -->
+        <div class="ch-top-vu"><div class="ch-top-vu-fill"></div></div>
         <label>VOLUME</label>
         <input class="new-fader channel-fader" data-k="fader" type="range" min="0" max="100" step="1" value="${Number(c.fader ?? 75)}">
         <output class="fader-val">${Math.round(Number(c.fader ?? 75))}%</output>
