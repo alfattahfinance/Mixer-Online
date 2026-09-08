@@ -135,7 +135,7 @@
         left: 0 !important;
         bottom: 0 !important;
         width: 100% !important;
-        height: 0% !important;
+        height: 75% !important;
         min-height: 0 !important;
         background: linear-gradient(0deg,
           #24e66b 0%,
@@ -147,7 +147,6 @@
         ) !important;
         border-radius: 1px !important;
         box-shadow: 0 0 4px rgba(40,255,110,.45) !important;
-        transition: height .06s linear !important;
         z-index: 1 !important;
       }
 
@@ -238,8 +237,8 @@
       </div>
 
       <div class="fader-area new-channel-fader">
-        <!-- Indikator VU panjang vertikal di dalam jalur fader -->
-        <div class="ch-top-vu"><div class="ch-top-vu-fill"></div></div>
+        <!-- Indikator VU panjang vertikal di dalam jalur fader dengan tinggi awal terpasang -->
+        <div class="ch-top-vu"><div class="ch-top-vu-fill" style="height: ${Math.round(Number(c.fader ?? 75))}%;"></div></div>
         <label>VOLUME</label>
         <input class="new-fader channel-fader" data-k="fader" type="range" min="0" max="100" step="1" value="${Number(c.fader ?? 75)}">
         <output class="fader-val">${Math.round(Number(c.fader ?? 75))}%</output>
@@ -269,6 +268,12 @@
         if (k === "fader") {
           const out = el.querySelector("output");
           if (out) out.textContent = Math.round(n) + "%";
+          
+          // Sinkronisasi tinggi fill bar indikator VU agar langsung mengikuti nilai fader secara real-time
+          const vuFill = el.querySelector(".ch-top-vu-fill");
+          if (vuFill) {
+            vuFill.style.height = Math.round(n) + "%";
+          }
         } else {
           const knobTxt = el.querySelector(`.knob-val[data-val="${k}"]`);
           if (knobTxt) knobTxt.textContent = formatVal(k, n);
@@ -315,6 +320,7 @@
           if (r) r.textContent = "CONTROL BLOCKED: SYSTEM OFF";
           return;
         }
+      
         const k = button.dataset.k;
         const ch = window.state.channels[id - 1];
         const nextValue = !ch[k];
@@ -345,6 +351,11 @@
           if (k === "fader") {
             const out = el.querySelector("output");
             if (out) out.textContent = Math.round(Number(c.fader ?? 75)) + "%";
+            
+            const vuFill = el.querySelector(".ch-top-vu-fill");
+            if (vuFill) {
+              vuFill.style.height = Math.round(Number(c.fader ?? 75)) + "%";
+            }
           } else {
             const knobTxt = el.querySelector(`.knob-val[data-val="${k}"]`);
             if (knobTxt) knobTxt.textContent = formatVal(k, c[k]);
