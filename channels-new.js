@@ -84,7 +84,7 @@
         box-shadow: 0 0 6px #ff6961 !important;
       }
 
-      /* FADER AREA: Mengatur posisi relatif agar VU meter panjang berada tepat di dalam jalur fader */
+      /* FADER AREA: Dipaksa memiliki posisi relatif dan tinggi penuh */
       .new-channel-strip .fader-area {
         position: relative !important;
         display: flex !important;
@@ -93,21 +93,21 @@
         justify-content: flex-end !important;
         flex-grow: 1 !important;
         width: 100% !important;
+        min-height: 280px !important;
       }
 
-      /* LED BAR / VU PANJANG DI DALAM FADER */
+      /* LED BAR / VU PANJANG DI DALAM FADER (Paksa tampil dengan ukuran jelas) */
       .new-channel-strip .ch-top-vu {
         position: absolute !important;
-        top: 15px !important;
-        bottom: 30px !important;
+        top: 20px !important;
+        bottom: 35px !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
-        width: 6px !important;
-        height: auto !important;
-        background: #090e12 !important;
-        border: 1px solid rgba(255,255,255,.16) !important;
-        border-radius: 2px !important;
-        box-shadow: inset 0 0 4px rgba(0,0,0,.95), 0 0 2px rgba(0,0,0,.6) !important;
+        width: 8px !important;
+        background: #040608 !important;
+        border: 1px solid rgba(255,255,255,.3) !important;
+        border-radius: 3px !important;
+        box-shadow: inset 0 0 4px rgba(0,0,0,.95) !important;
         overflow: hidden !important;
         display: flex !important;
         flex-direction: column-reverse !important;
@@ -121,8 +121,8 @@
         inset: 1px !important;
         background: repeating-linear-gradient(
           to bottom,
-          rgba(255,255,255,.10) 0,
-          rgba(255,255,255,.10) 2px,
+          rgba(255,255,255,.15) 0,
+          rgba(255,255,255,.15) 2px,
           transparent 2px,
           transparent 6px
         ) !important;
@@ -136,7 +136,6 @@
         bottom: 0 !important;
         width: 100% !important;
         height: 75% !important;
-        min-height: 0 !important;
         background: linear-gradient(0deg,
           #24e66b 0%,
           #24e66b 65%,
@@ -146,7 +145,7 @@
           #ff0000 100%
         ) !important;
         border-radius: 1px !important;
-        box-shadow: 0 0 4px rgba(40,255,110,.45) !important;
+        box-shadow: 0 0 6px rgba(40,255,110,.6) !important;
         z-index: 1 !important;
       }
 
@@ -237,7 +236,7 @@
       </div>
 
       <div class="fader-area new-channel-fader">
-        <!-- Indikator VU panjang vertikal di dalam jalur fader dengan tinggi awal terpasang -->
+        <!-- Indikator VU panjang vertikal di dalam jalur fader -->
         <div class="ch-top-vu"><div class="ch-top-vu-fill" style="height: ${Math.round(Number(c.fader ?? 75))}%;"></div></div>
         <label>VOLUME</label>
         <input class="new-fader channel-fader" data-k="fader" type="range" min="0" max="100" step="1" value="${Number(c.fader ?? 75)}">
@@ -269,7 +268,6 @@
           const out = el.querySelector("output");
           if (out) out.textContent = Math.round(n) + "%";
           
-          // Sinkronisasi tinggi fill bar indikator VU agar langsung mengikuti nilai fader secara real-time
           const vuFill = el.querySelector(".ch-top-vu-fill");
           if (vuFill) {
             vuFill.style.height = Math.round(n) + "%";
