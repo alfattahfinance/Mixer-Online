@@ -1,5 +1,5 @@
 /* ==========================================================================
-   WEB BLUETOOTH CONTROLLER FOR MIXER-ONLINE (FINAL PRO EDITION)
+   WEB BLUETOOTH CONTROLLER FOR MIXER-ONLINE (OPTIMIZED PRO EDITION)
    ========================================================================== */
 (function () {
   "use strict";
@@ -14,8 +14,8 @@
     HM_SERVICE: "0000ffe0-0000-1000-8000-00805f9b34fb",
     HM_CHAR: "0000ffe1-0000-1000-8000-00805f9b34fb",
     UART_SERVICE: "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
-    UART_RX: "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
-    UART_TX: "6e400003-b5a3-f393-e0a9-e50e24dcca9e"
+    UART_RX: "6e400002-b5a3-f393-e0a9-e50e24dcca9e", // ESP32 write
+    UART_TX: "6e400003-b5a3-f393-e0a9-e50e24dcca9e"  // ESP32 notify
   };
 
   async function connectBluetoothMixer() {
@@ -56,15 +56,32 @@
 
       if (!service) throw new Error("Service GATT Bluetooth tidak ditemukan.");
 
-      // Cari Characteristic Write & Notify
+      // Cari Characteristic Write & Notify secara cerdas berdasarkan UUID & Properti
       const characteristics = await service.getCharacteristics();
+      
       for (const char of characteristics) {
-        if (char.properties.write || char.properties.writeWithoutResponse) {
-          btWriteChar = char;
+        const uuid = char.uuid.toLowerCase();
+        
+        // Prioritas pencocokan berdasarkan UUID yang dikenal atau propertinya
+        if (uuid.includes("ffe1") || uuid.includes("6e400002") || char.properties.write || char.properties.writeWithoutResponse) {
+          if (!btWriteChar || uuid.includes("ffe1") || uuid.includes("6e400002")) {
+            btWriteChar = char;
+          }
         }
-        if (char.properties.notify) {
-          btNotifyChar = char;
+        
+        if (uuid.includes("ffe1") || uuid.includes("6e400003") || char.properties.notify) {
+          if (!btNotifyChar || uuid.includes("ffe1") || uuid.includes("6e400003")) {
+            btNotifyChar = char;
+          }
         }
+      }
+
+      // Fallback mutlak jika pencarian spesifik gagal
+      if (!btWriteChar) {
+        btWriteChar = characteristics.find(c => c.properties.write || c.properties.writeWithoutResponse);
+      }
+      if (!btNotifyChar) {
+        btNotifyChar = characteristics.find(c => c.properties.notify);
       }
 
       if (!btWriteChar) {
@@ -75,8 +92,12 @@
 
       // Dengarkan Data Masuk (Feedback)
       if (btNotifyChar) {
-        await btNotifyChar.startNotifications();
-        btNotifyChar.addEventListener('characteristicvaluechanged', handleIncomingData);
+        try {
+          await btNotifyChar.startNotifications();
+          btNotifyChar.addEventListener('characteristicvaluechanged', handleIncomingData);
+        } catch (notifErr) {
+          console.warn("[BT Warning] Gagal mengaktifkan notifications:", notifErr);
+        }
       }
 
       // Sync State Global Aplikasi
