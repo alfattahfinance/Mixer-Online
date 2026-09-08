@@ -15,7 +15,7 @@ float masterLevel = 75.0f;
 void setup() {
   Serial.begin(115200);
 
-  // Inisialisasi nilai default 14 channel
+  // Inisialisasi nilai default 14 channel (75%)
   for (uint8_t i = 0; i < CHANNELS; i++) {
     fader[i] = 75.0f;
     muteState[i] = false;
@@ -35,7 +35,7 @@ void loop() {
     
     if (incomingPacket.length() == 0) return;
 
-    // Parsing JSON menggunakan ArduinoJson (Mendukung v6 & v7)
+    // Alokasi JsonDocument dengan kapasitas aman untuk paket kontrol mixer
     JsonDocument doc;
     DeserializationError err = deserializeJson(doc, incomingPacket);
     
@@ -52,20 +52,24 @@ void loop() {
     if (strcmp(type, "CONTROL") == 0) {
       int ch = (doc["ch"] | 0) - 1; // Konversi channel 1-14 ke index 0-13
       const char* param = doc["param"] | "";
-      float val = doc["value"] | 0.0f;
-
+      
       if (ch >= 0 && ch < CHANNELS && strlen(param) > 0) {
         if (strcmp(param, "fader") == 0) {
+          float val = doc["value"] | 0.0f;
           fader[ch] = val;
           // TODO: Masukkan logika hardware (misal: PWM / Digital Potentiometer ke channel ch)
-        } else if (strcmp(param, "mute") == 0) {
-          muteState[ch] = doc["value"] | false;
-        } else if (strcmp(param, "solo") == 0) {
-          soloState[ch] = doc["value"] | false;
+          Serial.printf("[BT-RX] CH %d | Fader -> %.1f\n", ch + 1, val);
+        } 
+        else if (strcmp(param, "mute") == 0) {
+          bool val = doc["value"] | false;
+          muteState[ch] = val;
+          Serial.printf("[BT-RX] CH %d | Mute -> %s\n", ch + 1, val ? "ON" : "OFF");
+        } 
+        else if (strcmp(param, "solo") == 0) {
+          bool val = doc["value"] | false;
+          soloState[ch] = val;
+          Serial.printf("[BT-RX] CH %d | Solo -> %s\n", ch + 1, val ? "ON" : "OFF");
         }
-
-        // Debugging di Serial Monitor komputer
-        Serial.printf("[BT-RX] CH %d | %s -> %.1f\n", ch + 1, param, val);
 
         // Kirim ACK sukses kembali ke Web/Remote
         ESP_BT.printf("{\"type\":\"ACK\",\"ack\":\"%s\",\"ok\":true}\n", id);
