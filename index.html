@@ -2754,7 +2754,92 @@ aside.master-rack {
 
 })();
 </script>
+<script>
+(function() {
+  "use strict";
 
+  // 1. Pastikan Tombol Sumber Monitor Berfungsi Interaktif
+  const monitorCard = document.querySelector('.monitor-card');
+  if (monitorCard) {
+    const monitorBtn = monitorCard.querySelector('button');
+    const monitorKnob = monitorCard.querySelector('.monitor-knob, #monitorLevel');
+    
+    if (monitorBtn) {
+      const sources = ["MAIN L/R", "AUX 1-2", "FX 1-2", "USB STREAM"];
+      let srcIdx = 0;
 
+      monitorBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        srcIdx = (srcIdx + 1) % sources.length;
+        this.textContent = sources[srcIdx];
+
+        const tr = document.getElementById('testResult');
+        if (tr) tr.textContent = `MONITOR: Sumber dialihkan ke ${sources[srcIdx]}`;
+      });
+    }
+
+    if (monitorKnob) {
+      monitorKnob.style.cursor = 'pointer';
+      monitorKnob.addEventListener('click', function() {
+        const tr = document.getElementById('testResult');
+        if (tr) tr.textContent = `MONITOR LEVEL: Diputar/disesuaikan.`;
+      });
+    }
+  }
+
+  // 2. Pastikan Tombol/Knob Phones Berfungsi Interaktif (Mute/Unmute Headphone)
+  const phonesCard = document.querySelector('.phones-card');
+  if (phonesCard) {
+    const phoneKnob = phonesCard.querySelector('.phone-knob, div');
+    const phoneIndicator = phonesCard.querySelector('span:last-child, .phone-dot');
+
+    if (phoneKnob) {
+      phoneKnob.style.cursor = 'pointer';
+      let phoneActive = true;
+
+      phoneKnob.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        phoneActive = !phoneActive;
+        
+        if (phoneIndicator) {
+          phoneIndicator.style.color = phoneActive ? '#2ecc71' : '#e74c3c';
+        }
+
+        const tr = document.getElementById('testResult');
+        if (tr) tr.textContent = `PHONES: Output Headphone ${phoneActive ? 'AKTIF' : 'MUTED'}`;
+      });
+    }
+  }
+
+  // 3. Sinkronisasi Master Fader & Meteran L/R secara Real-Time
+  const masterFader = document.getElementById('master');
+  const masterVal = document.getElementById('masterVal');
+  const masterMeterL = document.getElementById('masterMeterL');
+  const masterMeterR = document.getElementById('masterMeterR');
+
+  if (masterFader) {
+    masterFader.addEventListener('input', function() {
+      const level = parseInt(this.value, 10);
+      if (masterVal) masterVal.textContent = level + '%';
+
+      // Gerakkan tinggi indikator meteran L/R mengikuti fader master
+      if (masterMeterL && masterMeterR) {
+        const h = level > 0 ? level + '%' : '0%';
+        masterMeterL.style.height = h;
+        masterMeterR.style.height = h;
+      }
+
+      if (!window.state) window.state = {};
+      window.state.masterFader = level;
+
+      const tr = document.getElementById('testResult');
+      if (tr) tr.textContent = `MASTER: Level Main L/R disetel ke ${level}%`;
+    });
+  }
+
+})();
+</script>
 </body>
 </html>
