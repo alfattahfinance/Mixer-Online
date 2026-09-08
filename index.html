@@ -2209,21 +2209,22 @@
 (function() {
   "use strict";
 
-  // 1. Atur state system awal menjadi OFF secara default (menunggu tombol power diklik)
+  // 1. Inisialisasi state system awal OFF (menunggu tombol power ditekan)
   window.state = window.state || {};
   if (window.state.system === undefined) {
     window.state.system = false; 
   }
   window.state.connected = false;
 
-  // 2. Perbaikan Total Navigasi Layar TFT & Render Konten Tiap Tab
+  // 2. Selektor Akurat sesuai struktur HTML M32 Pro Edition
   const tabs = document.querySelectorAll('#screenTabs button');
-  const views = document.querySelectorAll('.screen-view');
-  const subButtons = document.querySelectorAll('.m32-sub-btn');
-  const subPanels = document.querySelectorAll('.m32-sub-panel');
+  const views = document.querySelectorAll('.screen-content .screen-view');
+  const subButtons = document.querySelectorAll('#m32SubmenuBar .m32-sub-btn');
+  const subPanels = document.querySelectorAll('.midas-tft-screen .m32-sub-panel');
   const subBar = document.getElementById('m32SubmenuBar');
 
   function switchScreen(targetScreen) {
+    // Kelola tombol tab utama
     tabs.forEach(b => {
       if (b.dataset.screen === targetScreen) {
         b.classList.add('active');
@@ -2232,6 +2233,7 @@
       }
     });
 
+    // Kelola tampilan konten layar utama (.screen-view)
     views.forEach(v => {
       if (v.dataset.view === targetScreen) {
         v.classList.add('active');
@@ -2241,15 +2243,19 @@
       } else {
         v.classList.remove('active');
         v.style.display = 'none';
+        v.style.visibility = 'hidden';
+        v.style.opacity = '0';
       }
     });
 
+    // Submenu bar hanya tampil jika berada di tab HOME
     if (subBar) {
       subBar.style.display = (targetScreen === 'HOME') ? 'grid' : 'none';
     }
   }
 
   function switchSubPanel(targetSub) {
+    // Kelola tombol submenu
     subButtons.forEach(b => {
       if (b.dataset.sub === targetSub) {
         b.classList.add('active');
@@ -2258,6 +2264,7 @@
       }
     });
 
+    // Kelola tampilan panel submenu di dalam layar TFT (.m32-sub-panel)
     subPanels.forEach(panel => {
       if (panel.dataset.subpanel === targetSub) {
         panel.classList.add('active');
@@ -2267,11 +2274,13 @@
       } else {
         panel.classList.remove('active');
         panel.style.display = 'none';
+        panel.style.visibility = 'hidden';
+        panel.style.opacity = '0';
       }
     });
   }
 
-  // Pasang event listener dengan pencegahan propagasi untuk tab layar
+  // Pasang event listener untuk tab layar utama
   tabs.forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.preventDefault();
@@ -2280,6 +2289,7 @@
     }, true);
   });
 
+  // Pasang event listener untuk tombol submenu
   subButtons.forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.preventDefault();
@@ -2288,7 +2298,7 @@
     }, true);
   });
 
-  // Sinkronisasi tombol power fisik di header (harus diklik dulu baru ON)
+  // Sinkronisasi tombol power fisik di header (harus diklik manual agar ON)
   const powerBtn = document.getElementById("power");
   if (powerBtn) {
     powerBtn.textContent = window.state.system ? "SYSTEM ON" : "SYSTEM OFF";
@@ -2306,7 +2316,7 @@
     });
   }
 
-  // Jalankan pengaturan awal layar saat halaman dimuat
+  // Inisialisasi tampilan awal saat halaman dimuat
   window.addEventListener("DOMContentLoaded", () => {
     switchScreen('HOME');
     switchSubPanel('overview');
@@ -2314,6 +2324,7 @@
 
 })();
 </script>
+
 
   
 </body>
