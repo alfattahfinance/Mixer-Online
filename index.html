@@ -2209,14 +2209,14 @@
 (function() {
   "use strict";
 
-  // 1. Inisialisasi state system awal OFF (menunggu tombol power ditekan)
+  // Inisialisasi state system awal OFF (menunggu tombol power ditekan)
   window.state = window.state || {};
   if (window.state.system === undefined) {
     window.state.system = false; 
   }
   window.state.connected = false;
 
-  // 2. Selektor Akurat sesuai struktur HTML M32 Pro Edition
+  // Selektor Akurat sesuai struktur HTML M32 Pro Edition
   const tabs = document.querySelectorAll('#screenTabs button');
   const views = document.querySelectorAll('.screen-content .screen-view');
   const subButtons = document.querySelectorAll('#m32SubmenuBar .m32-sub-btn');
@@ -2255,7 +2255,7 @@
   }
 
   function switchSubPanel(targetSub) {
-    // Kelola tombol submenu
+    // Kelola tombol submenu (overview, config, gate, dyn, eq, sends)
     subButtons.forEach(b => {
       if (b.dataset.sub === targetSub) {
         b.classList.add('active');
@@ -2280,7 +2280,7 @@
     });
   }
 
-  // Pasang event listener untuk tab layar utama
+  // Pasang event listener untuk tab layar utama dengan tangkapan penuh (capture)
   tabs.forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.preventDefault();
@@ -2289,7 +2289,7 @@
     }, true);
   });
 
-  // Pasang event listener untuk tombol submenu
+  // Pasang event listener untuk tombol submenu (overview s.d sends)
   subButtons.forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.preventDefault();
@@ -2298,7 +2298,7 @@
     }, true);
   });
 
-  // Sinkronisasi tombol power fisik di header (harus diklik manual agar ON)
+  // Sinkronisasi tombol power fisik di header
   const powerBtn = document.getElementById("power");
   if (powerBtn) {
     powerBtn.textContent = window.state.system ? "SYSTEM ON" : "SYSTEM OFF";
@@ -2325,7 +2325,5 @@
 })();
 </script>
 
-
-  
 </body>
 </html>
