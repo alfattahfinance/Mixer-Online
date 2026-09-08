@@ -1,110 +1,53 @@
-/* Header status display for Physical ESP32 Bridge & Multi-Transport */
+/* ==========================================================================
+   HEADER CONTROLLER & BRIDGE STATUS SYNC
+   ========================================================================== */
 (function () {
   "use strict";
 
-  function refresh() {
+  // Fungsi utama untuk menyegarkan tampilan status di bagian header
+  function refreshHeader() {
     const st = window.state || {};
     const system = !!st.system;
-    
-    // Deteksi koneksi aktif dari Adapter / MixerControl
-    const activeAdapter = window.MixerAdapters?.active;
-    const connected = !!(st.connected || activeAdapter?.connected);
-    
-    // Ambil jenis transport aktif
-    let transportName = "ESP32";
-    if (st.bluetoothConnected || activeAdapter?.transport === "bluetooth") {
-      transportName = "BLUETOOTH";
-    } else if (activeAdapter?.type === "simulator") {
-      transportName = "SIMULATOR";
+    const connected = !!st.connected;
+
+    // 1. Update Tombol Power Utama
+    const powerBtn = document.getElementById("power");
+    if (powerBtn) {
+      powerBtn.textContent = system ? "SYSTEM ON" : "SYSTEM OFF";
+      powerBtn.classList.toggle("on", system);
     }
 
-    // 1. Indikator Tombol Power utama
-    const power = document.getElementById("power");
-    if (power) {
-      power.textContent = system ? "SYSTEM ON" : "SYSTEM OFF";
-      power.classList.toggle("on", system);
-    }
-
-    // 2. Status Teks Header Utama (Bridge Status)
-    const hs = document.getElementById("headerBridgeStatus") || document.getElementById("status");
-    if (hs) {
+    // 2. Update Indikator Status Bridge / ESP32 Hardware
+    const bridgeStatusEl = document.getElementById("headerBridgeStatus");
+    if (bridgeStatusEl) {
       if (connected) {
-        hs.textContent = `${transportName} ONLINE`;
-        hs.style.color = "#31e66b";
+        bridgeStatusEl.textContent = "ESP32 BRIDGE ONLINE";
+        bridgeStatusEl.style.color = "#7ee787";
       } else if (system) {
-        hs.textContent = "WAITING HARDWARE";
-        hs.style.color = "#ffd21c";
+        bridgeStatusEl.textContent = "WAITING HARDWARE...";
+        bridgeStatusEl.style.color = "#f1c40f";
       } else {
-        hs.textContent = "OFFLINE";
-        hs.style.color = "#ff3b30";
+        bridgeStatusEl.textContent = "OFFLINE";
+        bridgeStatusEl.style.color = "#e74c3c";
       }
     }
 
-    // 3. Lampu Indikator Status Bulat (Topbar & Device Panel)
-    const statusLamp = document.getElementById("statusLamp");
-    if (statusLamp) {
-      statusLamp.className = connected ? "head-status live" : "head-status";
-      const lampIcon = statusLamp.querySelector("i, .lamp");
-      if (lampIcon) {
-        lampIcon.className = connected ? "live green" : "red";
-      }
-    }
+    // 3. Update Elemen Pengaturan / Setup Pendukung (jika ada di DOM)
+    const setupSystem = document.getElementById("setupSystem");
+    if (setupSystem) setupSystem.textContent = system ? "ON" : "OFF";
 
-    const deviceLamp = document.getElementById("deviceLamp");
-    if (deviceLamp) {
-      deviceLamp.className = connected ? "lamp green" : "lamp red";
-    }
-
-    // 4. Pengaturan Teks Panel Setup & Detail Transport
-    const setup = document.getElementById("setupSystem");
-    if (setup) setup.textContent = system ? "ON" : "OFF";
-
-    const transport = document.getElementById("setupTransport") || document.getElementById("testTransportLabel");
-    if (transport) {
-      transport.textContent = connected ? `${transportName} ONLINE` : "DISCONNECTED";
-    }
-
-    // 5. Sync Label Tombol Connect di Berbagai Tempat
-    const btnConnect = document.getElementById("connectEsp");
-    if (btnConnect) {
-      btnConnect.textContent = connected ? `DISCONNECT ${transportName}` : "CONNECT ESP32";
-    }
-
-    const btnDevice = document.getElementById("deviceConnect");
-    if (btnDevice) {
-      btnDevice.textContent = connected ? "DISCONNECT" : "CONNECT HARDWARE";
-    }
-
-    const btnBluetooth = document.getElementById("btnBluetoothConnect") || document.getElementById("connectBluetooth");
-    if (btnBluetooth) {
-      const isBt = connected && transportName === "BLUETOOTH";
-      btnBluetooth.textContent = isBt ? "BLUETOOTH CONNECTED" : "CONNECT BLUETOOTH";
-      btnBluetooth.classList.toggle("on", isBt);
-      btnBluetooth.classList.toggle("active", isBt);
-    }
-
-    // 6. Teks Footer Sync
-    const footerConn = document.getElementById("footerConnection");
-    if (footerConn) {
-      footerConn.textContent = connected
-        ? `● ${transportName} BRIDGE ONLINE`
-        : `● ${transportName} BRIDGE OFFLINE`;
-    }
+    const setupTransport = document.getElementById("setupTransport");
+    if (setupTransport) setupTransport.textContent = connected ? "ONLINE" : "OFFLINE";
   }
 
-  window.refreshHeaderStatus = refresh;
-  window.refreshSystemHeader = refresh;
+  // Daftarkan fungsi ke scope global agar bisa dipanggil dari modul lain (seperti boot/adapter)
+  window.refreshHeaderStatus = refreshHeader;
+  window.refreshSystemHeader = refreshHeader;
 
-  // Jalankan interval berkala untuk sinkronisasi tampilan
-  setInterval(refresh, 500);
-
-  // Hook event listener jika ada perubahan koneksi / penerimaan data
-  document.addEventListener("mixer:esp32-rx", refresh);
-  document.addEventListener("mixer:bluetooth-rx", refresh);
-
+  // Inisialisasi saat dokumen selesai dimuat
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", refresh, { once: true });
+    document.addEventListener("DOMContentLoaded", refreshHeader, { once: true });
   } else {
-    refresh();
+    refreshHeader();
   }
 })();
