@@ -99,37 +99,36 @@
     overflow-x: auto !important;
   }
 
-header.topbar {
-  display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: nowrap !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  overflow-x: auto !important;
-  width: 100% !important;
-  padding: 4px 6px !important;
-  gap: 4px !important;
-  position: relative !important;
-  z-index: 100 !important;
-}
+  header.topbar {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    overflow-x: auto !important;
+    width: 100% !important;
+    padding: 4px 6px !important;
+    gap: 4px !important;
+    position: relative !important;
+    z-index: 100 !important;
+  }
 
-header.topbar > div {
-  flex: 0 0 auto !important;
-  margin: 0 !important;
-  position: static !important;
-  transform: none !important;
-}
+  header.topbar > div {
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+    position: static !important;
+    transform: none !important;
+  }
 
-.bridge-head, .status-head, .scene-head, .skin-head, .system-box, .clock-head {
-  position: static !important;
-  transform: none !important;
-  background: var(--panel-bg) !important;
-  border: 1px solid var(--panel-border) !important;
-  border-radius: 4px !important;
-  padding: 2px 4px !important;
-  font-size: 7px !important;
-}
-
+  .bridge-head, .status-head, .scene-head, .skin-head, .system-box, .clock-head {
+    position: static !important;
+    transform: none !important;
+    background: var(--panel-bg) !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 4px !important;
+    padding: 2px 4px !important;
+    font-size: 7px !important;
+  }
 
   .scene-head {
     position: static !important;
@@ -240,6 +239,107 @@ header.topbar > div {
   .new-channel-strip:last-child, .channel-strip:last-child {
     border-right: none !important;
     padding-right: 2px !important;
+  }
+
+  /* AREA FADER & INDIKATOR VU PANJANG DI DALAM JALUR FADER VOLUME */
+  .fader-area {
+    position: relative !important;
+    z-index: 2 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    flex-grow: 1 !important;
+    width: 100% !important;
+    padding-bottom: 0px !important;
+    margin-bottom: 0px !important;
+    margin-top: auto !important;
+  }
+
+  .ch-long-vu {
+    position: absolute !important;
+    top: 15px !important;
+    bottom: 35px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 4px !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 2px !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column-reverse !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
+  }
+
+  .ch-long-vu-fill {
+    width: 100% !important;
+    height: 0%;
+    /* Gradasi standar konsol: Hijau (bawah), Kuning (tengah), Merah (atas) */
+    background: linear-gradient(0deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 66%, #f39c12 85%, #e74c3c 86%, #ff0000 100%) !important;
+    transition: height 0.05s linear !important;
+  }
+
+  .fader-area input[type="range"], .channel-fader {
+    position: relative !important;
+    z-index: 2 !important;
+    background: transparent !important;
+    height: 240px !important;
+    accent-color: var(--accent-color) !important;
+  }
+
+  /* INDIKATOR BULAT/KECIL ATAS */
+  .ch-top-vu {
+    width: 6px !important;
+    height: 30px !important;
+    background: #040608 !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 2px !important;
+    margin: 2px auto 4px auto !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column-reverse !important;
+    padding: 0 !important;
+    z-index: 2 !important;
+  }
+
+  .ch-top-vu-fill {
+    width: 100% !important;
+    height: 0%;
+    background: linear-gradient(0deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 66%, #f39c12 85%, #e74c3c 86%, #ff0000 100%) !important;
+    transition: height 0.05s linear !important;
+  }
+
+  .ch-controls-group, .knob-container {
+    position: relative !important;
+    z-index: 2 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 6px !important;
+    width: 100% !important;
+    margin-top: 10px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .ch-controls-group input[type="range"],
+  .knob-container input[type="range"] {
+    position: relative !important;
+    z-index: 3 !important;
+    cursor: pointer !important;
+    touch-action: none !important;
+  }
+
+  .volume-label-text {
+    position: relative !important;
+    z-index: 2 !important;
+    font-size: 7px !important;
+    font-weight: bold !important;
+    color: var(--text-dim) !important;
+    text-transform: uppercase !important;
+    margin: 6px 0 2px 0 !important;
+    text-align: center !important;
   }
 
   /* INDIKATOR PANJANG (VU METER PANJANG SEJAJAR AREA KNOB) */
@@ -2865,6 +2965,77 @@ aside.master-rack {
 
 })();
 </script>
+
+  <script>
+(function() {
+  "use strict";
+
+  // Memastikan setiap strip channel memiliki elemen VU meter panjang di dalam fader area
+  function injectLongVuIntoFaders() {
+    const strips = document.querySelectorAll('.new-channel-strip, .channel-strip');
+    strips.forEach(strip => {
+      let faderArea = strip.querySelector('.fader-area');
+      if (faderArea && !faderArea.querySelector('.ch-long-vu')) {
+        const vuContainer = document.createElement('div');
+        vuContainer.className = 'ch-long-vu';
+        
+        const vuFill = document.createElement('div');
+        vuFill.className = 'ch-long-vu-fill';
+        vuContainer.appendChild(vuFill);
+        
+        // Sisipkan ke dalam area fader di belakang input range
+        faderArea.insertBefore(vuContainer, faderArea.firstChild);
+      }
+    });
+  }
+
+  // Jalankan injeksi saat halaman siap
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', injectLongVuIntoFaders);
+  } else {
+    injectLongVuIntoFaders();
+  }
+
+  // Fungsi penggerak animasi VU meter sesuai fader dan status mute
+  function updateChannelFaderMeters() {
+    requestAnimationFrame(updateChannelFaderMeters);
+
+    if (!window.state || !window.state.channels) return;
+
+    document.querySelectorAll('.new-channel-strip, .channel-strip').forEach(strip => {
+      const chId = Number(strip.dataset.ch) || parseInt(strip.innerText.match(/CH\s*(\d+)/i)?.[1] || '0', 10);
+      if (chId <= 0) return;
+
+      const chData = window.state.channels[chId - 1] || {};
+      const longVuFill = strip.querySelector('.ch-long-vu-fill');
+      if (!longVuFill) return;
+
+      // Jika channel di-mute, matikan indikator VU
+      if (chData.mute) {
+        longVuFill.style.height = '0%';
+        return;
+      }
+
+      // Simulasi tingkat sinyal dinamis berdasarkan posisi fader & gain
+      const faderVal = chData.fader !== undefined ? chData.fader : 75;
+      const gainVal = parseFloat(chData.gain || 1.0);
+      
+      // Jika fader di atas 0, buat tinggi level bervariasi secara real-time
+      if (faderVal > 0) {
+        const randomFluctuation = Math.random() * 25;
+        const calculatedHeight = Math.min(100, Math.max(5, (faderVal * 0.7) * (gainVal * 0.5) + randomFluctuation));
+        longVuFill.style.height = calculatedHeight + '%';
+      } else {
+        longVuFill.style.height = '0%';
+      }
+    });
+  }
+
+  requestAnimationFrame(updateChannelFaderMeters);
+
+})();
+</script>
+
 
 </body>
 </html>
