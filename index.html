@@ -7,14 +7,14 @@
 <title>MIXER-ONLINE • Midas M32 Pro Edition</title>
 
 <!-- Pembaruan versi query (Cache-Buster) -->
-<link rel="stylesheet" href="style.css?v=20260907-FULL-FLEX">
-<link rel="stylesheet" href="channel-skin.css?v=20260907-FULL-FLEX">
-<link rel="stylesheet" href="header-system.css?v=20260907-FULL-FLEX">
-<link rel="stylesheet" href="channels-new.css?v=20260907-FULL-FLEX">
+<link rel="stylesheet" href="style.css?v=20260908-PRO">
+<link rel="stylesheet" href="channel-skin.css?v=20260908-PRO">
+<link rel="stylesheet" href="header-system.css?v=20260908-PRO">
+<link rel="stylesheet" href="channels-new.css?v=20260908-PRO">
 <link rel="manifest" href="manifest.json">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js');
+    navigator.serviceWorker.register('/sw.js').catch(function(){});
   }
 </script>
 
@@ -214,14 +214,14 @@
   }
 
   .new-channel-strip, .channel-strip {
-    position: relative !important; /* Diperlukan untuk VU Meter Latar Belakang */
+    position: relative !important;
     width: 100% !important;
     min-width: 0 !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding: 8px 2px 0px 2px !important; /* Menurunkan seluruh isi channel */
+    padding: 8px 2px 0px 2px !important;
     border-right: 1px dashed var(--panel-border) !important;
     box-sizing: border-box !important;
     height: 100% !important;
@@ -245,7 +245,7 @@
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column-reverse !important;
-    z-index: 1 !important; /* Di belakang kontrol knob agar knob tetap responsif */
+    z-index: 1 !important;
     pointer-events: none !important;
   }
 
@@ -278,16 +278,15 @@
     transition: height 0.05s linear !important;
   }
 
-  /* KELOMPOK KNOB - DITURUNKAN & DIJAMIN RESPONSIF */
   .ch-controls-group, .knob-container {
     position: relative !important;
-    z-index: 2 !important; /* Memastikan Knob di atas VU meter latar */
+    z-index: 2 !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    gap: 6px !important; /* Ditolak/diturunkan sedikit */
+    gap: 6px !important;
     width: 100% !important;
-    margin-top: 10px !important; /* Kebawahin knob agar tidak mepet header */
+    margin-top: 10px !important;
     margin-bottom: 4px !important;
   }
 
@@ -306,7 +305,7 @@
     font-weight: bold !important;
     color: var(--text-dim) !important;
     text-transform: uppercase !important;
-    margin: 6px 0 2px 0 !important; /* Teks Volume diturunkan sedikit */
+    margin: 6px 0 2px 0 !important;
     text-align: center !important;
   }
 
@@ -488,7 +487,7 @@
   }
 
   /* ==========================================================
-     5. PANEL AUX & FX (RATA & SEJAJAR DENGAN DASAR CHANNEL STRIP)
+     5. PANEL AUX & FX
      ========================================================== */
   .center-console .fx-rack,
   .center-console .aux-rack,
@@ -607,7 +606,6 @@
     box-shadow: 0 0 6px var(--accent-color) !important;
   }
 
-  /* MODE LANDSCAPE (MENUTUP CELAH BAWAH SAMPAI BARIS BOTTOM NAV) */
   @media screen and (orientation: landscape) {
     .channel-bank {
       display: flex !important;
@@ -649,7 +647,6 @@
       height: 290px !important;
     }
   }
-
 </style>
 </head>
 <body class="theme-midas">
@@ -698,13 +695,11 @@
     <div id="channels"></div>
   </section>
 
-  <!-- 2. KONSOL TENGAH (SCREEN M32 + PLAYER + FX RACK + AUX RACK) -->
+  <!-- 2. KONSOL TENGAH -->
   <section class="center-console" id="centerConsole">
-    <!-- Screen M32 -->
     <div class="screen-frame">
       <div class="screen-title" style="margin-bottom: 4px;"><b>MIDAS M32</b><span>DIGITAL CONSOLE SYSTEM</span></div>
       
-      <!-- NAVIGASI LAYAR UTAMA -->
       <div class="screen-tabs" id="screenTabs">
         <button class="active" data-screen="HOME">HOME</button>
         <button data-screen="METER">METERS</button>
@@ -714,7 +709,6 @@
         <button data-screen="SCENE">LIBRARY</button>
       </div>
 
-      <!-- SUBMENU BAR -->
       <div class="m32-submenu-bar" id="m32SubmenuBar">
         <button class="m32-sub-btn active" data-sub="overview">OVERVIEW</button>
         <button class="m32-sub-btn" data-sub="config">CONFIG</button>
@@ -725,7 +719,6 @@
       </div>
       
       <div class="screen-content" id="screenContent">
-        <!-- 1. HOME VIEW -->
         <section class="screen-view active" data-view="HOME">
           <div class="midas-tft-screen">
             <div class="midas-header-strip" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
@@ -734,25 +727,12 @@
               <span id="screenStatus" style="font-size: 9px; color: #2ecc71; font-weight: bold;">[ACTIVE]</span>
             </div>
 
-            <!-- SUBPANEL 1: OVERVIEW -->
             <div class="m32-sub-panel active" data-subpanel="overview">
               <div class="midas-blocks-grid">
-                <div class="midas-block">
-                  <span>PREAMP / GAIN</span>
-                  <strong id="screenGain">1.00</strong>
-                </div>
-                <div class="midas-block">
-                  <span>PANORAMA</span>
-                  <strong id="screenPan">CENTER</strong>
-                </div>
-                <div class="midas-block">
-                  <span>FADER LEVEL</span>
-                  <strong id="screenFader" style="color: #2ecc71;">75%</strong>
-                </div>
-                <div class="midas-block">
-                  <span>DYNAMICS</span>
-                  <strong id="screenDynStatus" style="color: #f39c12;">BYPASS</strong>
-                </div>
+                <div class="midas-block"><span>PREAMP / GAIN</span><strong id="screenGain">1.00</strong></div>
+                <div class="midas-block"><span>PANORAMA</span><strong id="screenPan">CENTER</strong></div>
+                <div class="midas-block"><span>FADER LEVEL</span><strong id="screenFader" style="color: #2ecc71;">75%</strong></div>
+                <div class="midas-block"><span>DYNAMICS</span><strong id="screenDynStatus" style="color: #f39c12;">BYPASS</strong></div>
               </div>
 
               <div class="pro-mini-spectrum" id="visualMeter">
@@ -772,69 +752,35 @@
               </div>
             </div>
 
-            <!-- SUBPANEL 2: CONFIG -->
             <div class="m32-sub-panel" data-subpanel="config">
               <b style="font-size: 8px; color: var(--accent-color);">PREAMP / INPUT CONFIG</b>
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:6px; font-size: 8px;">
-                <div style="background:var(--main-bg); padding:4px; border:1px solid var(--panel-border);">
-                  +48V: <button id="btnPhantom" style="background:#2ecc71; color:#000; border:none; padding:1px 4px; font-weight:bold; border-radius:2px; cursor:pointer;">ON</button>
-                </div>
-                <div style="background:var(--main-bg); padding:4px; border:1px solid var(--panel-border);">
-                  HPF: <span id="hpfVal" style="color:var(--accent-color);">80 Hz</span>
-                  <input type="range" min="20" max="400" value="80" class="screen-slider" id="hpfSlider">
-                </div>
-                <div style="background:var(--main-bg); padding:4px; border:1px solid var(--panel-border);">
-                  POL: <button id="btnPolarity" style="background:var(--panel-border); color:#fff; border:none; padding:1px 4px; border-radius:2px; cursor:pointer;">NORM (+)</button>
-                </div>
-                <div style="background:var(--main-bg); padding:4px; border:1px solid var(--panel-border);">
-                  INSERT: <span style="color:#f39c12;">PRE-EQ</span>
-                </div>
+                <div style="background:var(--main-bg); padding:4px; border:1px solid var(--panel-border);">+48V: <button id="btnPhantom" style="background:#2ecc71; color:#000; border:none; padding:1px 4px; font-weight:bold; border-radius:2px; cursor:pointer;">ON</button></div>
+                <div style="background:var(--main-bg); padding:4px; border:1px solid var(--panel-border);">HPF: <span id="hpfVal" style="color:var(--accent-color);">80 Hz</span><input type="range" min="20" max="400" value="80" class="screen-slider" id="hpfSlider"></div>
+                <div style="background:var(--main-bg); padding:4px; border:1px solid var(--panel-border);">POL: <button id="btnPolarity" style="background:var(--panel-border); color:#fff; border:none; padding:1px 4px; border-radius:2px; cursor:pointer;">NORM (+)</button></div>
+                <div style="background:var(--main-bg); padding:4px; border:1px solid var(--panel-border);">INSERT: <span style="color:#f39c12;">PRE-EQ</span></div>
               </div>
             </div>
 
-            <!-- SUBPANEL 3: GATE -->
             <div class="m32-sub-panel" data-subpanel="gate">
               <b style="font-size: 8px; color: var(--accent-color);">EXPANDER / NOISE GATE</b>
               <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:4px; margin-top:6px; text-align:center; font-size: 8px;">
-                <div style="background:var(--main-bg); padding:4px; border:1px solid var(--panel-border);">
-                  THRESH<br><strong id="gateThreshVal" style="color:var(--accent-color);">-45 dB</strong>
-                  <input type="range" min="-80" max="0" value="-45" class="screen-slider" id="gateThreshSlider">
-                </div>
-                <div style="background:var(--main-bg); padding:4px; border:1px solid var(--panel-border);">
-                  RANGE<br><strong id="gateRangeVal" style="color:var(--accent-color);">40 dB</strong>
-                  <input type="range" min="0" max="60" value="40" class="screen-slider" id="gateRangeSlider">
-                </div>
-                <div style="background:var(--main-bg); padding:4px; border:1px solid var(--panel-border);">
-                  REL<br><strong id="gateRelVal" style="color:var(--accent-color);">250 ms</strong>
-                  <input type="range" min="10" max="1000" value="250" class="screen-slider" id="gateRelSlider">
-                </div>
+                <div style="background:var(--main-bg); padding:4px; border:1px solid var(--panel-border);">THRESH<br><strong id="gateThreshVal" style="color:var(--accent-color);">-45 dB</strong><input type="range" min="-80" max="0" value="-45" class="screen-slider" id="gateThreshSlider"></div>
+                <div style="background:var(--main-bg); padding:4px; border:1px solid var(--panel-border);">RANGE<br><strong id="gateRangeVal" style="color:var(--accent-color);">40 dB</strong><input type="range" min="0" max="60" value="40" class="screen-slider" id="gateRangeSlider"></div>
+                <div style="background:var(--main-bg); padding:4px; border:1px solid var(--panel-border);">REL<br><strong id="gateRelVal" style="color:var(--accent-color);">250 ms</strong><input type="range" min="10" max="1000" value="250" class="screen-slider" id="gateRelSlider"></div>
               </div>
             </div>
 
-            <!-- SUBPANEL 4: DYN -->
             <div class="m32-sub-panel" data-subpanel="dyn">
               <b style="font-size: 8px; color: var(--accent-color);">DYNAMICS / COMPRESSOR</b>
               <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:3px; margin-top:6px; text-align:center; font-size: 8px;">
-                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">
-                  THRESH<br><strong id="compThreshVal" style="color:#f39c12;">-18dB</strong>
-                  <input type="range" min="-60" max="0" value="-18" class="screen-slider" id="compThreshSlider">
-                </div>
-                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">
-                  RATIO<br><strong id="compRatioVal" style="color:#f39c12;">3.1</strong>
-                  <input type="range" min="1" max="20" step="0.1" value="3.1" class="screen-slider" id="compRatioSlider">
-                </div>
-                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">
-                  ATT<br><strong id="compAttVal" style="color:#f39c12;">15ms</strong>
-                  <input type="range" min="1" max="200" value="15" class="screen-slider" id="compAttSlider">
-                </div>
-                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">
-                  GAIN<br><strong id="compGainVal" style="color:#f39c12;">+2.5</strong>
-                  <input type="range" min="0" max="24" step="0.5" value="2.5" class="screen-slider" id="compGainSlider">
-                </div>
+                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">THRESH<br><strong id="compThreshVal" style="color:#f39c12;">-18dB</strong><input type="range" min="-60" max="0" value="-18" class="screen-slider" id="compThreshSlider"></div>
+                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">RATIO<br><strong id="compRatioVal" style="color:#f39c12;">3.1</strong><input type="range" min="1" max="20" step="0.1" value="3.1" class="screen-slider" id="compRatioSlider"></div>
+                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">ATT<br><strong id="compAttVal" style="color:#f39c12;">15ms</strong><input type="range" min="1" max="200" value="15" class="screen-slider" id="compAttSlider"></div>
+                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">GAIN<br><strong id="compGainVal" style="color:#f39c12;">+2.5</strong><input type="range" min="0" max="24" step="0.5" value="2.5" class="screen-slider" id="compGainSlider"></div>
               </div>
             </div>
 
-            <!-- SUBPANEL 5: EQ -->
             <div class="m32-sub-panel" data-subpanel="eq">
               <b style="font-size: 8px; color: var(--accent-color);">4-BAND PARAMETRIC EQ</b>
               <div style="display:flex; gap:2px; height:80px; align-items:flex-end; background:var(--main-bg); padding:4px; margin-top:4px; border:1px solid var(--panel-border);">
@@ -851,33 +797,18 @@
               </div>
             </div>
 
-            <!-- SUBPANEL 6: SENDS -->
             <div class="m32-sub-panel" data-subpanel="sends">
               <b style="font-size: 8px; color: var(--accent-color);">BUS / AUX SENDS ROUTING</b>
               <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:3px; margin-top:6px; text-align:center; font-size: 8px;">
-                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">
-                  BS1<br><strong id="bs1Val" style="color:#2ecc71;">0dB</strong>
-                  <input type="range" min="-40" max="10" value="0" class="screen-slider" id="bs1Slider">
-                </div>
-                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">
-                  BS2<br><strong id="bs2Val" style="color:#2ecc71;">-6dB</strong>
-                  <input type="range" min="-40" max="10" value="-6" class="screen-slider" id="bs2Slider">
-                </div>
-                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">
-                  FX1<br><strong id="fx1Val" style="color:#2ecc71;">-3dB</strong>
-                  <input type="range" min="-40" max="10" value="-3" class="screen-slider" id="fx1SendSlider">
-                </div>
-                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">
-                  FX2<br><strong id="fx2Val" style="color:#2ecc71;">-∞</strong>
-                  <input type="range" min="-40" max="10" value="-40" class="screen-slider" id="fx2SendSlider">
-                </div>
+                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">BS1<br><strong id="bs1Val" style="color:#2ecc71;">0dB</strong><input type="range" min="-40" max="10" value="0" class="screen-slider" id="bs1Slider"></div>
+                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">BS2<br><strong id="bs2Val" style="color:#2ecc71;">-6dB</strong><input type="range" min="-40" max="10" value="-6" class="screen-slider" id="bs2Slider"></div>
+                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">FX1<br><strong id="fx1Val" style="color:#2ecc71;">-3dB</strong><input type="range" min="-40" max="10" value="-3" class="screen-slider" id="fx1SendSlider"></div>
+                <div style="background:var(--main-bg); padding:3px; border:1px solid var(--panel-border);">FX2<br><strong id="fx2Val" style="color:#2ecc71;">-∞</strong><input type="range" min="-40" max="10" value="-40" class="screen-slider" id="fx2SendSlider"></div>
               </div>
             </div>
-
           </div>
         </section>
 
-        <!-- 2. METERS VIEW -->
         <section class="screen-view" data-view="METER">
           <div class="pro-screen-grid" style="background: var(--panel-bg); padding: 6px; border-radius: 4px; min-height: 200px;">
             <b style="font-size: 9px; color: var(--accent-color); display: block; margin-bottom: 4px;">CHANNEL LEVEL METERS (CH 1–14)</b>
@@ -886,7 +817,6 @@
           </div>
         </section>
 
-        <!-- 3. RTA VIEW -->
         <section class="screen-view" data-view="RTA">
           <div class="rta-display" style="background: var(--panel-bg); padding: 6px; border-radius: 4px; min-height: 200px;">
             <b style="font-size: 9px; color: var(--accent-color); display: block; margin-bottom: 4px;">REAL TIME ANALYZER (RTA)</b>
@@ -895,7 +825,6 @@
           </div>
         </section>
 
-        <!-- 4. SETUP VIEW -->
         <section class="screen-view" data-view="SETUP">
           <div class="setup-screen" style="background: var(--panel-bg); padding: 6px; border-radius: 4px; font-size: 9px; min-height: 200px;">
             <b style="color: var(--accent-color);">M32 SYSTEM CONFIG</b>
@@ -908,7 +837,6 @@
           </div>
         </section>
 
-        <!-- 5. EFFECTS VIEW -->
         <section class="screen-view" data-view="EFFECT">
           <div class="effect-screen effect-screen-live" style="background: var(--panel-bg); padding: 6px; border-radius: 4px; font-size: 9px; min-height: 200px;">
             <b style="color: var(--accent-color);">VIRTUAL FX RACK ASSIGNMENT</b>
@@ -924,7 +852,6 @@
           </div>
         </section>
 
-        <!-- 6. LIBRARY / SCENE VIEW -->
         <section class="screen-view" data-view="SCENE">
           <div class="scene-screen" style="background: var(--panel-bg); padding: 6px; border-radius: 4px; font-size: 9px; min-height: 200px;">
             <b style="color: var(--accent-color);">SCENE LIBRARY PRESETS</b>
@@ -1020,7 +947,7 @@
     <div id="channelsRight"></div>
   </section>
 
-  <!-- 4. MASTER RACK DENGAN INDIKATOR L/R MASTER STEREO -->
+  <!-- 4. MASTER RACK -->
   <aside class="master-rack" id="masterRack">
     <div class="meter-rack">
       <b style="font-size: 8px; color: var(--accent-color); display: block; text-align: center; margin-bottom: 2px;">MAIN L / R</b>
@@ -1110,25 +1037,24 @@
   <span>MEM: <b>42%</b></span>
 </footer>
 
-<script src="connection.js?v=20260903-final16"></script>
-<script src="adapters.js?v=20260903-esp32-bridge-final"></script>
-<script src="app.js?v=20260903-final16"></script>
-<script src="header-system.js?v=20260902-01"></script>
-<script src="header-controls.js?v=20260902-02"></script>
-<script src="channels-new.js?v=20260903-final16"></script>
-<script src="bluetooth-bridge.js"></script>
-<script src="player-bridge.js"></script>
-<script src="channels-bridge.js"></script> 
-<script src="audio-engine.js"></script>
+<!-- SCRIPT MODUL (DIPERBARUI DENGAN CACHE BUSTER PRO) -->
+<script src="connection.js?v=20260908-PRO"></script>
+<script src="adapters.js?v=20260908-PRO"></script>
+<script src="app.js?v=20260908-PRO"></script>
+<script src="header-system.js?v=20260908-PRO"></script>
+<script src="header-controls.js?v=20260908-PRO"></script>
+<script src="channels-new.js?v=20260908-PRO"></script>
+<script src="bluetooth-bridge.js?v=20260908-PRO"></script>
+<script src="player-bridge.js?v=20260908-PRO"></script>
+<script src="channels-bridge.js?v=20260908-PRO"></script> 
+<script src="audio-engine.js?v=20260908-PRO"></script>
 
 <script>
 (function(){
-  // Jam Realtime
   const clock = document.getElementById('clock');
   const tick = () => clock && (clock.textContent = new Date().toLocaleTimeString());
   tick(); setInterval(tick, 1000);
 
-  // Inject VU Meter Panjang secara otomatis jika belum ada di HTML
   document.querySelectorAll('.new-channel-strip, .channel-strip').forEach(strip => {
     if (!strip.querySelector('.ch-long-vu')) {
       const longVu = document.createElement('div');
@@ -1138,7 +1064,6 @@
     }
   });
 
-  // Tab Layar M32
   const tabs = document.querySelectorAll('#screenTabs button');
   const views = document.querySelectorAll('.screen-view');
   const subButtons = document.querySelectorAll('.m32-sub-btn');
@@ -1169,7 +1094,6 @@
     });
   });
 
-  // LOGIKA RESPONSIF BOTTOM NAV BAR
   const bottomNavButtons = document.querySelectorAll('#bottomNav button');
   bottomNavButtons.forEach(btn => {
     btn.addEventListener('click', function() {
@@ -1232,7 +1156,6 @@
     if (t) t.textContent = a?.connected ? (a.transport === 'bluetooth' ? 'BLUETOOTH' : 'ESP32 BRIDGE') : 'OFFLINE';
   }
 
-  // SCRIPT INTERAKTIF SCREEN SUBPANEL
   document.getElementById('hpfSlider')?.addEventListener('input', function() {
     const v = document.getElementById('hpfVal');
     if (v) v.textContent = this.value + ' Hz';
@@ -1309,7 +1232,6 @@
     if (msg) msg.textContent = "⚡ Preset M32 Scene Recalled!";
   });
 
-  // METODE SINKRONISASI DATA LAYAR M32 & CHANNEL
   function selectScreenChannel(id) {
     const c = window.state?.channels?.[id - 1];
     const set = (elemId, v) => { const e = document.getElementById(elemId); if (e) e.textContent = v; };
@@ -1338,7 +1260,6 @@
   }
   window.selectScreenChannel = selectScreenChannel;
 
-  // SINKRONISASI REALTIME FADER DAN KONTROL CHANNEL + HAPTIC FEEDBACK
   document.addEventListener('input', function(e) {
     if (e.target.matches('input[type="range"]')) {
       if (window.AndroidFeedback && typeof window.AndroidFeedback.triggerHaptic === 'function') {
@@ -1379,7 +1300,6 @@
     }
   });
 
-  // Haptic Feedback Klik Button
   document.addEventListener('click', function(e) {
     if (e.target.tagName === 'BUTTON') {
       if (window.AndroidFeedback && typeof window.AndroidFeedback.triggerHaptic === 'function') {
@@ -1656,7 +1576,6 @@
   let isShuffle = false;
   let lockedMusicChannel = null;
 
-  // SINKRONISASI MASTER FADER REAL-TIME
   if (masterFader) {
     masterFader.addEventListener('input', function() {
       const val = parseInt(this.value, 10);
@@ -1830,7 +1749,6 @@
     }
   }
 
-  /* INTEGRASI VU METER DENGAN ANALYSER AUDIO CONTEXT ASLI */
   function updateIndicators() {
     requestAnimationFrame(updateIndicators);
 
@@ -1984,7 +1902,6 @@
   }
 })();
 
-// Switcher Skin Mixer
 (function() {
   const skinSelect = document.getElementById('skinSelect');
   
@@ -2003,7 +1920,6 @@
 </script>
 
 <script>
-// DROPDOWN TRANSPORT HANDLER
 (function(){
   function initTransportHandler() {
     const transportSelect = document.getElementById("transportSelect");
@@ -2073,7 +1989,6 @@
 </script>
 
 <script>
-// USB RECORDER HANDLER
 (function(){
   const recBtn = document.getElementById('btnPlayerRec');
   const trackInfo = document.getElementById('playerTrackInfo');
@@ -2136,7 +2051,6 @@
 </script>
 
 <script>
-// FX & AUX CONTROLS
 (function(){
   const fxButtons = document.querySelectorAll('.fx-buttons button');
   const fxPresetName = document.getElementById('fxRackPreset');
@@ -2197,7 +2111,6 @@
 </script>
 
 <script>
-// CONNECTION & TEST SUITE HANDLER
 (function() {
   "use strict";
 
