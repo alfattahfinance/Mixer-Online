@@ -99,27 +99,37 @@
     overflow-x: auto !important;
   }
 
-  header.topbar {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 6px !important;
-    padding: 6px 10px !important;
-    background: var(--header-bg) !important;
-    border-bottom: 1px solid var(--panel-border) !important;
-    position: relative !important;
-    z-index: 100 !important;
-  }
+header.topbar {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  overflow-x: auto !important;
+  width: 100% !important;
+  padding: 4px 6px !important;
+  gap: 4px !important;
+  position: relative !important;
+  z-index: 100 !important;
+}
 
-  header.topbar, .system-box, .bridge-head, .status-head, .scene-head,
-  .channel-bank, .new-channel-strip, .channel-strip, .master-rack,
-  .media-rack, .midas-block, .aux-unit, .screen-frame, .midas-tft-screen,
-  .device-connection, .bridge-panel, .connection-test-panel, .status-footer {
-    background: var(--panel-bg) !important;
-    border-color: var(--panel-border) !important;
-    color: var(--text-main) !important;
-  }
+header.topbar > div {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  position: static !important;
+  transform: none !important;
+}
+
+.bridge-head, .status-head, .scene-head, .skin-head, .system-box, .clock-head {
+  position: static !important;
+  transform: none !important;
+  background: var(--panel-bg) !important;
+  border: 1px solid var(--panel-border) !important;
+  border-radius: 4px !important;
+  padding: 2px 4px !important;
+  font-size: 7px !important;
+}
+
 
   .scene-head {
     position: static !important;
