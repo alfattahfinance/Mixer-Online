@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MIXER TEST RUNNER — 14CH ULTIMATE AUTOMATION & HARDWARE SUITE
+   MIXER TEST RUNNER — 14CH ULTIMATE AUTOMATION & HARDWARE SUITE (PRO EDITION)
    ========================================================================== */
 "use strict";
 
