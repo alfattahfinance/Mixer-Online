@@ -1,8 +1,15 @@
 /* ==========================================================================
-   HEADER CONTROLLER & BRIDGE STATUS SYNC (FINAL PRO EDITION)
+   HEADER CONTROLLER & BRIDGE STATUS SYNC (OPTIMIZED PRO EDITION)
    ========================================================================== */
 (function () {
   "use strict";
+
+  // Cache state sebelumnya untuk mencegah DOM reflow/repaint berlebihan yang menyebabkan kedip
+  let lastStateCache = {
+    system: null,
+    connected: null,
+    transportName: null
+  };
 
   // Helper untuk mendapatkan status transport aktif
   function getActiveTransportName(st) {
@@ -25,6 +32,18 @@
     const activeAdapter = window.MixerAdapters?.active;
     const connected = !!(st.connected || activeAdapter?.connected);
     const transportName = getActiveTransportName(st);
+
+    // CEK OPTIMASI: Jika tidak ada perubahan status sama sekali, abaikan pembaruan DOM
+    if (
+      lastStateCache.system === system &&
+      lastStateCache.connected === connected &&
+      lastStateCache.transportName === transportName
+    ) {
+      return;
+    }
+
+    // Perbarui cache state saat ini
+    lastStateCache = { system, connected, transportName };
 
     // 1. Update Tombol Power Utama
     const powerBtn = document.getElementById("power");
@@ -106,8 +125,8 @@
   window.refreshHeaderStatus = refreshHeader;
   window.refreshSystemHeader = refreshHeader;
 
-  // Jalankan polling berkala setiap 500ms untuk memastikan UI selalu tersinkronisasi
-  setInterval(refreshHeader, 500);
+  // Interval dinaikkan ke 1000ms (1 detik) dengan proteksi cache agar aman dan ringan
+  setInterval(refreshHeader, 1000);
 
   // Auto-bind Event Listener Data RX Hardware
   document.addEventListener("mixer:esp32-rx", refreshHeader);
