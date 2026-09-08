@@ -7,7 +7,7 @@
 
   let audioCtx = null;
 
-  // Mixer menggunakan 16 channel
+  // Mixer menggunakan 14 channel
   const channelNodes = {};
   const channelAudioElements = {};
   let masterNode = null;
@@ -67,7 +67,7 @@
   window.initChannelAudioNode = function (chNum, mediaStreamOrElement) {
     const ch = Number(chNum);
 
-    if (!Number.isInteger(ch) || ch < 1 || ch > 16) {
+    if (!Number.isInteger(ch) || ch < 1 || ch > 14) {
       console.warn("[AUDIO ENGINE] Channel tidak valid:", chNum);
       return false;
     }
@@ -248,7 +248,7 @@
   window.updateAudioParamLive = function (chNum, param, val) {
     const ch = Number(chNum);
 
-    if (!Number.isInteger(ch) || ch < 1 || ch > 16 || !channelNodes[ch] || !audioCtx) {
+    if (!Number.isInteger(ch) || ch < 1 || ch > 14 || !channelNodes[ch] || !audioCtx) {
       return;
     }
 
@@ -294,7 +294,7 @@
   window.connectMediaElementToChannel = function (chNum, mediaElement) {
     if (!mediaElement) return false;
     const ch = Number(chNum);
-    if (!Number.isInteger(ch) || ch < 1 || ch > 16) return false;
+    if (!Number.isInteger(ch) || ch < 1 || ch > 14) return false;
 
     try {
       return window.initChannelAudioNode(ch, mediaElement);
@@ -306,7 +306,7 @@
 
   window.connectCustomAudioToChannel = function (chNum, url) {
     const ch = Number(chNum);
-    if (!Number.isInteger(ch) || ch < 1 || ch > 16) return false;
+    if (!Number.isInteger(ch) || ch < 1 || ch > 14) return false;
 
     if (typeof url !== "string" || !url.trim()) {
       console.warn(`[AUDIO ENGINE] CH${ch}: tidak ada sumber audio.`);
@@ -394,7 +394,7 @@
     const chNum = parseInt(strip.dataset.ch, 10);
     const val = parseFloat(target.value);
 
-    if (!Number.isInteger(chNum) || chNum < 1 || chNum > 16 || isNaN(val)) return;
+    if (!Number.isInteger(chNum) || chNum < 1 || chNum > 14 || isNaN(val)) return;
 
     initAudioEngine();
 
@@ -415,7 +415,7 @@
     const chNum = parseInt(strip.dataset.ch, 10);
     const action = target.dataset.k || target.dataset.action;
 
-    if (!Number.isInteger(chNum) || chNum < 1 || chNum > 16) return;
+    if (!Number.isInteger(chNum) || chNum < 1 || chNum > 14) return;
     if (action !== "mute" && action !== "solo") return;
 
     const channelState = window.state && window.state.channels ? window.state.channels[chNum - 1] : null;
@@ -440,7 +440,7 @@
 
         if (screenInputEl && screenInputEl.textContent) {
           const matchNum = parseInt(screenInputEl.textContent.replace(/\D/g, ""), 10);
-          if (!isNaN(matchNum) && matchNum >= 1 && matchNum <= 16) {
+          if (!isNaN(matchNum) && matchNum >= 1 && matchNum <= 14) {
             targetCh = matchNum;
           }
         }
