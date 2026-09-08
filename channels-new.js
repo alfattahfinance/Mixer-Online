@@ -7,16 +7,13 @@
   "use strict";
 
   /* ============================================================
-     CHANNEL INDICATOR SKIN ONLY
-     Lampu hijau kecil tetap dipertahankan.
-     Indikator VU panjang diposisikan di dalam fader-area.
-     Tidak mengubah state, kontrol, audio, atau ESP32 Bridge.
+     CHANNEL INDICATOR SKIN & VERTICAL FADER VU
      ============================================================ */
   if (!document.getElementById("mixer-channel-led-skin")) {
     const style = document.createElement("style");
     style.id = "mixer-channel-led-skin";
     style.textContent = `
-      /* Lampu status lama: TETAP ADA sebagai LED hijau kecil */
+      /* Lampu status kecil di bagian atas */
       .new-channel-strip .channel-led,
       .channel-strip .channel-led {
         position: relative !important;
@@ -90,17 +87,23 @@
       /* FADER AREA: Mengatur posisi relatif agar VU meter panjang berada tepat di dalam jalur fader */
       .new-channel-strip .fader-area {
         position: relative !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        flex-grow: 1 !important;
+        width: 100% !important;
       }
 
-      /* LED BAR / VU PANJANG DI DALAM FADER:
-         Bridge mengirim level melalui style.width atau style.height, mekanisme RX/TX aman. */
+      /* LED BAR / VU PANJANG DI DALAM FADER */
       .new-channel-strip .ch-top-vu {
         position: absolute !important;
-        top: 25px !important;
-        bottom: 35px !important;
+        top: 15px !important;
+        bottom: 30px !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
         width: 6px !important;
+        height: auto !important;
         background: #090e12 !important;
         border: 1px solid rgba(255,255,255,.16) !important;
         border-radius: 2px !important;
@@ -127,7 +130,10 @@
         z-index: 2 !important;
       }
 
-      .new-channel-strip .ch-top-vu-fill {
+      .new-channel-strip .ch-top-vu .ch-top-vu-fill {
+        position: absolute !important;
+        left: 0 !important;
+        bottom: 0 !important;
         width: 100% !important;
         height: 0% !important;
         min-height: 0 !important;
@@ -153,7 +159,7 @@
         z-index: 2 !important;
       }
 
-      /* Meter segmented lama disembunyikan agar hanya LED bar fader baru yang tampil. */
+      /* Meter segmented lama disembunyikan */
       .new-channel-strip .new-channel-meter {
         display: none !important;
       }
@@ -176,7 +182,6 @@
     }
   }
 
-  // Format teks tampilan nilai knob
   function formatVal(k, val) {
     const num = Number(val);
     if (k === "gain") return num.toFixed(2);
@@ -233,7 +238,7 @@
       </div>
 
       <div class="fader-area new-channel-fader">
-        <!-- Indikator VU panjang dipindahkan ke dalam fader-area -->
+        <!-- Indikator VU panjang vertikal di dalam jalur fader -->
         <div class="ch-top-vu"><div class="ch-top-vu-fill"></div></div>
         <label>VOLUME</label>
         <input class="new-fader channel-fader" data-k="fader" type="range" min="0" max="100" step="1" value="${Number(c.fader ?? 75)}">
@@ -302,25 +307,6 @@
     el.querySelectorAll("input").forEach(input => {
       input.addEventListener("input", () => update(input.dataset.k, input.value));
     });
-
-    const audioFile = el.querySelector("[data-audio-file]");
-    const audioLoad = el.querySelector('[data-audio-action="load"]');
-    const audioStop = el.querySelector('[data-audio-action="stop"]');
-
-    if (audioLoad && audioFile) {
-      audioLoad.addEventListener("click", () => audioFile.click());
-      audioFile.addEventListener("change", () => {
-        const file = audioFile.files && audioFile.files[0];
-        if (!file || !file.type.startsWith("audio/")) return;
-        const url = URL.createObjectURL(file);
-        const ok = window.connectCustomAudioToChannel?.(id, url);
-        const r = $("testResult");
-        if (r) r.textContent = ok ? "CH" + id + " AUDIO → PLAY" : "CH" + id + " AUDIO → ERROR";
-      });
-    }
-    if (audioStop) {
-      audioStop.addEventListener("click", () => window.stopChannelAudio?.(id));
-    }
 
     el.querySelectorAll("button").forEach(button => {
       button.addEventListener("click", () => {
