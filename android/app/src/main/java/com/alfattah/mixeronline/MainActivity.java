@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.view.View; // <-- Tambahan untuk LAYER_TYPE_HARDWARE
 import android.webkit.JavascriptInterface;
 import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
@@ -56,6 +57,14 @@ public class MainActivity extends Activity {
         settings.setAllowFileAccessFromFileURLs(true);
         settings.setAllowUniversalAccessFromFileURLs(true);
         settings.setDatabaseEnabled(true);
+
+        // ====================================================================
+        // OPTIMASI PERFORMA RENDER & AKSELERASI HARDWARE (MENGATASI LAG DI APK)
+        // ====================================================================
+        settings.setRenderPriority(WebSettings.RenderPriority.HIGH);
+        // Memaksa rendering grafis UI & fader konsol mixer berjalan di GPU
+        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        // ====================================================================
 
         webView.setWebChromeClient(new WebChromeClient() {
             /* Otomatis setujui izin mikrofon/input audio fisik dari Web Audio API */
@@ -152,13 +161,13 @@ public class MainActivity extends Activity {
             int end = html.indexOf("</script>", start);
             if (end < 0) {
                 html = html.substring(0, start)
-                        + "<!-- Android native Bluetooth bridge replaces website bridge. -->"
+                        + ""
                         + html.substring(start + marker.length());
                 break;
             }
             end += "</script>".length();
             html = html.substring(0, start)
-                    + "<!-- Android native Bluetooth bridge replaces website bridge. -->"
+                    + ""
                     + html.substring(end);
         }
         return html;
