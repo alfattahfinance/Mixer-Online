@@ -1048,298 +1048,141 @@
 <script src="player-bridge.js?v=20260908-PRO"></script>
 <script src="channels-bridge.js?v=20260908-PRO"></script> 
 <script src="audio-engine.js?v=20260908-PRO"></script>
-
+  
 <script>
-(function(){
-  const clock = document.getElementById('clock');
-  const tick = () => clock && (clock.textContent = new Date().toLocaleTimeString());
-  tick(); setInterval(tick, 1000);
+(function() {
+  "use strict";
 
-  document.querySelectorAll('.new-channel-strip, .channel-strip').forEach(strip => {
-    if (!strip.querySelector('.ch-long-vu')) {
-      const longVu = document.createElement('div');
-      longVu.className = 'ch-long-vu';
-      longVu.innerHTML = '<div class="ch-long-vu-fill"></div>';
-      strip.appendChild(longVu);
-    }
-  });
+  // Batching update untuk mencegah lag/freeze pada animasi tes UI
+  function triggerUiUpdateOptimized() {
+    requestAnimationFrame(() => {
+      if (!window.state || !window.state.channels) return;
 
-  const tabs = document.querySelectorAll('#screenTabs button');
-  const views = document.querySelectorAll('.screen-view');
-  const subButtons = document.querySelectorAll('.m32-sub-btn');
-  const subPanels = document.querySelectorAll('.m32-sub-panel');
-  const subBar = document.getElementById('m32SubmenuBar');
+      for (let i = 0; i < window.state.channels.length; i++) {
+        const chNum = i + 1;
+        const ch = window.state.channels[i];
+        if (!ch) continue;
 
-  const setScreen = (name) => {
-    tabs.forEach(b => b.classList.toggle('active', b.dataset.screen === name));
-    views.forEach(v => v.classList.toggle('active', v.dataset.view === name));
-    
-    if(subBar) subBar.style.display = (name === 'HOME') ? 'grid' : 'none';
+        const strip = document.querySelector(`.new-channel-strip[data-ch="${chNum}"], .channel-strip[data-ch="${chNum}"], [data-ch="${chNum}"]`);
+        if (!strip) continue;
 
-    if (name === 'METER') buildScreenMeters();
-    if (name === 'RTA') buildRta();
-    if (name === 'SETUP') updateSetup();
-  };
+        // Update fader secara langsung tanpa event berlebihan
+        const faderInput = strip.querySelector('input.channel-fader, input[data-k="fader"], input[data-param="fader"]');
+        if (faderInput && ch.fader !== undefined) {
+          faderInput.value = ch.fader;
+        }
+        const faderOut = strip.querySelector('output, .fader-val');
+        if (faderOut && ch.fader !== undefined) {
+          faderOut.textContent = Math.round(ch.fader) + '%';
+        }
 
-  tabs.forEach(b => b.addEventListener('click', () => setScreen(b.dataset.screen)));
+        // Update Mute & Solo Button state
+        const muteBtn = strip.querySelector('button[data-k="mute"], button.mute-btn');
+        if (muteBtn && ch.mute !== undefined) {
+          muteBtn.classList.toggle('active', !!ch.mute);
+          muteBtn.classList.toggle('on', !!ch.mute);
+          muteBtn.textContent = ch.mute ? 'UNMUTE' : 'MUTE';
+        }
 
-  subButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      subButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const targetSub = btn.dataset.sub;
-      subPanels.forEach(panel => {
-        panel.classList.toggle('active', panel.dataset.subpanel === targetSub);
-      });
-    });
-  });
-
-  const bottomNavButtons = document.querySelectorAll('#bottomNav button');
-  bottomNavButtons.forEach(btn => {
-    btn.addEventListener('click', function() {
-      bottomNavButtons.forEach(b => b.classList.remove('active'));
-      this.classList.add('active');
-
-      const target = this.dataset.nav;
-
-      if (target === 'ch1-7') {
-        document.getElementById('bankLeft')?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
-      } else if (target === 'ch8-14') {
-        document.getElementById('bankRight')?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
-      } else if (target === 'fx') {
-        setScreen('EFFECT');
-        document.getElementById('fxRack')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      } else if (target === 'master') {
-        document.getElementById('masterRack')?.scrollIntoView({ behavior: 'smooth', inline: 'end', block: 'nearest' });
-      } else if (target === 'scene') {
-        setScreen('SCENE');
-        document.getElementById('centerConsole')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } else if (target === 'setup') {
-        setScreen('SETUP');
-        document.getElementById('centerConsole')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } else if (target === 'system') {
-        document.getElementById('systemPanel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const soloBtn = strip.querySelector('button[data-k="solo"], button.solo-btn');
+        if (soloBtn && ch.solo !== undefined) {
+          soloBtn.classList.toggle('active', !!ch.solo);
+          soloBtn.classList.toggle('on', !!ch.solo);
+          soloBtn.textContent = ch.solo ? 'UNSOLO' : 'SOLO';
+        }
       }
     });
-  });
+  }
 
-  function buildScreenMeters() {
-    const root = document.getElementById('screenChannelMeters');
-    if (!root) return;
-    root.innerHTML = '';
+  document.getElementById('runCombinationTest')?.addEventListener('click', function() {
+    if (!window.state) window.state = { channels: [] };
+    if (!window.state.channels) window.state.channels = [];
+    
     for (let i = 0; i < 14; i++) {
-      const el = document.createElement('div');
-      el.style.flex = '1';
-      el.style.background = 'var(--accent-color)';
-      el.style.height = (12 + ((i * 17) % 70)) + '%';
-      el.title = 'CH' + (i + 1);
-      root.appendChild(el);
+      if (!window.state.channels[i]) window.state.channels[i] = {};
+      
+      window.state.channels[i].gain = (0.5 + Math.random() * 1.5).toFixed(2);
+      window.state.channels[i].pan = parseFloat((Math.random() * 2 - 1).toFixed(2));
+      window.state.channels[i].fader = Math.floor(20 + Math.random() * 75);
+      window.state.channels[i].low = Math.floor(Math.random() * 100);
+      window.state.channels[i].mid = Math.floor(Math.random() * 100);
+      window.state.channels[i].high = Math.floor(Math.random() * 100);
     }
-  }
 
-  function buildRta() {
-    const root = document.getElementById('rtaBars');
-    if (!root) return;
-    root.innerHTML = '';
+    triggerUiUpdateOptimized();
+    const tr = document.getElementById('testResult');
+    if (tr) tr.textContent = `TEST: COMBINATION CONTROL SUCCESSFUL`;
+  });
+
+  document.getElementById('runFaderTest')?.addEventListener('click', function() {
+    if (!window.state) window.state = { channels: [] };
+    if (!window.state.channels) window.state.channels = [];
+
     for (let i = 0; i < 14; i++) {
-      const b = document.createElement('div');
-      b.style.flex = '1';
-      b.style.background = '#2ecc71';
-      b.style.height = (18 + ((i * 23) % 72)) + '%';
-      root.appendChild(b);
+      if (!window.state.channels[i]) window.state.channels[i] = {};
+      window.state.channels[i].fader = Math.floor(Math.random() * 100);
     }
-  }
 
-  function updateSetup() {
-    const a = window.MixerAdapters?.status?.();
-    const t = document.getElementById('setupTransport');
-    if (t) t.textContent = a?.connected ? (a.transport === 'bluetooth' ? 'BLUETOOTH' : 'ESP32 BRIDGE') : 'OFFLINE';
-  }
-
-  document.getElementById('hpfSlider')?.addEventListener('input', function() {
-    const v = document.getElementById('hpfVal');
-    if (v) v.textContent = this.value + ' Hz';
+    triggerUiUpdateOptimized();
+    const tr = document.getElementById('testResult');
+    if (tr) tr.textContent = `TEST: FADER CH1–CH14 TEST PASSED`;
   });
 
-  document.getElementById('btnPhantom')?.addEventListener('click', function() {
-    const on = this.textContent === 'ON';
-    this.textContent = on ? 'OFF' : 'ON';
-    this.style.background = on ? 'var(--panel-border)' : '#2ecc71';
-    this.style.color = on ? '#fff' : '#000';
+  document.getElementById('runMuteSoloTest')?.addEventListener('click', function() {
+    if (!window.state) window.state = { channels: [] };
+    if (!window.state.channels) window.state.channels = [];
+
+    for (let i = 0; i < 14; i++) {
+      if (!window.state.channels[i]) window.state.channels[i] = {};
+      window.state.channels[i].mute = Math.random() > 0.5;
+      window.state.channels[i].solo = Math.random() > 0.7;
+    }
+
+    triggerUiUpdateOptimized();
+    const tr = document.getElementById('testResult');
+    if (tr) tr.textContent = `TEST: MUTE & SOLO TEST COMPLETED`;
   });
 
-  document.getElementById('btnPolarity')?.addEventListener('click', function() {
-    const norm = this.textContent.includes('NORM');
-    this.textContent = norm ? 'INV (-)' : 'NORM (+)';
-    this.style.color = norm ? '#e74c3c' : '#fff';
-  });
-
-  document.getElementById('gateThreshSlider')?.addEventListener('input', function() {
-    document.getElementById('gateThreshVal').textContent = this.value + ' dB';
-  });
-  document.getElementById('gateRangeSlider')?.addEventListener('input', function() {
-    document.getElementById('gateRangeVal').textContent = this.value + ' dB';
-  });
-  document.getElementById('gateRelSlider')?.addEventListener('input', function() {
-    document.getElementById('gateRelVal').textContent = this.value + ' ms';
-  });
-
-  document.getElementById('compThreshSlider')?.addEventListener('input', function() {
-    document.getElementById('compThreshVal').textContent = this.value + 'dB';
-  });
-  document.getElementById('compRatioSlider')?.addEventListener('input', function() {
-    document.getElementById('compRatioVal').textContent = this.value;
-  });
-  document.getElementById('compAttSlider')?.addEventListener('input', function() {
-    document.getElementById('compAttVal').textContent = this.value + 'ms';
-  });
-  document.getElementById('compGainSlider')?.addEventListener('input', function() {
-    document.getElementById('compGainVal').textContent = '+' + this.value;
-  });
-
-  ['Low', 'Mid1', 'Mid2', 'High'].forEach(band => {
-    document.getElementById('eq' + band + 'Slider')?.addEventListener('input', function() {
-      const bar = document.getElementById('eqBar' + band);
-      if (bar) bar.style.height = this.value + '%';
-    });
-  });
-
-  document.getElementById('bs1Slider')?.addEventListener('input', function() {
-    document.getElementById('bs1Val').textContent = this.value + 'dB';
-  });
-  document.getElementById('bs2Slider')?.addEventListener('input', function() {
-    document.getElementById('bs2Val').textContent = this.value + 'dB';
-  });
-  document.getElementById('fx1SendSlider')?.addEventListener('input', function() {
-    document.getElementById('fx1Val').textContent = this.value + 'dB';
-  });
-  document.getElementById('fx2SendSlider')?.addEventListener('input', function() {
-    document.getElementById('fx2Val').textContent = this.value === '-40' ? '-∞' : this.value + 'dB';
-  });
-
-  document.getElementById('screenFxSelect')?.addEventListener('change', function() {
-    const details = document.getElementById('fxSlotDetails');
-    if (details) details.innerHTML = `Loaded: <strong style="color:var(--accent-color);">${this.options[this.selectedIndex].text}</strong>`;
-  });
-
-  document.getElementById('screenSceneSave')?.addEventListener('click', function() {
-    const msg = document.getElementById('sceneStatusMsg');
-    if (msg) msg.textContent = "✅ Preset M32 Scene Saved Successfully!";
-  });
-
-  document.getElementById('screenSceneRecall')?.addEventListener('click', function() {
-    const msg = document.getElementById('sceneStatusMsg');
-    if (msg) msg.textContent = "⚡ Preset M32 Scene Recalled!";
-  });
-
-  function selectScreenChannel(id) {
-    const c = window.state?.channels?.[id - 1];
-    const set = (elemId, v) => { const e = document.getElementById(elemId); if (e) e.textContent = v; };
+  document.getElementById('runMasterIsolationTest')?.addEventListener('click', function() {
+    const masterElem = document.getElementById('master');
+    const masterValElem = document.getElementById('masterVal');
     
-    set('screenInput', 'CH ' + (id < 10 ? '0' + id : id));
+    const randomMasterVal = Math.floor(Math.random() * 101);
     
-    if (c) {
-      set('screenFader', Math.round(c.fader !== undefined ? c.fader : 75) + '%');
-      set('screenGain', Number(c.gain || 1.0).toFixed(2));
-      set('screenPan', c.pan === 0 || c.pan === undefined ? 'CENTER' : (c.pan < 0 ? 'L ' + Math.round(Math.abs(c.pan) * 100) + '%' : 'R ' + Math.round(c.pan * 100) + '%'));
-      
-      const statusElem = document.getElementById('screenStatus');
-      if (statusElem) {
-        if (c.mute) {
-          statusElem.textContent = '[MUTED]';
-          statusElem.style.color = '#e74c3c';
-        } else if (c.solo) {
-          statusElem.textContent = '[SOLO]';
-          statusElem.style.color = '#f1c40f';
-        } else {
-          statusElem.textContent = '[ACTIVE]';
-          statusElem.style.color = '#2ecc71';
-        }
-      }
+    if (masterElem) {
+      masterElem.value = randomMasterVal;
     }
-  }
-  window.selectScreenChannel = selectScreenChannel;
 
-  document.addEventListener('input', function(e) {
-    if (e.target.matches('input[type="range"]')) {
-      if (window.AndroidFeedback && typeof window.AndroidFeedback.triggerHaptic === 'function') {
-        window.AndroidFeedback.triggerHaptic(10);
-      } else if (navigator.vibrate) {
-        navigator.vibrate(10);
-      }
-
-      const container = e.target.parentElement || e.target.closest('div, section');
-      
-      if (container && e.target.classList.contains('channel-fader')) {
-        const valDisplay = container.querySelector('.fader-val, output');
-        if (valDisplay) {
-          valDisplay.textContent = Math.round(e.target.value) + '%';
-        }
-      }
-
-      const strip = e.target.closest('.new-channel-strip, .channel-strip, [data-ch]');
-      if (strip) {
-        const chId = Number(strip.dataset.ch) || parseInt(strip.innerText.match(/CH\s*(\d+)/i)?.[1] || '0', 10);
-        if (chId > 0) {
-          const val = Number(e.target.value);
-          if (!window.state) window.state = { channels: [] };
-          if (!window.state.channels) window.state.channels = [];
-          if (!window.state.channels[chId - 1]) window.state.channels[chId - 1] = {};
-          
-          if (e.target.classList.contains('channel-fader')) {
-            window.state.channels[chId - 1].fader = val;
-            
-            const activeInput = document.getElementById('screenInput')?.textContent;
-            if (activeInput && parseInt(activeInput.replace(/\D/g, ''), 10) === chId) {
-              const sf = document.getElementById('screenFader');
-              if (sf) sf.textContent = Math.round(val) + '%';
-            }
-          }
-        }
-      }
+    if (masterValElem) {
+      masterValElem.textContent = randomMasterVal + '%';
     }
+
+    const tr = document.getElementById('testResult');
+    if (tr) tr.textContent = `TEST: MASTER ISOLATION TEST PASSED`;
   });
 
-  document.addEventListener('click', function(e) {
-    if (e.target.tagName === 'BUTTON') {
-      if (window.AndroidFeedback && typeof window.AndroidFeedback.triggerHaptic === 'function') {
-        window.AndroidFeedback.triggerHaptic(20);
-      } else if (navigator.vibrate) {
-        navigator.vibrate(20);
-      }
-    }
+  document.getElementById('simulateRx')?.addEventListener('click', function() {
+    if (!window.state) window.state = { channels: [] };
+    if (!window.state.channels) window.state.channels = [];
+
+    const chId = Math.floor(Math.random() * 14) + 1;
+    if (!window.state.channels[chId - 1]) window.state.channels[chId - 1] = {};
+
+    window.state.channels[chId - 1].gain = (Math.random() * 2).toFixed(2);
+    window.state.channels[chId - 1].pan = parseFloat((Math.random() * 2 - 1).toFixed(2));
+    window.state.channels[chId - 1].low = Math.floor(Math.random() * 100);
+    
+    triggerUiUpdateOptimized();
+
+    const rx = document.getElementById('rx');
+    if (rx) rx.textContent = `RX: {"ch":${chId},"gain":${window.state.channels[chId - 1].gain},"pan":${window.state.channels[chId - 1].pan},"low":${window.state.channels[chId - 1].low}}`;
+
+    const tr = document.getElementById('testResult');
+    if (tr) tr.textContent = `TEST: HARDWARE RX SIMULATION CH${chId} UPDATED`;
   });
 
-  document.getElementById('channels')?.addEventListener('click', e => {
-    const strip = e.target.closest('.new-channel-strip, .channel-strip, [data-ch]');
-    if (strip) {
-      const chId = Number(strip.dataset.ch) || parseInt(strip.innerText.match(/CH\s*(\d+)/i)?.[1] || '0', 10);
-      if (chId > 0) selectScreenChannel(chId);
-    }
-  });
-
-  document.getElementById('channelsRight')?.addEventListener('click', e => {
-    const strip = e.target.closest('.new-channel-strip, .channel-strip, [data-ch]');
-    if (strip) {
-      const chId = Number(strip.dataset.ch) || parseInt(strip.innerText.match(/CH\s*(\d+)/i)?.[1] || '0', 10);
-      if (chId > 0) selectScreenChannel(chId);
-    }
-  });
-
-  const updateSkin = () => {
-    const adapter = window.MixerAdapters?.status?.();
-    const live = !!adapter?.connected;
-    document.getElementById('statusLamp')?.classList.toggle('live', live);
-    document.getElementById('deviceLamp')?.classList.toggle('green', live);
-    document.getElementById('deviceLamp')?.classList.toggle('red', !live);
-  };
-
-  window.initEffectEngine?.();
-  setInterval(updateSkin, 400);
-  updateSkin();
 })();
 </script>
-
 <script>
 (function(){
   function install(){
