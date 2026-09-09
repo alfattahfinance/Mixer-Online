@@ -561,6 +561,76 @@
     border-color: var(--accent-color) !important;
     box-shadow: 0 0 6px var(--accent-color) !important;
   }
+
+  /* ==========================================================
+   PERBAIKAN KESEJAJARAN CHANNEL KIRI & KANAN (RESPONSIVE)
+   ========================================================== */
+
+/* Pastikan wadah utama konsol menggunakan flex/grid yang sejajar */
+main.console {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 4px !important;
+}
+
+/* Menyamakan tinggi dan struktur Bank Channel Kiri dan Kanan */
+.channel-bank {
+  flex: 1 1 0 !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  max-height: 520px !important; /* Batasi tinggi maksimum agar tidak melar ke bawah */
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  background: var(--strip-bg) !important;
+  border: 1px solid var(--panel-border) !important;
+  border-radius: 4px !important;
+  padding: 2px !important;
+  box-sizing: border-box !important;
+}
+
+/* Grid Channel di dalam bank kiri & kanan */
+#channels, #channelsRight {
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr) !important;
+  width: 100% !important;
+  height: 100% !important;
+  flex-grow: 1 !important;
+  gap: 1px !important;
+  align-items: stretch !important;
+}
+
+/* Memastikan setiap strip channel memiliki tinggi yang seragam dan tidak melar */
+.new-channel-strip, .channel-strip {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 4px 1px 2px 1px !important;
+  box-sizing: border-box !important;
+}
+
+/* Menyesuaikan tinggi area fader agar pas di mode potret & lanskap */
+.fader-area {
+  min-height: 200px !important;
+  max-height: 220px !important;
+  flex-grow: 1 !important;
+}
+
+.fader-area input[type="range"], .channel-fader {
+  height: 190px !important;
+  width: 22px !important;
+}
+
 </style>
 
 </head>
