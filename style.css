@@ -1,7 +1,8 @@
 /* ==========================================================================
    FADER-SIDE VU METER — CH1-CH14
    Sinyal aktual: hijau -> kuning -> merah
-   Indikator berdiri tepat di sisi FADER, bukan mengubah posisi FADER.
+   Indikator ditempatkan di CELAH ANTAR-CHANNEL, tepat di samping FADER.
+   Tidak mengubah ukuran atau posisi FADER.
    ========================================================================== */
 .new-channel-strip {
   position: relative !important;
@@ -10,8 +11,8 @@
 .new-channel-strip .new-channel-meter,
 .new-channel-strip .led-meter.new-channel-meter {
   position: absolute !important;
-  z-index: 4 !important;
-  right: 3px !important;
+  z-index: 20 !important;
+  right: -5px !important;
   bottom: 39px !important;
   width: 7px !important;
   height: 230px !important;
@@ -77,13 +78,13 @@
   pointer-events: none !important;
 }
 
+/* Di layar kecil tetap masuk ke celah, bukan menutupi FADER. */
 @media screen and (max-width: 1024px) {
   .new-channel-strip .new-channel-meter,
   .new-channel-strip .led-meter.new-channel-meter {
-    right: 2px !important;
+    right: -4px !important;
     bottom: 39px !important;
     height: 230px !important;
     width: 6px !important;
   }
 }
-
