@@ -236,53 +236,72 @@
     padding-right: 2px !important;
   }
 
-  /* AREA FADER & INDIKATOR VU PANJANG DI DALAM JALUR FADER VOLUME */
+   /* ==========================================================
+     PERBAIKAN TATA LETAK FADER & METERAN SAMPING (SEPERTI GAMBAR)
+     ========================================================== */
+
+  /* Kontainer Area Fader agar fader dan meteran sejajar ke samping */
   .fader-area {
     position: relative !important;
-    z-index: 2 !important;
     display: flex !important;
-    flex-direction: column !important;
+    flex-direction: row !important; /* Membuat fader dan meteran berjajar horizontal */
     align-items: center !important;
-    justify-content: flex-end !important;
+    justify-content: center !important;
+    gap: 6px !important;            /* Jarak pas antara fader dan meteran */
     flex-grow: 1 !important;
     width: 100% !important;
-    padding-bottom: 0px !important;
-    margin-bottom: 0px !important;
-    margin-top: auto !important;
+    min-height: 240px !important;
+    padding: 4px 2px !important;
   }
 
-  .ch-long-vu {
-    position: absolute !important;
-    top: 15px !important;
-    bottom: 35px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 4px !important;
-    background: rgba(0, 0, 0, 0.6) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 2px !important;
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column-reverse !important;
-    z-index: 1 !important;
-    pointer-events: none !important;
-  }
-
-  .ch-long-vu-fill {
-    width: 100% !important;
-    height: 0%;
-    /* Gradasi standar konsol: Hijau (bawah), Kuning (tengah), Merah (atas) */
-    background: linear-gradient(0deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 66%, #f39c12 85%, #e74c3c 86%, #ff0000 100%) !important;
-    transition: height 0.05s linear !important;
-  }
-
+  /* Gaya Slider Fader Utama di Sebelah Kiri */
   .fader-area input[type="range"], .channel-fader {
     position: relative !important;
     z-index: 2 !important;
     background: transparent !important;
-    height: 240px !important;
+    height: 220px !important;
+    width: 24px !important;
     accent-color: var(--accent-color) !important;
+    margin: 0 !important;
   }
+
+  /* Kotak Indikator VU Meter Segmen di Sebelah Kanan Fader */
+  .ch-long-vu {
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+    width: 12px !important;         /* Lebar kotak meteran */
+    height: 215px !important;       /* Tinggi menyesuaikan fader */
+    background: #040608 !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 2px !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column-reverse !important;
+    padding: 1px !important;
+    box-sizing: border-box !important;
+    z-index: 1 !important;
+  }
+
+  /* Tampilan Kotak Segmen Lampu LED di dalam Meteran */
+  .ch-long-vu-fill {
+    width: 100% !important;
+    height: 0%;
+    /* Efek potongan segmen lampu ala LED meter hardware */
+    background-image: linear-gradient(
+      to top,
+      #2ecc71 0%, #2ecc71 60%, 
+      #f1c40f 61%, #f39c12 80%, 
+      #e74c3c 81%, #ff0000 100%
+    ) !important;
+    background-size: 100% 100px !important;
+    transition: height 0.05s linear !important;
+    border-radius: 1px !important;
+  }
+
 
   /* INDIKATOR BULAT/KECIL ATAS */
   .ch-top-vu {
