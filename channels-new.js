@@ -43,7 +43,7 @@
         box-shadow: 0 0 6px rgba(255,59,48,.65), inset 0 1px 1px rgba(255,255,255,.35) !important;
       }
 
-      /* FADER AREA: Mengisi penuh sisa ruang vertikal secara fleksibel */
+      /* FADER AREA: Diberikan tinggi pas agar memanjang rapi */
       .new-channel-strip .fader-area {
         position: relative !important;
         display: flex !important;
@@ -51,10 +51,10 @@
         align-items: center !important;
         justify-content: center !important;
         gap: 6px !important;
-        flex-grow: 1 !important;
+        flex-grow: 0 !important;
         width: 100% !important;
-        height: 100% !important;
-        min-height: 0 !important;
+        height: auto !important;
+        min-height: 290px !important; /* Ditinggikan agar fader memanjang ke bawah */
         padding: 4px 2px !important;
       }
 
@@ -63,12 +63,12 @@
         cursor: pointer !important;
       }
 
-      /* Slider Fader di Sebelah Kiri (Dipaksa merentang penuh 100% ke bawah) */
+      /* Slider Fader di Sebelah Kiri (Dibuat tinggi secara presisi) */
       .new-channel-strip .fader-area input.channel-fader, 
       .new-channel-strip .fader-area input.new-fader {
         width: 24px !important;
-        height: 100% !important;
-        min-height: 140px !important;
+        height: 270px !important; /* Ukuran tinggi fader diperpanjang pas */
+        min-height: 270px !important;
         position: relative !important;
         z-index: 2 !important;
         background: transparent !important;
@@ -76,12 +76,12 @@
         margin: 0 !important;
       }
 
-      /* KOTAK LED METER TUNGGAL DI SEBELAH KANAN FADER (Ikut merentang penuh) */
+      /* KOTAK LED METER TUNGGAL DI SEBELAH KANAN FADER */
       .new-channel-strip .ch-side-vu {
         position: relative !important;
         width: 10px !important;
-        height: 100% !important;
-        min-height: 140px !important;
+        height: 265px !important; /* Dibuat sejajar dengan tinggi fader */
+        min-height: 265px !important;
         background: #040608 !important;
         border: 1px solid rgba(255,255,255,0.2) !important;
         border-radius: 2px !important;
@@ -92,6 +92,7 @@
         padding: 1px !important;
         box-sizing: border-box !important;
       }
+
 
       .new-channel-strip .ch-side-vu .ch-side-vu-fill {
         width: 100% !important;
