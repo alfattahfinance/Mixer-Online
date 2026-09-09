@@ -179,14 +179,15 @@
   .center-console {
     max-width: 380px !important;
     min-width: 300px !important;
-    flex: 0 0 auto !important;
+    flex: 1 1 auto !important; /* Diubah agar fleksibel mengikuti tinggi layar */
     box-sizing: border-box !important;
+    height: 100% !important;
   }
 
   .channel-bank {
-    flex: 0 0 auto !important;
-    width: 505px !important;
-    min-width: 480px !important;
+    flex: 1 1 0 !important; /* Membuat bank channel meregang mengisi ruang vertikal */
+    width: 100% !important;
+    min-width: 0 !important;
     background: var(--strip-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
@@ -206,6 +207,7 @@
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
+    flex-shrink: 0 !important;
   }
 
   #channels, #channelsRight {
@@ -226,7 +228,7 @@
     flex-direction: column !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding: 8px 2px 0px 2px !important;
+    padding: 4px 2px 0px 2px !important;
     border-right: 1px dashed var(--panel-border) !important;
     box-sizing: border-box !important;
     height: 100% !important;
@@ -242,19 +244,28 @@
     gap: 6px !important;
     flex-grow: 1 !important;
     width: 100% !important;
-    min-height: 240px !important;
-    padding: 4px 2px !important;
+    height: 100% !important; /* Memaksa area fader meregang penuh ke bawah */
+    min-height: 0 !important; /* Menghapus batasan minimal agar bisa menyesuaikan */
+    padding: 2px !important;
   }
 
   .fader-area input[type="range"], .channel-fader {
     position: relative !important;
     z-index: 2 !important;
     background: transparent !important;
-    height: 220px !important;
+    height: 100% !important; /* Slider fader ikut merentang penuh mentok bawah */
+    min-height: 180px !important;
     width: 24px !important;
     accent-color: var(--accent-color) !important;
     margin: 0 !important;
   }
+  
+  /* Menyesuaikan LED meter samping agar ikut memanjang mentok bawah */
+  .new-channel-strip .ch-side-vu {
+    height: 100% !important;
+    min-height: 180px !important;
+  }
+
 
   /* INDIKATOR BULAT/KECIL ATAS */
   .ch-top-vu {
