@@ -628,6 +628,40 @@ aside.master-rack {
   box-sizing: border-box !important;
 }
 
+/* ==========================================================
+   MENYELARASKAN TINGGI CHANNEL KIRI, KANAN, DAN MASTER KE BAWAH
+   ========================================================== */
+main.console {
+  height: 100% !important;
+  min-height: 100% !important;
+  align-items: stretch !important;
+}
+
+.channel-bank, 
+.center-console, 
+aside.master-rack,
+.aux-bus-section, 
+.rx-return-section {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  box-sizing: border-box !important;
+}
+
+/* Memastikan area strip channel mengisi ruang vertikal secara penuh */
+#channels, #channelsRight {
+  flex: 1 !important;
+  display: grid !important;
+  grid-template-columns: repeat(7, minmax(35px, 1fr)) !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.new-channel-strip, .channel-strip {
+  height: 100% !important;
+  box-sizing: border-box !important;
+}
 
 
 </style>
