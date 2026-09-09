@@ -562,11 +562,9 @@
     box-shadow: 0 0 6px var(--accent-color) !important;
   }
 
-  /* ==========================================================
-   PERBAIKAN KESEJAJARAN CHANNEL KIRI & KANAN (RESPONSIVE)
+/* ==========================================================
+   PERBAIKAN TATA LETAK UTAMA KONSOL & KESEJAJARAN KANAN-KIRI
    ========================================================== */
-
-/* Pastikan wadah utama konsol menggunakan flex/grid yang sejajar */
 main.console {
   display: flex !important;
   flex-direction: row !important;
@@ -574,17 +572,18 @@ main.console {
   justify-content: center !important;
   gap: 4px !important;
   width: 100% !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
   box-sizing: border-box !important;
   padding: 4px !important;
 }
 
-/* Menyamakan tinggi dan struktur Bank Channel Kiri dan Kanan */
 .channel-bank {
   flex: 1 1 0 !important;
   width: auto !important;
   min-width: 0 !important;
-  height: 100% !important;
-  max-height: 520px !important; /* Batasi tinggi maksimum agar tidak melar ke bawah */
+  height: auto !important;
+  max-height: none !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: space-between !important;
@@ -595,41 +594,65 @@ main.console {
   box-sizing: border-box !important;
 }
 
-/* Grid Channel di dalam bank kiri & kanan */
 #channels, #channelsRight {
   display: grid !important;
   grid-template-columns: repeat(7, 1fr) !important;
   width: 100% !important;
-  height: 100% !important;
-  flex-grow: 1 !important;
   gap: 1px !important;
   align-items: stretch !important;
 }
 
-/* Memastikan setiap strip channel memiliki tinggi yang seragam dan tidak melar */
 .new-channel-strip, .channel-strip {
   position: relative !important;
   width: 100% !important;
-  height: 100% !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: space-between !important;
   padding: 4px 1px 2px 1px !important;
+  border-right: 1px dashed var(--panel-border) !important;
   box-sizing: border-box !important;
 }
 
-/* Menyesuaikan tinggi area fader agar pas di mode potret & lanskap */
 .fader-area {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  width: 100% !important;
   min-height: 200px !important;
-  max-height: 220px !important;
-  flex-grow: 1 !important;
+  padding: 2px !important;
 }
 
 .fader-area input[type="range"], .channel-fader {
-  height: 190px !important;
-  width: 22px !important;
+  height: 180px !important;
+  width: 20px !important;
+  accent-color: var(--accent-color) !important;
+  margin: 0 !important;
 }
+
+aside.master-rack {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  width: 100px !important;
+  min-width: 100px !important;
+  background: var(--panel-bg) !important;
+  border: 1px solid var(--panel-border) !important;
+  border-radius: 4px !important;
+  padding: 4px !important;
+  box-sizing: border-box !important;
+}
+
+.center-console {
+  flex: 1.2 1 0 !important;
+  max-width: 420px !important;
+  min-width: 280px !important;
+  box-sizing: border-box !important;
+}
+
 
 </style>
 
