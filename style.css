@@ -1,474 +1,89 @@
 /* ==========================================================================
-   1. RESET & LAYOUT GRID UTAMA CONSOLE (FIXED RESPONSIVE & ALIGNMENT)
+   FADER-SIDE VU METER — CH1-CH14
+   Sinyal aktual: hijau -> kuning -> merah
+   Indikator berdiri tepat di sisi FADER, bukan mengubah posisi FADER.
    ========================================================================== */
-main.console {
-  display: grid !important;
-  /* Grid 4 Kolom: Bank Left | Center Console | Bank Right | Master Rack */
-  grid-template-columns: minmax(260px, 1fr) 320px minmax(260px, 1fr) 85px !important;
-  grid-template-areas:
-    "ch-left center ch-right master"
-    "fx      center ch-right master"
-    "aux     center ch-right master" !important;
-  gap: 6px !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  padding: 4px 4px 0px 4px !important;
-  box-sizing: border-box !important;
-  float: none !important;
-  clear: both !important;
-  align-items: stretch !important;
-}
-
-/* MENETRALISIR STYLING LAMA PADA ELEMEN RACK */
-main.console > * {
+.new-channel-strip {
   position: relative !important;
-  top: auto !important;
-  left: auto !important;
-  right: auto !important;
-  bottom: auto !important;
-  margin: 0 !important;
-  float: none !important;
-  clear: none !important;
-  width: auto !important;
-  max-width: none !important;
-  box-sizing: border-box !important;
 }
 
-/* PENETAPAN AREA MASING-MASING ELEMEN */
-main.console > .channel-bank-left {
-  grid-area: ch-left !important;
-  height: 100% !important;
-  margin-bottom: 0 !important;
-}
-
-main.console > .center-console {
-  grid-area: center !important;
-}
-
-main.console > .channel-bank-right {
-  grid-area: ch-right !important;
-  height: 100% !important;
-  margin-bottom: 0 !important;
-}
-
-main.console > .master-rack {
-  grid-area: master !important;
-  width: 100% !important;
-  padding: 4px !important;
-}
-
-main.console > .fx-rack,
-main.console > .fx-rack-live {
-  grid-area: fx !important;
-}
-
-main.console > .aux-rack {
-  grid-area: aux !important;
-}
-
-/* RESPONSIVE OVERFLOW UNTUK TABLET/LAYAR KECIL */
-@media screen and (max-width: 1024px) {
-  main.console {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    overflow-x: auto !important;
-    width: max-content !important;
-    min-width: 100% !important;
-    padding-bottom: 0px !important;
-  }
-
-  main.console > .channel-bank-left,
-  main.console > .channel-bank-right {
-    min-width: 480px !important;
-  }
-
-  main.console > .center-console {
-    min-width: 320px !important;
-  }
-
-  main.console > .master-rack {
-    min-width: 75px !important;
-  }
-}
-
-/* ==========================================================================
-   2. STYLING STRIP CHANNEL & URUTAN VERTIKAL BARU
-   ========================================================================== */
-.new-channel-strip,
-.channel-strip {
-  position: relative !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  background: var(--strip-bg, #121619) !important;
-  border: 1px solid var(--panel-border, #2a323d) !important;
-  border-radius: 6px 6px 0 0 !important;
-  padding: 6px 3px 0px 3px !important; /* Bottom padding 0 agar pas menempel di dasar */
-  box-sizing: border-box !important;
-  width: 100% !important;
-  height: 100% !important;
-  margin-bottom: 0 !important;
-}
-
-/* 1. Lampu Bulat LED Top */
-.channel-led {
-  position: relative !important;
-  z-index: 2 !important;
-  width: 10px !important;
-  height: 10px !important;
-  border-radius: 50% !important;
-  background: #1a1f24 !important;
-  border: 1px solid #3d464e !important;
-  margin: 2px auto 4px auto !important;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.9) !important;
-  transition: all 0.15s ease-in-out !important;
-  flex-shrink: 0 !important;
-}
-
-.channel-led.active.green,
-.channel-led.green,
-.channel-led.on {
-  background: #31e66b !important;
-  box-shadow: 0 0 8px #31e66b, inset 0 1px 2px rgba(255, 255, 255, 0.7) !important;
-}
-
-.channel-led.active.red,
-.channel-led.red {
-  background: #ff3b30 !important;
-  box-shadow: 0 0 8px #ff3b30, inset 0 1px 2px rgba(255, 255, 255, 0.7) !important;
-}
-
-/* 2. Indikator Sinyal Berdiri (Vertikal) di Belakang/Samping Area Knob */
-.channel-meter-vertical,
-.ch-top-vu,
-.ch-long-vu {
+.new-channel-strip .new-channel-meter,
+.new-channel-strip .led-meter.new-channel-meter {
   position: absolute !important;
-  z-index: 1 !important; /* Berada di belakang knob agar interaksi bebas */
-  pointer-events: none !important;
-  width: 6px !important;
-  top: 24px !important;
-  bottom: 250px !important; /* Panjang menjangkau sejajar area knob */
-  background: #080a0c !important;
-  border: 1px solid var(--panel-border, #1c232b) !important;
-  border-radius: 2px !important;
-  margin: 0 auto !important;
-  display: flex !important;
-  flex-direction: column-reverse !important;
-  overflow: hidden !important;
-  flex-shrink: 0 !important;
-}
-
-.channel-meter-bar,
-.ch-top-vu-fill,
-.ch-long-vu-fill {
-  width: 100% !important;
-  height: 0%; /* Dinamis diatur via JS */
-  background: linear-gradient(to top, #31e66b 65%, #ffd21c 85%, #ff3b30 100%) !important;
-  transition: height 0.05s ease-out !important;
-}
-
-/* 3. Grup Knob Gain - Pan (Diposisikan Diturunkan Sedikit) */
-.knobs-container,
-.gain-pan-group,
-.ch-controls-group {
-  position: relative !important;
-  z-index: 2 !important; /* Memastikan Knob selalu di atas VU meter & bisa digeser */
+  z-index: 4 !important;
+  right: 3px !important;
+  bottom: 39px !important;
+  width: 7px !important;
+  height: 230px !important;
   display: flex !important;
   flex-direction: column !important;
-  align-items: center !important;
-  gap: 6px !important;
-  width: 100% !important;
-  margin-top: 8px !important; /* Menurunkan seluruh knob agar rapi */
-  margin-bottom: 4px !important;
-}
-
-.new-channel-strip input[type="range"].new-knob,
-.channel-strip input[type="range"],
-.knobs-container input[type="range"] {
-  position: relative !important;
-  z-index: 3 !important;
-  touch-action: none !important;
-  cursor: pointer !important;
-}
-
-/* 4. Label Volume Tepat di Bawah Gain-Pan & Diturunkan Sedikit di Atas Fader */
-.volume-label,
-.channel-vol-text,
-.volume-label-text {
-  position: relative !important;
-  z-index: 2 !important;
-  font-size: 8px !important;
-  font-weight: bold !important;
-  color: var(--text-dim, #8b949e) !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.5px !important;
-  margin: 8px 0 2px 0 !important; /* Posisi teks diturunkan */
-  text-align: center !important;
-  user-select: none !important;
-}
-
-/* 5. Slider Fader Vertikal (Ditata Pas Sampai Baris Bawah) */
-.fader-area {
-  position: relative !important;
-  z-index: 2 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
   justify-content: flex-end !important;
-  flex-grow: 1 !important;
-  width: 100% !important;
-  padding-bottom: 0px !important;
-  margin-bottom: 0px !important;
-  margin-top: auto !important;
-}
-
-.new-channel-strip input[type="range"].new-fader,
-.new-channel-strip input[type="range"].fader,
-.channel-fader,
-.master-card input[type="range"] {
-  -webkit-appearance: slider-vertical !important;
-  -moz-appearance: slider-vertical !important;
-  appearance: slider-vertical !important;
-  writing-mode: bt-lr !important; /* WebKit/Legacy Fallback */
-  width: 18px !important;
-  height: 230px !important; /* Menutup celah bawah secara presisi */
-  background: #080a0b !important;
-  outline: none !important;
-  cursor: pointer !important;
-  touch-action: none !important;
-  margin: 0 auto !important;
-  accent-color: var(--accent-color, #00e5ff) !important;
-}
-
-/* Mute & Solo Button Styling & Active State */
-.btn-mute.active,
-.btn-mute.on,
-button[data-k="mute"].on,
-button.mute-btn.active {
-  background-color: #ff3b30 !important;
-  color: #ffffff !important;
-  border-color: #ff3b30 !important;
-  box-shadow: 0 0 8px rgba(255, 59, 48, 0.8) !important;
-}
-
-.btn-solo.active,
-.btn-solo.on,
-button[data-k="solo"].on,
-button.solo-btn.active {
-  background-color: #f1c40f !important;
-  color: #000000 !important;
-  border-color: #f1c40f !important;
-  font-weight: bold !important;
-  box-shadow: 0 0 8px rgba(241, 196, 15, 0.8) !important;
-}
-
-/* ==========================================================================
-   3. STYLING UI PANEL PENGUJIAN (CONNECTION / TEST PANEL)
-   ========================================================================== */
-.connection-test-panel {
-  background: var(--panel-bg, #0d1117) !important;
-  border: 1px solid var(--panel-border, #30363d) !important;
-  border-radius: 8px !important;
-  padding: 12px !important;
-  margin: 12px auto !important;
-  width: 100% !important;
-  color: var(--text-main, #c9d1d9) !important;
-  font-family: monospace, monospace !important;
+  align-items: stretch !important;
+  gap: 2px !important;
+  padding: 2px !important;
   box-sizing: border-box !important;
-}
-
-.connection-test-panel h2 {
-  margin-top: 0 !important;
-  font-size: 1rem !important;
-  color: var(--accent-color, #58a6ff) !important;
-  border-bottom: 1px solid var(--panel-border, #21262d) !important;
-  padding-bottom: 6px !important;
-}
-
-.connection-test-panel .test-buttons {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
-  gap: 6px !important;
-  margin: 10px 0 !important;
-}
-
-.connection-test-panel button {
-  background: var(--main-bg, #21262d) !important;
-  color: var(--text-main, #c9d1d9) !important;
-  border: 1px solid var(--panel-border, #363b42) !important;
-  padding: 6px 10px !important;
-  font-size: 0.75rem !important;
-  font-weight: bold !important;
-  border-radius: 4px !important;
-  cursor: pointer !important;
-  transition: all 0.15s ease !important;
-}
-
-.connection-test-panel button:hover {
-  background: var(--panel-border, #30363d) !important;
-  border-color: var(--accent-color, #58a6ff) !important;
-  color: #ffffff !important;
-}
-
-.connection-test-panel button:active {
-  transform: scale(0.97) !important;
-  background: var(--btn-active, #1f6feb) !important;
-}
-
-.connection-test-panel button:disabled {
-  opacity: 0.4 !important;
-  cursor: not-allowed !important;
-  transform: none !important;
-}
-
-.connection-test-panel pre {
-  background: var(--main-bg, #040d21) !important;
-  border: 1px solid var(--panel-border, #1b283e) !important;
-  padding: 8px !important;
-  border-radius: 4px !important;
-  font-size: 0.75rem !important;
-  color: #7ee787 !important;
-  overflow-x: auto !important;
-  margin: 4px 0 !important;
-}
-
-/* ==========================================================================
-   4. DIGITAL CONSOLE PRO SCREEN STYLING (LAYAR TENGAH)
-   ========================================================================== */
-.pro-digital-screen {
-  display: flex !important;
-  flex-direction: column !important;
-  min-height: 200px !important;
-  background: linear-gradient(135deg, #0d1117 0%, #161b22 100%) !important;
-  border: 1px solid var(--panel-border, #30363d) !important;
-  border-radius: 6px !important;
-  padding: 6px !important;
-  color: #c9d1d9 !important;
-  font-family: system-ui, monospace !important;
-  box-sizing: border-box !important;
-}
-
-.pro-screen-top-bar {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  background: #21262d !important;
-  padding: 4px 8px !important;
-  border-radius: 4px !important;
-  border-left: 4px solid var(--accent-color, #00f0ff) !important;
-  margin-bottom: 6px !important;
-}
-
-.pro-ch-badge b {
-  font-size: 13px !important;
-  color: var(--accent-color, #00f0ff) !important;
-}
-
-.pro-ch-badge span {
-  font-size: 8px !important;
-  display: block !important;
-  color: #8b949e !important;
-}
-
-.pro-ch-title-edit input {
-  background: #0d1117 !important;
-  border: 1px solid #30363d !important;
-  color: #f0f6fc !important;
-  padding: 2px 6px !important;
-  border-radius: 3px !important;
-  font-weight: bold !important;
-  text-align: center !important;
-  font-size: 10px !important;
-}
-
-.pro-ch-status-badges {
-  display: flex !important;
-  gap: 4px !important;
-}
-
-.pro-ch-status-badges span {
-  font-size: 8px !important;
-  padding: 2px 5px !important;
-  border-radius: 3px !important;
-  font-weight: bold !important;
-}
-
-.badge-ready {
-  background: rgba(49, 230, 107, 0.2) !important;
-  color: #31e66b !important;
-  border: 1px solid #31e66b !important;
-}
-
-.badge-phantom {
-  background: rgba(255, 210, 28, 0.2) !important;
-  color: #ffd21c !important;
-  border: 1px solid #ffd21c !important;
-}
-
-.pro-processing-grid {
-  display: grid !important;
-  grid-template-columns: repeat(4, 1fr) !important;
-  gap: 4px !important;
-  margin-bottom: 6px !important;
-}
-
-.pro-block {
-  background: #161b22 !important;
-  border: 1px solid #30363d !important;
-  border-radius: 4px !important;
-  padding: 4px !important;
-  text-align: center !important;
-}
-
-.pro-block .block-title {
-  font-size: 8px !important;
-  color: #8b949e !important;
-  display: block !important;
-  margin-bottom: 2px !important;
-}
-
-.pro-block .block-value {
-  font-size: 11px !important;
-  font-weight: bold !important;
-  color: #e9eeee !important;
-}
-
-.pro-block .block-value.highlight {
-  color: #31e66b !important;
-  text-shadow: 0 0 6px rgba(49, 230, 107, 0.4) !important;
-}
-
-.pro-block small {
-  font-size: 7px !important;
-  color: #666666 !important;
-}
-
-.pro-mini-spectrum {
-  flex-grow: 1 !important;
-  background: #010409 !important;
-  border: 1px solid #202830 !important;
-  border-radius: 4px !important;
-  position: relative !important;
+  background: #050708 !important;
+  border: 1px solid #303840 !important;
+  border-radius: 2px !important;
   overflow: hidden !important;
-  display: flex !important;
-  align-items: flex-end !important;
-  padding: 3px !important;
-  min-height: 60px !important;
+  pointer-events: none !important;
 }
 
-.spectrum-bars-container {
+.new-channel-strip .new-channel-meter .led-segments {
   width: 100% !important;
   height: 100% !important;
   display: flex !important;
-  justify-content: space-around !important;
-  align-items: flex-end !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
   gap: 2px !important;
 }
 
-.bar-col {
+.new-channel-strip .new-channel-meter .led-segments i {
+  display: block !important;
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
   width: 100% !important;
-  background: linear-gradient(to top, #1589d2, #31e66b, #ff3b30) !important;
-  border-radius: 2px 2px 0 0 !important;
-  opacity: 0.85 !important;
+  border-radius: 1px !important;
+  background: #151a1d !important;
+  box-shadow: none !important;
 }
+
+/* 0-7 = HIJAU */
+.new-channel-strip .new-channel-meter .led-segments i.active:nth-child(-n+8) {
+  background: #31e66b !important;
+  box-shadow: 0 0 5px rgba(49,230,107,.9) !important;
+}
+
+/* 8-9 = KUNING */
+.new-channel-strip .new-channel-meter .led-segments i.active:nth-child(9),
+.new-channel-strip .new-channel-meter .led-segments i.active:nth-child(10) {
+  background: #ffd21c !important;
+  box-shadow: 0 0 5px rgba(255,210,28,.95) !important;
+}
+
+/* 10-12 = MERAH */
+.new-channel-strip .new-channel-meter .led-segments i.active:nth-child(n+11) {
+  background: #ff3b30 !important;
+  box-shadow: 0 0 5px rgba(255,59,48,.95) !important;
+}
+
+.new-channel-strip .new-channel-meter .led-peak {
+  position: absolute !important;
+  top: 1px !important;
+  left: 1px !important;
+  right: 1px !important;
+  height: 2px !important;
+  background: transparent !important;
+  pointer-events: none !important;
+}
+
+@media screen and (max-width: 1024px) {
+  .new-channel-strip .new-channel-meter,
+  .new-channel-strip .led-meter.new-channel-meter {
+    right: 2px !important;
+    bottom: 39px !important;
+    height: 230px !important;
+    width: 6px !important;
+  }
+}
+
