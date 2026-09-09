@@ -1,11 +1,11 @@
 /* ============================================================
-   Mixer-Online — 14CH channel panel (Optimized & Responsive)
+   Mixer-Online — 14CH channel panel (Clean & Fixed Layout)
    ============================================================ */
 (function () {
   "use strict";
 
   /* ============================================================
-     CHANNEL INDICATOR SKIN & RESPONSIVE TOUCH STYLING
+     CSS BERSIH: FADER DI KIRI, 1 LED METER DI KANAN (TANPA TUMPUK)
      ============================================================ */
   if (!document.getElementById("mixer-channel-led-skin")) {
     const style = document.createElement("style");
@@ -43,7 +43,7 @@
         box-shadow: 0 0 6px rgba(255,59,48,.65), inset 0 1px 1px rgba(255,255,255,.35) !important;
       }
 
-      /* FADER AREA: Horizontal Side-by-Side */
+      /* FADER AREA: Disusun Horizontal berdampingan secara rapi */
       .new-channel-strip .fader-area {
         position: relative !important;
         display: flex !important;
@@ -57,83 +57,68 @@
         padding: 4px 2px !important;
       }
 
-      /* OPTIMASI INPUT RANGE AGAR SANGAT RESPONSIF DI MOBILE & DESKTOP */
       .new-channel-strip input[type="range"] {
-        touch-action: none !important; /* Mencegah layar ikut scrolling saat menggeser slider */
+        touch-action: none !important;
         cursor: pointer !important;
       }
 
-      .new-channel-strip .fader-area input[type="range"], 
-      .new-channel-strip .channel-fader {
-        width: 26px !important;
-        height: 220px !important;
+      /* Slider Fader di Sebelah Kiri */
+      .new-channel-strip .fader-area input.channel-fader, 
+      .new-channel-strip .fader-area input.new-fader {
+        width: 24px !important;
+        height: 215px !important;
         position: relative !important;
         z-index: 2 !important;
         background: transparent !important;
         accent-color: var(--accent-color) !important;
+        margin: 0 !important;
       }
 
-      /* KOTAK LED VU METER SAMPING FADER */
-      .new-channel-strip .ch-top-vu {
+      /* KOTAK LED METER TUNGGAL DI SEBELAH KANAN FADER */
+      .new-channel-strip .ch-side-vu {
         position: relative !important;
-        width: 12px !important;
-        height: 215px !important;
+        width: 10px !important;
+        height: 210px !important;
         background: #040608 !important;
-        border: 1px solid rgba(255,255,255,.3) !important;
-        border-radius: 3px !important;
-        box-shadow: inset 0 0 4px rgba(0,0,0,.95) !important;
+        border: 1px solid rgba(255,255,255,0.2) !important;
+        border-radius: 2px !important;
         overflow: hidden !important;
         display: flex !important;
         flex-direction: column-reverse !important;
         z-index: 1 !important;
-        pointer-events: none !important;
         padding: 1px !important;
+        box-sizing: border-box !important;
       }
 
-      .new-channel-strip .ch-top-vu::before {
-        content: "" !important;
-        position: absolute !important;
-        inset: 1px !important;
-        background: repeating-linear-gradient(
-          to bottom,
-          rgba(255,255,255,.15) 0,
-          rgba(255,255,255,.15) 2px,
-          transparent 2px,
-          transparent 6px
-        ) !important;
-        pointer-events: none !important;
-        z-index: 2 !important;
-      }
-
-      .new-channel-strip .ch-top-vu .ch-top-vu-fill {
-        position: absolute !important;
-        left: 0 !important;
-        bottom: 0 !important;
+      .new-channel-strip .ch-side-vu .ch-side-vu-fill {
         width: 100% !important;
-        height: 75% !important;
-        background-image: linear-gradient(0deg,
-          #24e66b 0%,
-          #24e66b 65%,
-          #ffd21c 66%,
-          #ff9f00 85%,
-          #ff3b30 86%,
-          #ff0000 100%
-        ) !important;
+        height: 0%;
+        background: linear-gradient(0deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 66%, #f39c12 85%, #e74c3c 86%, #ff0000 100%) !important;
         border-radius: 1px !important;
-        box-shadow: 0 0 6px rgba(40,255,110,.6) !important;
-        z-index: 1 !important;
-        will-change: height; /* Akselerasi hardware browser untuk animasi halus */
+        transition: height 0.05s linear !important;
+        will-change: height;
       }
 
-      .new-channel-strip .fader-area output,
-      .new-channel-strip .fader-area label,
-      .new-channel-strip .new-channel-control input {
-        position: relative !important;
-        z-index: 2 !important;
-        touch-action: none !important;
+      /* Label dan Output Persentase */
+      .new-channel-strip .fader-area label {
+        position: absolute !important;
+        top: 2px !important;
+        font-size: 7px !important;
+        color: var(--text-dim) !important;
       }
 
-      .new-channel-strip .new-channel-meter {
+      .new-channel-strip .fader-area output.fader-val {
+        position: absolute !important;
+        bottom: 2px !important;
+        font-size: 8px !important;
+        font-weight: bold !important;
+        color: #2ecc71 !important;
+      }
+
+      /* Sembunyikan elemen meteran bawaan lama yang bikin numpuk */
+      .new-channel-strip .new-channel-meter,
+      .new-channel-strip .ch-top-vu,
+      .new-channel-strip .ch-long-vu {
         display: none !important;
       }
     `;
@@ -179,6 +164,7 @@
       ledClass += " active green";
     }
 
+    // HTML STRUKTUR BERSIH: Fader di kiri, 1 Kotak LED Meter di kanan
     el.innerHTML = `
       <header class="new-channel-head">CH${id}</header>
       <div class="${ledClass}" title="Channel Indicator"></div>
@@ -212,7 +198,7 @@
       <div class="fader-area new-channel-fader">
         <label>VOLUME</label>
         <input class="new-fader channel-fader" data-k="fader" type="range" min="0" max="100" step="1" value="${Number(c.fader ?? 75)}">
-        <div class="ch-top-vu"><div class="ch-top-vu-fill" style="height: ${Math.round(Number(c.fader ?? 75))}%;"></div></div>
+        <div class="ch-side-vu"><div class="ch-side-vu-fill" style="height: ${Math.round(Number(c.fader ?? 75))}%;"></div></div>
         <output class="fader-val">${Math.round(Number(c.fader ?? 75))}%</output>
       </div>
 
@@ -223,7 +209,6 @@
       <footer class="new-channel-source">CH${id} • <span>${c.mute ? "MUTED" : c.solo ? "SOLO" : "READY"}</span></footer>
     `;
 
-    // OPTIMASI RENDERING DENGAN REQUESTANIMATIONFRAME AGAR TIDAK LAG SAAT DIGESER CEPAT
     let ticking = false;
     const updateSmooth = (k, value) => {
       if (!window.state?.system) {
@@ -246,7 +231,7 @@
               const out = el.querySelector("output");
               if (out) out.textContent = Math.round(n) + "%";
               
-              const vuFill = el.querySelector(".ch-top-vu-fill");
+              const vuFill = el.querySelector(".ch-side-vu-fill");
               if (vuFill) {
                 vuFill.style.height = Math.round(n) + "%";
               }
@@ -275,12 +260,10 @@
         }
       }
 
-      // Kirim data ke adapter mixer
       window.MixerControl?.setControl?.(id, k, ch[k]);
     };
 
     el.querySelectorAll("input").forEach(input => {
-      // Menggunakan event 'input' agar pergeseran langsung merespons setiap piksel gerakan
       input.addEventListener("input", (e) => updateSmooth(e.target.dataset.k, e.target.value), { passive: true });
     });
 
@@ -323,7 +306,7 @@
             const out = el.querySelector("output");
             if (out) out.textContent = Math.round(Number(c.fader ?? 75)) + "%";
             
-            const vuFill = el.querySelector(".ch-top-vu-fill");
+            const vuFill = el.querySelector(".ch-side-vu-fill");
             if (vuFill) {
               vuFill.style.height = Math.round(Number(c.fader ?? 75)) + "%";
             }
