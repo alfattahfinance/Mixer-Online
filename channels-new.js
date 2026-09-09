@@ -218,7 +218,6 @@
     el.innerHTML = `
       <header class="new-channel-head">CH${id}</header>
       <div class="${ledClass}" title="Channel Indicator"></div>
-      <div class="led-meter new-channel-meter" data-ch="${id}" role="meter" aria-label="CH${id} level"><span class="led-peak"></span><span class="led-segments">${"<i data-seg=\"0\"></i>".repeat(12)}</span></div>
       
       <div class="new-channel-control">
         <label>GAIN</label>
@@ -250,7 +249,7 @@
         <label>VOLUME</label>
         <!-- 1. Fader Volume di Kiri -->
         <input class="new-fader channel-fader" data-k="fader" type="range" min="0" max="100" step="1" value="${Number(c.fader ?? 75)}">
-        <!-- 2. Kotak LED Meter di Kanan -->
+        <!-- 2. Kotak LED Meter di Kanan (Tunggal & Bersih) -->
         <div class="ch-top-vu"><div class="ch-top-vu-fill" style="height: ${Math.round(Number(c.fader ?? 75))}%;"></div></div>
         <output class="fader-val">${Math.round(Number(c.fader ?? 75))}%</output>
       </div>
