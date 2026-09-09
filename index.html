@@ -563,40 +563,39 @@
   }
 
 /* ==========================================================
-   PERBAIKAN TATA LETAK UTAMA KONSOL & KESEJAJARAN KANAN-KIRI
+/* ==========================================================
+   PERBAIKAN AGAR CHANNEL 1-7 TIDAK TERPOTONG DI KIRI
    ========================================================== */
 main.console {
   display: flex !important;
   flex-direction: row !important;
   align-items: stretch !important;
-  justify-content: center !important;
-  gap: 4px !important;
+  justify-content: space-between !important;
+  gap: 2px !important;
   width: 100% !important;
-  max-width: 1200px !important;
-  margin: 0 auto !important;
+  max-width: 100% !important;
+  overflow-x: auto !important; /* Memungkinkan geser jika layar sangat kecil, tapi pas di landscape */
   box-sizing: border-box !important;
-  padding: 4px !important;
+  padding: 2px !important;
 }
 
 .channel-bank {
   flex: 1 1 0 !important;
-  width: auto !important;
   min-width: 0 !important;
-  height: auto !important;
-  max-height: none !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
+  width: auto !important;
   background: var(--strip-bg) !important;
   border: 1px solid var(--panel-border) !important;
   border-radius: 4px !important;
   padding: 2px !important;
   box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
 }
 
 #channels, #channelsRight {
   display: grid !important;
-  grid-template-columns: repeat(7, 1fr) !important;
+  grid-template-columns: repeat(7, minmax(35px, 1fr)) !important;
   width: 100% !important;
   gap: 1px !important;
   align-items: stretch !important;
@@ -605,6 +604,7 @@ main.console {
 .new-channel-strip, .channel-strip {
   position: relative !important;
   width: 100% !important;
+  min-width: 0 !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
@@ -614,44 +614,20 @@ main.console {
   box-sizing: border-box !important;
 }
 
-.fader-area {
-  position: relative !important;
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 4px !important;
-  width: 100% !important;
-  min-height: 200px !important;
-  padding: 2px !important;
-}
-
-.fader-area input[type="range"], .channel-fader {
-  height: 180px !important;
-  width: 20px !important;
-  accent-color: var(--accent-color) !important;
-  margin: 0 !important;
+.center-console {
+  flex: 1.1 1 0 !important;
+  min-width: 260px !important;
+  max-width: 380px !important;
+  box-sizing: border-box !important;
 }
 
 aside.master-rack {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-  width: 100px !important;
-  min-width: 100px !important;
-  background: var(--panel-bg) !important;
-  border: 1px solid var(--panel-border) !important;
-  border-radius: 4px !important;
-  padding: 4px !important;
+  flex: 0 0 95px !important;
+  width: 95px !important;
+  min-width: 95px !important;
   box-sizing: border-box !important;
 }
 
-.center-console {
-  flex: 1.2 1 0 !important;
-  max-width: 420px !important;
-  min-width: 280px !important;
-  box-sizing: border-box !important;
-}
 
 
 </style>
