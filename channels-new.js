@@ -43,7 +43,7 @@
         box-shadow: 0 0 6px rgba(255,59,48,.65), inset 0 1px 1px rgba(255,255,255,.35) !important;
       }
 
-      /* FADER AREA: Disusun Horizontal berdampingan secara rapi */
+        /* FADER AREA: Disusun Horizontal berdampingan secara rapi dan mentok ke bawah */
       .new-channel-strip .fader-area {
         position: relative !important;
         display: flex !important;
@@ -53,7 +53,8 @@
         gap: 6px !important;
         flex-grow: 1 !important;
         width: 100% !important;
-        min-height: 240px !important;
+        height: 100% !important;
+        min-height: 250px !important;
         padding: 4px 2px !important;
       }
 
@@ -62,11 +63,12 @@
         cursor: pointer !important;
       }
 
-      /* Slider Fader di Sebelah Kiri */
+      /* Slider Fader di Sebelah Kiri (Dibuat lebih tinggi agar pas mentok bawah) */
       .new-channel-strip .fader-area input.channel-fader, 
       .new-channel-strip .fader-area input.new-fader {
         width: 24px !important;
-        height: 215px !important;
+        height: 100% !important;
+        min-height: 230px !important;
         position: relative !important;
         z-index: 2 !important;
         background: transparent !important;
@@ -78,7 +80,8 @@
       .new-channel-strip .ch-side-vu {
         position: relative !important;
         width: 10px !important;
-        height: 210px !important;
+        height: 100% !important;
+        min-height: 225px !important;
         background: #040608 !important;
         border: 1px solid rgba(255,255,255,0.2) !important;
         border-radius: 2px !important;
@@ -89,6 +92,7 @@
         padding: 1px !important;
         box-sizing: border-box !important;
       }
+
 
       .new-channel-strip .ch-side-vu .ch-side-vu-fill {
         width: 100% !important;
