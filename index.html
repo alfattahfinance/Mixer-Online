@@ -113,13 +113,6 @@
     z-index: 100 !important;
   }
 
-  header.topbar > div {
-    flex: 0 0 auto !important;
-    margin: 0 !important;
-    position: static !important;
-    transform: none !important;
-  }
-
   .bridge-head, .status-head, .scene-head, .skin-head, .system-box, .clock-head {
     position: static !important;
     transform: none !important;
@@ -131,8 +124,6 @@
   }
 
   .scene-head {
-    position: static !important;
-    transform: none !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -174,14 +165,15 @@
   }
 
   /* ==========================================================
-     3. MAIN CONSOLE & CHANNEL STRIP CUSTOMIZATION
+     3. MAIN CONSOLE & CHANNEL STRIP (BERJAJAR HORIZONTAL)
      ========================================================== */
   .center-console {
-  max-width: 380px !important; /* Sesuaikan ukuran ideal, misal 350px - 400px */
-  min-width: 300px !important;
-  flex: 0 0 auto !important;
-  box-sizing: border-box !important;
-}    
+    max-width: 380px !important;
+    min-width: 300px !important;
+    flex: 0 0 auto !important;
+    box-sizing: border-box !important;
+  }
+
   .channel-bank {
     flex: 0 0 auto !important;
     width: 505px !important;
@@ -231,30 +223,20 @@
     height: 100% !important;
   }
 
-  .new-channel-strip:last-child, .channel-strip:last-child {
-    border-right: none !important;
-    padding-right: 2px !important;
-  }
-
-   /* ==========================================================
-     PERBAIKAN TATA LETAK FADER & METERAN SAMPING (SEPERTI GAMBAR)
-     ========================================================== */
-
-  /* Kontainer Area Fader agar fader dan meteran sejajar ke samping */
+  /* FADER AREA: Fader di Kiri, LED Meter di Kanan */
   .fader-area {
     position: relative !important;
     display: flex !important;
-    flex-direction: row !important; /* Membuat fader dan meteran berjajar horizontal */
+    flex-direction: row !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 6px !important;            /* Jarak pas antara fader dan meteran */
+    gap: 6px !important;
     flex-grow: 1 !important;
     width: 100% !important;
     min-height: 240px !important;
     padding: 4px 2px !important;
   }
 
-  /* Gaya Slider Fader Utama di Sebelah Kiri */
   .fader-area input[type="range"], .channel-fader {
     position: relative !important;
     z-index: 2 !important;
@@ -265,18 +247,13 @@
     margin: 0 !important;
   }
 
-  /* Kotak Indikator VU Meter Segmen di Sebelah Kanan Fader */
+  /* KOTAK LED VU METER SAMPING FADER (.ch-long-vu) */
   .ch-long-vu {
     position: relative !important;
-    top: auto !important;
-    bottom: auto !important;
-    left: auto !important;
-    right: auto !important;
-    transform: none !important;
-    width: 12px !important;         /* Lebar kotak meteran */
-    height: 215px !important;       /* Tinggi menyesuaikan fader */
+    width: 12px !important;
+    height: 215px !important;
     background: #040608 !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
     border-radius: 2px !important;
     overflow: hidden !important;
     display: flex !important;
@@ -286,23 +263,14 @@
     z-index: 1 !important;
   }
 
-  /* Tampilan Kotak Segmen Lampu LED di dalam Meteran */
   .ch-long-vu-fill {
     width: 100% !important;
     height: 0%;
-    /* Efek potongan segmen lampu ala LED meter hardware */
-    background-image: linear-gradient(
-      to top,
-      #2ecc71 0%, #2ecc71 60%, 
-      #f1c40f 61%, #f39c12 80%, 
-      #e74c3c 81%, #ff0000 100%
-    ) !important;
-    background-size: 100% 100px !important;
+    background: linear-gradient(0deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 66%, #f39c12 85%, #e74c3c 86%, #ff0000 100%) !important;
     transition: height 0.05s linear !important;
     border-radius: 1px !important;
   }
 
-
   /* INDIKATOR BULAT/KECIL ATAS */
   .ch-top-vu {
     width: 6px !important;
@@ -314,7 +282,6 @@
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column-reverse !important;
-    padding: 0 !important;
     z-index: 2 !important;
   }
 
@@ -325,179 +292,18 @@
     transition: height 0.05s linear !important;
   }
 
-  .ch-controls-group, .knob-container {
-    position: relative !important;
-    z-index: 2 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 6px !important;
-    width: 100% !important;
-    margin-top: 10px !important;
-    margin-bottom: 4px !important;
-  }
-
-  .ch-controls-group input[type="range"],
-  .knob-container input[type="range"] {
-    position: relative !important;
-    z-index: 3 !important;
-    cursor: pointer !important;
-    touch-action: none !important;
-  }
-
-  .volume-label-text {
-    position: relative !important;
-    z-index: 2 !important;
-    font-size: 7px !important;
-    font-weight: bold !important;
-    color: var(--text-dim) !important;
-    text-transform: uppercase !important;
-    margin: 6px 0 2px 0 !important;
-    text-align: center !important;
-  }
-
-  /* INDIKATOR PANJANG (VU METER PANJANG SEJAJAR AREA KNOB) */
-  .ch-long-vu {
-    position: absolute !important;
-    top: 25px !important;
-    bottom: 255px !important;
-    left: 2px !important;
-    right: 2px !important;
-    background: rgba(0, 0, 0, 0.4) !important;
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
-    border-radius: 2px !important;
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column-reverse !important;
-    z-index: 1 !important;
-    pointer-events: none !important;
-  }
-
-  .ch-long-vu-fill {
-    width: 100% !important;
-    height: 0%;
-    background: linear-gradient(0deg, rgba(46, 204, 113, 0.6) 0%, rgba(46, 204, 113, 0.6) 65%, rgba(241, 196, 15, 0.7) 80%, rgba(231, 76, 60, 0.8) 100%) !important;
-    transition: height 0.05s linear !important;
-  }
-
-  /* Pastikan definisi CSS untuk VU Bar Panjang aktif di halaman utama */
-.new-channel-strip .fader-area {
-  position: relative !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  flex-grow: 1 !important;
-  width: 100% !important;
-  min-height: 280px !important;
-}
-
-.new-channel-strip .ch-top-vu {
-  position: absolute !important;
-  top: 20px !important;
-  bottom: 35px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  width: 8px !important;
-  background: #040608 !important;
-  border: 1px solid rgba(255,255,255,0.3) !important;
-  border-radius: 3px !important;
-  box-shadow: inset 0 0 4px rgba(0,0,0,0.95) !important;
-  overflow: hidden !important;
-  display: flex !important;
-  flex-direction: column-reverse !important;
-  z-index: 1 !important;
-  pointer-events: none !important;
-}
-
-.new-channel-strip .ch-top-vu-fill {
-  width: 100% !important;
-  height: 75% !important;
-  background: linear-gradient(0deg, #24e66b 0%, #24e66b 65%, #ffd21c 66%, #ff9f00 85%, #ff3b30 86%, #ff0000 100%) !important;
-  border-radius: 1px !important;
-  box-shadow: 0 0 6px rgba(40,255,110,0.6) !important;
-}
-
-  /* INDIKATOR BULAT/KECIL ATAS */
-  .ch-top-vu {
-    width: 6px !important;
-    height: 30px !important;
-    background: #040608 !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 2px !important;
-    margin: 2px auto 4px auto !important;
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column-reverse !important;
-    padding: 0 !important;
-    z-index: 2 !important;
-  }
-
-  .ch-top-vu-fill {
-    width: 100% !important;
-    height: 0%;
-    background: linear-gradient(0deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 66%, #f39c12 85%, #e74c3c 86%, #ff0000 100%) !important;
-    transition: height 0.05s linear !important;
-  }
-
-  .ch-controls-group, .knob-container {
-    position: relative !important;
-    z-index: 2 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 6px !important;
-    width: 100% !important;
-    margin-top: 10px !important;
-    margin-bottom: 4px !important;
-  }
-
-  .ch-controls-group input[type="range"],
-  .knob-container input[type="range"] {
-    position: relative !important;
-    z-index: 3 !important;
-    cursor: pointer !important;
-    touch-action: none !important;
-  }
-
-  .volume-label-text {
-    position: relative !important;
-    z-index: 2 !important;
-    font-size: 7px !important;
-    font-weight: bold !important;
-    color: var(--text-dim) !important;
-    text-transform: uppercase !important;
-    margin: 6px 0 2px 0 !important;
-    text-align: center !important;
-  }
-
-  .fader-area {
-    position: relative !important;
-    z-index: 2 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: flex-end !important;
-    flex-grow: 1 !important;
-    width: 100% !important;
-    padding-bottom: 0px !important;
-    margin-bottom: 0px !important;
-    margin-top: auto !important;
-  }
-
-  .fader-area input[type="range"], .channel-fader {
-    height: 240px !important;
-    accent-color: var(--accent-color) !important;
+  .new-channel-meter {
+    display: none !important;
   }
 
   /* ==========================================================
      4. NAVIGATION BAR SCREEN M32
      ========================================================== */
-.screen-frame {
-  max-width: 100% !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-}
+  .screen-frame {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
 
   .screen-tabs {
     display: grid !important;
@@ -559,23 +365,13 @@
     background: var(--panel-bg) !important;
   }
 
-  .screen-view {
-    display: none !important;
-    flex-grow: 1 !important;
-    flex-direction: column !important;
-  }
-
-  .screen-view.active {
-    display: flex !important;
-  }
-
-  .m32-sub-panel {
+  .screen-view, .m32-sub-panel {
     display: none !important;
     flex-direction: column !important;
     flex-grow: 1 !important;
   }
 
-  .m32-sub-panel.active {
+  .screen-view.active, .m32-sub-panel.active {
     display: flex !important;
   }
 
@@ -645,46 +441,7 @@
   }
 
   /* ==========================================================
-     5. PANEL AUX & FX
-     ========================================================== */
-  .center-console .fx-rack,
-  .center-console .aux-rack,
-  #fxRack, #auxRack {
-    position: static !important;
-    transform: none !important;
-    width: 100% !important;
-    margin: 0 !important;
-    background: var(--panel-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 4px !important;
-  }
-
-  .center-console .aux-rack {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 4px !important;
-    margin-top: auto !important;
-    padding: 4px !important;
-  }
-
-  .aux-unit {
-    background: var(--main-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 4px !important;
-    padding: 6px 4px 8px 4px !important;
-    min-height: 58px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-  }
-
-  main.console > .fx-rack, 
-  main.console > .aux-rack {
-    display: none !important;
-  }
-
-  /* ==========================================================
-     6. MAIN METERS L/R & MASTER RACK (FINAL OPTIMIZED & ALIGNED)
+     5. MASTER RACK & AUX
      ========================================================== */
   .main-meters {
     display: flex !important;
@@ -729,16 +486,14 @@
     margin-top: 2px !important;
   }
 
-  /* Master Rack Terintegrasi & Sejajar Mentok ke Bawah */
   aside.master-rack {
     display: flex !important;
     flex-direction: column !important;
-    align-items: stretch !important;
     justify-content: space-between !important;
     width: 110px !important;
     min-width: 110px !important;
     height: 100% !important;
-    min-height: 560px !important;
+    min-height: 520px !important;
     background: var(--panel-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
@@ -746,56 +501,23 @@
     box-sizing: border-box !important;
   }
 
-  /* Bagian Meter L/R di atas Master (Diperpanjang proporsional) */
-  .master-rack .meter-rack {
-    width: 100% !important;
+  .master-card {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-  }
-
-  .master-rack .main-meters {
-    width: 100% !important;
-    height: 130px !important;
-    display: flex !important;
-    justify-content: center !important;
-    gap: 4px !important;
-    background: #040608 !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 3px !important;
-    padding: 3px !important;
-  }
-
-  /* Kartu Master Fader (Memanjang Optimal) */
-  .master-rack .master-card {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: space-between !important;
     flex-grow: 1 !important;
-    width: 100% !important;
-    padding: 6px 0 !important;
-    border-top: 1px solid var(--panel-border) !important;
-    border-bottom: 1px solid var(--panel-border) !important;
+    justify-content: flex-end !important;
     margin: 4px 0 !important;
   }
 
-  .master-rack .master-card h2 {
-    font-size: 8px !important;
-    margin: 0 0 2px 0 !important;
-    color: var(--accent-color) !important;
-  }
-
-  .master-rack .master-card input[type="range"] {
-    height: 190px !important;
+  .master-card input[type="range"] {
+    height: 240px !important;
     width: 18px !important;
     accent-color: var(--accent-color) !important;
     cursor: pointer !important;
   }
 
-  /* Kartu Monitor & Phones di Bagian Bawah Master */
-  .master-rack .monitor-card, 
-  .master-rack .phones-card {
+  .monitor-card, .phones-card {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -809,7 +531,7 @@
     width: 100% !important;
   }
 
-  .master-rack .monitor-card button {
+  .monitor-card button {
     font-size: 7px !important;
     padding: 2px 4px !important;
     background: var(--panel-border) !important;
@@ -820,8 +542,7 @@
     width: 100% !important;
   }
 
-  .master-rack .monitor-knob, 
-  .master-rack .phone-knob {
+  .monitor-knob, .phone-knob {
     width: 16px !important;
     height: 16px !important;
     background: var(--accent-color) !important;
@@ -831,7 +552,7 @@
   }
 
   /* ==========================================================
-     7. BOTTOM NAV STYLING & ACTIVE STATES
+     6. BOTTOM NAV STYLING
      ========================================================== */
   .bottom-nav {
     display: flex !important;
@@ -864,82 +585,8 @@
     border-color: var(--accent-color) !important;
     box-shadow: 0 0 6px var(--accent-color) !important;
   }
-
-  @media screen and (orientation: landscape) {
-    .channel-bank {
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: space-between !important;
-      height: 100% !important;
-      padding-bottom: 0px !important;
-      margin-bottom: 0px !important;
-    }
-
-    #channels, #channelsRight {
-      display: grid !important;
-      grid-template-columns: repeat(6, 1fr) 1.25fr !important;
-      height: 100% !important;
-      align-items: stretch !important;
-    }
-
-    .new-channel-strip, .channel-strip {
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: space-between !important;
-      height: 100% !important;
-      padding-bottom: 2px !important;
-    }
-
-    .fader-area {
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: flex-end !important;
-      flex-grow: 1 !important;
-      width: 100% !important;
-      margin-top: auto !important;
-      padding-bottom: 0px !important;
-    }
-
-    .fader-area input[type="range"], 
-    .channel-fader, 
-    .new-channel-strip input[type="range"].new-fader {
-      height: 290px !important;
-    }
-  }
-
-  /* Menyelaraskan tinggi Master Rack agar sejajar sempurna dengan Channel Bank */
-aside.master-rack {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-  height: 100% !important;
-  min-height: 520px !important; /* Menyesuaikan tinggi standar strip channel */
-  background: var(--panel-bg) !important;
-  border: 1px solid var(--panel-border) !important;
-  border-radius: 4px !important;
-  padding: 4px !important;
-  box-sizing: border-box !important;
-}
-
-/* Penyesuaian area fader master agar proporsional */
-.master-card {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  flex-grow: 1 !important;
-  justify-content: flex-end !important;
-  margin: 4px 0 !important;
-}
-
-.master-card input[type="range"] {
-  height: 240px !important;
-  accent-color: var(--accent-color) !important;
-  writing-mode: bt-lr; /* Dukungan orientasi vertikal */
-  -webkit-appearance: slider-vertical;
-  width: 20px !important;
-}
-
 </style>
+
 </head>
 <body class="theme-midas">
 
