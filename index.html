@@ -247,30 +247,6 @@
     margin: 0 !important;
   }
 
-  /* KOTAK LED VU METER SAMPING FADER (.ch-long-vu) */
-  .ch-long-vu {
-    position: relative !important;
-    width: 12px !important;
-    height: 215px !important;
-    background: #040608 !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    border-radius: 2px !important;
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column-reverse !important;
-    padding: 1px !important;
-    box-sizing: border-box !important;
-    z-index: 1 !important;
-  }
-
-  .ch-long-vu-fill {
-    width: 100% !important;
-    height: 0%;
-    background: linear-gradient(0deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 66%, #f39c12 85%, #e74c3c 86%, #ff0000 100%) !important;
-    transition: height 0.05s linear !important;
-    border-radius: 1px !important;
-  }
-
   /* INDIKATOR BULAT/KECIL ATAS */
   .ch-top-vu {
     width: 6px !important;
@@ -1594,34 +1570,6 @@
         if (masterMeterL) masterMeterL.style.height = leftHeight + '%';
         if (masterMeterR) masterMeterR.style.height = rightHeight + '%';
 
-        document.querySelectorAll('.new-channel-strip, .channel-strip, [data-ch]').forEach(strip => {
-          const cId = Number(strip.dataset.ch) || parseInt(strip.innerText.match(/CH\s*(\d+)/i)?.[1] || '0', 10);
-          if (cId > 0) {
-            const cState = (window.state && window.state.channels) ? window.state.channels[cId - 1] : {};
-            const topVuFill = strip.querySelector('.ch-top-vu-fill');
-            const longVuFill = strip.querySelector('.ch-long-vu-fill');
-            
-            if (cState.mute) {
-              if (topVuFill) topVuFill.style.height = '0%';
-              if (longVuFill) longVuFill.style.height = '0%';
-            } else {
-              const cGain = parseFloat(cState.gain ?? 1.0);
-              const cFaderScale = (parseFloat(cState.fader ?? 75)) / 100;
-              let chSignalLevel = 0;
-              
-              if (cId === chNum && analyserNode) {
-                chSignalLevel = avgLevel * 100 * cGain * cFaderScale;
-              } else {
-                chSignalLevel = 0;
-              }
-
-              const targetH = Math.min(100, Math.max(0, chSignalLevel)) + '%';
-              if (topVuFill) topVuFill.style.height = targetH;
-              if (longVuFill) longVuFill.style.height = targetH;
-            }
-          }
-        });
-
         if (gainNode) {
           const gainVal = (parseFloat(chData.gain) || 1.0) * channelFaderScale * masterVolumeScale;
           gainNode.gain.setValueAtTime(Math.max(0, Math.min(2.0, gainVal)), audioCtx.currentTime);
@@ -1633,7 +1581,6 @@
       } else {
         if (masterMeterL) masterMeterL.style.height = '0%';
         if (masterMeterR) masterMeterR.style.height = '0%';
-        document.querySelectorAll('.ch-top-vu-fill, .ch-long-vu-fill').forEach(fill => fill.style.height = '0%');
       }
     }
   }
@@ -1896,7 +1843,6 @@
 (function() {
   "use strict";
 
-  // 1. Fungsi Optimasi UI Batching (Tanpa Lag / Tanpa Dispatch Berlebihan)
   function triggerUiUpdateOptimized() {
     requestAnimationFrame(() => {
       if (!window.state || !window.state.channels) return;
@@ -1909,7 +1855,6 @@
         const strip = document.querySelector(`.new-channel-strip[data-ch="${chNum}"], .channel-strip[data-ch="${chNum}"], [data-ch="${chNum}"]`);
         if (!strip) continue;
 
-        // Update fader secara langsung
         const faderInput = strip.querySelector('input.channel-fader, input[data-k="fader"], input[data-param="fader"]');
         if (faderInput && ch.fader !== undefined) {
           faderInput.value = ch.fader;
@@ -1919,7 +1864,6 @@
           faderOut.textContent = Math.round(ch.fader) + '%';
         }
 
-        // Update Mute & Solo Button state
         const muteBtn = strip.querySelector('button[data-k="mute"], button.mute-btn');
         if (muteBtn && ch.mute !== undefined) {
           muteBtn.classList.toggle('active', !!ch.mute);
@@ -1937,7 +1881,6 @@
     });
   }
 
-  // 2. Fungsi Pembantu untuk Mengisi Log Panel Bawah (Transport, TX, RX, Counter)
   function logTestData(txPacket, rxPacket) {
     const txPre = document.getElementById("tx");
     const rxPre = document.getElementById("rx");
@@ -1948,7 +1891,6 @@
     const bridgeState = document.getElementById("bridgeState");
     const bridgeTransport = document.getElementById("bridgeTransport");
 
-    // Paksa status panel bawah menjadi ONLINE saat tes berjalan
     if (transportStatus) {
       transportStatus.textContent = "ESP32 BRIDGE ONLINE";
       transportStatus.style.color = "#31e66b";
@@ -1956,17 +1898,14 @@
     if (bridgeState) bridgeState.textContent = "ONLINE";
     if (bridgeTransport) bridgeTransport.textContent = "TRANSPORT: ESP32 BRIDGE";
 
-    // Tampilkan data TX & RX di kotak log
     if (txPre) txPre.textContent = "TX: " + JSON.stringify(txPacket);
     if (rxPre) rxPre.textContent = "RX: " + JSON.stringify(rxPacket);
 
-    // Tambah nilai statistik counter secara real-time
     if (bridgeTx) bridgeTx.textContent = (parseInt(bridgeTx.textContent) || 0) + 1;
     if (bridgeAck) bridgeAck.textContent = (parseInt(bridgeAck.textContent) || 0) + 1;
     if (bridgeRx) bridgeRx.textContent = (parseInt(bridgeRx.textContent) || 0) + 1;
   }
 
-  // 3. Event Handler untuk Semua Tombol Pengujian
   document.getElementById('runCombinationTest')?.addEventListener('click', function() {
     if (!window.state) window.state = { channels: [] };
     if (!window.state.channels) window.state.channels = [];
@@ -2068,7 +2007,8 @@
 
 })();
 </script>
-  <script>
+
+<script>
 (function() {
   "use strict";
 
@@ -2138,31 +2078,28 @@
     });
   });
 
-  // Inisialisasi awal agar kondisi tampilan sesuai (HOME & overview aktif)
   switchScreen('HOME');
   switchSubPanel('overview');
 
 })();
 </script>
+
 <script>
 (function() {
   "use strict";
 
-  // 1. Inisialisasi state system awal OFF (menunggu tombol power ditekan)
   window.state = window.state || {};
   if (window.state.system === undefined) {
     window.state.system = false; 
   }
   window.state.connected = false;
 
-  // 2. Selektor Akurat sesuai struktur HTML M32 Pro Edition
   const tabs = document.querySelectorAll('#screenTabs button');
   const views = document.querySelectorAll('.screen-content .screen-view');
   const subButtons = document.querySelectorAll('#m32SubmenuBar .m32-sub-btn');
   const subPanels = document.querySelectorAll('.midas-tft-screen .m32-sub-panel');
   const subBar = document.getElementById('m32SubmenuBar');
 
-  // Fungsi Generator Grafik untuk Tab METERS dan RTA agar tampil dinamis
   function buildScreenMeters() {
     const root = document.getElementById('screenChannelMeters');
     if (!root) return;
@@ -2193,7 +2130,6 @@
   }
 
   function switchScreen(targetScreen) {
-    // Kelola tombol tab utama
     tabs.forEach(b => {
       if (b.dataset.screen === targetScreen) {
         b.classList.add('active');
@@ -2202,7 +2138,6 @@
       }
     });
 
-    // Kelola tampilan konten layar utama (.screen-view)
     views.forEach(v => {
       if (v.dataset.view === targetScreen) {
         v.classList.add('active');
@@ -2217,12 +2152,10 @@
       }
     });
 
-    // Submenu bar hanya tampil jika berada di tab HOME
     if (subBar) {
       subBar.style.display = (targetScreen === 'HOME') ? 'grid' : 'none';
     }
 
-    // Panggil fungsi render khusus jika tab METERS atau RTA dibuka
     if (targetScreen === 'METER') {
       buildScreenMeters();
     } else if (targetScreen === 'RTA') {
@@ -2254,7 +2187,6 @@
     });
   }
 
-  // Pasang event listener untuk tab layar utama
   tabs.forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.preventDefault();
@@ -2263,7 +2195,6 @@
     }, true);
   });
 
-  // Pasang event listener untuk tombol submenu (overview s.d sends)
   subButtons.forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.preventDefault();
@@ -2272,7 +2203,6 @@
     }, true);
   });
 
-  // Sinkronisasi tombol power fisik di header
   const powerBtn = document.getElementById("power");
   if (powerBtn) {
     powerBtn.textContent = window.state.system ? "SYSTEM ON" : "SYSTEM OFF";
@@ -2290,7 +2220,6 @@
     });
   }
 
-  // Inisialisasi tampilan awal saat halaman dimuat
   window.addEventListener("DOMContentLoaded", () => {
     switchScreen('HOME');
     switchSubPanel('overview');
@@ -2298,14 +2227,13 @@
 
 })();
 </script>
+
 <script>
 (function() {
   "use strict";
 
-  // Pastikan state global terdefinisi dengan aman
   window.state = window.state || { system: false, connected: false, channels: [] };
 
-  // 1. Fungsi Interaksi Tombol Phantom (+48V)
   const btnPhantom = document.getElementById('btnPhantom');
   if (btnPhantom) {
     btnPhantom.addEventListener('click', function(e) {
@@ -2320,7 +2248,6 @@
     });
   }
 
-  // 2. Fungsi Interaksi Tombol Polarity (INV / NORM)
   const btnPolarity = document.getElementById('btnPolarity');
   if (btnPolarity) {
     btnPolarity.addEventListener('click', function(e) {
@@ -2335,7 +2262,6 @@
     });
   }
 
-  // 3. Sinkronisasi Slider Parameter (HPF, Gate, Compressor, EQ, Sends) dengan Label Nilainya
   const slidersWithOutputs = [
     { slider: 'hpfSlider', val: 'hpfVal', unit: ' Hz' },
     { slider: 'gateThreshSlider', val: 'gateThreshVal', unit: ' dB' },
@@ -2369,7 +2295,6 @@
     }
   });
 
-  // 4. Interaksi Grafik/Slider EQ 4-Band
   const eqBands = ['Low', 'Mid1', 'Mid2', 'High'];
   eqBands.forEach(band => {
     const slider = document.getElementById('eq' + band + 'Slider');
@@ -2381,7 +2306,6 @@
     }
   });
 
-  // 5. Interaksi Tombol Save / Recall Preset Scene
   const sceneSave = document.getElementById('screenSceneSave');
   const sceneRecall = document.getElementById('screenSceneRecall');
   const sceneMsg = document.getElementById('sceneStatusMsg');
@@ -2399,11 +2323,11 @@
 
 })();
 </script>
+
 <script>
 (function() {
   "use strict";
 
-  // 1. Interaksi Tombol Pemilih Slot Efek di Panel FX (FX1, FX2, AUX1-AUX4)
   const fxRackButtons = document.querySelectorAll('.fx-buttons button');
   const fxRackPreset = document.getElementById('fxRackPreset');
   const fxRackSummary = document.getElementById('fxRackSummary');
@@ -2434,7 +2358,6 @@
     });
   });
 
-  // 2. Interaksi Tombol Pilihan Dropdown Efek di Layar TFT (Tab EFFECTS)
   const screenFxSelect = document.getElementById('screenFxSelect');
   const fxSlotDetails = document.getElementById('fxSlotDetails');
 
@@ -2452,7 +2375,6 @@
     });
   }
 
-  // 3. Interaksi Tombol Kontrol Cepat (TAP, SEL) pada Effect Rack
   const fxTapBtn = document.getElementById('fxTap');
   const fxSelBtn = document.getElementById('fxSelect');
   const fxBpmDisplay = document.getElementById('fxBpm');
@@ -2484,7 +2406,6 @@
     });
   }
 
-  // 4. Sinkronisasi Slider Parameter Efek (Time, Pre-Delay, Decay, Level) secara Real-Time
   const fxSliders = document.querySelectorAll('.fx-control');
   fxSliders.forEach(input => {
     input.addEventListener('input', function() {
@@ -2507,14 +2428,13 @@
 
 })();
 </script>
+
 <script>
 (function() {
   "use strict";
 
-  // Inisialisasi state global jika belum ada
   window.state = window.state || { aux: {}, fxReturn: {} };
 
-  // Interaksi Slider Aux / Bus & FX Return
   const auxReturnControls = document.querySelectorAll('.aux-control');
 
   auxReturnControls.forEach(input => {
@@ -2524,7 +2444,6 @@
       const rawVal = parseFloat(this.value);
       const percentVal = Math.round(rawVal <= 1 ? rawVal * 100 : rawVal);
 
-      // Simpan nilai ke state global aplikasi
       if (!window.state) window.state = {};
       if (scope === 'FX_RETURN') {
         if (!window.state.fxReturn) window.state.fxReturn = {};
@@ -2534,13 +2453,11 @@
         window.state.aux[target] = rawVal;
       }
 
-      // Tampilkan umpan balik teks log di panel bawah (testResult)
       const testResult = document.getElementById('testResult');
       if (testResult) {
         testResult.textContent = `ROUTING: ${scope} [${target}] Level diatur ke ${percentVal}%`;
       }
 
-      // Kirim perintah terpetakan ke mixer control jika tersedia
       if (window.MixerControl && typeof window.MixerControl.setControl === "function") {
         window.MixerControl.setControl(target, scope.toLowerCase(), rawVal);
       }
@@ -2549,11 +2466,11 @@
 
 })();
 </script>
+
 <script>
 (function() {
   "use strict";
 
-  // 1. Pastikan Tombol Sumber Monitor Berfungsi Interaktif
   const monitorCard = document.querySelector('.monitor-card');
   if (monitorCard) {
     const monitorBtn = monitorCard.querySelector('button');
@@ -2583,7 +2500,6 @@
     }
   }
 
-  // 2. Pastikan Tombol/Knob Phones Berfungsi Interaktif (Mute/Unmute Headphone)
   const phonesCard = document.querySelector('.phones-card');
   if (phonesCard) {
     const phoneKnob = phonesCard.querySelector('.phone-knob, div');
@@ -2608,7 +2524,6 @@
     }
   }
 
-  // 3. Sinkronisasi Master Fader & Meteran L/R secara Real-Time
   const masterFader = document.getElementById('master');
   const masterVal = document.getElementById('masterVal');
   const masterMeterL = document.getElementById('masterMeterL');
@@ -2619,7 +2534,6 @@
       const level = parseInt(this.value, 10);
       if (masterVal) masterVal.textContent = level + '%';
 
-      // Gerakkan tinggi indikator meteran L/R mengikuti fader master
       if (masterMeterL && masterMeterR) {
         const h = level > 0 ? level + '%' : '0%';
         masterMeterL.style.height = h;
@@ -2637,11 +2551,10 @@
 })();
 </script>
 
-  <script>
+<script>
 (function() {
   "use strict";
 
-  // Perbaikan Real-Time Clock & Sinkronisasi Waktu
   function updateClock() {
     const clockEl = document.getElementById('clock');
     if (!clockEl) return;
@@ -2654,151 +2567,11 @@
     clockEl.textContent = `${hours}:${minutes}:${seconds}`;
   }
 
-  // Jalankan detik per detik secara presisi
   setInterval(updateClock, 1000);
-  updateClock(); // Panggil langsung saat dimuat
+  updateClock();
 
 })();
 </script>
-
-  <script>
-(function() {
-  "use strict";
-
-  // Memastikan setiap strip channel memiliki elemen VU meter panjang di dalam fader area
-  function injectLongVuIntoFaders() {
-    const strips = document.querySelectorAll('.new-channel-strip, .channel-strip');
-    strips.forEach(strip => {
-      let faderArea = strip.querySelector('.fader-area');
-      if (faderArea && !faderArea.querySelector('.ch-long-vu')) {
-        const vuContainer = document.createElement('div');
-        vuContainer.className = 'ch-long-vu';
-        
-        const vuFill = document.createElement('div');
-        vuFill.className = 'ch-long-vu-fill';
-        vuContainer.appendChild(vuFill);
-        
-        // Sisipkan ke dalam area fader di belakang input range
-        faderArea.insertBefore(vuContainer, faderArea.firstChild);
-      }
-    });
-  }
-
-  // Jalankan injeksi saat halaman siap
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', injectLongVuIntoFaders);
-  } else {
-    injectLongVuIntoFaders();
-  }
-
-  // Fungsi penggerak animasi VU meter sesuai fader dan status mute
-  function updateChannelFaderMeters() {
-    requestAnimationFrame(updateChannelFaderMeters);
-
-    if (!window.state || !window.state.channels) return;
-
-    document.querySelectorAll('.new-channel-strip, .channel-strip').forEach(strip => {
-      const chId = Number(strip.dataset.ch) || parseInt(strip.innerText.match(/CH\s*(\d+)/i)?.[1] || '0', 10);
-      if (chId <= 0) return;
-
-      const chData = window.state.channels[chId - 1] || {};
-      const longVuFill = strip.querySelector('.ch-long-vu-fill');
-      if (!longVuFill) return;
-
-      // Jika channel di-mute, matikan indikator VU
-      if (chData.mute) {
-        longVuFill.style.height = '0%';
-        return;
-      }
-
-      // Simulasi tingkat sinyal dinamis berdasarkan posisi fader & gain
-      const faderVal = chData.fader !== undefined ? chData.fader : 75;
-      const gainVal = parseFloat(chData.gain || 1.0);
-      
-      // Jika fader di atas 0, buat tinggi level bervariasi secara real-time
-      if (faderVal > 0) {
-        const randomFluctuation = Math.random() * 25;
-        const calculatedHeight = Math.min(100, Math.max(5, (faderVal * 0.7) * (gainVal * 0.5) + randomFluctuation));
-        longVuFill.style.height = calculatedHeight + '%';
-      } else {
-        longVuFill.style.height = '0%';
-      }
-    });
-  }
-
-  requestAnimationFrame(updateChannelFaderMeters);
-
-})();
-</script>
-
-<script>
-(function() {
-  "use strict";
-
-  // Injeksi otomatis elemen VU meter panjang ke dalam setiap area fader channel
-  function injectLongVuToFaders() {
-    const strips = document.querySelectorAll('.new-channel-strip, .channel-strip');
-    
-    strips.forEach(strip => {
-      const faderArea = strip.querySelector('.fader-area');
-      if (faderArea && !faderArea.querySelector('.ch-long-vu')) {
-        const vuContainer = document.createElement('div');
-        vuContainer.className = 'ch-long-vu';
-        
-        const vuFill = document.createElement('div');
-        vuFill.className = 'ch-long-vu-fill';
-        vuContainer.appendChild(vuFill);
-        
-        // Masukkan ke dalam fader-area agar posisinya berada tepat di jalur fader
-        faderArea.insertBefore(vuContainer, faderArea.firstChild);
-      }
-    });
-  }
-
-  // Jalankan saat DOM siap
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', injectLongVuToFaders);
-  } else {
-    injectLongVuToFaders();
-  }
-
-  // Update pergerakan tinggi level VU meter secara dinamis berdasarkan state channel
-  function updateFaderMetersLoop() {
-    requestAnimationFrame(updateFaderMetersLoop);
-
-    if (!window.state || !window.state.channels) return;
-
-    document.querySelectorAll('.new-channel-strip, .channel-strip').forEach(strip => {
-      const chId = Number(strip.dataset.ch) || parseInt(strip.innerText.match(/CH\s*(\d+)/i)?.[1] || '0', 10);
-      if (chId <= 0) return;
-
-      const chData = window.state.channels[chId - 1] || {};
-      const longVuFill = strip.querySelector('.ch-long-vu-fill');
-      if (!longVuFill) return;
-
-      if (chData.mute) {
-        longVuFill.style.height = '0%';
-        return;
-      }
-
-      const faderVal = chData.fader !== undefined ? chData.fader : 75;
-      const gainVal = parseFloat(chData.gain || 1.0);
-
-      if (faderVal > 0) {
-        const randomFluq = Math.random() * 20;
-        const targetHeight = Math.min(100, Math.max(5, (faderVal * 0.75) * (gainVal * 0.5) + randomFluq));
-        longVuFill.style.height = targetHeight + '%';
-      } else {
-        longVuFill.style.height = '0%';
-      }
-    });
-  }
-
-  requestAnimationFrame(updateFaderMetersLoop);
-
-})();
-</script>
-  
 
 </body>
 </html>
