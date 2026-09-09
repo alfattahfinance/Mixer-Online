@@ -1,19 +1,16 @@
 /* ============================================================
-   Mixer-Online — 14CH channel panel
-   Owns channel DOM only. Uses the existing MixerControl adapter
-   for commands; it does not replace the mixer engine.
+   Mixer-Online — 14CH channel panel (Optimized & Responsive)
    ============================================================ */
 (function () {
   "use strict";
 
   /* ============================================================
-     CHANNEL INDICATOR SKIN & VERTICAL FADER VU (SIDE-BY-SIDE)
+     CHANNEL INDICATOR SKIN & RESPONSIVE TOUCH STYLING
      ============================================================ */
   if (!document.getElementById("mixer-channel-led-skin")) {
     const style = document.createElement("style");
     style.id = "mixer-channel-led-skin";
     style.textContent = `
-      /* Lampu status kecil di bagian atas */
       .new-channel-strip .channel-led,
       .channel-strip .channel-led {
         position: relative !important;
@@ -30,44 +27,12 @@
         opacity: .65 !important;
       }
 
-      .new-channel-strip .channel-led::before,
-      .channel-strip .channel-led::before {
-        content: "" !important;
-        position: absolute !important;
-        left: 3px !important;
-        right: 3px !important;
-        top: 1px !important;
-        height: 2px !important;
-        border-radius: 999px !important;
-        background: rgba(255,255,255,.10) !important;
-        pointer-events: none !important;
-      }
-
-      .new-channel-strip .channel-led::after,
-      .channel-strip .channel-led::after {
-        content: "" !important;
-        position: absolute !important;
-        left: 5px !important;
-        top: 2px !important;
-        width: 14px !important;
-        height: 2px !important;
-        border-radius: 999px !important;
-        background: #39444d !important;
-        pointer-events: none !important;
-      }
-
       .new-channel-strip .channel-led.active.green,
       .channel-strip .channel-led.active.green {
         opacity: 1 !important;
         background: linear-gradient(180deg,#8dffb7,#20d968 48%,#0a7135) !important;
         border-color: rgba(46,255,128,.65) !important;
         box-shadow: 0 0 5px rgba(46,255,128,.55), inset 0 1px 1px rgba(255,255,255,.35) !important;
-      }
-
-      .new-channel-strip .channel-led.active.green::after,
-      .channel-strip .channel-led.active.green::after {
-        background: #caffdd !important;
-        box-shadow: 0 0 5px #63ff9a !important;
       }
 
       .new-channel-strip .channel-led.active.red,
@@ -78,13 +43,7 @@
         box-shadow: 0 0 6px rgba(255,59,48,.65), inset 0 1px 1px rgba(255,255,255,.35) !important;
       }
 
-      .new-channel-strip .channel-led.active.red::after,
-      .channel-strip .channel-led.active.red::after {
-        background: #ffe1df !important;
-        box-shadow: 0 0 6px #ff6961 !important;
-      }
-
-      /* FADER AREA: Diatur horizontal (Fader di kiri, LED Meter di kanan) */
+      /* FADER AREA: Horizontal Side-by-Side */
       .new-channel-strip .fader-area {
         position: relative !important;
         display: flex !important;
@@ -98,14 +57,25 @@
         padding: 4px 2px !important;
       }
 
-      /* KOTAK LED VU METER DI SEBELAH KANAN FADER */
+      /* OPTIMASI INPUT RANGE AGAR SANGAT RESPONSIF DI MOBILE & DESKTOP */
+      .new-channel-strip input[type="range"] {
+        touch-action: none !important; /* Mencegah layar ikut scrolling saat menggeser slider */
+        cursor: pointer !important;
+      }
+
+      .new-channel-strip .fader-area input[type="range"], 
+      .new-channel-strip .channel-fader {
+        width: 26px !important;
+        height: 220px !important;
+        position: relative !important;
+        z-index: 2 !important;
+        background: transparent !important;
+        accent-color: var(--accent-color) !important;
+      }
+
+      /* KOTAK LED VU METER SAMPING FADER */
       .new-channel-strip .ch-top-vu {
         position: relative !important;
-        top: auto !important;
-        bottom: auto !important;
-        left: auto !important;
-        right: auto !important;
-        transform: none !important;
         width: 12px !important;
         height: 215px !important;
         background: #040608 !important;
@@ -152,23 +122,17 @@
         border-radius: 1px !important;
         box-shadow: 0 0 6px rgba(40,255,110,.6) !important;
         z-index: 1 !important;
-      }
-
-      /* Atur ukuran fader range agar pas bersandingan */
-      .new-channel-strip .fader-area input[type="range"] {
-        width: 24px !important;
-        height: 220px !important;
-        position: relative !important;
-        z-index: 2 !important;
+        will-change: height; /* Akselerasi hardware browser untuk animasi halus */
       }
 
       .new-channel-strip .fader-area output,
-      .new-channel-strip .fader-area label {
+      .new-channel-strip .fader-area label,
+      .new-channel-strip .new-channel-control input {
         position: relative !important;
         z-index: 2 !important;
+        touch-action: none !important;
       }
 
-      /* Meter segmented lama disembunyikan */
       .new-channel-strip .new-channel-meter {
         display: none !important;
       }
@@ -247,9 +211,7 @@
 
       <div class="fader-area new-channel-fader">
         <label>VOLUME</label>
-        <!-- 1. Fader Volume di Kiri -->
         <input class="new-fader channel-fader" data-k="fader" type="range" min="0" max="100" step="1" value="${Number(c.fader ?? 75)}">
-        <!-- 2. Kotak LED Meter di Kanan (Tunggal & Bersih) -->
         <div class="ch-top-vu"><div class="ch-top-vu-fill" style="height: ${Math.round(Number(c.fader ?? 75))}%;"></div></div>
         <output class="fader-val">${Math.round(Number(c.fader ?? 75))}%</output>
       </div>
@@ -261,7 +223,9 @@
       <footer class="new-channel-source">CH${id} • <span>${c.mute ? "MUTED" : c.solo ? "SOLO" : "READY"}</span></footer>
     `;
 
-    const update = (k, value) => {
+    // OPTIMASI RENDERING DENGAN REQUESTANIMATIONFRAME AGAR TIDAK LAG SAAT DIGESER CEPAT
+    let ticking = false;
+    const updateSmooth = (k, value) => {
       if (!window.state?.system) {
         const r = $("testResult"); 
         if (r) r.textContent = "CONTROL BLOCKED: SYSTEM OFF";
@@ -276,17 +240,23 @@
         const n = Number(value);
         ch[k] = Number.isFinite(n) ? n : value;
         
-        if (k === "fader") {
-          const out = el.querySelector("output");
-          if (out) out.textContent = Math.round(n) + "%";
-          
-          const vuFill = el.querySelector(".ch-top-vu-fill");
-          if (vuFill) {
-            vuFill.style.height = Math.round(n) + "%";
-          }
-        } else {
-          const knobTxt = el.querySelector(`.knob-val[data-val="${k}"]`);
-          if (knobTxt) knobTxt.textContent = formatVal(k, n);
+        if (!ticking) {
+          window.requestAnimationFrame(() => {
+            if (k === "fader") {
+              const out = el.querySelector("output");
+              if (out) out.textContent = Math.round(n) + "%";
+              
+              const vuFill = el.querySelector(".ch-top-vu-fill");
+              if (vuFill) {
+                vuFill.style.height = Math.round(n) + "%";
+              }
+            } else {
+              const knobTxt = el.querySelector(`.knob-val[data-val="${k}"]`);
+              if (knobTxt) knobTxt.textContent = formatVal(k, n);
+            }
+            ticking = false;
+          });
+          ticking = true;
         }
       }
 
@@ -305,22 +275,13 @@
         }
       }
 
-      const result = window.MixerControl?.setControl?.(id, k, ch[k]);
-      const r = $("testResult");
-      if (r) {
-        r.textContent = result?.ok 
-          ? "CH" + id + " " + k.toUpperCase() + " → SENT" 
-          : "CH" + id + " " + k.toUpperCase() + " → " + (result?.reason || "OFFLINE");
-      }
-
-      const statusSpan = el.querySelector("footer span");
-      if (statusSpan) {
-        statusSpan.textContent = ch.mute ? "MUTED" : ch.solo ? "SOLO" : "READY";
-      }
+      // Kirim data ke adapter mixer
+      window.MixerControl?.setControl?.(id, k, ch[k]);
     };
 
     el.querySelectorAll("input").forEach(input => {
-      input.addEventListener("input", () => update(input.dataset.k, input.value));
+      // Menggunakan event 'input' agar pergeseran langsung merespons setiap piksel gerakan
+      input.addEventListener("input", (e) => updateSmooth(e.target.dataset.k, e.target.value), { passive: true });
     });
 
     el.querySelectorAll("button").forEach(button => {
@@ -340,7 +301,7 @@
           ? (k === "mute" ? "UNMUTE" : "UNSOLO") 
           : (k === "mute" ? "MUTE" : "SOLO");
           
-        update(k, nextValue);
+        updateSmooth(k, nextValue);
       });
     });
 
@@ -372,27 +333,6 @@
           }
         }
       });
-
-      const ledEl = el.querySelector(".channel-led");
-      if (ledEl) {
-        if (c.mute) {
-          ledEl.className = "channel-led active red";
-        } else if (Number(c.fader) > 0 || Number(c.gain) > 0) {
-          ledEl.className = "channel-led active green";
-        } else {
-          ledEl.className = "channel-led";
-        }
-      }
-
-      el.querySelectorAll("button[data-k]").forEach(b => { 
-        const k = b.dataset.k;
-        const on = !!c[k]; 
-        b.classList.toggle("on", on); 
-        b.textContent = on ? (k === "mute" ? "UNMUTE" : "UNSOLO") : (k === "mute" ? "MUTE" : "SOLO"); 
-      });
-
-      const status = el.querySelector("footer span"); 
-      if (status) status.textContent = c.mute ? "MUTED" : c.solo ? "SOLO" : "READY";
     }
   }
 
