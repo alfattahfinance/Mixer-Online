@@ -562,19 +562,66 @@
     box-shadow: 0 0 6px var(--accent-color) !important;
   }
 /* ==========================================================
-   MENYELARASKAN TINGGI CHANNEL KIRI, KANAN, DAN MASTER KE BAWAH
+   PERBAIKAN TINGGI SEJAJAR MENTOK KE BAWAH (AUX/BUS LEVEL)
    ========================================================== */
 main.console {
-  height: 100% !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  justify-content: space-between !important;
+  gap: 2px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100% !important; /* Memaksa tinggi mengisi penuh area kontainer induk */
   min-height: 100% !important;
+  overflow-x: auto !important;
+  box-sizing: border-box !important;
+  padding: 2px !important;
+}
+
+.channel-bank {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  width: auto !important;
+  height: 100% !important; /* Membuat bank channel kiri & kanan meregang penuh ke bawah */
+  background: var(--strip-bg) !important;
+  border: 1px solid var(--panel-border) !important;
+  border-radius: 4px !important;
+  padding: 2px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+}
+
+#channels, #channelsRight {
+  display: grid !important;
+  grid-template-columns: repeat(7, minmax(35px, 1fr)) !important;
+  width: 100% !important;
+  height: 100% !important; /* Mengisi tinggi bank channel secara penuh */
+  flex-grow: 1 !important;
+  gap: 1px !important;
   align-items: stretch !important;
 }
 
-.channel-bank, 
-.center-console, 
-aside.master-rack,
-.aux-bus-section, 
-.rx-return-section {
+.new-channel-strip, .channel-strip {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important; /* Memastikan setiap strip channel ikut memanjang ke bawah */
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 4px 1px 2px 1px !important;
+  border-right: 1px dashed var(--panel-border) !important;
+  box-sizing: border-box !important;
+}
+
+.center-console {
+  flex: 1.1 1 0 !important;
+  min-width: 260px !important;
+  max-width: 380px !important;
   height: 100% !important;
   display: flex !important;
   flex-direction: column !important;
@@ -582,20 +629,16 @@ aside.master-rack,
   box-sizing: border-box !important;
 }
 
-/* Memastikan area strip channel mengisi ruang vertikal secara penuh */
-#channels, #channelsRight {
-  flex: 1 !important;
-  display: grid !important;
-  grid-template-columns: repeat(7, minmax(35px, 1fr)) !important;
-  height: 100% !important;
+aside.master-rack {
+  flex: 0 0 95px !important;
+  width: 95px !important;
+  min-width: 95px !important;
+  height: 100% !important; /* Membuat master rack ikut mentok ke garis bawah */
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
   box-sizing: border-box !important;
 }
-
-.new-channel-strip, .channel-strip {
-  height: 100% !important;
-  box-sizing: border-box !important;
-}
-
 
 </style>
 
