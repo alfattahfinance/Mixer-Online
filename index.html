@@ -85,17 +85,6 @@
   *, *::before, *::after {
     box-sizing: border-box !important;
   }
-/* ==========================================================
-   KUNCI TINGGI HALAMAN AGAR KONSOL MENTOK KE BAWAH TANPA CELAH
-   ========================================================== */
-html, body {
-  width: 100% !important;
-  height: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  overflow: hidden !important; /* Mencegah halaman utama ikut scroll ke bawah */
-  background: var(--main-bg) !important;
-}
 
 /* Pastikan pembungkus aplikasi (jika ada) ikut mengambil tinggi penuh */
 .app-container, body > .console-wrapper {
@@ -582,8 +571,10 @@ html, body {
     box-shadow: 0 0 6px var(--accent-color) !important;
   }
 /* ==========================================================
-   PERBAIKAN TINGGI SEJAJAR MENTOK KE BAWAH (AUX/BUS LEVEL)
+   MENHILANGKAN CELAH KOSONG DI BAWAH (FULL HEIGHT MENTOK)
    ========================================================== */
+
+/* 1. Pastikan area pembungkus utama konsol mengisi penuh layar secara vertikal */
 main.console {
   display: flex !important;
   flex-direction: row !important;
@@ -592,18 +583,18 @@ main.console {
   gap: 2px !important;
   width: 100% !important;
   max-width: 100% !important;
-  height: 100% !important; /* Memaksa tinggi mengisi penuh area kontainer induk */
+  height: 100% !important;          
   min-height: 100% !important;
-  overflow-x: auto !important;
   box-sizing: border-box !important;
   padding: 2px !important;
 }
 
+/* 2. Bank Channel Kiri & Kanan memanjang penuh ke bawah */
 .channel-bank {
   flex: 1 1 0 !important;
   min-width: 0 !important;
   width: auto !important;
-  height: 100% !important; /* Membuat bank channel kiri & kanan meregang penuh ke bawah */
+  height: 100% !important;          
   background: var(--strip-bg) !important;
   border: 1px solid var(--panel-border) !important;
   border-radius: 4px !important;
@@ -611,33 +602,36 @@ main.console {
   box-sizing: border-box !important;
   display: flex !important;
   flex-direction: column !important;
-  justify-content: space-between !important;
+  justify-content: space-between !important; 
 }
 
+/* 3. Grid Channel di dalam Bank */
 #channels, #channelsRight {
   display: grid !important;
   grid-template-columns: repeat(7, minmax(35px, 1fr)) !important;
   width: 100% !important;
-  height: 100% !important; /* Mengisi tinggi bank channel secara penuh */
+  height: 100% !important;          
   flex-grow: 1 !important;
   gap: 1px !important;
   align-items: stretch !important;
 }
 
+/* 4. Strip Individual Channel ikut meregang ke bawah tanpa celah */
 .new-channel-strip, .channel-strip {
   position: relative !important;
   width: 100% !important;
-  height: 100% !important; /* Memastikan setiap strip channel ikut memanjang ke bawah */
+  height: 100% !important;          
   min-width: 0 !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
-  justify-content: space-between !important;
+  justify-content: space-between !important; 
   padding: 4px 1px 2px 1px !important;
   border-right: 1px dashed var(--panel-border) !important;
   box-sizing: border-box !important;
 }
 
+/* 5. Center Console (Tengah) */
 .center-console {
   flex: 1.1 1 0 !important;
   min-width: 260px !important;
@@ -649,16 +643,18 @@ main.console {
   box-sizing: border-box !important;
 }
 
+/* 6. Master Rack (Kanan Luar) */
 aside.master-rack {
   flex: 0 0 95px !important;
   width: 95px !important;
   min-width: 95px !important;
-  height: 100% !important; /* Membuat master rack ikut mentok ke garis bawah */
+  height: 100% !important;          
   display: flex !important;
   flex-direction: column !important;
   justify-content: space-between !important;
   box-sizing: border-box !important;
 }
+
 
 </style>
 
