@@ -85,7 +85,27 @@
   *, *::before, *::after {
     box-sizing: border-box !important;
   }
+/* ==========================================================
+   KUNCI TINGGI HALAMAN AGAR KONSOL MENTOK KE BAWAH TANPA CELAH
+   ========================================================== */
+html, body {
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important; /* Mencegah halaman utama ikut scroll ke bawah */
+  background: var(--main-bg) !important;
+}
 
+/* Pastikan pembungkus aplikasi (jika ada) ikut mengambil tinggi penuh */
+.app-container, body > .console-wrapper {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+}
+
+  
   html {
     scroll-behavior: smooth !important;
   }
