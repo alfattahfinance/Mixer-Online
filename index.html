@@ -176,17 +176,12 @@
   /* ==========================================================
      3. MAIN CONSOLE & CHANNEL STRIP CUSTOMIZATION
      ========================================================== */
-  main.console {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    width: max-content !important;
-    min-width: 100% !important;
-    padding: 2px 2px 0px 2px !important;
-    gap: 4px !important;
-    align-items: stretch !important;
-  }
-
+  .center-console {
+  max-width: 380px !important; /* Sesuaikan ukuran ideal, misal 350px - 400px */
+  min-width: 300px !important;
+  flex: 0 0 auto !important;
+  box-sizing: border-box !important;
+}    
   .channel-bank {
     flex: 0 0 auto !important;
     width: 505px !important;
@@ -479,15 +474,11 @@
   /* ==========================================================
      4. NAVIGATION BAR SCREEN M32
      ========================================================== */
-  .screen-frame {
-    display: flex !important;
-    flex-direction: column !important;
-    border: 2px solid var(--panel-border) !important;
-    border-radius: 6px !important;
-    padding: 4px !important;
-    background: var(--panel-bg) !important;
-    width: 100% !important;
-  }
+.screen-frame {
+  max-width: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
 
   .screen-tabs {
     display: grid !important;
