@@ -5,6 +5,32 @@
 document.addEventListener("DOMContentLoaded", () => {
   console.log("[APP] System Initialized");
 
+  // 0. MASTER RACK: samakan ukuran panel dengan satu channel strip.
+  // Tidak mengubah CH1-CH14 atau isi dashboard lain.
+  const syncMasterRackSize = () => {
+    const masterRack = document.getElementById("masterRack") || document.querySelector(".master-rack");
+    const reference = document.querySelector(".new-channel-strip, .channel-strip, .channel");
+    if (!masterRack || !reference) return;
+
+    const rect = reference.getBoundingClientRect();
+    if (rect.width > 0) masterRack.style.setProperty("width", `${Math.round(rect.width)}px`, "important");
+    if (rect.height > 0) masterRack.style.setProperty("height", `${Math.round(rect.height)}px`, "important");
+    masterRack.style.setProperty("min-width", `${Math.round(rect.width)}px`, "important");
+    masterRack.style.setProperty("max-width", `${Math.round(rect.width)}px`, "important");
+    masterRack.style.setProperty("min-height", `${Math.round(rect.height)}px`, "important");
+    masterRack.style.setProperty("max-height", `${Math.round(rect.height)}px`, "important");
+    masterRack.style.setProperty("flex", `0 0 ${Math.round(rect.width)}px`, "important");
+    masterRack.style.setProperty("align-self", "flex-start", "important");
+  };
+
+  // Channel panel dibuat oleh channels-new.js; tunggu satu frame agar ukurannya siap.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(syncMasterRackSize);
+  });
+
+  window.addEventListener("resize", syncMasterRackSize);
+  window.addEventListener("orientationchange", () => setTimeout(syncMasterRackSize, 80));
+
   // 1. HELPER DELAY UNTUK ANIMASI STEP-BY-STEP
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
