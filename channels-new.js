@@ -7,7 +7,7 @@
   "use strict";
 
   /* ============================================================
-     CHANNEL INDICATOR SKIN & VERTICAL FADER VU
+     CHANNEL INDICATOR SKIN & VERTICAL FADER VU (SIDE-BY-SIDE)
      ============================================================ */
   if (!document.getElementById("mixer-channel-led-skin")) {
     const style = document.createElement("style");
@@ -84,26 +84,30 @@
         box-shadow: 0 0 6px #ff6961 !important;
       }
 
-      /* FADER AREA: Dipaksa memiliki posisi relatif dan tinggi penuh */
+      /* FADER AREA: Diatur horizontal (Fader di kiri, LED Meter di kanan) */
       .new-channel-strip .fader-area {
         position: relative !important;
         display: flex !important;
-        flex-direction: column !important;
+        flex-direction: row !important;
         align-items: center !important;
-        justify-content: flex-end !important;
+        justify-content: center !important;
+        gap: 6px !important;
         flex-grow: 1 !important;
         width: 100% !important;
-        min-height: 280px !important;
+        min-height: 240px !important;
+        padding: 4px 2px !important;
       }
 
-      /* LED BAR / VU PANJANG DI DALAM FADER (Paksa tampil dengan ukuran jelas) */
+      /* KOTAK LED VU METER DI SEBELAH KANAN FADER */
       .new-channel-strip .ch-top-vu {
-        position: absolute !important;
-        top: 20px !important;
-        bottom: 35px !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        width: 8px !important;
+        position: relative !important;
+        top: auto !important;
+        bottom: auto !important;
+        left: auto !important;
+        right: auto !important;
+        transform: none !important;
+        width: 12px !important;
+        height: 215px !important;
         background: #040608 !important;
         border: 1px solid rgba(255,255,255,.3) !important;
         border-radius: 3px !important;
@@ -113,6 +117,7 @@
         flex-direction: column-reverse !important;
         z-index: 1 !important;
         pointer-events: none !important;
+        padding: 1px !important;
       }
 
       .new-channel-strip .ch-top-vu::before {
@@ -136,7 +141,7 @@
         bottom: 0 !important;
         width: 100% !important;
         height: 75% !important;
-        background: linear-gradient(0deg,
+        background-image: linear-gradient(0deg,
           #24e66b 0%,
           #24e66b 65%,
           #ffd21c 66%,
@@ -149,8 +154,14 @@
         z-index: 1 !important;
       }
 
-      /* Pastikan elemen fader dan output tampil di atas layer VU meter */
-      .new-channel-strip .fader-area input[type="range"],
+      /* Atur ukuran fader range agar pas bersandingan */
+      .new-channel-strip .fader-area input[type="range"] {
+        width: 24px !important;
+        height: 220px !important;
+        position: relative !important;
+        z-index: 2 !important;
+      }
+
       .new-channel-strip .fader-area output,
       .new-channel-strip .fader-area label {
         position: relative !important;
@@ -236,12 +247,14 @@
       </div>
 
       <div class="fader-area new-channel-fader">
-        <!-- Indikator VU panjang vertikal di dalam jalur fader -->
-        <div class="ch-top-vu"><div class="ch-top-vu-fill" style="height: ${Math.round(Number(c.fader ?? 75))}%;"></div></div>
         <label>VOLUME</label>
+        <!-- 1. Fader Volume di Kiri -->
         <input class="new-fader channel-fader" data-k="fader" type="range" min="0" max="100" step="1" value="${Number(c.fader ?? 75)}">
+        <!-- 2. Kotak LED Meter di Kanan -->
+        <div class="ch-top-vu"><div class="ch-top-vu-fill" style="height: ${Math.round(Number(c.fader ?? 75))}%;"></div></div>
         <output class="fader-val">${Math.round(Number(c.fader ?? 75))}%</output>
       </div>
+
       <div class="new-channel-buttons">
         <button type="button" data-k="mute" class="${c.mute ? "on" : ""}">${c.mute ? "UNMUTE" : "MUTE"}</button>
         <button type="button" data-k="solo" class="${c.solo ? "on" : ""}">${c.solo ? "UNSOLO" : "SOLO"}</button>
