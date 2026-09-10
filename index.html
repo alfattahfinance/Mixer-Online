@@ -435,8 +435,8 @@
     accent-color: var(--accent-color);
     margin-top: 2px;
   }
-  /* ==========================================================
-     5. MASTER RACK & AUX (LATAR BELAKANG MENTOK BAWAH)
+    /* ==========================================================
+     5. MASTER RACK & AUX (INDIKATOR MASTER DIPERPANJANG KE BAWAH)
      ========================================================== */
   aside.master-rack {
     display: flex !important;
@@ -453,22 +453,24 @@
     box-sizing: border-box !important;
   }
 
-  /* Pembungkus/Latar belakang card agar mengisi penuh ruang vertikal */
   aside.master-rack > div, aside.master-rack > section {
     width: 100% !important;
     box-sizing: border-box !important;
   }
 
+  /* INDIKATOR MAIN L/R DIPERPANJANG KE BAWAH */
   .main-meters {
     display: flex !important;
-    gap: 6px !important;
+    gap: 8px !important;
     justify-content: center !important;
     align-items: center !important;
-    height: 120px !important;
-    padding: 2px !important;
+    height: 180px !important; /* Ditinggikan agar meteran merentang ke bawah */
+    min-height: 180px !important;
+    padding: 3px !important;
     background: #040608 !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 3px !important;
+    box-sizing: border-box !important;
   }
 
   .meter-bar-container {
@@ -566,7 +568,6 @@
     cursor: pointer !important;
   }
 
- 
   /* ==========================================================
      6. BOTTOM NAV STYLING
      ========================================================== */
