@@ -98,7 +98,6 @@ window.MixerControl = (() => {
   }
 
   async function connectESP32() {
-    // Validasi apakah sistem menyala (default true jika window.state belum ada)
     if (window.state && window.state.system === false) {
       alert("Nyalakan SYSTEM terlebih dahulu!");
       return { ok: false, connected: false, reason: "SYSTEM_OFF" };
@@ -106,7 +105,6 @@ window.MixerControl = (() => {
 
     const api = window.MixerAdapters;
     if (!api || typeof api.connectESP32 !== "function") {
-      // Fallback simulasi internal jika adapter belum siap
       console.warn("[MixerControl] MixerAdapters.connectESP32 tidak ditemukan, menggunakan simulasi aktif.");
       setStatus({ connected: true, transport: "esp32" });
       return { ok: true, connected: true };
@@ -160,7 +158,6 @@ window.MixerControl = (() => {
     document.addEventListener("mixer:bluetooth-rx", handleRxEvent);
   }
 
-  // Auto-bind tombol koneksi ESP32 pada dokumen HTML agar bisa diklik langsung
   function initButtonBindings() {
     const attachClick = (id) => {
       const btn = document.getElementById(id);
@@ -246,7 +243,8 @@ window.MixerControl = (() => {
 
       const chStrip = document.querySelector(`[data-ch="${chNum}"]`);
       if (chStrip) {
-        const vuBar = chStrip.querySelector(".vu-meter-fill, .meter-bar");
+        // Diperbarui ke kelas .ch-side-vu-fill agar sesuai dengan tata letak baru
+        const vuBar = chStrip.querySelector(".ch-side-vu-fill, .vu-meter-fill, .meter-bar");
         if (vuBar) vuBar.style.height = `${levelPercent}%`;
       }
     }
