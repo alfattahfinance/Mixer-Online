@@ -87,7 +87,6 @@ window.MixerControl = (() => {
       btnDevice.classList.toggle("active", isConnected);
     }
 
-    // Panel Connection/Test Updates
     if (transportLabel) {
       transportLabel.textContent = isConnected 
         ? `ESP32 BRIDGE ${state.transport.toUpperCase()} ONLINE` 
@@ -193,19 +192,22 @@ window.MixerControl = (() => {
 
   function setControl(channel, control, value) {
     const ch = Number(channel);
-    const command = {
-      type: "CONTROL",
-      channel: String(ch),
-      ch,
-      param: String(control),
-      control: String(control),
-      value: Number.isFinite(Number(value)) ? Number(value) : value,
-      time: Date.now()
-    };
-
     if (!Number.isInteger(ch) || ch < 1 || ch > 14) {
       return { ok: false, reason: "invalid-channel" };
     }
+
+    // Diselaraskan dengan struktur protokol ESP32-MIXER/1
+    const command = {
+      protocol: "ESP32-MIXER/1",
+      id: "cmd-" + Date.now(),
+      type: "CONTROL",
+      ch: ch,
+      param: String(control),
+      value: Number.isFinite(Number(value)) ? Number(value) : value,
+      rev: 1,
+      ts: Date.now(),
+      direction: "TX"
+    };
 
     state.lastCommand = command;
     cmdListeners.forEach(fn => fn({ ...command, direction: "TX" }));
@@ -237,15 +239,18 @@ window.MixerControl = (() => {
       rxLogEl.textContent = `RX: ${JSON.stringify(message)}`;
     }
 
+    // Menangani data METER masuk dan langsung merender ke kelas .ch-side-vu-fill
     if (message.type === "METER" && message.ch) {
       const chNum = message.ch;
-      const levelPercent = Math.min(100, Math.round((message.level || 0) * 50));
+      const levelPercent = Math.min(100, Math.max(0, Math.round((message.level || 0) * 50)));
 
       const chStrip = document.querySelector(`[data-ch="${chNum}"]`);
       if (chStrip) {
-        // Diperbarui ke kelas .ch-side-vu-fill agar sesuai dengan tata letak baru
-        const vuBar = chStrip.querySelector(".ch-side-vu-fill, .vu-meter-fill, .meter-bar");
-        if (vuBar) vuBar.style.height = `${levelPercent}%`;
+        const vuBar = chStrip.querySelector(".ch-side-vu-fill");
+        if (vuBar) {
+          vuBar.style.height = `${levelPercent}%`;
+          vuBar.style.setProperty("height", `${levelPercent}%`, "important");
+        }
       }
     }
 
