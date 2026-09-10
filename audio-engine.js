@@ -173,8 +173,7 @@
   window.refreshAudioDOMCache = function() {
     cachedStrips = null;
   };
-
-    function updateChannelMeters(timestamp) {
+  function updateChannelMeters(timestamp) {
     requestAnimationFrame(updateChannelMeters);
 
     if (timestamp - lastMeterUpdate < 33) return;
@@ -201,7 +200,7 @@
 
       let level = 0;
 
-      // 1. Ambil dari Analyser Node jika ada
+      // 1. Ambil level dari Analyser Node Web Audio API jika aktif
       if (nodes?.analyser) {
         const data = new Uint8Array(nodes.analyser.fftSize);
         nodes.analyser.getByteTimeDomainData(data);
@@ -215,22 +214,18 @@
         level = Math.max(0, Math.min(1, rms * 4.0));
       }
 
-      // 2. SAFETY FALLBACK: Jika elemen audio di channel ini sedang memutar lagu (playing), 
-      // berikan sinyal visual dinamis agar indikator dipastikan menyala naik-turun merespons fader.
+      // 2. Safety Fallback: Jika audio element sedang berputar (playing), berikan respons visual dinamis
       const mediaEl = channelAudioElements[ch];
       const isPlaying = mediaEl && !mediaEl.paused && !mediaEl.ended;
 
-      if (isPlaying) {
-        // Jika level dari analyser masih 0 padahal lagu sedang play, gunakan simulasi gelombang aktif berbasis fader
-        if (level < 0.05) {
-          level = (Math.random() * 0.6 + 0.2); 
-        }
+      if (isPlaying && level < 0.05) {
+        level = (Math.random() * 0.6 + 0.2); 
       }
 
       const visibleLevel = muted ? 0 : level;
-      // Kalikan dengan persentase fader (faderVal / 100)
       const finalPercent = Math.round(visibleLevel * (faderVal / 100) * 100) + "%";
 
+      // Terapkan langsung ke elemen visual DOM fader samping
       if (sideVuFill) {
         sideVuFill.style.height = finalPercent;
         sideVuFill.style.setProperty("height", finalPercent, "important");
@@ -263,7 +258,8 @@
       if (masterMeterL) masterMeterL.style.setProperty("height", outPct, "important");
       if (masterMeterR) masterMeterR.style.setProperty("height", outPct, "important");
     }
-  }    
+  }
+
 
   /* ------------------------------------------------------------------------
      MASTER LIVE
