@@ -5,7 +5,7 @@
   "use strict";
 
   /* ============================================================
-     CSS BERSIH: FADER DI KIRI, 1 LED METER DI KANAN (TANPA TUMPUK)
+     CSS PERBAIKAN POSISI METERAN & RESPONSIVITAS
      ============================================================ */
   if (!document.getElementById("mixer-channel-led-skin")) {
     const style = document.createElement("style");
@@ -43,19 +43,19 @@
         box-shadow: 0 0 6px rgba(255,59,48,.65), inset 0 1px 1px rgba(255,255,255,.35) !important;
       }
 
-      /* FADER AREA: Diberikan tinggi pas agar memanjang rapi */
+      /* FADER AREA: Menggunakan Grid agar posisi Fader dan Meteran Berjajar Rapi ke Samping (Tidak Tumpuk) */
       .new-channel-strip .fader-area {
         position: relative !important;
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 6px !important;
-        flex-grow: 0 !important;
+        gap: 4px !important;
         width: 100% !important;
         height: auto !important;
-        min-height: 320px !important;
-        padding: 5px 3px !important;
+        min-height: 310px !important;
+        padding: 16px 2px 18px 2px !important;
+        box-sizing: border-box !important;
       }
 
       .new-channel-strip input[type="range"] {
@@ -66,31 +66,32 @@
       /* Slider Fader di Sebelah Kiri */
       .new-channel-strip .fader-area input.channel-fader, 
       .new-channel-strip .fader-area input.new-fader {
-        width: 26px !important;
-        height: 290px !important;
-        min-height: 290px !important;
+        width: 24px !important;
+        height: 270px !important;
+        min-height: 270px !important;
         position: relative !important;
-        z-index: 2 !important;
+        z-index: 3 !important;
         background: transparent !important;
         accent-color: var(--accent-color) !important;
         margin: 0 !important;
       }
 
-      /* KOTAK LED METER TUNGGAL DI SEBELAH KANAN FADER */
+      /* KOTAK LED METER VERTIKAL DI SEBELAH KANAN FADER (DIJAMIN TIDAK TERTUTUP) */
       .new-channel-strip .ch-side-vu {
         position: relative !important;
         width: 10px !important;
-        height: 290px !important;
-        min-height: 290px !important;
+        height: 270px !important;
+        min-height: 270px !important;
         background: #040608 !important;
         border: 1px solid rgba(255,255,255,0.2) !important;
         border-radius: 2px !important;
         overflow: hidden !important;
         display: flex !important;
         flex-direction: column-reverse !important;
-        z-index: 1 !important;
+        z-index: 2 !important;
         padding: 0 !important;
         box-sizing: border-box !important;
+        flex-shrink: 0 !important;
       }
 
       .new-channel-strip .ch-side-vu .ch-side-vu-fill {
@@ -98,7 +99,7 @@
         height: 0%;
         background: linear-gradient(0deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 66%, #f39c12 85%, #e74c3c 86%, #ff0000 100%) !important;
         border-radius: 0px !important;
-        transition: height 0.05s linear !important;
+        transition: none !important; /* Dibuat instan agar sangat responsif terhadap sinyal audio */
         will-change: height;
       }
 
@@ -106,16 +107,22 @@
       .new-channel-strip .fader-area label {
         position: absolute !important;
         top: 2px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
         font-size: 7px !important;
         color: var(--text-dim) !important;
+        z-index: 4 !important;
       }
 
       .new-channel-strip .fader-area output.fader-val {
         position: absolute !important;
         bottom: 2px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
         font-size: 8px !important;
         font-weight: bold !important;
         color: #2ecc71 !important;
+        z-index: 4 !important;
       }
 
       /* Sembunyikan elemen meteran bawaan lama */
@@ -200,8 +207,8 @@
       <div class="fader-area new-channel-fader">
         <label>VOLUME</label>
         <input class="new-fader channel-fader" data-k="fader" type="range" min="0" max="100" step="1" value="${Number(c.fader ?? 75)}">
-        <div class="ch-side-vu" style="position:relative !important; width:10px !important; height:290px !important; background:#040608 !important; border:1px solid rgba(255,255,255,0.2) !important; border-radius:2px !important; overflow:hidden !important; display:flex !important; flex-direction:column-reverse !important; z-index:1 !important;">
-         <div class="ch-side-vu-fill" style="width:100% !important; height:0%; background: linear-gradient(0deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 66%, #f39c12 85%, #e74c3c 86%, #ff0000 100%) !important;"></div>
+        <div class="ch-side-vu">
+          <div class="ch-side-vu-fill"></div>
         </div>
         <output class="fader-val">${Math.round(Number(c.fader ?? 75))}%</output>
       </div>
