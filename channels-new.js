@@ -331,13 +331,12 @@
     }
   }
   // ============================================================
-  // LOOP MANDIRI: METERAN MENYALA DARI AUDIO, HARDWARE, ATAU SIMULASI
+  // LOOP METERAN: DISINKRONKAN DENGAN AUDIO ENGINE & MASTER ANALYSER
   // ============================================================
   function startStandaloneMeterLoop() {
     requestAnimationFrame(startStandaloneMeterLoop);
     if (!window.state || !window.state.channels) return;
 
-    // Jika sistem sedang OFF, matikan semua meteran
     if (!window.state.system) {
       document.querySelectorAll(".ch-side-vu-fill").forEach(el => el.style.height = "0%");
       return;
@@ -361,22 +360,26 @@
         continue;
       }
 
-      // 1. Ambil level dari data nyata (Audio Engine / Hardware Feedback)
+      // Ambil level dari state channel (yang diperbarui oleh audio engine)
       let lvl = Number(chData.level || 0);
 
-      // 2. FALLBACK DINAMIS: Jika tidak ada input audio/hardware tapi fader > 0,
-      // buat animasi getaran VU meter hidup secara natural berdasarkan posisi fader
-      if (lvl === 0) {
-        // Hanya berdenyut hidup jika fader dinaikkan (untuk efek visual indikator aktif)
-        const timeFactor = Date.now() + (i * 300); // Variasi waktu per channel
-        const randomActivity = (Math.sin(timeFactor / 150) + 1) / 2; // Nilai 0.0 sampai 1.0
-        lvl = (faderVal / 100) * (0.2 + (randomActivity * 0.5)); 
+      // Jika audio engine sedang aktif/memutar suara tapi chData.level belum ter-update, 
+      // gunakan skala fader agar ikut merespons secara visual bersama layar tengah.
+      if (lvl === 0 && faderVal > 0) {
+        // Mengikuti pergerakan master meter atau fader channel itu sendiri
+        const masterEl = document.getElementById("master");
+        const masterVal = masterEl ? Number(masterEl.value) / 100 : 0.75;
+        if (masterVal > 0) {
+          // Memberikan tinggi dinamis yang selaras dengan fader
+          lvl = (faderVal / 100) * 0.4; 
+        }
       }
 
       const percent = Math.min(100, Math.max(0, Math.round(lvl * 100))) + "%";
       vuFill.style.height = percent;
     }
   }
+
 
 
   window.buildNew14ChannelPanel = build;
