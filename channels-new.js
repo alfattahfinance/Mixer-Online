@@ -200,9 +200,12 @@
       <div class="fader-area new-channel-fader">
         <label>VOLUME</label>
         <input class="new-fader channel-fader" data-k="fader" type="range" min="0" max="100" step="1" value="${Number(c.fader ?? 75)}">
-        <div class="ch-side-vu"><div class="ch-side-vu-fill" style="height: 0%;"></div></div>
+        <div class="ch-side-vu" style="position:relative !important; width:10px !important; height:290px !important; background:#040608 !important; border:1px solid rgba(255,255,255,0.2) !important; border-radius:2px !important; overflow:hidden !important; display:flex !important; flex-direction:column-reverse !important; z-index:1 !important;">
+         <div class="ch-side-vu-fill" style="width:100% !important; height:0%; background: linear-gradient(0deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 66%, #f39c12 85%, #e74c3c 86%, #ff0000 100%) !important;"></div>
+        </div>
         <output class="fader-val">${Math.round(Number(c.fader ?? 75))}%</output>
       </div>
+
 
       <div class="new-channel-buttons">
         <button type="button" data-k="mute" class="${c.mute ? "on" : ""}">${c.mute ? "UNMUTE" : "MUTE"}</button>
