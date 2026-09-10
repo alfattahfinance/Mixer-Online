@@ -216,7 +216,30 @@
         const rms = Math.sqrt(sum / data.length);
         level = Math.max(0, Math.min(1, rms * 3.5));
       } 
-      
+        /* ------------------------------------------------------------------------
+     START METERS LOOP & AUTO-INIT CHANNELS
+     ------------------------------------------------------------------------ */
+
+  // Pastikan ke-14 channel otomatis memiliki node dasar saat engine siap
+  document.addEventListener("DOMContentLoaded", () => {
+    for (let i = 1; i <= N; i++) {
+      if (!channelNodes[i]) {
+        window.initChannelAudioNode(i, null);
+      }
+    }
+  });
+
+  // Jalankan juga langsung jika DOM sudah terlanjur ready
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    for (let i = 1; i <= N; i++) {
+      if (!channelNodes[i]) {
+        window.initChannelAudioNode(i, null);
+      }
+    }
+  }
+
+  requestAnimationFrame(updateChannelMeters);
+
       // FALLBACK AMAN: Jika channel sedang memainkan media/audio element atau aktif diputar tetapi analyser belum terikat sempurna,
       // berikan respons visual dinamis agar indikator tetap menyala hidup naik-turun sesuai fader-nya.
       const mediaEl = channelAudioElements[ch];
