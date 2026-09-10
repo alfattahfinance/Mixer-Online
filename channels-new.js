@@ -89,7 +89,7 @@
         display: flex !important;
         flex-direction: column-reverse !important;
         z-index: 1 !important;
-        padding: 1px !important;
+        padding: 0 !important;
         box-sizing: border-box !important;
       }
 
@@ -97,7 +97,7 @@
         width: 100% !important;
         height: 0%;
         background: linear-gradient(0deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 66%, #f39c12 85%, #e74c3c 86%, #ff0000 100%) !important;
-        border-radius: 1px !important;
+        border-radius: 0px !important;
         transition: height 0.05s linear !important;
         will-change: height;
       }
@@ -232,8 +232,6 @@
             if (k === "fader") {
               const out = el.querySelector("output");
               if (out) out.textContent = Math.round(n) + "%";
-              // KODE PENGUBAH TINGGI METERAN DI SINI TELAH DIHAPUS 
-              // AGAR METERAN TIDAK IKUT-IKUTAN BERGERAK SAAT FADER DIGESER.
             } else {
               const knobTxt = el.querySelector(`.knob-val[data-val="${k}"]`);
               if (knobTxt) knobTxt.textContent = formatVal(k, n);
@@ -304,9 +302,8 @@
           if (k === "fader") {
             const out = el.querySelector("output");
             if (out) out.textContent = Math.round(Number(c.fader ?? 75)) + "%";
-            // KODE PENGUBAH TINGGI METERAN DI SINI JUGA TELAH DIHAPUS
           } else {
-            const knobTxt = el.querySelector(`.knob-val[data-val="${k}"]`);
+            const knobTxt = el.querySelector(`.knox-val[data-val="${k}"]`)||el.querySelector(`.knob-val[data-val="${k}"]`);
             if (knobTxt) knobTxt.textContent = formatVal(k, c[k]);
           }
         }
