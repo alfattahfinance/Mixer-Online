@@ -435,17 +435,16 @@
     accent-color: var(--accent-color);
     margin-top: 2px;
   }
-    /* ==========================================================
-     5. MASTER RACK & AUX (INDIKATOR MASTER DIPERPANJANG KE BAWAH)
+   /* ==========================================================
+     5. MASTER RACK & AUX (TARIK PENUH MENTOK BAWAH)
      ========================================================== */
   aside.master-rack {
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
+    justify-content: space-between !important; /* Membentangkan elemen dari paling atas ke paling bawah */
     width: 110px !important;
     min-width: 110px !important;
     height: 100% !important;
-    min-height: 0 !important;
     background: var(--panel-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
@@ -453,18 +452,13 @@
     box-sizing: border-box !important;
   }
 
-  aside.master-rack > div, aside.master-rack > section {
-    width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  /* INDIKATOR MAIN L/R DIPERPANJANG KE BAWAH */
+  /* INDIKATOR MAIN L/R */
   .main-meters {
     display: flex !important;
     gap: 8px !important;
     justify-content: center !important;
     align-items: center !important;
-    height: 180px !important; /* Ditinggikan agar meteran merentang ke bawah */
+    height: 180px !important;
     min-height: 180px !important;
     padding: 3px !important;
     background: #040608 !important;
@@ -508,13 +502,14 @@
     margin-top: 2px !important;
   }
 
+  /* MASTER CARD LATAR BELAKANG DIPAKSA TARIK KE BAWAH */
   .master-card {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    flex-grow: 1 !important;
-    justify-content: center !important;
-    margin: 4px 0 !important;
+    flex-grow: 1 !important; /* Dipaksa mengisi seluruh sisa ruang kosong vertikal */
+    justify-content: space-between !important; /* Menyebarkan isi dari atas ke bawah */
+    margin: 3px 0 !important;
     background: var(--main-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 3px !important;
@@ -525,7 +520,8 @@
 
   .master-card input[type="range"] {
     height: 100% !important;
-    min-height: 160px !important;
+    flex-grow: 1 !important; /* Slider fader ikut tertarik merentang penuh ke bawah */
+    min-height: 140px !important;
     width: 20px !important;
     accent-color: var(--accent-color) !important;
     cursor: pointer !important;
@@ -567,6 +563,7 @@
     margin: 1px auto !important;
     cursor: pointer !important;
   }
+
 
   /* ==========================================================
      6. BOTTOM NAV STYLING
