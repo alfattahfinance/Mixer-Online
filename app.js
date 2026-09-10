@@ -167,13 +167,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // C. Sync Event Balik dari Hardware/Bridge (Feedback)
+  // C. Sync Event Balik dari Hardware/Bridge (Feedback & Meter Real-Time)
   const syncRxToUI = (event) => {
     const data = event.detail;
-    if (!data || (data.type !== "FEEDBACK" && data.type !== "CONTROL")) return;
+    if (!data) return;
 
     const ch = Number(data.ch);
-    if (ch >= 1 && ch <= 14 && data.param) {
+    if (isNaN(ch) || ch < 1 || ch > 14) return;
+
+    // 1. Tangkap paket METER dari hardware/mixer fisik
+    if (data.type === "METER") {
+      const rawLevel = Number(data.level ?? data.value ?? 0);
+      const levelPercent = Math.min(100, Math.max(0, Math.round(rawLevel > 1 ? rawLevel : rawLevel * 100)));
+
+      const strip = document.querySelector(`.new-channel-strip[data-ch="${ch}"], .channel-strip[data-ch="${ch}"]`);
+      if (strip) {
+        const vuBar = strip.querySelector(".ch-side-vu-fill");
+        if (vuBar) {
+          vuBar.style.height = `${levelPercent}%`;
+          vuBar.style.setProperty("height", `${levelPercent}%`, "important");
+        }
+      }
+      return;
+    }
+
+    // 2. Tangkap paket FEEDBACK atau CONTROL
+    if ((data.type === "FEEDBACK" || data.type === "CONTROL") && data.param) {
       updateChannelControl(ch, data.param, data.value);
     }
   };
