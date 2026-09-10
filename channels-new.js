@@ -43,14 +43,14 @@
         box-shadow: 0 0 6px rgba(255,59,48,.65), inset 0 1px 1px rgba(255,255,255,.35) !important;
       }
 
-      /* FADER AREA: Menggunakan Flex agar posisi Fader dan Meteran Berjajar Rapi ke Samping */
+            /* FADER AREA: Menggunakan Flexbox dengan jarak yang pas */
       .new-channel-strip .fader-area {
         position: relative !important;
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 6px !important;
+        gap: 2px !important;
         width: 100% !important;
         height: auto !important;
         min-height: 310px !important;
@@ -63,14 +63,14 @@
         cursor: pointer !important;
       }
 
-      /* Slider Fader di Sebelah Kiri */
+      /* Slider Fader di Sebelah Kiri (Lebar diperkecil sedikit agar ada ruang untuk meteran) */
       .new-channel-strip .fader-area input.channel-fader, 
       .new-channel-strip .fader-area input.new-fader {
-        width: 24px !important;
+        width: 18px !important;
         height: 270px !important;
         min-height: 270px !important;
         position: relative !important;
-        z-index: 3 !important;
+        z-index: 1 !important;
         background: transparent !important;
         accent-color: var(--accent-color) !important;
         margin: 0 !important;
@@ -79,11 +79,11 @@
       /* KOTAK LED METER VERTIKAL DI SEBELAH KANAN FADER */
       .new-channel-strip .ch-side-vu {
         position: relative !important;
-        width: 10px !important;
+        width: 12px !important;
         height: 270px !important;
         min-height: 270px !important;
         background: #040608 !important;
-        border: 1px solid rgba(255,255,255,0.2) !important;
+        border: 1px solid rgba(255,255,255,0.3) !important;
         border-radius: 2px !important;
         overflow: hidden !important;
         display: flex !important;
@@ -93,7 +93,6 @@
         box-sizing: border-box !important;
         flex-shrink: 0 !important;
       }
-
       .new-channel-strip .ch-side-vu .ch-side-vu-fill {
         width: 100% !important;
         height: 0%;
