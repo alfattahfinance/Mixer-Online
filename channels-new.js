@@ -137,7 +137,7 @@
     for (let i = 0; i < N; i++) {
       if (!window.state.channels[i]) {
         window.state.channels[i] = {
-          gain: 1, high: 0, mid: 0, low: 0, pan: 0, fader: 75, mute: false, solo: false
+          gain: 1, high: 0, mid: 0, low: 0, pan: 0, fader: 75, mute: false, solo: false, level: 0
         };
       }
     }
@@ -205,7 +205,6 @@
         </div>
         <output class="fader-val">${Math.round(Number(c.fader ?? 75))}%</output>
       </div>
-
 
       <div class="new-channel-buttons">
         <button type="button" data-k="mute" class="${c.mute ? "on" : ""}">${c.mute ? "UNMUTE" : "MUTE"}</button>
@@ -306,7 +305,7 @@
             const out = el.querySelector("output");
             if (out) out.textContent = Math.round(Number(c.fader ?? 75)) + "%";
           } else {
-            const knobTxt = el.querySelector(`.knox-val[data-val="${k}"]`)||el.querySelector(`.knob-val[data-val="${k}"]`);
+            const knobTxt = el.querySelector(`.knob-val[data-val="${k}"]`);
             if (knobTxt) knobTxt.textContent = formatVal(k, c[k]);
           }
         }
