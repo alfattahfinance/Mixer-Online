@@ -173,7 +173,7 @@
   window.refreshAudioDOMCache = function() {
     cachedStrips = null;
   };
-  function updateChannelMeters(timestamp) {
+    function updateChannelMeters(timestamp) {
     requestAnimationFrame(updateChannelMeters);
 
     if (timestamp - lastMeterUpdate < 33) return;
@@ -186,22 +186,20 @@
       if (!Number.isInteger(ch) || ch < 1 || ch > 14) return;
 
       const nodes = channelNodes[ch];
-      const sideVuFill = strip.querySelector(".ch-side-vu-fill");
-      const topMeter = strip.querySelector(".ch-top-vu-fill, .channel-meter-bar");
+      const sideVuFill = strip.querySelector(".ch-side-vu-fill, .ch-top-vu-fill, .channel-meter-bar");
 
       const muted = Boolean(window.state?.channels?.[ch - 1]?.mute);
       const faderVal = Number(window.state?.channels?.[ch - 1]?.fader ?? 75);
       
       if (muted || faderVal === 0) {
         if (sideVuFill) sideVuFill.style.setProperty("height", "0%", "important");
-        if (topMeter) topMeter.style.setProperty("height", "0%", "important");
         return;
       }
 
       let level = 0;
 
-      // 1. Ambil level dari Analyser Node Web Audio API jika aktif
-      if (nodes?.analyser) {
+      // AMBIL LEVEL MURNI DARI ANALYSER MASING-MASING CHANNEL (TERISOLASI)
+      if (nodes && nodes.analyser) {
         const data = new Uint8Array(nodes.analyser.fftSize);
         nodes.analyser.getByteTimeDomainData(data);
 
@@ -212,31 +210,25 @@
         }
         const rms = Math.sqrt(sum / data.length);
         level = Math.max(0, Math.min(1, rms * 4.0));
-      }
-
-      // 2. Safety Fallback: Jika audio element sedang berputar (playing), berikan respons visual dinamis
-      const mediaEl = channelAudioElements[ch];
-      const isPlaying = mediaEl && !mediaEl.paused && !mediaEl.ended;
-
-      if (isPlaying && level < 0.05) {
-        level = (Math.random() * 0.6 + 0.2); 
+      } else {
+        // Jika node channel belum diinisialisasi, periksa apakah elemen audio khusus channel ini sedang aktif
+        const mediaEl = channelAudioElements[ch];
+        if (mediaEl && !mediaEl.paused && !mediaEl.ended) {
+          level = (Math.random() * 0.5 + 0.2); // Fallback aktif khusus channel ini saja
+        }
       }
 
       const visibleLevel = muted ? 0 : level;
       const finalPercent = Math.round(visibleLevel * (faderVal / 100) * 100) + "%";
 
-      // Terapkan langsung ke elemen visual DOM fader samping
+      // Terapkan tinggi secara independen pada strip channel ini
       if (sideVuFill) {
         sideVuFill.style.height = finalPercent;
         sideVuFill.style.setProperty("height", finalPercent, "important");
       }
-      if (topMeter) {
-        topMeter.style.height = finalPercent;
-        topMeter.style.setProperty("height", finalPercent, "important");
-      }
     });
 
-    // MASTER L/R METERS
+    // MASTER L/R METERS Tetap Berjalan Normal
     const master = ensureMaster();
     if (master && master._analyser) {
       const data = new Uint8Array(master._analyser.fftSize);
@@ -259,6 +251,7 @@
       if (masterMeterR) masterMeterR.style.setProperty("height", outPct, "important");
     }
   }
+
 
 
   /* ------------------------------------------------------------------------
