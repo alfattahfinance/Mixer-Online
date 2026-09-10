@@ -40,7 +40,7 @@ main.console {
   width: max-content !important;
   min-width: 100% !important;
   gap: 6px !important;
-  padding: 4px 4px 0px 4px !important; /* Padding bawah 0px agar mentok ke nav */
+  padding: 4px 4px 0px 4px !important;
   align-items: stretch !important;
   background: var(--console-bg) !important;
   box-sizing: border-box !important;
@@ -94,33 +94,19 @@ main.console {
   justify-content: space-between !important;
   background: var(--strip-bg) !important;
   border-right: 1px dashed var(--strip-border) !important;
-  padding: 10px 2px 0px 2px !important; /* Padding-top 10px menurunkan knob atas */
+  padding: 10px 2px 0px 2px !important;
   box-sizing: border-box !important;
   height: 100% !important;
   margin-bottom: 0 !important;
 }
 
-/* A. Indikator Sinyal Vertikal Panjang (Latar Belakang Knob) */
+/* A. Sembunyikan Indikator Sinyal Vertikal Lama agar tidak bentrok dengan .ch-side-vu baru */
 .ch-long-vu, .channel-meter-vertical {
-  position: absolute !important;
-  z-index: 1 !important; /* Di belakang knob agar interaksi bebas */
-  pointer-events: none !important;
-  width: 6px !important;
-  top: 28px !important;
-  bottom: 255px !important; /* Memanjang sejajar area knob */
-  background: #040608 !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 2px !important;
-  overflow: hidden !important;
-  display: flex !important;
-  flex-direction: column-reverse !important;
+  display: none !important;
 }
 
 .ch-long-vu-fill, .channel-meter-bar {
-  width: 100% !important;
-  height: 0%;
-  background: linear-gradient(0deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 80%, #e74c3c 100%) !important;
-  transition: height 0.05s ease-out !important;
+  display: none !important;
 }
 
 /* B. Lampu Bulat LED Top */
@@ -145,16 +131,16 @@ main.console {
   box-shadow: 0 0 6px var(--accent-red) !important;
 }
 
-/* C. Kelompok Knob Gain, HIGH, MID, LOW, PAN (Diturunkan Secara Presisi) */
+/* C. Kelompok Knob Gain, HIGH, MID, LOW, PAN */
 .ch-controls-group, .knobs-container {
   position: relative !important;
-  z-index: 2 !important; /* Knob berada di atas layer VU Meter */
+  z-index: 2 !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   gap: 6px !important;
   width: 100% !important;
-  margin-top: 6px !important; /* Menurunkan posisi knob agar tidak tertutup */
+  margin-top: 6px !important;
   margin-bottom: 4px !important;
 }
 
@@ -165,7 +151,7 @@ main.console {
   cursor: pointer !important;
 }
 
-/* D. Label VOLUME & Slider Fader Vertikal (Mendorong Mute/Solo Mentok Bawah) */
+/* D. Label VOLUME & Slider Fader Vertikal */
 .volume-label-text {
   position: relative !important;
   z-index: 2 !important;
@@ -197,7 +183,7 @@ main.console {
   appearance: slider-vertical !important;
   writing-mode: bt-lr !important;
   width: 18px !important;
-  height: 250px !important; /* Menutup celah kosong bagian bawah */
+  height: 250px !important;
   background: #06080a !important;
   border: 1px solid var(--strip-border) !important;
   border-radius: 3px !important;
@@ -205,7 +191,7 @@ main.console {
   accent-color: var(--accent-cyan) !important;
 }
 
-/* E. Tombol MUTE & SOLO (Presisi di Dasar Strip) */
+/* E. Tombol MUTE & SOLO */
 .new-channel-buttons {
   position: relative !important;
   z-index: 2 !important;
