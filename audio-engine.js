@@ -186,7 +186,12 @@
       if (!Number.isInteger(ch) || ch < 1 || ch > 14) return;
 
       const nodes = channelNodes[ch];
-      const sideVuFill = strip.querySelector(".ch-side-vu-fill, .ch-top-vu-fill, .channel-meter-bar");
+            const sideVuFill = strip.querySelector(".ch-side-vu-fill") || strip.querySelector(".channel-meter-bar");
+      if (sideVuFill) {
+        sideVuFill.style.height = finalPercent;
+        sideVuFill.style.setProperty("height", finalPercent, "important");
+      }
+
 
       const muted = Boolean(window.state?.channels?.[ch - 1]?.mute);
       const faderVal = Number(window.state?.channels?.[ch - 1]?.fader ?? 75);
