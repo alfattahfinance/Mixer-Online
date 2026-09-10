@@ -330,13 +330,18 @@
       (i <= 7 ? left : right).appendChild(make(i));
     }
   }
-
   // ============================================================
-  // LOOP MANDIRI UNTUK MEMASTIKAN METERAN SELALU MENYALA DARI STATE
+  // LOOP MANDIRI: METERAN MENYALA DARI AUDIO, HARDWARE, ATAU SIMULASI
   // ============================================================
   function startStandaloneMeterLoop() {
     requestAnimationFrame(startStandaloneMeterLoop);
     if (!window.state || !window.state.channels) return;
+
+    // Jika sistem sedang OFF, matikan semua meteran
+    if (!window.state.system) {
+      document.querySelectorAll(".ch-side-vu-fill").forEach(el => el.style.height = "0%");
+      return;
+    }
 
     for (let i = 1; i <= N; i++) {
       const chData = window.state.channels[i - 1];
@@ -356,19 +361,23 @@
         continue;
       }
 
-      // Ambil level dari state (baik dari audio engine maupun feedback hardware)
+      // 1. Ambil level dari data nyata (Audio Engine / Hardware Feedback)
       let lvl = Number(chData.level || 0);
-      
-      // Jika level 0 tapi fader aktif, berikan sedikit denyut visual atau baca langsung fader
-      if (lvl === 0 && faderVal > 0 && window.state.system) {
-        // Mengikuti proporsi fader atau simulasi kecil jika ada audio aktif
-        lvl = (faderVal / 100) * 0.3; 
+
+      // 2. FALLBACK DINAMIS: Jika tidak ada input audio/hardware tapi fader > 0,
+      // buat animasi getaran VU meter hidup secara natural berdasarkan posisi fader
+      if (lvl === 0) {
+        // Hanya berdenyut hidup jika fader dinaikkan (untuk efek visual indikator aktif)
+        const timeFactor = Date.now() + (i * 300); // Variasi waktu per channel
+        const randomActivity = (Math.sin(timeFactor / 150) + 1) / 2; // Nilai 0.0 sampai 1.0
+        lvl = (faderVal / 100) * (0.2 + (randomActivity * 0.5)); 
       }
 
       const percent = Math.min(100, Math.max(0, Math.round(lvl * 100))) + "%";
       vuFill.style.height = percent;
     }
   }
+
 
   window.buildNew14ChannelPanel = build;
   window.syncNew14ChannelPanel = sync;
