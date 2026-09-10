@@ -1,1 +1,151 @@
-/* ==========================================================================\n   FADER VU METER — CH1-CH14\n   Indikator audio aktual di sisi jalur FADER.\n   Hijau -> Kuning -> Merah.\n   Tidak mengubah ukuran, nilai, atau gerakan FADER.\n   ========================================================================== */\n.new-channel-strip {\n  position: relative !important;\n}\n\n/* Hapus indikator segmented lama. */\n.new-channel-strip .new-channel-meter {\n  display: none !important;\n}\n\n/* Indikator baru: tipis, berada DI AREA FADER tepat di samping track. */\n.new-channel-strip .fader-area .ch-top-vu {\n  position: absolute !important;\n  top: 20px !important;\n  bottom: 35px !important;\n  left: calc(50% + 17px) !important;\n  transform: none !important;\n  width: 8px !important;\n  height: auto !important;\n  margin: 0 !important;\n  padding: 1px !important;\n  background: #050708 !important;\n  border: 1px solid #303840 !important;\n  border-radius: 3px !important;\n  box-shadow: inset 0 0 4px #000, 0 0 3px rgba(0,0,0,.8) !important;\n  overflow: hidden !important;\n  display: flex !important;\n  flex-direction: column-reverse !important;\n  z-index: 4 !important;\n  pointer-events: none !important;\n  opacity: 1 !important;\n}\n\n/* Skala kecil pada meter. */\n.new-channel-strip .fader-area .ch-top-vu::before {\n  content: "" !important;\n  position: absolute !important;\n  inset: 1px !important;\n  background: repeating-linear-gradient(to bottom, rgba(255,255,255,.18) 0, rgba(255,255,255,.18) 1px, transparent 1px, transparent 5px) !important;\n  pointer-events: none !important;\n  z-index: 2 !important;\n}\n\n/* Level audio aktual: HIJAU -> KUNING -> MERAH. */\n.new-channel-strip .fader-area .ch-top-vu .ch-top-vu-fill {\n  position: absolute !important;\n  left: 1px !important;\n  right: 1px !important;\n  bottom: 1px !important;\n  width: auto !important;\n  height: 0%;\n  min-height: 2px !important;\n  background: linear-gradient(to top, #31e66b 0%, #31e66b 64%, #ffd21c 65%, #ffd21c 84%, #ff3b30 85%, #ff3b30 100%) !important;\n  border-radius: 1px !important;\n  box-shadow: 0 0 6px rgba(49,230,107,.7) !important;\n  z-index: 1 !important;\n  transition: height .05s linear !important;\n}\n\n/* Override selector lebih kuat daripada skin lama di channels-new.js.\n   Hanya mengatur posisi/ukuran indikator; tidak mengubah FADER. */\n.channel-bank .new-channel-strip .fader-area .ch-top-vu {\n  left: calc(50% + 17px) !important;\n  width: 8px !important;\n  top: 20px !important;\n  bottom: 35px !important;\n  z-index: 4 !important;\n}\n\n/* FADER tetap dapat disentuh dan tidak digerakkan oleh meter. */\n.new-channel-strip .fader-area input[type="range"],\n.new-channel-strip .fader-area output,\n.new-channel-strip .fader-area label {\n  position: relative !important;\n  z-index: 3 !important;\n}\n\n@media screen and (max-width: 1024px) {\n  .channel-bank .new-channel-strip .fader-area .ch-top-vu {\n    left: calc(50% + 17px) !important;\n    width: 8px !important;\n    top: 20px !important;\n    bottom: 35px !important;\n  }\n}\n\n/* ==========================================================================\n   MASTER DASHBOARD — SAMAKAN DENGAN TINGGI/LEBAR SATU CHANNEL STRIP\n   Fokus hanya pada MASTER. Tidak mengubah channel, dashboard lain, atau ESP32.\n   ========================================================================== */\nhtml body main.console > aside.master-rack {\n  flex: 0 0 72px !important;\n  width: 72px !important;\n  min-width: 72px !important;\n  max-width: 72px !important;\n  height: auto !important;\n  min-height: 0 !important;\n  align-self: stretch !important;\n  box-sizing: border-box !important;\n  overflow: hidden !important;\n}\n\nhtml body main.console > aside.master-rack .master-card {\n  width: 100% !important;\n  height: 100% !important;\n  min-height: 0 !important;\n  flex: 1 1 auto !important;\n  box-sizing: border-box !important;\n}\n\nhtml body main.console > aside.master-rack .master-card input[type="range"] {\n  width: 20px !important;\n  max-width: 20px !important;\n  height: 230px !important;\n  max-height: 230px !important;\n}\n\n@media screen and (max-width: 1024px) {\n  html body main.console > aside.master-rack {\n    flex: 0 0 72px !important;\n    width: 72px !important;\n    min-width: 72px !important;\n    max-width: 72px !important;\n    height: auto !important;\n    align-self: stretch !important;\n  }\n}\n\n/* ==========================================================================\n   SCREEN MIXER — PERKECIL SEDIKIT SAJA\n   Hanya mengatur lebar kolom CENTER/SCREEN MIXER.\n   CH1-CH14, indikator, MASTER, FX/AUX dan ESP32 tidak disentuh.\n   ========================================================================== */\nmain.console {\n  grid-template-columns: minmax(260px, 1fr) 290px minmax(260px, 1fr) 85px !important;\n}\n\n@media screen and (max-width: 1024px) {\n  main.console > .center-console {\n    min-width: 290px !important;\n  }\n}\n
+/* ==========================================================================
+   FADER VU METER — CH1-CH14
+   Indikator audio aktual di sisi jalur FADER.
+   Hijau -> Kuning -> Merah.
+   Tidak mengubah ukuran, nilai, atau gerakan FADER.
+   ========================================================================== */
+.new-channel-strip {
+  position: relative !important;
+}
+
+/* Hapus indikator segmented lama. */
+.new-channel-strip .new-channel-meter {
+  display: none !important;
+}
+
+/* Indikator baru: tipis, berada DI AREA FADER merentang penuh ke bawah. */
+.new-channel-strip .fader-area .ch-top-vu {
+  position: absolute !important;
+  top: 6px !important;
+  bottom: 6px !important;
+  left: calc(50% + 17px) !important;
+  transform: none !important;
+  width: 8px !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 1px !important;
+  background: #050708 !important;
+  border: 1px solid #303840 !important;
+  border-radius: 3px !important;
+  box-shadow: inset 0 0 4px #000, 0 0 3px rgba(0,0,0,.8) !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column-reverse !important;
+  z-index: 4 !important;
+  pointer-events: none !important;
+  opacity: 1 !important;
+}
+
+/* Skala kecil pada meter. */
+.new-channel-strip .fader-area .ch-top-vu::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 1px !important;
+  background: repeating-linear-gradient(to bottom, rgba(255,255,255,.18) 0, rgba(255,255,255,.18) 1px, transparent 1px, transparent 5px) !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
+}
+
+/* Level audio aktual: HIJAU -> KUNING -> MERAH. */
+.new-channel-strip .fader-area .ch-top-vu .ch-top-vu-fill {
+  position: absolute !important;
+  left: 1px !important;
+  right: 1px !important;
+  bottom: 1px !important;
+  width: auto !important;
+  height: 0%;
+  min-height: 2px !important;
+  background: linear-gradient(to top, #31e66b 0%, #31e66b 64%, #ffd21c 65%, #ffd21c 84%, #ff3b30 85%, #ff3b30 100%) !important;
+  border-radius: 1px !important;
+  box-shadow: 0 0 6px rgba(49,230,107,.7) !important;
+  z-index: 1 !important;
+  transition: height .05s linear !important;
+}
+
+/* Override selector lebih kuat daripada skin lama di channels-new.js. */
+.channel-bank .new-channel-strip .fader-area .ch-top-vu {
+  left: calc(50% + 17px) !important;
+  width: 8px !important;
+  top: 6px !important;
+  bottom: 6px !important;
+  z-index: 4 !important;
+}
+
+/* FADER tetap dapat disentuh dan tidak digerakkan oleh meter. */
+.new-channel-strip .fader-area input[type="range"],
+.new-channel-strip .fader-area output,
+.new-channel-strip .fader-area label {
+  position: relative !important;
+  z-index: 3 !important;
+}
+
+@media screen and (max-width: 1024px) {
+  .channel-bank .new-channel-strip .fader-area .ch-top-vu {
+    left: calc(50% + 17px) !important;
+    width: 8px !important;
+    top: 6px !important;
+    bottom: 6px !important;
+  }
+}
+
+/* ==========================================================================
+   MASTER DASHBOARD — MENTOK PENUH KE BAWAH (TABLET OPTIMIZED)
+   ========================================================================== */
+html body main.console > aside.master-rack {
+  flex: 0 0 72px !important;
+  width: 72px !important;
+  min-width: 72px !important;
+  max-width: 72px !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  align-self: stretch !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+html body main.console > aside.master-rack .master-card {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  flex-grow: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  box-sizing: border-box !important;
+}
+
+html body main.console > aside.master-rack .master-card input[type="range"] {
+  width: 20px !important;
+  max-width: 20px !important;
+  height: 100% !important;
+  min-height: 180px !important;
+  flex-grow: 1 !important;
+  margin: 4px auto !important;
+}
+
+@media screen and (max-width: 1024px) {
+  html body main.console > aside.master-rack {
+    flex: 0 0 72px !important;
+    width: 72px !important;
+    min-width: 72px !important;
+    max-width: 72px !important;
+    height: 100% !important;
+    align-self: stretch !important;
+  }
+}
+
+/* ==========================================================================
+   SCREEN MIXER — PERKECIL SEDIKIT SAJA
+   ========================================================================== */
+main.console {
+  grid-template-columns: minmax(260px, 1fr) 290px minmax(260px, 1fr) 85px !important;
+}
+
+@media screen and (max-width: 1024px) {
+  main.console > .center-console {
+    min-width: 290px !important;
+  }
+}
