@@ -173,7 +173,8 @@
   window.refreshAudioDOMCache = function() {
     cachedStrips = null;
   };
-    function updateChannelMeters(timestamp) {
+
+  function updateChannelMeters(timestamp) {
     requestAnimationFrame(updateChannelMeters);
 
     if (timestamp - lastMeterUpdate < 33) return;
@@ -186,15 +187,11 @@
       if (!Number.isInteger(ch) || ch < 1 || ch > 14) return;
 
       const nodes = channelNodes[ch];
-            const sideVuFill = strip.querySelector(".ch-side-vu-fill") || strip.querySelector(".channel-meter-bar");
-      if (sideVuFill) {
-        sideVuFill.style.height = finalPercent;
-        sideVuFill.style.setProperty("height", finalPercent, "important");
-      }
+      const sideVuFill = strip.querySelector(".ch-side-vu-fill") || strip.querySelector(".channel-meter-bar");
 
-
-      const muted = Boolean(window.state?.channels?.[ch - 1]?.mute);
-      const faderVal = Number(window.state?.channels?.[ch - 1]?.fader ?? 75);
+      const channelState = window.state?.channels?.[ch - 1] || {};
+      const muted = Boolean(channelState.mute);
+      const faderVal = Number(channelState.fader ?? 75);
       
       if (muted || faderVal === 0) {
         if (sideVuFill) sideVuFill.style.setProperty("height", "0%", "important");
@@ -203,7 +200,7 @@
 
       let level = 0;
 
-      // AMBIL LEVEL MURNI DARI ANALYSER MASING-MASING CHANNEL (TERISOLASI)
+      // 1. Ambil level dari Analyser Node browser (jika ada pemutaran audio internal)
       if (nodes && nodes.analyser) {
         const data = new Uint8Array(nodes.analyser.fftSize);
         nodes.analyser.getByteTimeDomainData(data);
@@ -215,15 +212,25 @@
         }
         const rms = Math.sqrt(sum / data.length);
         level = Math.max(0, Math.min(1, rms * 4.0));
+      } 
+      
+      // 2. Fallback / Prioritas dari Hardware Feedback (jika audio internal kosong tapi ada data METER masuk dari ESP32/Bluetooth)
+      if (level === 0 && channelState.level !== undefined && channelState.level > 0) {
+        level = Number(channelState.level);
       } else {
-        // Jika node channel belum diinisialisasi, periksa apakah elemen audio khusus channel ini sedang aktif
         const mediaEl = channelAudioElements[ch];
-        if (mediaEl && !mediaEl.paused && !mediaEl.ended) {
-          level = (Math.random() * 0.5 + 0.2); // Fallback aktif khusus channel ini saja
+        if (mediaEl && !mediaEl.paused && !mediaEl.ended && level === 0) {
+          level = (Math.random() * 0.5 + 0.2); 
         }
       }
 
       const visibleLevel = muted ? 0 : level;
+      
+      // Simpan level ke state global
+      if (window.state && window.state.channels && window.state.channels[ch - 1]) {
+        window.state.channels[ch - 1].level = visibleLevel;
+      }
+
       const finalPercent = Math.round(visibleLevel * (faderVal / 100) * 100) + "%";
 
       // Terapkan tinggi secara independen pada strip channel ini
@@ -256,8 +263,6 @@
       if (masterMeterR) masterMeterR.style.setProperty("height", outPct, "important");
     }
   }
-
-
 
   /* ------------------------------------------------------------------------
      MASTER LIVE
