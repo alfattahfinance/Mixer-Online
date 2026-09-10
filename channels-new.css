@@ -77,25 +77,25 @@ main.console > .aux-rack { grid-area:aux !important; }
 .channel,.new-channel-strip { position:relative !important; min-width:65px !important; max-width:95px !important; flex:1 !important; background:linear-gradient(180deg,#181c20 0%,#0d0f11 100%) !important; border:1px solid #2a3035 !important; border-radius:6px 6px 0 0 !important; padding:8px 3px 0 !important; text-align:center !important; display:flex !important; flex-direction:column !important; align-items:center !important; justify-content:space-between !important; box-shadow:inset 0 1px 1px rgba(255,255,255,.08),0 4px 10px rgba(0,0,0,.5) !important; height:100% !important; margin-bottom:0 !important; }
 
 /* =========================================================
-   4. VU / FADER INDICATOR
+   4. VU / FADER INDICATOR (DISELARASKAN KE .ch-side-vu)
    ========================================================= */
-/* Old wide/background meters are disabled. The only visible meter is the
-   narrow meter inside each individual channel's fader area. */
 .channel-meter-vertical,.ch-top-vu { display:none !important; }
 .new-channel-strip .fader-area { position:relative !important; min-width:0 !important; width:100% !important; overflow:visible !important; }
-.new-channel-strip .fader-area > .ch-long-vu {
+
+/* Menggunakan .ch-side-vu agar sesuai dengan elemen meteran fader baru */
+.new-channel-strip .fader-area > .ch-side-vu {
   position:absolute !important;
-  top:0 !important;
-  bottom:auto !important;
+  top:2px !important;
+  bottom:2px !important;
   left:calc(50% + 14px) !important;
   right:auto !important;
-  width:7px !important;
-  height:230px !important;
-  min-width:7px !important;
-  max-width:7px !important;
-  flex:0 0 7px !important;
+  width:8px !important;
+  height:auto !important;
+  min-width:8px !important;
+  max-width:8px !important;
+  flex:0 0 8px !important;
   margin:0 !important;
-  padding:0 !important;
+  padding:1px !important;
   z-index:4 !important;
   pointer-events:none !important;
   display:flex !important;
@@ -106,7 +106,8 @@ main.console > .aux-rack { grid-area:aux !important; }
   border-radius:3px !important;
   box-shadow:0 0 3px rgba(0,0,0,.9) !important;
 }
-.new-channel-strip .fader-area > .ch-long-vu > .ch-long-vu-fill {
+
+.new-channel-strip .fader-area > .ch-side-vu > .ch-side-vu-fill {
   display:block !important;
   width:100% !important;
   height:0% !important;
@@ -117,6 +118,7 @@ main.console > .aux-rack { grid-area:aux !important; }
   background:linear-gradient(to top,var(--green) 0%,var(--green) 65%,var(--yellow) 82%,var(--red) 100%) !important;
   transition:height .05s linear !important;
 }
+
 
 /* =========================================================
    5. CHANNEL CONTROLS & FADERS
