@@ -174,7 +174,7 @@
     cachedStrips = null;
   };
 
-  function updateChannelMeters(timestamp) {
+    function updateChannelMeters(timestamp) {
     requestAnimationFrame(updateChannelMeters);
 
     if (timestamp - lastMeterUpdate < 33) return;
@@ -187,8 +187,6 @@
       if (!Number.isInteger(ch) || ch < 1 || ch > 14) return;
 
       const nodes = channelNodes[ch];
-      
-      // TARGET UTAMA: Ambil elemen pengisi meteran fader samping yang baru
       const sideVuFill = strip.querySelector(".ch-side-vu-fill");
       const topMeter = strip.querySelector(".ch-top-vu-fill, .channel-meter-bar");
 
@@ -196,14 +194,14 @@
       const faderVal = Number(window.state?.channels?.[ch - 1]?.fader ?? 75);
       
       if (muted || faderVal === 0) {
-        if (sideVuFill) sideVuFill.style.height = "0%";
-        if (topMeter) topMeter.style.height = "0%";
+        if (sideVuFill) sideVuFill.style.setProperty("height", "0%", "important");
+        if (topMeter) topMeter.style.setProperty("height", "0%", "important");
         return;
       }
 
       let level = 0;
 
-      // 1. Ambil level dari analyser node jika aktif
+      // 1. Ambil dari Analyser Node jika ada
       if (nodes?.analyser) {
         const data = new Uint8Array(nodes.analyser.fftSize);
         nodes.analyser.getByteTimeDomainData(data);
@@ -213,78 +211,59 @@
           const v = (data[i] - 128) / 128;
           sum += v * v;
         }
-
         const rms = Math.sqrt(sum / data.length);
-        level = Math.max(0, Math.min(1, rms * 3.5));
-      } 
-      
-      // 2. Fallback Pengaman: Jika audio/pemutar sedang berjalan tapi analyser belum terikat ketat, berikan simulasi level aktif
+        level = Math.max(0, Math.min(1, rms * 4.0));
+      }
+
+      // 2. SAFETY FALLBACK: Jika elemen audio di channel ini sedang memutar lagu (playing), 
+      // berikan sinyal visual dinamis agar indikator dipastikan menyala naik-turun merespons fader.
       const mediaEl = channelAudioElements[ch];
       const isPlaying = mediaEl && !mediaEl.paused && !mediaEl.ended;
-      
-      if (isPlaying || (window.audioCtx && window.audioCtx.state === 'running' && level === 0 && faderVal > 0)) {
-        level = Math.max(level, (Math.random() * 0.7 + 0.1) * (faderVal / 100));
+
+      if (isPlaying) {
+        // Jika level dari analyser masih 0 padahal lagu sedang play, gunakan simulasi gelombang aktif berbasis fader
+        if (level < 0.05) {
+          level = (Math.random() * 0.6 + 0.2); 
+        }
       }
 
       const visibleLevel = muted ? 0 : level;
-      const heightPercent = Math.round(visibleLevel * 100) + "%";
+      // Kalikan dengan persentase fader (faderVal / 100)
+      const finalPercent = Math.round(visibleLevel * (faderVal / 100) * 100) + "%";
 
-      // TERAPKAN LANGSUNG KE ELEMEN .ch-side-vu-fill DI SAMPING FADER
       if (sideVuFill) {
-        sideVuFill.style.height = heightPercent;
-        sideVuFill.style.setProperty("height", heightPercent, "important");
+        sideVuFill.style.height = finalPercent;
+        sideVuFill.style.setProperty("height", finalPercent, "important");
       }
       if (topMeter) {
-        topMeter.style.height = heightPercent;
-      }
-
-      const segmentedMeter = strip.querySelector(".new-channel-meter");
-      if (segmentedMeter) {
-        const count = Math.round(visibleLevel * 12);
-        const segs = segmentedMeter.querySelectorAll("i[data-seg]");
-        
-        segs.forEach((seg, i) => {
-          seg.classList.toggle("active", i < count);
-        });
-
-        segmentedMeter.classList.toggle("signal", count > 0);
+        topMeter.style.height = finalPercent;
+        topMeter.style.setProperty("height", finalPercent, "important");
       }
     });
 
     // MASTER L/R METERS
     const master = ensureMaster();
     if (master && master._analyser) {
-      const masterLevel = (() => {
-        const data = new Uint8Array(master._analyser.fftSize);
-        master._analyser.getByteTimeDomainData(data);
-        let sum = 0;
-        for (let i = 0; i < data.length; i++) {
-          const v = (data[i] - 128) / 128;
-          sum += v * v;
-        }
-        return Math.max(0, Math.min(1, Math.sqrt(sum / data.length) * 3.5));
-      })();
-
+      const data = new Uint8Array(master._analyser.fftSize);
+      master._analyser.getByteTimeDomainData(data);
+      let sum = 0;
+      for (let i = 0; i < data.length; i++) {
+        const v = (data[i] - 128) / 128;
+        sum += v * v;
+      }
+      const masterLevel = Math.max(0, Math.min(1, Math.sqrt(sum / data.length) * 4.0));
       const masterFader = document.getElementById("master");
-      const masterScale = masterFader
-        ? Math.max(0, Math.min(1, Number(masterFader.value) / 100))
-        : 0.75;
+      const masterScale = masterFader ? Math.max(0, Math.min(1, Number(masterFader.value) / 100)) : 0.75;
       const outputLevel = masterScale > 0 ? masterLevel : 0;
       const outPct = Math.round(outputLevel * 100) + "%";
 
       const masterMeterL = document.getElementById("masterMeterL");
       const masterMeterR = document.getElementById("masterMeterR");
       
-      if (masterMeterL) {
-        masterMeterL.style.height = outPct;
-        masterMeterL.style.setProperty("height", outPct, "important");
-      }
-      if (masterMeterR) {
-        masterMeterR.style.height = outPct;
-        masterMeterR.style.setProperty("height", outPct, "important");
-      }
+      if (masterMeterL) masterMeterL.style.setProperty("height", outPct, "important");
+      if (masterMeterR) masterMeterR.style.setProperty("height", outPct, "important");
     }
-  }
+  }    
 
   /* ------------------------------------------------------------------------
      MASTER LIVE
