@@ -214,7 +214,7 @@
         level = Math.max(0, Math.min(1, rms * 4.0));
       } 
       
-      // 2. Fallback / Prioritas dari Hardware Feedback (jika audio internal kosong tapi ada data METER masuk dari ESP32/Bluetooth)
+      // 2. Fallback / Prioritas dari Hardware Feedback atau Media Element aktif
       if (level === 0 && channelState.level !== undefined && channelState.level > 0) {
         level = Number(channelState.level);
       } else {
@@ -226,11 +226,12 @@
 
       const visibleLevel = muted ? 0 : level;
       
-      // Simpan level ke state global
+      // Simpan level ke state global agar konsisten dengan modul lain
       if (window.state && window.state.channels && window.state.channels[ch - 1]) {
         window.state.channels[ch - 1].level = visibleLevel;
       }
 
+      // Hitung persentase tinggi meteran berdasarkan level dan nilai fader
       const finalPercent = Math.round(visibleLevel * (faderVal / 100) * 100) + "%";
 
       // Terapkan tinggi secara independen pada strip channel ini
