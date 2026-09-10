@@ -54,7 +54,7 @@
     }
   };
 
-  // Fungsi global untuk memperbarui lampu LED & VU Meter pada ke-14 channel (Diperbarui ke .ch-side-vu-fill)
+  // Fungsi global untuk memperbarui lampu LED & VU Meter pada ke-14 channel
   window.updateAllChannelLeds = function() {
     for (let i = 1; i <= 14; i++) {
       const ch = window.state.channels[i - 1];
@@ -73,21 +73,30 @@
         }
       }
 
-      // 2. Update Isian VU Meter Vertikal (Menargetkan kelas baru .ch-side-vu-fill)
+      // 2. Update Isian VU Meter Vertikal (Menargetkan kelas .ch-side-vu-fill)
       const sideVuFill = channelStrip.querySelector('.ch-side-vu-fill, .ch-top-vu-fill, .channel-meter-bar');
       const longVuFill = channelStrip.querySelector('.ch-long-vu-fill');
       
       if (ch.mute) {
-        if (sideVuFill) sideVuFill.style.height = '0%';
+        if (sideVuFill) {
+          sideVuFill.style.height = '0%';
+          sideVuFill.style.setProperty("height", "0%", "important");
+        }
         if (longVuFill) longVuFill.style.height = '0%';
       } else {
-        // Jika level tidak dikontrol oleh audio engine, gunakan state level
-        const levelPct = Math.min(100, Math.max(0, (ch.level || 0) * 50)) + '%';
-        if (sideVuFill && !window.audioCtx) sideVuFill.style.height = levelPct;
+        // Render level dari feedback hardware secara langsung ke DOM
+        const rawLevel = Number(ch.level || 0);
+        const levelPct = Math.min(100, Math.max(0, Math.round(rawLevel > 1 ? rawLevel : rawLevel * 100))) + '%';
+        
+        if (sideVuFill) {
+          sideVuFill.style.height = levelPct;
+          sideVuFill.style.setProperty("height", levelPct, "important");
+        }
         if (longVuFill) longVuFill.style.height = levelPct;
       }
     }
   };
+
 
   // Helper fungsi untuk memperbarui readout di layar tengah secara instan
   function updateScreenReadoutsLive(chNum, param, val) {
