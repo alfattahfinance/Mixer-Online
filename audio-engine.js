@@ -77,6 +77,8 @@
     try {
       let sourceNode;
 
+      const hasValidMedia = (mediaStreamOrElement instanceof MediaStream) || (mediaStreamOrElement instanceof HTMLMediaElement);
+
       if (mediaStreamOrElement instanceof MediaStream) {
         sourceNode = audioCtx.createMediaStreamSource(mediaStreamOrElement);
       } else if (mediaStreamOrElement instanceof HTMLMediaElement) {
@@ -140,7 +142,8 @@
         high: highBq,
         pan: pannerNode,
         fader: faderNode,
-        analyser: analyserNode
+        analyser: analyserNode,
+        hasActiveMedia: hasValidMedia
       };
 
       console.log(`[AUDIO ENGINE] Jalur audio CH${ch} aktif.`);
@@ -153,7 +156,7 @@
   };
 
   /* ------------------------------------------------------------------------
-     CHANNEL METERS (OPTIMIZED WITH THROTTLING & CACHING)
+     CHANNEL METERS (OPTIMIZED & ISOLATED PER CHANNEL)
      ------------------------------------------------------------------------ */
 
   let lastMeterUpdate = 0;
@@ -182,10 +185,24 @@
 
     strips.forEach(strip => {
       const ch = Number(strip.dataset.ch);
-      const nodes = channelNodes[ch];
-      const meter = strip.querySelector(".new-channel-meter, .ch-top-vu-fill");
+      if (!Number.isInteger(ch) || ch < 1 || ch > 14) return;
 
-      if (!nodes?.analyser || !meter) return;
+      const nodes = channelNodes[ch];
+      const sideVuFill = strip.querySelector(".ch-side-vu-fill");
+      const topMeter = strip.querySelector(".ch-top-vu-fill, .channel-meter-bar");
+
+      const muted = Boolean(window.state?.channels?.[ch - 1]?.mute);
+      const faderVal = Number(window.state?.channels?.[ch - 1]?.fader ?? 75);
+      
+      const mediaEl = channelAudioElements[ch];
+      const isPlaying = mediaEl && !mediaEl.paused && !mediaEl.ended && mediaEl.currentTime > 0;
+
+      // Jika channel di-mute, fader 0, node analyser tidak ada, atau medianya tidak sedang diputar, matikan meternya mutlak!
+      if (muted || faderVal === 0 || !nodes?.analyser || !nodes.hasActiveMedia || !isPlaying) {
+        if (sideVuFill) sideVuFill.style.height = "0%";
+        if (topMeter) topMeter.style.height = "0%";
+        return;
+      }
 
       const data = new Uint8Array(nodes.analyser.fftSize);
       nodes.analyser.getByteTimeDomainData(data);
@@ -198,20 +215,55 @@
 
       const rms = Math.sqrt(sum / data.length);
       const level = Math.max(0, Math.min(1, rms * 3.5));
+      const visibleLevel = (muted || level < 0.01) ? 0 : level;
 
-      if (meter.classList.contains("ch-top-vu-fill")) {
-        meter.style.height = (level * 100) + "%";
-      } else {
-        const count = Math.round(level * 12);
-        const segs = meter.querySelectorAll("i[data-seg]");
+      // Terapkan tinggi secara spesifik pada indikator samping fader channel ini saja
+      if (sideVuFill) {
+        sideVuFill.style.height = (visibleLevel * 100) + "%";
+      }
+      if (topMeter) {
+        topMeter.style.height = (visibleLevel * 100) + "%";
+      }
+
+      const segmentedMeter = strip.querySelector(".new-channel-meter");
+      if (segmentedMeter) {
+        const count = Math.round(visibleLevel * 12);
+        const segs = segmentedMeter.querySelectorAll("i[data-seg]");
         
         segs.forEach((seg, i) => {
           seg.classList.toggle("active", i < count);
         });
 
-        meter.classList.toggle("signal", count > 0);
+        segmentedMeter.classList.toggle("signal", count > 0);
       }
     });
+
+    // MASTER L/R METERS
+    const master = ensureMaster();
+    if (master && master._analyser) {
+      const masterLevel = (() => {
+        const data = new Uint8Array(master._analyser.fftSize);
+        master._analyser.getByteTimeDomainData(data);
+        let sum = 0;
+        for (let i = 0; i < data.length; i++) {
+          const v = (data[i] - 128) / 128;
+          sum += v * v;
+        }
+        return Math.max(0, Math.min(1, Math.sqrt(sum / data.length) * 3.5));
+      })();
+
+      const masterFader = document.getElementById("master");
+      const masterScale = masterFader
+        ? Math.max(0, Math.min(1, Number(masterFader.value) / 100))
+        : 0.75;
+      const outputLevel = masterScale > 0 ? masterLevel : 0;
+
+      const masterMeterL = document.getElementById("masterMeterL");
+      const masterMeterR = document.getElementById("masterMeterR");
+      
+      if (masterMeterL) masterMeterL.style.height = (outputLevel * 100) + "%";
+      if (masterMeterR) masterMeterR.style.height = (outputLevel * 100) + "%";
+    }
   }
 
   /* ------------------------------------------------------------------------
