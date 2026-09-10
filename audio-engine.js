@@ -174,7 +174,7 @@
     cachedStrips = null;
   };
 
-    function updateChannelMeters(timestamp) {
+  function updateChannelMeters(timestamp) {
     requestAnimationFrame(updateChannelMeters);
 
     if (timestamp - lastMeterUpdate < 33) return;
@@ -232,6 +232,7 @@
       // TERAPKAN LANGSUNG KE ELEMEN .ch-side-vu-fill DI SAMPING FADER
       if (sideVuFill) {
         sideVuFill.style.height = heightPercent;
+        sideVuFill.style.setProperty("height", heightPercent, "important");
       }
       if (topMeter) {
         topMeter.style.height = heightPercent;
@@ -269,14 +270,22 @@
         ? Math.max(0, Math.min(1, Number(masterFader.value) / 100))
         : 0.75;
       const outputLevel = masterScale > 0 ? masterLevel : 0;
+      const outPct = Math.round(outputLevel * 100) + "%";
 
       const masterMeterL = document.getElementById("masterMeterL");
       const masterMeterR = document.getElementById("masterMeterR");
       
-      if (masterMeterL) masterMeterL.style.height = Math.round(outputLevel * 100) + "%";
-      if (masterMeterR) masterMeterR.style.height = Math.round(outputLevel * 100) + "%";
+      if (masterMeterL) {
+        masterMeterL.style.height = outPct;
+        masterMeterL.style.setProperty("height", outPct, "important");
+      }
+      if (masterMeterR) {
+        masterMeterR.style.height = outPct;
+        masterMeterR.style.setProperty("height", outPct, "important");
+      }
     }
   }
+
   /* ------------------------------------------------------------------------
      MASTER LIVE
      ------------------------------------------------------------------------ */
@@ -510,6 +519,13 @@
 
         window.connectCustomAudioToChannel(targetCh, url);
       });
+    }
+
+    // Auto-init ke-14 channel nodes saat DOM siap agar analyser langsung terbentuk
+    for (let i = 1; i <= 14; i++) {
+      if (!channelNodes[i]) {
+        window.initChannelAudioNode(i, null);
+      }
     }
   });
 
