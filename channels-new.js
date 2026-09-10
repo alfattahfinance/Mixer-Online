@@ -54,7 +54,7 @@
         flex-grow: 0 !important;
         width: 100% !important;
         height: auto !important;
-        min-height: 320px !important; /* Ditinggikan agar fader memanjang ke bawah */
+        min-height: 320px !important;
         padding: 5px 3px !important;
       }
 
@@ -63,11 +63,11 @@
         cursor: pointer !important;
       }
 
-      /* Slider Fader di Sebelah Kiri (Dibuat tinggi secara presisi) */
+      /* Slider Fader di Sebelah Kiri */
       .new-channel-strip .fader-area input.channel-fader, 
       .new-channel-strip .fader-area input.new-fader {
         width: 26px !important;
-        height: 290px !important; /* Ukuran tinggi fader diperpanjang pas */
+        height: 290px !important;
         min-height: 290px !important;
         position: relative !important;
         z-index: 2 !important;
@@ -80,7 +80,7 @@
       .new-channel-strip .ch-side-vu {
         position: relative !important;
         width: 10px !important;
-        height: 290px !important; /* Dibuat sejajar dengan tinggi fader */
+        height: 290px !important;
         min-height: 290px !important;
         background: #040608 !important;
         border: 1px solid rgba(255,255,255,0.2) !important;
@@ -92,7 +92,6 @@
         padding: 1px !important;
         box-sizing: border-box !important;
       }
-
 
       .new-channel-strip .ch-side-vu .ch-side-vu-fill {
         width: 100% !important;
@@ -119,7 +118,7 @@
         color: #2ecc71 !important;
       }
 
-      /* Sembunyikan elemen meteran bawaan lama yang bikin numpuk */
+      /* Sembunyikan elemen meteran bawaan lama */
       .new-channel-strip .new-channel-meter,
       .new-channel-strip .ch-top-vu,
       .new-channel-strip .ch-long-vu {
@@ -129,7 +128,6 @@
     document.head.appendChild(style);
   }
 
-  // Sisa kode fungsi builder (tetap sama seperti sebelumnya)
   const N = 14;
   const $ = id => document.getElementById(id);
 
@@ -202,7 +200,7 @@
       <div class="fader-area new-channel-fader">
         <label>VOLUME</label>
         <input class="new-fader channel-fader" data-k="fader" type="range" min="0" max="100" step="1" value="${Number(c.fader ?? 75)}">
-        <div class="ch-side-vu"><div class="ch-side-vu-fill" style="height: ${Math.round(Number(c.fader ?? 75))}%;"></div></div>
+        <div class="ch-side-vu"><div class="ch-side-vu-fill" style="height: 0%;"></div></div>
         <output class="fader-val">${Math.round(Number(c.fader ?? 75))}%</output>
       </div>
 
@@ -234,11 +232,8 @@
             if (k === "fader") {
               const out = el.querySelector("output");
               if (out) out.textContent = Math.round(n) + "%";
-              
-              const vuFill = el.querySelector(".ch-side-vu-fill");
-              if (vuFill) {
-                vuFill.style.height = Math.round(n) + "%";
-              }
+              // KODE PENGUBAH TINGGI METERAN DI SINI TELAH DIHAPUS 
+              // AGAR METERAN TIDAK IKUT-IKUTAN BERGERAK SAAT FADER DIGESER.
             } else {
               const knobTxt = el.querySelector(`.knob-val[data-val="${k}"]`);
               if (knobTxt) knobTxt.textContent = formatVal(k, n);
@@ -309,11 +304,7 @@
           if (k === "fader") {
             const out = el.querySelector("output");
             if (out) out.textContent = Math.round(Number(c.fader ?? 75)) + "%";
-            
-            const vuFill = el.querySelector(".ch-side-vu-fill");
-            if (vuFill) {
-              vuFill.style.height = Math.round(Number(c.fader ?? 75)) + "%";
-            }
+            // KODE PENGUBAH TINGGI METERAN DI SINI JUGA TELAH DIHAPUS
           } else {
             const knobTxt = el.querySelector(`.knob-val[data-val="${k}"]`);
             if (knobTxt) knobTxt.textContent = formatVal(k, c[k]);
