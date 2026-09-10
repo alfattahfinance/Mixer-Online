@@ -435,10 +435,30 @@
     accent-color: var(--accent-color);
     margin-top: 2px;
   }
-
   /* ==========================================================
-     5. MASTER RACK & AUX (DISEIMBANGKAN & MENTOK BAWAH)
+     5. MASTER RACK & AUX (LATAR BELAKANG MENTOK BAWAH)
      ========================================================== */
+  aside.master-rack {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    width: 110px !important;
+    min-width: 110px !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    background: var(--panel-bg) !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 4px !important;
+    padding: 4px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Pembungkus/Latar belakang card agar mengisi penuh ruang vertikal */
+  aside.master-rack > div, aside.master-rack > section {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
   .main-meters {
     display: flex !important;
     gap: 6px !important;
@@ -486,36 +506,28 @@
     margin-top: 2px !important;
   }
 
-  aside.master-rack {
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    width: 110px !important;
-    min-width: 110px !important;
-    height: 100% !important;
-    min-height: 0 !important;
-    background: var(--panel-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 4px !important;
-    padding: 4px !important;
-    box-sizing: border-box !important;
-  }
-
   .master-card {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     flex-grow: 1 !important;
     justify-content: center !important;
-    margin: 2px 0 !important;
+    margin: 4px 0 !important;
+    background: var(--main-bg) !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 3px !important;
+    padding: 6px 4px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .master-card input[type="range"] {
     height: 100% !important;
-    min-height: 180px !important;
+    min-height: 160px !important;
     width: 20px !important;
     accent-color: var(--accent-color) !important;
     cursor: pointer !important;
+    margin: 4px 0 !important;
   }
 
   .monitor-card, .phones-card {
@@ -526,10 +538,12 @@
     background: var(--main-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 3px !important;
-    padding: 3px !important;
+    padding: 4px !important;
     font-size: 7px !important;
     gap: 2px !important;
     width: 100% !important;
+    box-sizing: border-box !important;
+    margin-top: 2px !important;
   }
 
   .monitor-card button {
@@ -552,6 +566,7 @@
     cursor: pointer !important;
   }
 
+ 
   /* ==========================================================
      6. BOTTOM NAV STYLING
      ========================================================== */
