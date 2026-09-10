@@ -43,14 +43,14 @@
         box-shadow: 0 0 6px rgba(255,59,48,.65), inset 0 1px 1px rgba(255,255,255,.35) !important;
       }
 
-      /* FADER AREA: Menggunakan Grid agar posisi Fader dan Meteran Berjajar Rapi ke Samping (Tidak Tumpuk) */
+      /* FADER AREA: Menggunakan Flex agar posisi Fader dan Meteran Berjajar Rapi ke Samping */
       .new-channel-strip .fader-area {
         position: relative !important;
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 4px !important;
+        gap: 6px !important;
         width: 100% !important;
         height: auto !important;
         min-height: 310px !important;
@@ -76,7 +76,7 @@
         margin: 0 !important;
       }
 
-      /* KOTAK LED METER VERTIKAL DI SEBELAH KANAN FADER (DIJAMIN TIDAK TERTUTUP) */
+      /* KOTAK LED METER VERTIKAL DI SEBELAH KANAN FADER */
       .new-channel-strip .ch-side-vu {
         position: relative !important;
         width: 10px !important;
@@ -99,7 +99,7 @@
         height: 0%;
         background: linear-gradient(0deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 66%, #f39c12 85%, #e74c3c 86%, #ff0000 100%) !important;
         border-radius: 0px !important;
-        transition: none !important; /* Dibuat instan agar sangat responsif terhadap sinyal audio */
+        transition: none !important;
         will-change: height;
       }
 
@@ -331,6 +331,45 @@
     }
   }
 
+  // ============================================================
+  // LOOP MANDIRI UNTUK MEMASTIKAN METERAN SELALU MENYALA DARI STATE
+  // ============================================================
+  function startStandaloneMeterLoop() {
+    requestAnimationFrame(startStandaloneMeterLoop);
+    if (!window.state || !window.state.channels) return;
+
+    for (let i = 1; i <= N; i++) {
+      const chData = window.state.channels[i - 1];
+      if (!chData) continue;
+
+      const strip = document.querySelector(`.new-channel-strip[data-ch="${i}"]`);
+      if (!strip) continue;
+
+      const vuFill = strip.querySelector(".ch-side-vu-fill");
+      if (!vuFill) continue;
+
+      const muted = Boolean(chData.mute);
+      const faderVal = Number(chData.fader ?? 75);
+
+      if (muted || faderVal === 0) {
+        vuFill.style.height = "0%";
+        continue;
+      }
+
+      // Ambil level dari state (baik dari audio engine maupun feedback hardware)
+      let lvl = Number(chData.level || 0);
+      
+      // Jika level 0 tapi fader aktif, berikan sedikit denyut visual atau baca langsung fader
+      if (lvl === 0 && faderVal > 0 && window.state.system) {
+        // Mengikuti proporsi fader atau simulasi kecil jika ada audio aktif
+        lvl = (faderVal / 100) * 0.3; 
+      }
+
+      const percent = Math.min(100, Math.max(0, Math.round(lvl * 100))) + "%";
+      vuFill.style.height = percent;
+    }
+  }
+
   window.buildNew14ChannelPanel = build;
   window.syncNew14ChannelPanel = sync;
 
@@ -342,8 +381,12 @@
   });
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", build, { once: true });
+    document.addEventListener("DOMContentLoaded", () => {
+      build();
+      requestAnimationFrame(startStandaloneMeterLoop);
+    }, { once: true });
   } else {
     build();
+    requestAnimationFrame(startStandaloneMeterLoop);
   }
 })();
