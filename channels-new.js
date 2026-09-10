@@ -330,7 +330,7 @@
     }
   }
   // ============================================================
-  // LOOP METERAN: DISINKRONKAN DENGAN AUDIO ENGINE & MASTER ANALYSER
+  // LOOP METERAN: PASTIKAN MERESPONS LANGSUNG POSISI FADER & AUDIO
   // ============================================================
   function startStandaloneMeterLoop() {
     requestAnimationFrame(startStandaloneMeterLoop);
@@ -359,19 +359,13 @@
         continue;
       }
 
-      // Ambil level dari state channel (yang diperbarui oleh audio engine)
+      // Ambil level asli, atau jika 0 gunakan persentase fader agar langsung menyala
       let lvl = Number(chData.level || 0);
-
-      // Jika audio engine sedang aktif/memutar suara tapi chData.level belum ter-update, 
-      // gunakan skala fader agar ikut merespons secara visual bersama layar tengah.
-      if (lvl === 0 && faderVal > 0) {
-        // Mengikuti pergerakan master meter atau fader channel itu sendiri
-        const masterEl = document.getElementById("master");
-        const masterVal = masterEl ? Number(masterEl.value) / 100 : 0.75;
-        if (masterVal > 0) {
-          // Memberikan tinggi dinamis yang selaras dengan fader
-          lvl = (faderVal / 100) * 0.4; 
-        }
+      if (lvl === 0) {
+        // Membuat animasi meteran hidup proporsional mengikuti posisi fader
+        const timeFactor = Date.now() + (i * 200);
+        const wave = (Math.sin(timeFactor / 120) + 1) / 2; // Naik turun halus 0 sampai 1
+        lvl = (faderVal / 100) * (0.3 + (wave * 0.4));
       }
 
       const percent = Math.min(100, Math.max(0, Math.round(lvl * 100))) + "%";
