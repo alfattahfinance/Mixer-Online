@@ -27,9 +27,9 @@
   function formatKnobVal(param, val) {
     const num = Number(val);
     if (param === "gain") return num.toFixed(2);
-    if (param === "pan") return num === 0 ? "MID" : (num < 0 ? "L" + Math.round(Math.abs(num) * 100) : "R" + Math.round(num * 100));
-    if (["high", "mid", "low"].includes(param)) return (num > 0 ? "+" : "") + Math.round(num) + "dB";
-    return num;
+    if (param === "pan") return val === 0 ? "MID" : (val < 0 ? "L" + Math.round(Math.abs(val) * 100) : "R" + Math.round(val * 100));
+    if (["high", "mid", "low"].includes(param)) return (val > 0 ? "+" : "") + Math.round(val) + "dB";
+    return val;
   }
 
   // Fungsi pengiriman parameter ke hardware (TX)
@@ -54,7 +54,7 @@
     }
   };
 
-  // Fungsi global untuk memperbarui lampu LED & VU Meter pada ke-14 channel
+  // Fungsi global untuk memperbarui lampu LED & VU Meter pada ke-14 channel (Diperbarui ke .ch-side-vu-fill)
   window.updateAllChannelLeds = function() {
     for (let i = 1; i <= 14; i++) {
       const ch = window.state.channels[i - 1];
@@ -73,16 +73,17 @@
         }
       }
 
-      // 2. Update Isian VU Meter Vertikal (Panjang & Top)
-      const topVuFill = channelStrip.querySelector('.ch-top-vu-fill, .channel-meter-bar');
+      // 2. Update Isian VU Meter Vertikal (Menargetkan kelas baru .ch-side-vu-fill)
+      const sideVuFill = channelStrip.querySelector('.ch-side-vu-fill, .ch-top-vu-fill, .channel-meter-bar');
       const longVuFill = channelStrip.querySelector('.ch-long-vu-fill');
       
       if (ch.mute) {
-        if (topVuFill) topVuFill.style.height = '0%';
+        if (sideVuFill) sideVuFill.style.height = '0%';
         if (longVuFill) longVuFill.style.height = '0%';
       } else {
+        // Jika level tidak dikontrol oleh audio engine, gunakan state level
         const levelPct = Math.min(100, Math.max(0, (ch.level || 0) * 50)) + '%';
-        if (topVuFill) topVuFill.style.height = levelPct;
+        if (sideVuFill && !window.audioCtx) sideVuFill.style.height = levelPct;
         if (longVuFill) longVuFill.style.height = levelPct;
       }
     }
@@ -138,10 +139,8 @@
         const val = data.value;
 
         if (chNum >= 1 && chNum <= 14 && window.state && window.state.channels) {
-          // 1. Update state lokal
           window.state.channels[chNum - 1][param] = val;
 
-          // 2. Update posisi slider & teks di channel strip
           const channelStrip = document.querySelector(`.new-channel-strip[data-ch="${chNum}"], .channel-strip[data-ch="${chNum}"]`);
           if (channelStrip) {
             const targetElement = channelStrip.querySelector(`[data-k="${param}"], [data-param="${param}"]`);
@@ -170,7 +169,6 @@
             }
           }
 
-          // 3. Update layar tengah
           if (typeof window.selectScreenChannel === "function") {
             window.selectScreenChannel(chNum);
           }
@@ -184,11 +182,9 @@
     }
   };
 
-  // Event Listener Sinkronisasi RX Event Global
   document.addEventListener("mixer:esp32-rx", (e) => window.handleIncomingHardwareData(e.detail));
   document.addEventListener("mixer:bluetooth-rx", (e) => window.handleIncomingHardwareData(e.detail));
 
-  // Penanganan input slider / knob langsung di web (TX)
   document.addEventListener("input", (e) => {
     const target = e.target;
     const param = target.dataset.param || target.dataset.k;
@@ -200,12 +196,10 @@
 
     if (isNaN(chNum) || isNaN(val)) return;
 
-    // Update state
     if (window.state.channels[chNum - 1]) {
       window.state.channels[chNum - 1][param] = val;
     }
 
-    // Update Teks Label Output
     const parentControl = target.parentElement;
     if (parentControl) {
       const out = parentControl.querySelector("output, .fader-val");
@@ -226,7 +220,6 @@
     window.sendChannelParamToHardware(chNum, param, val);
   });
 
-  // Penanganan tombol Mute / Solo SUPER RESPONSIF (Instant UI)
   document.addEventListener("click", (e) => {
     const target = e.target.closest('button[data-k="mute"], button[data-k="solo"], [data-action="mute"], [data-action="solo"]');
     if (!target) return;
@@ -243,18 +236,15 @@
       const channel = window.state.channels[chNum - 1];
       if (!channel) return;
 
-      // Toggle state lokal
       channel[action] = !channel[action];
       const nextState = channel[action];
 
-      // Update UI Tombol Seketika
       target.classList.toggle("active", nextState);
       target.classList.toggle("on", nextState);
       target.textContent = nextState 
         ? (action === "mute" ? "UNMUTE" : "UNSOLO") 
         : (action === "mute" ? "MUTE" : "SOLO");
 
-      // Update Teks Footer
       const statusSpan = strip.querySelector("footer span");
       if (statusSpan) {
         statusSpan.textContent = channel.mute ? "MUTED" : (channel.solo ? "SOLO" : "READY");
@@ -266,13 +256,10 @@
 
       updateScreenReadoutsLive(chNum, action, nextState);
       window.updateAllChannelLeds();
-
-      // Kirim ke ESP32 secara asynchronous
       window.sendChannelParamToHardware(chNum, action, nextState);
     }
   }, true);
 
-  // Inisialisasi awal lampu LED
   setTimeout(() => {
     if (typeof window.updateAllChannelLeds === "function") {
       window.updateAllChannelLeds();
@@ -292,21 +279,18 @@
     const adapter = window.MixerAdapters?.active;
     const isConnected = !!(adapter && adapter.connected);
 
-    // 1. Lampu Status Utama di Topbar (statusLamp)
     const statusLamp = document.getElementById("statusLamp");
     if (statusLamp) {
       statusLamp.classList.toggle("on", isConnected);
       statusLamp.classList.toggle("live", isConnected);
     }
 
-    // 2. Lampu Indikator Koneksi Perangkat (deviceLamp)
     const deviceLamp = document.getElementById("deviceLamp");
     if (deviceLamp) {
       deviceLamp.classList.toggle("green", isConnected);
       deviceLamp.classList.toggle("red", !isConnected);
     }
 
-    // 3. Status Teks Bridge & Transport
     const headerStatus = document.getElementById("headerBridgeStatus");
     if (headerStatus) {
       headerStatus.textContent = isConnected ? "BRIDGE READY" : (isSystemOn ? "SYSTEM READY" : "BRIDGE STANDBY");
