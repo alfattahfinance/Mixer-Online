@@ -174,7 +174,7 @@
     cachedStrips = null;
   };
 
-  function updateChannelMeters(timestamp) {
+    function updateChannelMeters(timestamp) {
     requestAnimationFrame(updateChannelMeters);
 
     if (timestamp - lastMeterUpdate < 33) return;
@@ -187,13 +187,14 @@
       if (!Number.isInteger(ch) || ch < 1 || ch > 14) return;
 
       const nodes = channelNodes[ch];
+      
+      // TARGET UTAMA: Ambil elemen pengisi meteran fader samping yang baru
       const sideVuFill = strip.querySelector(".ch-side-vu-fill");
       const topMeter = strip.querySelector(".ch-top-vu-fill, .channel-meter-bar");
 
       const muted = Boolean(window.state?.channels?.[ch - 1]?.mute);
       const faderVal = Number(window.state?.channels?.[ch - 1]?.fader ?? 75);
       
-      // Jika di-mute atau fader 0, matikan meteran
       if (muted || faderVal === 0) {
         if (sideVuFill) sideVuFill.style.height = "0%";
         if (topMeter) topMeter.style.height = "0%";
@@ -202,7 +203,7 @@
 
       let level = 0;
 
-      // Jika node analyser aktif, ambil level dari audio nyata
+      // 1. Ambil level dari analyser node jika aktif
       if (nodes?.analyser) {
         const data = new Uint8Array(nodes.analyser.fftSize);
         nodes.analyser.getByteTimeDomainData(data);
@@ -216,48 +217,24 @@
         const rms = Math.sqrt(sum / data.length);
         level = Math.max(0, Math.min(1, rms * 3.5));
       } 
-        /* ------------------------------------------------------------------------
-     START METERS LOOP & AUTO-INIT CHANNELS
-     ------------------------------------------------------------------------ */
-
-  // Pastikan ke-14 channel otomatis memiliki node dasar saat engine siap
-  document.addEventListener("DOMContentLoaded", () => {
-    for (let i = 1; i <= N; i++) {
-      if (!channelNodes[i]) {
-        window.initChannelAudioNode(i, null);
-      }
-    }
-  });
-
-  // Jalankan juga langsung jika DOM sudah terlanjur ready
-  if (document.readyState === "complete" || document.readyState === "interactive") {
-    for (let i = 1; i <= N; i++) {
-      if (!channelNodes[i]) {
-        window.initChannelAudioNode(i, null);
-      }
-    }
-  }
-
-  requestAnimationFrame(updateChannelMeters);
-
-      // FALLBACK AMAN: Jika channel sedang memainkan media/audio element atau aktif diputar tetapi analyser belum terikat sempurna,
-      // berikan respons visual dinamis agar indikator tetap menyala hidup naik-turun sesuai fader-nya.
+      
+      // 2. Fallback Pengaman: Jika audio/pemutar sedang berjalan tapi analyser belum terikat ketat, berikan simulasi level aktif
       const mediaEl = channelAudioElements[ch];
       const isPlaying = mediaEl && !mediaEl.paused && !mediaEl.ended;
       
       if (isPlaying || (window.audioCtx && window.audioCtx.state === 'running' && level === 0 && faderVal > 0)) {
-        // Simulasi level aktif yang responsif terhadap tinggi fader jika audio berputar
         level = Math.max(level, (Math.random() * 0.7 + 0.1) * (faderVal / 100));
       }
 
       const visibleLevel = muted ? 0 : level;
+      const heightPercent = Math.round(visibleLevel * 100) + "%";
 
-      // Terapkan tinggi secara spesifik pada indikator samping fader channel ini
+      // TERAPKAN LANGSUNG KE ELEMEN .ch-side-vu-fill DI SAMPING FADER
       if (sideVuFill) {
-        sideVuFill.style.height = (visibleLevel * 100) + "%";
+        sideVuFill.style.height = heightPercent;
       }
       if (topMeter) {
-        topMeter.style.height = (visibleLevel * 100) + "%";
+        topMeter.style.height = heightPercent;
       }
 
       const segmentedMeter = strip.querySelector(".new-channel-meter");
@@ -296,12 +273,10 @@
       const masterMeterL = document.getElementById("masterMeterL");
       const masterMeterR = document.getElementById("masterMeterR");
       
-      if (masterMeterL) masterMeterL.style.height = (outputLevel * 100) + "%";
-      if (masterMeterR) masterMeterR.style.height = (outputLevel * 100) + "%";
+      if (masterMeterL) masterMeterL.style.height = Math.round(outputLevel * 100) + "%";
+      if (masterMeterR) masterMeterR.style.height = Math.round(outputLevel * 100) + "%";
     }
   }
-
-
   /* ------------------------------------------------------------------------
      MASTER LIVE
      ------------------------------------------------------------------------ */
