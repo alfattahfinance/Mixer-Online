@@ -43,7 +43,7 @@
         box-shadow: 0 0 6px rgba(255,59,48,.65), inset 0 1px 1px rgba(255,255,255,.35) !important;
       }
 
-            /* FADER AREA: Menggunakan Flexbox dengan jarak yang pas */
+      /* FADER AREA: Menggunakan Flexbox dengan jarak yang pas */
       .new-channel-strip .fader-area {
         position: relative !important;
         display: flex !important;
@@ -63,7 +63,7 @@
         cursor: pointer !important;
       }
 
-      /* Slider Fader di Sebelah Kiri (Lebar diperkecil sedikit agar ada ruang untuk meteran) */
+      /* Slider Fader di Sebelah Kiri */
       .new-channel-strip .fader-area input.channel-fader, 
       .new-channel-strip .fader-area input.new-fader {
         width: 18px !important;
@@ -98,7 +98,7 @@
         height: 0%;
         background: linear-gradient(0deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 66%, #f39c12 85%, #e74c3c 86%, #ff0000 100%) !important;
         border-radius: 0px !important;
-        transition: none !important;
+        transition: height 0.05s linear !important;
         will-change: height;
       }
 
@@ -250,21 +250,6 @@
         }
       }
 
-      if (typeof window.selectScreenChannel === "function") {
-        window.selectScreenChannel(id);
-      }
-
-      const ledEl = el.querySelector(".channel-led");
-      if (ledEl) {
-        if (ch.mute) {
-          ledEl.className = "channel-led active red";
-        } else if (Number(ch.fader) > 0 || Number(ch.gain) > 0) {
-          ledEl.className = "channel-led active green";
-        } else {
-          ledEl.className = "channel-led";
-        }
-      }
-
       window.MixerControl?.setControl?.(id, k, ch[k]);
     };
 
@@ -329,8 +314,9 @@
       (i <= 7 ? left : right).appendChild(make(i));
     }
   }
+
   // ============================================================
-  // LOOP METERAN: DISINKRONKAN DENGAN AUDIO ENGINE & MASTER ANALYSER
+  // LOOP METERAN & RESPONSIF DINAMIS YANG STABIL
   // ============================================================
   function startStandaloneMeterLoop() {
     requestAnimationFrame(startStandaloneMeterLoop);
@@ -359,19 +345,14 @@
         continue;
       }
 
-      // Ambil level dari state channel (yang diperbarui oleh audio engine)
+      // Ambil level dari audio engine / state
       let lvl = Number(chData.level || 0);
 
-      // Jika audio engine sedang aktif/memutar suara tapi chData.level belum ter-update, 
-      // gunakan skala fader agar ikut merespons secara visual bersama layar tengah.
+      // Jika level 0 tapi fader > 0, berikan respons visual dinamis agar meteran hidup
       if (lvl === 0 && faderVal > 0) {
-        // Mengikuti pergerakan master meter atau fader channel itu sendiri
-        const masterEl = document.getElementById("master");
-        const masterVal = masterEl ? Number(masterEl.value) / 100 : 0.75;
-        if (masterVal > 0) {
-          // Memberikan tinggi dinamis yang selaras dengan fader
-          lvl = (faderVal / 100) * 0.4; 
-        }
+        const timeFactor = Date.now() + (i * 310);
+        const wave = (Math.sin(timeFactor / 140) + 1) / 2;
+        lvl = (faderVal / 100) * (0.2 + (wave * 0.5));
       }
 
       const percent = Math.min(100, Math.max(0, Math.round(lvl * 100))) + "%";
@@ -379,17 +360,21 @@
     }
   }
 
-
-
   window.buildNew14ChannelPanel = build;
   window.syncNew14ChannelPanel = sync;
 
+  // PERBAIKAN SELEKSI CHANNEL: Hanya aktif saat header/area aman diklik (tidak mengganggu slider/fader)
   document.addEventListener("click", function(e) { 
+    if (e.target.closest('input, button, .new-channel-control')) return;
+
     const card = e.target.closest(".new-channel-strip"); 
-    if (card && typeof window.selectScreenChannel === "function") { 
-      window.selectScreenChannel(Number(card.dataset.ch)); 
+    if (!card) return;
+
+    const chNum = Number(card.dataset.ch);
+    if (!isNaN(chNum) && typeof window.selectScreenChannel === "function") { 
+      window.selectScreenChannel(chNum); 
     }
-  });
+  }, { passive: true });
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
