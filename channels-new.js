@@ -221,17 +221,17 @@
 
     let ticking = false;
     const updateSmooth = (k, value) => {
-      if (!window.state?.system) {
-        const r = $("testResult"); 
-        if (r) r.textContent = "CONTROL BLOCKED: SYSTEM OFF";
-        return;
-      }
-      const ch = window.state.channels[id - 1];
+      const ch = window.state?.channels?.[id - 1];
       if (!ch) return;
 
       if (k === "mute" || k === "solo") {
         ch[k] = Boolean(value);
       } else {
+        if (!window.state?.system) {
+          const r = $("testResult"); 
+          if (r) r.textContent = "CONTROL BLOCKED: SYSTEM OFF";
+          return;
+        }
         const n = Number(value);
         ch[k] = Number.isFinite(n) ? n : value;
         
@@ -258,12 +258,8 @@
     });
 
     el.querySelectorAll("button").forEach(button => {
-      button.addEventListener("click", () => {
-        if (!window.state?.system) {
-          const r = $("testResult"); 
-          if (r) r.textContent = "CONTROL BLOCKED: SYSTEM OFF";
-          return;
-        }
+      button.addEventListener("click", (e) => {
+        e.stopPropagation(); // Mencegah bentrok dengan klik kartu channel
       
         const k = button.dataset.k;
         const ch = window.state.channels[id - 1];
@@ -316,16 +312,11 @@
   }
 
   // ============================================================
-  // LOOP METERAN & RESPONSIF DINAMIS YANG STABIL
+  // LOOP METERAN: SELALU AKTIF DAN RESPONSIF
   // ============================================================
   function startStandaloneMeterLoop() {
     requestAnimationFrame(startStandaloneMeterLoop);
     if (!window.state || !window.state.channels) return;
-
-    if (!window.state.system) {
-      document.querySelectorAll(".ch-side-vu-fill").forEach(el => el.style.height = "0%");
-      return;
-    }
 
     for (let i = 1; i <= N; i++) {
       const chData = window.state.channels[i - 1];
@@ -337,22 +328,26 @@
       const vuFill = strip.querySelector(".ch-side-vu-fill");
       if (!vuFill) continue;
 
-      const muted = Boolean(chData.mute);
-      const faderVal = Number(chData.fader ?? 75);
-
-      if (muted || faderVal === 0) {
+      // Jika sistem dimatikan total atau channel di-mute, meteran kosong
+      if (!window.state.system || chData.mute) {
         vuFill.style.height = "0%";
         continue;
       }
 
-      // Ambil level dari audio engine / state
+      const faderVal = Number(chData.fader ?? 75);
+      if (faderVal === 0) {
+        vuFill.style.height = "0%";
+        continue;
+      }
+
+      // Ambil level dari state/audio engine
       let lvl = Number(chData.level || 0);
 
-      // Jika level 0 tapi fader > 0, berikan respons visual dinamis agar meteran hidup
-      if (lvl === 0 && faderVal > 0) {
-        const timeFactor = Date.now() + (i * 310);
-        const wave = (Math.sin(timeFactor / 140) + 1) / 2;
-        lvl = (faderVal / 100) * (0.2 + (wave * 0.5));
+      // Fallback animasi dinamis hidup jika level 0 tapi fader > 0 dan sistem ON
+      if (lvl === 0 && window.state.system) {
+        const timeFactor = Date.now() + (i * 200);
+        const wave = (Math.sin(timeFactor / 120) + 1) / 2;
+        lvl = (faderVal / 100) * (0.3 + (wave * 0.5));
       }
 
       const percent = Math.min(100, Math.max(0, Math.round(lvl * 100))) + "%";
@@ -363,9 +358,9 @@
   window.buildNew14ChannelPanel = build;
   window.syncNew14ChannelPanel = sync;
 
-  // PERBAIKAN SELEKSI CHANNEL: Hanya aktif saat header/area aman diklik (tidak mengganggu slider/fader)
+  // SELEKSI CHANNEL: Aman, tidak memblokir tombol Mute/Solo maupun kontrol fader/knob
   document.addEventListener("click", function(e) { 
-    if (e.target.closest('input, button, .new-channel-control')) return;
+    if (e.target.closest('input, button, .new-channel-buttons, .new-channel-control, .fader-area')) return;
 
     const card = e.target.closest(".new-channel-strip"); 
     if (!card) return;
