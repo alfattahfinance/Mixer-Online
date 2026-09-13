@@ -1,30 +1,33 @@
 /* ============================================================
-   Mixer-Online — 14CH channel panel (Clean, Compact & Responsive)
+   Mixer-Online — 14CH channel panel (Fully Responsive & Clean)
    ============================================================ */
 (function () {
   "use strict";
 
   /* ============================================================
-     CSS PERBAIKAN TAMPILAN RESPONSIF (AGAR TEKS TIDAK BERTUMPUK)
+     CSS RESPONSIF OTOMATIS (DESKTOP, TABLET & HP)
      ============================================================ */
   if (!document.getElementById("mixer-channel-led-skin")) {
     const style = document.createElement("style");
     style.id = "mixer-channel-led-skin";
     style.textContent = `
+      /* Container Utama Channel Strip dengan Skala Fleksibel */
       .new-channel-strip {
-        width: 58px !important;
-        min-width: 58px !important;
-        max-width: 60px !important;
+        width: 60px !important;
+        min-width: 48px !important;
+        max-width: 68px !important;
         padding: 2px !important;
         box-sizing: border-box !important;
         overflow: hidden !important;
+        flex: 1 1 0 !important;
       }
 
       .new-channel-strip .channel-led,
       .channel-strip .channel-led {
         position: relative !important;
         display: block !important;
-        width: 18px !important;
+        width: 80% !important;
+        max-width: 20px !important;
         height: 5px !important;
         margin: 2px auto !important;
         border-radius: 999px !important;
@@ -43,10 +46,10 @@
         background: linear-gradient(180deg,#ff918b,#ff3b30 48%,#8d120d) !important;
       }
 
-      /* KONTROL / KNOB: Mencegah teks meluber keluar kotak */
+      /* KONTROL / KNOB RESPONSIF TANPA OVERFLOW */
       .new-channel-strip .new-channel-control {
         width: 100% !important;
-        padding: 0 1px !important;
+        padding: 0 !important;
         margin-bottom: 2px !important;
         text-align: center !important;
         box-sizing: border-box !important;
@@ -59,12 +62,11 @@
         white-space: nowrap !important;
         overflow: hidden !important;
         text-overflow: ellipsis !important;
-        line-height: 1.1 !important;
       }
 
       .new-channel-strip .new-channel-control input.new-knob {
         width: 100% !important;
-        max-width: 48px !important;
+        max-width: 42px !important;
         height: 12px !important;
         margin: 1px auto !important;
         display: block !important;
@@ -77,7 +79,7 @@
         overflow: hidden !important;
       }
 
-      /* FADER AREA: Kompak fader dan meteran berdampingan */
+      /* FADER AREA: Kompak Fader & Meteran Samping Berdampingan */
       .new-channel-strip .fader-area {
         position: relative !important;
         display: flex !important;
@@ -87,7 +89,7 @@
         gap: 1px !important;
         width: 100% !important;
         height: auto !important;
-        min-height: 160px !important;
+        min-height: 150px !important;
         padding: 10px 1px 12px 1px !important;
         box-sizing: border-box !important;
       }
@@ -101,8 +103,8 @@
       .new-channel-strip .fader-area input.channel-fader, 
       .new-channel-strip .fader-area input.new-fader {
         width: 14px !important;
-        height: 130px !important;
-        min-height: 130px !important;
+        height: 125px !important;
+        min-height: 100px !important;
         position: relative !important;
         z-index: 1 !important;
         background: transparent !important;
@@ -114,8 +116,8 @@
       .new-channel-strip .ch-side-vu {
         position: relative !important;
         width: 8px !important;
-        height: 130px !important;
-        min-height: 130px !important;
+        height: 125px !important;
+        min-height: 100px !important;
         background: #040608 !important;
         border: 1px solid rgba(255,255,255,0.3) !important;
         border-radius: 2px !important;
@@ -176,6 +178,37 @@
         padding: 1px !important;
         white-space: nowrap !important;
         overflow: hidden !important;
+      }
+
+      /* MEDIA QUERY UNTUK LAYAR KECIL / HP */
+      @media screen and (max-width: 768px) {
+        .new-channel-strip {
+          width: 44px !important;
+          min-width: 40px !important;
+          max-width: 48px !important;
+          padding: 1px !important;
+        }
+        .new-channel-strip .new-channel-control label,
+        .new-channel-strip .new-channel-control .knob-val {
+          font-size: 4px !important;
+        }
+        .new-channel-strip .new-channel-buttons button {
+          font-size: 5px !important;
+          padding: 1px 0px !important;
+        }
+        .new-channel-strip .fader-area input.channel-fader, 
+        .new-channel-strip .fader-area input.new-fader,
+        .new-channel-strip .ch-side-vu {
+          height: 85px !important;
+          min-height: 75px !important;
+        }
+        .new-channel-strip .ch-side-vu {
+          width: 6px !important;
+        }
+        .new-channel-strip .fader-area input.channel-fader, 
+        .new-channel-strip .fader-area input.new-fader {
+          width: 10px !important;
+        }
       }
     `;
     document.head.appendChild(style);
