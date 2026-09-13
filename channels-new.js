@@ -1,30 +1,31 @@
 /* ============================================================
-   Mixer-Online — 14CH channel panel (Clean & Compact Layout)
+   Mixer-Online — 14CH channel panel (Clean, Compact & Responsive)
    ============================================================ */
 (function () {
   "use strict";
 
   /* ============================================================
-     CSS PERBAIKAN TAMPILAN AGAR TIDAK BERANTAKAN & PAS DI LAYAR
+     CSS PERBAIKAN TAMPILAN RESPONSIF (AGAR TEKS TIDAK BERTUMPUK)
      ============================================================ */
   if (!document.getElementById("mixer-channel-led-skin")) {
     const style = document.createElement("style");
     style.id = "mixer-channel-led-skin";
     style.textContent = `
       .new-channel-strip {
-        width: 62px !important;
-        min-width: 62px !important;
-        max-width: 65px !important;
-        padding: 4px !important;
+        width: 58px !important;
+        min-width: 58px !important;
+        max-width: 60px !important;
+        padding: 2px !important;
         box-sizing: border-box !important;
+        overflow: hidden !important;
       }
 
       .new-channel-strip .channel-led,
       .channel-strip .channel-led {
         position: relative !important;
         display: block !important;
-        width: 20px !important;
-        height: 6px !important;
+        width: 18px !important;
+        height: 5px !important;
         margin: 2px auto !important;
         border-radius: 999px !important;
         border: 1px solid rgba(255,255,255,.14) !important;
@@ -42,7 +43,41 @@
         background: linear-gradient(180deg,#ff918b,#ff3b30 48%,#8d120d) !important;
       }
 
-      /* FADER AREA: Kompak berdampingan fader dan meteran */
+      /* KONTROL / KNOB: Mencegah teks meluber keluar kotak */
+      .new-channel-strip .new-channel-control {
+        width: 100% !important;
+        padding: 0 1px !important;
+        margin-bottom: 2px !important;
+        text-align: center !important;
+        box-sizing: border-box !important;
+      }
+
+      .new-channel-strip .new-channel-control label {
+        display: block !important;
+        font-size: 5px !important;
+        color: var(--text-dim, #aaa) !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        line-height: 1.1 !important;
+      }
+
+      .new-channel-strip .new-channel-control input.new-knob {
+        width: 100% !important;
+        max-width: 48px !important;
+        height: 12px !important;
+        margin: 1px auto !important;
+        display: block !important;
+      }
+
+      .new-channel-strip .new-channel-control .knob-val {
+        display: block !important;
+        font-size: 5px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+      }
+
+      /* FADER AREA: Kompak fader dan meteran berdampingan */
       .new-channel-strip .fader-area {
         position: relative !important;
         display: flex !important;
@@ -52,8 +87,8 @@
         gap: 1px !important;
         width: 100% !important;
         height: auto !important;
-        min-height: 220px !important;
-        padding: 12px 1px 14px 1px !important;
+        min-height: 160px !important;
+        padding: 10px 1px 12px 1px !important;
         box-sizing: border-box !important;
       }
 
@@ -65,9 +100,9 @@
       /* Slider Fader */
       .new-channel-strip .fader-area input.channel-fader, 
       .new-channel-strip .fader-area input.new-fader {
-        width: 16px !important;
-        height: 190px !important;
-        min-height: 190px !important;
+        width: 14px !important;
+        height: 130px !important;
+        min-height: 130px !important;
         position: relative !important;
         z-index: 1 !important;
         background: transparent !important;
@@ -78,9 +113,9 @@
       /* KOTAK LED METER VERTIKAL */
       .new-channel-strip .ch-side-vu {
         position: relative !important;
-        width: 9px !important;
-        height: 190px !important;
-        min-height: 190px !important;
+        width: 8px !important;
+        height: 130px !important;
+        min-height: 130px !important;
         background: #040608 !important;
         border: 1px solid rgba(255,255,255,0.3) !important;
         border-radius: 2px !important;
@@ -100,30 +135,47 @@
 
       .new-channel-strip .fader-area label {
         position: absolute !important;
-        top: 2px !important;
+        top: 1px !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
-        font-size: 6px !important;
+        font-size: 5px !important;
         color: var(--text-dim) !important;
       }
 
       .new-channel-strip .fader-area output.fader-val {
         position: absolute !important;
-        bottom: 2px !important;
+        bottom: 1px !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
-        font-size: 7px !important;
+        font-size: 6px !important;
         font-weight: bold !important;
         color: #2ecc71 !important;
       }
 
-      .new-channel-strip .new-channel-control input.new-knob {
-        width: 44px !important;
+      .new-channel-strip .new-channel-buttons {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 1px !important;
+        width: 100% !important;
       }
 
       .new-channel-strip .new-channel-buttons button {
-        font-size: 8px !important;
-        padding: 3px 1px !important;
+        font-size: 6px !important;
+        padding: 2px 0px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      .new-channel-strip .new-channel-head {
+        font-size: 7px !important;
+        padding: 1px !important;
+      }
+
+      .new-channel-strip .new-channel-source {
+        font-size: 5px !important;
+        padding: 1px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
       }
     `;
     document.head.appendChild(style);
@@ -241,7 +293,6 @@
         }
       }
 
-      // Kirim perintah kontrol ke hardware/ESP32 dengan aman jika tersedia
       try {
         if (typeof window.MixerControl?.setControl === "function") {
           window.MixerControl.setControl(id, k, ch[k]);
@@ -255,7 +306,6 @@
       input.addEventListener("input", (e) => updateSmooth(e.target.dataset.k, e.target.value), { passive: true });
     });
 
-    // MUTE & SOLO: Dijamin langsung responsif meskipun ESP32/System ON
     el.querySelectorAll("button").forEach(button => {
       button.addEventListener("click", (e) => {
         e.stopPropagation();
