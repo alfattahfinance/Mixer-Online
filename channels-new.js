@@ -39,24 +39,27 @@
         -webkit-overflow-scrolling: touch !important;
         width: 100% !important;
         max-width: 100% !important;
+        height: 100% !important;
         box-sizing: border-box !important;
-        padding: 4px 6px 12px 6px !important;
+        padding: 4px 6px 2px 6px !important;
       }
 
-      /* Setiap Channel Strip diatur ukurannya dengan pas dan tidak melar/menumpuk */
+      /* Setiap Channel Strip diatur ukurannya dengan pas dan memanjang penuh ke bawah */
       .new-channel-strip {
         flex: 0 0 70px !important;
         width: 70px !important;
         min-width: 70px !important;
         max-width: 70px !important;
+        height: 100% !important;
         background: #0d1117 !important;
         border: 1px solid rgba(255, 255, 255, 0.15) !important;
         border-radius: 4px !important;
-        padding: 4px 2px !important;
+        padding: 4px 2px 2px 2px !important;
         box-sizing: border-box !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
+        justify-content: space-between !important;
         box-shadow: 0 4px 6px rgba(0,0,0,0.5) !important;
       }
 
@@ -66,11 +69,12 @@
         display: block !important;
         width: 22px !important;
         height: 6px !important;
-        margin: 3px auto !important;
+        margin: 2px auto !important;
         border-radius: 999px !important;
         border: 1px solid rgba(255,255,255,.14) !important;
         background: #182127 !important;
         opacity: .65 !important;
+        flex-shrink: 0 !important;
       }
 
       .new-channel-strip .channel-led.active.green {
@@ -89,12 +93,13 @@
       .new-channel-strip .new-channel-control {
         width: 100% !important;
         padding: 1px 0 !important;
-        margin-bottom: 2px !important;
+        margin-bottom: 1px !important;
         text-align: center !important;
         box-sizing: border-box !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
+        flex-shrink: 0 !important;
       }
 
       .new-channel-strip .new-channel-control label {
@@ -108,7 +113,7 @@
       .new-channel-strip .new-channel-control input.new-knob {
         width: 100% !important;
         max-width: 60px !important;
-        height: 14px !important;
+        height: 12px !important;
         margin: 1px auto !important;
         display: block !important;
         cursor: pointer !important;
@@ -122,7 +127,7 @@
         white-space: nowrap !important;
       }
 
-      /* FADER AREA & METERAN BERDAMPINGAN */
+      /* FADER AREA & METERAN BERDAMPINGAN (DIPERPANJANG KE BAWAH) */
       .new-channel-strip .fader-area {
         position: relative !important;
         display: flex !important;
@@ -131,9 +136,10 @@
         justify-content: center !important;
         gap: 3px !important;
         width: 100% !important;
-        height: auto !important;
-        min-height: 160px !important;
-        padding: 8px 1px 10px 1px !important;
+        flex-grow: 1 !important;
+        height: 100% !important;
+        min-height: 175px !important;
+        padding: 4px 1px 2px 1px !important;
         box-sizing: border-box !important;
       }
 
@@ -141,12 +147,12 @@
         touch-action: none !important;
       }
 
-      /* Slider Fader */
+      /* Slider Fader (Disesuaikan menjadi 175px agar pas mentok bawah) */
       .new-channel-strip .fader-area input.channel-fader, 
       .new-channel-strip .fader-area input.new-fader {
         width: 16px !important;
-        height: 135px !important;
-        min-height: 135px !important;
+        height: 175px !important;
+        min-height: 175px !important;
         position: relative !important;
         z-index: 2 !important;
         background: transparent !important;
@@ -154,12 +160,12 @@
         margin: 0 !important;
       }
 
-      /* KOTAK LED METER VERTIKAL */
+      /* KOTAK LED METER VERTIKAL (Disesuaikan menjadi 175px) */
       .new-channel-strip .ch-side-vu {
         position: relative !important;
         width: 8px !important;
-        height: 135px !important;
-        min-height: 135px !important;
+        height: 175px !important;
+        min-height: 175px !important;
         background: #040608 !important;
         border: 1px solid rgba(255,255,255,0.3) !important;
         border-radius: 2px !important;
@@ -180,7 +186,7 @@
 
       .new-channel-strip .fader-area label {
         position: absolute !important;
-        top: 2px !important;
+        top: 1px !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
         font-size: 5px !important;
@@ -189,7 +195,7 @@
 
       .new-channel-strip .fader-area output.fader-val {
         position: absolute !important;
-        bottom: 2px !important;
+        bottom: 1px !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
         font-size: 6px !important;
@@ -202,7 +208,8 @@
         flex-direction: column !important;
         gap: 2px !important;
         width: 100% !important;
-        margin-top: 2px !important;
+        margin-top: 1px !important;
+        flex-shrink: 0 !important;
       }
 
       .new-channel-strip .new-channel-buttons button {
@@ -219,15 +226,17 @@
         padding: 1px !important;
         text-align: center !important;
         width: 100% !important;
+        flex-shrink: 0 !important;
       }
 
       .new-channel-strip .new-channel-source {
         font-size: 5px !important;
-        padding: 2px 1px !important;
+        padding: 1px !important;
         text-align: center !important;
         white-space: nowrap !important;
         overflow: hidden !important;
         width: 100% !important;
+        flex-shrink: 0 !important;
       }
     `;
     document.head.appendChild(style);
