@@ -72,7 +72,7 @@
     --panel-bg: #0f0f0f;
     --panel-border: #222222;
     --accent-color: #2ecc71;
-    --header-bg: linear-gradient(90deg, #181818, #0f0f0f, #181818);
+    --header-bg: linear-gradient(180deg, #181818, #0f0f0f, #181818);
     --btn-active: linear-gradient(180deg, #2ecc71 0%, #1e8449 100%);
     --text-main: #eeeeee;
     --text-dim: #666666;
@@ -80,7 +80,7 @@
   }
 
   /* ==========================================================
-     2. GLOBAL RESET & PERBAIKAN TOTAL TOPBAR (BILAH ATAS)
+     2. GLOBAL RESET & BILAH ATAS (TOPBAR)
      ========================================================== */
   *, *::before, *::after {
     box-sizing: border-box !important;
@@ -99,7 +99,6 @@
     overflow-x: auto !important;
   }
 
-  /* Bilah Atas dirapikan menjadi satu baris horizontal yang rapi & fleksibel */
   header.topbar {
     display: flex !important;
     flex-direction: row !important;
@@ -219,7 +218,7 @@
   }
 
   /* ==========================================================
-     4. KONSOL UTAMA & PERPANJANGAN CHANNEL SEJAJAR FX RETURN
+     4. KONSOL UTAMA & KETINGGIAN CHANNEL SEJAJAR FX RETURN
      ========================================================== */
   main.console {
     display: flex !important;
@@ -236,7 +235,7 @@
     flex: 1 1 0 !important;
     min-width: 0 !important;
     height: auto !important;
-    min-height: 480px !important;
+    min-height: 520px !important;
     background: var(--strip-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
@@ -281,7 +280,6 @@
     height: 100% !important;
   }
 
-  /* FADER AREA: Diperpanjang ke bawah sejajar FX Return */
   .fader-area {
     position: relative !important;
     display: flex !important;
@@ -291,7 +289,7 @@
     gap: 4px !important;
     flex-grow: 1 !important;
     width: 100% !important;
-    min-height: 280px !important;
+    min-height: 310px !important;
     height: 100% !important;
     padding: 2px !important;
   }
@@ -302,16 +300,16 @@
     position: relative !important;
     z-index: 2 !important;
     background: transparent !important;
-    height: 240px !important;
-    min-height: 240px !important;
+    height: 270px !important;
+    min-height: 270px !important;
     width: 20px !important;
     accent-color: var(--accent-color) !important;
     margin: 0 !important;
   }
   
   .new-channel-strip .ch-side-vu {
-    height: 240px !important;
-    min-height: 240px !important;
+    height: 270px !important;
+    min-height: 270px !important;
     width: 8px !important;
     background: #040608 !important;
     border: 1px solid var(--panel-border) !important;
@@ -338,17 +336,17 @@
   }
 
   /* ==========================================================
-     5. MASTER RACK (DILEBARKAN & DIRAPIHKAN SUPAYA TIDAK TERPOTONG)
+     5. MASTER RACK (SEJAJAR DENGAN CHANNEL & FADER VERTIKAL)
      ========================================================== */
   aside.master-rack {
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
-    width: 125px !important;
-    min-width: 125px !important;
-    max-width: 125px !important;
+    width: 120px !important;
+    min-width: 120px !important;
+    max-width: 120px !important;
     height: auto !important;
-    min-height: 480px !important;
+    min-height: 520px !important; /* Disamakan persis dengan channel-bank */
     background: var(--panel-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
@@ -368,8 +366,8 @@
     gap: 6px !important;
     justify-content: center !important;
     align-items: center !important;
-    height: 110px !important;
-    min-height: 110px !important;
+    height: 120px !important;
+    min-height: 120px !important;
     padding: 2px !important;
     background: #040608 !important;
     border: 1px solid var(--panel-border) !important;
@@ -422,19 +420,24 @@
     background: var(--main-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 3px !important;
-    padding: 4px 2px !important;
+    padding: 6px 2px !important;
     width: 100% !important;
     box-sizing: border-box !important;
     margin: 3px 0 !important;
   }
 
+  /* MEMASTIKAN FADER MASTER BERORIENTASI VERTIKAL (ATAS - BAWAH) */
   aside.master-rack .master-card input[type="range"] {
-    height: 160px !important;
-    min-height: 160px !important;
-    width: 22px !important;
+    writing-mode: vertical-lr !important;
+    direction: rtl !important;
+    appearance: slider-vertical !important;
+    -webkit-appearance: slider-vertical !important;
+    height: 220px !important;
+    min-height: 220px !important;
+    width: 24px !important;
     accent-color: var(--accent-color) !important;
     cursor: pointer !important;
-    margin: 2px auto !important;
+    margin: 4px auto !important;
   }
 
   .monitor-card, .phones-card {
