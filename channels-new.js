@@ -44,38 +44,35 @@
         padding: 4px 6px 2px 6px !important;
       }
 
-      /* Setiap Channel Strip diatur ukurannya dengan pas dan memanjang penuh ke bawah */
-      .new-channel-strip {
-        flex: 0 0 70px !important;
-        width: 70px !important;
-        min-width: 70px !important;
-        max-width: 70px !important;
-        height: 100% !important;
-        background: #0d1117 !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        border-radius: 4px !important;
-        padding: 4px 2px 2px 2px !important;
-        box-sizing: border-box !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.5) !important;
-      }
+       /* Ubah tinggi fader channel dari 175px menjadi sekitar 195px atau sesuaikan dengan tinggi layar */
+  .new-channel-strip input.channel-fader, 
+  .new-channel-strip input.new-fader,
+  .channel-strip input.channel-fader {
+    position: relative !important;
+    z-index: 2 !important;
+    background: transparent !important;
+    height: 195px !important;
+    min-height: 195px !important;
+    width: 18px !important;
+    accent-color: var(--accent-color) !important;
+    margin: 0 !important;
+    pointer-events: auto !important;
+    touch-action: pan-y !important;
+  }
+  
+  .new-channel-strip .ch-side-vu {
+    height: 195px !important;
+    min-height: 195px !important;
+    width: 7px !important;
+    background: #040608 !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 2px !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column-reverse !important;
+    z-index: 2 !important;
+  }
 
-      .new-channel-strip .channel-led,
-      .channel-strip .channel-led {
-        position: relative !important;
-        display: block !important;
-        width: 22px !important;
-        height: 6px !important;
-        margin: 2px auto !important;
-        border-radius: 999px !important;
-        border: 1px solid rgba(255,255,255,.14) !important;
-        background: #182127 !important;
-        opacity: .65 !important;
-        flex-shrink: 0 !important;
-      }
 
       .new-channel-strip .channel-led.active.green {
         opacity: 1 !important;
