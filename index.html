@@ -79,20 +79,115 @@
     --strip-bg: #0a0a0a;
   }
 
-    /* ==========================================================
-     EFEK LAMPU-LAMPU MENYALA (GLOW & LED INDICATORS)
+  /* ==========================================================
+     2. GLOBAL RESET & PERBAIKAN TOTAL TOPBAR (BILAH ATAS)
      ========================================================== */
-  /* Efek menyala untuk tombol aktif / fader hidup */
+  *, *::before, *::after {
+    box-sizing: border-box !important;
+  }
+
+  html {
+    scroll-behavior: smooth !important;
+  }
+
+  body {
+    background: var(--main-bg) !important;
+    color: var(--text-main) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-family: system-ui, -apple-system, sans-serif !important;
+    overflow-x: auto !important;
+  }
+
+  /* Bilah Atas dirapikan menjadi satu baris horizontal yang rapi & fleksibel */
+  header.topbar {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    background: var(--header-bg) !important;
+    border-bottom: 1px solid var(--panel-border) !important;
+    width: 100% !important;
+    padding: 4px 8px !important;
+    gap: 6px !important;
+    position: relative !important;
+    z-index: 100 !important;
+    box-sizing: border-box !important;
+  }
+
+  header.topbar > div {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    background: var(--panel-bg) !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 4px !important;
+    padding: 3px 6px !important;
+    font-size: 7px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
+  header.topbar .brand {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    font-size: 8px !important;
+  }
+
+  .bridge-head {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+
+  .bridge-head button {
+    font-size: 7px !important;
+    padding: 2px 4px !important;
+    cursor: pointer !important;
+  }
+
+  .scene-head div {
+    display: flex !important;
+    gap: 2px !important;
+    margin-top: 1px !important;
+  }
+
+  .scene-head button {
+    font-size: 7px !important;
+    padding: 2px 4px !important;
+    border-radius: 2px !important;
+    cursor: pointer !important;
+  }
+
+  .clock-head {
+    background: transparent !important;
+    border: none !important;
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+
+  #clock {
+    font-size: 11px !important;
+    font-weight: bold !important;
+    color: var(--accent-color) !important;
+    font-family: monospace !important;
+  }
+
+  /* ==========================================================
+     3. EFEK LAMPU-LAMPU MENYALA (GLOW & LED INDICATORS)
+     ========================================================== */
   button.active, button.on, .bottom-nav button.active {
     box-shadow: 0 0 8px var(--accent-color), inset 0 0 4px rgba(255, 255, 255, 0.4) !important;
     border-color: var(--accent-color) !important;
   }
 
-  /* Lampu indikator status sistem / bridge */
   #statusLamp, .lamp {
     display: inline-block;
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: #555;
     box-shadow: 0 0 4px rgba(0,0,0,0.5);
@@ -107,12 +202,10 @@
     box-shadow: 0 0 6px #e74c3c !important;
   }
 
-  /* Efek menyala pada garis Fader dan Meteran Level */
   .meter-bar-fill, .ch-side-vu-fill, .ch-top-vu-fill {
     box-shadow: 0 0 6px rgba(46, 204, 113, 0.6);
   }
 
-  /* Indikator Tombol Power Muted/Solo menyala terang */
   button[data-k="mute"].on, button.mute-btn.on {
     background: linear-gradient(180deg, #ff6b6b 0%, #c0392b 100%) !important;
     color: #fff !important;
@@ -125,516 +218,10 @@
     box-shadow: 0 0 8px #f1c40f !important;
   }
 
-
   /* ==========================================================
-     2. GLOBAL RESET & OVERRIDE
+     4. KONSOL UTAMA & PERPANJANGAN CHANNEL SEJAJAR FX RETURN
      ========================================================== */
-  *, *::before, *::after {
-    box-sizing: border-box !important;
-  }
-
-/* Pastikan pembungkus aplikasi (jika ada) ikut mengambil tinggi penuh */
-.app-container, body > .console-wrapper {
-  height: 100% !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-}
-
-  
-  html {
-    scroll-behavior: smooth !important;
-  }
-
-  body {
-    background: var(--main-bg) !important;
-    color: var(--text-main) !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    font-family: system-ui, -apple-system, sans-serif !important;
-    overflow-x: auto !important;
-  }
-
-  header.topbar {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    overflow-x: auto !important;
-    width: 100% !important;
-    padding: 4px 6px !important;
-    gap: 4px !important;
-    position: relative !important;
-    z-index: 100 !important;
-  }
-
-  .bridge-head, .status-head, .scene-head, .skin-head, .system-box, .clock-head {
-    position: static !important;
-    transform: none !important;
-    background: var(--panel-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 4px !important;
-    padding: 2px 4px !important;
-    font-size: 7px !important;
-  }
-
-  .scene-head {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    padding: 2px 6px !important;
-  }
-
-  .scene-head div {
-    display: flex !important;
-    gap: 3px !important;
-  }
-
-  .scene-head button {
-    font-size: 8px !important;
-    padding: 3px 5px !important;
-    border-radius: 3px !important;
-    cursor: pointer !important;
-  }
-
-  .clock-head {
-    background: transparent !important;
-    border: none !important;
-    padding: 0 6px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-end !important;
-    justify-content: center !important;
-  }
-
-  .clock-head .box-title {
-    font-size: 7px !important;
-    color: var(--text-dim) !important;
-  }
-
-  #clock {
-    font-size: 13px !important;
-    font-weight: bold !important;
-    color: var(--accent-color) !important;
-    font-family: monospace, monospace !important;
-  }
-
-  /* ==========================================================
-     3. MAIN CONSOLE & CHANNEL STRIP (BERJAJAR HORIZONTAL)
-     ========================================================== */
-  .center-console {
-    max-width: 380px !important;
-    min-width: 300px !important;
-    flex: 1 1 auto !important; /* Diubah agar fleksibel mengikuti tinggi layar */
-    box-sizing: border-box !important;
-    height: 100% !important;
-  }
-
-  .channel-bank {
-    flex: 1 1 0 !important; /* Membuat bank channel meregang mengisi ruang vertikal */
-    width: 100% !important;
-    min-width: 0 !important;
-    background: var(--strip-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 4px !important;
-    padding: 2px 2px 0px 2px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    margin: 0 !important;
-    justify-content: space-between !important;
-    box-sizing: border-box !important;
-    height: 100% !important;
-  }
-
-  .bank-title {
-    padding: 2px 4px 4px 4px !important;
-    border-bottom: 1px solid var(--panel-border) !important;
-    margin-bottom: 2px !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    flex-shrink: 0 !important;
-  }
-
-  #channels, #channelsRight {
-    display: grid !important;
-    grid-template-columns: repeat(6, 1fr) 1.25fr !important;
-    width: 100% !important;
-    height: 100% !important;
-    flex-grow: 1 !important;
-    gap: 0 !important;
-    align-items: stretch !important;
-  }
-
-  .new-channel-strip, .channel-strip {
-    position: relative !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    padding: 4px 2px 0px 2px !important;
-    border-right: 1px dashed var(--panel-border) !important;
-    box-sizing: border-box !important;
-    height: 100% !important;
-  }
-
-  /* FADER AREA: Fader di Kiri, LED Meter di Kanan */
-  .fader-area {
-    position: relative !important;
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 6px !important;
-    flex-grow: 1 !important;
-    width: 100% !important;
-    height: 100% !important; /* Memaksa area fader meregang penuh ke bawah */
-    min-height: 0 !important; /* Menghapus batasan minimal agar bisa menyesuaikan */
-    padding: 2px !important;
-  }
-
-  .fader-area input[type="range"], .channel-fader {
-    position: relative !important;
-    z-index: 2 !important;
-    background: transparent !important;
-    height: 100% !important; /* Slider fader ikut merentang penuh mentok bawah */
-    min-height: 180px !important;
-    width: 24px !important;
-    accent-color: var(--accent-color) !important;
-    margin: 0 !important;
-  }
-  
-  /* Menyesuaikan LED meter samping agar ikut memanjang mentok bawah */
-  .new-channel-strip .ch-side-vu {
-    height: 100% !important;
-    min-height: 180px !important;
-  }
-
-
-  /* INDIKATOR BULAT/KECIL ATAS */
-  .ch-top-vu {
-    width: 6px !important;
-    height: 30px !important;
-    background: #040608 !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 2px !important;
-    margin: 2px auto 4px auto !important;
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column-reverse !important;
-    z-index: 2 !important;
-  }
-
-  .ch-top-vu-fill {
-    width: 100% !important;
-    height: 0%;
-    background: linear-gradient(0deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 66%, #f39c12 85%, #e74c3c 86%, #ff0000 100%) !important;
-    transition: height 0.05s linear !important;
-  }
-
-  .new-channel-meter {
-    display: none !important;
-  }
-
-  /* ==========================================================
-     4. NAVIGATION BAR SCREEN M32
-     ========================================================== */
-  .screen-frame {
-    max-width: 100% !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  .screen-tabs {
-    display: grid !important;
-    grid-template-columns: repeat(6, 1fr) !important;
-    gap: 2px !important;
-    width: 100% !important;
-    margin-bottom: 4px !important;
-  }
-
-  .screen-tabs button {
-    font-size: 7px !important;
-    padding: 4px 0 !important;
-    text-align: center !important;
-    text-transform: uppercase !important;
-    border-radius: 3px !important;
-    border: 1px solid var(--panel-border) !important;
-    cursor: pointer !important;
-    white-space: nowrap !important;
-  }
-
-  .screen-tabs button.active {
-    background: var(--btn-active) !important;
-    color: #fff !important;
-    border-color: var(--accent-color) !important;
-  }
-
-  .m32-submenu-bar {
-    display: grid !important;
-    grid-template-columns: repeat(6, 1fr) !important;
-    gap: 2px !important;
-    width: 100% !important;
-    margin-bottom: 4px !important;
-  }
-
-  .m32-sub-btn {
-    font-size: 7px !important;
-    padding: 4px 0 !important;
-    text-align: center !important;
-    text-transform: uppercase !important;
-    border-radius: 3px !important;
-    border: 1px solid var(--panel-border) !important;
-    cursor: pointer !important;
-    white-space: nowrap !important;
-  }
-
-  .m32-sub-btn.active {
-    background: var(--accent-color) !important;
-    color: #000 !important;
-    font-weight: bold !important;
-  }
-
-  .midas-tft-screen {
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 4px !important;
-    padding: 4px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    min-height: 200px !important;
-    background: var(--panel-bg) !important;
-  }
-
-  .screen-view, .m32-sub-panel {
-    display: none !important;
-    flex-direction: column !important;
-    flex-grow: 1 !important;
-  }
-
-  .screen-view.active, .m32-sub-panel.active {
-    display: flex !important;
-  }
-
-  .pro-mini-spectrum, .rta-display, .pro-screen-grid {
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-end !important;
-    min-height: 95px !important;
-    background: var(--main-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 4px !important;
-    padding: 4px !important;
-    margin-top: 4px !important;
-  }
-
-  .spectrum-bars-container {
-    display: flex !important;
-    gap: 2px !important;
-    height: 75px !important;
-    align-items: flex-end !important;
-  }
-
-  .midas-blocks-grid {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 4px !important;
-    margin-top: 4px !important;
-  }
-
-  .midas-block {
-    background: var(--main-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    padding: 4px !important;
-    border-radius: 3px !important;
-    text-align: center !important;
-    font-size: 8px !important;
-  }
-
-  .midas-block span {
-    display: block !important;
-    color: var(--text-dim) !important;
-    font-size: 7px !important;
-    margin-bottom: 2px !important;
-  }
-
-  .midas-encoders-bar {
-    display: grid !important;
-    grid-template-columns: repeat(6, 1fr) !important;
-    gap: 2px !important;
-    margin-top: 4px !important;
-  }
-
-  .m-encoder {
-    font-size: 7px !important;
-    text-align: center !important;
-    background: var(--main-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    padding: 2px 0 !important;
-    color: var(--accent-color) !important;
-    border-radius: 2px !important;
-  }
-
-  .screen-slider {
-    width: 100%;
-    accent-color: var(--accent-color);
-    margin-top: 2px;
-  }
-  /* ==========================================================
-     PERBAIKAN MASTER RACK & KETINGGIAN CHANNEL SEJAJAR FX RETURN
-     ========================================================== */
-
-  /* 1. Paksa konsol utama merentang penuh secara vertikal dan sejajar rata */
   main.console {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: stretch !important;
-    justify-content: space-between !important;
-    gap: 4px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    padding: 4px !important;
-  }
-
-  /* 2. Tarik Bank Channel (Kiri & Kanan) agar memanjang ke bawah sejajar FX Return */
-  .channel-bank {
-    flex: 1 1 0 !important;
-    min-width: 0 !important;
-    height: auto !important;
-    min-height: 480px !important; /* Disamakan dengan tinggi total konsol tengah sampai FX Return */
-    background: var(--strip-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 4px !important;
-    padding: 4px 2px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    box-sizing: border-box !important;
-  }
-
-  /* 3. Perpanjang area fader dan tinggi slider di dalam channel strip */
-  .new-channel-strip .fader-area, .channel-strip .fader-area {
-    min-height: 280px !important;
-    height: 100% !important;
-  }
-
-  .new-channel-strip input.channel-fader, 
-  .new-channel-strip input.new-fader,
-  .channel-strip input.channel-fader {
-    height: 240px !important;
-    min-height: 240px !important;
-  }
-
-  .new-channel-strip .ch-side-vu {
-    height: 240px !important;
-    min-height: 240px !important;
-  }
-
-  /* 4. Perbaikan Total untuk Master Rack agar rapi, tidak terpotong, dan sejajar */
-  aside.master-rack {
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    width: 115px !important;
-    min-width: 115px !important;
-    max-width: 115px !important;
-    height: auto !important;
-    min-height: 480px !important;
-    background: var(--panel-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 4px !important;
-    padding: 4px !important;
-    box-sizing: border-box !important;
-  }
-
-  aside.master-rack h2 {
-    font-size: 9px !important;
-    text-align: center !important;
-    margin: 2px 0 !important;
-    width: 100% !important;
-  }
-
-  aside.master-rack .master-card {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    flex-grow: 1 !important;
-    background: var(--main-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 3px !important;
-    padding: 4px 2px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    margin: 3px 0 !important;
-  }
-
-  aside.master-rack .master-card input[type="range"] {
-    height: 180px !important;
-    min-height: 180px !important;
-    width: 20px !important;
-    margin: 2px auto !important;
-  }
-
-  .main-meters {
-    display: flex !important;
-    gap: 6px !important;
-    justify-content: center !important;
-    align-items: center !important;
-    height: 120px !important;
-    min-height: 120px !important;
-    padding: 2px !important;
-    background: #040608 !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 3px !important;
-    box-sizing: border-box !important;
-    width: 100% !important;
-  }
-
-
-
-  /* ==========================================================
-     6. BOTTOM NAV STYLING
-     ========================================================== */
-  .bottom-nav {
-    display: flex !important;
-    position: sticky !important;
-    bottom: 0 !important;
-    z-index: 9999 !important;
-    width: 100% !important;
-    gap: 4px !important;
-    padding: 6px 8px !important;
-    background: var(--panel-bg) !important;
-    border-top: 1px solid var(--panel-border) !important;
-  }
-
-  .bottom-nav button {
-    flex: 1 !important;
-    padding: 8px 2px !important;
-    font-size: 9px !important;
-    font-weight: bold !important;
-    background: var(--main-bg) !important;
-    color: var(--text-dim) !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 4px !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-  }
-
-  .bottom-nav button.active {
-    background: var(--btn-active) !important;
-    color: #ffffff !important;
-    border-color: var(--accent-color) !important;
-    box-shadow: 0 0 6px var(--accent-color) !important;
-  }
-/* ==========================================================
-   MENHILANGKAN CELAH KOSONG DI BAWAH (FULL HEIGHT MENTOK)
-   ========================================================== */
-
-/* 1. Pastikan area pembungkus utama konsol mengisi penuh layar secara vertikal */
-main.console {
     display: flex !important;
     flex-direction: row !important;
     align-items: stretch !important;
@@ -751,15 +338,15 @@ main.console {
   }
 
   /* ==========================================================
-     5. MASTER RACK (RAPIH, PROPORSIONAL, TIDAK TERPOTONG)
+     5. MASTER RACK (DILEBARKAN & DIRAPIHKAN SUPAYA TIDAK TERPOTONG)
      ========================================================== */
   aside.master-rack {
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
-    width: 115px !important;
-    min-width: 115px !important;
-    max-width: 115px !important;
+    width: 125px !important;
+    min-width: 125px !important;
+    max-width: 125px !important;
     height: auto !important;
     min-height: 480px !important;
     background: var(--panel-bg) !important;
@@ -781,8 +368,8 @@ main.console {
     gap: 6px !important;
     justify-content: center !important;
     align-items: center !important;
-    height: 120px !important;
-    min-height: 120px !important;
+    height: 110px !important;
+    min-height: 110px !important;
     padding: 2px !important;
     background: #040608 !important;
     border: 1px solid var(--panel-border) !important;
@@ -796,7 +383,7 @@ main.console {
     flex-direction: column !important;
     align-items: center !important;
     height: 100% !important;
-    width: 12px !important;
+    width: 14px !important;
   }
 
   .meter-bar-bg {
@@ -842,9 +429,9 @@ main.console {
   }
 
   aside.master-rack .master-card input[type="range"] {
-    height: 180px !important;
-    min-height: 180px !important;
-    width: 20px !important;
+    height: 160px !important;
+    min-height: 160px !important;
+    width: 22px !important;
     accent-color: var(--accent-color) !important;
     cursor: pointer !important;
     margin: 2px auto !important;
@@ -1062,7 +649,6 @@ main.console {
     box-shadow: 0 0 6px var(--accent-color) !important;
   }
 </style>
-
 
 </head>
 <body class="theme-midas">
