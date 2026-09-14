@@ -79,7 +79,7 @@
   }
 
   /* ==========================================================
-     2. GLOBAL RESET & RESPONSIF LANSKAP AMAN
+     2. GLOBAL RESET & PENGUNCI LAYAR PENUH
      ========================================================== */
   *, *::before, *::after {
     box-sizing: border-box !important;
@@ -87,22 +87,22 @@
 
   html {
     scroll-behavior: smooth !important;
-    width: 100% !important;
     height: 100% !important;
   }
 
   body {
     width: 100% !important;
-    min-height: 100% !important;
+    height: 100vh !important;
+    height: 100dvh !important;
     margin: 0 !important;
     padding: 0 !important;
+    overflow: hidden !important;
     background: var(--main-bg) !important;
     color: var(--text-main) !important;
     font-family: system-ui, -apple-system, sans-serif !important;
     display: flex !important;
     flex-direction: column !important;
-    overflow-x: auto !important;
-    overflow-y: auto !important;
+    justify-content: space-between !important;
   }
 
   header.topbar {
@@ -223,18 +223,26 @@
   }
 
   /* ==========================================================
-     4. KONSOL UTAMA & KETINGGIAN LANSKAP FLEKSIBEL
+     4. KONSOL UTAMA & KETINGGIAN PAS SEJAJAR PENUH
      ========================================================== */
   main.console {
     display: flex !important;
     flex-direction: row !important;
     align-items: stretch !important;
     justify-content: space-between !important;
-    gap: 4px !important;
+    gap: 3px !important;
     width: 100% !important;
-    box-sizing: border-box !important;
-    padding: 4px !important;
     flex-grow: 1 !important;
+    height: 100% !important;
+    box-sizing: border-box !important;
+    padding: 2px 4px !important;
+    overflow: hidden !important;
+  }
+
+  .channel-bank, .center-console, aside.master-rack {
+    height: 100% !important;
+    max-height: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .channel-bank {
@@ -243,7 +251,7 @@
     background: var(--strip-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
-    padding: 4px 2px !important;
+    padding: 3px 2px !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
@@ -263,6 +271,8 @@
     display: grid !important;
     grid-template-columns: repeat(7, 1fr) !important;
     width: 100% !important;
+    height: 100% !important;
+    flex-grow: 1 !important;
     gap: 1px !important;
     align-items: stretch !important;
   }
@@ -277,6 +287,7 @@
     justify-content: space-between !important;
     padding: 2px 1px !important;
     border-right: 1px dashed var(--panel-border) !important;
+    height: 100% !important;
   }
 
   .fader-area {
@@ -286,7 +297,9 @@
     align-items: center !important;
     justify-content: center !important;
     gap: 3px !important;
+    flex-grow: 1 !important;
     width: 100% !important;
+    height: 100% !important;
     padding: 2px !important;
   }
 
@@ -296,7 +309,8 @@
     position: relative !important;
     z-index: 2 !important;
     background: transparent !important;
-    height: 180px !important;
+    height: 100% !important;
+    min-height: 160px !important;
     width: 18px !important;
     accent-color: var(--accent-color) !important;
     margin: 0 !important;
@@ -305,7 +319,8 @@
   }
   
   .new-channel-strip .ch-side-vu {
-    height: 180px !important;
+    height: 100% !important;
+    min-height: 160px !important;
     width: 7px !important;
     background: #040608 !important;
     border: 1px solid var(--panel-border) !important;
@@ -333,7 +348,7 @@
   }
 
   /* ==========================================================
-     5. MASTER RACK (LANSKAP AMAN & RESPONSIF)
+     5. MASTER RACK (SEJAJAR SEMPURNA & MEREGANG PAS KE BAWAH)
      ========================================================== */
   aside.master-rack {
     display: flex !important;
@@ -342,6 +357,7 @@
     width: 110px !important;
     min-width: 110px !important;
     max-width: 110px !important;
+    height: 100% !important;
     background: var(--panel-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
@@ -362,8 +378,8 @@
     gap: 4px !important;
     justify-content: center !important;
     align-items: center !important;
-    height: 90px !important;
-    min-height: 90px !important;
+    height: 22% !important;
+    min-height: 80px !important;
     padding: 2px !important;
     background: #040608 !important;
     border: 1px solid var(--panel-border) !important;
@@ -411,6 +427,7 @@
     align-items: center !important;
     justify-content: space-between !important;
     flex-grow: 1 !important;
+    height: 100% !important;
     background: var(--main-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 3px !important;
@@ -421,17 +438,18 @@
     z-index: 10 !important;
   }
 
-  /* FADER MASTER VERTIKAL AMAN & MUDAH DIGESER */
+  /* FADER MASTER VERTIKAL MEREGANG PENUH KE BAWAH & AKTIF */
   aside.master-rack .master-card input[type="range"] {
     writing-mode: vertical-lr !important;
     direction: rtl !important;
     appearance: slider-vertical !important;
     -webkit-appearance: slider-vertical !important;
-    height: 140px !important;
+    height: 100% !important;
+    min-height: 150px !important;
     width: 20px !important;
     accent-color: var(--accent-color) !important;
     cursor: pointer !important;
-    margin: 4px auto !important;
+    margin: 2px auto !important;
     pointer-events: auto !important;
     touch-action: pan-y !important;
     position: relative !important;
@@ -446,7 +464,7 @@
     background: var(--main-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 3px !important;
-    padding: 3px !important;
+    padding: 2px !important;
     font-size: 6px !important;
     gap: 1px !important;
     width: 100% !important;
@@ -616,7 +634,7 @@
 
   .bottom-nav {
     display: flex !important;
-    position: sticky !important;
+    position: relative !important;
     bottom: 0 !important;
     z-index: 9999 !important;
     width: 100% !important;
@@ -649,13 +667,19 @@
 
   /* MEDIA QUERY KHUSUS LAYAR KECIL / MODE PORTRET */
   @media screen and (max-width: 768px) and (orientation: portrait) {
+    body {
+      overflow-y: auto !important;
+      height: auto !important;
+    }
     main.console {
       flex-direction: column !important;
       align-items: center !important;
+      height: auto !important;
     }
     .channel-bank, aside.master-rack, .center-console {
       width: 100% !important;
       max-width: 100% !important;
+      height: auto !important;
     }
     #channels, #channelsRight {
       overflow-x: auto !important;
