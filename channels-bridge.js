@@ -1,16 +1,21 @@
 /* ==========================================================================
    WEB AUDIO ENGINE & MUSIC PLAYER ROUTING
-   14 CHANNEL - NO AUTO MUSIC (OPTIMIZED FOR PERFORMANCE)
+   14 CHANNEL - NO AUTO MUSIC
+   SAFE CHANNEL METER ENGINE
    ========================================================================== */
+
 (function () {
   "use strict";
 
   let audioCtx = null;
 
-  // Mixer menggunakan 14 channel
+  const CHANNEL_COUNT = 14;
+
   const channelNodes = {};
   const channelAudioElements = {};
+
   let masterNode = null;
+  let meterAnimationStarted = false;
 
   /* ------------------------------------------------------------------------
      AUDIO CONTEXT
@@ -22,7 +27,10 @@
         window.AudioContext || window.webkitAudioContext;
 
       if (!AudioContextClass) {
-        console.error("[AUDIO ENGINE] Web Audio API tidak tersedia.");
+        console.error(
+          "[AUDIO ENGINE] Web Audio API tidak tersedia."
+        );
+
         return false;
       }
 
@@ -41,13 +49,16 @@
      ------------------------------------------------------------------------ */
 
   function ensureMaster() {
-    if (!initAudioEngine()) return null;
+    if (!initAudioEngine()) {
+      return null;
+    }
 
     if (!masterNode) {
       masterNode = audioCtx.createGain();
       masterNode.gain.value = 0.75;
 
       const masterAnalyser = audioCtx.createAnalyser();
+
       masterAnalyser.fftSize = 64;
       masterAnalyser.smoothingTimeConstant = 0.75;
 
@@ -64,28 +75,58 @@
      CHANNEL AUDIO NODE
      ------------------------------------------------------------------------ */
 
-  window.initChannelAudioNode = function (chNum, mediaStreamOrElement) {
+  window.initChannelAudioNode = function (
+    chNum,
+    mediaStreamOrElement
+  ) {
     const ch = Number(chNum);
 
-    if (!Number.isInteger(ch) || ch < 1 || ch > 14) {
-      console.warn("[AUDIO ENGINE] Channel tidak valid:", chNum);
+    if (
+      !Number.isInteger(ch) ||
+      ch < 1 ||
+      ch > CHANNEL_COUNT
+    ) {
+      console.warn(
+        "[AUDIO ENGINE] Channel tidak valid:",
+        chNum
+      );
+
       return false;
     }
 
-    if (!initAudioEngine()) return false;
+    if (!initAudioEngine()) {
+      return false;
+    }
 
     try {
       let sourceNode;
+      let hasValidMedia = false;
 
-      const hasValidMedia =
-        mediaStreamOrElement instanceof MediaStream ||
-        mediaStreamOrElement instanceof HTMLMediaElement;
+      if (
+        typeof MediaStream !== "undefined" &&
+        mediaStreamOrElement instanceof MediaStream
+      ) {
+        sourceNode =
+          audioCtx.createMediaStreamSource(
+            mediaStreamOrElement
+          );
 
-      if (mediaStreamOrElement instanceof MediaStream) {
-        sourceNode = audioCtx.createMediaStreamSource(mediaStreamOrElement);
-      } else if (mediaStreamOrElement instanceof HTMLMediaElement) {
-        sourceNode = audioCtx.createMediaElementSource(mediaStreamOrElement);
+        hasValidMedia = true;
+      } else if (
+        typeof HTMLMediaElement !== "undefined" &&
+        mediaStreamOrElement instanceof HTMLMediaElement
+      ) {
+        sourceNode =
+          audioCtx.createMediaElementSource(
+            mediaStreamOrElement
+          );
+
+        hasValidMedia = true;
       } else {
+        /*
+         * Node kosong untuk channel yang belum memiliki input.
+         * Gain 0 mencegah suara kosong masuk ke output.
+         */
         sourceNode = audioCtx.createGain();
         sourceNode.gain.value = 0;
       }
@@ -101,7 +142,7 @@
       const midBq = audioCtx.createBiquadFilter();
       midBq.type = "peaking";
       midBq.frequency.value = 1000;
-      midBq.Q.value = 1.0;
+      midBq.Q.value = 1;
       midBq.gain.value = 0;
 
       const highBq = audioCtx.createBiquadFilter();
@@ -129,6 +170,7 @@
       }
 
       const analyserNode = audioCtx.createAnalyser();
+
       analyserNode.fftSize = 64;
       analyserNode.smoothingTimeConstant = 0.75;
 
@@ -152,158 +194,29 @@
         hasActiveMedia: hasValidMedia
       };
 
-      console.log(`[AUDIO ENGINE] Jalur audio CH${ch} aktif.`);
+      console.log(
+        `[AUDIO ENGINE] Jalur audio CH${ch} aktif.`
+      );
+
       return true;
-    } catch (e) {
+    } catch (error) {
       console.error(
         `[AUDIO ENGINE] Gagal menginisialisasi CH${ch}:`,
-        e
+        error
       );
+
       return false;
     }
   };
 
   /* ------------------------------------------------------------------------
-     CHANNEL METERS
+     LEVEL READER
      ------------------------------------------------------------------------ */
-let lastMeterUpdate = 0;
 
-function updateChannelMeters(timestamp) {
-  requestAnimationFrame(updateChannelMeters);
-
-  if (timestamp - lastMeterUpdate < 33) return;
-  lastMeterUpdate = timestamp;
-
-  for (let ch = 1; ch <= 14; ch++) {
-    const strip = document.querySelector(
-      `.new-channel-strip[data-ch="${ch}"], .channel-strip[data-ch="${ch}"]`
-    );
-
-    if (!strip) continue;
-
-    const sideVuFill = strip.querySelector(".ch-side-vu-fill");
-    if (!sideVuFill) continue;
-
-    const channelState =
-      window.state?.channels?.[ch - 1] || {};
-
-    const nodes = channelNodes[ch];
-
-    const muted = Boolean(channelState.mute);
-    const faderVal = Number(channelState.fader ?? 75);
-
-    let inputLevel = 0;
-
-    /*
-     * 1. Prioritas pertama:
-     *    Baca sinyal asli dari analyser channel.
-     */
-    if (nodes?.analyser) {
-      const analyser = nodes.analyser;
-
-      if (!analyser._meterBuffer) {
-        analyser._meterBuffer = new Uint8Array(
-          analyser.fftSize
-        );
-      }
-
-      const data = analyser._meterBuffer;
-
-      analyser.getByteTimeDomainData(data);
-
-      let sum = 0;
-      let peak = 0;
-
-      for (let i = 0; i < data.length; i++) {
-        const sample = (data[i] - 128) / 128;
-        const absoluteSample = Math.abs(sample);
-
-        sum += sample * sample;
-
-        if (absoluteSample > peak) {
-          peak = absoluteSample;
-        }
-      }
-
-      const rms = Math.sqrt(sum / data.length);
-
-      inputLevel = Math.max(
-        rms * 5,
-        peak * 0.8
-      );
+  function readAnalyserLevel(analyser) {
+    if (!analyser) {
+      return 0;
     }
-
-    /*
-     * 2. Jika analyser masih kosong, gunakan level dari
-     *    input/hardware feedback.
-     *
-     *    Mendukung:
-     *    - 0 sampai 1
-     *    - 0 sampai 100
-     */
-    if (
-      inputLevel <= 0.001 &&
-      channelState.level !== undefined
-    ) {
-      const feedbackLevel = Number(
-        channelState.level
-      );
-
-      if (Number.isFinite(feedbackLevel)) {
-        inputLevel = feedbackLevel > 1
-          ? feedbackLevel / 100
-          : feedbackLevel;
-      }
-    }
-
-    /*
-     * 3. Batasi level input agar tetap valid.
-     */
-    inputLevel = Math.max(
-      0,
-      Math.min(1, inputLevel)
-    );
-
-    /*
-     * 4. Terapkan MUTE dan fader channel masing-masing.
-     */
-    const faderScale = Math.max(
-      0,
-      Math.min(1, faderVal / 100)
-    );
-
-    const outputLevel = muted
-      ? 0
-      : inputLevel * faderScale;
-
-    const finalPercent = Math.round(
-      outputLevel * 100
-    );
-
-    /*
-     * 5. Tampilkan indikator channel yang sesuai.
-     */
-    sideVuFill.style.setProperty(
-      "height",
-      `${finalPercent}%`,
-      "important"
-    );
-
-    sideVuFill.style.setProperty(
-      "opacity",
-      finalPercent > 0 ? "1" : "0.25",
-      "important"
-    );
-  }
-
-  /*
-   * MASTER METER
-   * Bagian master tetap berjalan seperti sebelumnya.
-   */
-  const master = ensureMaster();
-
-  if (master && master._analyser) {
-    const analyser = master._analyser;
 
     if (!analyser._meterBuffer) {
       analyser._meterBuffer = new Uint8Array(
@@ -316,71 +229,99 @@ function updateChannelMeters(timestamp) {
     analyser.getByteTimeDomainData(data);
 
     let sum = 0;
+    let peak = 0;
 
     for (let i = 0; i < data.length; i++) {
-      const v = (data[i] - 128) / 128;
-      sum += v * v;
+      const sample = (data[i] - 128) / 128;
+      const absoluteSample = Math.abs(sample);
+
+      sum += sample * sample;
+
+      if (absoluteSample > peak) {
+        peak = absoluteSample;
+      }
     }
 
-    const masterLevel = Math.max(
-      0,
-      Math.min(
-        1,
-        Math.sqrt(sum / data.length) * 4
-      )
+    const rms = Math.sqrt(sum / data.length);
+
+    /*
+     * Gabungan RMS dan peak agar gerakan indikator terlihat.
+     */
+    return Math.max(
+      rms * 5,
+      peak * 0.8
     );
-
-    const masterFader =
-      document.getElementById("master");
-
-    const masterScale = masterFader
-      ? Math.max(
-          0,
-          Math.min(
-            1,
-            Number(masterFader.value) / 100
-          )
-        )
-      : 0.75;
-
-    const outputLevel =
-      masterLevel * masterScale;
-
-    const outPct =
-      Math.round(outputLevel * 100) + "%";
-
-    const masterMeterL =
-      document.getElementById("masterMeterL");
-
-    const masterMeterR =
-      document.getElementById("masterMeterR");
-
-    if (masterMeterL) {
-      masterMeterL.style.setProperty(
-        "height",
-        outPct,
-        "important"
-      );
-    }
-
-    if (masterMeterR) {
-      masterMeterR.style.setProperty(
-        "height",
-        outPct,
-        "important"
-      );
-    }
   }
-}
-  
+
+  /* ------------------------------------------------------------------------
+     STATE LEVEL READER
+     ------------------------------------------------------------------------ */
+
+  function readStateLevel(channelState) {
+    if (
+      !channelState ||
+      channelState.level === undefined ||
+      channelState.level === null
+    ) {
+      return 0;
+    }
+
+    const value = Number(channelState.level);
+
+    if (!Number.isFinite(value)) {
+      return 0;
+    }
+
+    /*
+     * Mendukung:
+     * - format 0 sampai 1
+     * - format 0 sampai 100
+     */
+    const normalized = value > 1
+      ? value / 100
+      : value;
+
+    return Math.max(
+      0,
+      Math.min(1, normalized)
+    );
+  }
+
+  /* ------------------------------------------------------------------------
+     CHANNEL METERS
+     ------------------------------------------------------------------------ */
+
+  let lastMeterUpdate = 0;
+
+  function updateChannelMeters(timestamp) {
+    requestAnimationFrame(updateChannelMeters);
+
+    /*
+     * Batasi update sekitar 30 FPS agar ringan.
+     */
+    if (timestamp - lastMeterUpdate < 33) {
+      return;
+    }
+
+    lastMeterUpdate = timestamp;
+
+    for (let ch = 1; ch <= CHANNEL_COUNT; ch++) {
       const strip = document.querySelector(
-        `.new-channel-strip[data-ch="${ch}"], .channel-strip[data-ch="${ch}"]`
+        `.new-channel-strip[data-ch="${ch}"], ` +
+        `.channel-strip[data-ch="${ch}"]`
       );
 
-      if (!strip) continue;
+      if (!strip) {
+        continue;
+      }
 
-      const sideVuFill = strip.querySelector(".ch-side-vu-fill");
-      if (!sideVuFill) continue;
+      const sideVuFill = strip.querySelector(
+        ".ch-side-vu-fill"
+      );
+
+      if (!sideVuFill) {
+        continue;
+      }
 
       const channelState =
         window.state?.channels?.[ch - 1] || {};
@@ -388,102 +329,56 @@ function updateChannelMeters(timestamp) {
       const nodes = channelNodes[ch];
 
       const muted = Boolean(channelState.mute);
-      const faderVal = Number(channelState.fader ?? 75);
 
-      // Jika mute atau fader berada di 0, indikator dimatikan.
-      if (muted || faderVal <= 0) {
-        sideVuFill.style.setProperty(
-          "height",
-          "0%",
-          "important"
-        );
+      const faderValue = Number(
+        channelState.fader ?? 75
+      );
 
-        sideVuFill.style.setProperty(
-          "opacity",
-          "0.25",
-          "important"
-        );
-
-        continue;
-      }
-
-      let level = 0;
-
-      /*
-       * Membaca sinyal asli dari analyser channel masing-masing.
-       * Tidak menggunakan Math.random(), sehingga indikator tidak
-       * menyala jika channel tersebut tidak menerima sinyal.
-       */
-      if (nodes?.analyser) {
-        const analyser = nodes.analyser;
-
-        if (!analyser._meterBuffer) {
-          analyser._meterBuffer = new Uint8Array(
-            analyser.fftSize
-          );
-        }
-
-        const data = analyser._meterBuffer;
-
-        analyser.getByteTimeDomainData(data);
-
-        let sum = 0;
-        let peak = 0;
-
-        for (let i = 0; i < data.length; i++) {
-          const sample = (data[i] - 128) / 128;
-          const absoluteSample = Math.abs(sample);
-
-          sum += sample * sample;
-
-          if (absoluteSample > peak) {
-            peak = absoluteSample;
-          }
-        }
-
-        const rms = Math.sqrt(sum / data.length);
-
-        // Gabungan RMS dan peak agar gerakan indikator lebih terlihat.
-        level = Math.max(rms * 5, peak * 0.8);
-      }
-
-      /*
-       * Fallback ke feedback level dari state/hardware.
-       * Mendukung format level 0–1 maupun 0–100.
-       */
-      if (
-        level <= 0 &&
-        channelState.level !== undefined &&
-        Number.isFinite(Number(channelState.level))
-      ) {
-        const stateLevel = Number(channelState.level);
-
-        level = stateLevel > 1
-          ? stateLevel / 100
-          : stateLevel;
-      }
-
-      // Batasi level agar selalu berada pada rentang 0–1.
-      level = Math.max(0, Math.min(1, level));
-
-      /*
-       * Level indikator mengikuti fader channel masing-masing.
-       * Fader 50 berarti indikator maksimalnya sekitar 50%.
-       */
       const faderScale = Math.max(
         0,
-        Math.min(1, faderVal / 100)
+        Math.min(1, faderValue / 100)
       );
 
-      const visibleLevel = muted
+      /*
+       * Prioritas pertama: analyser audio channel.
+       */
+      let inputLevel = readAnalyserLevel(
+        nodes?.analyser
+      );
+
+      /*
+       * Jika analyser belum menerima audio,
+       * gunakan feedback level dari state/hardware.
+       */
+      if (inputLevel <= 0.001) {
+        inputLevel = readStateLevel(
+          channelState
+        );
+      }
+
+      inputLevel = Math.max(
+        0,
+        Math.min(1, inputLevel)
+      );
+
+      /*
+       * Mute atau fader 0 mematikan indikator channel
+       * yang bersangkutan saja.
+       */
+      const outputLevel = muted
         ? 0
-        : level * faderScale;
+        : inputLevel * faderScale;
 
       const finalPercent = Math.round(
-        visibleLevel * 100
+        Math.max(
+          0,
+          Math.min(1, outputLevel)
+        ) * 100
       );
 
-      // Terapkan tinggi indikator hanya pada channel terkait.
+      /*
+       * Hanya indikator channel ini yang diubah.
+       */
       sideVuFill.style.setProperty(
         "height",
         `${finalPercent}%`,
@@ -495,16 +390,6 @@ function updateChannelMeters(timestamp) {
         finalPercent > 0 ? "1" : "0.25",
         "important"
       );
-
-      // Simpan level aktual channel tersebut ke state global.
-      if (
-        window.state &&
-        Array.isArray(window.state.channels) &&
-        window.state.channels[ch - 1]
-      ) {
-        window.state.channels[ch - 1].level =
-          visibleLevel;
-      }
     }
 
     /* ----------------------------------------------------------------------
@@ -513,32 +398,14 @@ function updateChannelMeters(timestamp) {
 
     const master = ensureMaster();
 
-    if (master && master._analyser) {
-      const analyser = master._analyser;
+    if (
+      master &&
+      master._analyser
+    ) {
+      const masterAnalyser = master._analyser;
 
-      if (!analyser._meterBuffer) {
-        analyser._meterBuffer = new Uint8Array(
-          analyser.fftSize
-        );
-      }
-
-      const data = analyser._meterBuffer;
-
-      analyser.getByteTimeDomainData(data);
-
-      let sum = 0;
-
-      for (let i = 0; i < data.length; i++) {
-        const v = (data[i] - 128) / 128;
-        sum += v * v;
-      }
-
-      const masterLevel = Math.max(
-        0,
-        Math.min(
-          1,
-          Math.sqrt(sum / data.length) * 4.0
-        )
+      const masterLevel = readAnalyserLevel(
+        masterAnalyser
       );
 
       const masterFader =
@@ -547,18 +414,23 @@ function updateChannelMeters(timestamp) {
       const masterScale = masterFader
         ? Math.max(
             0,
-            Math.min(1, Number(masterFader.value) / 100)
+            Math.min(
+              1,
+              Number(masterFader.value) / 100
+            )
           )
         : 0.75;
 
       const outputLevel =
-        masterScale > 0
-          ? masterLevel * masterScale
-          : 0;
+        masterLevel * masterScale;
 
-      const outPct = Math.round(
-        outputLevel * 100
-      ) + "%";
+      const outPercent =
+        Math.round(
+          Math.max(
+            0,
+            Math.min(1, outputLevel)
+          ) * 100
+        ) + "%";
 
       const masterMeterL =
         document.getElementById("masterMeterL");
@@ -569,7 +441,7 @@ function updateChannelMeters(timestamp) {
       if (masterMeterL) {
         masterMeterL.style.setProperty(
           "height",
-          outPct,
+          outPercent,
           "important"
         );
       }
@@ -577,7 +449,7 @@ function updateChannelMeters(timestamp) {
       if (masterMeterR) {
         masterMeterR.style.setProperty(
           "height",
-          outPct,
+          outPercent,
           "important"
         );
       }
@@ -591,15 +463,17 @@ function updateChannelMeters(timestamp) {
   window.updateMasterAudioLive = function (val) {
     const master = ensureMaster();
 
-    if (!master || !audioCtx) return;
+    if (!master || !audioCtx) {
+      return;
+    }
 
-    const n = Math.max(
+    const value = Math.max(
       0,
       Math.min(100, Number(val))
     );
 
     master.gain.setTargetAtTime(
-      n / 100,
+      value / 100,
       audioCtx.currentTime,
       0.02
     );
@@ -612,8 +486,13 @@ function updateChannelMeters(timestamp) {
   function parseEqGain(val) {
     const num = parseFloat(val);
 
-    if (isNaN(num)) return 0;
+    if (!Number.isFinite(num)) {
+      return 0;
+    }
 
+    /*
+     * Nilai 0 sampai 100 dikonversi menjadi -15 sampai +15 dB.
+     */
     if (num >= 0 && num <= 100) {
       return ((num - 50) / 50) * 15;
     }
@@ -638,7 +517,7 @@ function updateChannelMeters(timestamp) {
     if (
       !Number.isInteger(ch) ||
       ch < 1 ||
-      ch > 14 ||
+      ch > CHANNEL_COUNT ||
       !channelNodes[ch] ||
       !audioCtx
     ) {
@@ -659,11 +538,17 @@ function updateChannelMeters(timestamp) {
         );
       } else if (param === "gain") {
         nodes.gain.gain.setTargetAtTime(
-          Math.max(0.1, Number(val)),
+          Math.max(
+            0.1,
+            Number(val)
+          ),
           audioCtx.currentTime,
           0.02
         );
-      } else if (param === "pan" && nodes.pan) {
+      } else if (
+        param === "pan" &&
+        nodes.pan
+      ) {
         nodes.pan.pan.setTargetAtTime(
           Math.max(
             -1,
@@ -672,19 +557,28 @@ function updateChannelMeters(timestamp) {
           audioCtx.currentTime,
           0.02
         );
-      } else if (param === "low" && nodes.low) {
+      } else if (
+        param === "low" &&
+        nodes.low
+      ) {
         nodes.low.gain.setTargetAtTime(
           parseEqGain(val),
           audioCtx.currentTime,
           0.02
         );
-      } else if (param === "mid" && nodes.mid) {
+      } else if (
+        param === "mid" &&
+        nodes.mid
+      ) {
         nodes.mid.gain.setTargetAtTime(
           parseEqGain(val),
           audioCtx.currentTime,
           0.02
         );
-      } else if (param === "high" && nodes.high) {
+      } else if (
+        param === "high" &&
+        nodes.high
+      ) {
         nodes.high.gain.setTargetAtTime(
           parseEqGain(val),
           audioCtx.currentTime,
@@ -697,30 +591,32 @@ function updateChannelMeters(timestamp) {
           0.01
         );
       }
-    } catch (e) {
+    } catch (error) {
       console.error(
         "[AUDIO ENGINE] Error update audio:",
-        e
+        error
       );
     }
   };
 
   /* ------------------------------------------------------------------------
-     MEDIA ELEMENT & CUSTOM AUDIO CONNECTORS
+     MEDIA ELEMENT CONNECTOR
      ------------------------------------------------------------------------ */
 
   window.connectMediaElementToChannel = function (
     chNum,
     mediaElement
   ) {
-    if (!mediaElement) return false;
+    if (!mediaElement) {
+      return false;
+    }
 
     const ch = Number(chNum);
 
     if (
       !Number.isInteger(ch) ||
       ch < 1 ||
-      ch > 14
+      ch > CHANNEL_COUNT
     ) {
       return false;
     }
@@ -730,15 +626,19 @@ function updateChannelMeters(timestamp) {
         ch,
         mediaElement
       );
-    } catch (e) {
+    } catch (error) {
       console.error(
         "[AUDIO ENGINE] Gagal menghubungkan input audio:",
-        e
+        error
       );
 
       return false;
     }
   };
+
+  /* ------------------------------------------------------------------------
+     CUSTOM AUDIO CONNECTOR
+     ------------------------------------------------------------------------ */
 
   window.connectCustomAudioToChannel = function (
     chNum,
@@ -749,7 +649,7 @@ function updateChannelMeters(timestamp) {
     if (
       !Number.isInteger(ch) ||
       ch < 1 ||
-      ch > 14
+      ch > CHANNEL_COUNT
     ) {
       return false;
     }
@@ -765,7 +665,9 @@ function updateChannelMeters(timestamp) {
       return false;
     }
 
-    if (!initAudioEngine()) return false;
+    if (!initAudioEngine()) {
+      return false;
+    }
 
     try {
       if (channelAudioElements[ch]) {
@@ -786,9 +688,14 @@ function updateChannelMeters(timestamp) {
       channelAudioElements[ch] = audio;
 
       const initialized =
-        window.initChannelAudioNode(ch, audio);
+        window.initChannelAudioNode(
+          ch,
+          audio
+        );
 
-      if (!initialized) return false;
+      if (!initialized) {
+        return false;
+      }
 
       audio
         .play()
@@ -797,43 +704,55 @@ function updateChannelMeters(timestamp) {
             `[AUDIO ENGINE] Audio CH${ch} PLAY`
           );
         })
-        .catch((err) => {
+        .catch((error) => {
           console.warn(
             `[AUDIO ENGINE] CH${ch} menunggu interaksi user:`,
-            err
+            error
           );
         });
 
       return true;
-    } catch (e) {
+    } catch (error) {
       console.error(
         `[AUDIO ENGINE] Gagal memutar audio CH${ch}:`,
-        e
+        error
       );
 
       return false;
     }
   };
 
+  /* ------------------------------------------------------------------------
+     STOP CHANNEL AUDIO
+     ------------------------------------------------------------------------ */
+
   window.stopChannelAudio = function (chNum) {
     const ch = Number(chNum);
+
     const audio = channelAudioElements[ch];
 
-    if (!audio) return false;
+    if (!audio) {
+      return false;
+    }
 
     try {
       audio.pause();
       audio.currentTime = 0;
+
       return true;
-    } catch (e) {
+    } catch (error) {
       console.error(
         "[AUDIO ENGINE] Gagal stop audio:",
-        e
+        error
       );
 
       return false;
     }
   };
+
+  /* ------------------------------------------------------------------------
+     CONNECT MUSIC PLAYER TO CHANNEL 1
+     ------------------------------------------------------------------------ */
 
   window.connectPlayerToChannel1 = function (
     audioElementOrUrl
@@ -847,6 +766,7 @@ function updateChannelMeters(timestamp) {
     }
 
     if (
+      typeof HTMLMediaElement !== "undefined" &&
       audioElementOrUrl instanceof HTMLMediaElement
     ) {
       return window.connectMediaElementToChannel(
@@ -869,34 +789,40 @@ function updateChannelMeters(timestamp) {
   };
 
   /* ------------------------------------------------------------------------
-     EVENT LISTENERS (INPUT & UI)
+     EVENT LISTENER INPUT
      ------------------------------------------------------------------------ */
 
   document.addEventListener(
     "input",
-    (e) => {
-      const target = e.target;
+    (event) => {
+      const target = event.target;
+
       const param =
-        target.dataset.param || target.dataset.k;
+        target.dataset.param ||
+        target.dataset.k;
 
       const strip = target.closest(
         ".new-channel-strip, .channel-strip"
       );
 
-      if (!strip || !param) return;
+      if (!strip || !param) {
+        return;
+      }
 
       const chNum = parseInt(
         strip.dataset.ch,
         10
       );
 
-      const val = parseFloat(target.value);
+      const value = parseFloat(
+        target.value
+      );
 
       if (
         !Number.isInteger(chNum) ||
         chNum < 1 ||
-        chNum > 14 ||
-        isNaN(val)
+        chNum > CHANNEL_COUNT ||
+        !Number.isFinite(value)
       ) {
         return;
       }
@@ -913,26 +839,36 @@ function updateChannelMeters(timestamp) {
       window.updateAudioParamLive(
         chNum,
         param,
-        val
+        value
       );
     },
     true
   );
 
+  /* ------------------------------------------------------------------------
+     EVENT LISTENER MUTE / SOLO
+     ------------------------------------------------------------------------ */
+
   document.addEventListener(
     "click",
-    (e) => {
-      const target = e.target.closest(
-        'button[data-k="mute"], button[data-k="solo"], [data-action]'
+    (event) => {
+      const target = event.target.closest(
+        'button[data-k="mute"], ' +
+        'button[data-k="solo"], ' +
+        '[data-action]'
       );
 
-      if (!target) return;
+      if (!target) {
+        return;
+      }
 
       const strip = target.closest(
         ".new-channel-strip, .channel-strip"
       );
 
-      if (!strip) return;
+      if (!strip) {
+        return;
+      }
 
       const chNum = parseInt(
         strip.dataset.ch,
@@ -940,12 +876,13 @@ function updateChannelMeters(timestamp) {
       );
 
       const action =
-        target.dataset.k || target.dataset.action;
+        target.dataset.k ||
+        target.dataset.action;
 
       if (
         !Number.isInteger(chNum) ||
         chNum < 1 ||
-        chNum > 14
+        chNum > CHANNEL_COUNT
       ) {
         return;
       }
@@ -959,7 +896,7 @@ function updateChannelMeters(timestamp) {
 
       const channelState =
         window.state &&
-        window.state.channels
+        Array.isArray(window.state.channels)
           ? window.state.channels[chNum - 1]
           : null;
 
@@ -981,82 +918,126 @@ function updateChannelMeters(timestamp) {
     true
   );
 
-  document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-      const loadAudioBtn =
-        document.getElementById(
-          "screenLoadAudioBtn"
-        );
-
-      const audioInputUrl =
-        document.getElementById(
-          "screenAudioInputUrl"
-        );
-
-      if (
-        loadAudioBtn &&
-        audioInputUrl
-      ) {
-        loadAudioBtn.addEventListener(
-          "click",
-          () => {
-            const url =
-              audioInputUrl.value.trim();
-
-            if (!url) return;
-
-            let targetCh = 1;
-
-            const screenInputEl =
-              document.getElementById(
-                "screenInput"
-              );
-
-            if (
-              screenInputEl &&
-              screenInputEl.textContent
-            ) {
-              const matchNum = parseInt(
-                screenInputEl.textContent.replace(
-                  /\D/g,
-                  ""
-                ),
-                10
-              );
-
-              if (
-                !isNaN(matchNum) &&
-                matchNum >= 1 &&
-                matchNum <= 14
-              ) {
-                targetCh = matchNum;
-              }
-            }
-
-            window.connectCustomAudioToChannel(
-              targetCh,
-              url
-            );
-          }
-        );
-      }
-
-      // Auto-init ke-14 channel nodes saat DOM siap.
-      for (let i = 1; i <= 14; i++) {
-        if (!channelNodes[i]) {
-          window.initChannelAudioNode(
-            i,
-            null
-          );
-        }
-      }
-    }
-  );
-
   /* ------------------------------------------------------------------------
-     START METERS LOOP
+     AUDIO URL BUTTON
      ------------------------------------------------------------------------ */
 
-  requestAnimationFrame(updateChannelMeters);
+  function setupAudioUrlButton() {
+    const loadAudioBtn =
+      document.getElementById(
+        "screenLoadAudioBtn"
+      );
+
+    const audioInputUrl =
+      document.getElementById(
+        "screenAudioInputUrl"
+      );
+
+    if (
+      !loadAudioBtn ||
+      !audioInputUrl
+    ) {
+      return;
+    }
+
+    loadAudioBtn.addEventListener(
+      "click",
+      () => {
+        const url =
+          audioInputUrl.value.trim();
+
+        if (!url) {
+          return;
+        }
+
+        let targetCh = 1;
+
+        const screenInputEl =
+          document.getElementById(
+            "screenInput"
+          );
+
+        if (
+          screenInputEl &&
+          screenInputEl.textContent
+        ) {
+          const matchNum = parseInt(
+            screenInputEl.textContent.replace(
+              /\D/g,
+              ""
+            ),
+            10
+          );
+
+          if (
+            Number.isInteger(matchNum) &&
+            matchNum >= 1 &&
+            matchNum <= CHANNEL_COUNT
+          ) {
+            targetCh = matchNum;
+          }
+        }
+
+        window.connectCustomAudioToChannel(
+          targetCh,
+          url
+        );
+      }
+    );
+  }
+
+  /* ------------------------------------------------------------------------
+     SAFE DOM INITIALIZATION
+     ------------------------------------------------------------------------ */
+
+  function initializeAudioEngine() {
+    setupAudioUrlButton();
+
+    for (
+      let i = 1;
+      i <= CHANNEL_COUNT;
+      i++
+    ) {
+      if (!channelNodes[i]) {
+        window.initChannelAudioNode(
+          i,
+          null
+        );
+      }
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     START METERS LOOP ONLY ONCE
+     ------------------------------------------------------------------------ */
+
+  function startMetersLoop() {
+    if (meterAnimationStarted) {
+      return;
+    }
+
+    meterAnimationStarted = true;
+
+    requestAnimationFrame(
+      updateChannelMeters
+    );
+  }
+
+  if (
+    document.readyState === "loading"
+  ) {
+    document.addEventListener(
+      "DOMContentLoaded",
+      () => {
+        initializeAudioEngine();
+        startMetersLoop();
+      },
+      {
+        once: true
+      }
+    );
+  } else {
+    initializeAudioEngine();
+    startMetersLoop();
+  }
 })();
