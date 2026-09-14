@@ -79,7 +79,7 @@
   }
 
   /* ==========================================================
-     2. GLOBAL RESET & PENGUNCI LAYAR PENUH
+     2. GLOBAL RESET & AKTIFKAN SCROLL HORIZONTAL LANSKAP
      ========================================================== */
   *, *::before, *::after {
     box-sizing: border-box !important;
@@ -87,22 +87,25 @@
 
   html {
     scroll-behavior: smooth !important;
+    width: 100% !important;
     height: 100% !important;
   }
 
   body {
     width: 100% !important;
-    height: 100vh !important;
-    height: 100dvh !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
     margin: 0 !important;
     padding: 0 !important;
-    overflow: hidden !important;
+    overflow-x: auto !important; /* MEMBUAT SCROLL HORIZONTAL BERFUNGSI NORMAL */
+    overflow-y: hidden !important;
     background: var(--main-bg) !important;
     color: var(--text-main) !important;
     font-family: system-ui, -apple-system, sans-serif !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
+    -webkit-overflow-scrolling: touch !important; /* SCROLL HALUS DI IOS/ANDROID */
   }
 
   header.topbar {
@@ -114,6 +117,7 @@
     background: var(--header-bg) !important;
     border-bottom: 1px solid var(--panel-border) !important;
     width: 100% !important;
+    min-width: 780px !important; /* Memastikan topbar ikut melebar aman untuk digeser */
     padding: 4px 8px !important;
     gap: 4px !important;
     flex-shrink: 0 !important;
@@ -232,11 +236,11 @@
     justify-content: space-between !important;
     gap: 3px !important;
     width: 100% !important;
+    min-width: 780px !important; /* Mencegah elemen hancur saat digeser */
     flex-grow: 1 !important;
     height: 100% !important;
     box-sizing: border-box !important;
     padding: 2px 4px !important;
-    overflow: hidden !important;
   }
 
   .channel-bank, .center-console, aside.master-rack {
@@ -247,7 +251,7 @@
 
   .channel-bank {
     flex: 1 1 0 !important;
-    min-width: 0 !important;
+    min-width: 200px !important;
     background: var(--strip-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
@@ -340,7 +344,7 @@
 
   .center-console {
     max-width: 380px !important;
-    min-width: 280px !important;
+    min-width: 260px !important;
     flex: 1.2 1 auto !important;
     display: flex !important;
     flex-direction: column !important;
@@ -638,6 +642,7 @@
     bottom: 0 !important;
     z-index: 9999 !important;
     width: 100% !important;
+    min-width: 780px !important; /* Menjamin nav bawah ikut responsif geser */
     gap: 4px !important;
     padding: 4px 6px !important;
     background: var(--panel-bg) !important;
@@ -669,7 +674,11 @@
   @media screen and (max-width: 768px) and (orientation: portrait) {
     body {
       overflow-y: auto !important;
+      overflow-x: hidden !important;
       height: auto !important;
+    }
+    main.console, header.topbar, .bottom-nav {
+      min-width: 100% !important;
     }
     main.console {
       flex-direction: column !important;
