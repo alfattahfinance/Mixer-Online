@@ -482,16 +482,66 @@
     accent-color: var(--accent-color);
     margin-top: 2px;
   }
-   /* ==========================================================
-     5. MASTER RACK & AUX (TARIK PENUH MENTOK BAWAH)
+  /* ==========================================================
+     PERBAIKAN MASTER RACK & KETINGGIAN CHANNEL SEJAJAR FX RETURN
      ========================================================== */
+
+  /* 1. Paksa konsol utama merentang penuh secara vertikal dan sejajar rata */
+  main.console {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+    justify-content: space-between !important;
+    gap: 4px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 4px !important;
+  }
+
+  /* 2. Tarik Bank Channel (Kiri & Kanan) agar memanjang ke bawah sejajar FX Return */
+  .channel-bank {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 480px !important; /* Disamakan dengan tinggi total konsol tengah sampai FX Return */
+    background: var(--strip-bg) !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 4px !important;
+    padding: 4px 2px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 3. Perpanjang area fader dan tinggi slider di dalam channel strip */
+  .new-channel-strip .fader-area, .channel-strip .fader-area {
+    min-height: 280px !important;
+    height: 100% !important;
+  }
+
+  .new-channel-strip input.channel-fader, 
+  .new-channel-strip input.new-fader,
+  .channel-strip input.channel-fader {
+    height: 240px !important;
+    min-height: 240px !important;
+  }
+
+  .new-channel-strip .ch-side-vu {
+    height: 240px !important;
+    min-height: 240px !important;
+  }
+
+  /* 4. Perbaikan Total untuk Master Rack agar rapi, tidak terpotong, dan sejajar */
   aside.master-rack {
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important; /* Membentangkan elemen dari paling atas ke paling bawah */
-    width: 110px !important;
-    min-width: 110px !important;
-    height: 140% !important;
+    justify-content: space-between !important;
+    width: 115px !important;
+    min-width: 115px !important;
+    max-width: 115px !important;
+    height: auto !important;
+    min-height: 480px !important;
     background: var(--panel-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
@@ -499,117 +549,50 @@
     box-sizing: border-box !important;
   }
 
-  /* INDIKATOR MAIN L/R */
-  .main-meters {
+  aside.master-rack h2 {
+    font-size: 9px !important;
+    text-align: center !important;
+    margin: 2px 0 !important;
+    width: 100% !important;
+  }
+
+  aside.master-rack .master-card {
     display: flex !important;
-    gap: 8px !important;
-    justify-content: center !important;
+    flex-direction: column !important;
     align-items: center !important;
+    justify-content: space-between !important;
+    flex-grow: 1 !important;
+    background: var(--main-bg) !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 3px !important;
+    padding: 4px 2px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 3px 0 !important;
+  }
+
+  aside.master-rack .master-card input[type="range"] {
     height: 180px !important;
     min-height: 180px !important;
-    padding: 3px !important;
+    width: 20px !important;
+    margin: 2px auto !important;
+  }
+
+  .main-meters {
+    display: flex !important;
+    gap: 6px !important;
+    justify-content: center !important;
+    align-items: center !important;
+    height: 120px !important;
+    min-height: 120px !important;
+    padding: 2px !important;
     background: #040608 !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 3px !important;
     box-sizing: border-box !important;
-  }
-
-  .meter-bar-container {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    height: 100% !important;
-    width: 12px !important;
-  }
-
-  .meter-bar-bg {
-    width: 100% !important;
-    height: 100% !important;
-    background: #000000 !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 2px !important;
-    display: flex !important;
-    flex-direction: column-reverse !important;
-    overflow: hidden !important;
-    box-sizing: border-box !important;
-  }
-
-  .meter-bar-fill {
-    width: 100% !important;
-    height: 0%;
-    background: linear-gradient(0deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 66%, #f39c12 85%, #e74c3c 86%, #ff0000 100%) !important;
-    border-radius: 1px !important;
-    transition: height 0.05s linear !important;
-  }
-
-  .meter-label {
-    font-size: 8px !important;
-    font-weight: bold !important;
-    color: var(--accent-color) !important;
-    margin-top: 2px !important;
-  }
-
-  /* MASTER CARD LATAR BELAKANG DIPAKSA TARIK KE BAWAH */
-  .master-card {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    flex-grow: 1 !important; /* Dipaksa mengisi seluruh sisa ruang kosong vertikal */
-    justify-content: space-between !important; /* Menyebarkan isi dari atas ke bawah */
-    margin: 3px 0 !important;
-    background: var(--main-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 3px !important;
-    padding: 6px 4px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  .master-card input[type="range"] {
-    height: 100% !important;
-    flex-grow: 1 !important; /* Slider fader ikut tertarik merentang penuh ke bawah */
-    min-height: 140px !important;
-    width: 20px !important;
-    accent-color: var(--accent-color) !important;
-    cursor: pointer !important;
-    margin: 4px 0 !important;
-  }
-
-  .monitor-card, .phones-card {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    text-align: center !important;
-    background: var(--main-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 3px !important;
-    padding: 4px !important;
-    font-size: 7px !important;
-    gap: 2px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    margin-top: 2px !important;
-  }
-
-  .monitor-card button {
-    font-size: 7px !important;
-    padding: 2px 4px !important;
-    background: var(--panel-border) !important;
-    color: #fff !important;
-    border: none !important;
-    border-radius: 2px !important;
-    cursor: pointer !important;
     width: 100% !important;
   }
 
-  .monitor-knob, .phone-knob {
-    width: 14px !important;
-    height: 14px !important;
-    background: var(--accent-color) !important;
-    border-radius: 50% !important;
-    margin: 1px auto !important;
-    cursor: pointer !important;
-  }
 
 
   /* ==========================================================
