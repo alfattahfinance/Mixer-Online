@@ -219,7 +219,21 @@
   /* ==========================================================
      4. KONSOL UTAMA & CHANNEL BANK (PAS MENYENTUH NAVIGASI BAWAH)
      ========================================================== */
-    /* 1. Paksa area konsol utama membentang penuh secara seragam */
+      /* Mengatur struktur dasar agar pas memenuhi layar lanskap tanpa ada scroll ganda */
+  html, body {
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  body {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+  }
+
+  /* Konsol utama mengisi ruang sisa secara akurat di antara Header dan Bottom Nav */
   main.console {
     display: flex !important;
     flex-direction: row !important;
@@ -227,12 +241,22 @@
     justify-content: space-between !important;
     gap: 4px !important;
     width: 100% !important;
-    height: 100% !important;
+    flex-grow: 1 !important;
+    height: auto !important;
+    max-height: calc(100vh - 70px) !important;
     box-sizing: border-box !important;
     padding: 4px !important;
+    overflow: hidden !important;
   }
 
-  /* 2. Kunci Master Rack agar mengisi tinggi penuh secara fleksibel mengikuti konsol */
+  /* Menyamakan tinggi Channel Bank, Konsol Tengah, dan Master Rack agar sama persis */
+  .channel-bank, .center-console, aside.master-rack {
+    height: 100% !important;
+    max-height: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Kunci Master Rack agar pas merentang penuh secara presisi */
   aside.master-rack {
     display: flex !important;
     flex-direction: column !important;
@@ -240,14 +264,12 @@
     width: 115px !important;
     min-width: 115px !important;
     max-width: 115px !important;
-    flex: 1 1 auto !important;
-    height: 100% !important;
     background: var(--panel-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
     padding: 4px !important;
-    box-sizing: border-box !important;
   }
+
 
   /* 3. Samakan juga tinggi Channel Bank agar konsisten */
   .channel-bank {
