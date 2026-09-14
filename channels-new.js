@@ -25,20 +25,12 @@
     style.id = "mixer-channel-led-skin";
 
     style.textContent = `
-      /* =========================
-         BOX SIZING
-         ========================= */
-
       header,
       .top-bar,
       .mixer-header,
       div[style*="flex"] {
         box-sizing: border-box !important;
       }
-
-      /* =========================
-         TOP BAR
-         ========================= */
 
       .top-controls,
       .header-panel,
@@ -54,10 +46,6 @@
         width: 100% !important;
         box-sizing: border-box !important;
       }
-
-      /* =========================
-         CHANNEL CONTAINER
-         ========================= */
 
       #channels,
       #channelsRight {
@@ -75,19 +63,11 @@
         padding: 4px 6px 2px 6px !important;
       }
 
-      /* =========================
-         CHANNEL STRIP
-         ========================= */
-
       .new-channel-strip {
         box-sizing: border-box !important;
         flex: 0 0 auto !important;
         min-width: 64px !important;
       }
-
-      /* =========================
-         CONTROL GAIN / EQ / PAN
-         ========================= */
 
       .new-channel-strip .new-channel-control {
         width: 100% !important;
@@ -130,10 +110,6 @@
         white-space: nowrap !important;
       }
 
-      /* =========================
-         FADER AREA
-         ========================= */
-
       .new-channel-strip .fader-area {
         position: relative !important;
         display: flex !important;
@@ -153,10 +129,6 @@
         touch-action: none !important;
       }
 
-      /* =========================
-         FADER VERTIKAL
-         ========================= */
-
       .new-channel-strip .fader-area input.channel-fader,
       .new-channel-strip .fader-area input.new-fader {
         appearance: slider-vertical !important;
@@ -173,10 +145,6 @@
         margin: 0 !important;
         cursor: ns-resize !important;
       }
-
-      /* =========================
-         SIDE VU METER
-         ========================= */
 
       .new-channel-strip .ch-side-vu {
         position: relative !important;
@@ -209,10 +177,6 @@
         will-change: height;
       }
 
-      /* =========================
-         CHANNEL LED
-         ========================= */
-
       .new-channel-strip .channel-led.active.green {
         opacity: 1 !important;
         background: linear-gradient(
@@ -235,10 +199,6 @@
         box-shadow: 0 0 5px rgba(255, 59, 48, 0.6) !important;
       }
 
-      /* =========================
-         FADER LABEL
-         ========================= */
-
       .new-channel-strip .fader-area label {
         position: absolute !important;
         top: 1px !important;
@@ -260,10 +220,6 @@
         pointer-events: none !important;
       }
 
-      /* =========================
-         BUTTONS
-         ========================= */
-
       .new-channel-strip .new-channel-buttons {
         display: flex !important;
         flex-direction: column !important;
@@ -281,10 +237,6 @@
         cursor: pointer !important;
         touch-action: manipulation !important;
       }
-
-      /* =========================
-         HEADER DAN SOURCE
-         ========================= */
 
       .new-channel-strip .new-channel-head {
         font-size: 8px !important;
@@ -304,10 +256,6 @@
         width: 100% !important;
         flex-shrink: 0 !important;
       }
-
-      /* =========================
-         RESPONSIVE PORTRAIT
-         ========================= */
 
       @media screen and (max-width: 768px),
              screen and (orientation: portrait) {
@@ -365,11 +313,7 @@
 
         .new-channel-strip .fader-area input.channel-fader,
         .new-channel-strip .fader-area input.new-fader,
-        .new-channel-strip .ch-side-vu {
-          height: 140px !important;
-          min-height: 140px !important;
-        }
-
+        .new-channel-strip .ch-side-vu,
         .new-channel-strip .fader-area {
           height: 140px !important;
           min-height: 140px !important;
@@ -453,7 +397,7 @@
   }
 
   /* ============================================================
-     UPDATE TAMPILAN LED
+     LED CHANNEL
      ============================================================ */
 
   function updateChannelLed(strip, channelData) {
@@ -476,7 +420,7 @@
   }
 
   /* ============================================================
-     BUAT CHANNEL
+     MEMBUAT CHANNEL
      ============================================================ */
 
   function make(id) {
@@ -488,8 +432,6 @@
 
     el.className = "new-channel-strip";
     el.dataset.ch = String(id);
-
-    updateChannelLed(el, channelData);
 
     const muted = Boolean(channelData.mute);
     const solo = Boolean(channelData.solo);
@@ -690,7 +632,9 @@
 
       updateChannelLed(el, ch);
 
-      const sourceLabel = el.querySelector(".new-channel-source span");
+      const sourceLabel = el.querySelector(
+        ".new-channel-source span"
+      );
 
       if (sourceLabel) {
         sourceLabel.textContent =
@@ -711,9 +655,9 @@
       }
     }
 
-    /* =========================
+    /* ==========================================================
        INPUT CONTROL
-       ========================= */
+       ========================================================== */
 
     el.querySelectorAll("input").forEach((input) => {
       input.addEventListener(
@@ -728,9 +672,9 @@
       );
     });
 
-    /* =========================
+    /* ==========================================================
        MUTE / SOLO
-       ========================= */
+       ========================================================== */
 
     el.querySelectorAll("button").forEach((button) => {
       button.addEventListener("click", (event) => {
@@ -773,7 +717,7 @@
   }
 
   /* ============================================================
-     SINKRONISASI CHANNEL
+     SINKRONISASI
      ============================================================ */
 
   function sync() {
@@ -858,36 +802,78 @@
      ============================================================ */
 
   function build() {
+    ensureState();
+
     const left = $("channels");
     const right = $("channelsRight");
 
-    if (!left || !right) {
-      console.warn(
-        "Mixer channel panel: #channels atau #channelsRight tidak ditemukan."
-      );
+    /*
+      Bersihkan container yang tersedia.
+      Jangan langsung return jika salah satu container tidak ada.
+    */
+
+    if (left) {
+      left.innerHTML = "";
+    }
+
+    if (right) {
+      right.innerHTML = "";
+    }
+
+    /*
+      Jika hanya #channels tersedia,
+      tampilkan seluruh 14 channel di sana.
+    */
+
+    if (left && !right) {
+      for (let id = 1; id <= N; id++) {
+        left.appendChild(make(id));
+      }
 
       return;
     }
 
-    ensureState();
+    /*
+      Jika hanya #channelsRight tersedia,
+      tampilkan seluruh 14 channel di sana.
+    */
 
-    left.innerHTML = "";
-    right.innerHTML = "";
+    if (!left && right) {
+      for (let id = 1; id <= N; id++) {
+        right.appendChild(make(id));
+      }
 
-    for (let id = 1; id <= N; id++) {
-      const target = id <= 7 ? left : right;
-
-      target.appendChild(make(id));
+      return;
     }
+
+    /*
+      Jika kedua container tersedia,
+      bagi menjadi CH1–CH7 dan CH8–CH14.
+    */
+
+    if (left && right) {
+      for (let id = 1; id <= N; id++) {
+        if (id <= 7) {
+          left.appendChild(make(id));
+        } else {
+          right.appendChild(make(id));
+        }
+      }
+
+      return;
+    }
+
+    console.warn(
+      "Panel channel tidak ditemukan: #channels dan #channelsRight tidak tersedia."
+    );
   }
 
   /* ============================================================
      STANDALONE METER FALLBACK
 
-     CATATAN:
-     Loop ini TIDAK mengubah .ch-side-vu-fill.
+     Penting:
+     Fungsi ini tidak mengubah .ch-side-vu-fill.
      Meter utama dikelola oleh channels-bridge.js.
-     Loop ini hanya memperbarui LED dan label status.
      ============================================================ */
 
   function startStandaloneMeterLoop() {
@@ -974,8 +960,12 @@
      ============================================================ */
 
   function initialize() {
-    build();
-    startStandaloneMeterLoop();
+    ensureState();
+
+    window.requestAnimationFrame(() => {
+      build();
+      startStandaloneMeterLoop();
+    });
   }
 
   if (document.readyState === "loading") {
