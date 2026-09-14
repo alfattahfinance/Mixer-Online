@@ -1,17 +1,34 @@
 /* ============================================================
-   Mixer-Online — 14CH channel panel (Forced Horizontal Scroll)
+   Mixer-Online — 14CH channel panel & Clean Top Bar Layout
    ============================================================ */
 (function () {
   "use strict";
 
   /* ============================================================
-     CSS PAKSAAN SCROLL HORIZONTAL & RAPI
+     CSS PERBAIKAN BILAH ATAS & SCROLL CHANNEL HORIZONTAL
      ============================================================ */
   if (!document.getElementById("mixer-channel-led-skin")) {
     const style = document.createElement("style");
     style.id = "mixer-channel-led-skin";
     style.textContent = `
-      /* Paksa kontainer pembungkus channel agar bisa di-scroll ke kanan & kiri */
+      /* PERBAIKAN BILAH ATAS (TOP BAR / HEADER KONTROL) */
+      header, .top-bar, .mixer-header, div[style*="flex"] {
+        box-sizing: border-box !important;
+      }
+
+      /* Merapikan kontainer tombol atas agar tersusun rapi & tidak bertumpuk */
+      .top-controls, .header-panel, .mixer-top-panel, 
+      header .flex, div:has(> #systemBtn), div:has(> .system-btn) {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 6px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      /* Paksa kontainer pembungkus channel agar bisa di-scroll ke kanan & kiri dengan mulus */
       #channels, #channelsRight {
         display: flex !important;
         flex-direction: row !important;
@@ -24,12 +41,6 @@
         max-width: 100% !important;
         box-sizing: border-box !important;
         padding: 4px 6px 12px 6px !important;
-      }
-
-      /* Jika elemen pembungkus luar dari template membatasi, kita buat tembus */
-      .channels-wrapper, .mixer-channels-container {
-        overflow-x: auto !important;
-        width: 100% !important;
       }
 
       /* Setiap Channel Strip diatur ukurannya dengan pas dan tidak melar/menumpuk */
