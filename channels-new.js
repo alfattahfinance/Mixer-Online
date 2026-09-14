@@ -1,6 +1,6 @@
 /* ============================================================
    Mixer-Online — 14CH Channel Panel
-   Clean Top Bar Layout + Safe Channel Meter
+   Clean Top Bar Layout + Safe Channel Meter (Fixed Layout)
    ============================================================ */
 
 (function () {
@@ -49,24 +49,26 @@
 
       #channels,
       #channelsRight {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        gap: 8px !important;
-        overflow-x: auto !important;
-        overflow-y: hidden !important;
-        -webkit-overflow-scrolling: touch !important;
+        display: grid !important;
+        grid-template-columns: repeat(7, 1fr) !important;
         width: 100% !important;
-        max-width: 100% !important;
-        height: 100% !important;
+        gap: 1px !important;
+        align-items: stretch !important;
         box-sizing: border-box !important;
-        padding: 4px 6px 2px 6px !important;
+        padding: 2px !important;
       }
 
       .new-channel-strip {
+        position: relative !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 2px 1px !important;
+        border-right: 1px dashed var(--panel-border) !important;
         box-sizing: border-box !important;
-        flex: 0 0 auto !important;
-        min-width: 64px !important;
       }
 
       .new-channel-strip .new-channel-control {
@@ -148,7 +150,7 @@
 
       .new-channel-strip .ch-side-vu {
         position: relative !important;
-        width: 8px !important;
+        width: 7px !important;
         height: 195px !important;
         min-height: 195px !important;
         background: #040608 !important;
@@ -397,25 +399,38 @@
   }
 
   /* ============================================================
-     LED CHANNEL
+     VISUAL CHANNEL (LED & METER)
      ============================================================ */
 
-  function updateChannelLed(strip, channelData) {
+  function updateChannelVisuals(strip, channelData) {
     if (!strip || !channelData) return;
 
     const led = strip.querySelector(".channel-led");
+    const vuFill = strip.querySelector(".ch-side-vu-fill");
 
-    if (!led) return;
-
+    const systemOn = Boolean(window.state?.system);
     const muted = Boolean(channelData.mute);
     const level = Number(channelData.level || 0);
 
-    if (muted) {
-      led.className = "channel-led active red";
-    } else if (level > 0) {
-      led.className = "channel-led active green";
-    } else {
-      led.className = "channel-led";
+    if (led) {
+      if (!systemOn) {
+        led.className = "channel-led";
+      } else if (muted) {
+        led.className = "channel-led active red";
+      } else if (level > 0) {
+        led.className = "channel-led active green";
+      } else {
+        led.className = "channel-led";
+      }
+    }
+
+    if (vuFill) {
+      if (!systemOn || muted || level <= 0) {
+        vuFill.style.height = "0%";
+      } else {
+        const percent = Math.min(100, Math.max(0, Math.round(level * 100))) + "%";
+        vuFill.style.height = percent;
+      }
     }
   }
 
@@ -630,7 +645,7 @@
         window.selectScreenChannel(id);
       }
 
-      updateChannelLed(el, ch);
+      updateChannelVisuals(el, ch);
 
       const sourceLabel = el.querySelector(
         ".new-channel-source span"
@@ -655,10 +670,6 @@
       }
     }
 
-    /* ==========================================================
-       INPUT CONTROL
-       ========================================================== */
-
     el.querySelectorAll("input").forEach((input) => {
       input.addEventListener(
         "input",
@@ -671,10 +682,6 @@
         { passive: true }
       );
     });
-
-    /* ==========================================================
-       MUTE / SOLO
-       ========================================================== */
 
     el.querySelectorAll("button").forEach((button) => {
       button.addEventListener("click", (event) => {
@@ -713,6 +720,7 @@
       });
     });
 
+    updateChannelVisuals(el, channelData);
     return el;
   }
 
@@ -780,7 +788,7 @@
         soloButton.textContent = solo ? "UNSOLO" : "SOLO";
       }
 
-      updateChannelLed(el, channelData);
+      updateChannelVisuals(el, channelData);
 
       const sourceLabel = el.querySelector(
         ".new-channel-source span"
@@ -798,7 +806,7 @@
   }
 
   /* ============================================================
-     BUILD PANEL
+     BUILD PANEL (Diperbaiki ke Grid 7 Kolom)
      ============================================================ */
 
   function build() {
@@ -806,11 +814,6 @@
 
     const left = $("channels");
     const right = $("channelsRight");
-
-    /*
-      Bersihkan container yang tersedia.
-      Jangan langsung return jika salah satu container tidak ada.
-    */
 
     if (left) {
       left.innerHTML = "";
@@ -820,36 +823,19 @@
       right.innerHTML = "";
     }
 
-    /*
-      Jika hanya #channels tersedia,
-      tampilkan seluruh 14 channel di sana.
-    */
-
     if (left && !right) {
       for (let id = 1; id <= N; id++) {
         left.appendChild(make(id));
       }
-
       return;
     }
-
-    /*
-      Jika hanya #channelsRight tersedia,
-      tampilkan seluruh 14 channel di sana.
-    */
 
     if (!left && right) {
       for (let id = 1; id <= N; id++) {
         right.appendChild(make(id));
       }
-
       return;
     }
-
-    /*
-      Jika kedua container tersedia,
-      bagi menjadi CH1–CH7 dan CH8–CH14.
-    */
 
     if (left && right) {
       for (let id = 1; id <= N; id++) {
@@ -859,7 +845,6 @@
           right.appendChild(make(id));
         }
       }
-
       return;
     }
 
@@ -869,11 +854,7 @@
   }
 
   /* ============================================================
-     STANDALONE METER FALLBACK
-
-     Penting:
-     Fungsi ini tidak mengubah .ch-side-vu-fill.
-     Meter utama dikelola oleh channels-bridge.js.
+     STANDALONE METER LOOP
      ============================================================ */
 
   function startStandaloneMeterLoop() {
@@ -883,8 +864,6 @@
 
     function frame() {
       ensureState();
-
-      const systemOn = Boolean(window.state?.system);
 
       for (let id = 1; id <= N; id++) {
         const channelData =
@@ -898,17 +877,7 @@
 
         if (!strip) continue;
 
-        const led = strip.querySelector(".channel-led");
-
-        if (!systemOn) {
-          if (led) {
-            led.className = "channel-led";
-          }
-
-          continue;
-        }
-
-        updateChannelLed(strip, channelData);
+        updateChannelVisuals(strip, channelData);
       }
 
       window.requestAnimationFrame(frame);
