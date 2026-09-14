@@ -135,7 +135,7 @@
         width: 100% !important;
         flex-grow: 1 !important;
         height: 100% !important;
-        min-height: 175px !important;
+        min-height: 195px !important;
         padding: 4px 1px 2px 1px !important;
         box-sizing: border-box !important;
       }
@@ -144,12 +144,12 @@
         touch-action: none !important;
       }
 
-      /* Slider Fader (Disesuaikan menjadi 175px agar pas mentok bawah) */
+      /* Slider Fader (Disesuaikan menjadi 195px agar pas mentok bawah) */
       .new-channel-strip .fader-area input.channel-fader, 
       .new-channel-strip .fader-area input.new-fader {
         width: 16px !important;
-        height: 175px !important;
-        min-height: 175px !important;
+        height: 195px !important;
+        min-height: 195px !important;
         position: relative !important;
         z-index: 2 !important;
         background: transparent !important;
@@ -157,12 +157,12 @@
         margin: 0 !important;
       }
 
-      /* KOTAK LED METER VERTIKAL (Disesuaikan menjadi 175px) */
+      /* KOTAK LED METER VERTIKAL (Disesuaikan menjadi 195px) */
       .new-channel-strip .ch-side-vu {
         position: relative !important;
         width: 8px !important;
-        height: 175px !important;
-        min-height: 175px !important;
+        height: 195px !important;
+        min-height: 195px !important;
         background: #040608 !important;
         border: 1px solid rgba(255,255,255,0.3) !important;
         border-radius: 2px !important;
@@ -234,6 +234,53 @@
         overflow: hidden !important;
         width: 100% !important;
         flex-shrink: 0 !important;
+      }
+
+      /* PERBAIKAN TAMPILAN PORTRET & RESPONSIF LAYAR */
+      @media screen and (max-width: 768px), (orientation: portrait) {
+        html, body {
+          width: 100% !important;
+          overflow-x: hidden !important;
+        }
+        header.topbar, main.console, .bottom-nav {
+          width: 100% !important;
+          min-width: 100% !important;
+          max-width: 100% !important;
+        }
+        header.topbar {
+          flex-wrap: wrap !important;
+          gap: 3px !important;
+          padding: 4px !important;
+        }
+        main.console {
+          flex-direction: column !important;
+          align-items: stretch !important;
+          padding: 2px !important;
+          gap: 4px !important;
+        }
+        .channel-bank, aside.master-rack, .center-console {
+          width: 100% !important;
+          max-width: 100% !important;
+          min-width: 100% !important;
+        }
+        #channels, #channelsRight {
+          display: grid !important;
+          grid-template-columns: repeat(7, 1fr) !important;
+          gap: 1px !important;
+          width: 100% !important;
+        }
+        .new-channel-strip, .channel-strip {
+          flex: 1 1 0 !important;
+          min-width: 0 !important;
+          padding: 1px 0px !important;
+        }
+        .new-channel-strip input.channel-fader, 
+        .new-channel-strip input.new-fader,
+        .channel-strip input.channel-fader,
+        .new-channel-strip .ch-side-vu {
+          height: 140px !important;
+          min-height: 140px !important;
+        }
       }
     `;
     document.head.appendChild(style);
