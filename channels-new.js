@@ -317,7 +317,7 @@
     el.dataset.ch = String(id);
     
     const isMuted = Boolean(c.mute);
-    const hasSignal = Number(c.fader) > 0 || Number(c.gain) > 0;
+    const hasSignal = Number(c.level) > 0;
     let ledClass = "channel-led";
     if (isMuted) {
       ledClass += " active red";
@@ -410,7 +410,7 @@
       if (ledEl) {
         if (ch.mute) {
           ledEl.className = "channel-led active red";
-        } else if (Number(ch.fader) > 0 || Number(ch.gain) > 0) {
+        } else if (Number(ch.level) > 0) {
           ledEl.className = "channel-led active green";
         } else {
           ledEl.className = "channel-led";
@@ -498,6 +498,12 @@
 
     if (!window.state.system) {
       document.querySelectorAll(".ch-side-vu-fill").forEach(el => el.style.height = "0%");
+      document.querySelectorAll(".new-channel-strip").forEach(strip => {
+        const led = strip.querySelector(".channel-led");
+        if (led && !led.classList.contains("active") && !led.classList.contains("red")) {
+          led.className = "channel-led";
+        }
+      });
       return;
     }
 
@@ -509,27 +515,27 @@
       if (!strip) continue;
 
       const vuFill = strip.querySelector(".ch-side-vu-fill");
+      const ledEl = strip.querySelector(".channel-led");
       if (!vuFill) continue;
 
       const muted = Boolean(chData.mute);
       const faderVal = Number(chData.fader ?? 75);
-
-      if (muted || faderVal === 0) {
-        vuFill.style.height = "0%";
-        continue;
-      }
-
       let lvl = Number(chData.level || 0);
-      if (lvl === 0) {
-        const gainVal = Number(chData.gain ?? 1);
-        const timeFactor = Date.now() + (i * 311);
-        const microWave = (Math.sin(timeFactor / 90) + Math.cos(timeFactor / 140)) * 0.15;
-        const baseActivity = (faderVal / 100) * (gainVal / 2);
-        lvl = Math.min(1, Math.max(0.05, baseActivity + microWave));
+
+      if (muted || faderVal === 0 || lvl <= 0) {
+        vuFill.style.height = "0%";
+        if (ledEl && !muted) {
+          ledEl.className = "channel-led";
+        }
+        continue;
       }
 
       const percent = Math.min(100, Math.max(0, Math.round(lvl * 100))) + "%";
       vuFill.style.height = percent;
+
+      if (ledEl && !muted) {
+        ledEl.className = "channel-led active green";
+      }
     }
   }
 
