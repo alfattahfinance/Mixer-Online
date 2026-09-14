@@ -1,45 +1,52 @@
 /* ============================================================
-   Mixer-Online — 14CH channel panel (Fixed Layout & Scrollable)
+   Mixer-Online — 14CH channel panel (Forced Horizontal Scroll)
    ============================================================ */
 (function () {
   "use strict";
 
   /* ============================================================
-     CSS PERBAIKAN: ANTI-BERTUMPUK & BISA DIGESER KANAN-KIRI (SCROLL)
+     CSS PAKSAAN SCROLL HORIZONTAL & RAPI
      ============================================================ */
   if (!document.getElementById("mixer-channel-led-skin")) {
     const style = document.createElement("style");
     style.id = "mixer-channel-led-skin";
     style.textContent = `
-      /* Pastikan pembungkus panel channel mendukung scroll horizontal & tidak tumpang tindih */
+      /* Paksa kontainer pembungkus channel agar bisa di-scroll ke kanan & kiri */
       #channels, #channelsRight {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
-        gap: 6px !important;
+        gap: 8px !important;
         overflow-x: auto !important;
         overflow-y: hidden !important;
         -webkit-overflow-scrolling: touch !important;
-        padding-bottom: 8px !important;
+        width: 100% !important;
+        max-width: 100% !important;
         box-sizing: border-box !important;
+        padding: 4px 6px 12px 6px !important;
+      }
+
+      /* Jika elemen pembungkus luar dari template membatasi, kita buat tembus */
+      .channels-wrapper, .mixer-channels-container {
+        overflow-x: auto !important;
         width: 100% !important;
       }
 
-      /* Setiap Channel Strip berdiri kokoh sejajar, tidak mengapung/merapat berlebihan */
+      /* Setiap Channel Strip diatur ukurannya dengan pas dan tidak melar/menumpuk */
       .new-channel-strip {
-        flex: 0 0 68px !important;
-        width: 68px !important;
-        min-width: 68px !important;
-        max-width: 68px !important;
-        background: rgba(15, 20, 25, 0.95) !important;
-        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        flex: 0 0 70px !important;
+        width: 70px !important;
+        min-width: 70px !important;
+        max-width: 70px !important;
+        background: #0d1117 !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
         border-radius: 4px !important;
-        padding: 5px 3px !important;
+        padding: 4px 2px !important;
         box-sizing: border-box !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.4) !important;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.5) !important;
       }
 
       .new-channel-strip .channel-led,
@@ -58,20 +65,20 @@
       .new-channel-strip .channel-led.active.green {
         opacity: 1 !important;
         background: linear-gradient(180deg,#8dffb7,#20d968 48%,#0a7135) !important;
-        box-shadow: 0 0 4px rgba(46,255,128,.5) !important;
+        box-shadow: 0 0 5px rgba(46,255,128,.6) !important;
       }
 
       .new-channel-strip .channel-led.active.red {
         opacity: 1 !important;
         background: linear-gradient(180deg,#ff918b,#ff3b30 48%,#8d120d) !important;
-        box-shadow: 0 0 4px rgba(255,59,48,.5) !important;
+        box-shadow: 0 0 5px rgba(255,59,48,.6) !important;
       }
 
-      /* KONTROL / KNOB BERJARAK AMAN */
+      /* KONTROL / KNOB */
       .new-channel-strip .new-channel-control {
         width: 100% !important;
         padding: 1px 0 !important;
-        margin-bottom: 3px !important;
+        margin-bottom: 2px !important;
         text-align: center !important;
         box-sizing: border-box !important;
         display: flex !important;
@@ -82,14 +89,14 @@
       .new-channel-strip .new-channel-control label {
         display: block !important;
         font-size: 6px !important;
-        color: var(--text-dim, #b0c4de) !important;
+        color: #94a3b8 !important;
         margin-bottom: 1px !important;
         white-space: nowrap !important;
       }
 
       .new-channel-strip .new-channel-control input.new-knob {
         width: 100% !important;
-        max-width: 58px !important;
+        max-width: 60px !important;
         height: 14px !important;
         margin: 1px auto !important;
         display: block !important;
@@ -104,7 +111,7 @@
         white-space: nowrap !important;
       }
 
-      /* FADER AREA: Jajar rapi fader dan meteran samping */
+      /* FADER AREA & METERAN BERDAMPINGAN */
       .new-channel-strip .fader-area {
         position: relative !important;
         display: flex !important;
@@ -114,8 +121,8 @@
         gap: 3px !important;
         width: 100% !important;
         height: auto !important;
-        min-height: 200px !important;
-        padding: 10px 1px 12px 1px !important;
+        min-height: 160px !important;
+        padding: 8px 1px 10px 1px !important;
         box-sizing: border-box !important;
       }
 
@@ -126,9 +133,9 @@
       /* Slider Fader */
       .new-channel-strip .fader-area input.channel-fader, 
       .new-channel-strip .fader-area input.new-fader {
-        width: 18px !important;
-        height: 170px !important;
-        min-height: 170px !important;
+        width: 16px !important;
+        height: 135px !important;
+        min-height: 135px !important;
         position: relative !important;
         z-index: 2 !important;
         background: transparent !important;
@@ -140,8 +147,8 @@
       .new-channel-strip .ch-side-vu {
         position: relative !important;
         width: 8px !important;
-        height: 170px !important;
-        min-height: 170px !important;
+        height: 135px !important;
+        min-height: 135px !important;
         background: #040608 !important;
         border: 1px solid rgba(255,255,255,0.3) !important;
         border-radius: 2px !important;
@@ -166,7 +173,7 @@
         left: 50% !important;
         transform: translateX(-50%) !important;
         font-size: 5px !important;
-        color: var(--text-dim) !important;
+        color: #94a3b8 !important;
       }
 
       .new-channel-strip .fader-area output.fader-val {
@@ -184,7 +191,7 @@
         flex-direction: column !important;
         gap: 2px !important;
         width: 100% !important;
-        margin-top: 3px !important;
+        margin-top: 2px !important;
       }
 
       .new-channel-strip .new-channel-buttons button {
