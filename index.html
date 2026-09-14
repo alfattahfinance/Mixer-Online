@@ -17,7 +17,6 @@
     navigator.serviceWorker.register('/sw.js').catch(function(){});
   }
 </script>
-
 <style>
   /* ==========================================================
      1. DEFINISI VARIABEL WARNA (SKIN)
@@ -80,7 +79,7 @@
   }
 
   /* ==========================================================
-     2. GLOBAL RESET & BILAH ATAS (TOPBAR)
+     2. GLOBAL RESET & BILAH ATAS (TOPBAR RESPONSIF)
      ========================================================== */
   *, *::before, *::after {
     box-sizing: border-box !important;
@@ -102,14 +101,14 @@
   header.topbar {
     display: flex !important;
     flex-direction: row !important;
-    flex-wrap: nowrap !important;
+    flex-wrap: wrap !important;
     align-items: center !important;
     justify-content: space-between !important;
     background: var(--header-bg) !important;
     border-bottom: 1px solid var(--panel-border) !important;
     width: 100% !important;
     padding: 4px 8px !important;
-    gap: 6px !important;
+    gap: 4px !important;
     position: relative !important;
     z-index: 100 !important;
     box-sizing: border-box !important;
@@ -218,7 +217,7 @@
   }
 
   /* ==========================================================
-     4. KONSOL UTAMA & KETINGGIAN CHANNEL SEJAJAR FX RETURN
+     4. KONSOL UTAMA & PENYESUAIAN SEJAJAR FX RETURN (RESPONSIF)
      ========================================================== */
   main.console {
     display: flex !important;
@@ -231,11 +230,13 @@
     padding: 4px !important;
   }
 
+  /* Tinggi disesuaikan agar pas sejajar dengan batas bawah FX Return */
   .channel-bank {
     flex: 1 1 0 !important;
     min-width: 0 !important;
     height: auto !important;
-    min-height: 520px !important;
+    min-height: 420px !important;
+    max-height: 460px !important;
     background: var(--strip-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
@@ -247,7 +248,7 @@
   }
 
   .bank-title {
-    padding: 2px 4px 4px 4px !important;
+    padding: 2px 4px 2px 4px !important;
     border-bottom: 1px solid var(--panel-border) !important;
     margin-bottom: 2px !important;
     display: flex !important;
@@ -274,7 +275,7 @@
     flex-direction: column !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding: 4px 1px 2px 1px !important;
+    padding: 2px 1px !important;
     border-right: 1px dashed var(--panel-border) !important;
     box-sizing: border-box !important;
     height: 100% !important;
@@ -286,10 +287,10 @@
     flex-direction: row !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 4px !important;
+    gap: 3px !important;
     flex-grow: 1 !important;
     width: 100% !important;
-    min-height: 310px !important;
+    min-height: 210px !important;
     height: 100% !important;
     padding: 2px !important;
   }
@@ -300,17 +301,17 @@
     position: relative !important;
     z-index: 2 !important;
     background: transparent !important;
-    height: 270px !important;
-    min-height: 270px !important;
-    width: 20px !important;
+    height: 180px !important;
+    min-height: 180px !important;
+    width: 18px !important;
     accent-color: var(--accent-color) !important;
     margin: 0 !important;
   }
   
   .new-channel-strip .ch-side-vu {
-    height: 270px !important;
-    min-height: 270px !important;
-    width: 8px !important;
+    height: 180px !important;
+    min-height: 180px !important;
+    width: 7px !important;
     background: #040608 !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 2px !important;
@@ -329,45 +330,46 @@
 
   .center-console {
     max-width: 380px !important;
-    min-width: 300px !important;
-    flex: 1 1 auto !important;
+    min-width: 280px !important;
+    flex: 1.2 1 auto !important;
     box-sizing: border-box !important;
     height: 100% !important;
   }
 
   /* ==========================================================
-     5. MASTER RACK (SEJAJAR DENGAN CHANNEL & FADER VERTIKAL)
+     5. MASTER RACK (SEJAJAR PAS DENGAN FX RETURN & FADER VERTIKAL)
      ========================================================== */
   aside.master-rack {
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
-    width: 120px !important;
-    min-width: 120px !important;
-    max-width: 120px !important;
+    width: 110px !important;
+    min-width: 110px !important;
+    max-width: 110px !important;
     height: auto !important;
-    min-height: 520px !important; /* Disamakan persis dengan channel-bank */
+    min-height: 420px !important;
+    max-height: 460px !important; /* Disamakan persis dengan channel-bank agar sejajar */
     background: var(--panel-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
-    padding: 4px !important;
+    padding: 3px !important;
     box-sizing: border-box !important;
   }
 
   aside.master-rack h2 {
-    font-size: 9px !important;
+    font-size: 8px !important;
     text-align: center !important;
-    margin: 2px 0 !important;
+    margin: 1px 0 !important;
     width: 100% !important;
   }
 
   .main-meters {
     display: flex !important;
-    gap: 6px !important;
+    gap: 4px !important;
     justify-content: center !important;
     align-items: center !important;
-    height: 120px !important;
-    min-height: 120px !important;
+    height: 90px !important;
+    min-height: 90px !important;
     padding: 2px !important;
     background: #040608 !important;
     border: 1px solid var(--panel-border) !important;
@@ -381,7 +383,7 @@
     flex-direction: column !important;
     align-items: center !important;
     height: 100% !important;
-    width: 14px !important;
+    width: 12px !important;
   }
 
   .meter-bar-bg {
@@ -405,10 +407,10 @@
   }
 
   .meter-label {
-    font-size: 8px !important;
+    font-size: 7px !important;
     font-weight: bold !important;
     color: var(--accent-color) !important;
-    margin-top: 2px !important;
+    margin-top: 1px !important;
   }
 
   aside.master-rack .master-card {
@@ -420,24 +422,24 @@
     background: var(--main-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 3px !important;
-    padding: 6px 2px !important;
+    padding: 3px 2px !important;
     width: 100% !important;
     box-sizing: border-box !important;
-    margin: 3px 0 !important;
+    margin: 2px 0 !important;
   }
 
-  /* MEMASTIKAN FADER MASTER BERORIENTASI VERTIKAL (ATAS - BAWAH) */
+  /* FADER MASTER VERTIKAL (ATAS - BAWAH) */
   aside.master-rack .master-card input[type="range"] {
     writing-mode: vertical-lr !important;
     direction: rtl !important;
     appearance: slider-vertical !important;
     -webkit-appearance: slider-vertical !important;
-    height: 220px !important;
-    min-height: 220px !important;
-    width: 24px !important;
+    height: 140px !important;
+    min-height: 140px !important;
+    width: 20px !important;
     accent-color: var(--accent-color) !important;
     cursor: pointer !important;
-    margin: 4px auto !important;
+    margin: 2px auto !important;
   }
 
   .monitor-card, .phones-card {
@@ -448,17 +450,17 @@
     background: var(--main-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 3px !important;
-    padding: 4px !important;
-    font-size: 7px !important;
-    gap: 2px !important;
+    padding: 2px !important;
+    font-size: 6px !important;
+    gap: 1px !important;
     width: 100% !important;
     box-sizing: border-box !important;
-    margin-top: 2px !important;
+    margin-top: 1px !important;
   }
 
   .monitor-card button {
-    font-size: 6px !important;
-    padding: 2px 4px !important;
+    font-size: 5px !important;
+    padding: 1px 2px !important;
     background: var(--panel-border) !important;
     color: #fff !important;
     border: none !important;
@@ -468,8 +470,8 @@
   }
 
   .monitor-knob, .phone-knob {
-    width: 12px !important;
-    height: 12px !important;
+    width: 10px !important;
+    height: 10px !important;
     background: var(--accent-color) !important;
     border-radius: 50% !important;
     margin: 1px auto !important;
@@ -477,7 +479,7 @@
   }
 
   /* ==========================================================
-     6. NAVIGATION BAR SCREEN M32 & BOTTOM NAV
+     6. NAVIGATION BAR SCREEN M32 & BOTTOM NAV (RESPONSIF)
      ========================================================== */
   .screen-frame {
     max-width: 100% !important;
@@ -490,12 +492,12 @@
     grid-template-columns: repeat(6, 1fr) !important;
     gap: 2px !important;
     width: 100% !important;
-    margin-bottom: 4px !important;
+    margin-bottom: 3px !important;
   }
 
   .screen-tabs button {
-    font-size: 7px !important;
-    padding: 4px 0 !important;
+    font-size: 6px !important;
+    padding: 3px 0 !important;
     text-align: center !important;
     text-transform: uppercase !important;
     border-radius: 3px !important;
@@ -515,12 +517,12 @@
     grid-template-columns: repeat(6, 1fr) !important;
     gap: 2px !important;
     width: 100% !important;
-    margin-bottom: 4px !important;
+    margin-bottom: 3px !important;
   }
 
   .m32-sub-btn {
-    font-size: 7px !important;
-    padding: 4px 0 !important;
+    font-size: 6px !important;
+    padding: 3px 0 !important;
     text-align: center !important;
     text-transform: uppercase !important;
     border-radius: 3px !important;
@@ -538,10 +540,10 @@
   .midas-tft-screen {
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
-    padding: 4px !important;
+    padding: 3px !important;
     display: flex !important;
     flex-direction: column !important;
-    min-height: 200px !important;
+    min-height: 150px !important;
     background: var(--panel-bg) !important;
   }
 
@@ -559,53 +561,53 @@
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-end !important;
-    min-height: 95px !important;
+    min-height: 75px !important;
     background: var(--main-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
-    padding: 4px !important;
-    margin-top: 4px !important;
+    padding: 3px !important;
+    margin-top: 3px !important;
   }
 
   .spectrum-bars-container {
     display: flex !important;
     gap: 2px !important;
-    height: 75px !important;
+    height: 55px !important;
     align-items: flex-end !important;
   }
 
   .midas-blocks-grid {
     display: grid !important;
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 4px !important;
-    margin-top: 4px !important;
+    gap: 3px !important;
+    margin-top: 3px !important;
   }
 
   .midas-block {
     background: var(--main-bg) !important;
     border: 1px solid var(--panel-border) !important;
-    padding: 4px !important;
+    padding: 3px !important;
     border-radius: 3px !important;
     text-align: center !important;
-    font-size: 8px !important;
+    font-size: 7px !important;
   }
 
   .midas-block span {
     display: block !important;
     color: var(--text-dim) !important;
-    font-size: 7px !important;
-    margin-bottom: 2px !important;
+    font-size: 6px !important;
+    margin-bottom: 1px !important;
   }
 
   .midas-encoders-bar {
     display: grid !important;
     grid-template-columns: repeat(6, 1fr) !important;
     gap: 2px !important;
-    margin-top: 4px !important;
+    margin-top: 3px !important;
   }
 
   .m-encoder {
-    font-size: 7px !important;
+    font-size: 6px !important;
     text-align: center !important;
     background: var(--main-bg) !important;
     border: 1px solid var(--panel-border) !important;
@@ -617,7 +619,7 @@
   .screen-slider {
     width: 100%;
     accent-color: var(--accent-color);
-    margin-top: 2px;
+    margin-top: 1px;
   }
 
   .bottom-nav {
@@ -650,6 +652,29 @@
     color: #ffffff !important;
     border-color: var(--accent-color) !important;
     box-shadow: 0 0 6px var(--accent-color) !important;
+  }
+
+  /* MEDIA QUERY KHUSUS LAYAR KECIL / MODE PORTRET */
+  @media screen and (max-width: 768px) {
+    main.console {
+      flex-direction: column !important;
+      align-items: center !important;
+    }
+    .channel-bank, aside.master-rack, .center-console {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-height: auto !important;
+      max-height: none !important;
+    }
+    #channels, #channelsRight {
+      overflow-x: auto !important;
+      display: flex !important;
+      flex-wrap: nowrap !important;
+    }
+    .new-channel-strip, .channel-strip {
+      flex: 0 0 65px !important;
+      min-width: 65px !important;
+    }
   }
 </style>
 
