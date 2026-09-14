@@ -166,17 +166,213 @@
   /* ------------------------------------------------------------------------
      CHANNEL METERS
      ------------------------------------------------------------------------ */
+let lastMeterUpdate = 0;
 
-  let lastMeterUpdate = 0;
+function updateChannelMeters(timestamp) {
+  requestAnimationFrame(updateChannelMeters);
 
-  function updateChannelMeters(timestamp) {
-    requestAnimationFrame(updateChannelMeters);
+  if (timestamp - lastMeterUpdate < 33) return;
+  lastMeterUpdate = timestamp;
 
-    if (timestamp - lastMeterUpdate < 33) return;
-    lastMeterUpdate = timestamp;
+  for (let ch = 1; ch <= 14; ch++) {
+    const strip = document.querySelector(
+      `.new-channel-strip[data-ch="${ch}"], .channel-strip[data-ch="${ch}"]`
+    );
 
-    // Indikator tetap diproses untuk 14 channel.
-    for (let ch = 1; ch <= 14; ch++) {
+    if (!strip) continue;
+
+    const sideVuFill = strip.querySelector(".ch-side-vu-fill");
+    if (!sideVuFill) continue;
+
+    const channelState =
+      window.state?.channels?.[ch - 1] || {};
+
+    const nodes = channelNodes[ch];
+
+    const muted = Boolean(channelState.mute);
+    const faderVal = Number(channelState.fader ?? 75);
+
+    let inputLevel = 0;
+
+    /*
+     * 1. Prioritas pertama:
+     *    Baca sinyal asli dari analyser channel.
+     */
+    if (nodes?.analyser) {
+      const analyser = nodes.analyser;
+
+      if (!analyser._meterBuffer) {
+        analyser._meterBuffer = new Uint8Array(
+          analyser.fftSize
+        );
+      }
+
+      const data = analyser._meterBuffer;
+
+      analyser.getByteTimeDomainData(data);
+
+      let sum = 0;
+      let peak = 0;
+
+      for (let i = 0; i < data.length; i++) {
+        const sample = (data[i] - 128) / 128;
+        const absoluteSample = Math.abs(sample);
+
+        sum += sample * sample;
+
+        if (absoluteSample > peak) {
+          peak = absoluteSample;
+        }
+      }
+
+      const rms = Math.sqrt(sum / data.length);
+
+      inputLevel = Math.max(
+        rms * 5,
+        peak * 0.8
+      );
+    }
+
+    /*
+     * 2. Jika analyser masih kosong, gunakan level dari
+     *    input/hardware feedback.
+     *
+     *    Mendukung:
+     *    - 0 sampai 1
+     *    - 0 sampai 100
+     */
+    if (
+      inputLevel <= 0.001 &&
+      channelState.level !== undefined
+    ) {
+      const feedbackLevel = Number(
+        channelState.level
+      );
+
+      if (Number.isFinite(feedbackLevel)) {
+        inputLevel = feedbackLevel > 1
+          ? feedbackLevel / 100
+          : feedbackLevel;
+      }
+    }
+
+    /*
+     * 3. Batasi level input agar tetap valid.
+     */
+    inputLevel = Math.max(
+      0,
+      Math.min(1, inputLevel)
+    );
+
+    /*
+     * 4. Terapkan MUTE dan fader channel masing-masing.
+     */
+    const faderScale = Math.max(
+      0,
+      Math.min(1, faderVal / 100)
+    );
+
+    const outputLevel = muted
+      ? 0
+      : inputLevel * faderScale;
+
+    const finalPercent = Math.round(
+      outputLevel * 100
+    );
+
+    /*
+     * 5. Tampilkan indikator channel yang sesuai.
+     */
+    sideVuFill.style.setProperty(
+      "height",
+      `${finalPercent}%`,
+      "important"
+    );
+
+    sideVuFill.style.setProperty(
+      "opacity",
+      finalPercent > 0 ? "1" : "0.25",
+      "important"
+    );
+  }
+
+  /*
+   * MASTER METER
+   * Bagian master tetap berjalan seperti sebelumnya.
+   */
+  const master = ensureMaster();
+
+  if (master && master._analyser) {
+    const analyser = master._analyser;
+
+    if (!analyser._meterBuffer) {
+      analyser._meterBuffer = new Uint8Array(
+        analyser.fftSize
+      );
+    }
+
+    const data = analyser._meterBuffer;
+
+    analyser.getByteTimeDomainData(data);
+
+    let sum = 0;
+
+    for (let i = 0; i < data.length; i++) {
+      const v = (data[i] - 128) / 128;
+      sum += v * v;
+    }
+
+    const masterLevel = Math.max(
+      0,
+      Math.min(
+        1,
+        Math.sqrt(sum / data.length) * 4
+      )
+    );
+
+    const masterFader =
+      document.getElementById("master");
+
+    const masterScale = masterFader
+      ? Math.max(
+          0,
+          Math.min(
+            1,
+            Number(masterFader.value) / 100
+          )
+        )
+      : 0.75;
+
+    const outputLevel =
+      masterLevel * masterScale;
+
+    const outPct =
+      Math.round(outputLevel * 100) + "%";
+
+    const masterMeterL =
+      document.getElementById("masterMeterL");
+
+    const masterMeterR =
+      document.getElementById("masterMeterR");
+
+    if (masterMeterL) {
+      masterMeterL.style.setProperty(
+        "height",
+        outPct,
+        "important"
+      );
+    }
+
+    if (masterMeterR) {
+      masterMeterR.style.setProperty(
+        "height",
+        outPct,
+        "important"
+      );
+    }
+  }
+}
+  
       const strip = document.querySelector(
         `.new-channel-strip[data-ch="${ch}"], .channel-strip[data-ch="${ch}"]`
       );
