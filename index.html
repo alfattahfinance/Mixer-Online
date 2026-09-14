@@ -79,7 +79,7 @@
   }
 
   /* ==========================================================
-     2. GLOBAL RESET & BILAH ATAS (TOPBAR RESPONSIF)
+     2. GLOBAL RESET & PENGUNCI LAYAR (VIEWPORT FIT)
      ========================================================== */
   *, *::before, *::after {
     box-sizing: border-box !important;
@@ -87,21 +87,28 @@
 
   html {
     scroll-behavior: smooth !important;
+    height: 100% !important;
   }
 
   body {
-    background: var(--main-bg) !important;
-    color: var(--text-main) !important;
+    width: 100% !important;
+    height: 100vh !important;
+    height: 100dvh !important;
     margin: 0 !important;
     padding: 0 !important;
+    overflow: hidden !important;
+    background: var(--main-bg) !important;
+    color: var(--text-main) !important;
     font-family: system-ui, -apple-system, sans-serif !important;
-    overflow-x: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
   }
 
   header.topbar {
     display: flex !important;
     flex-direction: row !important;
-    flex-wrap: wrap !important;
+    flex-wrap: nowrap !important;
     align-items: center !important;
     justify-content: space-between !important;
     background: var(--header-bg) !important;
@@ -109,9 +116,8 @@
     width: 100% !important;
     padding: 4px 8px !important;
     gap: 4px !important;
-    position: relative !important;
+    flex-shrink: 0 !important;
     z-index: 100 !important;
-    box-sizing: border-box !important;
   }
 
   header.topbar > div {
@@ -217,27 +223,8 @@
   }
 
   /* ==========================================================
-     4. KONSOL UTAMA & CHANNEL BANK (PAS MENYENTUH NAVIGASI BAWAH)
+     4. KONSOL UTAMA & KETINGGIAN YANG SEJAJAR PRESISI
      ========================================================== */
-  /* 1. Kunci total layar agar tidak bisa di-scroll ke bawah dan pas di viewport */
-  html, body {
-    width: 100% !important;
-    height: 100vh !important;
-    height: 100dvh !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    position: fixed !important;
-  }
-
-  body {
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    background: var(--main-bg) !important;
-  }
-
-  /* 2. Batasi konsol utama agar mengisi ruang sisa secara pas tanpa memanjang ke bawah */
   main.console {
     display: flex !important;
     flex-direction: row !important;
@@ -246,64 +233,28 @@
     gap: 3px !important;
     width: 100% !important;
     flex-grow: 1 !important;
-    height: calc(100vh - 85px) !important;
+    height: auto !important;
     box-sizing: border-box !important;
     padding: 2px 4px !important;
     overflow: hidden !important;
   }
 
-  /* 3. Kunci tinggi Channel Bank dan Master Rack agar rata pas sejajar */
   .channel-bank, .center-console, aside.master-rack {
     height: 100% !important;
     max-height: 100% !important;
     box-sizing: border-box !important;
   }
 
-  aside.master-rack {
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    width: 110px !important;
-    min-width: 110px !important;
-    max-width: 110px !important;
-    background: var(--panel-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 4px !important;
-    padding: 3px !important;
-  }
-
-
-
-  /* 3. Samakan juga tinggi Channel Bank agar konsisten */
-  .channel-bank {
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-    height: 100% !important;
-    background: var(--strip-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 4px !important;
-    padding: 4px 2px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    box-sizing: border-box !important;
-  }
-
-
-  /* Tinggi bank channel ditarik agar pas mentok sejajar batas bawah konsol */
   .channel-bank {
     flex: 1 1 0 !important;
     min-width: 0 !important;
-    height: auto !important;
-    min-height: 520px !important;
     background: var(--strip-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
-    padding: 4px 2px 2px 2px !important;
+    padding: 3px 2px !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
-    box-sizing: border-box !important;
   }
 
   .bank-title {
@@ -336,7 +287,6 @@
     justify-content: space-between !important;
     padding: 2px 1px !important;
     border-right: 1px dashed var(--panel-border) !important;
-    box-sizing: border-box !important;
     height: 100% !important;
   }
 
@@ -349,7 +299,6 @@
     gap: 3px !important;
     flex-grow: 1 !important;
     width: 100% !important;
-    min-height: 290px !important;
     height: 100% !important;
     padding: 2px !important;
   }
@@ -360,16 +309,18 @@
     position: relative !important;
     z-index: 2 !important;
     background: transparent !important;
-    height: 250px !important;
-    min-height: 250px !important;
+    height: 100% !important;
+    min-height: 140px !important;
     width: 18px !important;
     accent-color: var(--accent-color) !important;
     margin: 0 !important;
+    pointer-events: auto !important;
+    touch-action: pan-y !important;
   }
   
   .new-channel-strip .ch-side-vu {
-    height: 250px !important;
-    min-height: 250px !important;
+    height: 100% !important;
+    min-height: 140px !important;
     width: 7px !important;
     background: #040608 !important;
     border: 1px solid var(--panel-border) !important;
@@ -391,27 +342,27 @@
     max-width: 380px !important;
     min-width: 280px !important;
     flex: 1.2 1 auto !important;
-    box-sizing: border-box !important;
-    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
   }
 
   /* ==========================================================
-     5. MASTER RACK (DISAMAKAN TINGGINYA PAS SEJAJAR CHANNEL)
+     5. MASTER RACK (SEJAJAR SEMPURNA & FADER AKTIF)
      ========================================================== */
   aside.master-rack {
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
-    width: 115px !important;
-    min-width: 115px !important;
-    max-width: 115px !important;
-    height: auto !important;
-    min-height: 520px !important; /* Disamakan persis dengan .channel-bank */
+    width: 110px !important;
+    min-width: 110px !important;
+    max-width: 110px !important;
     background: var(--panel-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
     padding: 3px !important;
-    box-sizing: border-box !important;
+    position: relative !important;
+    z-index: 5 !important;
   }
 
   aside.master-rack h2 {
@@ -426,13 +377,12 @@
     gap: 4px !important;
     justify-content: center !important;
     align-items: center !important;
-    height: 120px !important;
-    min-height: 120px !important;
+    height: 85px !important;
+    min-height: 85px !important;
     padding: 2px !important;
     background: #040608 !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 3px !important;
-    box-sizing: border-box !important;
     width: 100% !important;
   }
 
@@ -453,7 +403,6 @@
     display: flex !important;
     flex-direction: column-reverse !important;
     overflow: hidden !important;
-    box-sizing: border-box !important;
   }
 
   .meter-bar-fill {
@@ -480,24 +429,29 @@
     background: var(--main-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 3px !important;
-    padding: 4px 2px !important;
+    padding: 3px 2px !important;
     width: 100% !important;
-    box-sizing: border-box !important;
     margin: 2px 0 !important;
+    position: relative !important;
+    z-index: 10 !important;
   }
 
-  /* FADER MASTER VERTIKAL (MENYESUAIKAN TINGGI KONSOL) */
+  /* FADER MASTER VERTIKAL (MENGIKUTI TINGGI KONSOL & BISA DIGESER) */
   aside.master-rack .master-card input[type="range"] {
     writing-mode: vertical-lr !important;
     direction: rtl !important;
     appearance: slider-vertical !important;
     -webkit-appearance: slider-vertical !important;
-    height: 180px !important;
-    min-height: 180px !important;
+    height: 100% !important;
+    min-height: 120px !important;
     width: 20px !important;
     accent-color: var(--accent-color) !important;
     cursor: pointer !important;
     margin: 2px auto !important;
+    pointer-events: auto !important;
+    touch-action: pan-y !important;
+    position: relative !important;
+    z-index: 15 !important;
   }
 
   .monitor-card, .phones-card {
@@ -508,11 +462,10 @@
     background: var(--main-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 3px !important;
-    padding: 3px !important;
+    padding: 2px !important;
     font-size: 6px !important;
     gap: 1px !important;
     width: 100% !important;
-    box-sizing: border-box !important;
     margin-top: 1px !important;
   }
 
@@ -542,7 +495,6 @@
   .screen-frame {
     max-width: 100% !important;
     width: 100% !important;
-    box-sizing: border-box !important;
   }
 
   .screen-tabs {
@@ -550,12 +502,12 @@
     grid-template-columns: repeat(6, 1fr) !important;
     gap: 2px !important;
     width: 100% !important;
-    margin-bottom: 3px !important;
+    margin-bottom: 2px !important;
   }
 
   .screen-tabs button {
     font-size: 6px !important;
-    padding: 3px 0 !important;
+    padding: 2px 0 !important;
     text-align: center !important;
     text-transform: uppercase !important;
     border-radius: 3px !important;
@@ -575,12 +527,12 @@
     grid-template-columns: repeat(6, 1fr) !important;
     gap: 2px !important;
     width: 100% !important;
-    margin-bottom: 3px !important;
+    margin-bottom: 2px !important;
   }
 
   .m32-sub-btn {
     font-size: 6px !important;
-    padding: 3px 0 !important;
+    padding: 2px 0 !important;
     text-align: center !important;
     text-transform: uppercase !important;
     border-radius: 3px !important;
@@ -601,7 +553,6 @@
     padding: 3px !important;
     display: flex !important;
     flex-direction: column !important;
-    min-height: 150px !important;
     background: var(--panel-bg) !important;
   }
 
@@ -619,32 +570,31 @@
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-end !important;
-    min-height: 75px !important;
     background: var(--main-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
     padding: 3px !important;
-    margin-top: 3px !important;
+    margin-top: 2px !important;
   }
 
   .spectrum-bars-container {
     display: flex !important;
     gap: 2px !important;
-    height: 55px !important;
+    height: 45px !important;
     align-items: flex-end !important;
   }
 
   .midas-blocks-grid {
     display: grid !important;
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 3px !important;
-    margin-top: 3px !important;
+    gap: 2px !important;
+    margin-top: 2px !important;
   }
 
   .midas-block {
     background: var(--main-bg) !important;
     border: 1px solid var(--panel-border) !important;
-    padding: 3px !important;
+    padding: 2px !important;
     border-radius: 3px !important;
     text-align: center !important;
     font-size: 7px !important;
@@ -661,7 +611,7 @@
     display: grid !important;
     grid-template-columns: repeat(6, 1fr) !important;
     gap: 2px !important;
-    margin-top: 3px !important;
+    margin-top: 2px !important;
   }
 
   .m-encoder {
@@ -682,20 +632,21 @@
 
   .bottom-nav {
     display: flex !important;
-    position: sticky !important;
+    position: relative !important;
     bottom: 0 !important;
     z-index: 9999 !important;
     width: 100% !important;
     gap: 4px !important;
-    padding: 6px 8px !important;
+    padding: 4px 6px !important;
     background: var(--panel-bg) !important;
     border-top: 1px solid var(--panel-border) !important;
+    flex-shrink: 0 !important;
   }
 
   .bottom-nav button {
     flex: 1 !important;
-    padding: 8px 2px !important;
-    font-size: 9px !important;
+    padding: 6px 2px !important;
+    font-size: 8px !important;
     font-weight: bold !important;
     background: var(--main-bg) !important;
     color: var(--text-dim) !important;
@@ -714,15 +665,20 @@
 
   /* MEDIA QUERY KHUSUS LAYAR KECIL / MODE PORTRET */
   @media screen and (max-width: 768px) {
+    body {
+      overflow-y: auto !important;
+      position: static !important;
+      height: auto !important;
+    }
     main.console {
       flex-direction: column !important;
       align-items: center !important;
+      height: auto !important;
     }
     .channel-bank, aside.master-rack, .center-console {
       width: 100% !important;
       max-width: 100% !important;
-      min-height: auto !important;
-      max-height: none !important;
+      height: auto !important;
     }
     #channels, #channelsRight {
       overflow-x: auto !important;
