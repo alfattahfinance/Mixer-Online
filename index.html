@@ -219,56 +219,59 @@
   /* ==========================================================
      4. KONSOL UTAMA & CHANNEL BANK (PAS MENYENTUH NAVIGASI BAWAH)
      ========================================================== */
-      /* Mengatur struktur dasar agar pas memenuhi layar lanskap tanpa ada scroll ganda */
+  /* 1. Kunci total layar agar tidak bisa di-scroll ke bawah dan pas di viewport */
   html, body {
+    width: 100% !important;
     height: 100vh !important;
+    height: 100dvh !important;
     margin: 0 !important;
     padding: 0 !important;
     overflow: hidden !important;
+    position: fixed !important;
   }
 
   body {
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
+    background: var(--main-bg) !important;
   }
 
-  /* Konsol utama mengisi ruang sisa secara akurat di antara Header dan Bottom Nav */
+  /* 2. Batasi konsol utama agar mengisi ruang sisa secara pas tanpa memanjang ke bawah */
   main.console {
     display: flex !important;
     flex-direction: row !important;
     align-items: stretch !important;
     justify-content: space-between !important;
-    gap: 4px !important;
+    gap: 3px !important;
     width: 100% !important;
     flex-grow: 1 !important;
-    height: auto !important;
-    max-height: calc(100vh - 70px) !important;
+    height: calc(100vh - 85px) !important;
     box-sizing: border-box !important;
-    padding: 4px !important;
+    padding: 2px 4px !important;
     overflow: hidden !important;
   }
 
-  /* Menyamakan tinggi Channel Bank, Konsol Tengah, dan Master Rack agar sama persis */
+  /* 3. Kunci tinggi Channel Bank dan Master Rack agar rata pas sejajar */
   .channel-bank, .center-console, aside.master-rack {
     height: 100% !important;
     max-height: 100% !important;
     box-sizing: border-box !important;
   }
 
-  /* Kunci Master Rack agar pas merentang penuh secara presisi */
   aside.master-rack {
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
-    width: 115px !important;
-    min-width: 115px !important;
-    max-width: 115px !important;
+    width: 110px !important;
+    min-width: 110px !important;
+    max-width: 110px !important;
     background: var(--panel-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 4px !important;
-    padding: 4px !important;
+    padding: 3px !important;
   }
+
 
 
   /* 3. Samakan juga tinggi Channel Bank agar konsisten */
