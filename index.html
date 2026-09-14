@@ -219,6 +219,7 @@
   /* ==========================================================
      4. KONSOL UTAMA & CHANNEL BANK (PAS MENYENTUH NAVIGASI BAWAH)
      ========================================================== */
+    /* 1. Paksa area konsol utama membentang penuh secara seragam */
   main.console {
     display: flex !important;
     flex-direction: row !important;
@@ -226,9 +227,43 @@
     justify-content: space-between !important;
     gap: 4px !important;
     width: 100% !important;
+    height: 100% !important;
     box-sizing: border-box !important;
-    padding: 4px 4px 0 4px !important;
+    padding: 4px !important;
   }
+
+  /* 2. Kunci Master Rack agar mengisi tinggi penuh secara fleksibel mengikuti konsol */
+  aside.master-rack {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    width: 115px !important;
+    min-width: 115px !important;
+    max-width: 115px !important;
+    flex: 1 1 auto !important;
+    height: 100% !important;
+    background: var(--panel-bg) !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 4px !important;
+    padding: 4px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 3. Samakan juga tinggi Channel Bank agar konsisten */
+  .channel-bank {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    height: 100% !important;
+    background: var(--strip-bg) !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 4px !important;
+    padding: 4px 2px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    box-sizing: border-box !important;
+  }
+
 
   /* Tinggi bank channel ditarik agar pas mentok sejajar batas bawah konsol */
   .channel-bank {
