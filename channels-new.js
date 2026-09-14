@@ -1,23 +1,45 @@
 /* ============================================================
-   Mixer-Online — 14CH channel panel (Spaced Knobs & Active Meters)
+   Mixer-Online — 14CH channel panel (Fixed Layout & Scrollable)
    ============================================================ */
 (function () {
   "use strict";
 
   /* ============================================================
-     CSS PERBAIKAN JARAK KENOP & INDIKATOR METERAN
+     CSS PERBAIKAN: ANTI-BERTUMPUK & BISA DIGESER KANAN-KIRI (SCROLL)
      ============================================================ */
   if (!document.getElementById("mixer-channel-led-skin")) {
     const style = document.createElement("style");
     style.id = "mixer-channel-led-skin";
     style.textContent = `
-      .new-channel-strip {
-        width: 72px !important;
-        min-width: 72px !important;
-        max-width: 78px !important;
-        padding: 6px 4px !important;
+      /* Pastikan pembungkus panel channel mendukung scroll horizontal & tidak tumpang tindih */
+      #channels, #channelsRight {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        gap: 6px !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding-bottom: 8px !important;
         box-sizing: border-box !important;
-        overflow: hidden !important;
+        width: 100% !important;
+      }
+
+      /* Setiap Channel Strip berdiri kokoh sejajar, tidak mengapung/merapat berlebihan */
+      .new-channel-strip {
+        flex: 0 0 68px !important;
+        width: 68px !important;
+        min-width: 68px !important;
+        max-width: 68px !important;
+        background: rgba(15, 20, 25, 0.95) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-radius: 4px !important;
+        padding: 5px 3px !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.4) !important;
       }
 
       .new-channel-strip .channel-led,
@@ -45,11 +67,11 @@
         box-shadow: 0 0 4px rgba(255,59,48,.5) !important;
       }
 
-      /* KONTROL GAIN, HIGH, MID, LOW, PAN: Direnggangkan agar pas */
+      /* KONTROL / KNOB BERJARAK AMAN */
       .new-channel-strip .new-channel-control {
         width: 100% !important;
-        padding: 2px 0 !important;
-        margin-bottom: 4px !important;
+        padding: 1px 0 !important;
+        margin-bottom: 3px !important;
         text-align: center !important;
         box-sizing: border-box !important;
         display: flex !important;
@@ -59,16 +81,16 @@
 
       .new-channel-strip .new-channel-control label {
         display: block !important;
-        font-size: 7px !important;
-        letter-spacing: 0.5px !important;
+        font-size: 6px !important;
         color: var(--text-dim, #b0c4de) !important;
         margin-bottom: 1px !important;
+        white-space: nowrap !important;
       }
 
       .new-channel-strip .new-channel-control input.new-knob {
         width: 100% !important;
-        max-width: 60px !important;
-        height: 16px !important;
+        max-width: 58px !important;
+        height: 14px !important;
         margin: 1px auto !important;
         display: block !important;
         cursor: pointer !important;
@@ -76,10 +98,10 @@
 
       .new-channel-strip .new-channel-control .knob-val {
         display: block !important;
-        font-size: 7px !important;
+        font-size: 6px !important;
         font-weight: 600 !important;
         color: #fff !important;
-        margin-top: 1px !important;
+        white-space: nowrap !important;
       }
 
       /* FADER AREA: Jajar rapi fader dan meteran samping */
@@ -89,11 +111,11 @@
         flex-direction: row !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 4px !important;
+        gap: 3px !important;
         width: 100% !important;
         height: auto !important;
-        min-height: 240px !important;
-        padding: 14px 2px 16px 2px !important;
+        min-height: 200px !important;
+        padding: 10px 1px 12px 1px !important;
         box-sizing: border-box !important;
       }
 
@@ -104,9 +126,9 @@
       /* Slider Fader */
       .new-channel-strip .fader-area input.channel-fader, 
       .new-channel-strip .fader-area input.new-fader {
-        width: 20px !important;
-        height: 200px !important;
-        min-height: 200px !important;
+        width: 18px !important;
+        height: 170px !important;
+        min-height: 170px !important;
         position: relative !important;
         z-index: 2 !important;
         background: transparent !important;
@@ -117,9 +139,9 @@
       /* KOTAK LED METER VERTIKAL */
       .new-channel-strip .ch-side-vu {
         position: relative !important;
-        width: 10px !important;
-        height: 200px !important;
-        min-height: 200px !important;
+        width: 8px !important;
+        height: 170px !important;
+        min-height: 170px !important;
         background: #040608 !important;
         border: 1px solid rgba(255,255,255,0.3) !important;
         border-radius: 2px !important;
@@ -143,7 +165,7 @@
         top: 2px !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
-        font-size: 6px !important;
+        font-size: 5px !important;
         color: var(--text-dim) !important;
       }
 
@@ -152,7 +174,7 @@
         bottom: 2px !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
-        font-size: 7px !important;
+        font-size: 6px !important;
         font-weight: bold !important;
         color: #2ecc71 !important;
       }
@@ -162,30 +184,32 @@
         flex-direction: column !important;
         gap: 2px !important;
         width: 100% !important;
-        margin-top: 4px !important;
+        margin-top: 3px !important;
       }
 
       .new-channel-strip .new-channel-buttons button {
-        font-size: 7px !important;
-        padding: 4px 2px !important;
+        font-size: 6px !important;
+        padding: 3px 1px !important;
         width: 100% !important;
         box-sizing: border-box !important;
         cursor: pointer !important;
       }
 
       .new-channel-strip .new-channel-head {
-        font-size: 9px !important;
+        font-size: 8px !important;
         font-weight: bold !important;
-        padding: 2px !important;
+        padding: 1px !important;
         text-align: center !important;
+        width: 100% !important;
       }
 
       .new-channel-strip .new-channel-source {
-        font-size: 6px !important;
-        padding: 2px !important;
+        font-size: 5px !important;
+        padding: 2px 1px !important;
         text-align: center !important;
         white-space: nowrap !important;
         overflow: hidden !important;
+        width: 100% !important;
       }
     `;
     document.head.appendChild(style);
@@ -397,9 +421,6 @@
     }
   }
 
-  /* ============================================================
-     LOOP METERAN DINAMIS: MERESPONS INPUT MASING-MASING CHANNEL
-     ============================================================ */
   function startStandaloneMeterLoop() {
     requestAnimationFrame(startStandaloneMeterLoop);
     if (!window.state || !window.state.channels) return;
@@ -427,14 +448,10 @@
         continue;
       }
 
-      // Ambil level riil dari audio engine / state masing-masing channel
       let lvl = Number(chData.level || 0);
-
-      // Jika level belum ter-generate oleh mesin audio, buat simulasi responsif 
-      // yang unik dan hidup berdasarkan nilai fader & gain channel tersebut.
       if (lvl === 0) {
         const gainVal = Number(chData.gain ?? 1);
-        const timeFactor = Date.now() + (i * 311); // Offset unik tiap channel
+        const timeFactor = Date.now() + (i * 311);
         const microWave = (Math.sin(timeFactor / 90) + Math.cos(timeFactor / 140)) * 0.15;
         const baseActivity = (faderVal / 100) * (gainVal / 2);
         lvl = Math.min(1, Math.max(0.05, baseActivity + microWave));
