@@ -493,19 +493,100 @@
   }
 
   function startStandaloneMeterLoop() {
-    requestAnimationFrame(startStandaloneMeterLoop);
-    if (!window.state || !window.state.channels) return;
+  requestAnimationFrame(startStandaloneMeterLoop);
 
-    if (!window.state.system) {
-      document.querySelectorAll(".ch-side-vu-fill").forEach(el => el.style.height = "0%");
-      document.querySelectorAll(".new-channel-strip").forEach(strip => {
-        const led = strip.querySelector(".channel-led");
-        if (led && !led.classList.contains("active") && !led.classList.contains("red")) {
-          led.className = "channel-led";
-        }
-      });
+  if (!window.state || !window.state.channels) return;
+
+  const strips = document.querySelectorAll(
+    ".new-channel-strip[data-ch]"
+  );
+
+  if (!window.state.system) {
+    strips.forEach((strip) => {
+      const vuFill = strip.querySelector(".ch-side-vu-fill");
+      const ledEl = strip.querySelector(".channel-led");
+
+      if (vuFill) {
+        vuFill.style.setProperty(
+          "height",
+          "0%",
+          "important"
+        );
+      }
+
+      if (ledEl) {
+        ledEl.className = "channel-led";
+      }
+    });
+
+    return;
+  }
+
+  strips.forEach((strip) => {
+    const ch = Number(strip.dataset.ch);
+
+    if (!Number.isInteger(ch) || ch < 1 || ch > N) {
       return;
     }
+
+    const chData = window.state.channels[ch - 1];
+    if (!chData) return;
+
+    const vuFill = strip.querySelector(".ch-side-vu-fill");
+    const ledEl = strip.querySelector(".channel-led");
+
+    if (!vuFill) return;
+
+    const muted = Boolean(chData.mute);
+    const faderVal = Number(chData.fader ?? 75);
+
+    let level = Number(chData.level);
+
+    if (!Number.isFinite(level)) {
+      level = 0;
+    }
+
+    /*
+     * Mendukung dua format level:
+     * - 0 sampai 1
+     * - 0 sampai 100
+     */
+    if (level > 1) {
+      level = level / 100;
+    }
+
+    level = Math.max(0, Math.min(1, level));
+
+    const faderScale = Math.max(
+      0,
+      Math.min(1, faderVal / 100)
+    );
+
+    const visibleLevel = muted
+      ? 0
+      : level * faderScale;
+
+    const percent = Math.round(
+      visibleLevel * 100
+    );
+
+    vuFill.style.setProperty(
+      "height",
+      `${percent}%`,
+      "important"
+    );
+
+    if (ledEl) {
+      if (muted) {
+        ledEl.className = "channel-led active red";
+      } else if (percent > 0) {
+        ledEl.className = "channel-led active green";
+      } else {
+        ledEl.className = "channel-led";
+      }
+    }
+  });
+}
 
     for (let i = 1; i <= N; i++) {
       const chData = window.state.channels[i - 1];
