@@ -79,6 +79,53 @@
     --strip-bg: #0a0a0a;
   }
 
+    /* ==========================================================
+     EFEK LAMPU-LAMPU MENYALA (GLOW & LED INDICATORS)
+     ========================================================== */
+  /* Efek menyala untuk tombol aktif / fader hidup */
+  button.active, button.on, .bottom-nav button.active {
+    box-shadow: 0 0 8px var(--accent-color), inset 0 0 4px rgba(255, 255, 255, 0.4) !important;
+    border-color: var(--accent-color) !important;
+  }
+
+  /* Lampu indikator status sistem / bridge */
+  #statusLamp, .lamp {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #555;
+    box-shadow: 0 0 4px rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
+  }
+  #statusLamp.on, .lamp.green {
+    background: #2ecc71 !important;
+    box-shadow: 0 0 8px #2ecc71, 0 0 12px #2ecc71 !important;
+  }
+  .lamp.red {
+    background: #e74c3c !important;
+    box-shadow: 0 0 6px #e74c3c !important;
+  }
+
+  /* Efek menyala pada garis Fader dan Meteran Level */
+  .meter-bar-fill, .ch-side-vu-fill, .ch-top-vu-fill {
+    box-shadow: 0 0 6px rgba(46, 204, 113, 0.6);
+  }
+
+  /* Indikator Tombol Power Muted/Solo menyala terang */
+  button[data-k="mute"].on, button.mute-btn.on {
+    background: linear-gradient(180deg, #ff6b6b 0%, #c0392b 100%) !important;
+    color: #fff !important;
+    box-shadow: 0 0 8px #e74c3c !important;
+  }
+
+  button[data-k="solo"].on, button.solo-btn.on {
+    background: linear-gradient(180deg, #f1c40f 0%, #d35400 100%) !important;
+    color: #000 !important;
+    box-shadow: 0 0 8px #f1c40f !important;
+  }
+
+
   /* ==========================================================
      2. GLOBAL RESET & OVERRIDE
      ========================================================== */
