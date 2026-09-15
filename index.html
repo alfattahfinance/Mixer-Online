@@ -343,8 +343,8 @@
     gap: 3px !important;
   }
 
-  /* ==========================================================
-     5. MASTER RACK (PROPORSI PAS & FADER AMAN)
+   /* ==========================================================
+     5. MASTER RACK (DIPERBAIKI AGAR SEJAJAR & PAS KE BAWAH)
      ========================================================== */
   aside.master-rack {
     display: flex !important;
@@ -359,6 +359,7 @@
     padding: 3px !important;
     position: relative !important;
     z-index: 5 !important;
+    height: 100% !important; /* Mengikuti tinggi konsol utama */
   }
 
   aside.master-rack h2 {
@@ -421,7 +422,7 @@
     flex-direction: column !important;
     align-items: center !important;
     justify-content: space-between !important;
-    flex-grow: 1 !important;
+    flex-grow: 1 !important; /* Membuat kartu master mengisi ruang kosong secara vertikal */
     background: var(--main-bg) !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 3px !important;
@@ -432,14 +433,14 @@
     z-index: 10 !important;
   }
 
-  /* Fader Master disesuaikan tingginya agar pas sejajar dengan garis bar bawah */
+  /* Fader Master disesuaikan tingginya agar pas sejajar dengan fader channel (205px) */
   aside.master-rack .master-card input[type="range"] {
     writing-mode: vertical-lr !important;
     direction: rtl !important;
     appearance: slider-vertical !important;
     -webkit-appearance: slider-vertical !important;
-    height: 130px !important;
-    min-height: 130px !important;
+    height: 205px !important;
+    min-height: 205px !important;
     width: 20px !important;
     accent-color: var(--accent-color) !important;
     cursor: pointer !important;
@@ -450,40 +451,6 @@
     z-index: 15 !important;
   }
 
-  .monitor-card, .phones-card {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    text-align: center !important;
-    background: var(--main-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 3px !important;
-    padding: 2px !important;
-    font-size: 6px !important;
-    gap: 1px !important;
-    width: 100% !important;
-    margin-top: 1px !important;
-  }
-
-  .monitor-card button {
-    font-size: 5px !important;
-    padding: 1px 2px !important;
-    background: var(--panel-border) !important;
-    color: #fff !important;
-    border: none !important;
-    border-radius: 2px !important;
-    cursor: pointer !important;
-    width: 100% !important;
-  }
-
-  .monitor-knob, .phone-knob {
-    width: 10px !important;
-    height: 10px !important;
-    background: var(--accent-color) !important;
-    border-radius: 50% !important;
-    margin: 1px auto !important;
-    cursor: pointer !important;
-  }
 
   /* ==========================================================
      6. NAVIGATION BAR SCREEN M32 & BOTTOM NAV
