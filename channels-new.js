@@ -1,6 +1,6 @@
 /* ============================================================
    Mixer-Online — 14CH Channel Panel
-   Clean Top Bar Layout + Safe Channel Meter (Spacing Fixed)
+   Clean Top Bar Layout + Safe Channel Meter (Responsive Landscape Fixed)
    ============================================================ */
 
 (function () {
@@ -52,7 +52,7 @@
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
-        gap: 6px !important;
+        gap: 4px !important;
         overflow-x: auto !important;
         overflow-y: hidden !important;
         -webkit-overflow-scrolling: touch !important;
@@ -63,11 +63,11 @@
         padding: 4px 4px 2px 4px !important;
       }
 
+      /* Diubah agar responsif mengisi penuh ruang bank channel di layar lebar */
       .new-channel-strip {
         box-sizing: border-box !important;
-        flex: 0 0 54px !important;
-        min-width: 54px !important;
-        max-width: 54px !important;
+        flex: 1 1 0 !important;
+        min-width: 52px !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
@@ -76,7 +76,6 @@
         border-right: 1px dashed var(--panel-border) !important;
       }
 
-      /* Jarak antar kontrol (Gain, High, Mid, Low, Pan) diperlebar ke bawah */
       .new-channel-strip .new-channel-control {
         width: 100% !important;
         padding: 2px 0 !important;
