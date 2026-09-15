@@ -1,6 +1,6 @@
 /* ============================================================
    Mixer-Online — 14CH Channel Panel
-   Clean Top Bar Layout + Safe Channel Meter (Landscape & Portrait Fixed)
+   Clean Top Bar Layout + Safe Channel Meter (Spacing Fixed)
    ============================================================ */
 
 (function () {
@@ -76,10 +76,11 @@
         border-right: 1px dashed var(--panel-border) !important;
       }
 
+      /* Jarak antar kontrol (Gain, High, Mid, Low, Pan) diperlebar ke bawah */
       .new-channel-strip .new-channel-control {
         width: 100% !important;
-        padding: 1px 0 !important;
-        margin-bottom: 1px !important;
+        padding: 2px 0 !important;
+        margin-bottom: 3px !important;
         text-align: center !important;
         box-sizing: border-box !important;
         display: flex !important;
@@ -93,7 +94,7 @@
         font-size: 6px !important;
         line-height: 1.1 !important;
         color: #94a3b8 !important;
-        margin-bottom: 1px !important;
+        margin-bottom: 2px !important;
         white-space: nowrap !important;
       }
 
@@ -115,6 +116,7 @@
         font-weight: 600 !important;
         color: #ffffff !important;
         white-space: nowrap !important;
+        margin-top: 1px !important;
       }
 
       .new-channel-strip .fader-area {
@@ -272,7 +274,6 @@
         flex-shrink: 0 !important;
       }
 
-      /* Hanya aktifkan grid jika benar-benar di HP mode potret */
       @media screen and (max-width: 768px) and (orientation: portrait) {
         #channels,
         #channelsRight {
@@ -784,7 +785,7 @@
   }
 
   /* ============================================================
-     BUILD PANEL (Kembali ke Flex Horizontal & Scroll)
+     BUILD PANEL
      ============================================================ */
 
   function build() {
