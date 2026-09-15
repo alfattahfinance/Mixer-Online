@@ -1,6 +1,6 @@
 /* ============================================================
    Mixer-Online — 14CH Channel Panel
-   Clean Top Bar Layout + Safe Channel Meter (Fixed Layout)
+   Clean Top Bar Layout + Safe Channel Meter (Landscape & Portrait Fixed)
    ============================================================ */
 
 (function () {
@@ -49,26 +49,31 @@
 
       #channels,
       #channelsRight {
-        display: grid !important;
-        grid-template-columns: repeat(7, 1fr) !important;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        gap: 6px !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
         width: 100% !important;
-        gap: 1px !important;
-        align-items: stretch !important;
+        max-width: 100% !important;
+        height: 100% !important;
         box-sizing: border-box !important;
-        padding: 2px !important;
+        padding: 4px 4px 2px 4px !important;
       }
 
       .new-channel-strip {
-        position: relative !important;
-        width: 100% !important;
-        min-width: 0 !important;
+        box-sizing: border-box !important;
+        flex: 0 0 54px !important;
+        min-width: 54px !important;
+        max-width: 54px !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: space-between !important;
         padding: 2px 1px !important;
         border-right: 1px dashed var(--panel-border) !important;
-        box-sizing: border-box !important;
       }
 
       .new-channel-strip .new-channel-control {
@@ -94,7 +99,7 @@
 
       .new-channel-strip .new-channel-control input.new-knob {
         width: 100% !important;
-        max-width: 60px !important;
+        max-width: 45px !important;
         height: 12px !important;
         min-height: 12px !important;
         margin: 1px auto !important;
@@ -179,6 +184,14 @@
         will-change: height;
       }
 
+      .new-channel-strip .channel-led {
+        width: 7px !important;
+        height: 7px !important;
+        border-radius: 50% !important;
+        background: #555 !important;
+        margin: 1px auto !important;
+      }
+
       .new-channel-strip .channel-led.active.green {
         opacity: 1 !important;
         background: linear-gradient(
@@ -259,44 +272,8 @@
         flex-shrink: 0 !important;
       }
 
-      @media screen and (max-width: 768px),
-             screen and (orientation: portrait) {
-
-        html,
-        body {
-          width: 100% !important;
-          overflow-x: hidden !important;
-        }
-
-        header.topbar,
-        main.console,
-        .bottom-nav {
-          width: 100% !important;
-          min-width: 100% !important;
-          max-width: 100% !important;
-        }
-
-        header.topbar {
-          flex-wrap: wrap !important;
-          gap: 3px !important;
-          padding: 4px !important;
-        }
-
-        main.console {
-          flex-direction: column !important;
-          align-items: stretch !important;
-          padding: 2px !important;
-          gap: 4px !important;
-        }
-
-        .channel-bank,
-        aside.master-rack,
-        .center-console {
-          width: 100% !important;
-          max-width: 100% !important;
-          min-width: 100% !important;
-        }
-
+      /* Hanya aktifkan grid jika benar-benar di HP mode potret */
+      @media screen and (max-width: 768px) and (orientation: portrait) {
         #channels,
         #channelsRight {
           display: grid !important;
@@ -310,6 +287,7 @@
         .channel-strip {
           flex: 1 1 0 !important;
           min-width: 0 !important;
+          max-width: none !important;
           padding: 1px 0 !important;
         }
 
@@ -806,7 +784,7 @@
   }
 
   /* ============================================================
-     BUILD PANEL (Diperbaiki ke Grid 7 Kolom)
+     BUILD PANEL (Kembali ke Flex Horizontal & Scroll)
      ============================================================ */
 
   function build() {
