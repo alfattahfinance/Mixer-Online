@@ -1,6 +1,6 @@
 /* ============================================================
    Mixer-Online — 14CH Channel Panel
-   Clean Top Bar Layout + Safe Channel Meter (Responsive Landscape Fixed)
+   Clean Top Bar Layout + Safe Channel Meter (Landscape Height & Layout Fixed)
    ============================================================ */
 
 (function () {
@@ -52,7 +52,7 @@
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
-        gap: 4px !important;
+        gap: 3px !important;
         overflow-x: auto !important;
         overflow-y: hidden !important;
         -webkit-overflow-scrolling: touch !important;
@@ -60,26 +60,28 @@
         max-width: 100% !important;
         height: 100% !important;
         box-sizing: border-box !important;
-        padding: 4px 4px 2px 4px !important;
+        padding: 2px !important;
+        align-items: stretch !important;
       }
 
-      /* Diubah agar responsif mengisi penuh ruang bank channel di layar lebar */
+      /* Strip channel diperlebar dan dibuat memenuhi tinggi agar tidak ada celah kosong */
       .new-channel-strip {
         box-sizing: border-box !important;
         flex: 1 1 0 !important;
-        min-width: 52px !important;
+        min-width: 50px !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: space-between !important;
         padding: 2px 1px !important;
         border-right: 1px dashed var(--panel-border) !important;
+        height: 100% !important;
       }
 
       .new-channel-strip .new-channel-control {
         width: 100% !important;
-        padding: 2px 0 !important;
-        margin-bottom: 3px !important;
+        padding: 1px 0 !important;
+        margin-bottom: 2px !important;
         text-align: center !important;
         box-sizing: border-box !important;
         display: flex !important;
@@ -93,13 +95,13 @@
         font-size: 6px !important;
         line-height: 1.1 !important;
         color: #94a3b8 !important;
-        margin-bottom: 2px !important;
+        margin-bottom: 1px !important;
         white-space: nowrap !important;
       }
 
       .new-channel-strip .new-channel-control input.new-knob {
         width: 100% !important;
-        max-width: 45px !important;
+        max-width: 42px !important;
         height: 12px !important;
         min-height: 12px !important;
         margin: 1px auto !important;
@@ -118,6 +120,7 @@
         margin-top: 1px !important;
       }
 
+      /* Tinggi area fader diperbesar ke bawah agar pas menutupi celah kosong */
       .new-channel-strip .fader-area {
         position: relative !important;
         display: flex !important;
@@ -127,9 +130,9 @@
         gap: 3px !important;
         width: 100% !important;
         flex-grow: 1 !important;
-        height: 195px !important;
-        min-height: 195px !important;
-        padding: 4px 1px 2px 1px !important;
+        height: 205px !important;
+        min-height: 205px !important;
+        padding: 2px 1px !important;
         box-sizing: border-box !important;
       }
 
@@ -144,8 +147,8 @@
         writing-mode: vertical-lr !important;
         direction: rtl !important;
         width: 16px !important;
-        height: 195px !important;
-        min-height: 195px !important;
+        height: 205px !important;
+        min-height: 205px !important;
         position: relative !important;
         z-index: 2 !important;
         background: transparent !important;
@@ -157,8 +160,8 @@
       .new-channel-strip .ch-side-vu {
         position: relative !important;
         width: 7px !important;
-        height: 195px !important;
-        min-height: 195px !important;
+        height: 205px !important;
+        min-height: 205px !important;
         background: #040608 !important;
         border: 1px solid rgba(255, 255, 255, 0.3) !important;
         border-radius: 2px !important;
@@ -241,7 +244,7 @@
         flex-direction: column !important;
         gap: 2px !important;
         width: 100% !important;
-        margin-top: 1px !important;
+        margin-top: 2px !important;
         flex-shrink: 0 !important;
       }
 
