@@ -230,7 +230,7 @@
   /* ==========================================================
      4. KONSOL UTAMA & KETINGGIAN PROPORSIONAL (PAS DI GARIS BAR)
      ========================================================== */
-  main.console {
+    main.console {
     display: flex !important;
     flex-direction: row !important;
     align-items: stretch !important;
@@ -240,7 +240,7 @@
     min-width: 780px !important;
     box-sizing: border-box !important;
     padding: 2px 4px !important;
-    flex-grow: 1 !important;
+    height: calc(100vh - 85px) !important; /* Mengunci tinggi konsol agar pas di layar */
   }
 
   .channel-bank {
@@ -253,58 +253,27 @@
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
-  }
-
-  .bank-title {
-    padding: 2px 4px !important;
-    border-bottom: 1px solid var(--panel-border) !important;
-    margin-bottom: 2px !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    flex-shrink: 0 !important;
+    height: 100% !important; /* Memanjang penuh ke bawah */
   }
 
   #channels, #channelsRight {
     display: grid !important;
     grid-template-columns: repeat(7, 1fr) !important;
     width: 100% !important;
+    height: 100% !important;
     gap: 1px !important;
     align-items: stretch !important;
   }
 
-  .new-channel-strip, .channel-strip {
-    position: relative !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    padding: 2px 1px !important;
-    border-right: 1px dashed var(--panel-border) !important;
-  }
-
-  .fader-area {
-    position: relative !important;
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 3px !important;
-    width: 100% !important;
-    padding: 2px !important;
-  }
-
-  /* Fader channel disesuaikan tingginya agar pas sejajar dengan garis bar bawah */
+  /* Perbesar tinggi fader channel menjadi 215px agar menutup celah kosong */
   .new-channel-strip input.channel-fader, 
   .new-channel-strip input.new-fader,
   .channel-strip input.channel-fader {
     position: relative !important;
     z-index: 2 !important;
     background: transparent !important;
-    height: 175px !important;
-    min-height: 175px !important;
+    height: 215px !important;
+    min-height: 215px !important;
     width: 18px !important;
     accent-color: var(--accent-color) !important;
     margin: 0 !important;
@@ -313,8 +282,8 @@
   }
   
   .new-channel-strip .ch-side-vu {
-    height: 175px !important;
-    min-height: 175px !important;
+    height: 215px !important;
+    min-height: 215px !important;
     width: 7px !important;
     background: #040608 !important;
     border: 1px solid var(--panel-border) !important;
@@ -325,22 +294,22 @@
     z-index: 2 !important;
   }
 
-  .ch-side-vu-fill {
-    width: 100% !important;
-    height: 0%;
-    background: linear-gradient(0deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 66%, #f39c12 85%, #e74c3c 86%, #ff0000 100%) !important;
-    transition: height 0.05s linear !important;
-  }
-
-  /* Konsol tengah (screen) diperkecil proporsinya agar lebih kompak & tidak terlalu besar */
-  .center-console {
-    max-width: 330px !important;
-    min-width: 240px !important;
-    flex: 1 1 auto !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    gap: 3px !important;
+  /* Perbesar tinggi fader master juga menjadi 215px agar sejajar */
+  aside.master-rack .master-card input[type="range"] {
+    writing-mode: vertical-lr !important;
+    direction: rtl !important;
+    appearance: slider-vertical !important;
+    -webkit-appearance: slider-vertical !important;
+    height: 215px !important;
+    min-height: 215px !important;
+    width: 20px !important;
+    accent-color: var(--accent-color) !important;
+    cursor: pointer !important;
+    margin: 2px auto !important;
+    pointer-events: auto !important;
+    touch-action: pan-y !important;
+    position: relative !important;
+    z-index: 15 !important;
   }
 
    /* ==========================================================
