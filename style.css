@@ -407,9 +407,9 @@ main.console {
     position: relative !important;
     z-index: 2 !important;
     background: transparent !important;
-    height: 215px !important;
-    min-height: 215px !important;
-    width: 18px !important;
+    height: 270px !important;
+    min-height: 270px !important;
+    width: 16px !important;
     accent-color: var(--accent-color) !important;
     margin: 0 !important;
     pointer-events: auto !important;
@@ -417,9 +417,9 @@ main.console {
   }
   
   .new-channel-strip .ch-side-vu {
-    height: 215px !important;
-    min-height: 215px !important;
-    width: 7px !important;
+    height: 270px !important;
+    min-height: 270px !important;
+    width: 6px !important;
     background: #040608 !important;
     border: 1px solid var(--panel-border) !important;
     border-radius: 2px !important;
@@ -435,9 +435,9 @@ main.console {
     direction: rtl !important;
     appearance: slider-vertical !important;
     -webkit-appearance: slider-vertical !important;
-    height: 215px !important;
-    min-height: 215px !important;
-    width: 20px !important;
+    height: 270px !important;
+    min-height: 270px !important;
+    width: 16px !important;
     accent-color: var(--accent-color) !important;
     cursor: pointer !important;
     margin: 2px auto !important;
