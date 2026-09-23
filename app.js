@@ -67,7 +67,6 @@ document.addEventListener("DOMContentLoaded", () => {
           
           if (inputEl) {
             inputEl.value = value;
-            inputEl.dispatchEvent(new Event('input', { bubbles: true }));
           }
 
           // Format Tampilan Output Nilai
@@ -121,6 +120,11 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("input", (e) => {
     const target = e.target;
     if (!target) return;
+
+    // Channel strip baru sudah memiliki handler lokal di channels-new.js.
+    // Jangan proses ulang event di level document agar tidak terjadi
+    // loop input -> updateChannelControl -> input -> ... dan lag saat drag.
+    if (target.closest(".new-channel-strip, .channel-strip")) return;
 
     // Cari elemen strip terdekat untuk mendapatkan nomor Channel (1-14)
     const strip = target.closest("[data-ch]");
