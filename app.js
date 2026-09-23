@@ -343,3 +343,512 @@ document.addEventListener("DOMContentLoaded", () => {
     logTest("Save/Recall Test: SELESAI");
   });
 });
+
+
+/* ==========================================================
+   EXTRACTED FROM index.html — SERVICE WORKER REGISTRATION
+   ========================================================== */
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(function(){});
+  }
+
+
+/* ==========================================================
+   EXTRACTED FROM index.html — SCREEN / M32 DISPLAY + SYSTEM POWER UI
+   ========================================================== */
+(function() {
+  "use strict";
+
+  window.state = window.state || {};
+  if (window.state.system === undefined) {
+    window.state.system = false; 
+  }
+  window.state.connected = false;
+
+  const tabs = document.querySelectorAll('#screenTabs button');
+  const views = document.querySelectorAll('.screen-content .screen-view');
+  const subButtons = document.querySelectorAll('#m32SubmenuBar .m32-sub-btn');
+  const subPanels = document.querySelectorAll('.midas-tft-screen .m32-sub-panel');
+  const subBar = document.getElementById('m32SubmenuBar');
+
+  function buildScreenMeters() {
+    const root = document.getElementById('screenChannelMeters');
+    if (!root) return;
+    root.innerHTML = '';
+    for (let i = 0; i < 14; i++) {
+      const el = document.createElement('div');
+      el.style.flex = '1';
+      el.style.background = 'var(--accent-color)';
+      el.style.height = (15 + ((i * 17) % 75)) + '%';
+      el.style.borderRadius = '2px';
+      el.title = 'CH' + (i + 1);
+      root.appendChild(el);
+    }
+  }
+
+  function buildRta() {
+    const root = document.getElementById('rtaBars');
+    if (!root) return;
+    root.innerHTML = '';
+    for (let i = 0; i < 14; i++) {
+      const b = document.createElement('div');
+      b.style.flex = '1';
+      b.style.background = '#2ecc71';
+      b.style.height = (20 + ((i * 23) % 70)) + '%';
+      b.style.borderRadius = '2px';
+      root.appendChild(b);
+    }
+  }
+
+  function switchScreen(targetScreen) {
+    tabs.forEach(b => {
+      if (b.dataset.screen === targetScreen) {
+        b.classList.add('active');
+      } else {
+        b.classList.remove('active');
+      }
+    });
+
+    views.forEach(v => {
+      if (v.dataset.view === targetScreen) {
+        v.classList.add('active');
+        v.style.display = 'flex';
+        v.style.visibility = 'visible';
+        v.style.opacity = '1';
+      } else {
+        v.classList.remove('active');
+        v.style.display = 'none';
+        v.style.visibility = 'hidden';
+        v.style.opacity = '0';
+      }
+    });
+
+    if (subBar) {
+      subBar.style.display = (targetScreen === 'HOME') ? 'grid' : 'none';
+    }
+
+    if (targetScreen === 'METER') {
+      buildScreenMeters();
+    } else if (targetScreen === 'RTA') {
+      buildRta();
+    }
+  }
+
+  function switchSubPanel(targetSub) {
+    subButtons.forEach(b => {
+      if (b.dataset.sub === targetSub) {
+        b.classList.add('active');
+      } else {
+        b.classList.remove('active');
+      }
+    });
+
+    subPanels.forEach(panel => {
+      if (panel.dataset.subpanel === targetSub) {
+        panel.classList.add('active');
+        panel.style.display = 'flex';
+        panel.style.visibility = 'visible';
+        panel.style.opacity = '1';
+      } else {
+        panel.classList.remove('active');
+        panel.style.display = 'none';
+        panel.style.visibility = 'hidden';
+        panel.style.opacity = '0';
+      }
+    });
+  }
+
+  tabs.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      switchScreen(this.dataset.screen);
+    }, true);
+  });
+
+  subButtons.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      switchSubPanel(this.dataset.sub);
+    }, true);
+  });
+
+  const powerBtn = document.getElementById("power");
+  if (powerBtn) {
+    powerBtn.textContent = window.state.system ? "SYSTEM ON" : "SYSTEM OFF";
+    powerBtn.classList.toggle("on", window.state.system);
+    
+    powerBtn.addEventListener("click", function(e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      window.state.system = !window.state.system;
+      this.textContent = window.state.system ? "SYSTEM ON" : "SYSTEM OFF";
+      this.classList.toggle("on", window.state.system);
+
+      var hs = document.getElementById("headerBridgeStatus");
+      if (hs) hs.textContent = window.state.system ? "SYSTEM READY" : "BRIDGE STANDBY";
+    });
+  }
+
+  window.addEventListener("DOMContentLoaded", () => {
+    switchScreen('HOME');
+    switchSubPanel('overview');
+  });
+
+})();
+
+
+/* ==========================================================
+   EXTRACTED FROM index.html — INPUT CONFIG + SCENE UI
+   ========================================================== */
+(function() {
+  "use strict";
+
+  window.state = window.state || { system: false, connected: false, channels: [] };
+
+  const btnPhantom = document.getElementById('btnPhantom');
+  if (btnPhantom) {
+    btnPhantom.addEventListener('click', function(e) {
+      e.preventDefault();
+      const isOn = this.textContent.trim() === 'ON';
+      this.textContent = isOn ? 'OFF' : 'ON';
+      this.style.background = isOn ? 'var(--panel-border)' : '#2ecc71';
+      this.style.color = isOn ? '#fff' : '#000';
+      
+      const tr = document.getElementById('testResult');
+      if (tr) tr.textContent = `CONFIG: +48V Phantom Power set to ${this.textContent}`;
+    });
+  }
+
+  const btnPolarity = document.getElementById('btnPolarity');
+  if (btnPolarity) {
+    btnPolarity.addEventListener('click', function(e) {
+      e.preventDefault();
+      const isNorm = this.textContent.includes('NORM');
+      this.textContent = isNorm ? 'INV (-)' : 'NORM (+)';
+      this.style.color = isNorm ? '#e74c3c' : '#fff';
+      this.style.background = isNorm ? 'var(--main-bg)' : 'var(--panel-border)';
+
+      const tr = document.getElementById('testResult');
+      if (tr) tr.textContent = `CONFIG: Input Polarity set to ${this.textContent}`;
+    });
+  }
+
+  const slidersWithOutputs = [
+    { slider: 'hpfSlider', val: 'hpfVal', unit: ' Hz' },
+    { slider: 'gateThreshSlider', val: 'gateThreshVal', unit: ' dB' },
+    { slider: 'gateRangeSlider', val: 'gateRangeVal', unit: ' dB' },
+    { slider: 'gateRelSlider', val: 'gateRelVal', unit: ' ms' },
+    { slider: 'compThreshSlider', val: 'compThreshVal', unit: 'dB' },
+    { slider: 'compRatioSlider', val: 'compRatioVal', unit: '' },
+    { slider: 'compAttSlider', val: 'compAttVal', unit: 'ms' },
+    { slider: 'compGainSlider', val: 'compGainVal', unit: '' },
+    { slider: 'bs1Slider', val: 'bs1Val', unit: 'dB' },
+    { slider: 'bs2Slider', val: 'bs2Val', unit: 'dB' },
+    { slider: 'fx1SendSlider', val: 'fx1Val', unit: 'dB' },
+    { slider: 'fx2SendSlider', val: 'fx2Val', unit: 'dB' }
+  ];
+
+  slidersWithOutputs.forEach(item => {
+    const sliderEl = document.getElementById(item.slider);
+    const valEl = document.getElementById(item.val);
+    if (sliderEl && valEl) {
+      sliderEl.addEventListener('input', function() {
+        let displayVal = this.value;
+        if (item.slider === 'fx2SendSlider' && displayVal === '-40') {
+          displayVal = '-∞';
+          valEl.textContent = displayVal;
+        } else if (item.slider === 'compGainSlider') {
+          valEl.textContent = '+' + displayVal;
+        } else {
+          valEl.textContent = displayVal + item.unit;
+        }
+      });
+    }
+  });
+
+  const eqBands = ['Low', 'Mid1', 'Mid2', 'High'];
+  eqBands.forEach(band => {
+    const slider = document.getElementById('eq' + band + 'Slider');
+    const bar = document.getElementById('eqBar' + band);
+    if (slider && bar) {
+      slider.addEventListener('input', function() {
+        bar.style.height = this.value + '%';
+      });
+    }
+  });
+
+  const sceneSave = document.getElementById('screenSceneSave');
+  const sceneRecall = document.getElementById('screenSceneRecall');
+  const sceneMsg = document.getElementById('sceneStatusMsg');
+
+  if (sceneSave) {
+    sceneSave.addEventListener('click', () => {
+      if (sceneMsg) sceneMsg.textContent = "✅ Preset M32 Scene Saved Successfully!";
+    });
+  }
+  if (sceneRecall) {
+    sceneRecall.addEventListener('click', () => {
+      if (sceneMsg) sceneMsg.textContent = "⚡ Preset M32 Scene Recalled!";
+    });
+  }
+
+})();
+
+
+/* ==========================================================
+   EXTRACTED FROM index.html — FX RACK / FX PARAMETERS
+   ========================================================== */
+(function() {
+  "use strict";
+
+  const fxRackButtons = document.querySelectorAll('.fx-buttons button');
+  const fxRackPreset = document.getElementById('fxRackPreset');
+  const fxRackSummary = document.getElementById('fxRackSummary');
+
+  const fxPresetDescriptions = {
+    "FX1": "REVERB • TIME 2.45s",
+    "FX2": "STEREO DELAY • 120 BPM",
+    "AUX1": "GRAPHIC EQ • 31-BAND",
+    "AUX2": "PARAMETRIC EQ • 4-BAND",
+    "AUX3": "VINTAGE COMPRESSOR • 2:1",
+    "AUX4": "STEREO CHORUS • WIDE"
+  };
+
+  fxRackButtons.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      fxRackButtons.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+
+      const target = this.dataset.fxSelect;
+      if (fxRackPreset) fxRackPreset.textContent = target + " ACTIVE & RUNNING";
+      if (fxRackSummary) fxRackSummary.textContent = fxPresetDescriptions[target] || "PROCESSOR ACTIVE";
+
+      const tr = document.getElementById('testResult');
+      if (tr) tr.textContent = `FX RACK: Slot ${target} dipilih dan diaktifkan.`;
+    });
+  });
+
+  const screenFxSelect = document.getElementById('screenFxSelect');
+  const fxSlotDetails = document.getElementById('fxSlotDetails');
+
+  if (screenFxSelect) {
+    screenFxSelect.addEventListener('change', function() {
+      const selectedText = this.options[this.selectedIndex].text;
+      const selectedVal = this.value;
+
+      if (fxSlotDetails) {
+        fxSlotDetails.innerHTML = `Loaded Slot <strong style="color:var(--accent-color);">${selectedVal}</strong>: <span style="color:#2ecc71; font-weight:bold;">${selectedText}</span>`;
+      }
+
+      const tr = document.getElementById('testResult');
+      if (tr) tr.textContent = `SCREEN FX: Berhasil memuat ${selectedText}`;
+    });
+  }
+
+  const fxTapBtn = document.getElementById('fxTap');
+  const fxSelBtn = document.getElementById('fxSelect');
+  const fxBpmDisplay = document.getElementById('fxBpm');
+
+  let tapTimes = [];
+  if (fxTapBtn) {
+    fxTapBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const now = Date.now();
+      tapTimes.push(now);
+      if (tapTimes.length > 3) tapTimes.shift();
+
+      if (tapTimes.length >= 2) {
+        const diff = (tapTimes[tapTimes.length - 1] - tapTimes[0]) / (tapTimes.length - 1);
+        const calculatedBpm = Math.round(60000 / diff);
+        if (calculatedBpm >= 40 && calculatedBpm <= 240) {
+          if (fxBpmDisplay) fxBpmDisplay.textContent = calculatedBpm + " BPM";
+          const tr = document.getElementById('testResult');
+          if (tr) tr.textContent = `FX TAP TEMPO: Sinkron ke ${calculatedBpm} BPM`;
+        }
+      }
+    });
+  }
+
+  if (fxSelBtn) {
+    fxSelBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      alert("⚙️ Pengaturan Parameter Lanjutan FX Terbuka.");
+    });
+  }
+
+  const fxSliders = document.querySelectorAll('.fx-control');
+  fxSliders.forEach(input => {
+    input.addEventListener('input', function() {
+      const param = this.dataset.param;
+      const val = this.value;
+      const output = this.parentElement.querySelector('output');
+
+      if (output) {
+        if (param === 'time') output.textContent = val + 's';
+        else if (param === 'preDelay') output.textContent = val + 'ms';
+        else if (param === 'decay') output.textContent = val + '%';
+        else if (param === 'level') output.textContent = val + 'dB';
+        else output.textContent = val;
+      }
+
+      const tr = document.getElementById('testResult');
+      if (tr) tr.textContent = `FX PARAM: ${param.toUpperCase()} diatur ke ${val}`;
+    });
+  });
+
+})();
+
+
+/* ==========================================================
+   EXTRACTED FROM index.html — AUX / FX RETURN ROUTING
+   ========================================================== */
+(function() {
+  "use strict";
+
+  window.state = window.state || { aux: {}, fxReturn: {} };
+
+  const auxReturnControls = document.querySelectorAll('.aux-control');
+
+  auxReturnControls.forEach(input => {
+    input.addEventListener('input', function() {
+      const target = this.dataset.target || 'AUX1';
+      const scope = this.dataset.scope || 'AUX';
+      const rawVal = parseFloat(this.value);
+      const percentVal = Math.round(rawVal <= 1 ? rawVal * 100 : rawVal);
+
+      if (!window.state) window.state = {};
+      if (scope === 'FX_RETURN') {
+        if (!window.state.fxReturn) window.state.fxReturn = {};
+        window.state.fxReturn[target] = rawVal;
+      } else {
+        if (!window.state.aux) window.state.aux = {};
+        window.state.aux[target] = rawVal;
+      }
+
+      const testResult = document.getElementById('testResult');
+      if (testResult) {
+        testResult.textContent = `ROUTING: ${scope} [${target}] Level diatur ke ${percentVal}%`;
+      }
+
+      if (window.MixerControl && typeof window.MixerControl.setControl === "function") {
+        window.MixerControl.setControl(target, scope.toLowerCase(), rawVal);
+      }
+    });
+  });
+
+})();
+
+
+/* ==========================================================
+   EXTRACTED FROM index.html — MONITOR / PHONES / MASTER UI
+   ========================================================== */
+(function() {
+  "use strict";
+
+  const monitorCard = document.querySelector('.monitor-card');
+  if (monitorCard) {
+    const monitorBtn = monitorCard.querySelector('button');
+    const monitorKnob = monitorCard.querySelector('.monitor-knob, #monitorLevel');
+    
+    if (monitorBtn) {
+      const sources = ["MAIN L/R", "AUX 1-2", "FX 1-2", "USB STREAM"];
+      let srcIdx = 0;
+
+      monitorBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        srcIdx = (srcIdx + 1) % sources.length;
+        this.textContent = sources[srcIdx];
+
+        const tr = document.getElementById('testResult');
+        if (tr) tr.textContent = `MONITOR: Sumber dialihkan ke ${sources[srcIdx]}`;
+      });
+    }
+
+    if (monitorKnob) {
+      monitorKnob.style.cursor = 'pointer';
+      monitorKnob.addEventListener('click', function() {
+        const tr = document.getElementById('testResult');
+        if (tr) tr.textContent = `MONITOR LEVEL: Diputar/disesuaikan.`;
+      });
+    }
+  }
+
+  const phonesCard = document.querySelector('.phones-card');
+  if (phonesCard) {
+    const phoneKnob = phonesCard.querySelector('.phone-knob, div');
+    const phoneIndicator = phonesCard.querySelector('span:last-child, .phone-dot');
+
+    if (phoneKnob) {
+      phoneKnob.style.cursor = 'pointer';
+      let phoneActive = true;
+
+      phoneKnob.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        phoneActive = !phoneActive;
+        
+        if (phoneIndicator) {
+          phoneIndicator.style.color = phoneActive ? '#2ecc71' : '#e74c3c';
+        }
+
+        const tr = document.getElementById('testResult');
+        if (tr) tr.textContent = `PHONES: Output Headphone ${phoneActive ? 'AKTIF' : 'MUTED'}`;
+      });
+    }
+  }
+
+  const masterFader = document.getElementById('master');
+  const masterVal = document.getElementById('masterVal');
+  const masterMeterL = document.getElementById('masterMeterL');
+  const masterMeterR = document.getElementById('masterMeterR');
+
+  if (masterFader) {
+    masterFader.addEventListener('input', function() {
+      const level = parseInt(this.value, 10);
+      if (masterVal) masterVal.textContent = level + '%';
+
+      if (masterMeterL && masterMeterR) {
+        const h = level > 0 ? level + '%' : '0%';
+        masterMeterL.style.height = h;
+        masterMeterR.style.height = h;
+      }
+
+      if (!window.state) window.state = {};
+      window.state.masterFader = level;
+
+      const tr = document.getElementById('testResult');
+      if (tr) tr.textContent = `MASTER: Level Main L/R disetel ke ${level}%`;
+    });
+  }
+
+})();
+
+
+/* ==========================================================
+   EXTRACTED FROM index.html — CLOCK UI
+   ========================================================== */
+(function() {
+  "use strict";
+
+  function updateClock() {
+    const clockEl = document.getElementById('clock');
+    if (!clockEl) return;
+
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    clockEl.textContent = `${hours}:${minutes}:${seconds}`;
+  }
+
+  setInterval(updateClock, 1000);
+  updateClock();
+
+})();
