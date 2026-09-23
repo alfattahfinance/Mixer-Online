@@ -1,981 +1,501 @@
-/* ==========================================================================
-   FADER VU METER — CH1-CH14
-   Indikator audio aktual di sisi jalur FADER.
-   Hijau -> Kuning -> Merah.
-   Tidak mengubah ukuran, nilai, atau gerakan FADER.
-   ========================================================================== */
-.new-channel-strip {
-  position: relative !important;
+/* ==========================================================
+   1. DEFINISI VARIABEL WARNA (SKIN)
+   ========================================================== */
+.knob-val {
+  font-size: 8px !important;
+  color: var(--accent-color) !important;
+  font-weight: bold !important;
+  display: block !important;
+  text-align: center !important;
+  margin-top: 1px !important;
 }
 
-/* Hapus indikator segmented lama. */
-.new-channel-strip .new-channel-meter {
-  display: none !important;
+body, body.theme-midas {
+  --main-bg: #090b0c;
+  --panel-bg: #0c1219;
+  --panel-border: #1a2736;
+  --accent-color: #00e5ff;
+  --header-bg: linear-gradient(90deg, #0b131a, #132230, #0b131a);
+  --btn-active: linear-gradient(180deg, #00a8cc 0%, #00738c 100%);
+  --text-main: #ffffff;
+  --text-dim: #8899a6;
+  --strip-bg: #0b1017;
 }
 
-/* Indikator baru: tipis, berada DI AREA FADER merentang penuh ke bawah. */
-.new-channel-strip .fader-area .ch-top-vu {
-  position: absolute !important;
-  top: 6px !important;
-  bottom: 6px !important;
-  left: calc(50% + 17px) !important;
-  transform: none !important;
-  width: 8px !important;
-  height: auto !important;
+body.theme-x32 {
+  --main-bg: #10141a;
+  --panel-bg: #18202a;
+  --panel-border: #2c3e50;
+  --accent-color: #f39c12;
+  --header-bg: linear-gradient(90deg, #2c3e50, #1b222c, #2c3e50);
+  --btn-active: linear-gradient(180deg, #e67e22 0%, #d35400 100%);
+  --text-main: #ffffff;
+  --text-dim: #a0b0c0;
+  --strip-bg: #141b24;
+}
+
+body.theme-gold {
+  --main-bg: #12100e;
+  --panel-bg: #1c1815;
+  --panel-border: #382d24;
+  --accent-color: #f1c40f;
+  --header-bg: linear-gradient(90deg, #2a221b, #1c1815, #2a221b);
+  --btn-active: linear-gradient(180deg, #f39c12 0%, #b7950b 100%);
+  --text-main: #fff8e7;
+  --text-dim: #9c8a75;
+  --strip-bg: #161310;
+}
+
+body.theme-dark {
+  --main-bg: #050505;
+  --panel-bg: #0f0f0f;
+  --panel-border: #222222;
+  --accent-color: #2ecc71;
+  --header-bg: linear-gradient(180deg, #181818, #0f0f0f, #181818);
+  --btn-active: linear-gradient(180deg, #2ecc71 0%, #1e8449 100%);
+  --text-main: #eeeeee;
+  --text-dim: #666666;
+  --strip-bg: #0a0a0a;
+}
+
+/* ==========================================================
+   2. GLOBAL RESET & SCROLL
+   ========================================================== */
+*, *::before, *::after {
+  box-sizing: border-box !important;
+}
+
+html, body {
+  width: 100% !important;
+  max-width: 100% !important;
   margin: 0 !important;
-  padding: 1px !important;
-  background: #050708 !important;
-  border: 1px solid #303840 !important;
+  padding: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  background: var(--main-bg) !important;
+  color: var(--text-main) !important;
+  font-family: system-ui, -apple-system, sans-serif !important;
+  display: flex !important;
+  flex-direction: column !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+header.topbar {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  background: var(--header-bg) !important;
+  border-bottom: 1px solid var(--panel-border) !important;
+  width: 100% !important;
+  min-width: 780px !important;
+  padding: 4px 8px !important;
+  gap: 4px !important;
+  flex-shrink: 0 !important;
+  z-index: 100 !important;
+}
+
+header.topbar > div {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  background: var(--panel-bg) !important;
+  border: 1px solid var(--panel-border) !important;
+  border-radius: 4px !important;
+  padding: 3px 6px !important;
+  font-size: 7px !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+}
+
+header.topbar .brand {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  font-size: 8px !important;
+}
+
+.bridge-head {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.bridge-head button, .scene-head button {
+  font-size: 7px !important;
+  padding: 2px 4px !important;
+  border-radius: 2px !important;
+  cursor: pointer !important;
+}
+
+.clock-head {
+  background: transparent !important;
+  border: none !important;
+  align-items: flex-end !important;
+  padding: 0 !important;
+}
+
+#clock {
+  font-size: 11px !important;
+  font-weight: bold !important;
+  color: var(--accent-color) !important;
+  font-family: monospace !important;
+}
+
+/* ==========================================================
+   3. KONSOL UTAMA & LANSKAP PROAKTIF
+   ========================================================== */
+main.console {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  justify-content: space-between !important;
+  gap: 4px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: calc(100vh - 65px) !important;
+  box-sizing: border-box !important;
+  padding: 4px 6px !important;
+}
+
+/* Bank Channel Kiri & Kanan */
+main.console > .channel-bank {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  max-width: 31% !important;
+  background: var(--strip-bg) !important;
+  border: 1px solid var(--panel-border) !important;
+  border-radius: 4px !important;
+  padding: 3px 2px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  height: 100% !important;
+}
+
+.bank-title {
+  padding: 2px 4px !important;
+  border-bottom: 1px solid var(--panel-border) !important;
+  margin-bottom: 2px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+  font-size: 7px !important;
+}
+
+#channels, #channelsRight {
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr) !important;
+  width: 100% !important;
+  height: 100% !important;
+  gap: 1px !important;
+  align-items: stretch !important;
+}
+
+/* Konsol Tengah (Mixer Screen) Dikunci Lebarnya Agar Proporsional */
+main.console > .center-console {
+  flex: 0 0 320px !important;
+  width: 320px !important;
+  min-width: 320px !important;
+  max-width: 340px !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
+  gap: 3px !important;
+}
+
+/* ==========================================================
+   4. MASTER RACK
+   ========================================================== */
+html body main.console > aside.master-rack {
+  flex: 0 0 85px !important;
+  width: 85px !important;
+  min-width: 85px !important;
+  max-width: 85px !important;
+  height: 100% !important;
+  background: var(--panel-bg) !important;
+  border: 1px solid var(--panel-border) !important;
+  border-radius: 4px !important;
+  padding: 3px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  box-sizing: border-box !important;
+}
+
+aside.master-rack h2 {
+  font-size: 8px !important;
+  text-align: center !important;
+  margin: 1px 0 !important;
+  width: 100% !important;
+}
+
+.main-meters {
+  display: flex !important;
+  gap: 4px !important;
+  justify-content: center !important;
+  align-items: center !important;
+  height: 65px !important;
+  padding: 2px !important;
+  background: #040608 !important;
+  border: 1px solid var(--panel-border) !important;
   border-radius: 3px !important;
-  box-shadow: inset 0 0 4px #000, 0 0 3px rgba(0,0,0,.8) !important;
-  overflow: hidden !important;
+  width: 100% !important;
+}
+
+.meter-bar-container {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  height: 100% !important;
+  width: 12px !important;
+}
+
+.meter-bar-bg {
+  width: 100% !important;
+  height: 100% !important;
+  background: #000000 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 2px !important;
   display: flex !important;
   flex-direction: column-reverse !important;
-  z-index: 4 !important;
-  pointer-events: none !important;
-  opacity: 1 !important;
+  overflow: hidden !important;
 }
 
-/* Skala kecil pada meter. */
-.new-channel-strip .fader-area .ch-top-vu::before {
-  content: "" !important;
-  position: absolute !important;
-  inset: 1px !important;
-  background: repeating-linear-gradient(to bottom, rgba(255,255,255,.18) 0, rgba(255,255,255,.18) 1px, transparent 1px, transparent 5px) !important;
-  pointer-events: none !important;
-  z-index: 2 !important;
-}
-
-/* Level audio aktual: HIJAU -> KUNING -> MERAH. */
-.new-channel-strip .fader-area .ch-top-vu .ch-top-vu-fill {
-  position: absolute !important;
-  left: 1px !important;
-  right: 1px !important;
-  bottom: 1px !important;
-  width: auto !important;
+.meter-bar-fill {
+  width: 100% !important;
   height: 0%;
-  min-height: 2px !important;
-  background: linear-gradient(to top, #31e66b 0%, #31e66b 64%, #ffd21c 65%, #ffd21c 84%, #ff3b30 85%, #ff3b30 100%) !important;
+  background: linear-gradient(0deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 66%, #f39c12 85%, #e74c3c 86%, #ff0000 100%) !important;
   border-radius: 1px !important;
-  box-shadow: 0 0 6px rgba(49,230,107,.7) !important;
-  z-index: 1 !important;
-  transition: height .05s linear !important;
 }
 
-/* Override selector lebih kuat daripada skin lama di channels-new.js. */
-.channel-bank .new-channel-strip .fader-area .ch-top-vu {
-  left: calc(50% + 17px) !important;
-  width: 8px !important;
-  top: 6px !important;
-  bottom: 6px !important;
-  z-index: 4 !important;
+.meter-label {
+  font-size: 7px !important;
+  font-weight: bold !important;
+  color: var(--accent-color) !important;
+  margin-top: 1px !important;
 }
 
-/* FADER tetap dapat disentuh dan tidak digerakkan oleh meter. */
-.new-channel-strip .fader-area input[type="range"],
-.new-channel-strip .fader-area output,
-.new-channel-strip .fader-area label {
-  position: relative !important;
-  z-index: 3 !important;
-}
-
-@media screen and (max-width: 1024px) {
-  .channel-bank .new-channel-strip .fader-area .ch-top-vu {
-    left: calc(50% + 17px) !important;
-    width: 8px !important;
-    top: 6px !important;
-    bottom: 6px !important;
-  }
-}
-
-/* ==========================================================================
-   MASTER DASHBOARD — MENTOK PENUH KE BAWAH (TABLET OPTIMIZED)
-   ========================================================================== */
-html body main.console > aside.master-rack {
-  flex: 0 0 72px !important;
-  width: 72px !important;
-  min-width: 72px !important;
-  max-width: 72px !important;
-  height: 100% !important;
-  min-height: 100% !important;
+aside.master-rack .master-card {
   display: flex !important;
   flex-direction: column !important;
+  align-items: center !important;
   justify-content: space-between !important;
-  align-self: stretch !important;
-  box-sizing: border-box !important;
-  overflow: hidden !important;
+  flex-grow: 1 !important;
+  background: var(--main-bg) !important;
+  border: 1px solid var(--panel-border) !important;
+  border-radius: 3px !important;
+  padding: 3px 2px !important;
+  width: 100% !important;
+  margin: 2px 0 !important;
 }
 
-html body main.console > aside.master-rack .master-card {
-  width: 100% !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  flex-grow: 1 !important;
+aside.master-rack .master-card input[type="range"] {
+  writing-mode: vertical-lr !important;
+  direction: rtl !important;
+  appearance: slider-vertical !important;
+  -webkit-appearance: slider-vertical !important;
+  height: 160px !important;
+  min-height: 160px !important;
+  width: 18px !important;
+  accent-color: var(--accent-color) !important;
+  cursor: pointer !important;
+  margin: 2px auto !important;
+}
+
+.monitor-card, .phones-card {
   display: flex !important;
   flex-direction: column !important;
-  justify-content: space-between !important;
-  box-sizing: border-box !important;
-}
-
-html body main.console > aside.master-rack .master-card input[type="range"] {
-  width: 20px !important;
-  max-width: 20px !important;
-  height: 100% !important;
-  min-height: 180px !important;
-  flex-grow: 1 !important;
-  margin: 4px auto !important;
-}
-
-@media screen and (max-width: 1024px) {
-  html body main.console > aside.master-rack {
-    flex: 0 0 72px !important;
-    width: 72px !important;
-    min-width: 72px !important;
-    max-width: 72px !important;
-    height: 100% !important;
-    align-self: stretch !important;
-  }
-}
-
-/* ==========================================================================
-   SCREEN MIXER — LEBAR RESPONSIF
-   Fokus: layar mixer tidak melebar berlebihan, tetapi tetap nyaman
-   di layar kecil maupun besar.
-   ========================================================================== */
-main.console > .center-console {
-  flex: 0 1 clamp(320px, 26vw, 400px) !important;
-  width: clamp(320px, 26vw, 400px) !important;
-  min-width: 320px !important;
-  max-width: 400px !important;
-  min-height: 0 !important;
-  overflow: hidden !important;
-  box-sizing: border-box !important;
-}
-
-main.console > .center-console .screen-frame,
-main.console > .center-console .midas-tft-screen,
-main.console > .center-console .media-rack,
-main.console > .center-console .fx-rack,
-main.console > .center-console .aux-rack {
+  align-items: center !important;
+  text-align: center !important;
+  background: var(--main-bg) !important;
+  border: 1px solid var(--panel-border) !important;
+  border-radius: 3px !important;
+  padding: 2px !important;
+  font-size: 6px !important;
+  gap: 1px !important;
   width: 100% !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
-  box-sizing: border-box !important;
+  margin-top: 1px !important;
 }
 
-@media screen and (max-width: 1024px) {
-  main.console > .center-console {
-    flex-basis: 320px !important;
-    width: 320px !important;
-    min-width: 320px !important;
-    max-width: 360px !important;
-  }
+.monitor-card button {
+  font-size: 5px !important;
+  padding: 1px 2px !important;
+  background: var(--panel-border) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 2px !important;
+  cursor: pointer !important;
+  width: 100% !important;
 }
 
-@media screen and (max-width: 768px) {
-  main.console > .center-console {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    flex: 0 1 100% !important;
-  }
+.monitor-knob, .phone-knob {
+  width: 10px !important;
+  height: 10px !important;
+  background: var(--accent-color) !important;
+  border-radius: 50% !important;
+  margin: 1px auto !important;
+  cursor: pointer !important;
 }
-
 
 /* ==========================================================
-   EXTRACTED FROM index.html — LAYOUT / SKIN / RESPONSIVE CSS
+   5. SCREEN NAVIGATION & BOTTOM NAV
    ========================================================== */
-/* ==========================================================
-     1. DEFINISI VARIABEL WARNA (SKIN)
-     ========================================================== */
-  .knob-val {
-    font-size: 8px !important;
-    color: var(--accent-color) !important;
-    font-weight: bold !important;
-    display: block !important;
-    text-align: center !important;
-    margin-top: 1px !important;
-  }
-  
-  body, body.theme-midas {
-    --main-bg: #090b0c;
-    --panel-bg: #0c1219;
-    --panel-border: #1a2736;
-    --accent-color: #00e5ff;
-    --header-bg: linear-gradient(90deg, #0b131a, #132230, #0b131a);
-    --btn-active: linear-gradient(180deg, #00a8cc 0%, #00738c 100%);
-    --text-main: #ffffff;
-    --text-dim: #8899a6;
-    --strip-bg: #0b1017;
-  }
-
-  body.theme-x32 {
-    --main-bg: #10141a;
-    --panel-bg: #18202a;
-    --panel-border: #2c3e50;
-    --accent-color: #f39c12;
-    --header-bg: linear-gradient(90deg, #2c3e50, #1b222c, #2c3e50);
-    --btn-active: linear-gradient(180deg, #e67e22 0%, #d35400 100%);
-    --text-main: #ffffff;
-    --text-dim: #a0b0c0;
-    --strip-bg: #141b24;
-  }
-
-  body.theme-gold {
-    --main-bg: #12100e;
-    --panel-bg: #1c1815;
-    --panel-border: #382d24;
-    --accent-color: #f1c40f;
-    --header-bg: linear-gradient(90deg, #2a221b, #1c1815, #2a221b);
-    --btn-active: linear-gradient(180deg, #f39c12 0%, #b7950b 100%);
-    --text-main: #fff8e7;
-    --text-dim: #9c8a75;
-    --strip-bg: #161310;
-  }
-
-  body.theme-dark {
-    --main-bg: #050505;
-    --panel-bg: #0f0f0f;
-    --panel-border: #222222;
-    --accent-color: #2ecc71;
-    --header-bg: linear-gradient(180deg, #181818, #0f0f0f, #181818);
-    --btn-active: linear-gradient(180deg, #2ecc71 0%, #1e8449 100%);
-    --text-main: #eeeeee;
-    --text-dim: #666666;
-    --strip-bg: #0a0a0a;
-  }
-
-  /* ==========================================================
-     2. GLOBAL RESET & SCROLL ATAS-BAWAH AKTIF
-     ========================================================== */
-  *, *::before, *::after {
-    box-sizing: border-box !important;
-  }
-
-  html {
-    scroll-behavior: smooth !important;
-    width: 100% !important;
-    height: 100% !important;
-  }
-
-  body {
-    width: 100% !important;
-    min-height: 100vh !important;
-    min-height: 100dvh !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow-x: auto !important;
-    overflow-y: auto !important;
-    background: var(--main-bg) !important;
-    color: var(--text-main) !important;
-    font-family: system-ui, -apple-system, sans-serif !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-start !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-
-  header.topbar {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    background: var(--header-bg) !important;
-    border-bottom: 1px solid var(--panel-border) !important;
-    width: 100% !important;
-    min-width: 780px !important;
-    padding: 4px 8px !important;
-    gap: 4px !important;
-    flex-shrink: 0 !important;
-    z-index: 100 !important;
-  }
-
-  header.topbar > div {
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    background: var(--panel-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 4px !important;
-    padding: 3px 6px !important;
-    font-size: 7px !important;
-    white-space: nowrap !important;
-    flex-shrink: 0 !important;
-  }
-
-  header.topbar .brand {
-    background: transparent !important;
-    border: none !important;
-    padding: 0 !important;
-    font-size: 8px !important;
-  }
-
-  .bridge-head {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 4px !important;
-  }
-
-  .bridge-head button {
-    font-size: 7px !important;
-    padding: 2px 4px !important;
-    cursor: pointer !important;
-  }
-
-  .scene-head div {
-    display: flex !important;
-    gap: 2px !important;
-    margin-top: 1px !important;
-  }
-
-  .scene-head button {
-    font-size: 7px !important;
-    padding: 2px 4px !important;
-    border-radius: 2px !important;
-    cursor: pointer !important;
-  }
-
-  .clock-head {
-    background: transparent !important;
-    border: none !important;
-    align-items: flex-end !important;
-    padding: 0 !important;
-  }
-
-  #clock {
-    font-size: 11px !important;
-    font-weight: bold !important;
-    color: var(--accent-color) !important;
-    font-family: monospace !important;
-  }
-
-  /* ==========================================================
-     3. EFEK LAMPU-LAMPU MENYALA (GLOW & LED INDICATORS)
-     ========================================================== */
-  button.active, button.on, .bottom-nav button.active {
-    box-shadow: 0 0 8px var(--accent-color), inset 0 0 4px rgba(255, 255, 255, 0.4) !important;
-    border-color: var(--accent-color) !important;
-  }
-
-  #statusLamp, .lamp {
-    display: inline-block;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #555;
-    box-shadow: 0 0 4px rgba(0,0,0,0.5);
-    transition: all 0.3s ease;
-  }
-  #statusLamp.on, .lamp.green {
-    background: #2ecc71 !important;
-    box-shadow: 0 0 8px #2ecc71, 0 0 12px #2ecc71 !important;
-  }
-  .lamp.red {
-    background: #e74c3c !important;
-    box-shadow: 0 0 6px #e74c3c !important;
-  }
-
-  .meter-bar-fill, .ch-side-vu-fill, .ch-top-vu-fill {
-    box-shadow: 0 0 6px rgba(46, 204, 113, 0.6);
-  }
-
-  button[data-k="mute"].on, button.mute-btn.on {
-    background: linear-gradient(180deg, #ff6b6b 0%, #c0392b 100%) !important;
-    color: #fff !important;
-    box-shadow: 0 0 8px #e74c3c !important;
-  }
-
-  button[data-k="solo"].on, button.solo-btn.on {
-    background: linear-gradient(180deg, #f1c40f 0%, #d35400 100%) !important;
-    color: #000 !important;
-    box-shadow: 0 0 8px #f1c40f !important;
-  }
-
-  /* ==========================================================
-     4. KONSOL UTAMA & KETINGGIAN PROPORSIONAL (PAS DI GARIS BAR)
-     ========================================================== */
-    main.console {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: stretch !important;
-    justify-content: space-between !important;
-    gap: 3px !important;
-    width: 100% !important;
-    min-width: 780px !important;
-    box-sizing: border-box !important;
-    padding: 2px 4px !important;
-    height: calc(100vh - 85px) !important; /* Mengunci tinggi konsol agar pas di layar */
-  }
-
-  .channel-bank {
-    flex: 1 1 0 !important;
-    min-width: 200px !important;
-    background: var(--strip-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 4px !important;
-    padding: 3px 2px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    height: 100% !important; /* Memanjang penuh ke bawah */
-  }
-
-  #channels, #channelsRight {
-    display: grid !important;
-    grid-template-columns: repeat(7, 1fr) !important;
-    width: 100% !important;
-    height: 100% !important;
-    gap: 1px !important;
-    align-items: stretch !important;
-  }
-
-  /* Perbesar tinggi fader channel menjadi 215px agar menutup celah kosong */
-  .new-channel-strip input.channel-fader, 
-  .new-channel-strip input.new-fader,
-  .channel-strip input.channel-fader {
-    position: relative !important;
-    z-index: 2 !important;
-    background: transparent !important;
-    height: 270px !important;
-    min-height: 270px !important;
-    width: 16px !important;
-    accent-color: var(--accent-color) !important;
-    margin: 0 !important;
-    pointer-events: auto !important;
-    touch-action: pan-y !important;
-  }
-  
-  .new-channel-strip .ch-side-vu {
-    height: 270px !important;
-    min-height: 270px !important;
-    width: 6px !important;
-    background: #040608 !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 2px !important;
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column-reverse !important;
-    z-index: 2 !important;
-  }
-
-  /* Perbesar tinggi fader master juga menjadi 215px agar sejajar */
-  aside.master-rack .master-card input[type="range"] {
-    writing-mode: vertical-lr !important;
-    direction: rtl !important;
-    appearance: slider-vertical !important;
-    -webkit-appearance: slider-vertical !important;
-    height: 270px !important;
-    min-height: 270px !important;
-    width: 16px !important;
-    accent-color: var(--accent-color) !important;
-    cursor: pointer !important;
-    margin: 2px auto !important;
-    pointer-events: auto !important;
-    touch-action: pan-y !important;
-    position: relative !important;
-    z-index: 15 !important;
-  }
-
-   /* ==========================================================
-     5. MASTER RACK (DIPERBAIKI AGAR SEJAJAR & PAS KE BAWAH)
-     ========================================================== */
-  aside.master-rack {
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    width: 100px !important;
-    min-width: 100px !important;
-    max-width: 100px !important;
-    background: var(--panel-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 4px !important;
-    padding: 3px !important;
-    position: relative !important;
-    z-index: 5 !important;
-    height: 100% !important; /* Mengikuti tinggi konsol utama */
-  }
-
-  aside.master-rack h2 {
-    font-size: 8px !important;
-    text-align: center !important;
-    margin: 1px 0 !important;
-    width: 100% !important;
-  }
-
-  .main-meters {
-    display: flex !important;
-    gap: 4px !important;
-    justify-content: center !important;
-    align-items: center !important;
-    height: 75px !important;
-    min-height: 75px !important;
-    padding: 2px !important;
-    background: #040608 !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 3px !important;
-    width: 100% !important;
-  }
-
-  .meter-bar-container {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    height: 100% !important;
-    width: 12px !important;
-  }
-
-  .meter-bar-bg {
-    width: 100% !important;
-    height: 100% !important;
-    background: #000000 !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 2px !important;
-    display: flex !important;
-    flex-direction: column-reverse !important;
-    overflow: hidden !important;
-  }
-
-  .meter-bar-fill {
-    width: 100% !important;
-    height: 0%;
-    background: linear-gradient(0deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 66%, #f39c12 85%, #e74c3c 86%, #ff0000 100%) !important;
-    border-radius: 1px !important;
-    transition: height 0.05s linear !important;
-  }
-
-  .meter-label {
-    font-size: 7px !important;
-    font-weight: bold !important;
-    color: var(--accent-color) !important;
-    margin-top: 1px !important;
-  }
-
-  aside.master-rack .master-card {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    flex-grow: 1 !important; /* Membuat kartu master mengisi ruang kosong secara vertikal */
-    background: var(--main-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 3px !important;
-    padding: 3px 2px !important;
-    width: 100% !important;
-    margin: 2px 0 !important;
-    position: relative !important;
-    z-index: 10 !important;
-  }
-
-  /* Fader Master disesuaikan tingginya agar pas sejajar dengan fader channel (205px) */
-  aside.master-rack .master-card input[type="range"] {
-    writing-mode: vertical-lr !important;
-    direction: rtl !important;
-    appearance: slider-vertical !important;
-    -webkit-appearance: slider-vertical !important;
-    height: 205px !important;
-    min-height: 205px !important;
-    width: 20px !important;
-    accent-color: var(--accent-color) !important;
-    cursor: pointer !important;
-    margin: 2px auto !important;
-    pointer-events: auto !important;
-    touch-action: pan-y !important;
-    position: relative !important;
-    z-index: 15 !important;
-  }
-
-
-  /* ==========================================================
-     6. NAVIGATION BAR SCREEN M32 & BOTTOM NAV
-     ========================================================== */
-  .screen-frame {
-    max-width: 100% !important;
-    width: 100% !important;
-  }
-
-  .screen-tabs {
-    display: grid !important;
-    grid-template-columns: repeat(6, 1fr) !important;
-    gap: 2px !important;
-    width: 100% !important;
-    margin-bottom: 2px !important;
-  }
-
-  .screen-tabs button {
-    font-size: 6px !important;
-    padding: 2px 0 !important;
-    text-align: center !important;
-    text-transform: uppercase !important;
-    border-radius: 3px !important;
-    border: 1px solid var(--panel-border) !important;
-    cursor: pointer !important;
-    white-space: nowrap !important;
-  }
-
-  .screen-tabs button.active {
-    background: var(--btn-active) !important;
-    color: #fff !important;
-    border-color: var(--accent-color) !important;
-  }
-
-  .m32-submenu-bar {
-    display: grid !important;
-    grid-template-columns: repeat(6, 1fr) !important;
-    gap: 2px !important;
-    width: 100% !important;
-    margin-bottom: 2px !important;
-  }
-
-  .m32-sub-btn {
-    font-size: 6px !important;
-    padding: 2px 0 !important;
-    text-align: center !important;
-    text-transform: uppercase !important;
-    border-radius: 3px !important;
-    border: 1px solid var(--panel-border) !important;
-    cursor: pointer !important;
-    white-space: nowrap !important;
-  }
-
-  .m32-sub-btn.active {
-    background: var(--accent-color) !important;
-    color: #000 !important;
-    font-weight: bold !important;
-  }
-
-  .midas-tft-screen {
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 4px !important;
-    padding: 3px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    background: var(--panel-bg) !important;
-  }
-
-  .screen-view, .m32-sub-panel {
-    display: none !important;
-    flex-direction: column !important;
-    flex-grow: 1 !important;
-  }
-
-  .screen-view.active, .m32-sub-panel.active {
-    display: flex !important;
-  }
-
-  .pro-mini-spectrum, .rta-display, .pro-screen-grid {
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-end !important;
-    background: var(--main-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 4px !important;
-    padding: 3px !important;
-    margin-top: 2px !important;
-  }
-
-  .spectrum-bars-container {
-    display: flex !important;
-    gap: 2px !important;
-    height: 38px !important;
-    align-items: flex-end !important;
-  }
-
-  .midas-blocks-grid {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 2px !important;
-    margin-top: 2px !important;
-  }
-
-  .midas-block {
-    background: var(--main-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    padding: 2px !important;
-    border-radius: 3px !important;
-    text-align: center !important;
-    font-size: 7px !important;
-  }
-
-  .midas-block span {
-    display: block !important;
-    color: var(--text-dim) !important;
-    font-size: 6px !important;
-    margin-bottom: 1px !important;
-  }
-
-  .midas-encoders-bar {
-    display: grid !important;
-    grid-template-columns: repeat(6, 1fr) !important;
-    gap: 2px !important;
-    margin-top: 2px !important;
-  }
-
-  .m-encoder {
-    font-size: 6px !important;
-    text-align: center !important;
-    background: var(--main-bg) !important;
-    border: 1px solid var(--panel-border) !important;
-    padding: 2px 0 !important;
-    color: var(--accent-color) !important;
-    border-radius: 2px !important;
-  }
-
-  .screen-slider {
-    width: 100%;
-    accent-color: var(--accent-color);
-    margin-top: 1px;
-  }
-
-  .bottom-nav {
-    display: flex !important;
-    position: sticky !important;
-    bottom: 0 !important;
-    z-index: 9999 !important;
-    width: 100% !important;
-    min-width: 780px !important;
-    gap: 4px !important;
-    padding: 4px 6px !important;
-    background: var(--panel-bg) !important;
-    border-top: 1px solid var(--panel-border) !important;
-    flex-shrink: 0 !important;
-  }
-
-  .bottom-nav button {
-    flex: 1 !important;
-    padding: 6px 2px !important;
-    font-size: 8px !important;
-    font-weight: bold !important;
-    background: var(--main-bg) !important;
-    color: var(--text-dim) !important;
-    border: 1px solid var(--panel-border) !important;
-    border-radius: 4px !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-  }
-
-  .bottom-nav button.active {
-    background: var(--btn-active) !important;
-    color: #ffffff !important;
-    border-color: var(--accent-color) !important;
-    box-shadow: 0 0 6px var(--accent-color) !important;
-  }
-
-  /* MEDIA QUERY KHUSUS LAYAR KECIL / MODE PORTRET */
-  @media screen and (max-width: 768px) and (orientation: portrait) {
-    body {
-      overflow-y: auto !important;
-      height: auto !important;
-    }
-    main.console, header.topbar, .bottom-nav {
-      min-width: 100% !important;
-    }
-    main.console {
-      flex-direction: column !important;
-      align-items: center !important;
-    }
-    .channel-bank, aside.master-rack, .center-console {
-      width: 100% !important;
-      max-width: 100% !important;
-    }
-    #channels, #channelsRight {
-      overflow-x: auto !important;
-      display: flex !important;
-      flex-wrap: nowrap !important;
-    }
-    .new-channel-strip, .channel-strip {
-      flex: 0 0 65px !important;
-      min-width: 65px !important;
-    }
-  }
-
-
-/* ==========================================================================
-   MOBILE CHANNEL SCROLL ISOLATION — FINAL
-   Tujuan:
-   - hanya baris CH1-7 / CH8-14 yang bisa swipe kiri-kanan
-   - bank channel tetap menjadi viewport selebar layar
-   - CENTER MIXER tetap berada di bloknya sendiri dan tidak ikut scroll channel
-   - tidak membuat halaman utama melebar ke kanan
-   ========================================================================== */
-@media screen and (max-width: 768px) {
-  html,
-  body {
-    width: 100% !important;
-    max-width: 100% !important;
-    overflow-x: hidden !important;
-  }
-
-  main.console {
-    display: flex !important;
-    flex-direction: column !important;
-    flex-wrap: nowrap !important;
-    align-items: stretch !important;
-    justify-content: flex-start !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    overflow-x: hidden !important;
-    overflow-y: visible !important;
-    padding: 2px 3px !important;
-    gap: 6px !important;
-  }
-
-  /* Bank adalah viewport; JANGAN biarkan bank ikut melebar. */
-  main.console > .channel-bank,
-  main.console > .channel-bank-left,
-  main.console > .channel-bank-right {
-    flex: 0 0 auto !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    height: 390px !important;
-    min-height: 390px !important;
-    max-height: 390px !important;
-    overflow: hidden !important;
-    box-sizing: border-box !important;
-  }
-
-  /* Hanya isi channel yang boleh scroll horizontal. */
-  main.console > .channel-bank #channels,
-  main.console > .channel-bank #channelsRight {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    align-items: stretch !important;
-    justify-content: flex-start !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    height: calc(100% - 24px) !important;
-    min-height: 0 !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    gap: 1px !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    flex: 0 0 auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    overscroll-behavior-x: contain !important;
-    touch-action: pan-x !important;
-    scrollbar-width: thin !important;
-  }
-
-  /* Lebar strip dibuat nyaman dan konsisten; 7 channel tetap scroll di HP kecil. */
-  main.console > .channel-bank #channels > .new-channel-strip,
-  main.console > .channel-bank #channels > .channel-strip,
-  main.console > .channel-bank #channelsRight > .new-channel-strip,
-  main.console > .channel-bank #channelsRight > .channel-strip {
-    flex: 0 0 65px !important;
-    width: 65px !important;
-    min-width: 65px !important;
-    max-width: 65px !important;
-    height: 100% !important;
-    min-height: 0 !important;
-  }
-
-  /* CENTER MIXER adalah blok terpisah — tidak ikut horizontal scrolling. */
-  main.console > .center-console {
-    order: 2 !important;
-    flex: 0 0 auto !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    overflow: hidden !important;
-    box-sizing: border-box !important;
-  }
-
-  main.console > .channel-bank-left {
-    order: 1 !important;
-  }
-
-  main.console > .channel-bank-right {
-    order: 3 !important;
-  }
-
-  /* Master tetap setelah bank kanan dan tidak menciptakan overflow horizontal. */
-  html body main.console > aside.master-rack {
-    order: 4 !important;
-    flex: 0 0 auto !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    height: 390px !important;
-    min-height: 390px !important;
-    max-height: 390px !important;
-    overflow: hidden !important;
-    align-self: stretch !important;
-  }
-
-  /* Semua panel di dalam center mengikuti viewport center. */
-  main.console > .center-console .screen-frame,
-  main.console > .center-console .midas-tft-screen,
-  main.console > .center-console .media-rack,
-  main.console > .center-console .fx-rack,
-  main.console > .center-console .aux-rack {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-  }
-}
-
-
-/* ==========================================================================
-   GLOBAL HORIZONTAL SCROLL LOCK
-   Hanya #channels dan #channelsRight yang boleh scroll kiri-kanan.
-   Halaman, header, center mixer, master, dan nav tetap terkunci horizontal.
-   ========================================================================== */
-html {
-  width: 100% !important;
+.screen-frame {
   max-width: 100% !important;
-  overflow-x: hidden !important;
-}
-
-body {
   width: 100% !important;
-  max-width: 100% !important;
-  overflow-x: hidden !important;
 }
 
-header.topbar,
-.bottom-nav,
-main.console,
-main.console > .center-console,
-main.console > .channel-bank,
-main.console > aside.master-rack {
-  overflow-x: hidden !important;
-  overscroll-behavior-x: none !important;
+.screen-tabs, .m32-submenu-bar {
+  display: grid !important;
+  grid-template-columns: repeat(6, 1fr) !important;
+  gap: 2px !important;
+  width: 100% !important;
+  margin-bottom: 2px !important;
 }
 
-/* Jangan biarkan elemen anak membuat lebar halaman melebihi viewport. */
-header.topbar,
-.bottom-nav,
-main.console {
-  max-width: 100vw !important;
+.screen-tabs button, .m32-sub-btn {
+  font-size: 6px !important;
+  padding: 2px 0 !important;
+  text-align: center !important;
+  text-transform: uppercase !important;
+  border-radius: 3px !important;
+  border: 1px solid var(--panel-border) !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
 }
 
-/* Satu-satunya horizontal scroll yang diizinkan. */
-main.console > .channel-bank #channels,
-main.console > .channel-bank #channelsRight {
-  overflow-x: auto !important;
-  overscroll-behavior-x: contain !important;
-  touch-action: pan-x !important;
+.screen-tabs button.active {
+  background: var(--btn-active) !important;
+  color: #fff !important;
+  border-color: var(--accent-color) !important;
 }
 
-/* Center mixer tetap terkunci horizontal. */
-main.console > .center-console,
-main.console > .center-console * {
-  overscroll-behavior-x: none !important;
+.m32-sub-btn.active {
+  background: var(--accent-color) !important;
+  color: #000 !important;
+  font-weight: bold !important;
 }
 
-/* Pastikan bank/halaman tidak ikut menerima gesture horizontal. */
-main.console > .channel-bank,
-main.console > aside.master-rack {
-  touch-action: pan-y !important;
+.midas-tft-screen {
+  border: 1px solid var(--panel-border) !important;
+  border-radius: 4px !important;
+  padding: 3px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background: var(--panel-bg) !important;
+}
+
+.screen-view, .m32-sub-panel {
+  display: none !important;
+  flex-direction: column !important;
+  flex-grow: 1 !important;
+}
+
+.screen-view.active, .m32-sub-panel.active {
+  display: flex !important;
+}
+
+.pro-mini-spectrum, .rta-display, .pro-screen-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  background: var(--main-bg) !important;
+  border: 1px solid var(--panel-border) !important;
+  border-radius: 4px !important;
+  padding: 3px !important;
+  margin-top: 2px !important;
+}
+
+.spectrum-bars-container {
+  display: flex !important;
+  gap: 2px !important;
+  height: 38px !important;
+  align-items: flex-end !important;
+}
+
+.midas-blocks-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 2px !important;
+  margin-top: 2px !important;
+}
+
+.midas-block {
+  background: var(--main-bg) !important;
+  border: 1px solid var(--panel-border) !important;
+  padding: 2px !important;
+  border-radius: 3px !important;
+  text-align: center !important;
+  font-size: 7px !important;
+}
+
+.midas-block span {
+  display: block !important;
+  color: var(--text-dim) !important;
+  font-size: 6px !important;
+  margin-bottom: 1px !important;
+}
+
+.midas-encoders-bar {
+  display: grid !important;
+  grid-template-columns: repeat(6, 1fr) !important;
+  gap: 2px !important;
+  margin-top: 2px !important;
+}
+
+.m-encoder {
+  font-size: 6px !important;
+  text-align: center !important;
+  background: var(--main-bg) !important;
+  border: 1px solid var(--panel-border) !important;
+  padding: 2px 0 !important;
+  color: var(--accent-color) !important;
+  border-radius: 2px !important;
+}
+
+.screen-slider {
+  width: 100%;
+  accent-color: var(--accent-color);
+  margin-top: 1px;
+}
+
+.bottom-nav {
+  display: flex !important;
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 9999 !important;
+  width: 100% !important;
+  min-width: 780px !important;
+  gap: 4px !important;
+  padding: 4px 6px !important;
+  background: var(--panel-bg) !important;
+  border-top: 1px solid var(--panel-border) !important;
+  flex-shrink: 0 !important;
+}
+
+.bottom-nav button {
+  flex: 1 !important;
+  padding: 6px 2px !important;
+  font-size: 8px !important;
+  font-weight: bold !important;
+  background: var(--main-bg) !important;
+  color: var(--text-dim) !important;
+  border: 1px solid var(--panel-border) !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.bottom-nav button.active {
+  background: var(--btn-active) !important;
+  color: #ffffff !important;
+  border-color: var(--accent-color) !important;
+  box-shadow: 0 0 6px var(--accent-color) !important;
 }
