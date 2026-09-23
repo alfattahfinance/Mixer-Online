@@ -43,7 +43,7 @@
         box-shadow: 0 0 6px rgba(255,59,48,.65), inset 0 1px 1px rgba(255,255,255,.35) !important;
       }
 
-      /* FADER AREA: Menggunakan Flexbox dengan jarak yang pas */
+      /* FADER AREA: Jarak yang pas dan proporsional */
       .new-channel-strip .fader-area {
         position: relative !important;
         display: flex !important;
@@ -53,8 +53,8 @@
         gap: 2px !important;
         width: 100% !important;
         height: auto !important;
-        min-height: 310px !important;
-        padding: 16px 2px 18px 2px !important;
+        min-height: 200px !important;
+        padding: 10px 2px 12px 2px !important;
         box-sizing: border-box !important;
       }
 
@@ -63,12 +63,12 @@
         cursor: pointer !important;
       }
 
-      /* Slider Fader di Sebelah Kiri */
+      /* Slider Fader disesuaikan tingginya menjadi 160px agar proporsional */
       .new-channel-strip .fader-area input.channel-fader, 
       .new-channel-strip .fader-area input.new-fader {
         width: 18px !important;
-        height: 270px !important;
-        min-height: 270px !important;
+        height: 160px !important;
+        min-height: 160px !important;
         position: relative !important;
         z-index: 1 !important;
         background: transparent !important;
@@ -76,12 +76,12 @@
         margin: 0 !important;
       }
 
-      /* KOTAK LED METER VERTIKAL DI SEBELAH KANAN FADER */
+      /* KOTAK LED METER VERTIKAL DISESUAIKAN MENJADI 160px */
       .new-channel-strip .ch-side-vu {
         position: relative !important;
         width: 12px !important;
-        height: 270px !important;
-        min-height: 270px !important;
+        height: 160px !important;
+        min-height: 160px !important;
         background: #040608 !important;
         border: 1px solid rgba(255,255,255,0.3) !important;
         border-radius: 2px !important;
@@ -221,8 +221,6 @@
 
     let ticking = false;
     const updateSmooth = (k, value) => {
-      // Izinkan tombol Mute/Solo tetap berfungsi meskipun cek sistem ketat, 
-      // atau pastikan parameter kontrol diproses dengan aman.
       const ch = window.state?.channels?.[id - 1];
       if (!ch) return;
 
@@ -257,7 +255,7 @@
 
     el.querySelectorAll("button").forEach(button => {
       button.addEventListener("click", (e) => {
-        e.stopPropagation(); // Mencegah bentrok dengan klik pemilihan channel strip
+        e.stopPropagation();
         const k = button.dataset.k;
         const ch = window.state.channels[id - 1];
         const nextValue = !ch[k];
@@ -308,9 +306,6 @@
     }
   }
 
-  // ============================================================
-  // LOOP METERAN BERSIH & SELALU RESPONSIF
-  // ============================================================
   function startStandaloneMeterLoop() {
     requestAnimationFrame(startStandaloneMeterLoop);
     if (!window.state || !window.state.channels) return;
@@ -325,7 +320,6 @@
       const vuFill = strip.querySelector(".ch-side-vu-fill");
       if (!vuFill) continue;
 
-      // Jika sistem OFF atau channel di-mute, matikan meteran
       if (!window.state.system || chData.mute) {
         vuFill.style.height = "0%";
         continue;
@@ -337,10 +331,8 @@
         continue;
       }
 
-      // Ambil level aktif (dari audio engine atau hardware)
       let lvl = Number(chData.level || 0);
 
-      // Fallback animasi visual aktif jika level 0 tapi fader > 0 dan sistem ON
       if (lvl === 0 && window.state.system) {
         const timeFactor = Date.now() + (i * 250);
         const wave = (Math.sin(timeFactor / 130) + 1) / 2;
@@ -355,7 +347,6 @@
   window.buildNew14ChannelPanel = build;
   window.syncNew14ChannelPanel = sync;
 
-  // SELEKSI CHANNEL: Aman dari bentrok tombol Mute/Solo atau Knob
   document.addEventListener("click", function(e) { 
     if (e.target.closest('input, button, .new-channel-buttons, .new-channel-control')) return;
 
