@@ -835,37 +835,13 @@
   }
 
   /* ============================================================
-     STANDALONE METER LOOP
+     METER UPDATE
+     ============================================================
+     Meter/LED sekarang diperbarui saat state atau feedback berubah.
+     Tidak ada polling requestAnimationFrame 60fps karena level meter
+     tidak berubah sendiri di DOM. Ini mengurangi beban CPU saat fader
+     digerakkan dan mencegah UI terasa lag.
      ============================================================ */
-
-  function startStandaloneMeterLoop() {
-    if (standaloneMeterStarted) return;
-
-    standaloneMeterStarted = true;
-
-    function frame() {
-      ensureState();
-
-      for (let id = 1; id <= N; id++) {
-        const channelData =
-          window.state?.channels?.[id - 1];
-
-        if (!channelData) continue;
-
-        const strip = document.querySelector(
-          `.new-channel-strip[data-ch="${id}"]`
-        );
-
-        if (!strip) continue;
-
-        updateChannelVisuals(strip, channelData);
-      }
-
-      window.requestAnimationFrame(frame);
-    }
-
-    window.requestAnimationFrame(frame);
-  }
 
   /* ============================================================
      PUBLIC API
@@ -914,7 +890,6 @@
 
     window.requestAnimationFrame(() => {
       build();
-      startStandaloneMeterLoop();
     });
   }
 
