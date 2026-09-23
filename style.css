@@ -149,3 +149,612 @@ main.console {
     min-width: 290px !important;
   }
 }
+
+
+/* ==========================================================
+   EXTRACTED FROM index.html — LAYOUT / SKIN / RESPONSIVE CSS
+   ========================================================== */
+/* ==========================================================
+     1. DEFINISI VARIABEL WARNA (SKIN)
+     ========================================================== */
+  .knob-val {
+    font-size: 8px !important;
+    color: var(--accent-color) !important;
+    font-weight: bold !important;
+    display: block !important;
+    text-align: center !important;
+    margin-top: 1px !important;
+  }
+  
+  body, body.theme-midas {
+    --main-bg: #090b0c;
+    --panel-bg: #0c1219;
+    --panel-border: #1a2736;
+    --accent-color: #00e5ff;
+    --header-bg: linear-gradient(90deg, #0b131a, #132230, #0b131a);
+    --btn-active: linear-gradient(180deg, #00a8cc 0%, #00738c 100%);
+    --text-main: #ffffff;
+    --text-dim: #8899a6;
+    --strip-bg: #0b1017;
+  }
+
+  body.theme-x32 {
+    --main-bg: #10141a;
+    --panel-bg: #18202a;
+    --panel-border: #2c3e50;
+    --accent-color: #f39c12;
+    --header-bg: linear-gradient(90deg, #2c3e50, #1b222c, #2c3e50);
+    --btn-active: linear-gradient(180deg, #e67e22 0%, #d35400 100%);
+    --text-main: #ffffff;
+    --text-dim: #a0b0c0;
+    --strip-bg: #141b24;
+  }
+
+  body.theme-gold {
+    --main-bg: #12100e;
+    --panel-bg: #1c1815;
+    --panel-border: #382d24;
+    --accent-color: #f1c40f;
+    --header-bg: linear-gradient(90deg, #2a221b, #1c1815, #2a221b);
+    --btn-active: linear-gradient(180deg, #f39c12 0%, #b7950b 100%);
+    --text-main: #fff8e7;
+    --text-dim: #9c8a75;
+    --strip-bg: #161310;
+  }
+
+  body.theme-dark {
+    --main-bg: #050505;
+    --panel-bg: #0f0f0f;
+    --panel-border: #222222;
+    --accent-color: #2ecc71;
+    --header-bg: linear-gradient(180deg, #181818, #0f0f0f, #181818);
+    --btn-active: linear-gradient(180deg, #2ecc71 0%, #1e8449 100%);
+    --text-main: #eeeeee;
+    --text-dim: #666666;
+    --strip-bg: #0a0a0a;
+  }
+
+  /* ==========================================================
+     2. GLOBAL RESET & SCROLL ATAS-BAWAH AKTIF
+     ========================================================== */
+  *, *::before, *::after {
+    box-sizing: border-box !important;
+  }
+
+  html {
+    scroll-behavior: smooth !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  body {
+    width: 100% !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    background: var(--main-bg) !important;
+    color: var(--text-main) !important;
+    font-family: system-ui, -apple-system, sans-serif !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  header.topbar {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    background: var(--header-bg) !important;
+    border-bottom: 1px solid var(--panel-border) !important;
+    width: 100% !important;
+    min-width: 780px !important;
+    padding: 4px 8px !important;
+    gap: 4px !important;
+    flex-shrink: 0 !important;
+    z-index: 100 !important;
+  }
+
+  header.topbar > div {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    background: var(--panel-bg) !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 4px !important;
+    padding: 3px 6px !important;
+    font-size: 7px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
+  header.topbar .brand {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    font-size: 8px !important;
+  }
+
+  .bridge-head {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+
+  .bridge-head button {
+    font-size: 7px !important;
+    padding: 2px 4px !important;
+    cursor: pointer !important;
+  }
+
+  .scene-head div {
+    display: flex !important;
+    gap: 2px !important;
+    margin-top: 1px !important;
+  }
+
+  .scene-head button {
+    font-size: 7px !important;
+    padding: 2px 4px !important;
+    border-radius: 2px !important;
+    cursor: pointer !important;
+  }
+
+  .clock-head {
+    background: transparent !important;
+    border: none !important;
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+
+  #clock {
+    font-size: 11px !important;
+    font-weight: bold !important;
+    color: var(--accent-color) !important;
+    font-family: monospace !important;
+  }
+
+  /* ==========================================================
+     3. EFEK LAMPU-LAMPU MENYALA (GLOW & LED INDICATORS)
+     ========================================================== */
+  button.active, button.on, .bottom-nav button.active {
+    box-shadow: 0 0 8px var(--accent-color), inset 0 0 4px rgba(255, 255, 255, 0.4) !important;
+    border-color: var(--accent-color) !important;
+  }
+
+  #statusLamp, .lamp {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #555;
+    box-shadow: 0 0 4px rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
+  }
+  #statusLamp.on, .lamp.green {
+    background: #2ecc71 !important;
+    box-shadow: 0 0 8px #2ecc71, 0 0 12px #2ecc71 !important;
+  }
+  .lamp.red {
+    background: #e74c3c !important;
+    box-shadow: 0 0 6px #e74c3c !important;
+  }
+
+  .meter-bar-fill, .ch-side-vu-fill, .ch-top-vu-fill {
+    box-shadow: 0 0 6px rgba(46, 204, 113, 0.6);
+  }
+
+  button[data-k="mute"].on, button.mute-btn.on {
+    background: linear-gradient(180deg, #ff6b6b 0%, #c0392b 100%) !important;
+    color: #fff !important;
+    box-shadow: 0 0 8px #e74c3c !important;
+  }
+
+  button[data-k="solo"].on, button.solo-btn.on {
+    background: linear-gradient(180deg, #f1c40f 0%, #d35400 100%) !important;
+    color: #000 !important;
+    box-shadow: 0 0 8px #f1c40f !important;
+  }
+
+  /* ==========================================================
+     4. KONSOL UTAMA & KETINGGIAN PROPORSIONAL (PAS DI GARIS BAR)
+     ========================================================== */
+    main.console {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+    justify-content: space-between !important;
+    gap: 3px !important;
+    width: 100% !important;
+    min-width: 780px !important;
+    box-sizing: border-box !important;
+    padding: 2px 4px !important;
+    height: calc(100vh - 85px) !important; /* Mengunci tinggi konsol agar pas di layar */
+  }
+
+  .channel-bank {
+    flex: 1 1 0 !important;
+    min-width: 200px !important;
+    background: var(--strip-bg) !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 4px !important;
+    padding: 3px 2px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    height: 100% !important; /* Memanjang penuh ke bawah */
+  }
+
+  #channels, #channelsRight {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    width: 100% !important;
+    height: 100% !important;
+    gap: 1px !important;
+    align-items: stretch !important;
+  }
+
+  /* Perbesar tinggi fader channel menjadi 215px agar menutup celah kosong */
+  .new-channel-strip input.channel-fader, 
+  .new-channel-strip input.new-fader,
+  .channel-strip input.channel-fader {
+    position: relative !important;
+    z-index: 2 !important;
+    background: transparent !important;
+    height: 215px !important;
+    min-height: 215px !important;
+    width: 18px !important;
+    accent-color: var(--accent-color) !important;
+    margin: 0 !important;
+    pointer-events: auto !important;
+    touch-action: pan-y !important;
+  }
+  
+  .new-channel-strip .ch-side-vu {
+    height: 215px !important;
+    min-height: 215px !important;
+    width: 7px !important;
+    background: #040608 !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 2px !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column-reverse !important;
+    z-index: 2 !important;
+  }
+
+  /* Perbesar tinggi fader master juga menjadi 215px agar sejajar */
+  aside.master-rack .master-card input[type="range"] {
+    writing-mode: vertical-lr !important;
+    direction: rtl !important;
+    appearance: slider-vertical !important;
+    -webkit-appearance: slider-vertical !important;
+    height: 215px !important;
+    min-height: 215px !important;
+    width: 20px !important;
+    accent-color: var(--accent-color) !important;
+    cursor: pointer !important;
+    margin: 2px auto !important;
+    pointer-events: auto !important;
+    touch-action: pan-y !important;
+    position: relative !important;
+    z-index: 15 !important;
+  }
+
+   /* ==========================================================
+     5. MASTER RACK (DIPERBAIKI AGAR SEJAJAR & PAS KE BAWAH)
+     ========================================================== */
+  aside.master-rack {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    width: 100px !important;
+    min-width: 100px !important;
+    max-width: 100px !important;
+    background: var(--panel-bg) !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 4px !important;
+    padding: 3px !important;
+    position: relative !important;
+    z-index: 5 !important;
+    height: 100% !important; /* Mengikuti tinggi konsol utama */
+  }
+
+  aside.master-rack h2 {
+    font-size: 8px !important;
+    text-align: center !important;
+    margin: 1px 0 !important;
+    width: 100% !important;
+  }
+
+  .main-meters {
+    display: flex !important;
+    gap: 4px !important;
+    justify-content: center !important;
+    align-items: center !important;
+    height: 75px !important;
+    min-height: 75px !important;
+    padding: 2px !important;
+    background: #040608 !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 3px !important;
+    width: 100% !important;
+  }
+
+  .meter-bar-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    height: 100% !important;
+    width: 12px !important;
+  }
+
+  .meter-bar-bg {
+    width: 100% !important;
+    height: 100% !important;
+    background: #000000 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 2px !important;
+    display: flex !important;
+    flex-direction: column-reverse !important;
+    overflow: hidden !important;
+  }
+
+  .meter-bar-fill {
+    width: 100% !important;
+    height: 0%;
+    background: linear-gradient(0deg, #2ecc71 0%, #2ecc71 65%, #f1c40f 66%, #f39c12 85%, #e74c3c 86%, #ff0000 100%) !important;
+    border-radius: 1px !important;
+    transition: height 0.05s linear !important;
+  }
+
+  .meter-label {
+    font-size: 7px !important;
+    font-weight: bold !important;
+    color: var(--accent-color) !important;
+    margin-top: 1px !important;
+  }
+
+  aside.master-rack .master-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-grow: 1 !important; /* Membuat kartu master mengisi ruang kosong secara vertikal */
+    background: var(--main-bg) !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 3px !important;
+    padding: 3px 2px !important;
+    width: 100% !important;
+    margin: 2px 0 !important;
+    position: relative !important;
+    z-index: 10 !important;
+  }
+
+  /* Fader Master disesuaikan tingginya agar pas sejajar dengan fader channel (205px) */
+  aside.master-rack .master-card input[type="range"] {
+    writing-mode: vertical-lr !important;
+    direction: rtl !important;
+    appearance: slider-vertical !important;
+    -webkit-appearance: slider-vertical !important;
+    height: 205px !important;
+    min-height: 205px !important;
+    width: 20px !important;
+    accent-color: var(--accent-color) !important;
+    cursor: pointer !important;
+    margin: 2px auto !important;
+    pointer-events: auto !important;
+    touch-action: pan-y !important;
+    position: relative !important;
+    z-index: 15 !important;
+  }
+
+
+  /* ==========================================================
+     6. NAVIGATION BAR SCREEN M32 & BOTTOM NAV
+     ========================================================== */
+  .screen-frame {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .screen-tabs {
+    display: grid !important;
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: 2px !important;
+    width: 100% !important;
+    margin-bottom: 2px !important;
+  }
+
+  .screen-tabs button {
+    font-size: 6px !important;
+    padding: 2px 0 !important;
+    text-align: center !important;
+    text-transform: uppercase !important;
+    border-radius: 3px !important;
+    border: 1px solid var(--panel-border) !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+  }
+
+  .screen-tabs button.active {
+    background: var(--btn-active) !important;
+    color: #fff !important;
+    border-color: var(--accent-color) !important;
+  }
+
+  .m32-submenu-bar {
+    display: grid !important;
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: 2px !important;
+    width: 100% !important;
+    margin-bottom: 2px !important;
+  }
+
+  .m32-sub-btn {
+    font-size: 6px !important;
+    padding: 2px 0 !important;
+    text-align: center !important;
+    text-transform: uppercase !important;
+    border-radius: 3px !important;
+    border: 1px solid var(--panel-border) !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+  }
+
+  .m32-sub-btn.active {
+    background: var(--accent-color) !important;
+    color: #000 !important;
+    font-weight: bold !important;
+  }
+
+  .midas-tft-screen {
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 4px !important;
+    padding: 3px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: var(--panel-bg) !important;
+  }
+
+  .screen-view, .m32-sub-panel {
+    display: none !important;
+    flex-direction: column !important;
+    flex-grow: 1 !important;
+  }
+
+  .screen-view.active, .m32-sub-panel.active {
+    display: flex !important;
+  }
+
+  .pro-mini-spectrum, .rta-display, .pro-screen-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    background: var(--main-bg) !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 4px !important;
+    padding: 3px !important;
+    margin-top: 2px !important;
+  }
+
+  .spectrum-bars-container {
+    display: flex !important;
+    gap: 2px !important;
+    height: 38px !important;
+    align-items: flex-end !important;
+  }
+
+  .midas-blocks-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 2px !important;
+    margin-top: 2px !important;
+  }
+
+  .midas-block {
+    background: var(--main-bg) !important;
+    border: 1px solid var(--panel-border) !important;
+    padding: 2px !important;
+    border-radius: 3px !important;
+    text-align: center !important;
+    font-size: 7px !important;
+  }
+
+  .midas-block span {
+    display: block !important;
+    color: var(--text-dim) !important;
+    font-size: 6px !important;
+    margin-bottom: 1px !important;
+  }
+
+  .midas-encoders-bar {
+    display: grid !important;
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: 2px !important;
+    margin-top: 2px !important;
+  }
+
+  .m-encoder {
+    font-size: 6px !important;
+    text-align: center !important;
+    background: var(--main-bg) !important;
+    border: 1px solid var(--panel-border) !important;
+    padding: 2px 0 !important;
+    color: var(--accent-color) !important;
+    border-radius: 2px !important;
+  }
+
+  .screen-slider {
+    width: 100%;
+    accent-color: var(--accent-color);
+    margin-top: 1px;
+  }
+
+  .bottom-nav {
+    display: flex !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 9999 !important;
+    width: 100% !important;
+    min-width: 780px !important;
+    gap: 4px !important;
+    padding: 4px 6px !important;
+    background: var(--panel-bg) !important;
+    border-top: 1px solid var(--panel-border) !important;
+    flex-shrink: 0 !important;
+  }
+
+  .bottom-nav button {
+    flex: 1 !important;
+    padding: 6px 2px !important;
+    font-size: 8px !important;
+    font-weight: bold !important;
+    background: var(--main-bg) !important;
+    color: var(--text-dim) !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .bottom-nav button.active {
+    background: var(--btn-active) !important;
+    color: #ffffff !important;
+    border-color: var(--accent-color) !important;
+    box-shadow: 0 0 6px var(--accent-color) !important;
+  }
+
+  /* MEDIA QUERY KHUSUS LAYAR KECIL / MODE PORTRET */
+  @media screen and (max-width: 768px) and (orientation: portrait) {
+    body {
+      overflow-y: auto !important;
+      height: auto !important;
+    }
+    main.console, header.topbar, .bottom-nav {
+      min-width: 100% !important;
+    }
+    main.console {
+      flex-direction: column !important;
+      align-items: center !important;
+    }
+    .channel-bank, aside.master-rack, .center-console {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+    #channels, #channelsRight {
+      overflow-x: auto !important;
+      display: flex !important;
+      flex-wrap: nowrap !important;
+    }
+    .new-channel-strip, .channel-strip {
+      flex: 0 0 65px !important;
+      min-width: 65px !important;
+    }
+  }
