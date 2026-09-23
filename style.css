@@ -138,15 +138,46 @@ html body main.console > aside.master-rack .master-card input[type="range"] {
 }
 
 /* ==========================================================================
-   SCREEN MIXER — PERKECIL SEDIKIT SAJA
+   SCREEN MIXER — LEBAR RESPONSIF
+   Fokus: layar mixer tidak melebar berlebihan, tetapi tetap nyaman
+   di layar kecil maupun besar.
    ========================================================================== */
-main.console {
-  grid-template-columns: minmax(260px, 1fr) 290px minmax(260px, 1fr) 85px !important;
+main.console > .center-console {
+  flex: 0 1 clamp(320px, 26vw, 400px) !important;
+  width: clamp(320px, 26vw, 400px) !important;
+  min-width: 320px !important;
+  max-width: 400px !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+main.console > .center-console .screen-frame,
+main.console > .center-console .midas-tft-screen,
+main.console > .center-console .media-rack,
+main.console > .center-console .fx-rack,
+main.console > .center-console .aux-rack {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
 }
 
 @media screen and (max-width: 1024px) {
   main.console > .center-console {
-    min-width: 290px !important;
+    flex-basis: 320px !important;
+    width: 320px !important;
+    min-width: 320px !important;
+    max-width: 360px !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  main.console > .center-console {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    flex: 0 1 100% !important;
   }
 }
 
