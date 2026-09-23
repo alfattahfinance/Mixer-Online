@@ -789,3 +789,138 @@ main.console > .center-console .aux-rack {
       min-width: 65px !important;
     }
   }
+
+
+/* ==========================================================================
+   MOBILE CHANNEL SCROLL ISOLATION — FINAL
+   Tujuan:
+   - hanya baris CH1-7 / CH8-14 yang bisa swipe kiri-kanan
+   - bank channel tetap menjadi viewport selebar layar
+   - CENTER MIXER tetap berada di bloknya sendiri dan tidak ikut scroll channel
+   - tidak membuat halaman utama melebar ke kanan
+   ========================================================================== */
+@media screen and (max-width: 768px) {
+  html,
+  body {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  main.console {
+    display: flex !important;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    padding: 2px 3px !important;
+    gap: 6px !important;
+  }
+
+  /* Bank adalah viewport; JANGAN biarkan bank ikut melebar. */
+  main.console > .channel-bank,
+  main.console > .channel-bank-left,
+  main.console > .channel-bank-right {
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: 390px !important;
+    min-height: 390px !important;
+    max-height: 390px !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Hanya isi channel yang boleh scroll horizontal. */
+  main.console > .channel-bank #channels,
+  main.console > .channel-bank #channelsRight {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: calc(100% - 24px) !important;
+    min-height: 0 !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    gap: 1px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    flex: 0 0 auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-x: contain !important;
+    touch-action: pan-x !important;
+    scrollbar-width: thin !important;
+  }
+
+  /* Lebar strip dibuat nyaman dan konsisten; 7 channel tetap scroll di HP kecil. */
+  main.console > .channel-bank #channels > .new-channel-strip,
+  main.console > .channel-bank #channels > .channel-strip,
+  main.console > .channel-bank #channelsRight > .new-channel-strip,
+  main.console > .channel-bank #channelsRight > .channel-strip {
+    flex: 0 0 65px !important;
+    width: 65px !important;
+    min-width: 65px !important;
+    max-width: 65px !important;
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  /* CENTER MIXER adalah blok terpisah — tidak ikut horizontal scrolling. */
+  main.console > .center-console {
+    order: 2 !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  main.console > .channel-bank-left {
+    order: 1 !important;
+  }
+
+  main.console > .channel-bank-right {
+    order: 3 !important;
+  }
+
+  /* Master tetap setelah bank kanan dan tidak menciptakan overflow horizontal. */
+  html body main.console > aside.master-rack {
+    order: 4 !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: 390px !important;
+    min-height: 390px !important;
+    max-height: 390px !important;
+    overflow: hidden !important;
+    align-self: stretch !important;
+  }
+
+  /* Semua panel di dalam center mengikuti viewport center. */
+  main.console > .center-console .screen-frame,
+  main.console > .center-console .midas-tft-screen,
+  main.console > .center-console .media-rack,
+  main.console > .center-console .fx-rack,
+  main.console > .center-console .aux-rack {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
