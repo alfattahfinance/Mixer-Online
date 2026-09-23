@@ -285,3 +285,74 @@ window.MixerControl = (() => {
     applyRemote
   };
 })();
+
+
+/* ==========================================================
+   EXTRACTED FROM index.html — TRANSPORT SELECTOR / DEVICE CONNECT UI
+   ========================================================== */
+(function(){
+  function initTransportHandler() {
+    const transportSelect = document.getElementById("transportSelect");
+    const deviceConnect = document.getElementById("deviceConnect");
+    const deviceStatus = document.getElementById("deviceStatus");
+    const deviceHint = document.getElementById("deviceHint");
+
+    function updateTransportUI() {
+      if (!transportSelect || !deviceConnect) return;
+      const mode = transportSelect.value;
+      const isConnected = window.MixerAdapters?.active?.connected;
+
+      if (mode === "bluetooth") {
+        deviceConnect.textContent = isConnected ? "BLUETOOTH CONNECTED" : "CONNECT BLUETOOTH";
+        if (deviceStatus && !isConnected) deviceStatus.textContent = "🔴 BLUETOOTH DISCONNECTED";
+        if (deviceHint) deviceHint.textContent = "Koneksi langsung via Web Bluetooth API ke modul Bluetooth Mixer.";
+      } else {
+        deviceConnect.textContent = isConnected ? "ESP32 CONNECTED" : "CONNECT ESP32";
+        if (deviceStatus && !isConnected) deviceStatus.textContent = "🔴 ESP32 SIMULATOR OFFLINE";
+        if (deviceHint) deviceHint.textContent = "Simulator ESP32 berjalan langsung di Mixer-Online sebagai bridge.";
+      }
+    }
+
+    if (transportSelect) {
+      transportSelect.addEventListener("change", updateTransportUI);
+    }
+
+    if (deviceConnect) {
+      deviceConnect.addEventListener("click", async function(e) {
+        e.preventDefault();
+        const mode = transportSelect ? transportSelect.value : "esp32";
+
+        if (mode === "bluetooth") {
+          try {
+            deviceConnect.disabled = true;
+            deviceConnect.textContent = "PAIRING BT...";
+            const res = await window.MixerAdapters?.connectBluetooth?.();
+            if (res && res.ok) {
+              if (deviceStatus) deviceStatus.textContent = "🟢 BLUETOOTH CONNECTED";
+              deviceConnect.textContent = "🟢 BLUETOOTH CONNECTED";
+            } else {
+              alert("Gagal koneksi Bluetooth atau koneksi dibatalkan.");
+              updateTransportUI();
+            }
+          } catch (err) {
+            alert("Bluetooth Error: " + err.message);
+            updateTransportUI();
+          } finally {
+            deviceConnect.disabled = false;
+          }
+        } else {
+          const connectEspBtn = document.getElementById("connectEsp");
+          if (connectEspBtn) connectEspBtn.click();
+        }
+      });
+    }
+
+    updateTransportUI();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initTransportHandler);
+  } else {
+    initTransportHandler();
+  }
+})();
