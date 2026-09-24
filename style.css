@@ -160,7 +160,6 @@ main.console {
   padding: 4px 6px !important;
 }
 
-/* Bank Channel Kiri & Kanan */
 main.console > .channel-bank {
   flex: 1 1 0 !important;
   min-width: 0 !important;
@@ -173,6 +172,7 @@ main.console > .channel-bank {
   flex-direction: column !important;
   justify-content: space-between !important;
   height: 100% !important;
+  overflow: hidden !important;
 }
 
 .bank-title {
@@ -195,7 +195,35 @@ main.console > .channel-bank {
   align-items: stretch !important;
 }
 
-/* Konsol Tengah (Mixer Screen) Dikunci Lebarnya Agar Proporsional */
+/* Mengatur ukuran tinggi fader channel agar proporsional dan tidak terlalu panjang */
+#channels input[type="range"], 
+#channelsRight input[type="range"],
+.channel-strip input[type="range"] {
+  writing-mode: vertical-lr !important;
+  direction: rtl !important;
+  appearance: slider-vertical !important;
+  -webkit-appearance: slider-vertical !important;
+  height: 110px !important;
+  min-height: 90px !important;
+  max-height: 130px !important;
+  width: 16px !important;
+  accent-color: var(--accent-color) !important;
+  cursor: pointer !important;
+  margin: 2px auto !important;
+  pointer-events: none !important;
+}
+
+#channels input[type="range"]::-webkit-slider-thumb, 
+#channelsRight input[type="range"]::-webkit-slider-thumb,
+.channel-strip input[type="range"]::-webkit-slider-thumb {
+  pointer-events: auto !important;
+}
+#channels input[type="range"]::-moz-range-thumb, 
+#channelsRight input[type="range"]::-moz-range-thumb,
+.channel-strip input[type="range"]::-moz-range-thumb {
+  pointer-events: auto !important;
+}
+
 main.console > .center-console {
   flex: 0 0 320px !important;
   width: 320px !important;
@@ -211,7 +239,7 @@ main.console > .center-console {
 }
 
 /* ==========================================================
-   4. MASTER RACK
+   4. MASTER RACK & FADER TRACK KLIK PENYESUAIAN
    ========================================================== */
 html body main.console > aside.master-rack {
   flex: 0 0 85px !important;
@@ -227,6 +255,7 @@ html body main.console > aside.master-rack {
   flex-direction: column !important;
   justify-content: space-between !important;
   box-sizing: border-box !important;
+  position: relative !important;
 }
 
 aside.master-rack h2 {
@@ -294,6 +323,8 @@ aside.master-rack .master-card {
   padding: 3px 2px !important;
   width: 100% !important;
   margin: 2px 0 !important;
+  position: relative !important;
+  cursor: pointer !important;
 }
 
 aside.master-rack .master-card input[type="range"] {
@@ -301,12 +332,20 @@ aside.master-rack .master-card input[type="range"] {
   direction: rtl !important;
   appearance: slider-vertical !important;
   -webkit-appearance: slider-vertical !important;
-  height: 160px !important;
-  min-height: 160px !important;
+  height: 140px !important;
+  min-height: 120px !important;
   width: 18px !important;
   accent-color: var(--accent-color) !important;
   cursor: pointer !important;
   margin: 2px auto !important;
+  pointer-events: none !important; 
+}
+
+aside.master-rack .master-card input[type="range"]::-webkit-slider-thumb {
+  pointer-events: auto !important;
+}
+aside.master-rack .master-card input[type="range"]::-moz-range-thumb {
+  pointer-events: auto !important;
 }
 
 .monitor-card, .phones-card {
@@ -500,10 +539,8 @@ aside.master-rack .master-card input[type="range"] {
   box-shadow: 0 0 6px var(--accent-color) !important;
 }
 
-
 /* ==========================================================================
    AUDIO PROCESSOR — ONE PAGE / TWO TOP TABS
-   ECHO ALESIS <-> EQUALIZER
    ========================================================================== */
 .processor-tabs {
   display: grid !important;
@@ -629,6 +666,8 @@ aside.master-rack .master-card input[type="range"] {
   flex-direction: column !important;
   align-items: center !important;
   gap: 1px !important;
+  position: relative !important;
+  cursor: pointer !important;
 }
 
 .eq-band-label {
@@ -637,6 +676,7 @@ aside.master-rack .master-card input[type="range"] {
   white-space: nowrap !important;
   transform: rotate(-45deg) !important;
   height: 12px !important;
+  pointer-events: none !important;
 }
 
 .eq-band input[type="range"] {
@@ -645,11 +685,19 @@ aside.master-rack .master-card input[type="range"] {
   appearance: slider-vertical !important;
   -webkit-appearance: slider-vertical !important;
   width: 12px !important;
-  height: 112px !important;
-  min-height: 112px !important;
+  height: 90px !important;
+  min-height: 80px !important;
   accent-color: var(--accent-color) !important;
   touch-action: pan-y !important;
   cursor: pointer !important;
+  pointer-events: none !important; 
+}
+
+.eq-band input[type="range"]::-webkit-slider-thumb {
+  pointer-events: auto !important;
+}
+.eq-band input[type="range"]::-moz-range-thumb {
+  pointer-events: auto !important;
 }
 
 .eq-band-value {
@@ -657,6 +705,7 @@ aside.master-rack .master-card input[type="range"] {
   color: var(--accent-color) !important;
   font-family: monospace !important;
   white-space: nowrap !important;
+  pointer-events: none !important;
 }
 
 @media screen and (max-width: 1100px) {
@@ -679,7 +728,7 @@ aside.master-rack .master-card input[type="range"] {
   }
 
   .eq-band input[type="range"] {
-    height: 100px !important;
-    min-height: 100px !important;
+    height: 80px !important;
+    min-height: 70px !important;
   }
 }
