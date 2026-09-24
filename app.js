@@ -856,3 +856,145 @@ if ('serviceWorker' in navigator) {
   updateClock();
 
 })();
+
+
+/* ==========================================================
+   AUDIO PROCESSOR TABS — ECHO ALESIS / EQUALIZER
+   ========================================================== */
+(function() {
+  "use strict";
+
+  const tabs = document.querySelectorAll(".processor-tab");
+  const echoPanel = document.getElementById("fxRack");
+  const eqPanel = document.getElementById("equalizerRack");
+  const eqA = document.getElementById("eqBankA");
+  const eqB = document.getElementById("eqBankB");
+  const eqStatus = document.getElementById("eqStatus");
+
+  if (!tabs.length || !echoPanel || !eqPanel) return;
+
+  const frequencies = [
+    "20","25","31.5","40","50","63","80","100","125","160","200",
+    "250","315","400","500","630","800","1k","1.25k","1.6k","2k",
+    "2.5k","3.15k","4k","5k","6.3k","8k","10k","12.5k","16k","20k"
+  ];
+
+  window.state = window.state || {};
+  window.state.equalizer = window.state.equalizer || {
+    A: Array(31).fill(0),
+    B: Array(31).fill(0)
+  };
+
+  function buildBank(container, side) {
+    if (!container || container.children.length) return;
+
+    frequencies.forEach((freq, index) => {
+      const wrap = document.createElement("div");
+      wrap.className = "eq-band";
+
+      const label = document.createElement("span");
+      label.className = "eq-band-label";
+      label.textContent = freq;
+
+      const input = document.createElement("input");
+      input.type = "range";
+      input.min = "-12";
+      input.max = "12";
+      input.step = "0.5";
+      input.value = String(window.state.equalizer[side][index]);
+      input.dataset.eqSide = side;
+      input.dataset.eqIndex = String(index);
+      input.setAttribute("aria-label", side + " " + freq + " Hz");
+
+      const value = document.createElement("span");
+      value.className = "eq-band-value";
+      value.textContent = "0dB";
+
+      input.addEventListener("input", function() {
+        const val = Number(this.value);
+        window.state.equalizer[side][index] = Number.isFinite(val) ? val : 0;
+        value.textContent = (val > 0 ? "+" : "") + val + "dB";
+
+        window.dispatchEvent(new CustomEvent("mixer:eq-change", {
+          detail: { side, index, frequency: freq, value: val }
+        }));
+
+        if (eqStatus) {
+          eqStatus.textContent = side + " " + freq + "Hz " + (val > 0 ? "+" : "") + val + "dB";
+        }
+      });
+
+      wrap.append(label, input, value);
+      container.appendChild(wrap);
+    });
+  }
+
+  buildBank(eqA, "A");
+  buildBank(eqB, "B");
+
+  function applyPreset(name) {
+    const presets = {
+      flat: Array(31).fill(0),
+      vocal: [0,0,0,0,0,1,2,3,4,4,3,2,1,0,-1,-1,-1,0,1,2,2,2,1,0,-1,-2,-2,-1,0,0,0],
+      music: [2,2,2,1,1,0,-1,-1,0,1,2,2,1,0,0,0,0,1,2,2,1,1,2,2,1,0,-1,0,1,2,2]
+    };
+
+    const values = presets[name] || presets.flat;
+
+    ["A", "B"].forEach(side => {
+      window.state.equalizer[side] = values.slice();
+      const bank = side === "A" ? eqA : eqB;
+
+      bank?.querySelectorAll("input").forEach((input, i) => {
+        input.value = String(values[i]);
+        const output = input.parentElement.querySelector(".eq-band-value");
+        const val = values[i];
+        if (output) output.textContent = (val > 0 ? "+" : "") + val + "dB";
+      });
+    });
+
+    document.querySelectorAll("[data-eq-preset]").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.eqPreset === name);
+    });
+
+    if (eqStatus) eqStatus.textContent = "PRESET " + name.toUpperCase();
+  }
+
+  document.querySelectorAll("[data-eq-preset]").forEach(btn => {
+    btn.addEventListener("click", function() {
+      applyPreset(this.dataset.eqPreset);
+    });
+  });
+
+  function selectProcessor(target) {
+    const isEq = target === "equalizer";
+
+    tabs.forEach(tab => {
+      const active = tab.dataset.processor === target;
+      tab.classList.toggle("active", active);
+      tab.setAttribute("aria-selected", active ? "true" : "false");
+    });
+
+    echoPanel.hidden = isEq;
+    eqPanel.hidden = !isEq;
+
+    echoPanel.setAttribute("aria-hidden", isEq ? "true" : "false");
+    eqPanel.setAttribute("aria-hidden", isEq ? "false" : "true");
+
+    const tr = document.getElementById("testResult");
+    if (tr) {
+      tr.textContent = isEq
+        ? "PROCESSOR: EQUALIZER tampil."
+        : "PROCESSOR: ECHO ALESIS tampil.";
+    }
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener("click", function(e) {
+      e.preventDefault();
+      selectProcessor(this.dataset.processor);
+    });
+  });
+
+  selectProcessor("echo");
+})();
