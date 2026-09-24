@@ -253,6 +253,12 @@
       <input type="file" id="localAudioLoader" accept="audio/*" multiple style="display: none;">
     </section>
 
+    <!-- Audio Processor Tabs: satu halaman, dua tampilan -->
+    <div class="processor-tabs" id="processorTabs" role="tablist" aria-label="Audio Processor">
+      <button type="button" class="processor-tab active" data-processor="echo" role="tab" aria-selected="true">ECHO ALESIS</button>
+      <button type="button" class="processor-tab" data-processor="equalizer" role="tab" aria-selected="false">EQUALIZER</button>
+    </div>
+
     <!-- Effect Processor -->
     <div class="fx-rack fx-rack-live" id="fxRack" style="padding: 3px;">
       <div class="rack-title" style="font-size: 8px; margin-bottom: 2px;">EFFECT PROCESSOR <span style="color: var(--accent-color);">PARAMETER</span></div>
@@ -278,6 +284,23 @@
         <label>PRE-D <input class="fx-control" data-scope="FX" data-target="FX1" data-param="preDelay" type="range" min="0" max="200" step="1" value="32" style="width:100%;"><output data-fx-value="preDelay" style="color: var(--accent-color);">32ms</output></label>
         <label>DECAY <input class="fx-control" data-scope="FX" data-target="FX1" data-param="decay" type="range" min="0" max="100" step="1" value="65" style="width:100%;"><output data-fx-value="decay" style="color: var(--accent-color);">65%</output></label>
         <label>LEVEL <input class="fx-control" data-scope="FX" data-target="FX1" data-param="level" type="range" min="-20" max="6" step="0.1" value="-3" style="width:100%;"><output data-fx-value="level" style="color: var(--accent-color);">-3.0dB</output></label>
+      </div>
+    </div>
+
+    <div class="equalizer-rack" id="equalizerRack" hidden role="tabpanel" aria-label="Equalizer">
+      <div class="equalizer-head">
+        <strong>ALESIS / GQX-3102 • 2 × 31 BAND</strong>
+        <span id="eqStatus">EQUALIZER ACTIVE</span>
+      </div>
+      <div class="equalizer-presets">
+        <button type="button" data-eq-preset="flat">FLAT</button>
+        <button type="button" data-eq-preset="vocal">VOCAL</button>
+        <button type="button" data-eq-preset="music">MUSIC</button>
+      </div>
+      <div class="eq-bank-labels"><span>LEFT / A</span><span>RIGHT / B</span></div>
+      <div class="eq-banks">
+        <div class="eq-bank" id="eqBankA"></div>
+        <div class="eq-bank" id="eqBankB"></div>
       </div>
     </div>
 
