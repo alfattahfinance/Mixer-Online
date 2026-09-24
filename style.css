@@ -499,3 +499,187 @@ aside.master-rack .master-card input[type="range"] {
   border-color: var(--accent-color) !important;
   box-shadow: 0 0 6px var(--accent-color) !important;
 }
+
+
+/* ==========================================================================
+   AUDIO PROCESSOR — ONE PAGE / TWO TOP TABS
+   ECHO ALESIS <-> EQUALIZER
+   ========================================================================== */
+.processor-tabs {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 2px !important;
+  width: 100% !important;
+  margin: 2px 0 !important;
+  padding: 0 !important;
+}
+
+.processor-tab {
+  min-height: 22px !important;
+  padding: 3px 4px !important;
+  border: 1px solid var(--panel-border) !important;
+  border-radius: 3px !important;
+  background: var(--main-bg) !important;
+  color: var(--text-dim) !important;
+  font-size: 7px !important;
+  font-weight: 800 !important;
+  letter-spacing: .3px !important;
+  cursor: pointer !important;
+}
+
+.processor-tab.active {
+  background: var(--btn-active) !important;
+  color: #fff !important;
+  border-color: var(--accent-color) !important;
+  box-shadow: 0 0 5px rgba(0,229,255,.35) !important;
+}
+
+.fx-rack[hidden],
+.equalizer-rack[hidden] {
+  display: none !important;
+}
+
+.equalizer-rack {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  background: var(--panel-bg) !important;
+  border: 1px solid var(--panel-border) !important;
+  border-radius: 4px !important;
+  padding: 4px !important;
+  box-sizing: border-box !important;
+}
+
+.equalizer-head {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 4px !important;
+  margin-bottom: 3px !important;
+  font-size: 7px !important;
+}
+
+.equalizer-head strong {
+  color: var(--accent-color) !important;
+}
+
+.equalizer-head span {
+  color: #2ecc71 !important;
+  font-size: 6px !important;
+}
+
+.equalizer-presets {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 2px !important;
+  margin-bottom: 3px !important;
+}
+
+.equalizer-presets button {
+  padding: 2px !important;
+  font-size: 6px !important;
+  font-weight: bold !important;
+  border: 1px solid var(--panel-border) !important;
+  background: var(--main-bg) !important;
+  color: var(--text-main) !important;
+  border-radius: 2px !important;
+}
+
+.equalizer-presets button.active {
+  background: var(--accent-color) !important;
+  color: #000 !important;
+}
+
+.eq-bank-labels {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 3px !important;
+  color: var(--text-dim) !important;
+  font-size: 5px !important;
+  text-align: center !important;
+  margin-bottom: 1px !important;
+}
+
+.eq-banks {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 3px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.eq-bank {
+  display: flex !important;
+  gap: 2px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  padding: 2px 1px 3px !important;
+  scrollbar-width: thin !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.eq-band {
+  flex: 0 0 20px !important;
+  width: 20px !important;
+  min-width: 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 1px !important;
+}
+
+.eq-band-label {
+  font-size: 4px !important;
+  color: var(--text-dim) !important;
+  white-space: nowrap !important;
+  transform: rotate(-45deg) !important;
+  height: 12px !important;
+}
+
+.eq-band input[type="range"] {
+  writing-mode: vertical-lr !important;
+  direction: rtl !important;
+  appearance: slider-vertical !important;
+  -webkit-appearance: slider-vertical !important;
+  width: 12px !important;
+  height: 112px !important;
+  min-height: 112px !important;
+  accent-color: var(--accent-color) !important;
+  touch-action: pan-y !important;
+  cursor: pointer !important;
+}
+
+.eq-band-value {
+  font-size: 4px !important;
+  color: var(--accent-color) !important;
+  font-family: monospace !important;
+  white-space: nowrap !important;
+}
+
+@media screen and (max-width: 1100px) {
+  .eq-banks {
+    grid-template-columns: 1fr !important;
+  }
+  .eq-bank-labels {
+    grid-template-columns: 1fr !important;
+  }
+  .eq-bank {
+    border-bottom: 1px solid var(--panel-border) !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .processor-tabs {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 20 !important;
+  }
+
+  .eq-band input[type="range"] {
+    height: 100px !important;
+    min-height: 100px !important;
+  }
+}
