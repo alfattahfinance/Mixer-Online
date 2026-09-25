@@ -1275,18 +1275,35 @@ startAudioButton.addEventListener("click", async () => {
 });
 
 startMicButton.addEventListener("click", async () => {
+  // Mic dan playlist adalah dua sumber mixer terpisah: mengaktifkan mic
+  // tidak boleh menghentikan musik yang sedang diputar.
+  if (microphoneStream) {
+    microphoneSource?.disconnect();
+    microphoneSource = null;
+    microphoneStream.getTracks().forEach(track => track.stop());
+    microphoneStream = null;
+    startMicButton.classList.remove("active");
+    setAudioStatus(isPlaying ? "Mikrofon dimatikan; playlist tetap berjalan." : "Mikrofon dimatikan.");
+    return;
+  }
+
   try {
     const ctx = createAudioContext();
     if (ctx.state === "suspended") await ctx.resume();
-    
     initializeAudioGraph();
-    disconnectCurrentSource();
     const constraints = { audio: { channelCount: 1, echoCancellation: false } };
     microphoneStream = await navigator.mediaDevices.getUserMedia(constraints);
     microphoneSource = audioContext.createMediaStreamSource(microphoneStream);
     microphoneSource.connect(mixerInputGain);
-    setAudioStatus("Mikrofon aktif masuk ke Mixer.");
-  } catch (err) { setAudioStatus("Gagal mengakses mikrofon."); }
+    startMicButton.classList.add("active");
+    setAudioStatus(isPlaying ? "Mikrofon dan playlist aktif melalui Mixer." : "Mikrofon aktif masuk ke Mixer.");
+  } catch (err) {
+    microphoneStream?.getTracks().forEach(track => track.stop());
+    microphoneStream = null;
+    microphoneSource = null;
+    startMicButton.classList.remove("active");
+    setAudioStatus("Gagal mengakses mikrofon. Periksa izin mic dan gunakan HTTPS.");
+  }
 });
 
 stopAudioButton.addEventListener("click", () => {
