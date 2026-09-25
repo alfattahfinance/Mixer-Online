@@ -614,3 +614,173 @@ main.console {
     max-width: 54px !important;
   }
 }
+
+
+/* ============================================================
+   MIXING STATION-INSPIRED CHANNEL BANK REWORK
+   Single continuous input bank + dedicated horizontal scroll.
+   The console screen remains a separate row and does not scroll
+   with the channel strips.
+   ============================================================ */
+@media screen and (min-width: 769px) {
+  main.console {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 96px !important;
+    grid-template-rows: minmax(440px, 72vh) auto !important;
+    grid-template-areas:
+      "inputs master"
+      "screen screen" !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: calc(100vh - 70px) !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    align-items: stretch !important;
+    gap: 5px !important;
+    padding: 4px !important;
+  }
+
+  main.console > #bankLeft {
+    grid-area: inputs !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    padding: 2px !important;
+  }
+
+  main.console > #bankRight {
+    display: none !important;
+  }
+
+  main.console > #centerConsole {
+    grid-area: screen !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    flex: none !important;
+    overflow: visible !important;
+  }
+
+  main.console > #masterRack {
+    grid-area: master !important;
+    width: 96px !important;
+    min-width: 96px !important;
+    max-width: 96px !important;
+    height: 100% !important;
+    min-height: 440px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    align-self: stretch !important;
+  }
+
+  #bankLeft .bank-title {
+    min-height: 24px !important;
+  }
+
+  #channels {
+    display: grid !important;
+    grid-template-columns: repeat(14, minmax(0, 1fr)) !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: calc(100% - 25px) !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    align-items: stretch !important;
+    gap: 1px !important;
+    scrollbar-width: thin !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  #channels .new-channel-strip,
+  #channels .channel-strip {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    flex: initial !important;
+    height: 100% !important;
+    padding: 5px 2px 2px !important;
+  }
+
+  #channels .fader-area {
+    min-height: 180px !important;
+  }
+
+  #channels input.channel-fader,
+  #channels input.new-fader {
+    height: clamp(170px, 34vh, 320px) !important;
+    min-height: 150px !important;
+    max-height: 320px !important;
+  }
+}
+
+/* Smaller screens: keep the app viewport fixed; only the strip rail pans. */
+@media screen and (max-width: 768px) {
+  main.console {
+    display: flex !important;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+  }
+
+  main.console > #bankLeft {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: min(72vh, 680px) !important;
+    min-height: 390px !important;
+    overflow: hidden !important;
+  }
+
+  main.console > #bankRight {
+    display: none !important;
+  }
+
+  #channels {
+    display: grid !important;
+    grid-template-columns: repeat(14, 66px) !important;
+    grid-auto-flow: column !important;
+    width: max-content !important;
+    min-width: 100% !important;
+    max-width: none !important;
+    height: calc(100% - 25px) !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    gap: 1px !important;
+    touch-action: pan-x !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  #channels .new-channel-strip,
+  #channels .channel-strip {
+    width: 66px !important;
+    min-width: 66px !important;
+    max-width: 66px !important;
+    flex: none !important;
+  }
+
+  main.console > #centerConsole {
+    order: 2 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    flex: none !important;
+    overflow: hidden !important;
+  }
+
+  main.console > #masterRack {
+    order: 3 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+}
