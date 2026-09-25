@@ -957,45 +957,73 @@ function updateOutputMute() {
   muteOutputButton.classList.toggle("active", outputMuted);
 }
 
-// Token mencegah proses decode playlist lama menimpa pilihan file yang lebih baru.
+// Token dan promise decode menjaga pilihan file terbaru dan mencegah tombol
+// START mengalahkan proses decode yang masih berlangsung.
 let playlistLoadId = 0;
+let playlistLoadPromise = null;
+
+async function loadSelectedAudioFiles(files) {
+  if (!files || files.length === 0) return;
+  const loadId = ++playlistLoadId;
+  const task = (async () => {
+    try {
+      createAudioContext();
+      await audioContext.resume();
+      initializeAudioGraph();
+    } catch (err) {
+      setAudioStatus("Audio engine gagal diinisialisasi: " + (err?.message || err));
+      setStatus("Audio engine gagal dimulai. Muat ulang halaman dan coba lagi.");
+      return;
+    }
+
+    setAudioStatus("Mendecode " + files.length + " file audio...");
+    const nextBuffers = [];
+    const nextNames = [];
+    const failedFiles = [];
+
+    for (const file of files) {
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const decodedBuffer = await audioContext.decodeAudioData(arrayBuffer);
+        if (loadId !== playlistLoadId) return;
+        nextBuffers.push(decodedBuffer);
+        nextNames.push(file.name);
+      } catch (err) {
+        failedFiles.push(file.name + " (" + (err?.message || err?.name || "format tidak didukung") + ")");
+      }
+    }
+
+    if (loadId !== playlistLoadId) return;
+    if (activeSourceNode) {
+      activeSourceNode.onended = null;
+      try { activeSourceNode.stop(); } catch (err) {}
+      activeSourceNode = null;
+    }
+    isPlaying = false;
+    audioBuffers = nextBuffers;
+    audioFileNames = nextNames;
+    currentPlaylistIndex = 0;
+    startAudioButton.classList.remove("active");
+    renderPlaylistUI();
+
+    if (audioBuffers.length > 0) {
+      setAudioStatus(audioBuffers.length + " dari " + files.length + " file siap diputar.");
+      setStatus("Audio siap. Tekan START PLAYLIST untuk memutar.");
+      if (failedFiles.length) setAudioStatus(audioBuffers.length + " file siap; gagal membaca: " + failedFiles.join(", "));
+    } else {
+      setAudioStatus("Tidak ada file yang berhasil didekode. Coba MP3 atau WAV lain. Detail: " + failedFiles.join("; "));
+      setStatus("File dipilih, tetapi tidak berhasil dibaca. Coba file audio lain.");
+    }
+  })();
+
+  playlistLoadPromise = task;
+  try { await task; }
+  finally { if (playlistLoadPromise === task) playlistLoadPromise = null; }
+}
+
 audioFilesInput.addEventListener("change", async e => {
   const files = Array.from(e.target.files || []);
-  if (files.length === 0) return;
-
-  const loadId = ++playlistLoadId;
-  createAudioContext();
-  initializeAudioGraph();
-  setAudioStatus("Mendecode file audio ke Mixer...");
-
-  const nextBuffers = [];
-  const nextNames = [];
-  for (const file of files) {
-    try {
-      const arrayBuffer = await file.arrayBuffer();
-      const decodedBuffer = await audioContext.decodeAudioData(arrayBuffer);
-      // Jangan lanjutkan hasil usang jika pengguna sudah memilih playlist lain.
-      if (loadId !== playlistLoadId) return;
-      nextBuffers.push(decodedBuffer);
-      nextNames.push(file.name);
-    } catch (err) {
-      // Lewati file yang tidak dapat didekode; nama dan buffer tetap berpasangan.
-    }
-  }
-
-  if (loadId !== playlistLoadId) return;
-  if (activeSourceNode) {
-    activeSourceNode.onended = null;
-    try { activeSourceNode.stop(); } catch (err) {}
-    activeSourceNode = null;
-  }
-  isPlaying = false;
-  audioBuffers = nextBuffers;
-  audioFileNames = nextNames;
-  currentPlaylistIndex = 0;
-  startAudioButton.classList.remove("active");
-  renderPlaylistUI();
-  setAudioStatus(audioBuffers.length + " file siap diputar di Mixer.");
+  await loadSelectedAudioFiles(files);
 });
 
 function renderPlaylistUI() {
@@ -1266,21 +1294,28 @@ function playCurrentBuffer() {
 }
 
 startAudioButton.addEventListener("click", async () => {
-  if (audioBuffers.length === 0) {
-    setAudioStatus("Belum ada audio siap diputar. Tekan PILIH BANYAK FILE AUDIO, pilih file, tunggu proses decode selesai, lalu tekan START PLAYLIST.");
-    setStatus("Pilih file audio terlebih dahulu!");
-    return;
-  }
   try {
+    // Jika pengguna menekan START saat decode belum selesai, tunggu hasilnya.
+    if (playlistLoadPromise) await playlistLoadPromise;
+    // Pulihkan dari state kosong jika file sudah dipilih tetapi belum sempat diproses.
+    if (audioBuffers.length === 0 && audioFilesInput.files && audioFilesInput.files.length > 0) {
+      await loadSelectedAudioFiles(Array.from(audioFilesInput.files));
+    }
+    if (audioBuffers.length === 0) {
+      setAudioStatus("Belum ada audio siap diputar. Pilih file lalu tunggu pesan 'file siap diputar'.");
+      setStatus("Belum ada file audio yang berhasil dibaca.");
+      return;
+    }
+
     const ctx = createAudioContext();
     if (ctx.state === "suspended") await ctx.resume();
     initializeAudioGraph();
     playCurrentBuffer();
-    setAudioStatus("Memulai playlist: " + audioFileNames[currentPlaylistIndex]);
   } catch (err) {
     const audioError = err && err.name ? err.name : "Error";
     const audioMessage = err && err.message ? err.message : "Tidak dapat memulai audio.";
     setAudioStatus("Audio gagal (" + audioError + "): " + audioMessage);
+    setStatus("Gagal memulai audio: " + audioError);
   }
 });
 
