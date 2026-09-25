@@ -358,148 +358,237 @@ if ('serviceWorker' in navigator) {
 
 
 /* ==========================================================
-   EXTRACTED FROM index.html — SCREEN / M32 DISPLAY + SYSTEM POWER UI
+   SCREEN / M32 DISPLAY — NAVIGATION, METERS, ROUTING
    ========================================================== */
 (function() {
   "use strict";
-
   window.state = window.state || {};
-  if (window.state.system === undefined) {
-    window.state.system = false; 
+  window.state.channels = window.state.channels || [];
+  window.state.screenRoutes = window.state.screenRoutes || {};
+
+  const tabs = Array.from(document.querySelectorAll("#screenTabs [data-screen]"));
+  const views = Array.from(document.querySelectorAll(".screen-content .screen-view"));
+  const subButtons = Array.from(document.querySelectorAll("#m32SubmenuBar [data-sub]"));
+  const subPanels = Array.from(document.querySelectorAll(".midas-tft-screen .m32-sub-panel"));
+  const subBar = document.getElementById("m32SubmenuBar");
+  const meterRoot = document.getElementById("screenChannelMeters");
+  const rtaRoot = document.getElementById("rtaBars");
+  const routeGrid = document.getElementById("screenRouteGrid");
+  const routeStatus = document.getElementById("screenRouteStatus");
+  let activeScreen = "HOME";
+  let activeSub = "overview";
+  const meterLevels = Array(14).fill(0);
+
+  function selectedChannel() {
+    const badge = document.getElementById("screenInput");
+    const n = badge ? Number((badge.textContent.match(/\d+/) || [1])[0]) : 1;
+    return Math.max(1, Math.min(14, n || 1));
   }
-  window.state.connected = false;
 
-  const tabs = document.querySelectorAll('#screenTabs button');
-  const views = document.querySelectorAll('.screen-content .screen-view');
-  const subButtons = document.querySelectorAll('#m32SubmenuBar .m32-sub-btn');
-  const subPanels = document.querySelectorAll('.midas-tft-screen .m32-sub-panel');
-  const subBar = document.getElementById('m32SubmenuBar');
+  function channelLevel(ch) {
+    const c = window.state.channels[ch - 1] || {};
+    const stateLevel = Number(c.meterLevel ?? c.level);
+    if (Number.isFinite(stateLevel) && stateLevel >= 0) {
+      return Math.max(0, Math.min(100, stateLevel <= 1 ? stateLevel * 100 : stateLevel));
+    }
+    const fader = Number(c.fader ?? 0);
+    return Math.max(0, Math.min(100, fader));
+  }
 
-  function buildScreenMeters() {
-    const root = document.getElementById('screenChannelMeters');
-    if (!root) return;
-    root.innerHTML = '';
+  function buildMeters() {
+    if (!meterRoot || meterRoot.children.length) return;
     for (let i = 0; i < 14; i++) {
-      const el = document.createElement('div');
-      el.style.flex = '1';
-      el.style.background = 'var(--accent-color)';
-      el.style.height = (15 + ((i * 17) % 75)) + '%';
-      el.style.borderRadius = '2px';
-      el.title = 'CH' + (i + 1);
-      root.appendChild(el);
+      const col = document.createElement("div");
+      col.className = "screen-meter-column";
+      col.innerHTML = '<div class="screen-meter-track"><div class="screen-meter-fill"></div></div><span>CH' + (i + 1) + '</span>';
+      col.title = "Channel " + (i + 1) + " level meter";
+      col.dataset.ch = String(i + 1);
+      meterRoot.appendChild(col);
     }
   }
 
   function buildRta() {
-    const root = document.getElementById('rtaBars');
-    if (!root) return;
-    root.innerHTML = '';
-    for (let i = 0; i < 14; i++) {
-      const b = document.createElement('div');
-      b.style.flex = '1';
-      b.style.background = '#2ecc71';
-      b.style.height = (20 + ((i * 23) % 70)) + '%';
-      b.style.borderRadius = '2px';
-      root.appendChild(b);
+    if (!rtaRoot || rtaRoot.children.length) return;
+    for (let i = 0; i < 31; i++) {
+      const bar = document.createElement("div");
+      bar.className = "screen-rta-bar";
+      bar.dataset.band = String(i);
+      rtaRoot.appendChild(bar);
     }
   }
 
-  function switchScreen(targetScreen) {
-    tabs.forEach(b => {
-      if (b.dataset.screen === targetScreen) {
-        b.classList.add('active');
-      } else {
-        b.classList.remove('active');
-      }
-    });
-
-    views.forEach(v => {
-      if (v.dataset.view === targetScreen) {
-        v.classList.add('active');
-        v.style.display = 'flex';
-        v.style.visibility = 'visible';
-        v.style.opacity = '1';
-      } else {
-        v.classList.remove('active');
-        v.style.display = 'none';
-        v.style.visibility = 'hidden';
-        v.style.opacity = '0';
-      }
-    });
-
-    if (subBar) {
-      subBar.style.display = (targetScreen === 'HOME') ? 'grid' : 'none';
+  function renderMeters() {
+    buildMeters();
+    const selected = selectedChannel();
+    if (meterRoot) {
+      Array.from(meterRoot.children).forEach((col, i) => {
+        const level = meterLevels[i] || channelLevel(i + 1);
+        const fill = col.querySelector(".screen-meter-fill");
+        if (fill) fill.style.height = level + "%";
+        col.classList.toggle("selected", i + 1 === selected);
+      });
     }
-
-    if (targetScreen === 'METER') {
-      buildScreenMeters();
-    } else if (targetScreen === 'RTA') {
+    const activeLevel = meterLevels[selected - 1] || channelLevel(selected);
+    if (rtaRoot) {
       buildRta();
+      Array.from(rtaRoot.children).forEach((bar, i) => {
+        // Level-responsive spectrum preview, not a claim of FFT analysis.
+        const shape = 0.38 + 0.62 * Math.abs(Math.sin((i + 2) * 0.47));
+        const height = Math.max(2, Math.min(100, activeLevel * shape));
+        bar.style.height = height + "%";
+      });
     }
+    const mini = document.querySelectorAll("#visualMeter .bar-col");
+    mini.forEach((bar, i) => {
+      const shape = 0.42 + 0.58 * Math.abs(Math.sin((i + 1) * 0.83));
+      bar.style.height = Math.max(2, Math.min(100, activeLevel * shape)) + "%";
+    });
   }
 
-  function switchSubPanel(targetSub) {
-    subButtons.forEach(b => {
-      if (b.dataset.sub === targetSub) {
-        b.classList.add('active');
-      } else {
-        b.classList.remove('active');
-      }
+  function switchScreen(target) {
+    if (!views.some(v => v.dataset.view === target)) return;
+    activeScreen = target;
+    tabs.forEach(btn => {
+      const on = btn.dataset.screen === target;
+      btn.classList.toggle("active", on);
+      btn.setAttribute("aria-current", on ? "page" : "false");
     });
+    views.forEach(view => {
+      const on = view.dataset.view === target;
+      view.classList.toggle("active", on);
+      view.hidden = !on;
+      view.style.display = on ? "flex" : "none";
+      view.style.visibility = on ? "visible" : "hidden";
+      view.style.opacity = on ? "1" : "0";
+    });
+    if (subBar) {
+      const show = target === "HOME";
+      subBar.style.display = show ? "grid" : "none";
+      subBar.setAttribute("aria-hidden", show ? "false" : "true");
+    }
+    if (target === "METER") renderMeters();
+    if (target === "ROUTING") renderRoutes();
+  }
 
+  function switchSubPanel(target) {
+    const normalized = target === "main" ? "overview" : target;
+    if (!subPanels.some(panel => panel.dataset.subpanel === normalized)) return;
+    activeSub = normalized;
+    subButtons.forEach(btn => {
+      const on = (btn.dataset.sub === normalized) || (btn.dataset.sub === "main" && normalized === "overview");
+      btn.classList.toggle("active", on);
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+    });
     subPanels.forEach(panel => {
-      if (panel.dataset.subpanel === targetSub) {
-        panel.classList.add('active');
-        panel.style.display = 'flex';
-        panel.style.visibility = 'visible';
-        panel.style.opacity = '1';
-      } else {
-        panel.classList.remove('active');
-        panel.style.display = 'none';
-        panel.style.visibility = 'hidden';
-        panel.style.opacity = '0';
-      }
+      const on = panel.dataset.subpanel === normalized;
+      panel.classList.toggle("active", on);
+      panel.hidden = !on;
+      panel.style.display = on ? "flex" : "none";
+      panel.style.visibility = on ? "visible" : "hidden";
+      panel.style.opacity = on ? "1" : "0";
     });
+    if (activeScreen !== "HOME") switchScreen("HOME");
   }
 
-  tabs.forEach(btn => {
-    btn.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      switchScreen(this.dataset.screen);
-    }, true);
+  function routeKey(name) {
+    return name.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+  }
+
+  function renderRoutes() {
+    if (!routeGrid) return;
+    const ch = selectedChannel();
+    const routes = window.state.screenRoutes[ch] || { "MAIN L/R": true };
+    routeGrid.querySelectorAll("[data-route]").forEach(btn => {
+      const dest = btn.dataset.route;
+      const enabled = !!routes[dest];
+      btn.classList.toggle("selected", enabled);
+      btn.setAttribute("aria-pressed", enabled ? "true" : "false");
+      btn.textContent = dest + " · " + (enabled ? "ON" : "OFF");
+    });
+    if (routeStatus) routeStatus.textContent = "CH " + ch + " → " + Object.keys(routes).filter(k => routes[k]).join(", ");
+  }
+
+  tabs.forEach(btn => btn.addEventListener("click", event => {
+    event.preventDefault();
+    switchScreen(btn.dataset.screen);
+  }));
+  subButtons.forEach(btn => btn.addEventListener("click", event => {
+    event.preventDefault();
+    switchSubPanel(btn.dataset.sub);
+  }));
+
+  routeGrid?.addEventListener("click", event => {
+    const btn = event.target.closest("[data-route]");
+    if (!btn) return;
+    const ch = selectedChannel();
+    const dest = btn.dataset.route;
+    const routes = window.state.screenRoutes[ch] || (window.state.screenRoutes[ch] = { "MAIN L/R": true });
+    routes[dest] = !routes[dest];
+    if (dest === "MAIN L/R" && !routes[dest]) {
+      // Allow disabling main only if another destination remains enabled.
+      if (!Object.values(routes).some(Boolean)) routes[dest] = true;
+    }
+    const enabled = !!routes[dest];
+    const key = routeKey(dest);
+    if (window.MixerControl?.setControl) window.MixerControl.setControl(ch, "route_" + key, enabled);
+    document.dispatchEvent(new CustomEvent("mixer:route-change", { detail: { ch, destination: dest, enabled } }));
+    renderRoutes();
   });
 
-  subButtons.forEach(btn => {
-    btn.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      switchSubPanel(this.dataset.sub);
-    }, true);
+  function acceptMeter(event) {
+    const data = event.detail || {};
+    const ch = Number(data.ch);
+    if (!Number.isInteger(ch) || ch < 1 || ch > 14) return;
+    if (data.type === "METER" || data.type === "meter" || data.param === "meterLevel") {
+      const raw = Number(data.level ?? data.value ?? 0);
+      meterLevels[ch - 1] = Math.max(0, Math.min(100, raw <= 1 ? raw * 100 : raw));
+      if (meterRoot || rtaRoot) renderMeters();
+    }
+  }
+  document.addEventListener("mixer:esp32-rx", acceptMeter);
+  document.addEventListener("mixer:bluetooth-rx", acceptMeter);
+  document.addEventListener("mixer:meter", acceptMeter);
+
+  document.addEventListener("input", event => {
+    const strip = event.target.closest(".new-channel-strip[data-ch], .channel-strip[data-ch]");
+    if (!strip) return;
+    const ch = Number(strip.dataset.ch);
+    if (!Number.isInteger(ch) || ch < 1 || ch > 14) return;
+    const param = event.target.dataset.param || event.target.dataset.k || (event.target.classList.contains("new-fader") ? "fader" : "");
+    if (param === "fader") {
+      const raw = Number(event.target.value);
+      meterLevels[ch - 1] = Math.max(0, Math.min(100, raw));
+      renderMeters();
+    }
+  });
+
+  document.addEventListener("click", event => {
+    const strip = event.target.closest(".new-channel-strip[data-ch], .channel-strip[data-ch]");
+    if (strip && typeof window.selectScreenChannel === "function") {
+      window.selectScreenChannel(Number(strip.dataset.ch));
+      renderMeters();
+      if (activeScreen === "ROUTING") renderRoutes();
+    }
   });
 
   const powerBtn = document.getElementById("power");
   if (powerBtn) {
     powerBtn.textContent = window.state.system ? "SYSTEM ON" : "SYSTEM OFF";
-    powerBtn.classList.toggle("on", window.state.system);
-    
-    powerBtn.addEventListener("click", function(e) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
+    powerBtn.classList.toggle("on", !!window.state.system);
+    powerBtn.addEventListener("click", () => {
       window.state.system = !window.state.system;
-      this.textContent = window.state.system ? "SYSTEM ON" : "SYSTEM OFF";
-      this.classList.toggle("on", window.state.system);
-
-      var hs = document.getElementById("headerBridgeStatus");
-      if (hs) hs.textContent = window.state.system ? "SYSTEM READY" : "BRIDGE STANDBY";
+      powerBtn.textContent = window.state.system ? "SYSTEM ON" : "SYSTEM OFF";
+      powerBtn.classList.toggle("on", window.state.system);
+      const status = document.getElementById("headerBridgeStatus");
+      if (status) status.textContent = window.state.system ? "SYSTEM READY" : "BRIDGE STANDBY";
     });
   }
 
-  window.addEventListener("DOMContentLoaded", () => {
-    switchScreen('HOME');
-    switchSubPanel('overview');
-  });
-
+  switchScreen("HOME");
+  switchSubPanel("overview");
+  buildMeters();
+  buildRta();
+  renderMeters();
 })();
 
 
