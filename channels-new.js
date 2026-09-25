@@ -10,7 +10,7 @@
      KONFIGURASI
      ============================================================ */
 
-  const N = 14; // Keep current engine profile; all 14 strips share one bank row.
+  const N = 16; // Mixing Station-style 16 input strips.
   const $ = (id) => document.getElementById(id);
 
   let standaloneMeterStarted = false;
