@@ -10,7 +10,7 @@
      KONFIGURASI
      ============================================================ */
 
-  const N = 14;
+  const N = 14; // Keep current engine profile; all 14 strips share one bank row.
   const $ = (id) => document.getElementById(id);
 
   let standaloneMeterStarted = false;
@@ -819,13 +819,12 @@
     }
 
     if (left && right) {
+      // Mixing Station-style: one continuous channel bank; only channel row owns horizontal overflow.
       for (let id = 1; id <= N; id++) {
-        if (id <= 7) {
-          left.appendChild(make(id));
-        } else {
-          right.appendChild(make(id));
-        }
+        left.appendChild(make(id));
       }
+      const rightBank = $("bankRight");
+      if (rightBank) rightBank.hidden = true;
       return;
     }
 
