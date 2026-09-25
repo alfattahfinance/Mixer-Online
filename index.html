@@ -1228,6 +1228,7 @@ function rebuildAudioRouting() {
     mixerInputGain.connect(alesisDelayNode);
     alesisDelayNode.connect(alesisWetNode);
     alesisWetNode.connect(mixerStripGains[3]);
+    try { mixerStripAnalysers[3].disconnect(); } catch (err) {}
     mixerStripAnalysers[3].connect(audioChannels[0].inputGain);
     mixerStripAnalysers[3].connect(audioChannels[1].inputGain);
   } else {
@@ -1268,8 +1269,8 @@ echoDamping.addEventListener("input", () => {
 echoMix.addEventListener("input", () => {
   document.getElementById("echoMixVal").textContent = Math.round(echoMix.value * 100) + "%";
   if (alesisWetNode && alesisDryNode && audioContext) {
-    alesisWetNode.gain.setTargetAtTime(Number(echoMix.value), audioContext.currentTime, 0.01);
     alesisDryNode.gain.setTargetAtTime(1.0 - Number(echoMix.value), audioContext.currentTime, 0.01);
+    updateMixerStripControls(); // keep FX return fader/mute/solo in the signal path
   }
 });
 
