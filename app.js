@@ -377,12 +377,12 @@ if ('serviceWorker' in navigator) {
   const routeStatus = document.getElementById("screenRouteStatus");
   let activeScreen = "HOME";
   let activeSub = "overview";
-  const meterLevels = Array(14).fill(0);
+  const meterLevels = Array(16).fill(0);
 
   function selectedChannel() {
     const badge = document.getElementById("screenInput");
     const n = badge ? Number((badge.textContent.match(/\d+/) || [1])[0]) : 1;
-    return Math.max(1, Math.min(14, n || 1));
+    return Math.max(1, Math.min(16, n || 1));
   }
 
   function channelLevel(ch) {
@@ -397,7 +397,7 @@ if ('serviceWorker' in navigator) {
 
   function buildMeters() {
     if (!meterRoot || meterRoot.children.length) return;
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 16; i++) {
       const col = document.createElement("div");
       col.className = "screen-meter-column";
       col.innerHTML = '<div class="screen-meter-track"><div class="screen-meter-fill"></div></div><span>CH' + (i + 1) + '</span>';
@@ -538,7 +538,7 @@ if ('serviceWorker' in navigator) {
   function acceptMeter(event) {
     const data = event.detail || {};
     const ch = Number(data.ch);
-    if (!Number.isInteger(ch) || ch < 1 || ch > 14) return;
+    if (!Number.isInteger(ch) || ch < 1 || ch > 16) return;
     if (data.type === "METER" || data.type === "meter" || data.param === "meterLevel") {
       const raw = Number(data.level ?? data.value ?? 0);
       meterLevels[ch - 1] = Math.max(0, Math.min(100, raw <= 1 ? raw * 100 : raw));
@@ -553,7 +553,7 @@ if ('serviceWorker' in navigator) {
     const strip = event.target.closest(".new-channel-strip[data-ch], .channel-strip[data-ch]");
     if (!strip) return;
     const ch = Number(strip.dataset.ch);
-    if (!Number.isInteger(ch) || ch < 1 || ch > 14) return;
+    if (!Number.isInteger(ch) || ch < 1 || ch > 16) return;
     const param = event.target.dataset.param || event.target.dataset.k || (event.target.classList.contains("new-fader") ? "fader" : "");
     if (param === "fader") {
       const raw = Number(event.target.value);
