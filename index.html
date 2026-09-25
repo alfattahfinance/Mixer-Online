@@ -1308,10 +1308,19 @@ startMicButton.addEventListener("click", async () => {
 });
 
 stopAudioButton.addEventListener("click", () => {
-  disconnectCurrentSource();
+  // STOP AUDIO hanya mematikan playlist; input mic tetap berjalan jika aktif.
+  const sourceToStop = activeSourceNode;
+  activeSourceNode = null;
+  if (sourceToStop) {
+    sourceToStop.onended = null;
+    try { sourceToStop.stop(); } catch (e) {}
+    try { sourceToStop.disconnect(); } catch (e) {}
+  }
   isPlaying = false;
   startAudioButton.classList.remove("active");
-  setAudioStatus("Audio dihentikan.");
+  setAudioStatus(microphoneStream
+    ? "Playlist dihentikan; mikrofon tetap aktif."
+    : "Playlist dihentikan.");
 });
 
 function syncAudioControlsFromUI() {
