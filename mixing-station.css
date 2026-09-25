@@ -625,3 +625,26 @@ body[data-panel="setup"] .screen-frame { display: block !important; }
     max-width: clamp(56px, 5.5vw, 72px) !important;
   }
 }
+
+
+/* Keep the global header compact; page-specific controls live in their own tabs. */
+body[data-panel]:not([data-panel="system"]) header.topbar {
+  display: flex !important;
+  min-height: 42px !important;
+  height: auto !important;
+  padding: 5px 8px !important;
+  align-items: center !important;
+}
+body[data-panel]:not([data-panel="system"]) header.topbar > div:not(.brand) {
+  display: none !important;
+}
+body[data-panel="scene"] header.topbar > .scene-head {
+  display: flex !important;
+}
+body[data-panel="setup"] header.topbar > .system-box,
+body[data-panel="setup"] header.topbar > .skin-head {
+  display: flex !important;
+}
+body[data-panel="system"] header.topbar {
+  min-height: 0 !important;
+}
