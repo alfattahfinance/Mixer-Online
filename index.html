@@ -342,7 +342,8 @@ header, .topbar {
 .console-action-btn.solo.active { background: #f59e0b; color: #000; border-color: #fbbf24; }
 
 /* Audio & Bluetooth Panel */
-.audio-panel { background: #1b2027; border: 1px solid #3a414b; border-radius: 8px; padding: 12px; margin-top: 14px; }
+.audio-panel { display: none; background: #1b2027; border: 1px solid #3a414b; border-radius: 8px; padding: 12px; margin-top: 14px; }
+.audio-panel.active { display: block; }
 .audio-panel h3 { margin: 0 0 10px 0; font-size: 12px; color: #38bdf8; }
 .audio-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
 .bt-panel {
@@ -784,14 +785,17 @@ const tabMixerContent = document.getElementById("tabMixerContent");
 tabEqBtn.addEventListener("click", () => {
   tabEqBtn.classList.add("active"); tabEchoBtn.classList.remove("active"); tabMixerBtn.classList.remove("active");
   tabEqContent.classList.add("active"); tabEchoContent.classList.remove("active"); tabMixerContent.classList.remove("active");
+  document.querySelector(".audio-panel").classList.remove("active");
 });
 tabEchoBtn.addEventListener("click", () => {
   tabEchoBtn.classList.add("active"); tabEqBtn.classList.remove("active"); tabMixerBtn.classList.remove("active");
   tabEchoContent.classList.add("active"); tabEqContent.classList.remove("active"); tabMixerContent.classList.remove("active");
+  document.querySelector(".audio-panel").classList.remove("active");
 });
 tabMixerBtn.addEventListener("click", () => {
   tabMixerBtn.classList.add("active"); tabEqBtn.classList.remove("active"); tabEchoBtn.classList.remove("active");
   tabMixerContent.classList.add("active"); tabEqContent.classList.remove("active"); tabEchoContent.classList.remove("active");
+  document.querySelector(".audio-panel").classList.add("active");
 });
 
 /* =========================================================
