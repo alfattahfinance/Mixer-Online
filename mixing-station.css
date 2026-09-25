@@ -289,3 +289,180 @@ main.console > aside.master-rack input[type="range"] {
     font-size: 9px !important;
   }
 }
+
+
+/* FINAL FIT-TO-VIEWPORT PASS — channel rail only scrolls horizontally */
+* { box-sizing: border-box; }
+html, body {
+  overflow-x: clip !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+body { overflow-y: auto !important; }
+main.console {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 82px !important;
+  grid-template-rows: auto auto !important;
+  grid-template-areas:
+    "left master"
+    "screen screen" !important;
+  gap: 7px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 7px !important;
+  overflow: visible !important;
+  align-items: start !important;
+}
+main.console > #bankLeft {
+  grid-area: left !important;
+  display: flex !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: clamp(390px, 68vh, 610px) !important;
+  min-height: 390px !important;
+  overflow: hidden !important;
+}
+main.console > #bankRight {
+  display: none !important;
+}
+main.console > #centerConsole {
+  grid-area: screen !important;
+  display: flex !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+  justify-content: flex-start !important;
+  gap: 7px !important;
+}
+main.console > #centerConsole > * {
+  width: 100% !important;
+  max-width: 1120px !important;
+  min-width: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+main.console > #masterRack {
+  grid-area: master !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  width: 82px !important;
+  min-width: 82px !important;
+  max-width: 82px !important;
+  height: clamp(390px, 68vh, 610px) !important;
+  min-height: 390px !important;
+  gap: 5px !important;
+  padding: 5px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+main.console > #masterRack > * {
+  flex: 0 0 auto !important;
+  max-width: 100% !important;
+}
+#bankLeft .bank-title {
+  flex: 0 0 23px !important;
+  min-height: 23px !important;
+  margin: 0 !important;
+}
+#channels {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-flow: row nowrap !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: 3px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: calc(100% - 23px) !important;
+  min-height: 0 !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  padding: 2px 2px 8px !important;
+  overscroll-behavior-x: contain !important;
+  touch-action: pan-x !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: thin !important;
+}
+#channels > .new-channel-strip,
+#channels > .channel-strip {
+  flex: 1 0 clamp(62px, calc((100vw - 125px) / 16), 90px) !important;
+  width: clamp(62px, calc((100vw - 125px) / 16), 90px) !important;
+  min-width: 62px !important;
+  max-width: 90px !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  padding: 5px 2px 3px !important;
+}
+#channels input[type="range"] {
+  max-width: 16px !important;
+}
+.center-console .screen-frame {
+  width: 100% !important;
+  max-width: 1120px !important;
+  min-width: 0 !important;
+  margin: 0 auto !important;
+}
+@media (max-width: 900px) {
+  main.console {
+    grid-template-columns: minmax(0, 1fr) 76px !important;
+    gap: 5px !important;
+    padding: 5px !important;
+  }
+  main.console > #bankLeft,
+  main.console > #masterRack {
+    height: clamp(360px, 58vh, 520px) !important;
+    min-height: 360px !important;
+  }
+  main.console > #masterRack {
+    width: 76px !important;
+    min-width: 76px !important;
+    max-width: 76px !important;
+  }
+  #channels > .new-channel-strip,
+  #channels > .channel-strip {
+    flex-basis: 66px !important;
+    width: 66px !important;
+    min-width: 66px !important;
+  }
+}
+@media (max-width: 600px) {
+  main.console {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-areas: "left" "screen" "master" !important;
+  }
+  main.console > #bankLeft {
+    height: min(62vh, 490px) !important;
+    min-height: 330px !important;
+  }
+  main.console > #masterRack {
+    flex-direction: row !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 82px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+  }
+  main.console > #masterRack > * { min-width: 65px !important; }
+  #channels > .new-channel-strip,
+  #channels > .channel-strip {
+    flex-basis: 62px !important;
+    width: 62px !important;
+    min-width: 62px !important;
+  }
+  main.console > #centerConsole > * {
+    max-width: 100% !important;
+  }
+}
