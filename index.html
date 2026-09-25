@@ -1211,7 +1211,10 @@ function playCurrentBuffer() {
   initializeAudioGraph();
 
   if (activeSourceNode) {
+    // Detach the old completion callback before stopping it: stop() also fires onended.
+    activeSourceNode.onended = null;
     try { activeSourceNode.stop(); } catch (e) {}
+    activeSourceNode = null;
   }
 
   const buffer = audioBuffers[currentPlaylistIndex];
@@ -1220,21 +1223,26 @@ function playCurrentBuffer() {
     setAudioStatus("File audio tidak tersedia. Pilih ulang playlist.");
     return;
   }
-  activeSourceNode = audioContext.createBufferSource();
-  activeSourceNode.buffer = buffer;
+  const sourceNode = audioContext.createBufferSource();
+  activeSourceNode = sourceNode;
+  sourceNode.buffer = buffer;
+  sourceNode.connect(mixerInputGain);
 
-  activeSourceNode.connect(mixerInputGain);
-
-  activeSourceNode.start(0);
+  sourceNode.start(0);
   isPlaying = true;
   startAudioButton.classList.add("active");
   setAudioStatus("Memutar dari Mixer: " + audioFileNames[currentPlaylistIndex]);
 
-  activeSourceNode.onended = () => {
+  sourceNode.onended = () => {
+    // Ignore callbacks from any source that is no longer the active playlist item.
+    if (activeSourceNode !== sourceNode) return;
+    activeSourceNode = null;
     if (isPlaying && audioBuffers.length > 0) {
       currentPlaylistIndex = (currentPlaylistIndex + 1) % audioBuffers.length;
       renderPlaylistUI();
       playCurrentBuffer();
+    } else {
+      startAudioButton.classList.remove("active");
     }
   };
 }
