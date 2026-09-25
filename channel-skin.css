@@ -784,3 +784,71 @@ main.console {
     overflow: visible !important;
   }
 }
+
+
+/* MOBILE SCROLL ISOLATION PATCH — only the channel rail may pan sideways. */
+@media screen and (max-width: 768px) {
+  html, body {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: clip !important;
+  }
+
+  main.console {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-x: clip !important;
+  }
+
+  main.console > #bankLeft,
+  main.console > #centerConsole,
+  main.console > #masterRack {
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  main.console > #bankLeft {
+    overflow: hidden !important;
+    contain: inline-size !important;
+  }
+
+  #bankLeft > #channels {
+    display: grid !important;
+    grid-auto-flow: column !important;
+    grid-template-rows: minmax(0, 1fr) !important;
+    grid-template-columns: repeat(14, 66px) !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    overscroll-behavior-x: contain !important;
+    touch-action: pan-x !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  #bankLeft > #channels > .new-channel-strip,
+  #bankLeft > #channels > .channel-strip {
+    flex: none !important;
+    width: 66px !important;
+    min-width: 66px !important;
+    max-width: 66px !important;
+  }
+
+  main.console > #centerConsole {
+    order: 2 !important;
+    overflow-x: hidden !important;
+  }
+
+  main.console > #centerConsole > * {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+}
