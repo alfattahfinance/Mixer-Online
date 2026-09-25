@@ -302,7 +302,7 @@
     right.innerHTML = "";
     ensureState();
     for (let i = 1; i <= N; i++) {
-      (i <= 7 ? left : right).appendChild(make(i));
+      left.appendChild(make(i));
     }
   }
 
