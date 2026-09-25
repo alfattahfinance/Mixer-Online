@@ -1198,7 +1198,8 @@ function updateMixerStripControls() {
     readout.textContent = db.toFixed(1) + " dB";
     const allowedBySolo = !anySolo || mixerStripSolo[index];
     const gain = (mixerStripMuted[index] || !allowedBySolo) ? 0 : dbToGain(db);
-    if (index < 4 && mixerStripGains[index]) mixerStripGains[index].gain.setTargetAtTime(gain, audioContext.currentTime, 0.015);
+    if (index < 3 && mixerStripGains[index]) mixerStripGains[index].gain.setTargetAtTime(gain, audioContext.currentTime, 0.015);
+    // CH4 is the FX return; its fader controls the wet return level exactly once.
     if (index === 3 && alesisWetNode) alesisWetNode.gain.setTargetAtTime(gain * Number(echoMix.value), audioContext.currentTime, 0.015);
     if (index === 4 && masterStripGainNode) masterStripGainNode.gain.setTargetAtTime(gain, audioContext.currentTime, 0.015);
     const muteBtn = strip.querySelector(".console-action-btn.mute");
@@ -1828,14 +1829,14 @@ function startRealMeters() {
       if (!isAudioRunning) { meterSpans.forEach(span => span.classList.remove("on")); return; }
 
       let rms = 0;
-      const sourceAnalyzerIdx = mIdx < 4 ? (mIdx % 2) : 0; 
-      if (audioChannels[sourceAnalyzerIdx] && audioChannels[sourceAnalyzerIdx].analyser) {
+      // Meter mapping: CH1 Mic, CH2 Music, CH3 AUX, CH4 FX return, Master L/R.
+      const analyser = mIdx === 4 ? masterMeterAnalyser : mixerStripAnalysers[mIdx];
+      if (analyser) {
         try {
-          const analyser = audioChannels[sourceAnalyzerIdx].analyser;
           analyser.getByteTimeDomainData(vertMeterBuffers[mIdx]);
           let sum = 0;
           for (let i = 0; i < vertMeterBuffers[mIdx].length; i++) {
-            let sample = (vertMeterBuffers[mIdx][i] - 128) / 128;
+            const sample = (vertMeterBuffers[mIdx][i] - 128) / 128;
             sum += sample * sample;
           }
           rms = Math.sqrt(sum / vertMeterBuffers[mIdx].length);
