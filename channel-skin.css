@@ -683,7 +683,7 @@ main.console {
 
   #channels {
     display: grid !important;
-    grid-template-columns: repeat(14, minmax(0, 1fr)) !important;
+    grid-template-columns: repeat(16, minmax(0, 1fr)) !important;
     width: 100% !important;
     min-width: 0 !important;
     height: calc(100% - 25px) !important;
@@ -745,7 +745,7 @@ main.console {
 
   #channels {
     display: grid !important;
-    grid-template-columns: repeat(14, 66px) !important;
+    grid-template-columns: repeat(16, 66px) !important;
     grid-auto-flow: column !important;
     width: max-content !important;
     min-width: 100% !important;
