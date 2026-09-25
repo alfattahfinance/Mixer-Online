@@ -450,3 +450,19 @@ main.console > #masterRack > * { flex: 0 0 auto !important; max-width: 100% !imp
     min-width: 60px !important;
   }
 }
+
+/* COMPACT TOP CONTROL STRIP — fit header to tablet and phone viewports */
+header.topbar{display:grid!important;grid-template-columns:minmax(125px,1.1fr) repeat(5,minmax(100px,1fr)) minmax(82px,.65fr)!important;grid-auto-flow:row!important;align-items:stretch!important;gap:6px!important;padding:6px 8px!important}
+header.topbar>div{min-height:0!important;height:auto!important;padding:5px 7px!important;gap:3px!important;align-self:stretch!important;justify-content:center!important}
+header.topbar .brand{align-items:flex-start!important}
+header.topbar .brand b{font-size:11px!important;line-height:1.2!important}
+header.topbar .brand span,header.topbar .box-title{font-size:8px!important;line-height:1.2!important}
+header.topbar .power-btn{min-height:26px!important;padding:4px 6px!important;font-size:10px!important}
+header.topbar .bridge-head{align-items:center!important}
+header.topbar .bridge-head button,header.topbar .scene-head button{min-height:24px!important;padding:3px 5px!important;font-size:9px!important}
+header.topbar .scene-head>div{display:flex!important;flex-wrap:nowrap!important;gap:3px!important}
+header.topbar .clock-head{align-items:flex-end!important}
+header.topbar .clock-head strong{font-size:14px!important;line-height:1.15!important}
+@media(max-width:1100px){header.topbar{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px!important;padding:5px 7px!important}header.topbar .brand,header.topbar .clock-head{grid-column:auto!important}}
+@media(max-width:700px){header.topbar{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:4px!important;padding:4px 5px!important}header.topbar>div{padding:4px 5px!important}header.topbar .bridge-head{grid-column:span 1!important}header.topbar .bridge-head button{width:100%!important;white-space:normal!important}header.topbar .scene-head>div{flex-wrap:wrap!important}header.topbar .scene-head button{flex:1 1 auto!important}header.topbar .clock-head{align-items:flex-start!important}header.topbar .clock-head strong{font-size:12px!important}}
+@media(max-width:430px){header.topbar{grid-template-columns:repeat(2,minmax(0,1fr))!important}header.topbar .brand{grid-column:1/-1!important}header.topbar .bridge-head{grid-column:1/-1!important;display:grid!important;grid-template-columns:1fr 1fr!important}header.topbar .bridge-head .box-title,header.topbar .bridge-head .head-status{grid-column:1/-1!important}header.topbar .scene-head>div{flex-wrap:nowrap!important}}
