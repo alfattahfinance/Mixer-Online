@@ -1267,12 +1267,21 @@ function playCurrentBuffer() {
 
 startAudioButton.addEventListener("click", async () => {
   if (audioBuffers.length === 0) {
+    setAudioStatus("Belum ada audio siap diputar. Tekan PILIH BANYAK FILE AUDIO, pilih file, tunggu proses decode selesai, lalu tekan START PLAYLIST.");
     setStatus("Pilih file audio terlebih dahulu!");
     return;
   }
-  const ctx = createAudioContext();
-  if (ctx.state === "suspended") await ctx.resume();
-  playCurrentBuffer();
+  try {
+    const ctx = createAudioContext();
+    if (ctx.state === "suspended") await ctx.resume();
+    initializeAudioGraph();
+    playCurrentBuffer();
+    setAudioStatus("Memulai playlist: " + audioFileNames[currentPlaylistIndex]);
+  } catch (err) {
+    const audioError = err && err.name ? err.name : "Error";
+    const audioMessage = err && err.message ? err.message : "Tidak dapat memulai audio.";
+    setAudioStatus("Audio gagal (" + audioError + "): " + audioMessage);
+  }
 });
 
 startMicButton.addEventListener("click", async () => {
@@ -1292,8 +1301,12 @@ startMicButton.addEventListener("click", async () => {
     const ctx = createAudioContext();
     if (ctx.state === "suspended") await ctx.resume();
     initializeAudioGraph();
-    const constraints = { audio: { channelCount: 1, echoCancellation: false } };
-    microphoneStream = await navigator.mediaDevices.getUserMedia(constraints);
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      throw new Error("MIC_UNAVAILABLE: Browser tidak menyediakan akses mikrofon. Buka halaman melalui HTTPS dan browser yang mendukung mic.");
+    }
+    // Gunakan permintaan audio dasar untuk menghindari penolakan constraint
+    // tertentu pada sebagian browser/perangkat Android.
+    microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: true });
     microphoneSource = audioContext.createMediaStreamSource(microphoneStream);
     microphoneSource.connect(mixerInputGain);
     startMicButton.classList.add("active");
@@ -1303,7 +1316,9 @@ startMicButton.addEventListener("click", async () => {
     microphoneStream = null;
     microphoneSource = null;
     startMicButton.classList.remove("active");
-    setAudioStatus("Gagal mengakses mikrofon. Periksa izin mic dan gunakan HTTPS.");
+    const micError = err && err.name ? err.name : "Error";
+    const micMessage = err && err.message ? err.message : "Akses mikrofon gagal.";
+    setAudioStatus("Mic gagal (" + micError + "): " + micMessage + " — izinkan mikrofon di browser, gunakan HTTPS, lalu coba lagi.");
   }
 });
 
