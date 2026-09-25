@@ -896,3 +896,58 @@ aside.master-rack .master-card input[type="range"]::-moz-range-thumb {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+
+/* Temporary clean slate while the mixer interface is rebuilt.
+   Keep the existing mixer DOM mounted (but visually hidden) so the
+   audio engine, channel state, bridge and test modules retain their hooks. */
+body.theme-midas main.console,
+body.theme-midas #bottomNav {
+  display: none !important;
+}
+body.theme-midas .topbar {
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  align-items: center !important;
+}
+body.theme-midas .skin-head,
+body.theme-midas .scene-head,
+body.theme-midas .clock-head {
+  display: none !important;
+}
+body.theme-midas .rebuild-placeholder {
+  box-sizing: border-box;
+  width: min(100% - 24px, 1100px);
+  margin: 18px auto;
+  padding: 24px 18px;
+  border: 1px dashed var(--panel-border, #303846);
+  border-radius: 10px;
+  background: var(--panel-bg, #151923);
+  color: var(--text-main, #e4e8ef);
+  text-align: center;
+}
+body.theme-midas .rebuild-placeholder strong {
+  display: block;
+  color: var(--accent-color, #00d5e5);
+  letter-spacing: .08em;
+}
+body.theme-midas .rebuild-placeholder p {
+  margin: 8px 0 0;
+  color: var(--text-dim, #9aa6b7);
+}
+@media (max-width: 700px) {
+  body.theme-midas .topbar {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    padding: 8px !important;
+  }
+  body.theme-midas .topbar > .brand,
+  body.theme-midas .topbar > .system-box,
+  body.theme-midas .topbar > .bridge-head,
+  body.theme-midas .topbar > .status-head {
+    flex: 1 1 145px !important;
+    min-width: 0 !important;
+  }
+}
