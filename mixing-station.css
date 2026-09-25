@@ -648,3 +648,69 @@ body[data-panel="setup"] header.topbar > .skin-head {
 body[data-panel="system"] header.topbar {
   min-height: 0 !important;
 }
+
+
+/* === Final channel/screen order + full-height strip content === */
+main.console {
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-areas: "screen" "left" "master" !important;
+  grid-template-rows: auto auto auto !important;
+  align-items: start !important;
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
+}
+main.console > #centerConsole { grid-area: screen !important; }
+main.console > #bankLeft {
+  grid-area: left !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+#bankLeft .bank-title { flex: 0 0 auto !important; }
+#channels {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  align-items: stretch !important;
+  padding-bottom: 8px !important;
+}
+#channels > .new-channel-strip,
+#channels > .channel-strip {
+  height: auto !important;
+  min-height: 620px !important;
+  max-height: none !important;
+  flex-shrink: 0 !important;
+}
+main.console > #centerConsole {
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+}
+.center-console .screen-frame {
+  max-height: none !important;
+  overflow: visible !important;
+}
+@media (max-width: 768px) {
+  main.console {
+    grid-template-areas: "screen" "left" "master" !important;
+    padding: 6px !important;
+    gap: 8px !important;
+  }
+  main.console > #bankLeft { height: auto !important; }
+  #channels > .new-channel-strip,
+  #channels > .channel-strip {
+    flex-basis: 66px !important;
+    width: 66px !important;
+    min-width: 66px !important;
+    max-width: 66px !important;
+    min-height: 600px !important;
+  }
+}
+@media (orientation: landscape) and (max-height: 600px) {
+  #channels > .new-channel-strip,
+  #channels > .channel-strip { min-height: 560px !important; }
+}
