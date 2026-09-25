@@ -957,30 +957,43 @@ function updateOutputMute() {
   muteOutputButton.classList.toggle("active", outputMuted);
 }
 
-// Playlist multi-file handler menggunakan ArrayBuffer Decoding (Ampuh untuk HP)
+// Token mencegah proses decode playlist lama menimpa pilihan file yang lebih baru.
+let playlistLoadId = 0;
 audioFilesInput.addEventListener("change", async e => {
-  const files = Array.from(e.target.files);
+  const files = Array.from(e.target.files || []);
   if (files.length === 0) return;
 
+  const loadId = ++playlistLoadId;
   createAudioContext();
   initializeAudioGraph();
-  audioBuffers = [];
-  audioFileNames = [];
   setAudioStatus("Mendecode file audio ke Mixer...");
 
+  const nextBuffers = [];
+  const nextNames = [];
   for (const file of files) {
     try {
       const arrayBuffer = await file.arrayBuffer();
       const decodedBuffer = await audioContext.decodeAudioData(arrayBuffer);
-      // Simpan nama hanya jika decode berhasil agar indeks playlist selalu cocok.
-      audioBuffers.push(decodedBuffer);
-      audioFileNames.push(file.name);
+      // Jangan lanjutkan hasil usang jika pengguna sudah memilih playlist lain.
+      if (loadId !== playlistLoadId) return;
+      nextBuffers.push(decodedBuffer);
+      nextNames.push(file.name);
     } catch (err) {
-      // Lewati file yang tidak dapat didekode; jangan biarkan playlist tidak sinkron.
+      // Lewati file yang tidak dapat didekode; nama dan buffer tetap berpasangan.
     }
   }
 
+  if (loadId !== playlistLoadId) return;
+  if (activeSourceNode) {
+    activeSourceNode.onended = null;
+    try { activeSourceNode.stop(); } catch (err) {}
+    activeSourceNode = null;
+  }
+  isPlaying = false;
+  audioBuffers = nextBuffers;
+  audioFileNames = nextNames;
   currentPlaylistIndex = 0;
+  startAudioButton.classList.remove("active");
   renderPlaylistUI();
   setAudioStatus(audioBuffers.length + " file siap diputar di Mixer.");
 });
