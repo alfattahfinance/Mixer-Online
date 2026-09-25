@@ -1170,7 +1170,9 @@ function rebuildAudioRouting() {
   mixerInputGain.disconnect();
   alesisDryNode.disconnect();
   alesisWetNode.disconnect();
-  alesisDelayNode.disconnect(alesisWetNode);
+  // Destination-specific disconnect throws in browsers when that edge
+  // was never connected (the normal first-load state with FX disabled).
+  try { alesisDelayNode.disconnect(alesisWetNode); } catch (err) { /* edge absent */ }
 
   if (isAlesisFxEnabled) {
     mixerInputGain.connect(alesisDryNode);
