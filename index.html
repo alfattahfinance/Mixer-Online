@@ -67,7 +67,7 @@
       <div class="screen-tabs" id="screenTabs">
         <button class="active" data-screen="HOME">HOME</button>
         <button data-screen="METER">METERS</button>
-        <button data-screen="RTA">RTA</button>
+        <button data-screen="ROUTING">ROUTING</button>
         <button data-screen="SETUP">SETUP</button>
         <button data-screen="EFFECT">EFFECTS</button>
         <button data-screen="SCENE">LIBRARY</button>
@@ -77,9 +77,10 @@
         <button class="m32-sub-btn active" data-sub="overview">OVERVIEW</button>
         <button class="m32-sub-btn" data-sub="config">CONFIG</button>
         <button class="m32-sub-btn" data-sub="gate">GATE</button>
-        <button class="m32-sub-btn" data-sub="dyn">DYN</button>
+        <button class="m32-sub-btn" data-sub="dyn">DYNAMICS</button>
         <button class="m32-sub-btn" data-sub="eq">EQ</button>
         <button class="m32-sub-btn" data-sub="sends">SENDS</button>
+        <button class="m32-sub-btn" data-sub="overview">MAIN</button>
       </div>
       
       <div class="screen-content" id="screenContent">
@@ -174,18 +175,37 @@
         </section>
 
         <section class="screen-view" data-view="METER">
-          <div class="pro-screen-grid" style="background: var(--panel-bg); padding: 4px; border-radius: 4px; min-height: 140px;">
-            <b style="font-size: 8px; color: var(--accent-color); display: block; margin-bottom: 2px;">CHANNEL LEVEL METERS (CH 1–14)</b>
-            <div class="meter-columns" id="screenChannelMeters" style="display: flex; gap: 3px; height: 110px; align-items: flex-end; background: var(--main-bg); padding: 3px;"></div>
-            <span class="meter-db" style="font-size: 6px; color: var(--text-dim); display: flex; justify-content: space-between; margin-top: 2px;"><span>0dB</span><span>-6</span><span>-12</span><span>-24</span><span>-48</span></span>
+          <div class="pro-screen-grid screen-meter-page">
+            <b class="screen-panel-heading">CHANNEL LEVEL METERS (CH 1–14)</b>
+            <div class="meter-columns" id="screenChannelMeters"></div>
+            <div class="meter-db"><span>0dB</span><span>-6</span><span>-12</span><span>-24</span><span>-48</span></div>
+          </div>
+          <div class="rta-display screen-rta-page">
+            <b class="screen-panel-heading">RTA / SPECTRUM MONITOR</b>
+            <div class="rta-bars" id="rtaBars"></div>
+            <div class="rta-labels"><span>63</span><span>125</span><span>250</span><span>500</span><span>1K</span><span>2K</span><span>4K</span><span>8K</span><span>16K</span></div>
+            <small class="screen-meter-note">RTA preview follows active channel level; connect an audio analyzer for true FFT.</small>
           </div>
         </section>
 
-        <section class="screen-view" data-view="RTA">
-          <div class="rta-display" style="background: var(--panel-bg); padding: 4px; border-radius: 4px; min-height: 140px;">
-            <b style="font-size: 8px; color: var(--accent-color); display: block; margin-bottom: 2px;">REAL TIME ANALYZER (RTA)</b>
-            <div class="rta-bars" id="rtaBars" style="display: flex; gap: 2px; height: 110px; align-items: flex-end; background: var(--main-bg); padding: 3px;"></div>
-            <div class="rta-labels" style="font-size: 6px; color: var(--text-dim); display: flex; justify-content: space-between; margin-top: 2px;"><span>63</span><span>125</span><span>250</span><span>500</span><span>1K</span><span>2K</span><span>4K</span><span>8K</span><span>16K</span></div>
+        <section class="screen-view" data-view="ROUTING">
+          <div class="screen-route-page">
+            <b class="screen-panel-heading">OUTPUT ROUTING MATRIX</b>
+            <p>Select an output destination for the active channel. MAIN L/R is enabled by default.</p>
+            <div class="screen-route-grid" id="screenRouteGrid">
+              <button type="button" data-route="MAIN L/R" class="selected">MAIN L/R · ON</button>
+              <button type="button" data-route="BUS 1">BUS 1 · OFF</button>
+              <button type="button" data-route="BUS 2">BUS 2 · OFF</button>
+              <button type="button" data-route="BUS 3">BUS 3 · OFF</button>
+              <button type="button" data-route="BUS 4">BUS 4 · OFF</button>
+              <button type="button" data-route="BUS 5">BUS 5 · OFF</button>
+              <button type="button" data-route="BUS 6">BUS 6 · OFF</button>
+              <button type="button" data-route="FX 1">FX 1 · OFF</button>
+              <button type="button" data-route="FX 2">FX 2 · OFF</button>
+              <button type="button" data-route="FX 3">FX 3 · OFF</button>
+              <button type="button" data-route="FX 4">FX 4 · OFF</button>
+            </div>
+            <div class="screen-route-status" id="screenRouteStatus">CH 1 → MAIN L/R</div>
           </div>
         </section>
 
