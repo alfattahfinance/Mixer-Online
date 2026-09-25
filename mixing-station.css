@@ -466,3 +466,162 @@ header.topbar .clock-head strong{font-size:14px!important;line-height:1.15!impor
 @media(max-width:1100px){header.topbar{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px!important;padding:5px 7px!important}header.topbar .brand,header.topbar .clock-head{grid-column:auto!important}}
 @media(max-width:700px){header.topbar{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:4px!important;padding:4px 5px!important}header.topbar>div{padding:4px 5px!important}header.topbar .bridge-head{grid-column:span 1!important}header.topbar .bridge-head button{width:100%!important;white-space:normal!important}header.topbar .scene-head>div{flex-wrap:wrap!important}header.topbar .scene-head button{flex:1 1 auto!important}header.topbar .clock-head{align-items:flex-start!important}header.topbar .clock-head strong{font-size:12px!important}}
 @media(max-width:430px){header.topbar{grid-template-columns:repeat(2,minmax(0,1fr))!important}header.topbar .brand{grid-column:1/-1!important}header.topbar .bridge-head{grid-column:1/-1!important;display:grid!important;grid-template-columns:1fr 1fr!important}header.topbar .bridge-head .box-title,header.topbar .bridge-head .head-status{grid-column:1/-1!important}header.topbar .scene-head>div{flex-wrap:nowrap!important}}
+
+
+/* === Dedicated workspace panels and non-clipping responsive channel rail === */
+body[data-panel] .right-tools,
+body[data-panel] #connectionTestPanel,
+body[data-panel] .status-footer { display: none !important; }
+
+body[data-panel="system"] .right-tools,
+body[data-panel="system"] #connectionTestPanel,
+body[data-panel="system"] .status-footer { display: block !important; }
+
+main.console {
+  box-sizing: border-box !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: auto auto !important;
+  grid-template-areas: "inputs" "screen" !important;
+  gap: 8px !important;
+  min-height: 0 !important;
+  height: auto !important;
+}
+main.console > #bankLeft {
+  grid-area: inputs !important;
+  height: clamp(480px, 72vh, 760px) !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+main.console > #bankRight { display: none !important; }
+main.console > #centerConsole {
+  grid-area: screen !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+}
+#channels {
+  display: flex !important;
+  flex-flow: row nowrap !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  touch-action: pan-x !important;
+  overscroll-behavior-x: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+  align-items: stretch !important;
+}
+#channels > .new-channel-strip,
+#channels > .channel-strip {
+  flex: 0 0 clamp(60px, 6.5vw, 88px) !important;
+  width: clamp(60px, 6.5vw, 88px) !important;
+  min-width: clamp(60px, 6.5vw, 88px) !important;
+  max-width: clamp(60px, 6.5vw, 88px) !important;
+  height: 100% !important;
+  min-height: 0 !important;
+}
+#channels .fader-area { min-height: 0 !important; }
+#channels input.channel-fader,
+#channels input.new-fader {
+  height: clamp(170px, 36vh, 340px) !important;
+  max-height: none !important;
+}
+
+/* Only the selected work area is shown; controls stay mounted for live sync. */
+body[data-panel="mixer"] main.console > #centerConsole > .media-rack,
+body[data-panel="mixer"] main.console > #centerConsole > .processor-tabs,
+body[data-panel="mixer"] main.console > #centerConsole > .fx-rack,
+body[data-panel="mixer"] main.console > #centerConsole > .equalizer-rack,
+body[data-panel="mixer"] main.console > #centerConsole > .aux-rack,
+body[data-panel="mixer"] main.console > #masterRack { display: none !important; }
+
+body[data-panel="player"] main.console > #bankLeft,
+body[data-panel="player"] main.console > #masterRack,
+body[data-panel="fx"] main.console > #bankLeft,
+body[data-panel="fx"] main.console > #masterRack,
+body[data-panel="aux"] main.console > #bankLeft,
+body[data-panel="aux"] main.console > #masterRack,
+body[data-panel="master"] main.console > #bankLeft,
+body[data-panel="master"] main.console > #centerConsole,
+body[data-panel="scene"] main.console > #bankLeft,
+body[data-panel="scene"] main.console > #masterRack,
+body[data-panel="setup"] main.console > #bankLeft,
+body[data-panel="setup"] main.console > #masterRack,
+body[data-panel="system"] main.console { display: none !important; }
+
+body[data-panel="player"] main.console > #centerConsole > :not(.media-rack),
+body[data-panel="fx"] main.console > #centerConsole > :not(.processor-tabs):not(.fx-rack):not(.equalizer-rack),
+body[data-panel="aux"] main.console > #centerConsole > :not(.aux-rack),
+body[data-panel="scene"] main.console > #centerConsole > :not(.screen-frame),
+body[data-panel="setup"] main.console > #centerConsole > :not(.screen-frame) { display: none !important; }
+
+body[data-panel="player"] .media-rack,
+body[data-panel="fx"] .processor-tabs,
+body[data-panel="fx"] .fx-rack,
+body[data-panel="fx"] .equalizer-rack,
+body[data-panel="aux"] .aux-rack { display: block !important; }
+
+body[data-panel="master"] main.console {
+  display: block !important;
+  min-height: 420px !important;
+}
+body[data-panel="master"] main.console > #masterRack {
+  display: flex !important;
+  grid-area: auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 380px !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  align-items: stretch !important;
+}
+body[data-panel="master"] #masterRack > * {
+  flex: 1 1 140px !important;
+  min-width: 120px !important;
+  max-width: 320px !important;
+}
+body[data-panel="scene"] .screen-frame,
+body[data-panel="setup"] .screen-frame { display: block !important; }
+
+.bottom-nav {
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 1000 !important;
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+.bottom-nav button {
+  flex: 0 0 auto !important;
+  min-width: 76px !important;
+  white-space: nowrap !important;
+}
+@media (max-width: 768px) {
+  main.console { padding: 5px !important; }
+  main.console > #bankLeft { height: clamp(400px, 62vh, 620px) !important; }
+  #channels > .new-channel-strip,
+  #channels > .channel-strip {
+    flex-basis: 64px !important;
+    width: 64px !important;
+    min-width: 64px !important;
+    max-width: 64px !important;
+  }
+  #channels input.channel-fader,
+  #channels input.new-fader { height: clamp(150px, 28vh, 250px) !important; }
+  header.topbar { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  header.topbar .brand { grid-column: 1 / -1 !important; }
+}
+@media (orientation: landscape) and (max-width: 1100px) {
+  main.console > #bankLeft { height: clamp(420px, 74vh, 680px) !important; }
+  #channels > .new-channel-strip,
+  #channels > .channel-strip {
+    flex-basis: clamp(56px, 5.5vw, 72px) !important;
+    width: clamp(56px, 5.5vw, 72px) !important;
+    min-width: clamp(56px, 5.5vw, 72px) !important;
+    max-width: clamp(56px, 5.5vw, 72px) !important;
+  }
+}
