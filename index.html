@@ -1213,6 +1213,7 @@ function disconnectCurrentSource() {
     microphoneStream.getTracks().forEach(track => track.stop());
     microphoneStream = null;
   }
+  if (startMicButton) startMicButton.classList.remove("active");
 
   isPlaying = false;
   if (startAudioButton) startAudioButton.classList.remove("active");
