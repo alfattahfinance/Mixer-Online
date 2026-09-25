@@ -908,6 +908,12 @@ let activeSourceNode = null;
 let isPlaying = false;
 
 let mixerInputGain = null;
+let mixerStripGains = [null, null, null, null];
+let mixerStripAnalysers = [null, null, null, null];
+let masterStripGainNode = null;
+let masterMeterAnalyser = null;
+let mixerStripMuted = [false, false, false, false];
+let mixerStripSolo = [false, false, false, false];
 let alesisDelayNode = null, alesisFeedbackNode = null, alesisFilterNode = null, alesisWetNode = null, alesisDryNode = null;
 let masterGainNode = null, outputMuteGainNode = null, outputMergerNode = null;
 
@@ -1122,6 +1128,18 @@ function initializeAudioGraph() {
   mixerInputGain = audioContext.createGain();
   mixerInputGain.gain.value = 1.0;
 
+  // Independent input strips: CH1 mic, CH2 playlist, CH3 AUX (reserved), CH4 FX return.
+  for (let i = 0; i < 4; i++) {
+    mixerStripGains[i] = audioContext.createGain();
+    mixerStripAnalysers[i] = audioContext.createAnalyser();
+    mixerStripAnalysers[i].fftSize = 1024;
+    mixerStripGains[i].connect(mixerStripAnalysers[i]);
+    if (i < 2) mixerStripAnalysers[i].connect(mixerInputGain);
+  }
+  masterStripGainNode = audioContext.createGain();
+  masterMeterAnalyser = audioContext.createAnalyser();
+  masterMeterAnalyser.fftSize = 1024;
+
   buildEqualizerChannel(0);
   buildEqualizerChannel(1);
 
@@ -1154,7 +1172,9 @@ function initializeAudioGraph() {
   outputMergerNode = audioContext.createChannelMerger(2);
   audioChannels[0].analyser.connect(outputMergerNode, 0, 0);
   audioChannels[1].analyser.connect(outputMergerNode, 0, 1);
-  outputMergerNode.connect(masterGainNode);
+  outputMergerNode.connect(masterStripGainNode);
+  masterStripGainNode.connect(masterMeterAnalyser);
+  masterMeterAnalyser.connect(masterGainNode);
   masterGainNode.connect(outputMuteGainNode);
   outputMuteGainNode.connect(audioContext.destination);
 
@@ -1163,7 +1183,29 @@ function initializeAudioGraph() {
   rebuildAudioRouting();
   updateMasterGain();
   updateOutputMute();
+  updateMixerStripControls();
   startRealMeters();
+}
+
+function updateMixerStripControls() {
+  const strips = [...document.querySelectorAll(".mixer-desk-surface .console-channel-strip")];
+  const anySolo = mixerStripSolo.some(Boolean);
+  strips.forEach((strip, index) => {
+    const fader = strip.querySelector('.fader-slot input[type="range"]');
+    const readout = strip.querySelector(".fader-readout");
+    if (!fader || !readout) return;
+    const db = Number(fader.value);
+    readout.textContent = db.toFixed(1) + " dB";
+    const allowedBySolo = !anySolo || mixerStripSolo[index];
+    const gain = (mixerStripMuted[index] || !allowedBySolo) ? 0 : dbToGain(db);
+    if (index < 4 && mixerStripGains[index]) mixerStripGains[index].gain.setTargetAtTime(gain, audioContext.currentTime, 0.015);
+    if (index === 3 && alesisWetNode) alesisWetNode.gain.setTargetAtTime(gain * Number(echoMix.value), audioContext.currentTime, 0.015);
+    if (index === 4 && masterStripGainNode) masterStripGainNode.gain.setTargetAtTime(gain, audioContext.currentTime, 0.015);
+    const muteBtn = strip.querySelector(".console-action-btn.mute");
+    const soloBtn = strip.querySelector(".console-action-btn.solo");
+    if (muteBtn) muteBtn.classList.toggle("active", mixerStripMuted[index]);
+    if (soloBtn) soloBtn.classList.toggle("active", mixerStripSolo[index]);
+  });
 }
 
 function rebuildAudioRouting() {
@@ -1184,8 +1226,9 @@ function rebuildAudioRouting() {
     alesisDryNode.connect(audioChannels[1].inputGain);
     mixerInputGain.connect(alesisDelayNode);
     alesisDelayNode.connect(alesisWetNode);
-    alesisWetNode.connect(audioChannels[0].inputGain);
-    alesisWetNode.connect(audioChannels[1].inputGain);
+    alesisWetNode.connect(mixerStripGains[3]);
+    mixerStripAnalysers[3].connect(audioChannels[0].inputGain);
+    mixerStripAnalysers[3].connect(audioChannels[1].inputGain);
   } else {
     mixerInputGain.connect(audioChannels[0].inputGain);
     mixerInputGain.connect(audioChannels[1].inputGain);
@@ -1278,7 +1321,7 @@ function playCurrentBuffer() {
   const sourceNode = audioContext.createBufferSource();
   activeSourceNode = sourceNode;
   sourceNode.buffer = buffer;
-  sourceNode.connect(mixerInputGain);
+  sourceNode.connect(mixerStripGains[1]);
 
   sourceNode.start(0);
   isPlaying = true;
@@ -1351,7 +1394,7 @@ startMicButton.addEventListener("click", async () => {
     // Reinitialize/resume on the user gesture, then let the meter loop detect mic input.
     if (audioContext.state === "suspended") await audioContext.resume();
     microphoneSource = audioContext.createMediaStreamSource(microphoneStream);
-    microphoneSource.connect(mixerInputGain);
+    microphoneSource.connect(mixerStripGains[0]);
     startMicButton.classList.add("active");
     setAudioStatus(isPlaying ? "Mikrofon dan playlist aktif melalui Mixer." : "Mikrofon aktif masuk ke Mixer.");
   } catch (err) {
@@ -1490,8 +1533,20 @@ masterGainControl.addEventListener("input", updateMasterGain);
 outputMode.addEventListener("change", updateMasterGain);
 muteOutputButton.addEventListener("click", () => { outputMuted = !outputMuted; updateOutputMute(); });
 
-document.querySelectorAll(".console-action-btn").forEach(btn => {
-  btn.addEventListener("click", () => { btn.classList.toggle("active"); });
+document.querySelectorAll(".mixer-desk-surface .console-channel-strip").forEach((strip, index) => {
+  const fader = strip.querySelector('.fader-slot input[type="range"]');
+  fader?.addEventListener("input", () => { if (audioContext) updateMixerStripControls(); else {
+    const readout = strip.querySelector(".fader-readout");
+    if (readout) readout.textContent = Number(fader.value).toFixed(1) + " dB";
+  }});
+  strip.querySelector(".console-action-btn.mute")?.addEventListener("click", () => {
+    mixerStripMuted[index] = !mixerStripMuted[index];
+    if (audioContext) updateMixerStripControls(); else strip.querySelector(".console-action-btn.mute").classList.toggle("active", mixerStripMuted[index]);
+  });
+  strip.querySelector(".console-action-btn.solo")?.addEventListener("click", () => {
+    mixerStripSolo[index] = !mixerStripSolo[index];
+    if (audioContext) updateMixerStripControls(); else strip.querySelector(".console-action-btn.solo").classList.toggle("active", mixerStripSolo[index]);
+  });
 });
 
 /* =========================================================
