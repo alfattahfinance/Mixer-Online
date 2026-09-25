@@ -1196,9 +1196,26 @@ echoMix.addEventListener("input", () => {
 });
 
 function disconnectCurrentSource() {
-  if (activeSourceNode) { try { activeSourceNode.stop(); } catch (e) {} activeSourceNode = null; }
-  if (microphoneStream) { microphoneStream.getTracks().forEach(t => t.stop()); microphoneStream = null; }
-  microphoneSource = null;
+  // Invalidate the current source before stop(): stop() asynchronously fires onended.
+  const sourceToStop = activeSourceNode;
+  activeSourceNode = null;
+  if (sourceToStop) {
+    sourceToStop.onended = null;
+    try { sourceToStop.stop(); } catch (e) {}
+    try { sourceToStop.disconnect(); } catch (e) {}
+  }
+
+  if (microphoneSource) {
+    try { microphoneSource.disconnect(); } catch (e) {}
+    microphoneSource = null;
+  }
+  if (microphoneStream) {
+    microphoneStream.getTracks().forEach(track => track.stop());
+    microphoneStream = null;
+  }
+
+  isPlaying = false;
+  if (startAudioButton) startAudioButton.classList.remove("active");
 }
 
 function playCurrentBuffer() {
