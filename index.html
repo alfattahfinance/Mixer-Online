@@ -1342,6 +1342,8 @@ startMicButton.addEventListener("click", async () => {
     // Gunakan permintaan audio dasar untuk menghindari penolakan constraint
     // tertentu pada sebagian browser/perangkat Android.
     microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    // Reinitialize/resume on the user gesture, then let the meter loop detect mic input.
+    if (audioContext.state === "suspended") await audioContext.resume();
     microphoneSource = audioContext.createMediaStreamSource(microphoneStream);
     microphoneSource.connect(mixerInputGain);
     startMicButton.classList.add("active");
@@ -1703,7 +1705,10 @@ function startRealMeters() {
   function updateAllMeters() {
     meterAnimationId = requestAnimationFrame(updateAllMeters);
 
-    const isAudioRunning = audioContext && audioContext.state === "running" && isPlaying;
+    // Meter tetap membaca sinyal saat playlist ATAU mic aktif.
+    const micHasLiveTrack = !!(microphoneStream && microphoneStream.getAudioTracks().some(track => track.readyState === "live" && track.enabled));
+    const hasActiveInput = isPlaying || micHasLiveTrack;
+    const isAudioRunning = !!(audioContext && audioContext.state === "running" && hasActiveInput);
 
     audioChannels.forEach((audioChannel, index) => {
       const channel = channels[index];
