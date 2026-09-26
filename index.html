@@ -387,26 +387,64 @@ header, .topbar {
 
 .fader-slot {
   position: relative;
-  flex: 0 0 28px;
+  flex: 0 0 38px;
   height: 300px;
-  width: 28px;
+  width: 38px;
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: visible;
   background: #080b10;
   border: 1px solid #202833;
   border-radius: 4px;
 }
 .fader-slot input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
   writing-mode: vertical-lr;
   direction: rtl;
-  width: 20px;
-  height: 282px;
-  accent-color: #38bdf8;
+  width: 28px;
+  height: 286px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
   cursor: pointer;
-  touch-action: pan-x;
+  touch-action: none;
 }
-.master-strip .fader-slot input[type="range"] { accent-color: #fbbf24; }
+.fader-slot input[type="range"]::-webkit-slider-runnable-track {
+  width: 4px;
+  background: linear-gradient(90deg, #171b21, #454a50, #171b21);
+  border: 1px solid #60656b;
+  border-radius: 2px;
+}
+.fader-slot input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 42px;
+  height: 24px;
+  margin-left: -19px;
+  border: 1px solid #73777d;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, #b7b9bc 0%, #777b80 18%, #5d6166 48%, #a5a7aa 52%, #777b80 74%, #b7b9bc 100%);
+  box-shadow: 0 1px 3px #000, inset 0 1px 1px #e1e3e5;
+}
+.fader-slot input[type="range"]::-moz-range-track {
+  width: 4px;
+  background: linear-gradient(90deg, #171b21, #454a50, #171b21);
+  border: 1px solid #60656b;
+  border-radius: 2px;
+}
+.fader-slot input[type="range"]::-moz-range-thumb {
+  width: 42px;
+  height: 24px;
+  border: 1px solid #73777d;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, #b7b9bc 0%, #777b80 18%, #5d6166 48%, #a5a7aa 52%, #777b80 74%, #b7b9bc 100%);
+  box-shadow: 0 1px 3px #000, inset 0 1px 1px #e1e3e5;
+}
+.master-strip .fader-slot input[type="range"]::-webkit-slider-thumb,
+.master-strip .fader-slot input[type="range"]::-moz-range-thumb {
+  border-color: #c38a16;
+}
 
 .fader-readout { font-size: 10px; font-family: monospace; color: #38bdf8; margin-bottom: 6px; font-weight: bold; }
 .master-strip .fader-readout { color: #fbbf24; }
