@@ -550,6 +550,9 @@ header, .topbar {
   }
 }
 
+
+/* Hide accessible form labels visually without affecting screen readers. */
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
   </style>
 </head>
 
@@ -881,7 +884,11 @@ header, .topbar {
       </div>
 
       <div class="audio-actions">
-        <button id="startMicButton">MIC INPUT</button>
+        <button id="startMicButton">INPUT FISIK / MIC</button>
+        <label for="physicalInputDevice" class="sr-only">Pilih sumber input fisik</label>
+        <select id="physicalInputDevice" aria-label="Sumber input fisik" title="Pilih mikrofon atau USB audio interface">
+          <option value="">Input default HP</option>
+        </select>
         <label class="file-button">PILIH BANYAK FILE AUDIO<input id="audioFilesInput" type="file" accept="audio/*" multiple hidden></label>
         <button id="startAudioButton">START PLAYLIST</button>
         <button id="stopAudioButton">STOP AUDIO</button>
@@ -1089,6 +1096,27 @@ let audioGraphReady = false, meterAnimationId = null, outputMuted = false;
 const audioFilesInput = document.getElementById("audioFilesInput");
 const playlistContainer = document.getElementById("playlistContainer");
 const startMicButton = document.getElementById("startMicButton");
+const physicalInputDevice = document.getElementById("physicalInputDevice");
+
+async function refreshPhysicalInputDevices() {
+  if (!physicalInputDevice || !navigator.mediaDevices?.enumerateDevices) return;
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const inputs = devices.filter(device => device.kind === "audioinput");
+    const previous = physicalInputDevice.value;
+    physicalInputDevice.innerHTML = '<option value="">Input default HP</option>';
+    inputs.forEach((device, index) => {
+      const option = document.createElement("option");
+      option.value = device.deviceId;
+      option.textContent = device.label || ("Input audio " + (index + 1));
+      physicalInputDevice.appendChild(option);
+    });
+    if (inputs.some(device => device.deviceId === previous)) physicalInputDevice.value = previous;
+  } catch (err) {
+    // Device listing is optional; the default input remains available.
+  }
+}
+
 const startAudioButton = document.getElementById("startAudioButton");
 const stopAudioButton = document.getElementById("stopAudioButton");
 const masterGainControl = document.getElementById("masterGainControl");
@@ -1558,13 +1586,19 @@ startMicButton.addEventListener("click", async () => {
     }
     // Gunakan permintaan audio dasar untuk menghindari penolakan constraint
     // tertentu pada sebagian browser/perangkat Android.
-    microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const selectedInputId = physicalInputDevice?.value || "";
+    const audioConstraints = selectedInputId
+      ? { deviceId: { exact: selectedInputId }, echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+      : { echoCancellation: false, noiseSuppression: false, autoGainControl: false };
+    microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
+    await refreshPhysicalInputDevices();
     // Reinitialize/resume on the user gesture, then let the meter loop detect mic input.
     if (audioContext.state === "suspended") await audioContext.resume();
     microphoneSource = audioContext.createMediaStreamSource(microphoneStream);
     microphoneSource.connect(mixerStripGains[0]);
     startMicButton.classList.add("active");
-    setAudioStatus(isPlaying ? "Mikrofon dan playlist aktif melalui Mixer." : "Mikrofon aktif masuk ke Mixer.");
+    const chosenInputLabel = physicalInputDevice?.selectedOptions?.[0]?.textContent || "Input default HP";
+    setAudioStatus("Input fisik aktif: " + chosenInputLabel + ". Meter CH1 menunjukkan level sinyal masuk.");
   } catch (err) {
     microphoneStream?.getTracks().forEach(track => track.stop());
     microphoneStream = null;
