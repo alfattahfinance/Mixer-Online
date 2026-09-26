@@ -85,6 +85,24 @@ header, .topbar {
 .small-button { background: #252b35; color: #cbd5e1; border: 1px solid #485260; padding: 3px 8px; font-size: 10px; border-radius: 3px; display: flex; align-items: center; gap: 4px; }
 .small-button.active { background: #ef4444; color: #fff; border-color: #f87171; }
 .small-button.test-button.active { background: #f59e0b; color: #000; }
+/* Equalizer channel buttons use the same compact console feel, with their own teal/purple palette. */
+.channel-controls { flex-wrap: wrap; justify-content: flex-end; max-width: 58%; }
+.eq-action-button { min-height: 27px; padding: 5px 7px; border-radius: 4px; font-size: 9px; font-weight: 800; letter-spacing: .2px; }
+.eq-action-button.bypass-button { background: #073344; border-color: #0e7490; color: #a5f3fc; }
+.eq-action-button.bypass-button.active { background: #0e7490; border-color: #67e8f9; color: #fff; }
+.eq-action-button.test-button { background: #30204f; border-color: #7c3aed; color: #ddd6fe; }
+.eq-action-button.test-button.active { background: #8b5cf6; border-color: #c4b5fd; color: #fff; }
+.eq-action-button.eq-mute-button { background: #4a1745; border-color: #a21caf; color: #f5d0fe; }
+.eq-action-button.eq-mute-button.active { background: #c026d3; border-color: #f0abfc; color: #fff; }
+.eq-action-button.eq-solo-button { background: #123c2e; border-color: #059669; color: #a7f3d0; }
+.eq-action-button.eq-solo-button.active { background: #10b981; border-color: #6ee7b7; color: #052e1b; }
+.eq-action-button.eq-reset-button { background: #303640; border-color: #64748b; color: #e2e8f0; }
+.eq-action-button:focus-visible { outline: 2px solid #f8fafc; outline-offset: 2px; }
+@media (max-width: 560px) {
+  .channel-header { align-items: flex-start; gap: 6px; }
+  .channel-controls { max-width: 62%; gap: 4px; }
+  .eq-action-button { padding: 5px 6px; }
+}
 
 .control-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; background: #101216; padding: 8px; border-radius: 6px; margin-bottom: 8px; align-items: center; }
 .control label { display: block; font-size: 9px; color: #94a3b8; margin-bottom: 3px; }
@@ -601,8 +619,11 @@ header, .topbar {
                 <div class="channel-title">CHANNEL 1</div>
               </div>
               <div class="channel-controls">
-                <button class="small-button bypass-button"><span class="status-led bypass-led"></span> BYPASS</button>
-                <button class="small-button test-button"><span class="status-led test-led"></span> TEST</button>
+                <button class="small-button eq-action-button bypass-button" type="button" aria-pressed="false">EQ BYPASS</button>
+                <button class="small-button eq-action-button test-button" type="button" aria-pressed="false">TEST</button>
+                <button class="small-button eq-action-button eq-mute-button" type="button" aria-pressed="false">MUTE</button>
+                <button class="small-button eq-action-button eq-solo-button" type="button" aria-pressed="false">SOLO</button>
+                <button class="small-button eq-action-button eq-reset-button" type="button">RESET</button>
               </div>
             </div>
             <div class="control-row">
@@ -647,8 +668,11 @@ header, .topbar {
                 <div class="channel-title">CHANNEL 2</div>
               </div>
               <div class="channel-controls">
-                <button class="small-button bypass-button"><span class="status-led bypass-led"></span> BYPASS</button>
-                <button class="small-button test-button"><span class="status-led test-led"></span> TEST</button>
+                <button class="small-button eq-action-button bypass-button" type="button" aria-pressed="false">EQ BYPASS</button>
+                <button class="small-button eq-action-button test-button" type="button" aria-pressed="false">TEST</button>
+                <button class="small-button eq-action-button eq-mute-button" type="button" aria-pressed="false">MUTE</button>
+                <button class="small-button eq-action-button eq-solo-button" type="button" aria-pressed="false">SOLO</button>
+                <button class="small-button eq-action-button eq-reset-button" type="button">RESET</button>
               </div>
             </div>
             <div class="control-row">
@@ -1300,9 +1324,11 @@ function renderPlaylistUI() {
 }
 
 const audioChannels = [
-  { inputGain: null, highPass: null, filters: [], analyser: null, bypass: false },
-  { inputGain: null, highPass: null, filters: [], analyser: null, bypass: false }
+  { inputGain: null, highPass: null, filters: [], outputGain: null, analyser: null, bypass: false },
+  { inputGain: null, highPass: null, filters: [], outputGain: null, analyser: null, bypass: false }
 ];
+const eqChannelMuted = [false, false];
+const eqChannelSolo = [false, false];
 
 function buildEqualizerChannel(channelIndex) {
   const channel = channels[channelIndex];
@@ -1312,9 +1338,11 @@ function buildEqualizerChannel(channelIndex) {
 
   const inputGain = audioContext.createGain();
   const highPass = audioContext.createBiquadFilter();
+  const outputGain = audioContext.createGain();
   const analyser = audioContext.createAnalyser();
 
   inputGain.gain.value = dbToGain(Number(gainControl.value));
+  outputGain.gain.value = 1;
   highPass.type = "highpass";
   highPass.frequency.value = hpfControl.value === "off" ? 20 : Number(hpfControl.value);
   highPass.Q.value = 0.707;
@@ -1335,8 +1363,9 @@ function buildEqualizerChannel(channelIndex) {
     filters.push(filter);
   });
 
-  previousNode.connect(analyser);
-  audioChannels[channelIndex] = { inputGain, highPass, filters, analyser, bypass: false };
+  previousNode.connect(outputGain);
+  outputGain.connect(analyser);
+  audioChannels[channelIndex] = { inputGain, highPass, filters, outputGain, analyser, bypass: false };
 
   gainControl.addEventListener("input", () => {
     inputGain.gain.setTargetAtTime(dbToGain(Number(gainControl.value)), audioContext.currentTime, 0.01);
@@ -1422,6 +1451,7 @@ function initializeAudioGraph() {
   updateMasterGain();
   updateOutputMute();
   updateMixerStripControls();
+  updateEqChannelStates();
   startRealMeters();
 }
 
@@ -1673,6 +1703,16 @@ stopAudioButton.addEventListener("click", () => {
     : "Playlist dihentikan.");
 });
 
+function updateEqChannelStates() {
+  if (!audioGraphReady || !audioContext) return;
+  const anySolo = eqChannelSolo.some(Boolean);
+  audioChannels.forEach((ac, index) => {
+    if (!ac.outputGain) return;
+    const audible = !eqChannelMuted[index] && (!anySolo || eqChannelSolo[index]);
+    ac.outputGain.gain.setTargetAtTime(audible ? 1 : 0, audioContext.currentTime, 0.012);
+  });
+}
+
 function syncAudioControlsFromUI() {
   if (!audioGraphReady || !audioContext) return;
   channels.forEach((channel, index) => {
@@ -1762,6 +1802,7 @@ channels.forEach((channel, idx) => {
 
   testBtn.addEventListener("click", () => {
     testBtn.classList.toggle("active");
+    testBtn.setAttribute("aria-pressed", String(testBtn.classList.contains("active")));
     const testing = testBtn.classList.contains("active");
     channel.querySelector(".gain").value = testing ? "6" : "0";
     channel.querySelectorAll(".band input").forEach(s => {
@@ -1770,6 +1811,34 @@ channels.forEach((channel, idx) => {
       if (valDisplay) valDisplay.textContent = Number(s.value).toFixed(1);
     });
     updateValues(channel);
+  });
+
+  const muteBtn = channel.querySelector(".eq-mute-button");
+  const soloBtn = channel.querySelector(".eq-solo-button");
+  const resetBtn = channel.querySelector(".eq-reset-button");
+  muteBtn.addEventListener("click", () => {
+    eqChannelMuted[idx] = !eqChannelMuted[idx];
+    muteBtn.classList.toggle("active", eqChannelMuted[idx]);
+    muteBtn.setAttribute("aria-pressed", String(eqChannelMuted[idx]));
+    updateEqChannelStates();
+    setStatus(eqChannelMuted[idx] ? "Mute Equalizer CH " + (idx + 1) + " aktif." : "Mute Equalizer CH " + (idx + 1) + " nonaktif.");
+  });
+  soloBtn.addEventListener("click", () => {
+    eqChannelSolo[idx] = !eqChannelSolo[idx];
+    soloBtn.classList.toggle("active", eqChannelSolo[idx]);
+    soloBtn.setAttribute("aria-pressed", String(eqChannelSolo[idx]));
+    updateEqChannelStates();
+    setStatus(eqChannelSolo[idx] ? "Solo Equalizer CH " + (idx + 1) + " aktif." : "Solo Equalizer CH " + (idx + 1) + " nonaktif.");
+  });
+  resetBtn.addEventListener("click", () => {
+    channel.querySelector(".gain").value = "0";
+    channel.querySelector(".hpf").value = "off";
+    channel.querySelector(".range").value = "15";
+    channel.querySelectorAll(".band input").forEach(slider => slider.value = "0");
+    channel.querySelector(".test-button").classList.remove("active");
+    channel.querySelector(".test-button").setAttribute("aria-pressed", "false");
+    updateValues(channel);
+    setStatus("Equalizer CH " + (idx + 1) + " di-reset ke flat.");
   });
   updateValues(channel);
 });
