@@ -129,32 +129,36 @@ header, .topbar {
 .band input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
-  writing-mode: vertical-lr;
-  direction: rtl;
-  width: 40px;
-  height: 165px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 165px;
+  height: 26px;
+  margin: 0;
+  padding: 0;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  transform-origin: center;
   background: transparent;
-  accent-color: #38bdf8;
   cursor: pointer;
-  position: relative;
   z-index: 2;
   touch-action: pan-x;
 }
 
-/* EQ graphic fader: narrow recessed rail and a metal crossbar cap */
+/* Graphic EQ rail and centered metal fader cap */
 .band input[type="range"]::-webkit-slider-runnable-track {
-  width: 4px;
+  height: 4px;
   border: 1px solid #46515f;
   border-radius: 3px;
-  background: linear-gradient(90deg, #080b10 0%, #26303b 35%, #10151c 70%, #080b10 100%);
+  background: linear-gradient(to bottom, #080b10 0%, #26303b 35%, #10151c 70%, #080b10 100%);
   box-shadow: inset 0 0 2px #000, 0 0 0 1px rgba(148,163,184,.12);
 }
 
 .band input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 34px;
-  height: 13px;
+  width: 13px;
+  height: 26px;
+  margin-top: -12px;
   border: 1px solid #626d7a;
   border-radius: 3px;
   background:
@@ -164,16 +168,16 @@ header, .topbar {
 }
 
 .band input[type="range"]::-moz-range-track {
-  width: 4px;
+  height: 4px;
   border: 1px solid #46515f;
   border-radius: 3px;
-  background: linear-gradient(90deg, #080b10 0%, #26303b 35%, #10151c 70%, #080b10 100%);
+  background: linear-gradient(to bottom, #080b10 0%, #26303b 35%, #10151c 70%, #080b10 100%);
   box-shadow: inset 0 0 2px #000;
 }
 
 .band input[type="range"]::-moz-range-thumb {
-  width: 34px;
-  height: 13px;
+  width: 13px;
+  height: 26px;
   border: 1px solid #626d7a;
   border-radius: 3px;
   background:
@@ -186,6 +190,7 @@ header, .topbar {
   position: relative;
   height: 165px;
   width: 40px;
+  flex: 0 0 40px;
   display: flex;
   justify-content: center;
   align-items: center;
