@@ -910,6 +910,10 @@ header, .topbar {
             <option value="safe" selected>SAFE MODE</option>
             <option value="normal">NORMAL MODE</option>
           </select>
+          <label for="physicalOutputDevice" style="display:block;margin-top:8px;">OUTPUT KE MIXER FISIK</label>
+          <select id="physicalOutputDevice" aria-label="Pilih output audio" style="width:100%;">
+            <option value="">Output default HP / USB</option>
+          </select>
           <button id="muteOutputButton" style="width:100%; margin-top:8px;">MUTE OUTPUT</button>
         </div>
       </div>
@@ -1098,22 +1102,57 @@ const playlistContainer = document.getElementById("playlistContainer");
 const startMicButton = document.getElementById("startMicButton");
 const physicalInputDevice = document.getElementById("physicalInputDevice");
 
+const physicalOutputDevice = document.getElementById("physicalOutputDevice");
+
 async function refreshPhysicalInputDevices() {
-  if (!physicalInputDevice || !navigator.mediaDevices?.enumerateDevices) return;
+  if (!navigator.mediaDevices?.enumerateDevices) return;
   try {
     const devices = await navigator.mediaDevices.enumerateDevices();
-    const inputs = devices.filter(device => device.kind === "audioinput");
-    const previous = physicalInputDevice.value;
-    physicalInputDevice.innerHTML = '<option value="">Input default HP</option>';
-    inputs.forEach((device, index) => {
-      const option = document.createElement("option");
-      option.value = device.deviceId;
-      option.textContent = device.label || ("Input audio " + (index + 1));
-      physicalInputDevice.appendChild(option);
-    });
-    if (inputs.some(device => device.deviceId === previous)) physicalInputDevice.value = previous;
+    if (physicalInputDevice) {
+      const inputs = devices.filter(device => device.kind === "audioinput");
+      const previous = physicalInputDevice.value;
+      physicalInputDevice.innerHTML = '<option value="">Input default HP / USB</option>';
+      inputs.forEach((device, index) => {
+        const option = document.createElement("option");
+        option.value = device.deviceId;
+        option.textContent = device.label || ("Input audio " + (index + 1));
+        physicalInputDevice.appendChild(option);
+      });
+      if (inputs.some(device => device.deviceId === previous)) physicalInputDevice.value = previous;
+    }
+    if (physicalOutputDevice) {
+      const outputs = devices.filter(device => device.kind === "audiooutput");
+      const previous = physicalOutputDevice.value;
+      physicalOutputDevice.innerHTML = '<option value="">Output default HP / USB</option>';
+      outputs.forEach((device, index) => {
+        const option = document.createElement("option");
+        option.value = device.deviceId;
+        option.textContent = device.label || ("Output audio " + (index + 1));
+        physicalOutputDevice.appendChild(option);
+      });
+      if (outputs.some(device => device.deviceId === previous)) physicalOutputDevice.value = previous;
+    }
   } catch (err) {
-    // Device listing is optional; the default input remains available.
+    // The browser may hide device names until microphone permission is granted.
+  }
+}
+
+async function applyPhysicalOutputDevice() {
+  const requestedId = physicalOutputDevice?.value || "";
+  if (!audioContext) {
+    setAudioStatus("Output akan dipilih setelah audio dimulai. Jika USB tidak muncul, pilih output USB di pengaturan HP.");
+    return;
+  }
+  if (typeof audioContext.setSinkId !== "function") {
+    setAudioStatus("Browser ini tidak mendukung pemilihan output dari halaman. Pilih USB audio sebagai output default di pengaturan HP, lalu mulai ulang audio.");
+    return;
+  }
+  try {
+    await audioContext.setSinkId(requestedId);
+    const label = physicalOutputDevice?.selectedOptions?.[0]?.textContent || "output default";
+    setAudioStatus("Output audio diarahkan ke: " + label + ".");
+  } catch (err) {
+    setAudioStatus("Output tidak dapat dipilih (" + (err.name || "Error") + "). Pilih USB audio sebagai output default HP.");
   }
 }
 
@@ -1123,6 +1162,11 @@ const masterGainControl = document.getElementById("masterGainControl");
 const masterGainValue = document.getElementById("masterGainValue");
 const outputMode = document.getElementById("outputMode");
 const muteOutputButton = document.getElementById("muteOutputButton");
+if (physicalOutputDevice) physicalOutputDevice.addEventListener("change", applyPhysicalOutputDevice);
+if (navigator.mediaDevices?.addEventListener) {
+  navigator.mediaDevices.addEventListener("devicechange", refreshPhysicalInputDevices);
+}
+refreshPhysicalInputDevices();
 
 const echoDelay = document.getElementById("echoDelay");
 const echoFeedback = document.getElementById("echoFeedback");
@@ -1555,6 +1599,7 @@ startAudioButton.addEventListener("click", async () => {
     const ctx = createAudioContext();
     if (ctx.state === "suspended") await ctx.resume();
     initializeAudioGraph();
+    await applyPhysicalOutputDevice();
     playCurrentBuffer();
   } catch (err) {
     const audioError = err && err.name ? err.name : "Error";
@@ -1581,11 +1626,13 @@ startMicButton.addEventListener("click", async () => {
     const ctx = createAudioContext();
     if (ctx.state === "suspended") await ctx.resume();
     initializeAudioGraph();
+    await applyPhysicalOutputDevice();
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       throw new Error("MIC_UNAVAILABLE: Browser tidak menyediakan akses mikrofon. Buka halaman melalui HTTPS dan browser yang mendukung mic.");
     }
     // Gunakan permintaan audio dasar untuk menghindari penolakan constraint
     // tertentu pada sebagian browser/perangkat Android.
+    await refreshPhysicalInputDevices();
     const selectedInputId = physicalInputDevice?.value || "";
     const audioConstraints = selectedInputId
       ? { deviceId: { exact: selectedInputId }, echoCancellation: false, noiseSuppression: false, autoGainControl: false }
