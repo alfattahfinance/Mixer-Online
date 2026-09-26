@@ -511,6 +511,45 @@ header, .topbar {
 .tft-meter-bar span { flex: 1; background: #111827; border-radius: 1px; }
 .tft-curve-box { display: flex; justify-content: space-around; align-items: flex-end; height: 40px; background: #03060a; border: 1px solid #1e293b; border-radius: 3px; padding: 2px 4px; margin-top: 4px; }
 .tft-curve-bar { width: 8px; background: #0284c7; border-radius: 2px 2px 0 0; transition: height 0.2s; }
+
+/* Landscape tuning: keep the mixer TFT readable without an overly wide aspect. */
+@media (orientation: landscape) and (min-width: 769px) {
+  .mixer-top-console {
+    grid-template-columns: minmax(0, 1.35fr) minmax(250px, 0.85fr);
+    align-items: stretch;
+  }
+  .mixer-tft-screen {
+    min-width: 0;
+    min-height: 460px;
+  }
+  .tft-main-viewport {
+    flex: 1 1 auto;
+    min-height: 150px;
+  }
+}
+@media (orientation: landscape) and (max-width: 768px) {
+  .mixer-top-console {
+    grid-template-columns: minmax(0, 1.15fr) minmax(190px, 0.85fr);
+    gap: 8px;
+    padding: 8px;
+  }
+  .mixer-tft-screen {
+    min-width: 0;
+    min-height: 340px;
+  }
+  .mixer-control-section {
+    min-width: 0;
+    padding: 7px;
+  }
+  .tft-main-viewport {
+    flex: 1 1 auto;
+    min-height: 125px;
+  }
+  .tft-encoders-bar {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
   </style>
 </head>
 
