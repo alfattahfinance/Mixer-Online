@@ -1610,7 +1610,7 @@ const tftDatabase = {
   config: {
     title: "CONFIG / PREAMP INTERFACE",
     footerCh: "CH 01: Lead Vocal",
-    footerSt: "Sentuh & geser kurva preamp",
+    footerSt: "Sentuh & geser slider atau kurva preamp",
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box">
@@ -1633,7 +1633,7 @@ const tftDatabase = {
   gate: {
     title: "NOISE GATE / EXPANDER PROCESSOR",
     footerCh: "CH 01: Lead Vocal",
-    footerSt: "Sentuh & geser kurva threshold gate",
+    footerSt: "Sentuh & geser slider atau kurva threshold gate",
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box">
@@ -1656,7 +1656,7 @@ const tftDatabase = {
   dynamics: {
     title: "DYNAMICS / COMPRESSOR PROCESSOR",
     footerCh: "CH 01: Lead Vocal",
-    footerSt: "Sentuh & geser kurva compressor",
+    footerSt: "Sentuh & geser slider atau kurva compressor",
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box">
@@ -1679,7 +1679,7 @@ const tftDatabase = {
   eq: {
     title: "PARAMETRIC EQ / CHANNEL PROCESSOR",
     footerCh: "CH 02: PEQ",
-    footerSt: "Sentuh & geser titik grafik atau gunakan slider",
+    footerSt: "Sentuh & geser titik grafik atau slider",
     content: `
       <div class="tft-peq">
         <div class="tft-peq-head"><strong>PEQ • CH 02</strong><span style="color:#10b981;">● AUDIO DSP ACTIVE</span></div>
@@ -1716,7 +1716,7 @@ const tftDatabase = {
   sends: {
     title: "BUS SENDS & FX ROUTING",
     footerCh: "CH 01: Lead Vocal",
-    footerSt: "Sentuh & geser kurva routing send",
+    footerSt: "Sentuh & geser slider atau kurva routing send",
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box">
@@ -1739,7 +1739,7 @@ const tftDatabase = {
   main: {
     title: "MAIN FOH OUTPUT & MATRIX",
     footerCh: "MASTER FOH",
-    footerSt: "Sentuh & geser kurva limiter master",
+    footerSt: "Sentuh & geser slider atau kurva limiter master",
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box">
@@ -2106,32 +2106,46 @@ function bindTftDynamicEventListeners(key) {
     updateSvg(valThresh);
   }
 
-  // --- DYNAMICS MODULE DRAG ---
+  // --- DYNAMICS MODULE DRAG & SLIDER SYNC ---
   if (key === "dynamics") {
     const compThresh = document.getElementById("compThresh");
     const compThreshVal = document.getElementById("compThreshVal");
+    const compRatio = document.getElementById("compRatio");
+    const compRatioVal = document.getElementById("compRatioVal");
     const svgContainer = document.getElementById("tftCompSvgContainer");
     const curve = document.getElementById("tftCompSvgCurve");
     const fill = document.getElementById("tftCompSvgFill");
     const dot = document.getElementById("tftCompSvgDot");
 
     let valThresh = compThresh ? Number(compThresh.value) : -18;
-    const updateSvg = (val) => {
+    let valRatio = compRatio ? Number(compRatio.value) : 3;
+
+    const updateSvg = (thresh, ratio) => {
       if (!curve || !dot) return;
-      const cx = 10 + ((val + 60) / 60) * 300;
-      const cy = 50 - ((val + 60) / 60) * 40;
+      const cx = 10 + ((thresh + 60) / 60) * 300;
+      const slope = 1 / ratio;
+      const cy = Math.max(10, Math.min(50, 50 - ((thresh + 60) / 60) * 40 * slope));
       curve.setAttribute("d", `M10 50 L ${cx.toFixed(1)} ${cy.toFixed(1)} L 310 15`);
       fill.setAttribute("d", `M10 50 L ${cx.toFixed(1)} ${cy.toFixed(1)} L 310 15 L 310 50 Z`);
       dot.setAttribute("cx", cx.toFixed(1));
       dot.setAttribute("cy", cy.toFixed(1));
     };
+
     if (compThresh) {
       compThresh.addEventListener("input", () => {
         valThresh = Number(compThresh.value);
         if (compThreshVal) compThreshVal.textContent = valThresh.toFixed(0) + "dB";
-        updateSvg(valThresh);
+        updateSvg(valThresh, valRatio);
       });
     }
+    if (compRatio) {
+      compRatio.addEventListener("input", () => {
+        valRatio = Number(compRatio.value);
+        if (compRatioVal) compRatioVal.textContent = valRatio.toFixed(0) + ":1";
+        updateSvg(valThresh, valRatio);
+      });
+    }
+
     if (svgContainer) {
       let dragging = false;
       svgContainer.addEventListener("pointerdown", (e) => { dragging = true; svgContainer.setPointerCapture(e.pointerId); });
@@ -2142,13 +2156,13 @@ function bindTftDynamicEventListeners(key) {
         valThresh = Math.round(((x - 10) / 300) * 60 - 60);
         if (compThresh) compThresh.value = valThresh;
         if (compThreshVal) compThreshVal.textContent = valThresh.toFixed(0) + "dB";
-        updateSvg(valThresh);
+        updateSvg(valThresh, valRatio);
       });
       const stop = (e) => { dragging = false; try { svgContainer.releasePointerCapture(e.pointerId); } catch(err){} };
       svgContainer.addEventListener("pointerup", stop);
       svgContainer.addEventListener("pointercancel", stop);
     }
-    updateSvg(valThresh);
+    updateSvg(valThresh, valRatio);
   }
 
   // --- SENDS MODULE DRAG ---
