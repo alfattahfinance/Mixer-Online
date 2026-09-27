@@ -1152,6 +1152,9 @@ function createBands(channel) {
 /* =========================================================
    AUDIO ENGINE & ROUTING (DIPERBAIKI 100% TEMBUS KE HP)
 ========================================================= */
+// Smooth control response for EQ, echo FX, channel and master faders.
+const CONTROL_SMOOTHING_SECONDS = 0.08;
+
 let audioContext = null;
 let microphoneStream = null;
 let microphoneSource = null;
@@ -1271,7 +1274,7 @@ function updateMasterGain() {
   const appliedDb = getSafeMasterGainDb();
   masterGainValue.textContent = appliedDb.toFixed(0) + " dB";
   if (masterGainNode && audioContext) {
-    masterGainNode.gain.setTargetAtTime(dbToGain(appliedDb), audioContext.currentTime, 0.01);
+    masterGainNode.gain.setTargetAtTime(dbToGain(appliedDb), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
   }
 }
 
@@ -1422,15 +1425,15 @@ function buildEqualizerChannel(channelIndex) {
   audioChannels[channelIndex] = { inputGain, highPass, filters, outputGain, analyser, bypass: false };
 
   gainControl.addEventListener("input", () => {
-    inputGain.gain.setTargetAtTime(dbToGain(Number(gainControl.value)), audioContext.currentTime, 0.01);
+    inputGain.gain.setTargetAtTime(dbToGain(Number(gainControl.value)), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
   });
   hpfControl.addEventListener("change", () => {
-    highPass.frequency.setTargetAtTime(hpfControl.value === "off" ? 20 : Number(hpfControl.value), audioContext.currentTime, 0.01);
+    highPass.frequency.setTargetAtTime(hpfControl.value === "off" ? 20 : Number(hpfControl.value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
   });
   bandControls.forEach((control, index) => {
     control.addEventListener("input", () => {
       if (audioChannels[channelIndex].bypass) return;
-      filters[index].gain.setTargetAtTime(Number(control.value), audioContext.currentTime, 0.01);
+      filters[index].gain.setTargetAtTime(Number(control.value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
     });
   });
 
@@ -1520,10 +1523,10 @@ function updateMixerStripControls() {
     readout.textContent = db.toFixed(1) + " dB";
     const allowedBySolo = !anySolo || mixerStripSolo[index];
     const gain = (mixerStripMuted[index] || !allowedBySolo) ? 0 : dbToGain(db);
-    if (index < 3 && mixerStripGains[index]) mixerStripGains[index].gain.setTargetAtTime(gain, audioContext.currentTime, 0.015);
+    if (index < 3 && mixerStripGains[index]) mixerStripGains[index].gain.setTargetAtTime(gain, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
     // CH4 is the FX return; its fader controls the wet return level exactly once.
-    if (index === 3 && alesisWetNode) alesisWetNode.gain.setTargetAtTime(gain * Number(echoMix.value), audioContext.currentTime, 0.015);
-    if (index === 4 && masterStripGainNode) masterStripGainNode.gain.setTargetAtTime(gain, audioContext.currentTime, 0.015);
+    if (index === 3 && alesisWetNode) alesisWetNode.gain.setTargetAtTime(gain * Number(echoMix.value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+    if (index === 4 && masterStripGainNode) masterStripGainNode.gain.setTargetAtTime(gain, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
     const muteBtn = strip.querySelector(".console-action-btn.mute");
     const soloBtn = strip.querySelector(".console-action-btn.solo");
     if (muteBtn) muteBtn.classList.toggle("active", mixerStripMuted[index]);
@@ -1575,23 +1578,23 @@ echoToggleBtn.addEventListener("click", () => {
 
 echoDelay.addEventListener("input", () => {
   document.getElementById("echoDelayVal").textContent = Number(echoDelay.value).toFixed(2) + " detik";
-  if (alesisDelayNode && audioContext) alesisDelayNode.delayTime.setTargetAtTime(Number(echoDelay.value), audioContext.currentTime, 0.01);
+  if (alesisDelayNode && audioContext) alesisDelayNode.delayTime.setTargetAtTime(Number(echoDelay.value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
 });
 
 echoFeedback.addEventListener("input", () => {
   document.getElementById("echoFeedbackVal").textContent = Math.round(echoFeedback.value * 100) + "%";
-  if (alesisFeedbackNode && audioContext) alesisFeedbackNode.gain.setTargetAtTime(Number(echoFeedback.value), audioContext.currentTime, 0.01);
+  if (alesisFeedbackNode && audioContext) alesisFeedbackNode.gain.setTargetAtTime(Number(echoFeedback.value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
 });
 
 echoDamping.addEventListener("input", () => {
   document.getElementById("echoDampingVal").textContent = echoDamping.value + " Hz";
-  if (alesisFilterNode && audioContext) alesisFilterNode.frequency.setTargetAtTime(Number(echoDamping.value), audioContext.currentTime, 0.01);
+  if (alesisFilterNode && audioContext) alesisFilterNode.frequency.setTargetAtTime(Number(echoDamping.value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
 });
 
 echoMix.addEventListener("input", () => {
   document.getElementById("echoMixVal").textContent = Math.round(echoMix.value * 100) + "%";
   if (alesisWetNode && alesisDryNode && audioContext) {
-    alesisDryNode.gain.setTargetAtTime(1.0 - Number(echoMix.value), audioContext.currentTime, 0.01);
+    alesisDryNode.gain.setTargetAtTime(1.0 - Number(echoMix.value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
     updateMixerStripControls(); // keep FX return fader/mute/solo in the signal path
   }
 });
@@ -1777,13 +1780,13 @@ function syncAudioControlsFromUI() {
     const bypassBtn = channel.querySelector(".bypass-button");
     const bands = [...channel.querySelectorAll(".band input[type='range']")];
 
-    ac.inputGain.gain.setTargetAtTime(dbToGain(Number(gainCtrl.value)), audioContext.currentTime, 0.01);
-    ac.highPass.frequency.setTargetAtTime(hpfCtrl.value === "off" ? 20 : Number(hpfCtrl.value), audioContext.currentTime, 0.01);
+    ac.inputGain.gain.setTargetAtTime(dbToGain(Number(gainCtrl.value)), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+    ac.highPass.frequency.setTargetAtTime(hpfCtrl.value === "off" ? 20 : Number(hpfCtrl.value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
     ac.bypass = bypassBtn.classList.contains("active");
 
     ac.filters.forEach((filter, bIdx) => {
       if (bands[bIdx]) {
-        filter.gain.setTargetAtTime(ac.bypass ? 0 : Number(bands[bIdx].value), audioContext.currentTime, 0.01);
+        filter.gain.setTargetAtTime(ac.bypass ? 0 : Number(bands[bIdx].value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
       }
     });
   });
