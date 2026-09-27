@@ -141,7 +141,10 @@ header, .topbar {
   background: transparent;
   cursor: pointer;
   z-index: 2;
-  touch-action: pan-y;
+  /* Keep touch drags on the EQ fader from scrolling the page */
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 /* Graphic EQ fader: vertical recessed rail with a metal crossbar cap */
