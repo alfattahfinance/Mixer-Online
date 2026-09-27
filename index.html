@@ -92,12 +92,7 @@ header, .topbar {
 .status-led.test-led { background: #f59e0b; border-color: #fbbf24; box-shadow: 0 0 6px #f59e0b; }
 
 .channel-title { font-size: 12px; font-weight: bold; color: #38bdf8; }
-.channel-controls { display: flex; gap: 6px; align-items: center; }
-.small-button { background: #252b35; color: #cbd5e1; border: 1px solid #485260; padding: 3px 8px; font-size: 10px; border-radius: 3px; display: flex; align-items: center; gap: 4px; }
-.small-button.active { background: #ef4444; color: #fff; border-color: #f87171; }
-.small-button.test-button.active { background: #f59e0b; color: #000; }
-/* Equalizer channel buttons use the same compact console feel, with their own teal/purple palette. */
-.channel-controls { flex-wrap: wrap; justify-content: flex-end; max-width: 58%; }
+.channel-controls { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; max-width: 58%; }
 .eq-action-button { min-height: 27px; padding: 5px 7px; border-radius: 4px; font-size: 9px; font-weight: 800; letter-spacing: .2px; }
 .eq-action-button.bypass-button { background: #073344; border-color: #0e7490; color: #a5f3fc; }
 .eq-action-button.bypass-button.active { background: #0e7490; border-color: #67e8f9; color: #fff; }
@@ -108,12 +103,6 @@ header, .topbar {
 .eq-action-button.eq-solo-button { background: #123c2e; border-color: #059669; color: #a7f3d0; }
 .eq-action-button.eq-solo-button.active { background: #10b981; border-color: #6ee7b7; color: #052e1b; }
 .eq-action-button.eq-reset-button { background: #303640; border-color: #64748b; color: #e2e8f0; }
-.eq-action-button:focus-visible { outline: 2px solid #f8fafc; outline-offset: 2px; }
-@media (max-width: 560px) {
-  .channel-header { align-items: flex-start; gap: 6px; }
-  .channel-controls { max-width: 62%; gap: 4px; }
-  .eq-action-button { padding: 5px 6px; }
-}
 
 .control-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; background: #101216; padding: 8px; border-radius: 6px; margin-bottom: 8px; align-items: center; }
 .control label { display: block; font-size: 9px; color: #94a3b8; margin-bottom: 3px; }
@@ -134,607 +123,20 @@ header, .topbar {
 
 .eq-section { width: 100%; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; }
 .eq { display: grid; grid-template-columns: repeat(31, 48px); gap: 6px; min-width: max-content; align-items: stretch; }
+
 .band {
   box-sizing: border-box;
   background: #101216;
   border: 1px solid #2a323d;
   border-radius: 5px;
   padding: 5px 3px;
-  display: grid;
-  grid-template-rows: 18px minmax(165px, 1fr) 18px;
-  row-gap: 4px;
-  justify-items: center;
-  align-items: center;
-  height: 230px;
-  min-width: 0;
-  position: relative;
-}
-.band-frequency {
-  box-sizing: border-box;
-  width: 100%;
-  height: 18px;
-  font-size: 8px;
-  line-height: 18px;
-  color: #94a3b8;
-  margin: 0;
-  text-align: center;
-  white-space: nowrap;
-}
-
-.slider-track-container {
-  position: relative;
-  height: 100%;
-  min-height: 165px;
-  width: 100%;
-  min-width: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: ns-resize;
-  touch-action: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-/* Native vertical range keeps the cap centered on its rail at every value. */
-.band input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  writing-mode: vertical-lr;
-  direction: rtl;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  display: block;
-  box-sizing: border-box;
-  width: 26px;
-  height: 165px;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  transform: translate(-50%, -50%);
-  background: transparent;
-  cursor: ns-resize;
-  z-index: 2;
-  touch-action: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
-
- .band input[type="range"]::-webkit-slider-runnable-track {
-  width: 4px;
-  height: 100%;
-  border: 1px solid #46515f;
-  border-radius: 3px;
-  background: linear-gradient(to bottom, #080b10 0%, #26303b 35%, #10151c 70%, #080b10 100%);
-  box-shadow: inset 0 0 2px #000, 0 0 0 1px rgba(148,163,184,.12);
-}
-
-.band input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  box-sizing: border-box;
-  width: 26px;
-  height: 13px;
-  margin-left: -12px;
-  border: 1px solid #626d7a;
-  border-radius: 3px;
-  background:
-    linear-gradient(90deg, transparent 0 37%, rgba(22,28,36,.85) 37% 41%, transparent 41% 59%, rgba(22,28,36,.85) 59% 63%, transparent 63%),
-    linear-gradient(to bottom, #f1f3f5 0%, #b9c0c8 17%, #737d89 46%, #414b57 52%, #9ba4af 82%, #e6e9ed 100%);
-  box-shadow: 0 2px 3px rgba(0,0,0,.85), inset 0 1px 1px rgba(255,255,255,.85), inset 0 -1px 1px rgba(20,25,32,.9);
-}
-
- .band input[type="range"]::-moz-range-track {
-  width: 4px;
-  height: 100%;
-  border: 1px solid #46515f;
-  border-radius: 3px;
-  background: linear-gradient(to bottom, #080b10 0%, #26303b 35%, #10151c 70%, #080b10 100%);
-  box-shadow: inset 0 0 2px #000;
-}
-
-.band input[type="range"]::-moz-range-thumb {
-  box-sizing: border-box;
-  width: 26px;
-  height: 13px;
-  border: 1px solid #626d7a;
-  border-radius: 3px;
-  background:
-    linear-gradient(90deg, transparent 0 37%, rgba(22,28,36,.85) 37% 41%, transparent 41% 59%, rgba(22,28,36,.85) 59% 63%, transparent 63%),
-    linear-gradient(to bottom, #f1f3f5 0%, #b9c0c8 17%, #737d89 46%, #414b57 52%, #9ba4af 82%, #e6e9ed 100%);
-  box-shadow: 0 2px 3px rgba(0,0,0,.85), inset 0 1px 1px rgba(255,255,255,.85), inset 0 -1px 1px rgba(20,25,32,.9);
-}
-
-.band-value { width: 100%; height: 18px; line-height: 18px; font-size: 8px; color: #38bdf8; margin: 0; font-family: monospace; text-align: center; white-space: nowrap; }
-.scale { display: flex; justify-content: space-between; font-size: 9px; color: #64748b; padding: 2px 4px; }
-
-/* =========================================================
-   PANEL ALESIS (EFFECTS PROCESSOR)
-========================================================= */
-.echo-panel-box {
-  background: #161a22;
-  border: 1px solid #3a414b;
-  border-radius: 8px;
-  padding: 20px;
-}
-.echo-header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-.echo-onoff-btn {
-  background: #252b35; color: #fff; border: 1px solid #485260; padding: 8px 16px; border-radius: 6px; font-weight: bold; font-size: 12px;
-}
-.echo-onoff-btn.active {
-  background: #10b981; border-color: #34d399; color: #000; box-shadow: 0 0 8px #10b981;
-}
-.echo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-.echo-control-card { background: #101216; border: 1px solid #2a323d; padding: 15px; border-radius: 6px; }
-.echo-control-card label { display: block; font-size: 11px; color: #38bdf8; margin-bottom: 6px; font-weight: bold; }
-.echo-control-card input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  display: block;
-  width: 100%;
-  height: 30px;
-  margin: 0 0 6px;
-  padding: 0;
-  background: transparent;
-  cursor: pointer;
-  touch-action: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
-.echo-control-card input[type="range"]::-webkit-slider-runnable-track {
-  height: 6px;
-  border: 1px solid #647080;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #38bdf8 0%, #38bdf8 50%, #d1d5db 50%, #d1d5db 100%);
-  box-shadow: inset 0 1px 2px rgba(0,0,0,.65);
-}
-.echo-control-card input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 24px;
-  height: 24px;
-  margin-top: -10px;
-  border: 2px solid #aab4c0;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 28%, #ffffff 0%, #e2e8f0 38%, #a8b2bf 72%, #66717f 100%);
-  box-shadow: 0 2px 5px rgba(0,0,0,.65), inset 0 1px 2px rgba(255,255,255,.9);
-}
-.echo-control-card input[type="range"]::-moz-range-track {
-  height: 6px;
-  border: 1px solid #647080;
-  border-radius: 999px;
-  background: #d1d5db;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,.65);
-}
-.echo-control-card input[type="range"]::-moz-range-progress {
-  height: 6px;
-  border-radius: 999px;
-  background: #38bdf8;
-}
-.echo-control-card input[type="range"]::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  border: 2px solid #aab4c0;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 28%, #ffffff 0%, #e2e8f0 38%, #a8b2bf 72%, #66717f 100%);
-  box-shadow: 0 2px 5px rgba(0,0,0,.65), inset 0 1px 2px rgba(255,255,255,.9);
-}
-.echo-val { font-size: 11px; color: #f59e0b; font-family: monospace; text-align: right; }
-
-/* =========================================================
-   DIGITAL MIXER CONSOLE
-========================================================= */
-.mixer-console {
-  background: #0d1117;
-  border: 1px solid #30363d;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-}
-
-.mixer-top-console {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 12px;
-  background: #040609;
-  border: 1px solid #21262d;
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 16px;
-}
-
-.mixer-tft-screen {
-  background: #05080c;
-  border: 2px solid #2d3748;
-  border-radius: 8px;
-  padding: 8px;
-  box-shadow: inset 0 0 20px rgba(0,0,0,0.9), 0 4px 10px rgba(0,0,0,0.5);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.tft-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #1e293b;
-  padding-bottom: 4px;
-  margin-bottom: 6px;
-  font-size: 10px;
-  font-weight: bold;
-  color: #38bdf8;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.tft-top-tabs {
-  display: flex;
-  gap: 3px;
-  background: #0f172a;
-  padding: 3px;
-  border-radius: 4px;
-  margin-bottom: 6px;
-  border: 1px solid #1e293b;
-  overflow-x: auto;
-}
-
-.tft-tab {
-  background: #1e293b;
-  color: #94a3b8;
-  border: none;
-  font-size: 8px;
-  font-weight: bold;
-  padding: 3px 6px;
-  border-radius: 3px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s;
-}
-
-.tft-tab.active { background: #0284c7; color: #fff; }
-
-.tft-main-viewport {
-  background: #020408;
-  border: 1px solid #1e293b;
-  border-radius: 4px;
-  min-height: 95px;
-  padding: 6px 8px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.tft-content-screen { font-size: 10px; color: #38bdf8; line-height: 1.3; }
-.tft-interactive-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
-.tft-interactive-item { background: #0d121c; border: 1px solid #1e293b; padding: 4px; border-radius: 4px; font-size: 9px; }
-.tft-interactive-item label { display: block; color: #94a3b8; margin-bottom: 2px; font-size: 8px; }
-.tft-interactive-item input[type="range"] { width: 100%; accent-color: #38bdf8; }
-.tft-interactive-item select { width: 100%; background: #161f30; color: #fff; border: 1px solid #334155; font-size: 9px; padding: 2px; border-radius: 3px; }
-.tft-interactive-item button { width: 100%; background: #0284c7; color: #fff; border: none; padding: 3px; font-size: 8px; font-weight: bold; border-radius: 3px; }
-.tft-interactive-item button.active-action { background: #10b981; }
-
-.tft-encoders-bar {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 4px;
-  margin-top: 6px;
-  background: #090d16;
-  padding: 4px;
-  border-radius: 4px;
-  border: 1px solid #1e293b;
-}
-
-.tft-encoder-knob {
-  background: linear-gradient(180deg, #1e293b, #0f172a);
-  border: 1px solid #475569;
-  border-radius: 4px;
-  text-align: center;
-  padding: 3px 1px;
-  font-size: 7px;
-  color: #cbd5e1;
-  font-family: monospace;
-}
-
-.tft-encoder-knob span { display: block; color: #38bdf8; font-weight: bold; font-size: 8px; margin-top: 1px; }
-
-.mixer-control-section {
-  background: #11161d;
-  border: 1px solid #21262d;
-  border-radius: 6px;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.section-grid-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
-
-.console-btn {
-  background: #1f2937; color: #cbd5e1; border: 1px solid #374151; font-size: 9px; font-weight: bold; padding: 6px 2px; border-radius: 3px; text-align: center;
-}
-.console-btn.active { background: #0284c7; color: #fff; border-color: #38bdf8; }
-
-/* Console-inspired channel bank: slim strips, horizontal touch-scroll on phones. */
-.mixer-desk-surface {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: stretch;
-  gap: 4px;
-  width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 2px 2px 8px;
-  scroll-snap-type: x proximity;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-}
-.mixer-desk-surface .console-channel-strip {
-  flex: 0 0 82px;
-  min-width: 82px;
-  min-height: 540px;
-  padding: 6px 5px;
-  scroll-snap-align: start;
-  background: linear-gradient(180deg, #171c24, #0d1117 58%);
-  border: 1px solid #30363d;
-  border-radius: 6px;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
-}
-
-.console-channel-strip.master-strip { background: linear-gradient(180deg, #221a10, #110c05); border-color: #d97706; }
-
-.strip-label-box {
-  background: #f1f3f5;
-  color: #252a30;
-  border: 1px solid #cbd5e1;
-  border-radius: 5px;
-  width: 100%;
-  min-height: 42px;
-  padding: 5px 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  margin: 0 0 5px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0;
-  line-height: 1.15;
-}
-.master-strip .strip-label-box { color: #fbbf24; border-color: #78350f; background: #140d04; }
-
-.strip-knobs-area {
-  width: 100%;
-  background: #10141a;
-  border: 1px solid #252d38;
-  border-radius: 4px;
-  padding: 4px;
-  margin-bottom: 4px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-.knob-row { display: flex; justify-content: space-between; align-items: center; font-size: 9px; color: #94a3b8; }
-.knob-row select { background: #111827; color: #fff; border: 1px solid #374151; font-size: 9px; padding: 2px; border-radius: 3px; }
-
-.fader-panel-area {
-  display: flex;
-  flex: 1 1 auto;
-  align-items: stretch;
-  justify-content: center;
-  gap: 5px;
-  margin: 4px 0 6px;
-  min-height: 300px;
-}
-.vert-led-meter {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 0 0 8px;
-  width: 8px;
-  height: 300px;
-  background: #020408;
-  border: 1px solid #1f2937;
-  padding: 3px 1px;
-  border-radius: 3px;
-}
-.vert-led-meter span { flex: 1; background: #111827; border-radius: 1px; }
-.vert-led-meter span.green.on { background: #10b981 !important; box-shadow: 0 0 4px #10b981; }
-.vert-led-meter span.yellow.on { background: #f59e0b !important; box-shadow: 0 0 4px #f59e0b; }
-.vert-led-meter span.red.on { background: #ef4444 !important; box-shadow: 0 0 4px #ef4444; }
-
-.fader-slot {
-  position: relative;
-  flex: 0 0 38px;
-  height: 300px;
-  width: 38px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: visible;
-  background: #080b10;
-  border: 1px solid #202833;
-  border-radius: 4px;
-}
-.fader-slot input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  writing-mode: vertical-lr;
-  direction: rtl;
-  width: 28px;
-  height: 286px;
-  margin: 0;
-  padding: 0;
-  background: transparent;
-  cursor: pointer;
-  touch-action: none;
-}
-.fader-slot input[type="range"]::-webkit-slider-runnable-track {
-  width: 4px;
-  background: linear-gradient(90deg, #171b21, #454a50, #171b21);
-  border: 1px solid #60656b;
-  border-radius: 2px;
-}
-.fader-slot input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 42px;
-  height: 24px;
-  margin-left: -19px;
-  border: 1px solid #73777d;
-  border-radius: 2px;
-  background: linear-gradient(to bottom, #b7b9bc 0%, #777b80 18%, #5d6166 48%, #a5a7aa 52%, #777b80 74%, #b7b9bc 100%);
-  box-shadow: 0 1px 3px #000, inset 0 1px 1px #e1e3e5;
-}
-.fader-slot input[type="range"]::-moz-range-track {
-  width: 4px;
-  background: linear-gradient(90deg, #171b21, #454a50, #171b21);
-  border: 1px solid #60656b;
-  border-radius: 2px;
-}
-.fader-slot input[type="range"]::-moz-range-thumb {
-  width: 42px;
-  height: 24px;
-  border: 1px solid #73777d;
-  border-radius: 2px;
-  background: linear-gradient(to bottom, #b7b9bc 0%, #777b80 18%, #5d6166 48%, #a5a7aa 52%, #777b80 74%, #b7b9bc 100%);
-  box-shadow: 0 1px 3px #000, inset 0 1px 1px #e1e3e5;
-}
-.master-strip .fader-slot input[type="range"]::-webkit-slider-thumb,
-.master-strip .fader-slot input[type="range"]::-moz-range-thumb {
-  border-color: #c38a16;
-}
-
-.fader-readout { font-size: 10px; font-family: monospace; color: #38bdf8; margin-bottom: 6px; font-weight: bold; }
-.master-strip .fader-readout { color: #fbbf24; }
-
-.strip-action-buttons { display: flex; gap: 3px; width: 100%; margin-top: auto !important; }
-.console-action-btn {
-  flex: 1;
-  min-width: 0;
-  background: #242a32;
-  color: #e2e8f0;
-  border: 1px solid #374151;
-  padding: 7px 1px;
-  font-size: 8px;
-  font-weight: 700;
-  border-radius: 4px;
-  text-align: center;
-}
-.console-action-btn.mute { background: #5f0909; border-color: #861616; color: #fff; }
-.console-action-btn.solo { background: #514807; border-color: #796c0b; color: #fff; }
-.console-action-btn.mute.active { background: #dc2626; color: #fff; border-color: #f87171; }
-.console-action-btn.solo.active { background: #facc15; color: #111827; border-color: #fde047; }
-.mixer-desk-surface .master-strip { background: linear-gradient(180deg, #251b0b, #110c05); border-color: #d97706; }
-
-/* Audio & Bluetooth Panel */
-.audio-panel { display: none; background: #1b2027; border: 1px solid #3a414b; border-radius: 8px; padding: 12px; margin-top: 14px; }
-.audio-panel.active { display: block; }
-.audio-panel h3 { margin: 0 0 10px 0; font-size: 12px; color: #38bdf8; }
-.audio-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
-.bt-panel {
-  width: 100%; background: #101216; padding: 10px; border-radius: 6px; border: 1px solid #2a323d; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
-}
-.bt-info { font-size: 10px; color: #94a3b8; }
-#connectBtButton { background: #3b82f6; color: white; border: 1px solid #60a5fa; padding: 6px 14px; border-radius: 4px; font-weight: bold; }
-#connectBtButton.connected { background: #10b981; border-color: #34d399; }
-
-.audio-actions button, .file-button {
-  background: #252b35; color: #fff; border: 1px solid #485260; padding: 6px 12px; font-size: 11px; border-radius: 4px; font-weight: bold; display: inline-flex; align-items: center; cursor: pointer;
-}
-.audio-actions button:hover, .file-button:hover { background: #334155; }
-.audio-actions button.active { background: #10b981; border-color: #34d399; color: #000; }
-
-.playlist-container { width: 100%; background: #101216; border: 1px solid #2a323d; border-radius: 6px; padding: 8px; margin: 8px 0; max-height: 100px; overflow-y: auto; font-size: 10px; color: #94a3b8; }
-.playlist-item { display: flex; justify-content: space-between; padding: 3px 6px; border-bottom: 1px solid #1e293b; cursor: pointer; }
-.playlist-item:hover { background: #1e293b; color: #fff; }
-.playlist-item.playing { color: #38bdf8; font-weight: bold; }
-
-.output-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #101216; padding: 8px; border-radius: 6px; margin-top: 8px; }
-.output-control label { display: block; font-size: 9px; color: #94a3b8; margin-bottom: 3px; }
-.output-control input[type="range"] { width: 100%; accent-color: #f59e0b; }
-.master-value { font-size: 10px; color: #f59e0b; font-family: monospace; text-align: center; }
-.output-control select { width: 100%; background: #1e293b; color: #fff; border: 1px solid #485260; padding: 4px; font-size: 11px; border-radius: 4px; }
-#muteOutputButton.active { background: #ef4444 !important; color: #fff !important; border-color: #f87171; }
-
-.device-status, .feedback-status, .audio-status, .status { font-size: 10px; color: #94a3b8; margin-top: 4px; }
-.footer { text-align: center; font-size: 10px; color: #64748b; margin-top: 15px; }
-
-@media (max-width: 768px) {
-  .control-row, .output-panel, .echo-grid { grid-template-columns: 1fr; }
-}
-
-.tft-visual-meters { display: flex; flex-direction: column; gap: 4px; width: 100%; }
-.tft-meter-row { display: flex; align-items: center; gap: 8px; font-size: 9px; font-family: monospace; color: #94a3b8; }
-.tft-meter-bar { flex-grow: 1; height: 8px; background: #090d16; border: 1px solid #1e293b; border-radius: 2px; display: flex; gap: 1px; padding: 1px; }
-.tft-meter-bar span { flex: 1; background: #111827; border-radius: 1px; }
-.tft-curve-box { display: flex; justify-content: space-around; align-items: flex-end; height: 40px; background: #03060a; border: 1px solid #1e293b; border-radius: 3px; padding: 2px 4px; margin-top: 4px; }
-.tft-curve-bar { width: 8px; background: #0284c7; border-radius: 2px 2px 0 0; transition: height 0.2s; }
-
-/* Landscape tuning: keep the mixer TFT readable without an overly wide aspect. */
-@media (orientation: landscape) and (min-width: 769px) {
-  .mixer-top-console {
-    grid-template-columns: minmax(0, 1.35fr) minmax(250px, 0.85fr);
-    align-items: stretch;
-  }
-  .mixer-tft-screen {
-    min-width: 0;
-    min-height: 460px;
-  }
-  .tft-main-viewport {
-    flex: 1 1 auto;
-    min-height: 150px;
-  }
-}
-@media (orientation: landscape) and (max-width: 768px) {
-  .mixer-top-console {
-    grid-template-columns: minmax(0, 1.15fr) minmax(190px, 0.85fr);
-    gap: 8px;
-    padding: 8px;
-  }
-  .mixer-tft-screen {
-    min-width: 0;
-    min-height: 340px;
-  }
-  .mixer-control-section {
-    min-width: 0;
-    padding: 7px;
-  }
-  .tft-main-viewport {
-    flex: 1 1 auto;
-    min-height: 125px;
-  }
-  .tft-encoders-bar {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-
-/* Hide accessible form labels visually without affecting screen readers. */
-.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
-  
-/* Restore the requested real graphic-EQ fader layout.
-   Keep every band element centered in its own column and prevent page panning
-   while a user drags a control. */
-.band {
-  box-sizing: border-box;
-  height: 230px;
-  min-width: 0;
-  padding: 5px 3px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   gap: 0;
+  height: 230px;
+  min-width: 0;
   position: relative;
 }
 .band-frequency {
@@ -742,26 +144,13 @@ header, .topbar {
   width: 100%;
   min-height: 20px;
   line-height: 20px;
+  font-size: 8px;
+  color: #94a3b8;
   margin: 0 0 4px;
   text-align: center;
   white-space: nowrap;
 }
-.slider-track-container {
-  position: relative;
-  width: 100%;
-  height: 165px;
-  flex: 0 0 165px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: visible;
-  cursor: ns-resize;
-  touch-action: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
-/* Rotary EQ control: the range remains the accessible/touch input,
-   while the visible dial follows its value via --knob-angle. */
+
 .slider-track-container {
   position: relative;
   width: 100%;
@@ -786,8 +175,7 @@ header, .topbar {
   transform: translate(-50%, -50%);
   border: 2px solid #4b5563;
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 35% 28%, #87919d 0%, #535e6b 28%, #303945 57%, #171d26 78%, #0b1017 100%);
+  background: radial-gradient(circle at 35% 28%, #87919d 0%, #535e6b 28%, #303945 57%, #171d26 78%, #0b1017 100%);
   box-shadow: 0 2px 5px rgba(0,0,0,.75), inset 0 1px 2px rgba(255,255,255,.28), inset 0 -2px 4px rgba(0,0,0,.85);
   pointer-events: none;
   z-index: 1;
@@ -838,49 +226,138 @@ header, .topbar {
   -webkit-user-select: none;
   user-select: none;
 }
-.band input[type="range"]::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 100%;
-  background: transparent;
-  border: 0;
-}
-.band input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 38px;
-  height: 38px;
-  border: 0;
-  background: transparent;
-}
-.band input[type="range"]::-moz-range-track {
-  width: 100%;
-  height: 100%;
-  background: transparent;
-  border: 0;
-}
-.band input[type="range"]::-moz-range-thumb {
-  width: 38px;
-  height: 38px;
-  border: 0;
-  background: transparent;
-}
+.band input[type="range"]::-webkit-slider-runnable-track { width: 100%; height: 100%; background: transparent; border: 0; }
+.band input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 38px; height: 38px; border: 0; background: transparent; }
+.band input[type="range"]::-moz-range-track { width: 100%; height: 100%; background: transparent; border: 0; }
+.band input[type="range"]::-moz-range-thumb { width: 38px; height: 38px; border: 0; background: transparent; }
+
 .band-value {
   margin-top: 4px;
   line-height: 18px;
   font-size: 9px;
+  color: #38bdf8;
+  font-family: monospace;
   text-align: center;
   white-space: nowrap;
 }
+.scale { display: flex; justify-content: space-between; font-size: 9px; color: #64748b; padding: 2px 4px; }
 
-/* Keep the page still while a hardware-style control is being dragged.
-   The control remains directly touch-operable; vertical page scrolling starts
-   outside the active range control. */
-input[type="range"] {
-  touch-action: none;
-  -webkit-user-select: none;
-  user-select: none;
+/* =========================================================
+   PANEL ALESIS (EFFECTS PROCESSOR)
+========================================================= */
+.echo-panel-box { background: #161a22; border: 1px solid #3a414b; border-radius: 8px; padding: 20px; }
+.echo-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.echo-onoff-btn { background: #252b35; color: #fff; border: 1px solid #485260; padding: 8px 16px; border-radius: 6px; font-weight: bold; font-size: 12px; }
+.echo-onoff-btn.active { background: #10b981; border-color: #34d399; color: #000; box-shadow: 0 0 8px #10b981; }
+.echo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.echo-control-card { background: #101216; border: 1px solid #2a323d; padding: 15px; border-radius: 6px; }
+.echo-control-card label { display: block; font-size: 11px; color: #38bdf8; margin-bottom: 6px; font-weight: bold; }
+.echo-control-card input[type="range"] {
+  -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 30px; margin: 0 0 6px; padding: 0; background: transparent; cursor: pointer; touch-action: none;
 }
-</style>
+.echo-control-card input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px; border: 1px solid #647080; border-radius: 999px; background: linear-gradient(90deg, #38bdf8 0%, #38bdf8 50%, #d1d5db 50%, #d1d5db 100%); box-shadow: inset 0 1px 2px rgba(0,0,0,.65);
+}
+.echo-control-card input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; width: 24px; height: 24px; margin-top: -10px; border: 2px solid #aab4c0; border-radius: 50%; background: radial-gradient(circle at 35% 28%, #ffffff 0%, #e2e8f0 38%, #a8b2bf 72%, #66717f 100%); box-shadow: 0 2px 5px rgba(0,0,0,.65);
+}
+.echo-val { font-size: 11px; color: #f59e0b; font-family: monospace; text-align: right; }
+
+/* =========================================================
+   DIGITAL MIXER CONSOLE
+========================================================= */
+.mixer-console { background: #0d1117; border: 1px solid #30363d; border-radius: 12px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+.mixer-top-console { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; background: #040609; border: 1px solid #21262d; border-radius: 8px; padding: 12px; margin-bottom: 16px; }
+.mixer-tft-screen { background: #05080c; border: 2px solid #2d3748; border-radius: 8px; padding: 8px; box-shadow: inset 0 0 20px rgba(0,0,0,0.9); display: flex; flex-direction: column; justify-content: space-between; }
+.tft-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 4px; margin-bottom: 6px; font-size: 10px; font-weight: bold; color: #38bdf8; }
+.tft-top-tabs { display: flex; gap: 3px; background: #0f172a; padding: 3px; border-radius: 4px; margin-bottom: 6px; border: 1px solid #1e293b; overflow-x: auto; }
+.tft-tab { background: #1e293b; color: #94a3b8; border: none; font-size: 8px; font-weight: bold; padding: 3px 6px; border-radius: 3px; cursor: pointer; white-space: nowrap; }
+.tft-tab.active { background: #0284c7; color: #fff; }
+.tft-main-viewport { background: #020408; border: 1px solid #1e293b; border-radius: 4px; min-height: 95px; padding: 6px 8px; display: flex; flex-direction: column; justify-content: space-between; }
+.tft-content-screen { font-size: 10px; color: #38bdf8; line-height: 1.3; }
+.tft-interactive-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
+.tft-interactive-item { background: #0d121c; border: 1px solid #1e293b; padding: 4px; border-radius: 4px; font-size: 9px; }
+.tft-interactive-item label { display: block; color: #94a3b8; margin-bottom: 2px; font-size: 8px; }
+.tft-interactive-item input[type="range"] { width: 100%; accent-color: #38bdf8; }
+.tft-interactive-item select { width: 100%; background: #161f30; color: #fff; border: 1px solid #334155; font-size: 9px; padding: 2px; border-radius: 3px; }
+.tft-interactive-item button { width: 100%; background: #0284c7; color: #fff; border: none; padding: 3px; font-size: 8px; font-weight: bold; border-radius: 3px; }
+.tft-interactive-item button.active-action { background: #10b981; }
+
+.tft-encoders-bar { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-top: 6px; background: #090d16; padding: 4px; border-radius: 4px; border: 1px solid #1e293b; }
+.tft-encoder-knob { background: linear-gradient(180deg, #1e293b, #0f172a); border: 1px solid #475569; border-radius: 4px; text-align: center; padding: 3px 1px; font-size: 7px; color: #cbd5e1; font-family: monospace; }
+.tft-encoder-knob span { display: block; color: #38bdf8; font-weight: bold; font-size: 8px; margin-top: 1px; }
+
+.mixer-control-section { background: #11161d; border: 1px solid #21262d; border-radius: 6px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; }
+.section-grid-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.console-btn { background: #1f2937; color: #cbd5e1; border: 1px solid #374151; font-size: 9px; font-weight: bold; padding: 6px 2px; border-radius: 3px; text-align: center; }
+.console-btn.active { background: #0284c7; color: #fff; border-color: #38bdf8; }
+
+.mixer-desk-surface { display: flex; flex-flow: row nowrap; align-items: stretch; gap: 4px; width: 100%; overflow-x: auto; overflow-y: hidden; padding: 2px 2px 8px; }
+.mixer-desk-surface .console-channel-strip {
+  flex: 0 0 82px; min-width: 82px; min-height: 540px; padding: 6px 5px; background: linear-gradient(180deg, #171c24, #0d1117 58%); border: 1px solid #30363d; border-radius: 6px; display: flex; flex-direction: column; align-items: stretch;
+}
+.console-channel-strip.master-strip { background: linear-gradient(180deg, #221a10, #110c05); border-color: #d97706; }
+.strip-label-box { background: #f1f3f5; color: #252a30; border: 1px solid #cbd5e1; border-radius: 5px; width: 100%; min-height: 42px; padding: 5px 2px; display: flex; align-items: center; justify-content: center; text-align: center; margin: 0 0 5px; font-size: 11px; font-weight: 600; }
+.master-strip .strip-label-box { color: #fbbf24; border-color: #78350f; background: #140d04; }
+.strip-knobs-area { width: 100%; background: #10141a; border: 1px solid #252d38; border-radius: 4px; padding: 4px; margin-bottom: 4px; display: flex; flex-direction: column; gap: 5px; }
+.knob-row { display: flex; justify-content: space-between; align-items: center; font-size: 9px; color: #94a3b8; }
+.knob-row select { background: #111827; color: #fff; border: 1px solid #374151; font-size: 9px; padding: 2px; border-radius: 3px; }
+
+.fader-panel-area { display: flex; flex: 1 1 auto; align-items: stretch; justify-content: center; gap: 5px; margin: 4px 0 6px; min-height: 300px; }
+.vert-led-meter { display: flex; flex-direction: column; gap: 2px; flex: 0 0 8px; width: 8px; height: 300px; background: #020408; border: 1px solid #1f2937; padding: 3px 1px; border-radius: 3px; }
+.vert-led-meter span { flex: 1; background: #111827; border-radius: 1px; }
+.vert-led-meter span.green.on { background: #10b981 !important; box-shadow: 0 0 4px #10b981; }
+.vert-led-meter span.yellow.on { background: #f59e0b !important; box-shadow: 0 0 4px #f59e0b; }
+.vert-led-meter span.red.on { background: #ef4444 !important; box-shadow: 0 0 4px #ef4444; }
+
+.fader-slot { position: relative; flex: 0 0 38px; height: 300px; width: 38px; display: flex; justify-content: center; align-items: center; background: #080b10; border: 1px solid #202833; border-radius: 4px; }
+.fader-slot input[type="range"] { -webkit-appearance: none; appearance: none; writing-mode: vertical-lr; direction: rtl; width: 28px; height: 286px; margin: 0; background: transparent; cursor: pointer; }
+.fader-readout { font-size: 10px; font-family: monospace; color: #38bdf8; margin-bottom: 6px; font-weight: bold; }
+.master-strip .fader-readout { color: #fbbf24; }
+
+.strip-action-buttons { display: flex; gap: 3px; width: 100%; margin-top: auto !important; }
+.console-action-btn { flex: 1; background: #242a32; color: #e2e8f0; border: 1px solid #374151; padding: 7px 1px; font-size: 8px; font-weight: 700; border-radius: 4px; text-align: center; }
+.console-action-btn.mute.active { background: #dc2626; color: #fff; border-color: #f87171; }
+.console-action-btn.solo.active { background: #facc15; color: #111827; border-color: #fde047; }
+
+/* Audio & Bluetooth Panel */
+.audio-panel { display: none; background: #1b2027; border: 1px solid #3a414b; border-radius: 8px; padding: 12px; margin-top: 14px; }
+.audio-panel.active { display: block; }
+.audio-panel h3 { margin: 0 0 10px 0; font-size: 12px; color: #38bdf8; }
+.audio-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
+.bt-panel { width: 100%; background: #101216; padding: 10px; border-radius: 6px; border: 1px solid #2a323d; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.bt-info { font-size: 10px; color: #94a3b8; }
+#connectBtButton { background: #3b82f6; color: white; border: 1px solid #60a5fa; padding: 6px 14px; border-radius: 4px; font-weight: bold; }
+#connectBtButton.connected { background: #10b981; border-color: #34d399; }
+
+.audio-actions button, .file-button { background: #252b35; color: #fff; border: 1px solid #485260; padding: 6px 12px; font-size: 11px; border-radius: 4px; font-weight: bold; display: inline-flex; align-items: center; cursor: pointer; }
+.audio-actions button.active { background: #10b981; border-color: #34d399; color: #000; }
+.playlist-container { width: 100%; background: #101216; border: 1px solid #2a323d; border-radius: 6px; padding: 8px; margin: 8px 0; max-height: 100px; overflow-y: auto; font-size: 10px; color: #94a3b8; }
+.playlist-item { display: flex; justify-content: space-between; padding: 3px 6px; border-bottom: 1px solid #1e293b; cursor: pointer; }
+.playlist-item.playing { color: #38bdf8; font-weight: bold; }
+
+.output-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #101216; padding: 8px; border-radius: 6px; margin-top: 8px; }
+.output-control label { display: block; font-size: 9px; color: #94a3b8; margin-bottom: 3px; }
+.output-control input[type="range"] { width: 100%; accent-color: #f59e0b; }
+.master-value { font-size: 10px; color: #f59e0b; font-family: monospace; text-align: center; }
+.output-control select { width: 100%; background: #1e293b; color: #fff; border: 1px solid #485260; padding: 4px; font-size: 11px; border-radius: 4px; }
+#muteOutputButton.active { background: #ef4444 !important; color: #fff !important; }
+
+.device-status, .feedback-status, .audio-status, .status { font-size: 10px; color: #94a3b8; margin-top: 4px; }
+.footer { text-align: center; font-size: 10px; color: #64748b; margin-top: 15px; }
+
+/* Parametric EQ TFT view styles */
+.tft-peq { display:grid; grid-template-columns:minmax(0,1fr); gap:7px; height:100%; }
+.tft-peq-head { display:flex; justify-content:space-between; align-items:center; gap:6px; color:#cbd5e1; font-size:9px; }
+.tft-peq-graph { width:100%; min-height:90px; height:120px; background:#101923; border:1px solid #334155; border-radius:5px; display:block; }
+.tft-peq-controls { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+.tft-peq-control { background:#202631; border:1px solid #394454; border-radius:5px; padding:5px; text-align:center; }
+.tft-peq-control label { display:block; color:#94a3b8; font-size:8px; margin-bottom:3px; }
+.tft-peq-control input { width:100%; accent-color:#38bdf8; margin:3px 0; }
+.tft-peq-value { display:block; color:#e2e8f0; font-size:9px; font-weight:700; }
+.tft-peq-foot { display:flex; justify-content:space-between; color:#64748b; font-size:8px; }
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
+  </style>
 </head>
 
 <body>
@@ -1378,8 +855,6 @@ function setStatus(msg) { const el = document.getElementById("status"); if (el) 
 function setAudioStatus(msg) { const el = document.getElementById("audioStatus"); if (el) el.textContent = msg; }
 function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed(1); }
 
-// Slow, controlled touch/mouse dragging for audio sliders.
-// A full-range change takes about 5x the slider travel for finer control.
 (function enableStableRangeDragging() {
   const SENSITIVITY = 0.20;
   let active = null;
@@ -1487,9 +962,8 @@ function createBands(channel) {
 }
 
 /* =========================================================
-   AUDIO ENGINE & ROUTING (DIPERBAIKI 100% TEMBUS KE HP)
+   AUDIO ENGINE & ROUTING
 ========================================================= */
-// Smooth control response for EQ, echo FX, channel and master faders.
 const CONTROL_SMOOTHING_SECONDS = 0.06;
 
 let audioContext = null;
@@ -1519,7 +993,6 @@ const audioFilesInput = document.getElementById("audioFilesInput");
 const playlistContainer = document.getElementById("playlistContainer");
 const startMicButton = document.getElementById("startMicButton");
 const physicalInputDevice = document.getElementById("physicalInputDevice");
-
 const physicalOutputDevice = document.getElementById("physicalOutputDevice");
 
 async function refreshPhysicalInputDevices() {
@@ -1550,28 +1023,13 @@ async function refreshPhysicalInputDevices() {
       });
       if (outputs.some(device => device.deviceId === previous)) physicalOutputDevice.value = previous;
     }
-  } catch (err) {
-    // The browser may hide device names until microphone permission is granted.
-  }
+  } catch (err) {}
 }
 
 async function applyPhysicalOutputDevice() {
   const requestedId = physicalOutputDevice?.value || "";
-  if (!audioContext) {
-    setAudioStatus("Output akan dipilih setelah audio dimulai. Jika USB tidak muncul, pilih output USB di pengaturan HP.");
-    return;
-  }
-  if (typeof audioContext.setSinkId !== "function") {
-    setAudioStatus("Browser ini tidak mendukung pemilihan output dari halaman. Pilih USB audio sebagai output default di pengaturan HP, lalu mulai ulang audio.");
-    return;
-  }
-  try {
-    await audioContext.setSinkId(requestedId);
-    const label = physicalOutputDevice?.selectedOptions?.[0]?.textContent || "output default";
-    setAudioStatus("Output audio diarahkan ke: " + label + ".");
-  } catch (err) {
-    setAudioStatus("Output tidak dapat dipilih (" + (err.name || "Error") + "). Pilih USB audio sebagai output default HP.");
-  }
+  if (!audioContext || typeof audioContext.setSinkId !== "function") return;
+  try { await audioContext.setSinkId(requestedId); } catch (err) {}
 }
 
 const startAudioButton = document.getElementById("startAudioButton");
@@ -1581,9 +1039,6 @@ const masterGainValue = document.getElementById("masterGainValue");
 const outputMode = document.getElementById("outputMode");
 const muteOutputButton = document.getElementById("muteOutputButton");
 if (physicalOutputDevice) physicalOutputDevice.addEventListener("change", applyPhysicalOutputDevice);
-if (navigator.mediaDevices?.addEventListener) {
-  navigator.mediaDevices.addEventListener("devicechange", refreshPhysicalInputDevices);
-}
 refreshPhysicalInputDevices();
 
 const echoDelay = document.getElementById("echoDelay");
@@ -1623,8 +1078,6 @@ function updateOutputMute() {
   muteOutputButton.classList.toggle("active", outputMuted);
 }
 
-// Token dan promise decode menjaga pilihan file terbaru dan mencegah tombol
-// START mengalahkan proses decode yang masih berlangsung.
 let playlistLoadId = 0;
 let playlistLoadPromise = null;
 
@@ -1637,15 +1090,13 @@ async function loadSelectedAudioFiles(files) {
       await audioContext.resume();
       initializeAudioGraph();
     } catch (err) {
-      setAudioStatus("Audio engine gagal diinisialisasi: " + (err?.message || err));
-      setStatus("Audio engine gagal dimulai. Muat ulang halaman dan coba lagi.");
+      setAudioStatus("Audio engine gagal: " + (err?.message || err));
       return;
     }
 
     setAudioStatus("Mendecode " + files.length + " file audio...");
     const nextBuffers = [];
     const nextNames = [];
-    const failedFiles = [];
 
     for (const file of files) {
       try {
@@ -1654,9 +1105,7 @@ async function loadSelectedAudioFiles(files) {
         if (loadId !== playlistLoadId) return;
         nextBuffers.push(decodedBuffer);
         nextNames.push(file.name);
-      } catch (err) {
-        failedFiles.push(file.name + " (" + (err?.message || err?.name || "format tidak didukung") + ")");
-      }
+      } catch (err) {}
     }
 
     if (loadId !== playlistLoadId) return;
@@ -1673,18 +1122,13 @@ async function loadSelectedAudioFiles(files) {
     renderPlaylistUI();
 
     if (audioBuffers.length > 0) {
-      setAudioStatus(audioBuffers.length + " dari " + files.length + " file siap diputar.");
-      setStatus("Audio siap. Tekan START PLAYLIST untuk memutar.");
-      if (failedFiles.length) setAudioStatus(audioBuffers.length + " file siap; gagal membaca: " + failedFiles.join(", "));
-    } else {
-      setAudioStatus("Tidak ada file yang berhasil didekode. Coba MP3 atau WAV lain. Detail: " + failedFiles.join("; "));
-      setStatus("File dipilih, tetapi tidak berhasil dibaca. Coba file audio lain.");
+      setAudioStatus(audioBuffers.length + " file siap diputar.");
+      setStatus("Audio siap. Tekan START PLAYLIST.");
     }
   })();
 
   playlistLoadPromise = task;
-  try { await task; }
-  finally { if (playlistLoadPromise === task) playlistLoadPromise = null; }
+  try { await task; } finally { if (playlistLoadPromise === task) playlistLoadPromise = null; }
 }
 
 audioFilesInput.addEventListener("change", async e => {
@@ -1696,7 +1140,7 @@ function renderPlaylistUI() {
   playlistContainer.replaceChildren();
   if (audioFileNames.length === 0) {
     const empty = document.createElement("div");
-    empty.textContent = "Tidak ada file audio yang berhasil dibaca.";
+    empty.textContent = "Tidak ada file audio dipilih.";
     empty.style.textAlign = "center";
     empty.style.padding = "6px";
     playlistContainer.appendChild(empty);
@@ -1789,7 +1233,6 @@ function initializeAudioGraph() {
   mixerInputGain = audioContext.createGain();
   mixerInputGain.gain.value = 1.0;
 
-  // Independent input strips: CH1 mic, CH2 playlist, CH3 AUX (reserved), CH4 FX return.
   for (let i = 0; i < 4; i++) {
     mixerStripGains[i] = audioContext.createGain();
     mixerStripAnalysers[i] = audioContext.createAnalyser();
@@ -1839,7 +1282,6 @@ function initializeAudioGraph() {
   masterGainNode.connect(outputMuteGainNode);
   outputMuteGainNode.connect(audioContext.destination);
 
-  // Tandai siap sebelum rebuild agar fungsi routing tidak keluar lebih awal.
   audioGraphReady = true;
   rebuildAudioRouting();
   updateMasterGain();
@@ -1861,7 +1303,6 @@ function updateMixerStripControls() {
     const allowedBySolo = !anySolo || mixerStripSolo[index];
     const gain = (mixerStripMuted[index] || !allowedBySolo) ? 0 : dbToGain(db);
     if (index < 3 && mixerStripGains[index]) mixerStripGains[index].gain.setTargetAtTime(gain, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
-    // CH4 is the FX return; its fader controls the wet return level exactly once.
     if (index === 3 && alesisWetNode) alesisWetNode.gain.setTargetAtTime(gain * Number(echoMix.value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
     if (index === 4 && masterStripGainNode) masterStripGainNode.gain.setTargetAtTime(gain, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
     const muteBtn = strip.querySelector(".console-action-btn.mute");
@@ -1874,14 +1315,10 @@ function updateMixerStripControls() {
 function rebuildAudioRouting() {
   if (!audioGraphReady || !audioContext || !mixerInputGain || !alesisDryNode || !alesisWetNode) return;
 
-  // Putuskan hanya cabang sumber/routing FX. Jangan disconnect inputGain EQ,
-  // karena itu juga akan memutus rantai HPF, filter EQ, dan analyser.
   mixerInputGain.disconnect();
   alesisDryNode.disconnect();
   alesisWetNode.disconnect();
-  // Destination-specific disconnect throws in browsers when that edge
-  // was never connected (the normal first-load state with FX disabled).
-  try { alesisDelayNode.disconnect(alesisWetNode); } catch (err) { /* edge absent */ }
+  try { alesisDelayNode.disconnect(alesisWetNode); } catch (err) {}
 
   if (isAlesisFxEnabled) {
     mixerInputGain.connect(alesisDryNode);
@@ -1904,11 +1341,11 @@ echoToggleBtn.addEventListener("click", () => {
   if (isAlesisFxEnabled) {
     echoToggleBtn.textContent = "ALESIS FX: ON";
     echoToggleBtn.classList.add("active");
-    setStatus("Prosesor Alesis FX diaktifkan.");
+    setStatus("Alesis FX diaktifkan.");
   } else {
     echoToggleBtn.textContent = "ALESIS FX: OFF";
     echoToggleBtn.classList.remove("active");
-    setStatus("Prosesor Alesis FX dimatikan.");
+    setStatus("Alesis FX dimatikan.");
   }
   rebuildAudioRouting();
 });
@@ -1932,33 +1369,9 @@ echoMix.addEventListener("input", () => {
   document.getElementById("echoMixVal").textContent = Math.round(echoMix.value * 100) + "%";
   if (alesisWetNode && alesisDryNode && audioContext) {
     alesisDryNode.gain.setTargetAtTime(1.0 - Number(echoMix.value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
-    updateMixerStripControls(); // keep FX return fader/mute/solo in the signal path
+    updateMixerStripControls();
   }
 });
-
-function disconnectCurrentSource() {
-  // Invalidate the current source before stop(): stop() asynchronously fires onended.
-  const sourceToStop = activeSourceNode;
-  activeSourceNode = null;
-  if (sourceToStop) {
-    sourceToStop.onended = null;
-    try { sourceToStop.stop(); } catch (e) {}
-    try { sourceToStop.disconnect(); } catch (e) {}
-  }
-
-  if (microphoneSource) {
-    try { microphoneSource.disconnect(); } catch (e) {}
-    microphoneSource = null;
-  }
-  if (microphoneStream) {
-    microphoneStream.getTracks().forEach(track => track.stop());
-    microphoneStream = null;
-  }
-  if (startMicButton) startMicButton.classList.remove("active");
-
-  isPlaying = false;
-  if (startAudioButton) startAudioButton.classList.remove("active");
-}
 
 function playCurrentBuffer() {
   if (audioBuffers.length === 0) {
@@ -1970,18 +1383,13 @@ function playCurrentBuffer() {
   initializeAudioGraph();
 
   if (activeSourceNode) {
-    // Detach the old completion callback before stopping it: stop() also fires onended.
     activeSourceNode.onended = null;
     try { activeSourceNode.stop(); } catch (e) {}
     activeSourceNode = null;
   }
 
   const buffer = audioBuffers[currentPlaylistIndex];
-  if (!buffer) {
-    isPlaying = false;
-    setAudioStatus("File audio tidak tersedia. Pilih ulang playlist.");
-    return;
-  }
+  if (!buffer) return;
   const sourceNode = audioContext.createBufferSource();
   activeSourceNode = sourceNode;
   sourceNode.buffer = buffer;
@@ -1990,10 +1398,9 @@ function playCurrentBuffer() {
   sourceNode.start(0);
   isPlaying = true;
   startAudioButton.classList.add("active");
-  setAudioStatus("Memutar dari Mixer: " + audioFileNames[currentPlaylistIndex]);
+  setAudioStatus("Memutar: " + audioFileNames[currentPlaylistIndex]);
 
   sourceNode.onended = () => {
-    // Ignore callbacks from any source that is no longer the active playlist item.
     if (activeSourceNode !== sourceNode) return;
     activeSourceNode = null;
     if (isPlaying && audioBuffers.length > 0) {
@@ -2008,15 +1415,12 @@ function playCurrentBuffer() {
 
 startAudioButton.addEventListener("click", async () => {
   try {
-    // Jika pengguna menekan START saat decode belum selesai, tunggu hasilnya.
     if (playlistLoadPromise) await playlistLoadPromise;
-    // Pulihkan dari state kosong jika file sudah dipilih tetapi belum sempat diproses.
     if (audioBuffers.length === 0 && audioFilesInput.files && audioFilesInput.files.length > 0) {
       await loadSelectedAudioFiles(Array.from(audioFilesInput.files));
     }
     if (audioBuffers.length === 0) {
-      setAudioStatus("Belum ada audio siap diputar. Pilih file lalu tunggu pesan 'file siap diputar'.");
-      setStatus("Belum ada file audio yang berhasil dibaca.");
+      setAudioStatus("Pilih file audio terlebih dahulu.");
       return;
     }
 
@@ -2026,23 +1430,18 @@ startAudioButton.addEventListener("click", async () => {
     await applyPhysicalOutputDevice();
     playCurrentBuffer();
   } catch (err) {
-    const audioError = err && err.name ? err.name : "Error";
-    const audioMessage = err && err.message ? err.message : "Tidak dapat memulai audio.";
-    setAudioStatus("Audio gagal (" + audioError + "): " + audioMessage);
-    setStatus("Gagal memulai audio: " + audioError);
+    setAudioStatus("Audio gagal dimulai.");
   }
 });
 
 startMicButton.addEventListener("click", async () => {
-  // Mic dan playlist adalah dua sumber mixer terpisah: mengaktifkan mic
-  // tidak boleh menghentikan musik yang sedang diputar.
   if (microphoneStream) {
     microphoneSource?.disconnect();
     microphoneSource = null;
     microphoneStream.getTracks().forEach(track => track.stop());
     microphoneStream = null;
     startMicButton.classList.remove("active");
-    setAudioStatus(isPlaying ? "Mikrofon dimatikan; playlist tetap berjalan." : "Mikrofon dimatikan.");
+    setAudioStatus("Mikrofon dimatikan.");
     return;
   }
 
@@ -2051,50 +1450,31 @@ startMicButton.addEventListener("click", async () => {
     if (ctx.state === "suspended") await ctx.resume();
     initializeAudioGraph();
     await applyPhysicalOutputDevice();
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      throw new Error("MIC_UNAVAILABLE: Browser tidak menyediakan akses mikrofon. Buka halaman melalui HTTPS dan browser yang mendukung mic.");
-    }
-    // Gunakan permintaan audio dasar untuk menghindari penolakan constraint
-    // tertentu pada sebagian browser/perangkat Android.
     await refreshPhysicalInputDevices();
     const selectedInputId = physicalInputDevice?.value || "";
     const audioConstraints = selectedInputId
       ? { deviceId: { exact: selectedInputId }, echoCancellation: false, noiseSuppression: false, autoGainControl: false }
       : { echoCancellation: false, noiseSuppression: false, autoGainControl: false };
     microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
-    await refreshPhysicalInputDevices();
-    // Reinitialize/resume on the user gesture, then let the meter loop detect mic input.
-    if (audioContext.state === "suspended") await audioContext.resume();
     microphoneSource = audioContext.createMediaStreamSource(microphoneStream);
     microphoneSource.connect(mixerStripGains[0]);
     startMicButton.classList.add("active");
-    const chosenInputLabel = physicalInputDevice?.selectedOptions?.[0]?.textContent || "Input default HP";
-    setAudioStatus("Input fisik aktif: " + chosenInputLabel + ". Meter CH1 menunjukkan level sinyal masuk.");
+    setAudioStatus("Mikrofon aktif.");
   } catch (err) {
-    microphoneStream?.getTracks().forEach(track => track.stop());
-    microphoneStream = null;
-    microphoneSource = null;
-    startMicButton.classList.remove("active");
-    const micError = err && err.name ? err.name : "Error";
-    const micMessage = err && err.message ? err.message : "Akses mikrofon gagal.";
-    setAudioStatus("Mic gagal (" + micError + "): " + micMessage + " — izinkan mikrofon di browser, gunakan HTTPS, lalu coba lagi.");
+    setAudioStatus("Gagal mengakses mikrofon.");
   }
 });
 
 stopAudioButton.addEventListener("click", () => {
-  // STOP AUDIO hanya mematikan playlist; input mic tetap berjalan jika aktif.
   const sourceToStop = activeSourceNode;
   activeSourceNode = null;
   if (sourceToStop) {
     sourceToStop.onended = null;
     try { sourceToStop.stop(); } catch (e) {}
-    try { sourceToStop.disconnect(); } catch (e) {}
   }
   isPlaying = false;
   startAudioButton.classList.remove("active");
-  setAudioStatus(microphoneStream
-    ? "Playlist dihentikan; mikrofon tetap aktif."
-    : "Playlist dihentikan.");
+  setAudioStatus("Playlist dihentikan.");
 });
 
 function updateEqChannelStates() {
@@ -2213,16 +1593,12 @@ channels.forEach((channel, idx) => {
   muteBtn.addEventListener("click", () => {
     eqChannelMuted[idx] = !eqChannelMuted[idx];
     muteBtn.classList.toggle("active", eqChannelMuted[idx]);
-    muteBtn.setAttribute("aria-pressed", String(eqChannelMuted[idx]));
     updateEqChannelStates();
-    setStatus(eqChannelMuted[idx] ? "Mute Equalizer CH " + (idx + 1) + " aktif." : "Mute Equalizer CH " + (idx + 1) + " nonaktif.");
   });
   soloBtn.addEventListener("click", () => {
     eqChannelSolo[idx] = !eqChannelSolo[idx];
     soloBtn.classList.toggle("active", eqChannelSolo[idx]);
-    soloBtn.setAttribute("aria-pressed", String(eqChannelSolo[idx]));
     updateEqChannelStates();
-    setStatus(eqChannelSolo[idx] ? "Solo Equalizer CH " + (idx + 1) + " aktif." : "Solo Equalizer CH " + (idx + 1) + " nonaktif.");
   });
   resetBtn.addEventListener("click", () => {
     channel.querySelector(".gain").value = "0";
@@ -2230,9 +1606,7 @@ channels.forEach((channel, idx) => {
     channel.querySelector(".range").value = "15";
     channel.querySelectorAll(".band input").forEach(slider => slider.value = "0");
     channel.querySelector(".test-button").classList.remove("active");
-    channel.querySelector(".test-button").setAttribute("aria-pressed", "false");
     updateValues(channel);
-    setStatus("Equalizer CH " + (idx + 1) + " di-reset ke flat.");
   });
   updateValues(channel);
 });
@@ -2247,17 +1621,22 @@ muteOutputButton.addEventListener("click", () => { outputMuted = !outputMuted; u
 
 document.querySelectorAll(".mixer-desk-surface .console-channel-strip").forEach((strip, index) => {
   const fader = strip.querySelector('.fader-slot input[type="range"]');
-  fader?.addEventListener("input", () => { if (audioContext) updateMixerStripControls(); else {
-    const readout = strip.querySelector(".fader-readout");
-    if (readout) readout.textContent = Number(fader.value).toFixed(1) + " dB";
-  }});
+  fader?.addEventListener("input", () => {
+    if (audioContext) updateMixerStripControls();
+    else {
+      const readout = strip.querySelector(".fader-readout");
+      if (readout) readout.textContent = Number(fader.value).toFixed(1) + " dB";
+    }
+  });
   strip.querySelector(".console-action-btn.mute")?.addEventListener("click", () => {
     mixerStripMuted[index] = !mixerStripMuted[index];
-    if (audioContext) updateMixerStripControls(); else strip.querySelector(".console-action-btn.mute").classList.toggle("active", mixerStripMuted[index]);
+    if (audioContext) updateMixerStripControls();
+    else strip.querySelector(".console-action-btn.mute").classList.toggle("active", mixerStripMuted[index]);
   });
   strip.querySelector(".console-action-btn.solo")?.addEventListener("click", () => {
     mixerStripSolo[index] = !mixerStripSolo[index];
-    if (audioContext) updateMixerStripControls(); else strip.querySelector(".console-action-btn.solo").classList.toggle("active", mixerStripSolo[index]);
+    if (audioContext) updateMixerStripControls();
+    else strip.querySelector(".console-action-btn.solo").classList.toggle("active", mixerStripSolo[index]);
   });
 });
 
@@ -2280,17 +1659,7 @@ function updateEncoders(data) {
   });
 }
 
-/* Parametric EQ page in the mixer TFT */
-.tft-peq { display:grid; grid-template-columns:minmax(0,1fr); gap:7px; height:100%; min-height:0; }
-.tft-peq-head { display:flex; justify-content:space-between; align-items:center; gap:6px; color:#cbd5e1; font-size:9px; }
-.tft-peq-graph { width:100%; min-height:90px; height:clamp(90px, 22vw, 150px); background:#101923; border:1px solid #334155; border-radius:5px; display:block; }
-.tft-peq-controls { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
-.tft-peq-control { min-width:0; background:#202631; border:1px solid #394454; border-radius:5px; padding:5px; text-align:center; }
-.tft-peq-control label { display:block; color:#94a3b8; font-size:8px; margin-bottom:3px; }
-.tft-peq-control input { width:100%; accent-color:#38bdf8; margin:3px 0; }
-.tft-peq-value { display:block; color:#e2e8f0; font-size:9px; font-weight:700; }
-.tft-peq-foot { display:flex; justify-content:space-between; color:#64748b; font-size:8px; }
-\nconst tftDatabase = {
+const tftDatabase = {
   config: {
     title: "CONFIG / PREAMP INTERFACE",
     footerCh: "CH 01: Lead Vocal",
@@ -2331,17 +1700,29 @@ function updateEncoders(data) {
     encoders: [{name:"THRESH", val:"-18dB"}, {name:"RATIO", val:"3:1"}, {name:"ATTACK", val:"10ms"}, {name:"RELEASE", val:"300ms"}, {name:"MAKEUP", val:"+2dB"}, {name:"KNEE", val:"Soft"}]
   },
   eq: {
-    title: "CHANNEL PARAMETRIC EQUALIZER",
-    footerCh: "CH 01: Lead Vocal",
-    footerSt: "4-Band Parametric Active",
+    title: "PARAMETRIC EQ / CHANNEL PROCESSOR",
+    footerCh: "CH 02: PEQ",
+    footerSt: "3-band PEQ controls",
     content: `
-      <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Low Gain (+2dB)</label><input type="range" min="-15" max="15" value="2" oninput="this.parentElement.querySelector('span').textContent=this.value+'dB'"><span>+2dB</span></div>
-        <div class="tft-interactive-item"><label>Mid Gain (-3dB)</label><input type="range" min="-15" max="15" value="-3" oninput="this.parentElement.querySelector('span').textContent=this.value+'dB'"><span>-3dB</span></div>
-        <div class="tft-interactive-item"><label>High Gain (+4dB)</label><input type="range" min="-15" max="15" value="4" oninput="this.parentElement.querySelector('span').textContent=this.value+'dB'"><span>+4dB</span></div>
+      <div class="tft-peq">
+        <div class="tft-peq-head"><strong>PEQ • CH 02</strong><span style="color:#eab308;">● ACTIVE</span></div>
+        <svg class="tft-peq-graph" viewBox="0 0 320 150" preserveAspectRatio="none" role="img" aria-label="Parametric equalizer response curve">
+          <g stroke="#475569" stroke-width=".7" opacity=".8">
+            <path d="M28 12H310 M28 42H310 M28 72H310 M28 102H310 M28 132H310"/>
+            <path d="M28 12V132 M84 12V132 M140 12V132 M196 12V132 M252 12V132 M310 12V132"/>
+          </g>
+          <path d="M28 72 C86 72 117 72 145 69 C166 66 176 55 184 31 C189 16 192 13 196 31 C204 55 214 66 235 69 C260 72 285 72 310 72" fill="none" stroke="#facc15" stroke-width="3" stroke-linecap="round"/>
+          <path d="M28 72 C86 72 117 72 145 69 C166 66 176 55 184 31 C189 16 192 13 196 31 C204 55 214 66 235 69 C260 72 285 72 310 72 L310 72 L28 72Z" fill="#06b6d4" opacity=".12"/>
+          <circle cx="192" cy="17" r="4" fill="#e0f2fe" stroke="#22d3ee" stroke-width="2"/>
+        </svg>
+        <div class="tft-peq-controls">
+          <div class="tft-peq-control"><label for="tftPeqFreq">FREQ</label><input id="tftPeqFreq" type="range" min="20" max="20000" value="1100" oninput="document.getElementById('tftPeqFreqVal').textContent=(this.value>=1000?(this.value/1000).toFixed(2)+' kHz':this.value+' Hz')"><span class="tft-peq-value" id="tftPeqFreqVal">1.10 kHz</span></div>
+          <div class="tft-peq-control"><label for="tftPeqQ">Q</label><input id="tftPeqQ" type="range" min="0.1" max="10" step="0.1" value="1.7" oninput="document.getElementById('tftPeqQVal').textContent=Number(this.value).toFixed(1)"><span class="tft-peq-value" id="tftPeqQVal">1.7</span></div>
+          <div class="tft-peq-control"><label for="tftPeqGain">GAIN</label><input id="tftPeqGain" type="range" min="-15" max="15" step="0.5" value="15" oninput="document.getElementById('tftPeqGainVal').textContent=Number(this.value).toFixed(1)+' dB'"><span class="tft-peq-value" id="tftPeqGainVal">15.0 dB</span></div>
+        </div>
       </div>
     `,
-    encoders: [{name:"LOW FREQ", val:"100Hz"}, {name:"LOW GAIN", val:"+2dB"}, {name:"MID FREQ", val:"2.5kHz"}, {name:"MID GAIN", val:"-3dB"}, {name:"HIGH FREQ", val:"10kHz"}, {name:"HIGH GAIN", val:"+4dB"}]
+    encoders: [{name:"FREQ", val:"1.10kHz"}, {name:"Q", val:"1.7"}, {name:"GAIN", val:"15.0dB"}, {name:"BAND", val:"MID"}, {name:"TYPE", val:"PEAK"}, {name:"BYPASS", val:"OFF"}]
   },
   sends: {
     title: "BUS SENDS & FX ROUTING",
@@ -2351,7 +1732,7 @@ function updateEncoders(data) {
       <div class="tft-interactive-grid">
         <div class="tft-interactive-item"><label>Send 1 (Alesis)</label><input type="range" min="-60" max="0" value="-6" oninput="this.parentElement.querySelector('span').textContent=this.value+'dB'"><span>-6dB</span></div>
         <div class="tft-interactive-item"><label>Send 2 (Aux)</label><input type="range" min="-60" max="0" value="-12" oninput="this.parentElement.querySelector('span').textContent=this.value+'dB'"><span>-12dB</span></div>
-        <div class="tft-interactive-item"><label>Send Mode</label><select><option>Post-Fader</option><option>Pre-Fader</option><option>Subgroup</option></select></div>
+        <div class="tft-interactive-item"><label>Send Mode</label><select><option>Post-Fader</option><option>Pre-Fader</option></select></div>
       </div>
     `,
     encoders: [{name:"SEND 1", val:"-6dB"}, {name:"SEND 2", val:"-12dB"}, {name:"SEND 3", val:"-inf"}, {name:"SEND 4", val:"-inf"}, {name:"PAN", val:"C (0)"}, {name:"MODE", val:"POST"}]
@@ -2376,38 +1757,11 @@ function updateEncoders(data) {
     content: `
       <div class="tft-interactive-grid">
         <div class="tft-interactive-item"><label>Global Mute All</label><button onclick="this.classList.toggle('active-action');">MUTE ALL</button></div>
-        <div class="tft-interactive-item"><label>DSP Engine Clock</label><select><option>48 kHz / 32-bit</option><option>44.1 kHz / 24-bit</option></select></div>
+        <div class="tft-interactive-item"><label>DSP Engine Clock</label><select><option>48 kHz / 32-bit</option></select></div>
         <div class="tft-interactive-item"><label>Talkback Mic</label><button onclick="this.classList.toggle('active-action');">TALK ON</button></div>
       </div>
     `,
     encoders: [{name:"CH 1 LVL", val:"0dB"}, {name:"CH 2 LVL", val:"0dB"}, {name:"CH 3 LVL", val:"0dB"}, {name:"CH 4 LVL", val:"0dB"}, {name:"FX RET", val:"-6dB"}, {name:"MASTER", val:"0dB"}]
-  },
-  eq: {
-    title: "PARAMETRIC EQ / CHANNEL PROCESSOR",
-    footerCh: "CH 02: PEQ",
-    footerSt: "3-band PEQ controls",
-    content: `
-      <div class="tft-peq">
-        <div class="tft-peq-head"><strong>PEQ • CH 02</strong><span style="color:#eab308;">● ACTIVE</span></div>
-        <svg class="tft-peq-graph" viewBox="0 0 320 150" preserveAspectRatio="none" role="img" aria-label="Parametric equalizer response curve">
-          <g stroke="#475569" stroke-width=".7" opacity=".8">
-            <path d="M28 12H310 M28 42H310 M28 72H310 M28 102H310 M28 132H310"/>
-            <path d="M28 12V132 M84 12V132 M140 12V132 M196 12V132 M252 12V132 M310 12V132"/>
-          </g>
-          <path d="M28 72 C86 72 117 72 145 69 C166 66 176 55 184 31 C189 16 192 13 196 31 C204 55 214 66 235 69 C260 72 285 72 310 72" fill="none" stroke="#facc15" stroke-width="3" stroke-linecap="round"/>
-          <path d="M28 72 C86 72 117 72 145 69 C166 66 176 55 184 31 C189 16 192 13 196 31 C204 55 214 66 235 69 C260 72 285 72 310 72 L310 72 L28 72Z" fill="#06b6d4" opacity=".12"/>
-          <circle cx="192" cy="17" r="4" fill="#e0f2fe" stroke="#22d3ee" stroke-width="2"/>
-          <g fill="#94a3b8" font-size="8"><text x="4" y="15">+15</text><text x="10" y="75">0</text><text x="4" y="135">-15</text><text x="28" y="145">20</text><text x="88" y="145">100</text><text x="184" y="145">1k</text><text x="267" y="145">10k</text></g>
-        </svg>
-        <div class="tft-peq-controls">
-          <div class="tft-peq-control"><label for="tftPeqFreq">FREQ</label><input id="tftPeqFreq" type="range" min="20" max="20000" value="1100" oninput="document.getElementById('tftPeqFreqVal').textContent=(this.value>=1000?(this.value/1000).toFixed(2)+' kHz':this.value+' Hz')"><span class="tft-peq-value" id="tftPeqFreqVal">1.10 kHz</span></div>
-          <div class="tft-peq-control"><label for="tftPeqQ">Q</label><input id="tftPeqQ" type="range" min="0.1" max="10" step="0.1" value="1.7" oninput="document.getElementById('tftPeqQVal').textContent=Number(this.value).toFixed(1)"><span class="tft-peq-value" id="tftPeqQVal">1.7</span></div>
-          <div class="tft-peq-control"><label for="tftPeqGain">GAIN</label><input id="tftPeqGain" type="range" min="-15" max="15" step="0.5" value="15" oninput="document.getElementById('tftPeqGainVal').textContent=Number(this.value).toFixed(1)+' dB'"><span class="tft-peq-value" id="tftPeqGainVal">15.0 dB</span></div>
-        </div>
-        <div class="tft-peq-foot"><span>RTA / RESPONSE</span><span>LOW  ◀  HIGH</span></div>
-      </div>
-    `,
-    encoders: [{name:"FREQ", val:"1.10kHz"}, {name:"Q", val:"1.7"}, {name:"GAIN", val:"15.0dB"}, {name:"BAND", val:"MID"}, {name:"TYPE", val:"PEAK"}, {name:"BYPASS", val:"OFF"}]
   },
   meters: {
     title: "METERS / RTA SPECTRUM ANALYZER",
@@ -2415,8 +1769,8 @@ function updateEncoders(data) {
     footerSt: "Real-time FFT Active",
     content: `
       <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>RTA Source</label><select><option>Post-EQ Main</option><option>Pre-DSP Input</option></select></div>
-        <div class="tft-interactive-item"><label>Peak Hold Time</label><select><option>3.0 Seconds</option><option>Infinite</option><option>Off</option></select></div>
+        <div class="tft-interactive-item"><label>RTA Source</label><select><option>Post-EQ Main</option></select></div>
+        <div class="tft-interactive-item"><label>Peak Hold Time</label><select><option>3.0 Seconds</option></select></div>
         <div class="tft-interactive-item"><label>Spectrum Zoom</label><input type="range" min="1" max="4" value="1" oninput="this.parentElement.querySelector('span').textContent=this.value+'x'"><span>1x</span></div>
       </div>
     `,
@@ -2428,9 +1782,9 @@ function updateEncoders(data) {
     footerSt: "USB Audio Interface Linked",
     content: `
       <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Input 1 Source</label><select><option>Playlist Audio</option><option>USB Stream L</option></select></div>
-        <div class="tft-interactive-item"><label>Input 2 Source</label><select><option>Mic / Line 2</option><option>USB Stream R</option></select></div>
-        <div class="tft-interactive-item"><label>Direct Out Tap</label><select><option>Post-Fader</option><option>Pre-EQ</option></select></div>
+        <div class="tft-interactive-item"><label>Input 1 Source</label><select><option>Playlist Audio</option></select></div>
+        <div class="tft-interactive-item"><label>Input 2 Source</label><select><option>Mic / Line 2</option></select></div>
+        <div class="tft-interactive-item"><label>Direct Out Tap</label><select><option>Post-Fader</option></select></div>
       </div>
     `,
     encoders: [{name:"IN 1", val:"PLAYLIST"}, {name:"IN 2", val:"MIC 2"}, {name:"IN 3", val:"AUX 1"}, {name:"IN 4", val:"AUX 2"}, {name:"USB IN", val:"CH 1-2"}, {name:"OUT", val:"MAIN L/R"}]
@@ -2443,7 +1797,7 @@ function updateEncoders(data) {
       <div class="tft-interactive-grid">
         <div class="tft-interactive-item"><label>Display Brightness</label><input type="range" min="20" max="100" value="85" oninput="this.parentElement.querySelector('span').textContent=this.value+'%'"><span>85%</span></div>
         <div class="tft-interactive-item"><label>BLE ESP32 Link</label><button class="active-action" onclick="this.classList.toggle('active-action')">CONNECTED</button></div>
-        <div class="tft-interactive-item"><label>Audio Buffer Size</label><select><option>512 Samples</option><option>256 Samples</option><option>1024 Samples</option></select></div>
+        <div class="tft-interactive-item"><label>Audio Buffer Size</label><select><option>512 Samples</option></select></div>
       </div>
     `,
     encoders: [{name:"CLOCK", val:"INTERNAL"}, {name:"SAMPLE", val:"48kHz"}, {name:"BUFFER", val:"512smpl"}, {name:"MIDI CH", val:"1"}, {name:"BLE LINK", val:"ACTIVE"}, {name:"BRIGHTNESS", val:"85%"}]
@@ -2454,7 +1808,7 @@ function updateEncoders(data) {
     footerSt: "Auto-Save Enabled",
     content: `
       <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Active Scene</label><select><option>#01 Live Stage Default</option><option>#02 Acoustic Cafe</option><option>#03 Karaoke Night</option></select></div>
+        <div class="tft-interactive-item"><label>Active Scene</label><select><option>#01 Live Stage Default</option></select></div>
         <div class="tft-interactive-item"><label>Store Preset</label><button onclick="alert('Konfigurasi mixer berhasil disimpan ke Scene aktif!')">STORE SCENE</button></div>
         <div class="tft-interactive-item"><label>Recall Safe</label><button class="active-action" onclick="this.classList.toggle('active-action')">SAFE ON</button></div>
       </div>
@@ -2467,8 +1821,8 @@ function updateEncoders(data) {
     footerSt: "Alesis FX Processor Assigned",
     content: `
       <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Alesis Preset 1</label><select><option>Stage Reverb</option><option>Plate Reverb</option><option>Vocal Echo</option></select></div>
-        <div class="tft-interactive-item"><label>Alesis Preset 2</label><select><option>Stereo Chorus</option><option>Delay + Reverb</option><option>Flanger</option></select></div>
+        <div class="tft-interactive-item"><label>Alesis Preset 1</label><select><option>Stage Reverb</option></select></div>
+        <div class="tft-interactive-item"><label>Alesis Preset 2</label><select><option>Stereo Chorus</option></select></div>
         <div class="tft-interactive-item"><label>FX Master Bypass</label><button onclick="this.classList.toggle('active-action'); this.textContent = this.classList.contains('active-action') ? 'FX ACTIVE' : 'BYPASSED'">FX ACTIVE</button></div>
       </div>
     `,
@@ -2515,7 +1869,6 @@ function startRealMeters() {
   function updateAllMeters() {
     meterAnimationId = requestAnimationFrame(updateAllMeters);
 
-    // Meter tetap membaca sinyal saat playlist ATAU mic aktif.
     const micHasLiveTrack = !!(microphoneStream && microphoneStream.getAudioTracks().some(track => track.readyState === "live" && track.enabled));
     const hasActiveInput = isPlaying || micHasLiveTrack;
     const isAudioRunning = !!(audioContext && audioContext.state === "running" && hasActiveInput);
@@ -2577,7 +1930,6 @@ function startRealMeters() {
       if (!isAudioRunning) { meterSpans.forEach(span => span.classList.remove("on")); return; }
 
       let rms = 0;
-      // Meter mapping: CH1 Mic, CH2 Music, CH3 AUX, CH4 FX return, Master L/R.
       const analyser = mIdx === 4 ? masterMeterAnalyser : mixerStripAnalysers[mIdx];
       if (analyser) {
         try {
