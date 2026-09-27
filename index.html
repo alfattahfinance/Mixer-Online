@@ -33,7 +33,7 @@ header, .topbar {
 .actions button:hover, .actions button.active { background: #00d9ff; color: #000; border-color: #00d9ff; }
 
 /* =========================================================
-   EMPAT TAB NAVIGASI UTAMA (TERMASUK ESP32)
+   EMPAT TAB NAVIGASI UTAMA
 ========================================================= */
 .mode-switch-bar {
   position: relative; z-index: 50; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; pointer-events: auto;
@@ -63,8 +63,6 @@ header, .topbar {
 /* LED Indikator */
 .status-led { width: 8px; height: 8px; border-radius: 50%; background: #252b35; border: 1px solid #485260; display: inline-block; }
 .status-led.active-led { background: #10b981; border-color: #34d399; box-shadow: 0 0 6px #10b981; }
-.status-led.bypass-led { background: #ef4444; border-color: #f87171; box-shadow: 0 0 6px #ef4444; }
-.status-led.test-led { background: #f59e0b; border-color: #fbbf24; box-shadow: 0 0 6px #f59e0b; }
 
 .channel-title { font-size: 12px; font-weight: bold; color: #38bdf8; }
 .channel-controls { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; max-width: 58%; }
@@ -124,13 +122,6 @@ header, .topbar {
   background: linear-gradient(to bottom, #d1d5db 0%, #9ca3af 20%, #4b5563 50%, #1f2937 52%, #9ca3af 80%, #e5e7eb 100%);
   box-shadow: 0 1px 3px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.8);
 }
-.band input[type="range"]::-moz-range-track { width: 3px; background: transparent; border: 0; }
-.band input[type="range"]::-moz-range-thumb {
-  width: 26px; height: 14px; border: 1px solid #6b7280; border-radius: 2px;
-  background: linear-gradient(to bottom, #d1d5db 0%, #9ca3af 20%, #4b5563 50%, #1f2937 52%, #9ca3af 80%, #e5e7eb 100%);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.8);
-}
-
 .band-value { margin-top: 4px; line-height: 14px; font-size: 8px; color: #38bdf8; font-family: monospace; text-align: center; white-space: nowrap; }
 .scale { display: flex; justify-content: space-between; font-size: 9px; color: #64748b; padding: 2px 4px; }
 
@@ -172,15 +163,20 @@ header, .topbar {
 .tft-top-tabs { display: flex; gap: 3px; background: #0f172a; padding: 3px; border-radius: 4px; margin-bottom: 6px; border: 1px solid #1e293b; overflow-x: auto; }
 .tft-tab { background: #1e293b; color: #94a3b8; border: none; font-size: 8px; font-weight: bold; padding: 3px 6px; border-radius: 3px; cursor: pointer; white-space: nowrap; }
 .tft-tab.active { background: #0284c7; color: #fff; }
-.tft-main-viewport { background: #020408; border: 1px solid #1e293b; border-radius: 4px; min-height: 95px; padding: 6px 8px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+.tft-main-viewport { background: #020408; border: 1px solid #1e293b; border-radius: 4px; min-height: 115px; padding: 6px 8px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
 .tft-content-screen { font-size: 10px; color: #38bdf8; line-height: 1.3; }
-.tft-interactive-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
-.tft-interactive-item { background: #0d121c; border: 1px solid #1e293b; padding: 4px; border-radius: 4px; font-size: 9px; }
-.tft-interactive-item label { display: block; color: #94a3b8; margin-bottom: 2px; font-size: 8px; }
-.tft-interactive-item input[type="range"] { width: 100%; accent-color: #38bdf8; cursor: pointer; }
-.tft-interactive-item select { width: 100%; background: #161f30; color: #fff; border: 1px solid #334155; font-size: 9px; padding: 2px; border-radius: 3px; }
-.tft-interactive-item button { width: 100%; background: #0284c7; color: #fff; border: none; padding: 3px; font-size: 8px; font-weight: bold; border-radius: 3px; }
-.tft-interactive-item button.active-action { background: #10b981; }
+
+/* LAYOUT GRAFIK & KONTROL UNTUK SEMUA MODUL TFT */
+.tft-module-view { display: flex; flex-direction: column; gap: 6px; height: 100%; }
+.tft-module-graph-box { width: 100%; height: 65px; background: #0e1520; border: 1px solid #223043; border-radius: 4px; padding: 4px; display: flex; align-items: center; justify-content: center; position: relative; }
+.tft-module-controls-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+.tft-mod-ctrl { background: #131b28; border: 1px solid #253347; border-radius: 4px; padding: 4px; text-align: center; }
+.tft-mod-ctrl label { display: block; color: #94a3b8; font-size: 7.5px; margin-bottom: 2px; }
+.tft-mod-ctrl input[type="range"] { width: 100%; accent-color: #38bdf8; margin: 2px 0; cursor: pointer; }
+.tft-mod-ctrl select { width: 100%; background: #1b2638; color: #fff; border: 1px solid #33445c; font-size: 8.5px; padding: 2px; border-radius: 3px; }
+.tft-mod-ctrl button { width: 100%; background: #0284c7; color: #fff; border: none; padding: 3px; font-size: 8px; font-weight: bold; border-radius: 3px; }
+.tft-mod-ctrl button.active-action { background: #10b981; }
+.tft-val-disp { font-size: 8.5px; color: #f59e0b; font-family: monospace; font-weight: bold; display: block; }
 
 .tft-encoders-bar { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-top: 6px; background: #090d16; padding: 4px; border-radius: 4px; border: 1px solid #1e293b; }
 .tft-encoder-knob { background: linear-gradient(180deg, #1e293b, #0f172a); border: 1px solid #475569; border-radius: 4px; text-align: center; padding: 3px 1px; font-size: 7px; color: #cbd5e1; font-family: monospace; }
@@ -235,14 +231,7 @@ header, .topbar {
   background: linear-gradient(to bottom, #b7b9bc 0%, #777b80 18%, #5d6166 48%, #a5a7aa 52%, #777b80 74%, #b7b9bc 100%);
   box-shadow: 0 1px 3px rgba(0,0,0,0.9), inset 0 1px 1px rgba(255,255,255,0.85);
 }
-.fader-slot input[type="range"]::-moz-range-track { width: 4px; background: transparent; border: 0; }
-.fader-slot input[type="range"]::-moz-range-thumb {
-  width: 42px; height: 24px; border: 1px solid #73777d; border-radius: 2px;
-  background: linear-gradient(to bottom, #b7b9bc 0%, #777b80 18%, #5d6166 48%, #a5a7aa 52%, #777b80 74%, #b7b9bc 100%);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.9), inset 0 1px 1px rgba(255,255,255,0.85);
-}
-.master-strip .fader-slot input[type="range"]::-webkit-slider-thumb,
-.master-strip .fader-slot input[type="range"]::-moz-range-thumb { border-color: #c38a16; }
+.master-strip .fader-slot input[type="range"]::-webkit-slider-thumb { border-color: #c38a16; }
 
 .fader-readout { font-size: 10px; font-family: monospace; color: #38bdf8; margin-bottom: 6px; font-weight: bold; }
 .master-strip .fader-readout { color: #fbbf24; }
@@ -280,14 +269,14 @@ header, .topbar {
 .playlist-item.playing { color: #38bdf8; font-weight: bold; }
 
 /* Parametric EQ TFT view styles */
-.tft-peq { display:grid; grid-template-columns:minmax(0,1fr); gap:7px; height:100%; }
+.tft-peq { display:grid; grid-template-columns:minmax(0,1fr); gap:6px; height:100%; }
 .tft-peq-head { display:flex; justify-content:space-between; align-items:center; gap:6px; color:#cbd5e1; font-size:9px; }
-.tft-peq-graph { width:100%; min-height:80px; height:105px; background:#101923; border:1px solid #334155; border-radius:5px; display:block; cursor: crosshair; touch-action: none; }
-.tft-peq-controls { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
-.tft-peq-control { background:#202631; border:1px solid #394454; border-radius:5px; padding:5px; text-align:center; }
-.tft-peq-control label { display:block; color:#94a3b8; font-size:8px; margin-bottom:3px; }
-.tft-peq-control input { width:100%; accent-color:#38bdf8; margin:3px 0; cursor: pointer; }
-.tft-peq-value { display:block; color:#e2e8f0; font-size:9px; font-weight:700; }
+.tft-peq-graph { width:100%; height:62px; background:#101923; border:1px solid #334155; border-radius:4px; display:block; cursor: crosshair; touch-action: none; }
+.tft-peq-controls { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:5px; }
+.tft-peq-control { background:#202631; border:1px solid #394454; border-radius:4px; padding:4px; text-align:center; }
+.tft-peq-control label { display:block; color:#94a3b8; font-size:7.5px; margin-bottom:2px; }
+.tft-peq-control input { width:100%; accent-color:#38bdf8; margin:2px 0; cursor: pointer; }
+.tft-peq-value { display:block; color:#e2e8f0; font-size:8.5px; font-weight:700; }
 .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
   </style>
 </head>
@@ -831,8 +820,7 @@ function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed
     if (!slider || slider.disabled || event.button > 0) return;
 
     const style = window.getComputedStyle(slider);
-    const vertical = style.writingMode.startsWith("vertical") ||
-      /rotate\((-?\d+\.?\d*)deg\)/.test(style.transform);
+    const vertical = style.writingMode.startsWith("vertical") || /rotate\((-?\d+\.?\d*)deg\)/.test(style.transform);
     const rect = slider.getBoundingClientRect();
     const length = vertical ? rect.height : rect.width;
     if (!length) return;
@@ -1602,7 +1590,7 @@ document.querySelectorAll(".mixer-desk-surface .console-channel-strip").forEach(
 });
 
 /* =========================================================
-   DATABASE TFT INTERAKTIF & EVENT LISTENER YANG KOKOH
+   DATABASE TFT INTERAKTIF LENGKAP UNTUK SEMUA MODUL
 ========================================================= */
 const tftSectionTitle = document.getElementById("tftSectionTitle");
 const tftContentArea = document.getElementById("tftContentArea");
@@ -1626,10 +1614,18 @@ const tftDatabase = {
     footerCh: "CH 01: Lead Vocal",
     footerSt: "Preamp & Phantom Active",
     content: `
-      <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Analog Gain (+12dB)</label><input type="range" id="cfgGain" min="0" max="60" value="12"><span id="cfgGainVal">12dB</span></div>
-        <div class="tft-interactive-item"><label>Phantom 48V</label><button id="cfgPhantomBtn" class="active-action">ON</button></div>
-        <div class="tft-interactive-item"><label>Phase Invert</label><button id="cfgPhaseBtn">NORMAL</button></div>
+      <div class="tft-module-view">
+        <div class="tft-module-graph-box">
+          <svg viewBox="0 0 320 60" style="width:100%; height:100%;">
+            <path d="M10 50 Q 80 10, 160 30 T 310 15" fill="none" stroke="#38bdf8" stroke-width="2"/>
+            <text x="15" y="20" fill="#94a3b8" font-size="8">PREAMP GAIN CURVE</text>
+          </svg>
+        </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>Analog Gain</label><input type="range" id="cfgGain" min="0" max="60" value="12"><span class="tft-val-disp" id="cfgGainVal">12dB</span></div>
+          <div class="tft-mod-ctrl"><label>Phantom 48V</label><button id="cfgPhantomBtn" class="active-action">ON</button></div>
+          <div class="tft-mod-ctrl"><label>Phase Invert</label><button id="cfgPhaseBtn">NORMAL</button></div>
+        </div>
       </div>
     `,
     encoders: [{name:"GAIN", val:"+12dB"}, {name:"HPF", val:"80Hz"}, {name:"POLARITY", val:"NORM"}, {name:"DELAY", val:"0.0ms"}, {name:"WIDTH", val:"100%"}, {name:"TRIM", val:"0.0dB"}]
@@ -1639,10 +1635,18 @@ const tftDatabase = {
     footerCh: "CH 01: Lead Vocal",
     footerSt: "Expander Active",
     content: `
-      <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Threshold (-45dB)</label><input type="range" id="gateThresh" min="-80" max="0" value="-45"><span id="gateThreshVal">-45dB</span></div>
-        <div class="tft-interactive-item"><label>Ratio (1:2.5)</label><input type="range" id="gateRatio" min="1" max="10" step="0.5" value="2.5"><span id="gateRatioVal">1:2.5</span></div>
-        <div class="tft-interactive-item"><label>Gate Status</label><button id="gateStateBtn" class="active-action">ACTIVE</button></div>
+      <div class="tft-module-view">
+        <div class="tft-module-graph-box">
+          <svg viewBox="0 0 320 60" style="width:100%; height:100%;">
+            <path d="M10 10 L 140 50 L 310 50" fill="none" stroke="#f59e0b" stroke-width="2"/>
+            <text x="15" y="20" fill="#94a3b8" font-size="8">GATE DYNAMICS TRANSFER</text>
+          </svg>
+        </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>Threshold</label><input type="range" id="gateThresh" min="-80" max="0" value="-45"><span class="tft-val-disp" id="gateThreshVal">-45dB</span></div>
+          <div class="tft-mod-ctrl"><label>Ratio</label><input type="range" id="gateRatio" min="1" max="10" step="0.5" value="2.5"><span class="tft-val-disp" id="gateRatioVal">1:2.5</span></div>
+          <div class="tft-mod-ctrl"><label>Gate Status</label><button id="gateStateBtn" class="active-action">ACTIVE</button></div>
+        </div>
       </div>
     `,
     encoders: [{name:"THRESH", val:"-45dB"}, {name:"RATIO", val:"1:2.5"}, {name:"ATTACK", val:"5ms"}, {name:"HOLD", val:"20ms"}, {name:"RELEASE", val:"300ms"}, {name:"FILTER", val:"OFF"}]
@@ -1652,10 +1656,18 @@ const tftDatabase = {
     footerCh: "CH 01: Lead Vocal",
     footerSt: "Peak Compressor Active",
     content: `
-      <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Threshold (-18dB)</label><input type="range" id="compThresh" min="-60" max="0" value="-18"><span id="compThreshVal">-18dB</span></div>
-        <div class="tft-interactive-item"><label>Ratio (3:1)</label><input type="range" id="compRatio" min="1" max="20" value="3"><span id="compRatioVal">3:1</span></div>
-        <div class="tft-interactive-item"><label>Makeup Gain</label><input type="range" id="compMakeup" min="0" max="24" value="2"><span id="compMakeupVal">+2dB</span></div>
+      <div class="tft-module-view">
+        <div class="tft-module-graph-box">
+          <svg viewBox="0 0 320 60" style="width:100%; height:100%;">
+            <path d="M10 50 L 180 30 L 310 25" fill="none" stroke="#10b981" stroke-width="2"/>
+            <text x="15" y="20" fill="#94a3b8" font-size="8">COMPRESSOR CURVE</text>
+          </svg>
+        </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>Threshold</label><input type="range" id="compThresh" min="-60" max="0" value="-18"><span class="tft-val-disp" id="compThreshVal">-18dB</span></div>
+          <div class="tft-mod-ctrl"><label>Ratio</label><input type="range" id="compRatio" min="1" max="20" value="3"><span class="tft-val-disp" id="compRatioVal">3:1</span></div>
+          <div class="tft-mod-ctrl"><label>Makeup Gain</label><input type="range" id="compMakeup" min="0" max="24" value="2"><span class="tft-val-disp" id="compMakeupVal">+2dB</span></div>
+        </div>
       </div>
     `,
     encoders: [{name:"THRESH", val:"-18dB"}, {name:"RATIO", val:"3:1"}, {name:"ATTACK", val:"10ms"}, {name:"RELEASE", val:"300ms"}, {name:"MAKEUP", val:"+2dB"}, {name:"KNEE", val:"Soft"}]
@@ -1702,10 +1714,18 @@ const tftDatabase = {
     footerCh: "CH 01: Lead Vocal",
     footerSt: "Post-Fader Send Active",
     content: `
-      <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Send 1 (Alesis)</label><input type="range" id="send1Lvl" min="-60" max="0" value="-6"><span id="send1LvlVal">-6dB</span></div>
-        <div class="tft-interactive-item"><label>Send 2 (Aux)</label><input type="range" id="send2Lvl" min="-60" max="0" value="-12"><span id="send2LvlVal">-12dB</span></div>
-        <div class="tft-interactive-item"><label>Send Mode</label><select id="sendModeSelect"><option>Post-Fader</option><option>Pre-Fader</option></select></div>
+      <div class="tft-module-view">
+        <div class="tft-module-graph-box">
+          <svg viewBox="0 0 320 60" style="width:100%; height:100%;">
+            <path d="M10 40 L 150 20 L 310 10" fill="none" stroke="#a855f7" stroke-width="2"/>
+            <text x="15" y="20" fill="#94a3b8" font-size="8">SEND BUS ROUTING MATRIX</text>
+          </svg>
+        </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>Send 1 Level</label><input type="range" id="send1Lvl" min="-60" max="0" value="-6"><span class="tft-val-disp" id="send1LvlVal">-6dB</span></div>
+          <div class="tft-mod-ctrl"><label>Send 2 Level</label><input type="range" id="send2Lvl" min="-60" max="0" value="-12"><span class="tft-val-disp" id="send2LvlVal">-12dB</span></div>
+          <div class="tft-mod-ctrl"><label>Send Mode</label><select id="sendModeSelect"><option>Post-Fader</option><option>Pre-Fader</option></select></div>
+        </div>
       </div>
     `,
     encoders: [{name:"SEND 1", val:"-6dB"}, {name:"SEND 2", val:"-12dB"}, {name:"SEND 3", val:"-inf"}, {name:"SEND 4", val:"-inf"}, {name:"PAN", val:"C (0)"}, {name:"MODE", val:"POST"}]
@@ -1715,10 +1735,18 @@ const tftDatabase = {
     footerCh: "MASTER FOH",
     footerSt: "Limiter Active",
     content: `
-      <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Main FOH Level</label><input type="range" id="mainFohLvl" min="-50" max="6" value="0"><span id="mainFohLvlVal">0dB</span></div>
-        <div class="tft-interactive-item"><label>Brickwall Limiter</label><input type="range" id="mainLimitLvl" min="-20" max="0" value="-0.5"><span id="mainLimitLvlVal">-0.5dB</span></div>
-        <div class="tft-interactive-item"><label>Mono Sum</label><button id="mainMonoBtn">OFF</button></div>
+      <div class="tft-module-view">
+        <div class="tft-module-graph-box">
+          <svg viewBox="0 0 320 60" style="width:100%; height:100%;">
+            <path d="M10 30 Q 160 5, 310 30" fill="none" stroke="#ef4444" stroke-width="2"/>
+            <text x="15" y="20" fill="#94a3b8" font-size="8">MASTER FOH LIMITER SPECTRUM</text>
+          </svg>
+        </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>Main FOH Level</label><input type="range" id="mainFohLvl" min="-50" max="6" value="0"><span class="tft-val-disp" id="mainFohLvlVal">0dB</span></div>
+          <div class="tft-mod-ctrl"><label>Brickwall Limiter</label><input type="range" id="mainLimitLvl" min="-20" max="0" value="-0.5"><span class="tft-val-disp" id="mainLimitLvlVal">-0.5dB</span></div>
+          <div class="tft-mod-ctrl"><label>Mono Sum</label><button id="mainMonoBtn">OFF</button></div>
+        </div>
       </div>
     `,
     encoders: [{name:"MASTER", val:"0dB"}, {name:"LIMITER", val:"-0.5dB"}, {name:"BALANCE", val:"CENTER"}, {name:"MONO", val:"OFF"}, {name:"MATRIX 1", val:"-inf"}, {name:"MATRIX 2", val:"-inf"}]
@@ -1728,10 +1756,18 @@ const tftDatabase = {
     footerCh: "SYSTEM OVERVIEW",
     footerSt: "All Channels Operational",
     content: `
-      <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Global Mute All</label><button id="homeMuteAllBtn">MUTE ALL</button></div>
-        <div class="tft-interactive-item"><label>DSP Engine Clock</label><select id="homeClockSelect"><option>48 kHz / 32-bit</option><option>96 kHz / 32-bit</option></select></div>
-        <div class="tft-interactive-item"><label>Talkback Mic</label><button id="homeTalkBtn">TALK ON</button></div>
+      <div class="tft-module-view">
+        <div class="tft-module-graph-box">
+          <svg viewBox="0 0 320 60" style="width:100%; height:100%;">
+            <path d="M10 45 L 80 15 L 160 35 L 240 10 L 310 40" fill="none" stroke="#22d3ee" stroke-width="2"/>
+            <text x="15" y="20" fill="#94a3b8" font-size="8">OVERVIEW STATUS METER</text>
+          </svg>
+        </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>Global Mute All</label><button id="homeMuteAllBtn">MUTE ALL</button></div>
+          <div class="tft-mod-ctrl"><label>DSP Clock</label><select id="homeClockSelect"><option>48 kHz / 32-bit</option><option>96 kHz / 32-bit</option></select></div>
+          <div class="tft-mod-ctrl"><label>Talkback Mic</label><button id="homeTalkBtn">TALK ON</button></div>
+        </div>
       </div>
     `,
     encoders: [{name:"CH 1 LVL", val:"0dB"}, {name:"CH 2 LVL", val:"0dB"}, {name:"CH 3 LVL", val:"0dB"}, {name:"CH 4 LVL", val:"0dB"}, {name:"FX RET", val:"-6dB"}, {name:"MASTER", val:"0dB"}]
@@ -1741,10 +1777,18 @@ const tftDatabase = {
     footerCh: "RTA SPECTRUM",
     footerSt: "Real-time FFT Active",
     content: `
-      <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>RTA Source</label><select id="rtaSourceSelect"><option>Post-EQ Main</option><option>Pre-EQ Input</option></select></div>
-        <div class="tft-interactive-item"><label>Peak Hold Time</label><select id="rtaHoldSelect"><option>3.0 Seconds</option><option>Infinite</option></select></div>
-        <div class="tft-interactive-item"><label>Spectrum Zoom</label><input type="range" id="rtaZoom" min="1" max="4" value="1"><span id="rtaZoomVal">1x</span></div>
+      <div class="tft-module-view">
+        <div class="tft-module-graph-box">
+          <svg viewBox="0 0 320 60" style="width:100%; height:100%;">
+            <path d="M10 50 L 30 20 L 60 35 L 90 10 L 120 40 L 150 15 L 180 30 L 210 5 L 240 25 L 270 12 L 310 45" fill="none" stroke="#38bdf8" stroke-width="2"/>
+            <text x="15" y="15" fill="#94a3b8" font-size="8">RTA SPECTRUM REALTIME FFT</text>
+          </svg>
+        </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>RTA Source</label><select id="rtaSourceSelect"><option>Post-EQ Main</option><option>Pre-EQ Input</option></select></div>
+          <div class="tft-mod-ctrl"><label>Peak Hold</label><select id="rtaHoldSelect"><option>3.0 Seconds</option><option>Infinite</option></select></div>
+          <div class="tft-mod-ctrl"><label>Zoom</label><input type="range" id="rtaZoom" min="1" max="4" value="1"><span class="tft-val-disp" id="rtaZoomVal">1x</span></div>
+        </div>
       </div>
     `,
     encoders: [{name:"SOURCE", val:"POST-EQ"}, {name:"DECAY", val:"Fast"}, {name:"PEAK HOLD", val:"3.0s"}, {name:"ZOOM", val:"1x"}, {name:"WEIGHT", val:"A-EQ"}, {name:"VIEW", val:"31-BAND"}]
@@ -1754,10 +1798,18 @@ const tftDatabase = {
     footerCh: "IO PATCHBAY",
     footerSt: "USB Audio Interface Linked",
     content: `
-      <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Input 1 Source</label><select id="routeIn1"><option>Playlist Audio</option><option>Physical Mic</option></select></div>
-        <div class="tft-interactive-item"><label>Input 2 Source</label><select id="routeIn2"><option>Mic / Line 2</option><option>Bluetooth In</option></select></div>
-        <div class="tft-interactive-item"><label>Direct Out Tap</label><select id="routeTap"><option>Post-Fader</option><option>Pre-Fader</option></select></div>
+      <div class="tft-module-view">
+        <div class="tft-module-graph-box">
+          <svg viewBox="0 0 320 60" style="width:100%; height:100%;">
+            <path d="M20 15 L 120 15 L 160 45 L 300 45" fill="none" stroke="#f43f5e" stroke-width="2"/>
+            <text x="15" y="20" fill="#94a3b8" font-size="8">PATCHBAY SIGNAL PATH MATRIX</text>
+          </svg>
+        </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>Input 1 Source</label><select id="routeIn1"><option>Playlist Audio</option><option>Physical Mic</option></select></div>
+          <div class="tft-mod-ctrl"><label>Input 2 Source</label><select id="routeIn2"><option>Mic / Line 2</option><option>Bluetooth In</option></select></div>
+          <div class="tft-mod-ctrl"><label>Direct Out Tap</label><select id="routeTap"><option>Post-Fader</option><option>Pre-Fader</option></select></div>
+        </div>
       </div>
     `,
     encoders: [{name:"IN 1", val:"PLAYLIST"}, {name:"IN 2", val:"MIC 2"}, {name:"IN 3", val:"AUX 1"}, {name:"IN 4", val:"AUX 2"}, {name:"USB IN", val:"CH 1-2"}, {name:"OUT", val:"MAIN L/R"}]
@@ -1767,10 +1819,18 @@ const tftDatabase = {
     footerCh: "HARDWARE PREF",
     footerSt: "Firmware v2.4.1 Stable",
     content: `
-      <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Display Brightness</label><input type="range" id="setupBright" min="20" max="100" value="85"><span id="setupBrightVal">85%</span></div>
-        <div class="tft-interactive-item"><label>BLE ESP32 Link</label><button id="setupBleBtn" class="active-action">CONNECTED</button></div>
-        <div class="tft-interactive-item"><label>Audio Buffer Size</label><select id="setupBuffer"><option>512 Samples</option><option>256 Samples</option></select></div>
+      <div class="tft-module-view">
+        <div class="tft-module-graph-box">
+          <svg viewBox="0 0 320 60" style="width:100%; height:100%;">
+            <path d="M10 30 L 310 30" stroke="#64748b" stroke-dasharray="4" stroke-width="2"/>
+            <text x="15" y="20" fill="#94a3b8" font-size="8">SYSTEM CLOCK & BUFFER SYNC</text>
+          </svg>
+        </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>Brightness</label><input type="range" id="setupBright" min="20" max="100" value="85"><span class="tft-val-disp" id="setupBrightVal">85%</span></div>
+          <div class="tft-mod-ctrl"><label>BLE ESP32 Link</label><button id="setupBleBtn" class="active-action">CONNECTED</button></div>
+          <div class="tft-mod-ctrl"><label>Buffer Size</label><select id="setupBuffer"><option>512 Samples</option><option>256 Samples</option></select></div>
+        </div>
       </div>
     `,
     encoders: [{name:"CLOCK", val:"INTERNAL"}, {name:"SAMPLE", val:"48kHz"}, {name:"BUFFER", val:"512smpl"}, {name:"MIDI CH", val:"1"}, {name:"BLE LINK", val:"ACTIVE"}, {name:"BRIGHTNESS", val:"85%"}]
@@ -1780,10 +1840,18 @@ const tftDatabase = {
     footerCh: "SCENE MANAGER",
     footerSt: "Auto-Save Enabled",
     content: `
-      <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Active Scene</label><select id="libSceneSelect"><option>#01 Live Stage Default</option><option>#02 Acoustic Night</option></select></div>
-        <div class="tft-interactive-item"><label>Store Preset</label><button id="libStoreBtn">STORE SCENE</button></div>
-        <div class="tft-interactive-item"><label>Recall Safe</label><button id="libSafeBtn" class="active-action">SAFE ON</button></div>
+      <div class="tft-module-view">
+        <div class="tft-module-graph-box">
+          <svg viewBox="0 0 320 60" style="width:100%; height:100%;">
+            <path d="M15 40 L 80 20 L 160 35 L 240 15 L 305 30" fill="none" stroke="#eab308" stroke-width="2"/>
+            <text x="15" y="20" fill="#94a3b8" font-size="8">SCENE MEMORY PRESET BANK</text>
+          </svg>
+        </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>Active Scene</label><select id="libSceneSelect"><option>#01 Live Stage</option><option>#02 Acoustic Night</option></select></div>
+          <div class="tft-mod-ctrl"><label>Store Preset</label><button id="libStoreBtn">STORE</button></div>
+          <div class="tft-mod-ctrl"><label>Recall Safe</label><button id="libSafeBtn" class="active-action">SAFE ON</button></div>
+        </div>
       </div>
     `,
     encoders: [{name:"SCENE", val:"#01"}, {name:"RECALL", val:"SAFE"}, {name:"STORE", val:"READY"}, {name:"SNIPPET", val:"ALL"}, {name:"USB BACKUP", val:"READY"}, {name:"AUTO SAVE", val:"ON"}]
@@ -1793,10 +1861,18 @@ const tftDatabase = {
     footerCh: "VIRTUAL FX RACK",
     footerSt: "Alesis FX Processor Assigned",
     content: `
-      <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Alesis Preset 1</label><select id="fxPreset1"><option>Stage Reverb</option><option>Plate Reverb</option></select></div>
-        <div class="tft-interactive-item"><label>Alesis Preset 2</label><select id="fxPreset2"><option>Stereo Chorus</option><option>PingPong Delay</option></select></div>
-        <div class="tft-interactive-item"><label>FX Master Bypass</label><button id="fxBypassBtn" class="active-action">FX ACTIVE</button></div>
+      <div class="tft-module-view">
+        <div class="tft-module-graph-box">
+          <svg viewBox="0 0 320 60" style="width:100%; height:100%;">
+            <path d="M10 50 Q 80 5, 160 30 T 310 20" fill="none" stroke="#ec4899" stroke-width="2"/>
+            <text x="15" y="20" fill="#94a3b8" font-size="8">ALESIS VIRTUAL REVERB TAIL</text>
+          </svg>
+        </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>FX Preset 1</label><select id="fxPreset1"><option>Stage Reverb</option><option>Plate Reverb</option></select></div>
+          <div class="tft-mod-ctrl"><label>FX Preset 2</label><select id="fxPreset2"><option>Chorus</option><option>Delay</option></select></div>
+          <div class="tft-mod-ctrl"><label>FX Master</label><button id="fxBypassBtn" class="active-action">ACTIVE</button></div>
+        </div>
       </div>
     `,
     encoders: [{name:"FX TYPE 1", val:"REVERB"}, {name:"TIME 1", val:"2.2s"}, {name:"FX TYPE 2", val:"DELAY"}, {name:"TIME 2", val:"350ms"}, {name:"MIX 1", val:"25%"}, {name:"MIX 2", val:"30%"}]
@@ -1925,7 +2001,7 @@ function bindTftDynamicEventListeners(key) {
     updateTftPeqVisuals();
   }
 
-  // Interaksi widget di modul TFT lain
+  // Event listener untuk seluruh modul TFT lainnya agar berfungsi penuh
   const cfgGain = document.getElementById("cfgGain");
   if (cfgGain) cfgGain.addEventListener("input", () => { document.getElementById("cfgGainVal").textContent = cfgGain.value + "dB"; });
   const cfgPhantomBtn = document.getElementById("cfgPhantomBtn");
@@ -1978,7 +2054,7 @@ function bindTftDynamicEventListeners(key) {
   if (libSafeBtn) libSafeBtn.addEventListener("click", () => { libSafeBtn.classList.toggle("active-action"); libSafeBtn.textContent = libSafeBtn.classList.contains("active-action") ? "SAFE ON" : "SAFE OFF"; });
 
   const fxBypassBtn = document.getElementById("fxBypassBtn");
-  if (fxBypassBtn) fxBypassBtn.addEventListener("click", () => { fxBypassBtn.classList.toggle("active-action"); fxBypassBtn.textContent = fxBypassBtn.classList.contains("active-action") ? "FX ACTIVE" : "BYPASSED"; });
+  if (fxBypassBtn) fxBypassBtn.addEventListener("click", () => { fxBypassBtn.classList.toggle("active-action"); fxBypassBtn.textContent = fxBypassBtn.classList.contains("active-action") ? "ACTIVE" : "BYPASSED"; });
 }
 
 function loadTftPage(key) {
@@ -1992,7 +2068,6 @@ function loadTftPage(key) {
   setTimeout(() => bindTftDynamicEventListeners(key), 10);
 }
 
-// PERBAIKAN UTAMA: Event Listener Navigasi Atas & Section Select dipasang secara global & persisten
 function switchActiveSection(key) {
   consoleSectionBtns.forEach(b => b.classList.toggle("active", b.getAttribute("data-section") === key));
   tftTabs.forEach(t => t.classList.toggle("active", t.getAttribute("data-tft-tab") === key));
