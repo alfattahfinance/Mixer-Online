@@ -821,6 +821,15 @@ header, .topbar {
   text-align: center;
   white-space: nowrap;
 }
+
+/* Keep the page still while a hardware-style control is being dragged.
+   The control remains directly touch-operable; vertical page scrolling starts
+   outside the active range control. */
+input[type="range"] {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
 </style>
 </head>
 
@@ -1423,7 +1432,7 @@ function createBands(channel) {
    AUDIO ENGINE & ROUTING (DIPERBAIKI 100% TEMBUS KE HP)
 ========================================================= */
 // Smooth control response for EQ, echo FX, channel and master faders.
-const CONTROL_SMOOTHING_SECONDS = 0.20;
+const CONTROL_SMOOTHING_SECONDS = 0.06;
 
 let audioContext = null;
 let microphoneStream = null;
