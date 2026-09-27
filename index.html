@@ -140,23 +140,23 @@ header, .topbar {
   user-select: none;
 }
 
-/* Horizontal native range rotated into a vertical graphic-EQ fader.
-   Center the full control in its slot so the cap stays on the rail. */
+/* Native vertical range keeps the cap centered on its rail at every value. */
 .band input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
+  writing-mode: vertical-lr;
+  direction: rtl;
   position: absolute;
   left: 50%;
   top: 50%;
   display: block;
   box-sizing: border-box;
-  width: 165px;
-  height: 26px;
+  width: 26px;
+  height: 165px;
   min-width: 0;
   margin: 0;
   padding: 0;
-  transform: translate(-50%, -50%) rotate(-90deg);
-  transform-origin: center center;
+  transform: translate(-50%, -50%);
   background: transparent;
   cursor: ns-resize;
   z-index: 2;
@@ -165,8 +165,9 @@ header, .topbar {
   user-select: none;
 }
 
-.band input[type="range"]::-webkit-slider-runnable-track {
-  height: 4px;
+ .band input[type="range"]::-webkit-slider-runnable-track {
+  width: 4px;
+  height: 100%;
   border: 1px solid #46515f;
   border-radius: 3px;
   background: linear-gradient(to bottom, #080b10 0%, #26303b 35%, #10151c 70%, #080b10 100%);
@@ -177,9 +178,9 @@ header, .topbar {
   -webkit-appearance: none;
   appearance: none;
   box-sizing: border-box;
-  width: 13px;
-  height: 26px;
-  margin-top: -12px;
+  width: 26px;
+  height: 13px;
+  margin-left: -12px;
   border: 1px solid #626d7a;
   border-radius: 3px;
   background:
@@ -188,8 +189,9 @@ header, .topbar {
   box-shadow: 0 2px 3px rgba(0,0,0,.85), inset 0 1px 1px rgba(255,255,255,.85), inset 0 -1px 1px rgba(20,25,32,.9);
 }
 
-.band input[type="range"]::-moz-range-track {
-  height: 4px;
+ .band input[type="range"]::-moz-range-track {
+  width: 4px;
+  height: 100%;
   border: 1px solid #46515f;
   border-radius: 3px;
   background: linear-gradient(to bottom, #080b10 0%, #26303b 35%, #10151c 70%, #080b10 100%);
@@ -198,8 +200,8 @@ header, .topbar {
 
 .band input[type="range"]::-moz-range-thumb {
   box-sizing: border-box;
-  width: 13px;
-  height: 26px;
+  width: 26px;
+  height: 13px;
   border: 1px solid #626d7a;
   border-radius: 3px;
   background:
