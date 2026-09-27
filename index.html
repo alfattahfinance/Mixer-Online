@@ -36,38 +36,13 @@ header, .topbar {
    EMPAT TAB NAVIGASI UTAMA (TERMASUK ESP32)
 ========================================================= */
 .mode-switch-bar {
-  position: relative;
-  z-index: 50;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-  margin-bottom: 12px;
-  pointer-events: auto;
+  position: relative; z-index: 50; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; pointer-events: auto;
 }
-.mode-switch-bar .tab-btn {
-  position: relative;
-  z-index: 1;
-  min-height: 42px;
-  pointer-events: auto;
-  touch-action: manipulation;
-}
+.mode-switch-bar .tab-btn { position: relative; z-index: 1; min-height: 42px; pointer-events: auto; touch-action: manipulation; }
 .tab-btn {
-  background: #1a222d;
-  color: #94a3b8;
-  border: 1px solid #3a414b;
-  padding: 8px 4px;
-  border-radius: 6px;
-  font-weight: bold;
-  font-size: 11px;
-  text-align: center;
-  transition: all 0.2s;
+  background: #1a222d; color: #94a3b8; border: 1px solid #3a414b; padding: 8px 4px; border-radius: 6px; font-weight: bold; font-size: 11px; text-align: center; transition: all 0.2s;
 }
-.tab-btn.active {
-  background: #2563eb;
-  color: #fff;
-  border-color: #3b82f6;
-  box-shadow: 0 0 10px rgba(37, 99, 235, 0.4);
-}
+.tab-btn.active { background: #2563eb; color: #fff; border-color: #3b82f6; box-shadow: 0 0 10px rgba(37, 99, 235, 0.4); }
 
 .tab-content { display: none; }
 .tab-content.active { display: block; }
@@ -126,102 +101,37 @@ header, .topbar {
 
 /* FADER VERTIKAL GRAFIK EQUALIZER */
 .band {
-  box-sizing: border-box;
-  background: #101216;
-  border: 1px solid #2a323d;
-  border-radius: 5px;
-  padding: 5px 2px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  height: 230px;
-  min-width: 0;
-  position: relative;
+  box-sizing: border-box; background: #101216; border: 1px solid #2a323d; border-radius: 5px; padding: 5px 2px;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 230px; min-width: 0; position: relative;
 }
-.band-frequency {
-  box-sizing: border-box;
-  width: 100%;
-  min-height: 18px;
-  font-size: 7.5px;
-  color: #94a3b8;
-  margin: 0 0 4px;
-  text-align: center;
-  white-space: nowrap;
-}
+.band-frequency { box-sizing: border-box; width: 100%; min-height: 18px; font-size: 7.5px; color: #94a3b8; margin: 0 0 4px; text-align: center; white-space: nowrap; }
 
 .slider-track-container {
-  position: relative;
-  width: 24px;
-  height: 165px;
-  flex: 0 0 165px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #080b10;
-  border: 1px solid #202833;
-  border-radius: 3px;
-  cursor: ns-resize;
-  touch-action: none;
+  position: relative; width: 24px; height: 165px; flex: 0 0 165px; display: flex; justify-content: center; align-items: center;
+  background: #080b10; border: 1px solid #202833; border-radius: 3px; cursor: ns-resize; touch-action: none;
 }
 .slider-track-container::before {
-  content: "";
-  position: absolute;
-  width: 3px;
-  height: 100%;
-  background: linear-gradient(90deg, #13171f, #333d4a, #13171f);
-  border-radius: 1px;
+  content: ""; position: absolute; width: 3px; height: 100%; background: linear-gradient(90deg, #13171f, #333d4a, #13171f); border-radius: 1px;
 }
 
 .band input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  writing-mode: vertical-lr;
-  direction: rtl;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 20px;
-  height: 158px;
-  margin: 0;
-  padding: 0;
-  transform: translate(-50%, -50%);
-  background: transparent;
-  cursor: ns-resize;
-  z-index: 2;
-  touch-action: none;
+  -webkit-appearance: none; appearance: none; writing-mode: vertical-lr; direction: rtl; position: absolute; left: 50%; top: 50%;
+  width: 20px; height: 158px; margin: 0; padding: 0; transform: translate(-50%, -50%); background: transparent; cursor: ns-resize; z-index: 2; touch-action: none;
 }
 .band input[type="range"]::-webkit-slider-runnable-track { width: 3px; background: transparent; border: 0; }
 .band input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 26px;
-  height: 14px;
-  margin-left: -11.5px;
-  border: 1px solid #6b7280;
-  border-radius: 2px;
+  -webkit-appearance: none; appearance: none; width: 26px; height: 14px; margin-left: -11.5px; border: 1px solid #6b7280; border-radius: 2px;
   background: linear-gradient(to bottom, #d1d5db 0%, #9ca3af 20%, #4b5563 50%, #1f2937 52%, #9ca3af 80%, #e5e7eb 100%);
   box-shadow: 0 1px 3px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.8);
 }
 .band input[type="range"]::-moz-range-track { width: 3px; background: transparent; border: 0; }
 .band input[type="range"]::-moz-range-thumb {
-  width: 26px;
-  height: 14px;
-  border: 1px solid #6b7280;
-  border-radius: 2px;
+  width: 26px; height: 14px; border: 1px solid #6b7280; border-radius: 2px;
   background: linear-gradient(to bottom, #d1d5db 0%, #9ca3af 20%, #4b5563 50%, #1f2937 52%, #9ca3af 80%, #e5e7eb 100%);
   box-shadow: 0 1px 3px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.8);
 }
 
-.band-value {
-  margin-top: 4px;
-  line-height: 14px;
-  font-size: 8px;
-  color: #38bdf8;
-  font-family: monospace;
-  text-align: center;
-  white-space: nowrap;
-}
+.band-value { margin-top: 4px; line-height: 14px; font-size: 8px; color: #38bdf8; font-family: monospace; text-align: center; white-space: nowrap; }
 .scale { display: flex; justify-content: space-between; font-size: 9px; color: #64748b; padding: 2px 4px; }
 
 /* =========================================================
@@ -241,7 +151,8 @@ header, .topbar {
   height: 6px; border: 1px solid #647080; border-radius: 999px; background: linear-gradient(90deg, #38bdf8 0%, #38bdf8 50%, #d1d5db 50%, #d1d5db 100%); box-shadow: inset 0 1px 2px rgba(0,0,0,.65);
 }
 .echo-control-card input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none; appearance: none; width: 24px; height: 24px; margin-top: -10px; border: 2px solid #aab4c0; border-radius: 50%; background: radial-gradient(circle at 35% 28%, #ffffff 0%, #e2e8f0 38%, #a8b2bf 72%, #66717f 100%); box-shadow: 0 2px 5px rgba(0,0,0,.65);
+  -webkit-appearance: none; appearance: none; width: 24px; height: 24px; margin-top: -10px; border: 2px solid #aab4c0; border-radius: 50%;
+  background: radial-gradient(circle at 35% 28%, #ffffff 0%, #e2e8f0 38%, #a8b2bf 72%, #66717f 100%); box-shadow: 0 2px 5px rgba(0,0,0,.65);
 }
 .echo-val { font-size: 11px; color: #f59e0b; font-family: monospace; text-align: right; }
 
@@ -250,14 +161,11 @@ header, .topbar {
 ========================================================= */
 .mixer-console { background: #0d1117; border: 1px solid #30363d; border-radius: 12px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
 
-/* Panel Audio Player Khusus di dalam Mixer */
 .integrated-audio-deck { background: #141b24; border: 1px solid #1e293b; border-radius: 8px; padding: 12px; margin-bottom: 16px; }
 .deck-title { font-size: 11px; font-weight: bold; color: #38bdf8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
 
 .mixer-top-console { display: grid; grid-template-columns: 1fr 280px; gap: 12px; background: #040609; border: 1px solid #21262d; border-radius: 8px; padding: 12px; margin-bottom: 16px; align-items: stretch; }
-@media(max-width: 900px) {
-  .mixer-top-console { grid-template-columns: 1fr; }
-}
+@media(max-width: 900px) { .mixer-top-console { grid-template-columns: 1fr; } }
 
 .mixer-tft-screen { background: #05080c; border: 2px solid #2d3748; border-radius: 8px; padding: 8px; box-shadow: inset 0 0 20px rgba(0,0,0,0.9); display: flex; flex-direction: column; justify-content: space-between; }
 .tft-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 4px; margin-bottom: 6px; font-size: 10px; font-weight: bold; color: #38bdf8; }
@@ -278,42 +186,14 @@ header, .topbar {
 .tft-encoder-knob { background: linear-gradient(180deg, #1e293b, #0f172a); border: 1px solid #475569; border-radius: 4px; text-align: center; padding: 3px 1px; font-size: 7px; color: #cbd5e1; font-family: monospace; }
 .tft-encoder-knob span { display: block; color: #38bdf8; font-weight: bold; font-size: 8px; margin-top: 1px; }
 
-/* INDIKATOR METER PRO DI DALAM LAYAR TFT */
+/* INDIKATOR METER STEREO PRO DI DALAM LAYAR TFT */
 .tft-stereo-meter-box {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #080d14;
-  border: 1px solid #1e293b;
-  border-radius: 4px;
-  padding: 4px 8px;
-  margin-top: 6px;
+  display: flex; align-items: center; gap: 8px; background: #080d14; border: 1px solid #1e293b; border-radius: 4px; padding: 4px 8px; margin-top: 6px;
 }
-.tft-meter-channel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.tft-meter-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 7px;
-  color: #64748b;
-  font-family: monospace;
-}
-.tft-led-bar {
-  display: flex;
-  gap: 2px;
-  height: 8px;
-  align-items: center;
-}
-.tft-led-bar span {
-  flex: 1;
-  height: 6px;
-  background: #111827;
-  border-radius: 1px;
-}
+.tft-meter-channel { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.tft-meter-label { display: flex; justify-content: space-between; font-size: 7px; color: #64748b; font-family: monospace; }
+.tft-led-bar { display: flex; gap: 2px; height: 8px; align-items: center; }
+.tft-led-bar span { flex: 1; height: 6px; background: #111827; border-radius: 1px; }
 .tft-led-bar span.green.on { background: #10b981; box-shadow: 0 0 3px #10b981; }
 .tft-led-bar span.yellow.on { background: #f59e0b; box-shadow: 0 0 3px #f59e0b; }
 .tft-led-bar span.red.on { background: #ef4444; box-shadow: 0 0 4px #ef4444; }
@@ -343,56 +223,26 @@ header, .topbar {
 
 .fader-slot { position: relative; flex: 0 0 38px; height: 300px; width: 38px; display: flex; justify-content: center; align-items: center; background: #080b10; border: 1px solid #202833; border-radius: 4px; }
 .fader-slot::before {
-  content: "";
-  position: absolute;
-  width: 4px;
-  height: 286px;
-  background: linear-gradient(90deg, #11141a, #38414e, #11141a);
-  border-radius: 2px;
+  content: ""; position: absolute; width: 4px; height: 286px; background: linear-gradient(90deg, #11141a, #38414e, #11141a); border-radius: 2px;
 }
 .fader-slot input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  writing-mode: vertical-lr;
-  direction: rtl;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 28px;
-  height: 286px;
-  margin: 0;
-  padding: 0;
-  transform: translate(-50%, -50%);
-  background: transparent;
-  cursor: pointer;
-  z-index: 2;
-  touch-action: none;
+  -webkit-appearance: none; appearance: none; writing-mode: vertical-lr; direction: rtl; position: absolute; left: 50%; top: 50%;
+  width: 28px; height: 286px; margin: 0; padding: 0; transform: translate(-50%, -50%); background: transparent; cursor: pointer; z-index: 2; touch-action: none;
 }
 .fader-slot input[type="range"]::-webkit-slider-runnable-track { width: 4px; background: transparent; border: 0; }
 .fader-slot input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 42px;
-  height: 24px;
-  margin-left: -19px;
-  border: 1px solid #73777d;
-  border-radius: 2px;
+  -webkit-appearance: none; appearance: none; width: 42px; height: 24px; margin-left: -19px; border: 1px solid #73777d; border-radius: 2px;
   background: linear-gradient(to bottom, #b7b9bc 0%, #777b80 18%, #5d6166 48%, #a5a7aa 52%, #777b80 74%, #b7b9bc 100%);
   box-shadow: 0 1px 3px rgba(0,0,0,0.9), inset 0 1px 1px rgba(255,255,255,0.85);
 }
 .fader-slot input[type="range"]::-moz-range-track { width: 4px; background: transparent; border: 0; }
 .fader-slot input[type="range"]::-moz-range-thumb {
-  width: 42px;
-  height: 24px;
-  border: 1px solid #73777d;
-  border-radius: 2px;
+  width: 42px; height: 24px; border: 1px solid #73777d; border-radius: 2px;
   background: linear-gradient(to bottom, #b7b9bc 0%, #777b80 18%, #5d6166 48%, #a5a7aa 52%, #777b80 74%, #b7b9bc 100%);
   box-shadow: 0 1px 3px rgba(0,0,0,0.9), inset 0 1px 1px rgba(255,255,255,0.85);
 }
 .master-strip .fader-slot input[type="range"]::-webkit-slider-thumb,
-.master-strip .fader-slot input[type="range"]::-moz-range-thumb {
-  border-color: #c38a16;
-}
+.master-strip .fader-slot input[type="range"]::-moz-range-thumb { border-color: #c38a16; }
 
 .fader-readout { font-size: 10px; font-family: monospace; color: #38bdf8; margin-bottom: 6px; font-weight: bold; }
 .master-strip .fader-readout { color: #fbbf24; }
@@ -422,7 +272,6 @@ header, .topbar {
 .device-status, .feedback-status, .audio-status, .status { font-size: 10px; color: #94a3b8; margin-top: 4px; }
 .footer { text-align: center; font-size: 10px; color: #64748b; margin-top: 15px; }
 
-/* Tombol file & audio actions umum */
 .audio-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
 .audio-actions button, .file-button { background: #252b35; color: #fff; border: 1px solid #485260; padding: 6px 12px; font-size: 11px; border-radius: 4px; font-weight: bold; display: inline-flex; align-items: center; cursor: pointer; }
 .audio-actions button.active { background: #10b981; border-color: #34d399; color: #000; }
@@ -457,7 +306,7 @@ header, .topbar {
       </div>
     </header>
 
-    <!-- EMPAT TAB NAVIGASI UTAMA (TERMASUK ESP32) -->
+    <!-- EMPAT TAB NAVIGASI UTAMA -->
     <nav class="mode-switch-bar" id="mainTabNavigation" aria-label="Main pages">
       <button type="button" class="tab-btn active" id="tabEqBtn" data-main-tab="eq" aria-controls="tabEqContent" aria-selected="true">🎛️ EQUALIZER</button>
       <button type="button" class="tab-btn" id="tabEchoBtn" data-main-tab="echo" aria-controls="tabEchoContent" aria-selected="false">🔊 ALESIS FX</button>
@@ -878,7 +727,7 @@ function initMixerVerticalMeters() {
 initMixerVerticalMeters();
 
 /* =========================================================
-   NAVIGASI EMPAT TAB UTAMA (TERMASUK ESP32)
+   NAVIGASI EMPAT TAB UTAMA
 ========================================================= */
 const mainTabNavigation = document.getElementById("mainTabNavigation");
 const mainTabButtons = Array.from(document.querySelectorAll("[data-main-tab]"));
@@ -972,7 +821,7 @@ function setStatus(msg) { const el = document.getElementById("status"); if (el) 
 function setAudioStatus(msg) { const el = document.getElementById("audioStatus"); if (el) el.textContent = msg; }
 function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed(1); }
 
-/* DRAG STABILIZER UNTUK SLIDER RANGKAIAN */
+/* DRAG STABILIZER UNTUK SLIDER */
 (function enableStableRangeDragging() {
   const SENSITIVITY = 0.08; 
   let active = null;
@@ -1008,16 +857,13 @@ function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed
     if (!active || event.pointerId !== active.pointerId) return;
     event.preventDefault();
     const coord = active.vertical ? event.clientY : event.clientX;
-    const rawDelta = active.vertical
-      ? active.startCoord - coord
-      : coord - active.startCoord;
+    const rawDelta = active.vertical ? active.startCoord - coord : coord - active.startCoord;
     
     const maxDeltaStep = (active.max - active.min) * 0.15;
     const delta = Math.max(-maxDeltaStep, Math.min(maxDeltaStep, rawDelta * SENSITIVITY));
 
     const raw = active.startValue + (delta / active.length) * (active.max - active.min);
-    const stepped = active.min +
-      Math.round((raw - active.min) / active.step) * active.step;
+    const stepped = active.min + Math.round((raw - active.min) / active.step) * active.step;
     const next = Math.max(active.min, Math.min(active.max, stepped));
     
     if (next !== Number(active.slider.value)) {
@@ -1499,10 +1345,7 @@ echoMix.addEventListener("input", () => {
 });
 
 function playCurrentBuffer() {
-  if (audioBuffers.length === 0) {
-    setStatus("Pilih file audio terlebih dahulu di Mixer!");
-    return;
-  }
+  if (audioBuffers.length === 0) { setStatus("Pilih file audio terlebih dahulu di Mixer!"); return; }
 
   createAudioContext();
   initializeAudioGraph();
@@ -1544,19 +1387,14 @@ startAudioButton.addEventListener("click", async () => {
     if (audioBuffers.length === 0 && audioFilesInput.files && audioFilesInput.files.length > 0) {
       await loadSelectedAudioFiles(Array.from(audioFilesInput.files));
     }
-    if (audioBuffers.length === 0) {
-      setAudioStatus("Pilih file audio terlebih dahulu.");
-      return;
-    }
+    if (audioBuffers.length === 0) { setAudioStatus("Pilih file audio terlebih dahulu."); return; }
 
     const ctx = createAudioContext();
     if (ctx.state === "suspended") await ctx.resume();
     initializeAudioGraph();
     await applyPhysicalOutputDevice();
     playCurrentBuffer();
-  } catch (err) {
-    setAudioStatus("Audio gagal dimulai.");
-  }
+  } catch (err) { setAudioStatus("Audio gagal dimulai."); }
 });
 
 startMicButton.addEventListener("click", async () => {
@@ -1585,9 +1423,7 @@ startMicButton.addEventListener("click", async () => {
     microphoneSource.connect(mixerStripGains[0]);
     startMicButton.classList.add("active");
     setAudioStatus("Mikrofon aktif.");
-  } catch (err) {
-    setAudioStatus("Gagal mengakses mikrofon.");
-  }
+  } catch (err) { setAudioStatus("Gagal mengakses mikrofon."); }
 });
 
 stopAudioButton.addEventListener("click", () => {
@@ -1766,7 +1602,7 @@ document.querySelectorAll(".mixer-desk-surface .console-channel-strip").forEach(
 });
 
 /* =========================================================
-   UI SYNC & SEMUA EVENT LISTENER MODUL TFT INTERAKTIF BERFUNGSI
+   DATABASE TFT INTERAKTIF & EVENT LISTENER YANG KOKOH
 ========================================================= */
 const tftSectionTitle = document.getElementById("tftSectionTitle");
 const tftContentArea = document.getElementById("tftContentArea");
@@ -2089,157 +1925,60 @@ function bindTftDynamicEventListeners(key) {
     updateTftPeqVisuals();
   }
 
-  // Menambahkan event listener untuk interaksi widget di modul TFT lain
+  // Interaksi widget di modul TFT lain
   const cfgGain = document.getElementById("cfgGain");
-  if (cfgGain) {
-    cfgGain.addEventListener("input", () => {
-      document.getElementById("cfgGainVal").textContent = cfgGain.value + "dB";
-    });
-  }
+  if (cfgGain) cfgGain.addEventListener("input", () => { document.getElementById("cfgGainVal").textContent = cfgGain.value + "dB"; });
   const cfgPhantomBtn = document.getElementById("cfgPhantomBtn");
-  if (cfgPhantomBtn) {
-    cfgPhantomBtn.addEventListener("click", () => {
-      cfgPhantomBtn.classList.toggle("active-action");
-      cfgPhantomBtn.textContent = cfgPhantomBtn.classList.contains("active-action") ? "ON" : "OFF";
-    });
-  }
+  if (cfgPhantomBtn) cfgPhantomBtn.addEventListener("click", () => { cfgPhantomBtn.classList.toggle("active-action"); cfgPhantomBtn.textContent = cfgPhantomBtn.classList.contains("active-action") ? "ON" : "OFF"; });
   const cfgPhaseBtn = document.getElementById("cfgPhaseBtn");
-  if (cfgPhaseBtn) {
-    cfgPhaseBtn.addEventListener("click", () => {
-      cfgPhaseBtn.classList.toggle("active-action");
-      cfgPhaseBtn.textContent = cfgPhaseBtn.classList.contains("active-action") ? "INVERT" : "NORMAL";
-    });
-  }
+  if (cfgPhaseBtn) cfgPhaseBtn.addEventListener("click", () => { cfgPhaseBtn.classList.toggle("active-action"); cfgPhaseBtn.textContent = cfgPhaseBtn.classList.contains("active-action") ? "INVERT" : "NORMAL"; });
 
   const gateThresh = document.getElementById("gateThresh");
-  if (gateThresh) {
-    gateThresh.addEventListener("input", () => {
-      document.getElementById("gateThreshVal").textContent = gateThresh.value + "dB";
-    });
-  }
+  if (gateThresh) gateThresh.addEventListener("input", () => { document.getElementById("gateThreshVal").textContent = gateThresh.value + "dB"; });
   const gateRatio = document.getElementById("gateRatio");
-  if (gateRatio) {
-    gateRatio.addEventListener("input", () => {
-      document.getElementById("gateRatioVal").textContent = "1:" + gateRatio.value;
-    });
-  }
+  if (gateRatio) gateRatio.addEventListener("input", () => { document.getElementById("gateRatioVal").textContent = "1:" + gateRatio.value; });
   const gateStateBtn = document.getElementById("gateStateBtn");
-  if (gateStateBtn) {
-    gateStateBtn.addEventListener("click", () => {
-      gateStateBtn.classList.toggle("active-action");
-      gateStateBtn.textContent = gateStateBtn.classList.contains("active-action") ? "ACTIVE" : "BYPASS";
-    });
-  }
+  if (gateStateBtn) gateStateBtn.addEventListener("click", () => { gateStateBtn.classList.toggle("active-action"); gateStateBtn.textContent = gateStateBtn.classList.contains("active-action") ? "ACTIVE" : "BYPASS"; });
 
   const compThresh = document.getElementById("compThresh");
-  if (compThresh) {
-    compThresh.addEventListener("input", () => {
-      document.getElementById("compThreshVal").textContent = compThresh.value + "dB";
-    });
-  }
+  if (compThresh) compThresh.addEventListener("input", () => { document.getElementById("compThreshVal").textContent = compThresh.value + "dB"; });
   const compRatio = document.getElementById("compRatio");
-  if (compRatio) {
-    compRatio.addEventListener("input", () => {
-      document.getElementById("compRatioVal").textContent = compRatio.value + ":1";
-    });
-  }
+  if (compRatio) compRatio.addEventListener("input", () => { document.getElementById("compRatioVal").textContent = compRatio.value + ":1"; });
   const compMakeup = document.getElementById("compMakeup");
-  if (compMakeup) {
-    compMakeup.addEventListener("input", () => {
-      document.getElementById("compMakeupVal").textContent = "+" + compMakeup.value + "dB";
-    });
-  }
+  if (compMakeup) compMakeup.addEventListener("input", () => { document.getElementById("compMakeupVal").textContent = "+" + compMakeup.value + "dB"; });
 
   const send1Lvl = document.getElementById("send1Lvl");
-  if (send1Lvl) {
-    send1Lvl.addEventListener("input", () => {
-      document.getElementById("send1LvlVal").textContent = send1Lvl.value + "dB";
-    });
-  }
+  if (send1Lvl) send1Lvl.addEventListener("input", () => { document.getElementById("send1LvlVal").textContent = send1Lvl.value + "dB"; });
   const send2Lvl = document.getElementById("send2Lvl");
-  if (send2Lvl) {
-    send2Lvl.addEventListener("input", () => {
-      document.getElementById("send2LvlVal").textContent = send2Lvl.value + "dB";
-    });
-  }
+  if (send2Lvl) send2Lvl.addEventListener("input", () => { document.getElementById("send2LvlVal").textContent = send2Lvl.value + "dB"; });
 
   const mainFohLvl = document.getElementById("mainFohLvl");
-  if (mainFohLvl) {
-    mainFohLvl.addEventListener("input", () => {
-      document.getElementById("mainFohLvlVal").textContent = mainFohLvl.value + "dB";
-    });
-  }
+  if (mainFohLvl) mainFohLvl.addEventListener("input", () => { document.getElementById("mainFohLvlVal").textContent = mainFohLvl.value + "dB"; });
   const mainLimitLvl = document.getElementById("mainLimitLvl");
-  if (mainLimitLvl) {
-    mainLimitLvl.addEventListener("input", () => {
-      document.getElementById("mainLimitLvlVal").textContent = mainLimitLvl.value + "dB";
-    });
-  }
+  if (mainLimitLvl) mainLimitLvl.addEventListener("input", () => { document.getElementById("mainLimitLvlVal").textContent = mainLimitLvl.value + "dB"; });
   const mainMonoBtn = document.getElementById("mainMonoBtn");
-  if (mainMonoBtn) {
-    mainMonoBtn.addEventListener("click", () => {
-      mainMonoBtn.classList.toggle("active-action");
-      mainMonoBtn.textContent = mainMonoBtn.classList.contains("active-action") ? "MONO ON" : "OFF";
-    });
-  }
+  if (mainMonoBtn) mainMonoBtn.addEventListener("click", () => { mainMonoBtn.classList.toggle("active-action"); mainMonoBtn.textContent = mainMonoBtn.classList.contains("active-action") ? "MONO ON" : "OFF"; });
 
   const homeMuteAllBtn = document.getElementById("homeMuteAllBtn");
-  if (homeMuteAllBtn) {
-    homeMuteAllBtn.addEventListener("click", () => {
-      homeMuteAllBtn.classList.toggle("active-action");
-      setStatus(homeMuteAllBtn.classList.contains("active-action") ? "Global Mute All Aktif." : "Mute All Nonaktif.");
-    });
-  }
+  if (homeMuteAllBtn) homeMuteAllBtn.addEventListener("click", () => { homeMuteAllBtn.classList.toggle("active-action"); setStatus(homeMuteAllBtn.classList.contains("active-action") ? "Global Mute All Aktif." : "Mute All Nonaktif."); });
   const homeTalkBtn = document.getElementById("homeTalkBtn");
-  if (homeTalkBtn) {
-    homeTalkBtn.addEventListener("click", () => {
-      homeTalkBtn.classList.toggle("active-action");
-      homeTalkBtn.textContent = homeTalkBtn.classList.contains("active-action") ? "TALK ON" : "TALK OFF";
-    });
-  }
+  if (homeTalkBtn) homeTalkBtn.addEventListener("click", () => { homeTalkBtn.classList.toggle("active-action"); homeTalkBtn.textContent = homeTalkBtn.classList.contains("active-action") ? "TALK ON" : "TALK OFF"; });
 
   const rtaZoom = document.getElementById("rtaZoom");
-  if (rtaZoom) {
-    rtaZoom.addEventListener("input", () => {
-      document.getElementById("rtaZoomVal").textContent = rtaZoom.value + "x";
-    });
-  }
+  if (rtaZoom) rtaZoom.addEventListener("input", () => { document.getElementById("rtaZoomVal").textContent = rtaZoom.value + "x"; });
 
   const setupBright = document.getElementById("setupBright");
-  if (setupBright) {
-    setupBright.addEventListener("input", () => {
-      document.getElementById("setupBrightVal").textContent = setupBright.value + "%";
-    });
-  }
+  if (setupBright) setupBright.addEventListener("input", () => { document.getElementById("setupBrightVal").textContent = setupBright.value + "%"; });
   const setupBleBtn = document.getElementById("setupBleBtn");
-  if (setupBleBtn) {
-    setupBleBtn.addEventListener("click", () => {
-      setupBleBtn.classList.toggle("active-action");
-      setupBleBtn.textContent = setupBleBtn.classList.contains("active-action") ? "CONNECTED" : "DISCONNECTED";
-    });
-  }
+  if (setupBleBtn) setupBleBtn.addEventListener("click", () => { setupBleBtn.classList.toggle("active-action"); setupBleBtn.textContent = setupBleBtn.classList.contains("active-action") ? "CONNECTED" : "DISCONNECTED"; });
 
   const libStoreBtn = document.getElementById("libStoreBtn");
-  if (libStoreBtn) {
-    libStoreBtn.addEventListener("click", () => {
-      alert("Konfigurasi preset mixer berhasil disimpan ke Scene!");
-    });
-  }
+  if (libStoreBtn) libStoreBtn.addEventListener("click", () => { alert("Konfigurasi preset mixer berhasil disimpan ke Scene!"); });
   const libSafeBtn = document.getElementById("libSafeBtn");
-  if (libSafeBtn) {
-    libSafeBtn.addEventListener("click", () => {
-      libSafeBtn.classList.toggle("active-action");
-      libSafeBtn.textContent = libSafeBtn.classList.contains("active-action") ? "SAFE ON" : "SAFE OFF";
-    });
-  }
+  if (libSafeBtn) libSafeBtn.addEventListener("click", () => { libSafeBtn.classList.toggle("active-action"); libSafeBtn.textContent = libSafeBtn.classList.contains("active-action") ? "SAFE ON" : "SAFE OFF"; });
 
   const fxBypassBtn = document.getElementById("fxBypassBtn");
-  if (fxBypassBtn) {
-    fxBypassBtn.addEventListener("click", () => {
-      fxBypassBtn.classList.toggle("active-action");
-      fxBypassBtn.textContent = fxBypassBtn.classList.contains("active-action") ? "FX ACTIVE" : "BYPASSED";
-    });
-  }
+  if (fxBypassBtn) fxBypassBtn.addEventListener("click", () => { fxBypassBtn.classList.toggle("active-action"); fxBypassBtn.textContent = fxBypassBtn.classList.contains("active-action") ? "FX ACTIVE" : "BYPASSED"; });
 }
 
 function loadTftPage(key) {
@@ -2253,34 +1992,29 @@ function loadTftPage(key) {
   setTimeout(() => bindTftDynamicEventListeners(key), 10);
 }
 
+// PERBAIKAN UTAMA: Event Listener Navigasi Atas & Section Select dipasang secara global & persisten
+function switchActiveSection(key) {
+  consoleSectionBtns.forEach(b => b.classList.toggle("active", b.getAttribute("data-section") === key));
+  tftTabs.forEach(t => t.classList.toggle("active", t.getAttribute("data-tft-tab") === key));
+  loadTftPage(key);
+}
+
 consoleSectionBtns.forEach(btn => {
   btn.addEventListener("click", () => {
-    consoleSectionBtns.forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
     const sectionKey = btn.getAttribute("data-section");
-    loadTftPage(sectionKey);
-    tftTabs.forEach(t => {
-      t.classList.toggle("active", t.getAttribute("data-tft-tab") === sectionKey);
-    });
+    switchActiveSection(sectionKey);
   });
 });
 
 tftTabs.forEach(tab => {
   tab.addEventListener("click", () => {
-    tftTabs.forEach(t => t.classList.remove("active"));
-    tab.classList.add("active");
     const tabKey = tab.getAttribute("data-tft-tab");
-    loadTftPage(tabKey);
-    consoleSectionBtns.forEach(b => {
-      b.classList.toggle("active", b.getAttribute("data-section") === tabKey);
-    });
+    switchActiveSection(tabKey);
   });
 });
 
-// DEFAULT INISIALISASI KE TAB EQ
-tftTabs.forEach(t => t.classList.toggle("active", t.getAttribute("data-tft-tab") === "eq"));
-consoleSectionBtns.forEach(b => b.classList.toggle("active", b.getAttribute("data-section") === "eq"));
-loadTftPage("eq");
+// Inisialisasi awal ke EQ
+switchActiveSection("eq");
 
 /* =========================================================
    LOGIKA METER LED REAL-TIME & STEREO METER TFT
@@ -2376,7 +2110,6 @@ function startRealMeters() {
       });
     });
 
-    /* PEMBARUAN INDIKATOR METER TFT STEREO UTAMA */
     const tftSpansL = document.querySelectorAll("#tftMeterL span");
     const tftSpansR = document.querySelectorAll("#tftMeterR span");
     const tftMeterLVal = document.getElementById("tftMeterLVal");
@@ -2409,12 +2142,8 @@ function startRealMeters() {
         let activeL = rmsL < 0.001 ? 0 : Math.max(1, Math.min(16, Math.round(((dbL + 50) / 50) * 16)));
         let activeR = rmsR < 0.001 ? 0 : Math.max(1, Math.min(16, Math.round(((dbR + 50) / 50) * 16)));
 
-        tftSpansL.forEach((span, idx) => {
-          if (idx < activeL) span.classList.add("on"); else span.classList.remove("on");
-        });
-        tftSpansR.forEach((span, idx) => {
-          if (idx < activeR) span.classList.add("on"); else span.classList.remove("on");
-        });
+        tftSpansL.forEach((span, idx) => { if (idx < activeL) span.classList.add("on"); else span.classList.remove("on"); });
+        tftSpansR.forEach((span, idx) => { if (idx < activeR) span.classList.add("on"); else span.classList.remove("on"); });
 
         if (tftMeterLVal) tftMeterLVal.textContent = (dbL < -45 ? "-inf" : dbL.toFixed(1)) + " dB";
         if (tftMeterRVal) tftMeterRVal.textContent = (dbR < -45 ? "-inf" : dbR.toFixed(1)) + " dB";
