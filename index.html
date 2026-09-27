@@ -253,9 +253,7 @@ header, .topbar {
 /* Panel Audio Player Khusus di dalam Mixer */
 .integrated-audio-deck { background: #141b24; border: 1px solid #1e293b; border-radius: 8px; padding: 12px; margin-bottom: 16px; }
 .deck-title { font-size: 11px; font-weight: bold; color: #38bdf8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-.deck-controls-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 
-/* TATA LETAK UTAMA MIXER TOP CONSOLE & SECTION SELECT YANG RAPIH */
 .mixer-top-console { display: grid; grid-template-columns: 1fr 280px; gap: 12px; background: #040609; border: 1px solid #21262d; border-radius: 8px; padding: 12px; margin-bottom: 16px; align-items: stretch; }
 @media(max-width: 900px) {
   .mixer-top-console { grid-template-columns: 1fr; }
@@ -266,7 +264,7 @@ header, .topbar {
 .tft-top-tabs { display: flex; gap: 3px; background: #0f172a; padding: 3px; border-radius: 4px; margin-bottom: 6px; border: 1px solid #1e293b; overflow-x: auto; }
 .tft-tab { background: #1e293b; color: #94a3b8; border: none; font-size: 8px; font-weight: bold; padding: 3px 6px; border-radius: 3px; cursor: pointer; white-space: nowrap; }
 .tft-tab.active { background: #0284c7; color: #fff; }
-.tft-main-viewport { background: #020408; border: 1px solid #1e293b; border-radius: 4px; min-height: 95px; padding: 6px 8px; display: flex; flex-direction: column; justify-content: space-between; }
+.tft-main-viewport { background: #020408; border: 1px solid #1e293b; border-radius: 4px; min-height: 95px; padding: 6px 8px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
 .tft-content-screen { font-size: 10px; color: #38bdf8; line-height: 1.3; }
 .tft-interactive-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
 .tft-interactive-item { background: #0d121c; border: 1px solid #1e293b; padding: 4px; border-radius: 4px; font-size: 9px; }
@@ -280,7 +278,46 @@ header, .topbar {
 .tft-encoder-knob { background: linear-gradient(180deg, #1e293b, #0f172a); border: 1px solid #475569; border-radius: 4px; text-align: center; padding: 3px 1px; font-size: 7px; color: #cbd5e1; font-family: monospace; }
 .tft-encoder-knob span { display: block; color: #38bdf8; font-weight: bold; font-size: 8px; margin-top: 1px; }
 
-/* BAGIAN SECTION SELECT YANG SUDAH DITATA RAPIH DI SISI KANAN */
+/* INDIKATOR METER PRO DI DALAM LAYAR TFT */
+.tft-stereo-meter-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #080d14;
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin-top: 6px;
+}
+.tft-meter-channel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.tft-meter-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 7px;
+  color: #64748b;
+  font-family: monospace;
+}
+.tft-led-bar {
+  display: flex;
+  gap: 2px;
+  height: 8px;
+  align-items: center;
+}
+.tft-led-bar span {
+  flex: 1;
+  height: 6px;
+  background: #111827;
+  border-radius: 1px;
+}
+.tft-led-bar span.green.on { background: #10b981; box-shadow: 0 0 3px #10b981; }
+.tft-led-bar span.yellow.on { background: #f59e0b; box-shadow: 0 0 3px #f59e0b; }
+.tft-led-bar span.red.on { background: #ef4444; box-shadow: 0 0 4px #ef4444; }
+
 .mixer-control-section { background: #11161d; border: 1px solid #21262d; border-radius: 6px; padding: 12px; display: flex; flex-direction: column; justify-content: flex-start; }
 .section-grid-btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 8px; }
 .console-btn { background: #1f2937; color: #cbd5e1; border: 1px solid #374151; font-size: 9px; font-weight: bold; padding: 8px 4px; border-radius: 4px; text-align: center; transition: all 0.2s; }
@@ -396,7 +433,7 @@ header, .topbar {
 /* Parametric EQ TFT view styles */
 .tft-peq { display:grid; grid-template-columns:minmax(0,1fr); gap:7px; height:100%; }
 .tft-peq-head { display:flex; justify-content:space-between; align-items:center; gap:6px; color:#cbd5e1; font-size:9px; }
-.tft-peq-graph { width:100%; min-height:90px; height:120px; background:#101923; border:1px solid #334155; border-radius:5px; display:block; cursor: crosshair; touch-action: none; }
+.tft-peq-graph { width:100%; min-height:80px; height:105px; background:#101923; border:1px solid #334155; border-radius:5px; display:block; cursor: crosshair; touch-action: none; }
 .tft-peq-controls { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
 .tft-peq-control { background:#202631; border:1px solid #394454; border-radius:5px; padding:5px; text-align:center; }
 .tft-peq-control label { display:block; color:#94a3b8; font-size:8px; margin-bottom:3px; }
@@ -628,10 +665,23 @@ header, .topbar {
 
             <div class="tft-main-viewport">
               <div class="tft-content-screen" id="tftContentArea"></div>
-              <div style="font-size: 8px; color: #64748b; border-top: 1px solid #1e293b; padding-top: 3px; display: flex; justify-content: space-between;">
-                <span id="tftFooterChannel">CH 01: Lead Vocal</span>
-                <span id="tftFooterStatus">Gate/Comp/EQ Active</span>
+              
+              <!-- INDIKATOR METER STEREO PROFESIONAL DI DALAM LAYAR TFT -->
+              <div class="tft-stereo-meter-box">
+                <div class="tft-meter-channel">
+                  <div class="tft-meter-label"><span>MAIN L</span><span id="tftMeterLVal">-inf dB</span></div>
+                  <div class="tft-led-bar" id="tftMeterL"></div>
+                </div>
+                <div class="tft-meter-channel">
+                  <div class="tft-meter-label"><span>MAIN R</span><span id="tftMeterRVal">-inf dB</span></div>
+                  <div class="tft-led-bar" id="tftMeterR"></div>
+                </div>
               </div>
+            </div>
+
+            <div style="font-size: 8px; color: #64748b; border-top: 1px solid #1e293b; padding-top: 3px; display: flex; justify-content: space-between; margin-top: 4px;">
+              <span id="tftFooterChannel">CH 01: Lead Vocal</span>
+              <span id="tftFooterStatus">Gate/Comp/EQ Active</span>
             </div>
 
             <div class="tft-encoders-bar">
@@ -644,7 +694,7 @@ header, .topbar {
             </div>
           </div>
 
-          <!-- SECTION SELECT DIPINDAHKAN DENGAN RAPIH DI SEBELAH KANAN -->
+          <!-- SECTION SELECT DI KANAN -->
           <div class="mixer-control-section">
             <div style="font-size: 10px; font-weight: bold; color: #38bdf8; margin-bottom: 2px;">SECTION SELECT</div>
             <div style="font-size: 8px; color: #94a3b8; margin-bottom: 4px;">Pilih modul prosesor console</div>
@@ -795,7 +845,7 @@ header, .topbar {
 "use strict";
 
 /* =========================================================
-   INISIALISASI LED METER VERTIKAL MIXER
+   INISIALISASI LED METER & TFT STEREO METER
 ========================================================= */
 function initMixerVerticalMeters() {
   const meterIds = ["mixerMeter1", "mixerMeter2", "mixerMeter3", "mixerMeter4", "mixerMeterMaster"];
@@ -809,6 +859,19 @@ function initMixerVerticalMeters() {
       else if (i < 4) span.className = "yellow";
       else span.className = "green";
       container.appendChild(span);
+    }
+  });
+
+  ['tftMeterL', 'tftMeterR'].forEach(id => {
+    const box = document.getElementById(id);
+    if (!box) return;
+    box.innerHTML = "";
+    for (let i = 0; i < 16; i++) {
+      const span = document.createElement("span");
+      if (i >= 13) span.className = "red";
+      else if (i >= 10) span.className = "yellow";
+      else span.className = "green";
+      box.appendChild(span);
     }
   });
 }
@@ -909,7 +972,7 @@ function setStatus(msg) { const el = document.getElementById("status"); if (el) 
 function setAudioStatus(msg) { const el = document.getElementById("audioStatus"); if (el) el.textContent = msg; }
 function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed(1); }
 
-/* PENYESUAIAN STABILITAS DRAG */
+/* DRAG STABILIZER UNTUK SLIDER RANGKAIAN */
 (function enableStableRangeDragging() {
   const SENSITIVITY = 0.08; 
   let active = null;
@@ -1037,7 +1100,6 @@ let masterGainNode = null, outputMuteGainNode = null, outputMergerNode = null;
 let isAlesisFxEnabled = false;
 let audioGraphReady = false, meterAnimationId = null, outputMuted = false;
 
-/* VARIABEL KONTROL PARAMETRIC EQ DIGITAL MIXER */
 let tftPeqFilter = null;
 let tftPeqFreqVal = 1100;
 let tftPeqQVal = 1.7;
@@ -1704,7 +1766,7 @@ document.querySelectorAll(".mixer-desk-surface .console-channel-strip").forEach(
 });
 
 /* =========================================================
-   UI SYNC & TFT DISPLAY INTERAKTIF (DENGAN TITIK GRAFIK BISA DIATUR)
+   UI SYNC & SEMUA EVENT LISTENER MODUL TFT INTERAKTIF BERFUNGSI
 ========================================================= */
 const tftSectionTitle = document.getElementById("tftSectionTitle");
 const tftContentArea = document.getElementById("tftContentArea");
@@ -1729,9 +1791,9 @@ const tftDatabase = {
     footerSt: "Preamp & Phantom Active",
     content: `
       <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Analog Gain (+12dB)</label><input type="range" min="0" max="60" value="12" oninput="this.parentElement.querySelector('span').textContent=this.value+'dB'"><span>12dB</span></div>
-        <div class="tft-interactive-item"><label>Phantom 48V</label><button class="active-action" onclick="this.classList.toggle('active-action'); this.textContent = this.classList.contains('active-action') ? 'ON' : 'OFF'">ON</button></div>
-        <div class="tft-interactive-item"><label>Phase Invert</label><button onclick="this.classList.toggle('active-action'); this.textContent = this.classList.contains('active-action') ? 'INVERT' : 'NORMAL'">NORMAL</button></div>
+        <div class="tft-interactive-item"><label>Analog Gain (+12dB)</label><input type="range" id="cfgGain" min="0" max="60" value="12"><span id="cfgGainVal">12dB</span></div>
+        <div class="tft-interactive-item"><label>Phantom 48V</label><button id="cfgPhantomBtn" class="active-action">ON</button></div>
+        <div class="tft-interactive-item"><label>Phase Invert</label><button id="cfgPhaseBtn">NORMAL</button></div>
       </div>
     `,
     encoders: [{name:"GAIN", val:"+12dB"}, {name:"HPF", val:"80Hz"}, {name:"POLARITY", val:"NORM"}, {name:"DELAY", val:"0.0ms"}, {name:"WIDTH", val:"100%"}, {name:"TRIM", val:"0.0dB"}]
@@ -1742,9 +1804,9 @@ const tftDatabase = {
     footerSt: "Expander Active",
     content: `
       <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Threshold (-45dB)</label><input type="range" min="-80" max="0" value="-45" oninput="this.parentElement.querySelector('span').textContent=this.value+'dB'"><span>-45dB</span></div>
-        <div class="tft-interactive-item"><label>Ratio (1:2.5)</label><input type="range" min="1" max="10" step="0.5" value="2.5" oninput="this.parentElement.querySelector('span').textContent='1:'+this.value"><span>1:2.5</span></div>
-        <div class="tft-interactive-item"><label>Gate Status</label><button class="active-action" onclick="this.classList.toggle('active-action'); this.textContent = this.classList.contains('active-action') ? 'ACTIVE' : 'BYPASS'">ACTIVE</button></div>
+        <div class="tft-interactive-item"><label>Threshold (-45dB)</label><input type="range" id="gateThresh" min="-80" max="0" value="-45"><span id="gateThreshVal">-45dB</span></div>
+        <div class="tft-interactive-item"><label>Ratio (1:2.5)</label><input type="range" id="gateRatio" min="1" max="10" step="0.5" value="2.5"><span id="gateRatioVal">1:2.5</span></div>
+        <div class="tft-interactive-item"><label>Gate Status</label><button id="gateStateBtn" class="active-action">ACTIVE</button></div>
       </div>
     `,
     encoders: [{name:"THRESH", val:"-45dB"}, {name:"RATIO", val:"1:2.5"}, {name:"ATTACK", val:"5ms"}, {name:"HOLD", val:"20ms"}, {name:"RELEASE", val:"300ms"}, {name:"FILTER", val:"OFF"}]
@@ -1755,9 +1817,9 @@ const tftDatabase = {
     footerSt: "Peak Compressor Active",
     content: `
       <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Threshold (-18dB)</label><input type="range" min="-60" max="0" value="-18" oninput="this.parentElement.querySelector('span').textContent=this.value+'dB'"><span>-18dB</span></div>
-        <div class="tft-interactive-item"><label>Ratio (3:1)</label><input type="range" min="1" max="20" value="3" oninput="this.parentElement.querySelector('span').textContent=this.value+':1'"><span>3:1</span></div>
-        <div class="tft-interactive-item"><label>Makeup Gain</label><input type="range" min="0" max="24" value="2" oninput="this.parentElement.querySelector('span').textContent='+'+this.value+'dB'"><span>+2dB</span></div>
+        <div class="tft-interactive-item"><label>Threshold (-18dB)</label><input type="range" id="compThresh" min="-60" max="0" value="-18"><span id="compThreshVal">-18dB</span></div>
+        <div class="tft-interactive-item"><label>Ratio (3:1)</label><input type="range" id="compRatio" min="1" max="20" value="3"><span id="compRatioVal">3:1</span></div>
+        <div class="tft-interactive-item"><label>Makeup Gain</label><input type="range" id="compMakeup" min="0" max="24" value="2"><span id="compMakeupVal">+2dB</span></div>
       </div>
     `,
     encoders: [{name:"THRESH", val:"-18dB"}, {name:"RATIO", val:"3:1"}, {name:"ATTACK", val:"10ms"}, {name:"RELEASE", val:"300ms"}, {name:"MAKEUP", val:"+2dB"}, {name:"KNEE", val:"Soft"}]
@@ -1765,10 +1827,10 @@ const tftDatabase = {
   eq: {
     title: "PARAMETRIC EQ / CHANNEL PROCESSOR",
     footerCh: "CH 02: PEQ",
-    footerSt: "Sentuh & geser titik grafik atau gunakan slider untuk mengatur Freq, Q & Gain",
+    footerSt: "Sentuh & geser titik grafik atau gunakan slider",
     content: `
       <div class="tft-peq">
-        <div class="tft-peq-head"><strong>PEQ • CH 02</strong><span style="color:#10b981;" id="tftPeqStatusIndicator">● AUDIO DSP ACTIVE</span></div>
+        <div class="tft-peq-head"><strong>PEQ • CH 02</strong><span style="color:#10b981;">● AUDIO DSP ACTIVE</span></div>
         <svg class="tft-peq-graph" id="tftPeqSvgContainer" viewBox="0 0 320 150" preserveAspectRatio="none" role="img" aria-label="Parametric equalizer response curve">
           <g stroke="#475569" stroke-width=".7" opacity=".8">
             <path d="M28 12H310 M28 42H310 M28 72H310 M28 102H310 M28 132H310"/>
@@ -1805,9 +1867,9 @@ const tftDatabase = {
     footerSt: "Post-Fader Send Active",
     content: `
       <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Send 1 (Alesis)</label><input type="range" min="-60" max="0" value="-6" oninput="this.parentElement.querySelector('span').textContent=this.value+'dB'"><span>-6dB</span></div>
-        <div class="tft-interactive-item"><label>Send 2 (Aux)</label><input type="range" min="-60" max="0" value="-12" oninput="this.parentElement.querySelector('span').textContent=this.value+'dB'"><span>-12dB</span></div>
-        <div class="tft-interactive-item"><label>Send Mode</label><select><option>Post-Fader</option><option>Pre-Fader</option></select></div>
+        <div class="tft-interactive-item"><label>Send 1 (Alesis)</label><input type="range" id="send1Lvl" min="-60" max="0" value="-6"><span id="send1LvlVal">-6dB</span></div>
+        <div class="tft-interactive-item"><label>Send 2 (Aux)</label><input type="range" id="send2Lvl" min="-60" max="0" value="-12"><span id="send2LvlVal">-12dB</span></div>
+        <div class="tft-interactive-item"><label>Send Mode</label><select id="sendModeSelect"><option>Post-Fader</option><option>Pre-Fader</option></select></div>
       </div>
     `,
     encoders: [{name:"SEND 1", val:"-6dB"}, {name:"SEND 2", val:"-12dB"}, {name:"SEND 3", val:"-inf"}, {name:"SEND 4", val:"-inf"}, {name:"PAN", val:"C (0)"}, {name:"MODE", val:"POST"}]
@@ -1818,9 +1880,9 @@ const tftDatabase = {
     footerSt: "Limiter Active",
     content: `
       <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Main FOH Level</label><input type="range" min="-50" max="6" value="0" oninput="this.parentElement.querySelector('span').textContent=this.value+'dB'"><span>0dB</span></div>
-        <div class="tft-interactive-item"><label>Brickwall Limiter</label><input type="range" min="-20" max="0" value="-0.5" oninput="this.parentElement.querySelector('span').textContent=this.value+'dB'"><span>-0.5dB</span></div>
-        <div class="tft-interactive-item"><label>Mono Sum</label><button onclick="this.classList.toggle('active-action'); this.textContent = this.classList.contains('active-action') ? 'MONO ON' : 'OFF'">OFF</button></div>
+        <div class="tft-interactive-item"><label>Main FOH Level</label><input type="range" id="mainFohLvl" min="-50" max="6" value="0"><span id="mainFohLvlVal">0dB</span></div>
+        <div class="tft-interactive-item"><label>Brickwall Limiter</label><input type="range" id="mainLimitLvl" min="-20" max="0" value="-0.5"><span id="mainLimitLvlVal">-0.5dB</span></div>
+        <div class="tft-interactive-item"><label>Mono Sum</label><button id="mainMonoBtn">OFF</button></div>
       </div>
     `,
     encoders: [{name:"MASTER", val:"0dB"}, {name:"LIMITER", val:"-0.5dB"}, {name:"BALANCE", val:"CENTER"}, {name:"MONO", val:"OFF"}, {name:"MATRIX 1", val:"-inf"}, {name:"MATRIX 2", val:"-inf"}]
@@ -1831,9 +1893,9 @@ const tftDatabase = {
     footerSt: "All Channels Operational",
     content: `
       <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Global Mute All</label><button onclick="this.classList.toggle('active-action');">MUTE ALL</button></div>
-        <div class="tft-interactive-item"><label>DSP Engine Clock</label><select><option>48 kHz / 32-bit</option></select></div>
-        <div class="tft-interactive-item"><label>Talkback Mic</label><button onclick="this.classList.toggle('active-action');">TALK ON</button></div>
+        <div class="tft-interactive-item"><label>Global Mute All</label><button id="homeMuteAllBtn">MUTE ALL</button></div>
+        <div class="tft-interactive-item"><label>DSP Engine Clock</label><select id="homeClockSelect"><option>48 kHz / 32-bit</option><option>96 kHz / 32-bit</option></select></div>
+        <div class="tft-interactive-item"><label>Talkback Mic</label><button id="homeTalkBtn">TALK ON</button></div>
       </div>
     `,
     encoders: [{name:"CH 1 LVL", val:"0dB"}, {name:"CH 2 LVL", val:"0dB"}, {name:"CH 3 LVL", val:"0dB"}, {name:"CH 4 LVL", val:"0dB"}, {name:"FX RET", val:"-6dB"}, {name:"MASTER", val:"0dB"}]
@@ -1844,9 +1906,9 @@ const tftDatabase = {
     footerSt: "Real-time FFT Active",
     content: `
       <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>RTA Source</label><select><option>Post-EQ Main</option></select></div>
-        <div class="tft-interactive-item"><label>Peak Hold Time</label><select><option>3.0 Seconds</option></select></div>
-        <div class="tft-interactive-item"><label>Spectrum Zoom</label><input type="range" min="1" max="4" value="1" oninput="this.parentElement.querySelector('span').textContent=this.value+'x'"><span>1x</span></div>
+        <div class="tft-interactive-item"><label>RTA Source</label><select id="rtaSourceSelect"><option>Post-EQ Main</option><option>Pre-EQ Input</option></select></div>
+        <div class="tft-interactive-item"><label>Peak Hold Time</label><select id="rtaHoldSelect"><option>3.0 Seconds</option><option>Infinite</option></select></div>
+        <div class="tft-interactive-item"><label>Spectrum Zoom</label><input type="range" id="rtaZoom" min="1" max="4" value="1"><span id="rtaZoomVal">1x</span></div>
       </div>
     `,
     encoders: [{name:"SOURCE", val:"POST-EQ"}, {name:"DECAY", val:"Fast"}, {name:"PEAK HOLD", val:"3.0s"}, {name:"ZOOM", val:"1x"}, {name:"WEIGHT", val:"A-EQ"}, {name:"VIEW", val:"31-BAND"}]
@@ -1857,9 +1919,9 @@ const tftDatabase = {
     footerSt: "USB Audio Interface Linked",
     content: `
       <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Input 1 Source</label><select><option>Playlist Audio</option></select></div>
-        <div class="tft-interactive-item"><label>Input 2 Source</label><select><option>Mic / Line 2</option></select></div>
-        <div class="tft-interactive-item"><label>Direct Out Tap</label><select><option>Post-Fader</option></select></div>
+        <div class="tft-interactive-item"><label>Input 1 Source</label><select id="routeIn1"><option>Playlist Audio</option><option>Physical Mic</option></select></div>
+        <div class="tft-interactive-item"><label>Input 2 Source</label><select id="routeIn2"><option>Mic / Line 2</option><option>Bluetooth In</option></select></div>
+        <div class="tft-interactive-item"><label>Direct Out Tap</label><select id="routeTap"><option>Post-Fader</option><option>Pre-Fader</option></select></div>
       </div>
     `,
     encoders: [{name:"IN 1", val:"PLAYLIST"}, {name:"IN 2", val:"MIC 2"}, {name:"IN 3", val:"AUX 1"}, {name:"IN 4", val:"AUX 2"}, {name:"USB IN", val:"CH 1-2"}, {name:"OUT", val:"MAIN L/R"}]
@@ -1870,9 +1932,9 @@ const tftDatabase = {
     footerSt: "Firmware v2.4.1 Stable",
     content: `
       <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Display Brightness</label><input type="range" min="20" max="100" value="85" oninput="this.parentElement.querySelector('span').textContent=this.value+'%'"><span>85%</span></div>
-        <div class="tft-interactive-item"><label>BLE ESP32 Link</label><button class="active-action" onclick="this.classList.toggle('active-action')">CONNECTED</button></div>
-        <div class="tft-interactive-item"><label>Audio Buffer Size</label><select><option>512 Samples</option></select></div>
+        <div class="tft-interactive-item"><label>Display Brightness</label><input type="range" id="setupBright" min="20" max="100" value="85"><span id="setupBrightVal">85%</span></div>
+        <div class="tft-interactive-item"><label>BLE ESP32 Link</label><button id="setupBleBtn" class="active-action">CONNECTED</button></div>
+        <div class="tft-interactive-item"><label>Audio Buffer Size</label><select id="setupBuffer"><option>512 Samples</option><option>256 Samples</option></select></div>
       </div>
     `,
     encoders: [{name:"CLOCK", val:"INTERNAL"}, {name:"SAMPLE", val:"48kHz"}, {name:"BUFFER", val:"512smpl"}, {name:"MIDI CH", val:"1"}, {name:"BLE LINK", val:"ACTIVE"}, {name:"BRIGHTNESS", val:"85%"}]
@@ -1883,9 +1945,9 @@ const tftDatabase = {
     footerSt: "Auto-Save Enabled",
     content: `
       <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Active Scene</label><select><option>#01 Live Stage Default</option></select></div>
-        <div class="tft-interactive-item"><label>Store Preset</label><button onclick="alert('Konfigurasi mixer berhasil disimpan ke Scene aktif!')">STORE SCENE</button></div>
-        <div class="tft-interactive-item"><label>Recall Safe</label><button class="active-action" onclick="this.classList.toggle('active-action')">SAFE ON</button></div>
+        <div class="tft-interactive-item"><label>Active Scene</label><select id="libSceneSelect"><option>#01 Live Stage Default</option><option>#02 Acoustic Night</option></select></div>
+        <div class="tft-interactive-item"><label>Store Preset</label><button id="libStoreBtn">STORE SCENE</button></div>
+        <div class="tft-interactive-item"><label>Recall Safe</label><button id="libSafeBtn" class="active-action">SAFE ON</button></div>
       </div>
     `,
     encoders: [{name:"SCENE", val:"#01"}, {name:"RECALL", val:"SAFE"}, {name:"STORE", val:"READY"}, {name:"SNIPPET", val:"ALL"}, {name:"USB BACKUP", val:"READY"}, {name:"AUTO SAVE", val:"ON"}]
@@ -1896,9 +1958,9 @@ const tftDatabase = {
     footerSt: "Alesis FX Processor Assigned",
     content: `
       <div class="tft-interactive-grid">
-        <div class="tft-interactive-item"><label>Alesis Preset 1</label><select><option>Stage Reverb</option></select></div>
-        <div class="tft-interactive-item"><label>Alesis Preset 2</label><select><option>Stereo Chorus</option></select></div>
-        <div class="tft-interactive-item"><label>FX Master Bypass</label><button onclick="this.classList.toggle('active-action'); this.textContent = this.classList.contains('active-action') ? 'FX ACTIVE' : 'BYPASSED'">FX ACTIVE</button></div>
+        <div class="tft-interactive-item"><label>Alesis Preset 1</label><select id="fxPreset1"><option>Stage Reverb</option><option>Plate Reverb</option></select></div>
+        <div class="tft-interactive-item"><label>Alesis Preset 2</label><select id="fxPreset2"><option>Stereo Chorus</option><option>PingPong Delay</option></select></div>
+        <div class="tft-interactive-item"><label>FX Master Bypass</label><button id="fxBypassBtn" class="active-action">FX ACTIVE</button></div>
       </div>
     `,
     encoders: [{name:"FX TYPE 1", val:"REVERB"}, {name:"TIME 1", val:"2.2s"}, {name:"FX TYPE 2", val:"DELAY"}, {name:"TIME 2", val:"350ms"}, {name:"MIX 1", val:"25%"}, {name:"MIX 2", val:"30%"}]
@@ -1932,104 +1994,252 @@ function updateTftPeqVisuals() {
   fill.setAttribute("d", fillData);
 }
 
-function bindTftEqEvents() {
-  const freqInput = document.getElementById("tftPeqFreq");
-  const qInput = document.getElementById("tftPeqQ");
-  const gainInput = document.getElementById("tftPeqGain");
-  const svgContainer = document.getElementById("tftPeqSvgContainer");
+function bindTftDynamicEventListeners(key) {
+  if (key === "eq") {
+    const freqInput = document.getElementById("tftPeqFreq");
+    const qInput = document.getElementById("tftPeqQ");
+    const gainInput = document.getElementById("tftPeqGain");
+    const svgContainer = document.getElementById("tftPeqSvgContainer");
 
-  if (freqInput) {
-    freqInput.addEventListener("input", () => {
-      tftPeqFreqVal = Number(freqInput.value);
-      const valText = tftPeqFreqVal >= 1000 ? (tftPeqFreqVal/1000).toFixed(2)+' kHz' : tftPeqFreqVal+' Hz';
-      const valSpan = document.getElementById("tftPeqFreqVal");
-      if (valSpan) valSpan.textContent = valText;
-      if (tftPeqFilter && audioContext) {
-        tftPeqFilter.frequency.setTargetAtTime(tftPeqFreqVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
-      }
-      updateTftPeqVisuals();
-    });
-  }
-  if (qInput) {
-    qInput.addEventListener("input", () => {
-      tftPeqQVal = Number(qInput.value);
-      const valSpan = document.getElementById("tftPeqQVal");
-      if (valSpan) valSpan.textContent = tftPeqQVal.toFixed(1);
-      if (tftPeqFilter && audioContext) {
-        tftPeqFilter.Q.setTargetAtTime(tftPeqQVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
-      }
-      updateTftPeqVisuals();
-    });
-  }
-  if (gainInput) {
-    gainInput.addEventListener("input", () => {
-      tftPeqGainVal = Number(gainInput.value);
-      const valSpan = document.getElementById("tftPeqGainVal");
-      if (valSpan) valSpan.textContent = tftPeqGainVal.toFixed(1) + " dB";
-      if (tftPeqFilter && audioContext) {
-        tftPeqFilter.gain.setTargetAtTime(tftPeqGainVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
-      }
-      updateTftPeqVisuals();
-    });
-  }
+    if (freqInput) {
+      freqInput.addEventListener("input", () => {
+        tftPeqFreqVal = Number(freqInput.value);
+        const valText = tftPeqFreqVal >= 1000 ? (tftPeqFreqVal/1000).toFixed(2)+' kHz' : tftPeqFreqVal+' Hz';
+        const valSpan = document.getElementById("tftPeqFreqVal");
+        if (valSpan) valSpan.textContent = valText;
+        if (tftPeqFilter && audioContext) {
+          tftPeqFilter.frequency.setTargetAtTime(tftPeqFreqVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+        }
+        updateTftPeqVisuals();
+      });
+    }
+    if (qInput) {
+      qInput.addEventListener("input", () => {
+        tftPeqQVal = Number(qInput.value);
+        const valSpan = document.getElementById("tftPeqQVal");
+        if (valSpan) valSpan.textContent = tftPeqQVal.toFixed(1);
+        if (tftPeqFilter && audioContext) {
+          tftPeqFilter.Q.setTargetAtTime(tftPeqQVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+        }
+        updateTftPeqVisuals();
+      });
+    }
+    if (gainInput) {
+      gainInput.addEventListener("input", () => {
+        tftPeqGainVal = Number(gainInput.value);
+        const valSpan = document.getElementById("tftPeqGainVal");
+        if (valSpan) valSpan.textContent = tftPeqGainVal.toFixed(1) + " dB";
+        if (tftPeqFilter && audioContext) {
+          tftPeqFilter.gain.setTargetAtTime(tftPeqGainVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+        }
+        updateTftPeqVisuals();
+      });
+    }
 
-  /* MEMBUAT TITIK / TOMBOL GRAFIK PEQ DAPAT DIGESER (INTERAKTIF) */
-  if (svgContainer) {
-    let isDraggingDot = false;
+    if (svgContainer) {
+      let isDraggingDot = false;
+      const handleSvgPointerMove = (e) => {
+        if (!isDraggingDot) return;
+        const rect = svgContainer.getBoundingClientRect();
+        const clientX = e.clientX !== undefined ? e.clientX : e.touches?.[0]?.clientX;
+        const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
+        if (clientX === undefined || clientY === undefined) return;
 
-    const handleSvgPointerMove = (e) => {
-      if (!isDraggingDot) return;
-      const rect = svgContainer.getBoundingClientRect();
-      const clientX = e.clientX !== undefined ? e.clientX : e.touches?.[0]?.clientX;
-      const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
-      if (clientX === undefined || clientY === undefined) return;
+        const x = Math.max(28, Math.min(310, clientX - rect.left));
+        const y = Math.max(12, Math.min(132, clientY - rect.top));
 
-      const x = Math.max(28, Math.min(310, clientX - rect.left));
-      const y = Math.max(12, Math.min(132, clientY - rect.top));
+        const minLog = Math.log10(20);
+        const maxLog = Math.log10(20000);
+        const ratioX = (x - 28) / (310 - 28);
+        tftPeqFreqVal = Math.round(Math.pow(10, minLog + ratioX * (maxLog - minLog)) / 10) * 10;
+        tftPeqGainVal = Math.round(((72 - y) / 60) * 15 * 2) / 2;
 
-      const minLog = Math.log10(20);
-      const maxLog = Math.log10(20000);
-      const ratioX = (x - 28) / (310 - 28);
-      tftPeqFreqVal = Math.round(Math.pow(10, minLog + ratioX * (maxLog - minLog)) / 10) * 10;
-      tftPeqGainVal = Math.round(((72 - y) / 60) * 15 * 2) / 2;
+        tftPeqFreqVal = Math.max(20, Math.min(20000, tftPeqFreqVal));
+        tftPeqGainVal = Math.max(-15, Math.min(15, tftPeqGainVal));
 
-      tftPeqFreqVal = Math.max(20, Math.min(20000, tftPeqFreqVal));
-      tftPeqGainVal = Math.max(-15, Math.min(15, tftPeqGainVal));
+        if (freqInput) freqInput.value = tftPeqFreqVal;
+        if (gainInput) gainInput.value = tftPeqGainVal;
 
-      if (freqInput) freqInput.value = tftPeqFreqVal;
-      if (gainInput) gainInput.value = tftPeqGainVal;
+        const valFreqSpan = document.getElementById("tftPeqFreqVal");
+        if (valFreqSpan) valFreqSpan.textContent = tftPeqFreqVal >= 1000 ? (tftPeqFreqVal/1000).toFixed(2)+' kHz' : tftPeqFreqVal+' Hz';
+        const valGainSpan = document.getElementById("tftPeqGainVal");
+        if (valGainSpan) valGainSpan.textContent = tftPeqGainVal.toFixed(1) + " dB";
 
-      const valFreqSpan = document.getElementById("tftPeqFreqVal");
-      if (valFreqSpan) valFreqSpan.textContent = tftPeqFreqVal >= 1000 ? (tftPeqFreqVal/1000).toFixed(2)+' kHz' : tftPeqFreqVal+' Hz';
-      const valGainSpan = document.getElementById("tftPeqGainVal");
-      if (valGainSpan) valGainSpan.textContent = tftPeqGainVal.toFixed(1) + " dB";
+        if (tftPeqFilter && audioContext) {
+          tftPeqFilter.frequency.setTargetAtTime(tftPeqFreqVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+          tftPeqFilter.gain.setTargetAtTime(tftPeqGainVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+        }
+        updateTftPeqVisuals();
+      };
 
-      if (tftPeqFilter && audioContext) {
-        tftPeqFilter.frequency.setTargetAtTime(tftPeqFreqVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
-        tftPeqFilter.gain.setTargetAtTime(tftPeqGainVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
-      }
-      updateTftPeqVisuals();
-    };
-
-    svgContainer.addEventListener("pointerdown", (e) => {
-      isDraggingDot = true;
-      svgContainer.setPointerCapture(e.pointerId);
-      handleSvgPointerMove(e);
-    });
-
-    svgContainer.addEventListener("pointermove", handleSvgPointerMove);
-
-    const stopDragging = (e) => {
-      if (!isDraggingDot) return;
-      isDraggingDot = false;
-      try { svgContainer.releasePointerCapture(e.pointerId); } catch (err) {}
-    };
-
-    svgContainer.addEventListener("pointerup", stopDragging);
-    svgContainer.addEventListener("pointercancel", stopDragging);
+      svgContainer.addEventListener("pointerdown", (e) => {
+        isDraggingDot = true;
+        svgContainer.setPointerCapture(e.pointerId);
+        handleSvgPointerMove(e);
+      });
+      svgContainer.addEventListener("pointermove", handleSvgPointerMove);
+      const stopDragging = (e) => {
+        if (!isDraggingDot) return;
+        isDraggingDot = false;
+        try { svgContainer.releasePointerCapture(e.pointerId); } catch (err) {}
+      };
+      svgContainer.addEventListener("pointerup", stopDragging);
+      svgContainer.addEventListener("pointercancel", stopDragging);
+    }
+    updateTftPeqVisuals();
   }
 
-  updateTftPeqVisuals();
+  // Menambahkan event listener untuk interaksi widget di modul TFT lain
+  const cfgGain = document.getElementById("cfgGain");
+  if (cfgGain) {
+    cfgGain.addEventListener("input", () => {
+      document.getElementById("cfgGainVal").textContent = cfgGain.value + "dB";
+    });
+  }
+  const cfgPhantomBtn = document.getElementById("cfgPhantomBtn");
+  if (cfgPhantomBtn) {
+    cfgPhantomBtn.addEventListener("click", () => {
+      cfgPhantomBtn.classList.toggle("active-action");
+      cfgPhantomBtn.textContent = cfgPhantomBtn.classList.contains("active-action") ? "ON" : "OFF";
+    });
+  }
+  const cfgPhaseBtn = document.getElementById("cfgPhaseBtn");
+  if (cfgPhaseBtn) {
+    cfgPhaseBtn.addEventListener("click", () => {
+      cfgPhaseBtn.classList.toggle("active-action");
+      cfgPhaseBtn.textContent = cfgPhaseBtn.classList.contains("active-action") ? "INVERT" : "NORMAL";
+    });
+  }
+
+  const gateThresh = document.getElementById("gateThresh");
+  if (gateThresh) {
+    gateThresh.addEventListener("input", () => {
+      document.getElementById("gateThreshVal").textContent = gateThresh.value + "dB";
+    });
+  }
+  const gateRatio = document.getElementById("gateRatio");
+  if (gateRatio) {
+    gateRatio.addEventListener("input", () => {
+      document.getElementById("gateRatioVal").textContent = "1:" + gateRatio.value;
+    });
+  }
+  const gateStateBtn = document.getElementById("gateStateBtn");
+  if (gateStateBtn) {
+    gateStateBtn.addEventListener("click", () => {
+      gateStateBtn.classList.toggle("active-action");
+      gateStateBtn.textContent = gateStateBtn.classList.contains("active-action") ? "ACTIVE" : "BYPASS";
+    });
+  }
+
+  const compThresh = document.getElementById("compThresh");
+  if (compThresh) {
+    compThresh.addEventListener("input", () => {
+      document.getElementById("compThreshVal").textContent = compThresh.value + "dB";
+    });
+  }
+  const compRatio = document.getElementById("compRatio");
+  if (compRatio) {
+    compRatio.addEventListener("input", () => {
+      document.getElementById("compRatioVal").textContent = compRatio.value + ":1";
+    });
+  }
+  const compMakeup = document.getElementById("compMakeup");
+  if (compMakeup) {
+    compMakeup.addEventListener("input", () => {
+      document.getElementById("compMakeupVal").textContent = "+" + compMakeup.value + "dB";
+    });
+  }
+
+  const send1Lvl = document.getElementById("send1Lvl");
+  if (send1Lvl) {
+    send1Lvl.addEventListener("input", () => {
+      document.getElementById("send1LvlVal").textContent = send1Lvl.value + "dB";
+    });
+  }
+  const send2Lvl = document.getElementById("send2Lvl");
+  if (send2Lvl) {
+    send2Lvl.addEventListener("input", () => {
+      document.getElementById("send2LvlVal").textContent = send2Lvl.value + "dB";
+    });
+  }
+
+  const mainFohLvl = document.getElementById("mainFohLvl");
+  if (mainFohLvl) {
+    mainFohLvl.addEventListener("input", () => {
+      document.getElementById("mainFohLvlVal").textContent = mainFohLvl.value + "dB";
+    });
+  }
+  const mainLimitLvl = document.getElementById("mainLimitLvl");
+  if (mainLimitLvl) {
+    mainLimitLvl.addEventListener("input", () => {
+      document.getElementById("mainLimitLvlVal").textContent = mainLimitLvl.value + "dB";
+    });
+  }
+  const mainMonoBtn = document.getElementById("mainMonoBtn");
+  if (mainMonoBtn) {
+    mainMonoBtn.addEventListener("click", () => {
+      mainMonoBtn.classList.toggle("active-action");
+      mainMonoBtn.textContent = mainMonoBtn.classList.contains("active-action") ? "MONO ON" : "OFF";
+    });
+  }
+
+  const homeMuteAllBtn = document.getElementById("homeMuteAllBtn");
+  if (homeMuteAllBtn) {
+    homeMuteAllBtn.addEventListener("click", () => {
+      homeMuteAllBtn.classList.toggle("active-action");
+      setStatus(homeMuteAllBtn.classList.contains("active-action") ? "Global Mute All Aktif." : "Mute All Nonaktif.");
+    });
+  }
+  const homeTalkBtn = document.getElementById("homeTalkBtn");
+  if (homeTalkBtn) {
+    homeTalkBtn.addEventListener("click", () => {
+      homeTalkBtn.classList.toggle("active-action");
+      homeTalkBtn.textContent = homeTalkBtn.classList.contains("active-action") ? "TALK ON" : "TALK OFF";
+    });
+  }
+
+  const rtaZoom = document.getElementById("rtaZoom");
+  if (rtaZoom) {
+    rtaZoom.addEventListener("input", () => {
+      document.getElementById("rtaZoomVal").textContent = rtaZoom.value + "x";
+    });
+  }
+
+  const setupBright = document.getElementById("setupBright");
+  if (setupBright) {
+    setupBright.addEventListener("input", () => {
+      document.getElementById("setupBrightVal").textContent = setupBright.value + "%";
+    });
+  }
+  const setupBleBtn = document.getElementById("setupBleBtn");
+  if (setupBleBtn) {
+    setupBleBtn.addEventListener("click", () => {
+      setupBleBtn.classList.toggle("active-action");
+      setupBleBtn.textContent = setupBleBtn.classList.contains("active-action") ? "CONNECTED" : "DISCONNECTED";
+    });
+  }
+
+  const libStoreBtn = document.getElementById("libStoreBtn");
+  if (libStoreBtn) {
+    libStoreBtn.addEventListener("click", () => {
+      alert("Konfigurasi preset mixer berhasil disimpan ke Scene!");
+    });
+  }
+  const libSafeBtn = document.getElementById("libSafeBtn");
+  if (libSafeBtn) {
+    libSafeBtn.addEventListener("click", () => {
+      libSafeBtn.classList.toggle("active-action");
+      libSafeBtn.textContent = libSafeBtn.classList.contains("active-action") ? "SAFE ON" : "SAFE OFF";
+    });
+  }
+
+  const fxBypassBtn = document.getElementById("fxBypassBtn");
+  if (fxBypassBtn) {
+    fxBypassBtn.addEventListener("click", () => {
+      fxBypassBtn.classList.toggle("active-action");
+      fxBypassBtn.textContent = fxBypassBtn.classList.contains("active-action") ? "FX ACTIVE" : "BYPASSED";
+    });
+  }
 }
 
 function loadTftPage(key) {
@@ -2040,9 +2250,7 @@ function loadTftPage(key) {
   tftFooterChannel.textContent = data.footerCh;
   tftFooterStatus.textContent = data.footerSt;
   updateEncoders(data.encoders);
-  if (key === "eq") {
-    setTimeout(bindTftEqEvents, 10);
-  }
+  setTimeout(() => bindTftDynamicEventListeners(key), 10);
 }
 
 consoleSectionBtns.forEach(btn => {
@@ -2069,13 +2277,13 @@ tftTabs.forEach(tab => {
   });
 });
 
-// DEFAULT INISIALISASI KE TAB EQ AGAR SESUAI DENGAN PILIHAN SECTION AKTIF
+// DEFAULT INISIALISASI KE TAB EQ
 tftTabs.forEach(t => t.classList.toggle("active", t.getAttribute("data-tft-tab") === "eq"));
 consoleSectionBtns.forEach(b => b.classList.toggle("active", b.getAttribute("data-section") === "eq"));
 loadTftPage("eq");
 
 /* =========================================================
-   LOGIKA METER LED REAL-TIME
+   LOGIKA METER LED REAL-TIME & STEREO METER TFT
 ========================================================= */
 function startRealMeters() {
   if (meterAnimationId) return;
@@ -2167,6 +2375,51 @@ function startRealMeters() {
         if (reverseIdx < activeCount) span.classList.add("on"); else span.classList.remove("on");
       });
     });
+
+    /* PEMBARUAN INDIKATOR METER TFT STEREO UTAMA */
+    const tftSpansL = document.querySelectorAll("#tftMeterL span");
+    const tftSpansR = document.querySelectorAll("#tftMeterR span");
+    const tftMeterLVal = document.getElementById("tftMeterLVal");
+    const tftMeterRVal = document.getElementById("tftMeterRVal");
+
+    if (tftSpansL.length > 0 && audioChannels[0]?.analyser) {
+      if (!isAudioRunning) {
+        tftSpansL.forEach(s => s.classList.remove("on"));
+        tftSpansR.forEach(s => s.classList.remove("on"));
+        if (tftMeterLVal) tftMeterLVal.textContent = "-inf dB";
+        if (tftMeterRVal) tftMeterRVal.textContent = "-inf dB";
+      } else {
+        const bufL = meterBuffers[0];
+        const bufR = meterBuffers[1] || meterBuffers[0];
+        audioChannels[0].analyser.getByteTimeDomainData(bufL);
+        audioChannels[1]?.analyser?.getByteTimeDomainData(bufR);
+
+        let sumL = 0, sumR = 0;
+        for (let i = 0; i < bufL.length; i++) {
+          let sL = (bufL[i] - 128) / 128;
+          let sR = (bufR[i] - 128) / 128;
+          sumL += sL * sL;
+          sumR += sR * sR;
+        }
+        let rmsL = Math.sqrt(sumL / bufL.length);
+        let rmsR = Math.sqrt(sumR / bufR.length);
+        let dbL = 20 * Math.log10(Math.max(rmsL, 0.0001));
+        let dbR = 20 * Math.log10(Math.max(rmsR, 0.0001));
+
+        let activeL = rmsL < 0.001 ? 0 : Math.max(1, Math.min(16, Math.round(((dbL + 50) / 50) * 16)));
+        let activeR = rmsR < 0.001 ? 0 : Math.max(1, Math.min(16, Math.round(((dbR + 50) / 50) * 16)));
+
+        tftSpansL.forEach((span, idx) => {
+          if (idx < activeL) span.classList.add("on"); else span.classList.remove("on");
+        });
+        tftSpansR.forEach((span, idx) => {
+          if (idx < activeR) span.classList.add("on"); else span.classList.remove("on");
+        });
+
+        if (tftMeterLVal) tftMeterLVal.textContent = (dbL < -45 ? "-inf" : dbL.toFixed(1)) + " dB";
+        if (tftMeterRVal) tftMeterRVal.textContent = (dbR < -45 ? "-inf" : dbR.toFixed(1)) + " dB";
+      }
+    }
   }
   updateAllMeters();
 }
