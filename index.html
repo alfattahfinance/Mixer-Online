@@ -1115,6 +1115,67 @@ function setStatus(msg) { const el = document.getElementById("status"); if (el) 
 function setAudioStatus(msg) { const el = document.getElementById("audioStatus"); if (el) el.textContent = msg; }
 function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed(1); }
 
+// Slow, controlled touch/mouse dragging for audio sliders.
+// A full-range change now takes about 4x the usual finger travel.
+(function enableStableRangeDragging() {
+  const SENSITIVITY = 0.25;
+  let active = null;
+
+  document.addEventListener("pointerdown", (event) => {
+    const slider = event.target.closest('input[type="range"]');
+    if (!slider || slider.disabled || event.button > 0) return;
+
+    const style = window.getComputedStyle(slider);
+    const vertical = style.writingMode.startsWith("vertical") ||
+      /rotate\((-?\d+\.?\d*)deg\)/.test(style.transform);
+    const rect = slider.getBoundingClientRect();
+    const length = vertical ? rect.height : rect.width;
+    if (!length) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    active = {
+      slider,
+      pointerId: event.pointerId,
+      startCoord: vertical ? event.clientY : event.clientX,
+      startValue: Number(slider.value),
+      min: Number(slider.min || 0),
+      max: Number(slider.max || 100),
+      step: Number(slider.step || 1),
+      length,
+      vertical
+    };
+    try { slider.setPointerCapture(event.pointerId); } catch (_) {}
+  }, { capture: true });
+
+  document.addEventListener("pointermove", (event) => {
+    if (!active || event.pointerId !== active.pointerId) return;
+    event.preventDefault();
+    const coord = active.vertical ? event.clientY : event.clientX;
+    const delta = active.vertical
+      ? active.startCoord - coord
+      : coord - active.startCoord;
+    const raw = active.startValue +
+      (delta / active.length) * (active.max - active.min) * SENSITIVITY;
+    const stepped = active.min +
+      Math.round((raw - active.min) / active.step) * active.step;
+    const next = Math.max(active.min, Math.min(active.max, stepped));
+    if (next !== Number(active.slider.value)) {
+      active.slider.value = String(next);
+      active.slider.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  }, { capture: true, passive: false });
+
+  const finish = (event) => {
+    if (!active || event.pointerId !== active.pointerId) return;
+    const slider = active.slider;
+    active = null;
+    slider.dispatchEvent(new Event("change", { bubbles: true }));
+  };
+  document.addEventListener("pointerup", finish, { capture: true });
+  document.addEventListener("pointercancel", finish, { capture: true });
+})();
+
 function createBands(channel) {
   const eq = channel.querySelector(".eq");
   if (!eq || eq.children.length > 0) return;
