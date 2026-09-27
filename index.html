@@ -231,7 +231,56 @@ header, .topbar {
 .echo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 .echo-control-card { background: #101216; border: 1px solid #2a323d; padding: 15px; border-radius: 6px; }
 .echo-control-card label { display: block; font-size: 11px; color: #38bdf8; margin-bottom: 6px; font-weight: bold; }
-.echo-control-card input[type="range"] { width: 100%; accent-color: #38bdf8; margin-bottom: 6px; }
+.echo-control-card input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 30px;
+  margin: 0 0 6px;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  touch-action: pan-y;
+}
+.echo-control-card input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  border: 1px solid #647080;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #38bdf8 0%, #38bdf8 50%, #d1d5db 50%, #d1d5db 100%);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.65);
+}
+.echo-control-card input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  margin-top: -10px;
+  border: 2px solid #aab4c0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 28%, #ffffff 0%, #e2e8f0 38%, #a8b2bf 72%, #66717f 100%);
+  box-shadow: 0 2px 5px rgba(0,0,0,.65), inset 0 1px 2px rgba(255,255,255,.9);
+}
+.echo-control-card input[type="range"]::-moz-range-track {
+  height: 6px;
+  border: 1px solid #647080;
+  border-radius: 999px;
+  background: #d1d5db;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.65);
+}
+.echo-control-card input[type="range"]::-moz-range-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: #38bdf8;
+}
+.echo-control-card input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #aab4c0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 28%, #ffffff 0%, #e2e8f0 38%, #a8b2bf 72%, #66717f 100%);
+  box-shadow: 0 2px 5px rgba(0,0,0,.65), inset 0 1px 2px rgba(255,255,255,.9);
+}
 .echo-val { font-size: 11px; color: #f59e0b; font-family: monospace; text-align: right; }
 
 /* =========================================================
