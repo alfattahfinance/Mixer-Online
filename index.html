@@ -709,112 +709,115 @@ header, .topbar {
 /* Hide accessible form labels visually without affecting screen readers. */
 .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
   
-/* Rotary EQ controls: visual dial beneath a transparent, touch-safe range hit area. */
+/* Restore the requested real graphic-EQ fader layout.
+   Keep every band element centered in its own column and prevent page panning
+   while a user drags a control. */
 .band {
-  height: 116px;
-  padding: 6px 3px;
+  box-sizing: border-box;
+  height: 230px;
+  min-width: 0;
+  padding: 5px 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: flex-start;
-  gap: 2px;
+  gap: 0;
+  position: relative;
 }
 .band-frequency {
+  box-sizing: border-box;
+  width: 100%;
   min-height: 20px;
   line-height: 20px;
-  margin: 0;
-  font-size: 8px;
+  margin: 0 0 4px;
+  text-align: center;
+  white-space: nowrap;
 }
 .slider-track-container {
+  position: relative;
   width: 100%;
-  height: 62px;
-  flex: 0 0 62px;
+  height: 165px;
+  flex: 0 0 165px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: visible;
   cursor: ns-resize;
   touch-action: none;
-  overflow: visible;
-}
-.band .eq-rotary-knob {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 38px;
-  height: 38px;
-  box-sizing: border-box;
-  border: 1px solid #596575;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  background:
-    radial-gradient(circle at 34% 28%, #f3f5f7 0%, #bfc6ce 20%, #737e8a 47%, #343d49 73%, #171c24 100%);
-  box-shadow: 0 2px 5px rgba(0,0,0,.7), inset 0 1px 2px rgba(255,255,255,.75), inset 0 -2px 3px rgba(0,0,0,.8);
-  pointer-events: none;
-}
-.band .eq-rotary-knob::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 4px;
-  width: 3px;
-  height: 11px;
-  border-radius: 2px;
-  background: #10151c;
-  box-shadow: 0 0 0 1px rgba(255,255,255,.28);
-  transform: translateX(-50%) rotate(var(--knob-angle, -135deg));
-  transform-origin: 50% 15px;
-}
-.band .eq-rotary-knob::after {
-  content: "";
-  position: absolute;
-  inset: 5px;
-  border: 1px solid rgba(255,255,255,.14);
-  border-radius: 50%;
+  -webkit-user-select: none;
+  user-select: none;
 }
 .band input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
+  writing-mode: vertical-lr;
+  direction: rtl;
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 54px;
-  height: 54px;
+  display: block;
+  box-sizing: border-box;
+  width: 26px;
+  height: 165px;
   min-width: 0;
   margin: 0;
   padding: 0;
   transform: translate(-50%, -50%);
-  opacity: 0;
   background: transparent;
   cursor: ns-resize;
-  z-index: 3;
+  z-index: 2;
   touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 .band input[type="range"]::-webkit-slider-runnable-track {
-  width: 100%;
+  width: 4px;
   height: 100%;
-  background: transparent;
-  border: 0;
+  border: 1px solid #46515f;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, #080b10 0%, #26303b 35%, #10151c 70%, #080b10 100%);
+  box-shadow: inset 0 0 2px #000, 0 0 0 1px rgba(148,163,184,.12);
 }
 .band input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 54px;
-  height: 54px;
-  border: 0;
-  background: transparent;
+  box-sizing: border-box;
+  width: 26px;
+  height: 13px;
+  margin-left: -12px;
+  border: 1px solid #626d7a;
+  border-radius: 3px;
+  background:
+    linear-gradient(90deg, transparent 0 37%, rgba(22,28,36,.85) 37% 41%, transparent 41% 59%, rgba(22,28,36,.85) 59% 63%, transparent 63%),
+    linear-gradient(to bottom, #f1f3f5 0%, #b9c0c8 17%, #737d89 46%, #414b57 52%, #9ba4af 82%, #e6e9ed 100%);
+  box-shadow: 0 2px 3px rgba(0,0,0,.85), inset 0 1px 1px rgba(255,255,255,.85), inset 0 -1px 1px rgba(20,25,32,.9);
 }
 .band input[type="range"]::-moz-range-track {
-  width: 100%;
+  width: 4px;
   height: 100%;
-  background: transparent;
-  border: 0;
+  border: 1px solid #46515f;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, #080b10 0%, #26303b 35%, #10151c 70%, #080b10 100%);
+  box-shadow: inset 0 0 2px #000;
 }
 .band input[type="range"]::-moz-range-thumb {
-  width: 54px;
-  height: 54px;
-  border: 0;
-  background: transparent;
+  box-sizing: border-box;
+  width: 26px;
+  height: 13px;
+  border: 1px solid #626d7a;
+  border-radius: 3px;
+  background:
+    linear-gradient(90deg, transparent 0 37%, rgba(22,28,36,.85) 37% 41%, transparent 41% 59%, rgba(22,28,36,.85) 59% 63%, transparent 63%),
+    linear-gradient(to bottom, #f1f3f5 0%, #b9c0c8 17%, #737d89 46%, #414b57 52%, #9ba4af 82%, #e6e9ed 100%);
+  box-shadow: 0 2px 3px rgba(0,0,0,.85), inset 0 1px 1px rgba(255,255,255,.85), inset 0 -1px 1px rgba(20,25,32,.9);
 }
 .band-value {
-  margin-top: 0;
+  margin-top: 4px;
   line-height: 18px;
   font-size: 9px;
+  text-align: center;
+  white-space: nowrap;
 }
-
 </style>
 </head>
 
