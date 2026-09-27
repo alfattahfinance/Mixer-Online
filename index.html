@@ -124,7 +124,7 @@ header, .topbar {
 .eq-section { width: 100%; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; }
 .eq { display: grid; grid-template-columns: repeat(31, 38px); gap: 4px; min-width: max-content; align-items: stretch; }
 
-/* FADER VERTIKAL GRAFIK EQUALIZER (GQX-3102 STYLE) */
+/* FADER VERTIKAL GRAFIK EQUALIZER */
 .band {
   box-sizing: border-box;
   background: #101216;
@@ -614,10 +614,10 @@ header, .topbar {
           <div class="mixer-control-section">
             <div style="font-size: 10px; font-weight: bold; color: #38bdf8; margin-bottom: 4px;">SECTION SELECT</div>
             <div class="section-grid-btns">
-              <button class="console-btn active" data-section="config">CONFIG</button>
+              <button class="console-btn" data-section="config">CONFIG</button>
               <button class="console-btn" data-section="gate">GATE</button>
               <button class="console-btn" data-section="dynamics">DYNAMICS</button>
-              <button class="console-btn" data-section="eq">EQ</button>
+              <button class="console-btn active" data-section="eq">EQ</button>
               <button class="console-btn" data-section="sends">SENDS</button>
               <button class="console-btn" data-section="main">MAIN</button>
             </div>
@@ -888,8 +888,9 @@ function setStatus(msg) { const el = document.getElementById("status"); if (el) 
 function setAudioStatus(msg) { const el = document.getElementById("audioStatus"); if (el) el.textContent = msg; }
 function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed(1); }
 
+/* PENYESUAIAN SENSITIVITAS FADER (AGAR LEBIH HALUS & STABIL) */
 (function enableStableRangeDragging() {
-  const SENSITIVITY = 0.20;
+  const SENSITIVITY = 0.12;
   let active = null;
 
   document.addEventListener("pointerdown", (event) => {
@@ -986,7 +987,7 @@ function createBands(channel) {
 /* =========================================================
    AUDIO ENGINE & ROUTING
 ========================================================= */
-const CONTROL_SMOOTHING_SECONDS = 0.06;
+const CONTROL_SMOOTHING_SECONDS = 0.12; // Diperhalus agar respons fader lebih lambat & stabil
 
 let audioContext = null;
 let microphoneStream = null;
@@ -1010,6 +1011,12 @@ let masterGainNode = null, outputMuteGainNode = null, outputMergerNode = null;
 
 let isAlesisFxEnabled = false;
 let audioGraphReady = false, meterAnimationId = null, outputMuted = false;
+
+/* VARIABEL KONTROL PARAMETRIC EQ DIGITAL MIXER */
+let tftPeqFilter = null;
+let tftPeqFreqVal = 1100;
+let tftPeqQVal = 1.7;
+let tftPeqGainVal = 15.0;
 
 const audioFilesInput = document.getElementById("audioFilesInput");
 const playlistContainer = document.getElementById("playlistContainer");
@@ -1094,7 +1101,7 @@ function updateMasterGain() {
 
 function updateOutputMute() {
   if (outputMuteGainNode && audioContext) {
-    outputMuteGainNode.gain.setTargetAtTime(outputMuted ? 0 : 1, audioContext.currentTime, 0.01);
+    outputMuteGainNode.gain.setTargetAtTime(outputMuted ? 0 : 1, audioContext.currentTime, 0.02);
   }
   muteOutputButton.textContent = outputMuted ? "UNMUTE OUTPUT" : "MUTE OUTPUT";
   muteOutputButton.classList.toggle("active", outputMuted);
@@ -1269,6 +1276,13 @@ function initializeAudioGraph() {
   buildEqualizerChannel(0);
   buildEqualizerChannel(1);
 
+  /* INISIALISASI FILTER PARAMETRIC EQ DIGITAL MIXER */
+  tftPeqFilter = audioContext.createBiquadFilter();
+  tftPeqFilter.type = "peaking";
+  tftPeqFilter.frequency.value = tftPeqFreqVal;
+  tftPeqFilter.Q.value = tftPeqQVal;
+  tftPeqFilter.gain.value = tftPeqGainVal;
+
   masterGainNode = audioContext.createGain();
   outputMuteGainNode = audioContext.createGain();
 
@@ -1298,7 +1312,11 @@ function initializeAudioGraph() {
   outputMergerNode = audioContext.createChannelMerger(2);
   audioChannels[0].analyser.connect(outputMergerNode, 0, 0);
   audioChannels[1].analyser.connect(outputMergerNode, 0, 1);
-  outputMergerNode.connect(masterStripGainNode);
+  
+  /* ROUTING MELALUI PARAMETRIC EQ DIGITAL MIXER SEBELUM MASTER GAIN */
+  outputMergerNode.connect(tftPeqFilter);
+  tftPeqFilter.connect(masterStripGainNode);
+
   masterStripGainNode.connect(masterMeterAnalyser);
   masterMeterAnalyser.connect(masterGainNode);
   masterGainNode.connect(outputMuteGainNode);
@@ -1505,7 +1523,7 @@ function updateEqChannelStates() {
   audioChannels.forEach((ac, index) => {
     if (!ac.outputGain) return;
     const audible = !eqChannelMuted[index] && (!anySolo || eqChannelSolo[index]);
-    ac.outputGain.gain.setTargetAtTime(audible ? 1 : 0, audioContext.currentTime, 0.012);
+    ac.outputGain.gain.setTargetAtTime(audible ? 1 : 0, audioContext.currentTime, 0.02);
   });
 }
 
@@ -1663,7 +1681,7 @@ document.querySelectorAll(".mixer-desk-surface .console-channel-strip").forEach(
 });
 
 /* =========================================================
-   UI SYNC & TFT DISPLAY INTERAKTIF
+   UI SYNC & TFT DISPLAY INTERAKTIF (DENGAN PEQ AKTIF)
 ========================================================= */
 const tftSectionTitle = document.getElementById("tftSectionTitle");
 const tftContentArea = document.getElementById("tftContentArea");
@@ -1724,7 +1742,7 @@ const tftDatabase = {
   eq: {
     title: "PARAMETRIC EQ / CHANNEL PROCESSOR",
     footerCh: "CH 02: PEQ",
-    footerSt: "3-band PEQ controls",
+    footerSt: "3-band PEQ controls active",
     content: `
       <div class="tft-peq">
         <div class="tft-peq-head"><strong>PEQ • CH 02</strong><span style="color:#eab308;">● ACTIVE</span></div>
@@ -1738,13 +1756,25 @@ const tftDatabase = {
           <circle cx="192" cy="17" r="4" fill="#e0f2fe" stroke="#22d3ee" stroke-width="2"/>
         </svg>
         <div class="tft-peq-controls">
-          <div class="tft-peq-control"><label for="tftPeqFreq">FREQ</label><input id="tftPeqFreq" type="range" min="20" max="20000" value="1100" oninput="document.getElementById('tftPeqFreqVal').textContent=(this.value>=1000?(this.value/1000).toFixed(2)+' kHz':this.value+' Hz')"><span class="tft-peq-value" id="tftPeqFreqVal">1.10 kHz</span></div>
-          <div class="tft-peq-control"><label for="tftPeqQ">Q</label><input id="tftPeqQ" type="range" min="0.1" max="10" step="0.1" value="1.7" oninput="document.getElementById('tftPeqQVal').textContent=Number(this.value).toFixed(1)"><span class="tft-peq-value" id="tftPeqQVal">1.7</span></div>
-          <div class="tft-peq-control"><label for="tftPeqGain">GAIN</label><input id="tftPeqGain" type="range" min="-15" max="15" step="0.5" value="15" oninput="document.getElementById('tftPeqGainVal').textContent=Number(this.value).toFixed(1)+' dB'"><span class="tft-peq-value" id="tftPeqGainVal">15.0 dB</span></div>
+          <div class="tft-peq-control">
+            <label for="tftPeqFreq">FREQ</label>
+            <input id="tftPeqFreq" type="range" min="20" max="20000" step="10" value="${tftPeqFreqVal}">
+            <span class="tft-peq-value" id="tftPeqFreqVal">${tftPeqFreqVal >= 1000 ? (tftPeqFreqVal/1000).toFixed(2)+' kHz' : tftPeqFreqVal+' Hz'}</span>
+          </div>
+          <div class="tft-peq-control">
+            <label for="tftPeqQ">Q</label>
+            <input id="tftPeqQ" type="range" min="0.1" max="10" step="0.1" value="${tftPeqQVal}">
+            <span class="tft-peq-value" id="tftPeqQVal">${tftPeqQVal.toFixed(1)}</span>
+          </div>
+          <div class="tft-peq-control">
+            <label for="tftPeqGain">GAIN</label>
+            <input id="tftPeqGain" type="range" min="-15" max="15" step="0.5" value="${tftPeqGainVal}">
+            <span class="tft-peq-value" id="tftPeqGainVal">${tftPeqGainVal.toFixed(1)} dB</span>
+          </div>
         </div>
       </div>
     `,
-    encoders: [{name:"FREQ", val:"1.10kHz"}, {name:"Q", val:"1.7"}, {name:"GAIN", val:"15.0dB"}, {name:"BAND", val:"MID"}, {name:"TYPE", val:"PEAK"}, {name:"BYPASS", val:"OFF"}]
+    encoders: [{name:"FREQ", val: tftPeqFreqVal>=1000?(tftPeqFreqVal/1000).toFixed(2)+'kHz':tftPeqFreqVal+'Hz'}, {name:"Q", val: tftPeqQVal.toFixed(1)}, {name:"GAIN", val: tftPeqGainVal.toFixed(1)+'dB'}, {name:"BAND", val:"MID"}, {name:"TYPE", val:"PEAK"}, {name:"BYPASS", val:"OFF"}]
   },
   sends: {
     title: "BUS SENDS & FX ROUTING",
@@ -1852,6 +1882,40 @@ const tftDatabase = {
   }
 };
 
+function bindTftEqEvents() {
+  const freqInput = document.getElementById("tftPeqFreq");
+  const qInput = document.getElementById("tftPeqQ");
+  const gainInput = document.getElementById("tftPeqGain");
+
+  if (freqInput) {
+    freqInput.addEventListener("input", () => {
+      tftPeqFreqVal = Number(freqInput.value);
+      document.getElementById("tftPeqFreqVal").textContent = tftPeqFreqVal >= 1000 ? (tftPeqFreqVal/1000).toFixed(2)+' kHz' : tftPeqFreqVal+' Hz';
+      if (tftPeqFilter && audioContext) {
+        tftPeqFilter.frequency.setTargetAtTime(tftPeqFreqVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+      }
+    });
+  }
+  if (qInput) {
+    qInput.addEventListener("input", () => {
+      tftPeqQVal = Number(qInput.value);
+      document.getElementById("tftPeqQVal").textContent = tftPeqQVal.toFixed(1);
+      if (tftPeqFilter && audioContext) {
+        tftPeqFilter.Q.setTargetAtTime(tftPeqQVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+      }
+    });
+  }
+  if (gainInput) {
+    gainInput.addEventListener("input", () => {
+      tftPeqGainVal = Number(gainInput.value);
+      document.getElementById("tftPeqGainVal").textContent = tftPeqGainVal.toFixed(1) + " dB";
+      if (tftPeqFilter && audioContext) {
+        tftPeqFilter.gain.setTargetAtTime(tftPeqGainVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+      }
+    });
+  }
+}
+
 function loadTftPage(key) {
   const data = tftDatabase[key];
   if (!data) return;
@@ -1860,6 +1924,9 @@ function loadTftPage(key) {
   tftFooterChannel.textContent = data.footerCh;
   tftFooterStatus.textContent = data.footerSt;
   updateEncoders(data.encoders);
+  if (key === "eq") {
+    bindTftEqEvents();
+  }
 }
 
 consoleSectionBtns.forEach(btn => {
@@ -1878,7 +1945,7 @@ tftTabs.forEach(tab => {
   });
 });
 
-loadTftPage("config");
+loadTftPage("eq"); // Memuat halaman EQ TFT secara default agar langsung bisa diatur
 
 /* =========================================================
    LOGIKA METER LED REAL-TIME
