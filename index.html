@@ -36,10 +36,20 @@ header, .topbar {
    TIGA TAB NAVIGASI UTAMA
 ========================================================= */
 .mode-switch-bar {
+  position: relative;
+  z-index: 50;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   margin-bottom: 12px;
+  pointer-events: auto;
+}
+.mode-switch-bar .tab-btn {
+  position: relative;
+  z-index: 1;
+  min-height: 42px;
+  pointer-events: auto;
+  touch-action: manipulation;
 }
 .tab-btn {
   background: #1a222d;
@@ -848,10 +858,10 @@ input[type="range"] {
     </header>
 
     <!-- TIGA TAB NAVIGASI UTAMA -->
-    <nav class="mode-switch-bar">
-      <button class="tab-btn active" id="tabEqBtn">🎛️ EQUALIZER</button>
-      <button class="tab-btn" id="tabEchoBtn">🔊 ALESIS FX</button>
-      <button class="tab-btn" id="tabMixerBtn">🎚️ DIGITAL MIXER</button>
+    <nav class="mode-switch-bar" id="mainTabNavigation" aria-label="Main pages">
+      <button type="button" class="tab-btn active" id="tabEqBtn" data-main-tab="eq" aria-controls="tabEqContent" aria-selected="true">🎛️ EQUALIZER</button>
+      <button type="button" class="tab-btn" id="tabEchoBtn" data-main-tab="echo" aria-controls="tabEchoContent" aria-selected="false">🔊 ALESIS FX</button>
+      <button type="button" class="tab-btn" id="tabMixerBtn" data-main-tab="mixer" aria-controls="tabMixerContent" aria-selected="false">🎚️ DIGITAL MIXER</button>
     </nav>
 
     <!-- KONTEN TAB 1: EQUALIZER -->
@@ -1235,28 +1245,36 @@ initMixerVerticalMeters();
 /* =========================================================
    NAVIGASI TIGA TAB UTAMA
 ========================================================= */
-const tabEqBtn = document.getElementById("tabEqBtn");
-const tabEchoBtn = document.getElementById("tabEchoBtn");
-const tabMixerBtn = document.getElementById("tabMixerBtn");
-const tabEqContent = document.getElementById("tabEqContent");
-const tabEchoContent = document.getElementById("tabEchoContent");
-const tabMixerContent = document.getElementById("tabMixerContent");
+const mainTabNavigation = document.getElementById("mainTabNavigation");
+const mainTabButtons = Array.from(document.querySelectorAll("[data-main-tab]"));
+const mainTabContents = {
+  eq: document.getElementById("tabEqContent"),
+  echo: document.getElementById("tabEchoContent"),
+  mixer: document.getElementById("tabMixerContent")
+};
 
-tabEqBtn.addEventListener("click", () => {
-  tabEqBtn.classList.add("active"); tabEchoBtn.classList.remove("active"); tabMixerBtn.classList.remove("active");
-  tabEqContent.classList.add("active"); tabEchoContent.classList.remove("active"); tabMixerContent.classList.remove("active");
-  document.querySelector(".audio-panel").classList.remove("active");
-});
-tabEchoBtn.addEventListener("click", () => {
-  tabEchoBtn.classList.add("active"); tabEqBtn.classList.remove("active"); tabMixerBtn.classList.remove("active");
-  tabEchoContent.classList.add("active"); tabEqContent.classList.remove("active"); tabMixerContent.classList.remove("active");
-  document.querySelector(".audio-panel").classList.remove("active");
-});
-tabMixerBtn.addEventListener("click", () => {
-  tabMixerBtn.classList.add("active"); tabEqBtn.classList.remove("active"); tabEchoBtn.classList.remove("active");
-  tabMixerContent.classList.add("active"); tabEqContent.classList.remove("active"); tabEchoContent.classList.remove("active");
-  document.querySelector(".audio-panel").classList.add("active");
-});
+function activateMainTab(tabName) {
+  if (!mainTabContents[tabName]) return;
+  mainTabButtons.forEach(button => {
+    const selected = button.dataset.mainTab === tabName;
+    button.classList.toggle("active", selected);
+    button.setAttribute("aria-selected", String(selected));
+  });
+  Object.entries(mainTabContents).forEach(([name, panel]) => {
+    if (panel) panel.classList.toggle("active", name === tabName);
+  });
+  const audioPanel = document.querySelector(".audio-panel");
+  if (audioPanel) audioPanel.classList.toggle("active", tabName === "mixer");
+}
+
+if (mainTabNavigation) {
+  mainTabNavigation.addEventListener("click", event => {
+    const button = event.target.closest("[data-main-tab]");
+    if (!button || !mainTabNavigation.contains(button)) return;
+    event.preventDefault();
+    activateMainTab(button.dataset.mainTab);
+  });
+}
 
 /* =========================================================
    WEB BLUETOOTH API KE ESP32
