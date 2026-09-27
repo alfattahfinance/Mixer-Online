@@ -260,7 +260,7 @@ header, .topbar {
 .tft-interactive-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
 .tft-interactive-item { background: #0d121c; border: 1px solid #1e293b; padding: 4px; border-radius: 4px; font-size: 9px; }
 .tft-interactive-item label { display: block; color: #94a3b8; margin-bottom: 2px; font-size: 8px; }
-.tft-interactive-item input[type="range"] { width: 100%; accent-color: #38bdf8; }
+.tft-interactive-item input[type="range"] { width: 100%; accent-color: #38bdf8; cursor: pointer; }
 .tft-interactive-item select { width: 100%; background: #161f30; color: #fff; border: 1px solid #334155; font-size: 9px; padding: 2px; border-radius: 3px; }
 .tft-interactive-item button { width: 100%; background: #0284c7; color: #fff; border: none; padding: 3px; font-size: 8px; font-weight: bold; border-radius: 3px; }
 .tft-interactive-item button.active-action { background: #10b981; }
@@ -386,7 +386,7 @@ header, .topbar {
 .tft-peq-controls { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
 .tft-peq-control { background:#202631; border:1px solid #394454; border-radius:5px; padding:5px; text-align:center; }
 .tft-peq-control label { display:block; color:#94a3b8; font-size:8px; margin-bottom:3px; }
-.tft-peq-control input { width:100%; accent-color:#38bdf8; margin:3px 0; }
+.tft-peq-control input { width:100%; accent-color:#38bdf8; margin:3px 0; cursor: pointer; }
 .tft-peq-value { display:block; color:#e2e8f0; font-size:9px; font-weight:700; }
 .tft-peq-foot { display:flex; justify-content:space-between; color:#64748b; font-size:8px; }
 .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
@@ -888,9 +888,9 @@ function setStatus(msg) { const el = document.getElementById("status"); if (el) 
 function setAudioStatus(msg) { const el = document.getElementById("audioStatus"); if (el) el.textContent = msg; }
 function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed(1); }
 
-/* PENYESUAIAN SENSITIVITAS FADER (AGAR LEBIH HALUS & STABIL) */
+/* PENYESUAIAN STABILITAS DRAG: BATASAN DELTA MAKSIMAL AGAR TIDAK KEBURU KENCANG */
 (function enableStableRangeDragging() {
-  const SENSITIVITY = 0.12;
+  const SENSITIVITY = 0.08; 
   let active = null;
 
   document.addEventListener("pointerdown", (event) => {
@@ -924,14 +924,19 @@ function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed
     if (!active || event.pointerId !== active.pointerId) return;
     event.preventDefault();
     const coord = active.vertical ? event.clientY : event.clientX;
-    const delta = active.vertical
+    const rawDelta = active.vertical
       ? active.startCoord - coord
       : coord - active.startCoord;
-    const raw = active.startValue +
-      (delta / active.length) * (active.max - active.min) * SENSITIVITY;
+    
+    // Pembatasan delta maksimal per frame agar pergerakan selalu halus dan tidak melompat liar
+    const maxDeltaStep = (active.max - active.min) * 0.15;
+    const delta = Math.max(-maxDeltaStep, Math.min(maxDeltaStep, rawDelta * SENSITIVITY));
+
+    const raw = active.startValue + (delta / active.length) * (active.max - active.min);
     const stepped = active.min +
       Math.round((raw - active.min) / active.step) * active.step;
     const next = Math.max(active.min, Math.min(active.max, stepped));
+    
     if (next !== Number(active.slider.value)) {
       active.slider.value = String(next);
       active.slider.dispatchEvent(new Event("input", { bubbles: true }));
@@ -987,7 +992,7 @@ function createBands(channel) {
 /* =========================================================
    AUDIO ENGINE & ROUTING
 ========================================================= */
-const CONTROL_SMOOTHING_SECONDS = 0.12; // Diperhalus agar respons fader lebih lambat & stabil
+const CONTROL_SMOOTHING_SECONDS = 0.15; // Dibuat lebih stabil dan lembut
 
 let audioContext = null;
 let microphoneStream = null;
@@ -1681,7 +1686,7 @@ document.querySelectorAll(".mixer-desk-surface .console-channel-strip").forEach(
 });
 
 /* =========================================================
-   UI SYNC & TFT DISPLAY INTERAKTIF (DENGAN PEQ AKTIF)
+   UI SYNC & TFT DISPLAY INTERAKTIF (PERBAIKAN EVENT SLIDER EQ LAYAR)
 ========================================================= */
 const tftSectionTitle = document.getElementById("tftSectionTitle");
 const tftContentArea = document.getElementById("tftContentArea");
@@ -1890,7 +1895,9 @@ function bindTftEqEvents() {
   if (freqInput) {
     freqInput.addEventListener("input", () => {
       tftPeqFreqVal = Number(freqInput.value);
-      document.getElementById("tftPeqFreqVal").textContent = tftPeqFreqVal >= 1000 ? (tftPeqFreqVal/1000).toFixed(2)+' kHz' : tftPeqFreqVal+' Hz';
+      const valText = tftPeqFreqVal >= 1000 ? (tftPeqFreqVal/1000).toFixed(2)+' kHz' : tftPeqFreqVal+' Hz';
+      const valSpan = document.getElementById("tftPeqFreqVal");
+      if (valSpan) valSpan.textContent = valText;
       if (tftPeqFilter && audioContext) {
         tftPeqFilter.frequency.setTargetAtTime(tftPeqFreqVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
       }
@@ -1899,7 +1906,8 @@ function bindTftEqEvents() {
   if (qInput) {
     qInput.addEventListener("input", () => {
       tftPeqQVal = Number(qInput.value);
-      document.getElementById("tftPeqQVal").textContent = tftPeqQVal.toFixed(1);
+      const valSpan = document.getElementById("tftPeqQVal");
+      if (valSpan) valSpan.textContent = tftPeqQVal.toFixed(1);
       if (tftPeqFilter && audioContext) {
         tftPeqFilter.Q.setTargetAtTime(tftPeqQVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
       }
@@ -1908,7 +1916,8 @@ function bindTftEqEvents() {
   if (gainInput) {
     gainInput.addEventListener("input", () => {
       tftPeqGainVal = Number(gainInput.value);
-      document.getElementById("tftPeqGainVal").textContent = tftPeqGainVal.toFixed(1) + " dB";
+      const valSpan = document.getElementById("tftPeqGainVal");
+      if (valSpan) valSpan.textContent = tftPeqGainVal.toFixed(1) + " dB";
       if (tftPeqFilter && audioContext) {
         tftPeqFilter.gain.setTargetAtTime(tftPeqGainVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
       }
@@ -1925,7 +1934,7 @@ function loadTftPage(key) {
   tftFooterStatus.textContent = data.footerSt;
   updateEncoders(data.encoders);
   if (key === "eq") {
-    bindTftEqEvents();
+    setTimeout(bindTftEqEvents, 10);
   }
 }
 
@@ -1945,7 +1954,7 @@ tftTabs.forEach(tab => {
   });
 });
 
-loadTftPage("eq"); // Memuat halaman EQ TFT secara default agar langsung bisa diatur
+loadTftPage("eq");
 
 /* =========================================================
    LOGIKA METER LED REAL-TIME
