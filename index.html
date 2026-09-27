@@ -13,7 +13,7 @@
    RESET & STYLING DASAR
 ========================================================= */
 * { box-sizing: border-box; }
-input[type="range"] { touch-action: none; -webkit-user-select: none; user-select: none; }
+input[type="range"] { touch-action: manipulation; -webkit-user-select: none; user-select: none; }
 html, body { width: 100%; min-height: 100%; margin: 0; padding: 0; overflow-x: hidden; }
 body { font-family: Arial, Helvetica, sans-serif; background: #0c0f15; color: #ffffff; -webkit-text-size-adjust: 100%; }
 button, input, select { font: inherit; -webkit-tap-highlight-color: transparent; cursor: pointer; }
@@ -112,12 +112,12 @@ header, .topbar {
   content: ""; position: absolute; width: 3px; height: 100%; background: linear-gradient(90deg, #13171f, #333d4a, #13171f); border-radius: 1px;
 }
 
-.band input[type="range"] {
+.band input.eq-range {
   -webkit-appearance: none; appearance: none; writing-mode: vertical-lr; direction: rtl; position: absolute; left: 50%; top: 50%;
   width: 20px; height: 158px; margin: 0; padding: 0; transform: translate(-50%, -50%); background: transparent; cursor: ns-resize; z-index: 2; touch-action: none;
 }
-.band input[type="range"]::-webkit-slider-runnable-track { width: 3px; background: transparent; border: 0; }
-.band input[type="range"]::-webkit-slider-thumb {
+.band input.eq-range::-webkit-slider-runnable-track { width: 3px; background: transparent; border: 0; }
+.band input.eq-range::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none; width: 26px; height: 14px; margin-left: -11.5px; border: 1px solid #6b7280; border-radius: 2px;
   background: linear-gradient(to bottom, #d1d5db 0%, #9ca3af 20%, #4b5563 50%, #1f2937 52%, #9ca3af 80%, #e5e7eb 100%);
   box-shadow: 0 1px 3px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.8);
@@ -136,7 +136,7 @@ header, .topbar {
 .echo-control-card { background: #101216; border: 1px solid #2a323d; padding: 15px; border-radius: 6px; }
 .echo-control-card label { display: block; font-size: 11px; color: #38bdf8; margin-bottom: 6px; font-weight: bold; }
 .echo-control-card input[type="range"] {
-  -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 30px; margin: 0 0 6px; padding: 0; background: transparent; cursor: pointer; touch-action: none;
+  -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 30px; margin: 0 0 6px; padding: 0; background: transparent; cursor: pointer; touch-action: manipulation;
 }
 .echo-control-card input[type="range"]::-webkit-slider-runnable-track {
   height: 6px; border: 1px solid #647080; border-radius: 999px; background: linear-gradient(90deg, #38bdf8 0%, #38bdf8 50%, #d1d5db 50%, #d1d5db 100%); box-shadow: inset 0 1px 2px rgba(0,0,0,.65);
@@ -166,13 +166,13 @@ header, .topbar {
 .tft-main-viewport { background: #020408; border: 1px solid #1e293b; border-radius: 4px; min-height: 115px; padding: 6px 8px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
 .tft-content-screen { font-size: 10px; color: #38bdf8; line-height: 1.3; }
 
-/* LAYOUT GRAFIK & KONTROL UNTUK SEMUA MODUL TFT */
+/* LAYAR TFT MODUL INTERAKTIF */
 .tft-module-view { display: flex; flex-direction: column; gap: 6px; height: 100%; }
 .tft-module-graph-box { width: 100%; height: 65px; background: #0e1520; border: 1px solid #223043; border-radius: 4px; padding: 4px; display: flex; align-items: center; justify-content: center; position: relative; }
 .tft-module-controls-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
 .tft-mod-ctrl { background: #131b28; border: 1px solid #253347; border-radius: 4px; padding: 4px; text-align: center; }
 .tft-mod-ctrl label { display: block; color: #94a3b8; font-size: 7.5px; margin-bottom: 2px; }
-.tft-mod-ctrl input[type="range"] { width: 100%; accent-color: #38bdf8; margin: 2px 0; cursor: pointer; }
+.tft-mod-ctrl input[type="range"] { width: 100%; accent-color: #38bdf8; margin: 2px 0; cursor: pointer; touch-action: manipulation; }
 .tft-mod-ctrl select { width: 100%; background: #1b2638; color: #fff; border: 1px solid #33445c; font-size: 8.5px; padding: 2px; border-radius: 3px; }
 .tft-mod-ctrl button { width: 100%; background: #0284c7; color: #fff; border: none; padding: 3px; font-size: 8px; font-weight: bold; border-radius: 3px; }
 .tft-mod-ctrl button.active-action { background: #10b981; }
@@ -223,7 +223,7 @@ header, .topbar {
 }
 .fader-slot input[type="range"] {
   -webkit-appearance: none; appearance: none; writing-mode: vertical-lr; direction: rtl; position: absolute; left: 50%; top: 50%;
-  width: 28px; height: 286px; margin: 0; padding: 0; transform: translate(-50%, -50%); background: transparent; cursor: pointer; z-index: 2; touch-action: none;
+  width: 28px; height: 286px; margin: 0; padding: 0; transform: translate(-50%, -50%); background: transparent; cursor: pointer; z-index: 2; touch-action: manipulation;
 }
 .fader-slot input[type="range"]::-webkit-slider-runnable-track { width: 4px; background: transparent; border: 0; }
 .fader-slot input[type="range"]::-webkit-slider-thumb {
@@ -253,7 +253,7 @@ header, .topbar {
 
 .output-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #101216; padding: 12px; border-radius: 6px; margin-top: 10px; }
 .output-control label { display: block; font-size: 9px; color: #94a3b8; margin-bottom: 3px; }
-.output-control input[type="range"] { width: 100%; accent-color: #f59e0b; }
+.output-control input[type="range"] { width: 100%; accent-color: #f59e0b; touch-action: manipulation; }
 .master-value { font-size: 10px; color: #f59e0b; font-family: monospace; text-align: center; }
 .output-control select { width: 100%; background: #1e293b; color: #fff; border: 1px solid #485260; padding: 4px; font-size: 11px; border-radius: 4px; }
 #muteOutputButton.active { background: #ef4444 !important; color: #fff !important; }
@@ -275,7 +275,7 @@ header, .topbar {
 .tft-peq-controls { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:5px; }
 .tft-peq-control { background:#202631; border:1px solid #394454; border-radius:4px; padding:4px; text-align:center; }
 .tft-peq-control label { display:block; color:#94a3b8; font-size:7.5px; margin-bottom:2px; }
-.tft-peq-control input { width:100%; accent-color:#38bdf8; margin:2px 0; cursor: pointer; }
+.tft-peq-control input { width:100%; accent-color:#38bdf8; margin:2px 0; cursor: pointer; touch-action: manipulation; }
 .tft-peq-value { display:block; color:#e2e8f0; font-size:8.5px; font-weight:700; }
 .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
   </style>
@@ -810,19 +810,17 @@ function setStatus(msg) { const el = document.getElementById("status"); if (el) 
 function setAudioStatus(msg) { const el = document.getElementById("audioStatus"); if (el) el.textContent = msg; }
 function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed(1); }
 
-/* DRAG STABILIZER UNTUK SLIDER */
+/* DRAG STABILIZER KHUSUS UNTUK FADER EQ 31-BAND */
 (function enableStableRangeDragging() {
   const SENSITIVITY = 0.08; 
   let active = null;
 
   document.addEventListener("pointerdown", (event) => {
-    const slider = event.target.closest('input[type="range"]');
+    const slider = event.target.closest('input.eq-range');
     if (!slider || slider.disabled || event.button > 0) return;
 
-    const style = window.getComputedStyle(slider);
-    const vertical = style.writingMode.startsWith("vertical") || /rotate\((-?\d+\.?\d*)deg\)/.test(style.transform);
     const rect = slider.getBoundingClientRect();
-    const length = vertical ? rect.height : rect.width;
+    const length = rect.height;
     if (!length) return;
 
     event.preventDefault();
@@ -830,13 +828,12 @@ function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed
     active = {
       slider,
       pointerId: event.pointerId,
-      startCoord: vertical ? event.clientY : event.clientX,
+      startCoord: event.clientY,
       startValue: Number(slider.value),
       min: Number(slider.min || 0),
       max: Number(slider.max || 100),
       step: Number(slider.step || 1),
-      length,
-      vertical
+      length
     };
     try { slider.setPointerCapture(event.pointerId); } catch (_) {}
   }, { capture: true });
@@ -844,8 +841,7 @@ function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed
   document.addEventListener("pointermove", (event) => {
     if (!active || event.pointerId !== active.pointerId) return;
     event.preventDefault();
-    const coord = active.vertical ? event.clientY : event.clientX;
-    const rawDelta = active.vertical ? active.startCoord - coord : coord - active.startCoord;
+    const rawDelta = active.startCoord - event.clientY;
     
     const maxDeltaStep = (active.max - active.min) * 0.15;
     const delta = Math.max(-maxDeltaStep, Math.min(maxDeltaStep, rawDelta * SENSITIVITY));
@@ -886,7 +882,9 @@ function createBands(channel) {
     trackContainer.className = "slider-track-container";
 
     const slider = document.createElement("input");
-    slider.type = "range"; slider.min = "-15"; slider.max = "15"; slider.step = "0.5"; slider.value = "0";
+    slider.type = "range"; 
+    slider.className = "eq-range";
+    slider.min = "-15"; slider.max = "15"; slider.step = "0.5"; slider.value = "0";
     slider.setAttribute("aria-label", formatFrequency(frequency) + " Hz EQ gain");
     slider.title = formatFrequency(frequency) + " Hz";
 
@@ -1122,7 +1120,7 @@ function buildEqualizerChannel(channelIndex) {
   const channel = channels[channelIndex];
   const gainControl = channel.querySelector(".gain");
   const hpfControl = channel.querySelector(".hpf");
-  const bandControls = [...channel.querySelectorAll(".band input[type='range']")];
+  const bandControls = [...channel.querySelectorAll(".band input.eq-range")];
 
   const inputGain = audioContext.createGain();
   const highPass = audioContext.createBiquadFilter();
@@ -1444,7 +1442,7 @@ function syncAudioControlsFromUI() {
     const gainCtrl = channel.querySelector(".gain");
     const hpfCtrl = channel.querySelector(".hpf");
     const bypassBtn = channel.querySelector(".bypass-button");
-    const bands = [...channel.querySelectorAll(".band input[type='range']")];
+    const bands = [...channel.querySelectorAll(".band input.eq-range")];
 
     ac.inputGain.gain.setTargetAtTime(dbToGain(Number(gainCtrl.value)), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
     ac.highPass.frequency.setTargetAtTime(hpfCtrl.value === "off" ? 20 : Number(hpfCtrl.value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
@@ -1472,7 +1470,7 @@ function updateValues(channel) {
 
 function setRange(channel, range) {
   const max = Number(range);
-  channel.querySelectorAll(".band input").forEach(s => {
+  channel.querySelectorAll(".band input.eq-range").forEach(s => {
     s.min = String(-max); s.max = String(max);
     if (Number(s.value) > max) s.value = String(max);
     if (Number(s.value) < -max) s.value = String(-max);
@@ -1484,7 +1482,7 @@ function setRange(channel, range) {
 function setPreset(type) {
   channels.forEach(channel => {
     channel.querySelector(".gain").value = "0";
-    channel.querySelectorAll(".band input").forEach((slider, index) => {
+    channel.querySelectorAll(".band input.eq-range").forEach((slider, index) => {
       let val = 0;
       if (type === "vocal") {
         if (index >= 13 && index <= 21) val = 3;
@@ -1516,7 +1514,7 @@ channels.forEach((channel, idx) => {
   bypassBtn.addEventListener("click", () => {
     bypassBtn.classList.toggle("active");
     const bypassed = bypassBtn.classList.contains("active");
-    channel.querySelectorAll(".gain, .hpf, .range, .band input").forEach(c => c.disabled = bypassed);
+    channel.querySelectorAll(".gain, .hpf, .range, .band input.eq-range").forEach(c => c.disabled = bypassed);
     syncAudioControlsFromUI();
     if (bypassed) activeLed.classList.remove("active-led");
     else activeLed.classList.add("active-led");
@@ -1528,7 +1526,7 @@ channels.forEach((channel, idx) => {
     testBtn.setAttribute("aria-pressed", String(testBtn.classList.contains("active")));
     const testing = testBtn.classList.contains("active");
     channel.querySelector(".gain").value = testing ? "6" : "0";
-    channel.querySelectorAll(".band input").forEach(s => {
+    channel.querySelectorAll(".band input.eq-range").forEach(s => {
       s.value = testing ? "2" : "0";
       const valDisplay = s.closest(".band").querySelector(".band-value");
       if (valDisplay) valDisplay.textContent = Number(s.value).toFixed(1);
@@ -1553,7 +1551,7 @@ channels.forEach((channel, idx) => {
     channel.querySelector(".gain").value = "0";
     channel.querySelector(".hpf").value = "off";
     channel.querySelector(".range").value = "15";
-    channel.querySelectorAll(".band input").forEach(slider => slider.value = "0");
+    channel.querySelectorAll(".band input.eq-range").forEach(slider => slider.value = "0");
     channel.querySelector(".test-button").classList.remove("active");
     updateValues(channel);
   });
