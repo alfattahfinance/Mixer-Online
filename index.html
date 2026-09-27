@@ -1588,7 +1588,7 @@ document.querySelectorAll(".mixer-desk-surface .console-channel-strip").forEach(
 });
 
 /* =========================================================
-   DATABASE TFT INTERAKTIF LENGKAP DENGAN JUMLAH FADER/TITIK SESUAI MODUL
+   DATABASE TFT INTERAKTIF LENGKAP DENGAN DRAG & DROP PADA KURVA
 ========================================================= */
 const tftSectionTitle = document.getElementById("tftSectionTitle");
 const tftContentArea = document.getElementById("tftContentArea");
@@ -1610,15 +1610,15 @@ const tftDatabase = {
   config: {
     title: "CONFIG / PREAMP INTERFACE (1 FADER)",
     footerCh: "CH 01: Lead Vocal",
-    footerSt: "1 Fader Utama: Mengatur Kurva Gain Preamp Secara Real-Time",
+    footerSt: "1 Fader Utama: Geser kurva atau slider untuk mengatur Gain Preamp",
     content: `
       <div class="tft-module-view">
-        <div class="tft-module-graph-box">
+        <div class="tft-module-graph-box" id="tftConfigBox">
           <svg id="tftConfigSvgContainer" viewBox="0 0 320 60" style="width:100%; height:100%; touch-action:none;">
             <path id="tftConfigSvgCurve" d="M10 45 Q 160 30, 310 15" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
             <path id="tftConfigSvgFill" d="M10 45 Q 160 30, 310 15 L310 50 L10 50 Z" fill="#0284c7" opacity=".12"/>
-            <circle id="tftConfigSvgDot" cx="160" cy="30" r="5.5" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2"/>
-            <text x="15" y="18" fill="#94a3b8" font-size="7.5">CONFIG CURVE (1 FADER ACTIVE)</text>
+            <circle id="tftConfigSvgDot" cx="160" cy="30" r="7" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2" style="cursor:pointer;"/>
+            <text x="15" y="18" fill="#94a3b8" font-size="7.5">CONFIG CURVE (DRAG TO ADJUST)</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -1633,16 +1633,16 @@ const tftDatabase = {
   gate: {
     title: "NOISE GATE / EXPANDER PROCESSOR (2 FADER)",
     footerCh: "CH 01: Lead Vocal",
-    footerSt: "2 Fader (Threshold & Ratio): Mengatur 2 Titik Kurva Gate",
+    footerSt: "2 Fader / Titik: Geser titik kurva untuk Threshold & Ratio",
     content: `
       <div class="tft-module-view">
-        <div class="tft-module-graph-box">
+        <div class="tft-module-graph-box" id="tftGateBox">
           <svg id="tftGateSvgContainer" viewBox="0 0 320 60" style="width:100%; height:100%; touch-action:none;">
             <path id="tftGateSvgCurve" d="M10 50 L 140 50 L 310 10" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
             <path id="tftGateSvgFill" d="M10 50 L 140 50 L 310 10 L 310 50 Z" fill="#f59e0b" opacity=".1"/>
-            <circle id="tftGateDot1" cx="140" cy="50" r="5.5" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
-            <circle id="tftGateDot2" cx="310" cy="10" r="5.5" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
-            <text x="15" y="18" fill="#94a3b8" font-size="7.5">GATE TRANSFER (2 FADER ACTIVE)</text>
+            <circle id="tftGateDot1" cx="140" cy="50" r="7" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" style="cursor:pointer;"/>
+            <circle id="tftGateDot2" cx="310" cy="10" r="7" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" style="cursor:pointer;"/>
+            <text x="15" y="18" fill="#94a3b8" font-size="7.5">GATE TRANSFER (DRAG DOTS)</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -1657,17 +1657,17 @@ const tftDatabase = {
   dynamics: {
     title: "DYNAMICS / COMPRESSOR PROCESSOR (3 FADER)",
     footerCh: "CH 01: Lead Vocal",
-    footerSt: "3 Fader (Threshold, Ratio, Makeup): Mengatur 3 Titik Kurva Kompresor",
+    footerSt: "3 Fader / Titik: Geser titik kurva untuk Threshold, Ratio, Makeup",
     content: `
       <div class="tft-module-view">
-        <div class="tft-module-graph-box">
+        <div class="tft-module-graph-box" id="tftCompBox">
           <svg id="tftCompSvgContainer" viewBox="0 0 320 60" style="width:100%; height:100%; touch-action:none;">
             <path id="tftCompSvgCurve" d="M10 50 L 180 30 L 310 20" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>
             <path id="tftCompSvgFill" d="M10 50 L 180 30 L 310 20 L 310 50 Z" fill="#10b981" opacity=".1"/>
-            <circle id="tftCompDot1" cx="10" cy="50" r="5.5" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
-            <circle id="tftCompDot2" cx="180" cy="30" r="5.5" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
-            <circle id="tftCompDot3" cx="310" cy="20" r="5.5" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
-            <text x="15" y="18" fill="#94a3b8" font-size="7.5">COMPRESSOR (3 FADER ACTIVE)</text>
+            <circle id="tftCompDot1" cx="10" cy="50" r="7" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer;"/>
+            <circle id="tftCompDot2" cx="180" cy="30" r="7" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer;"/>
+            <circle id="tftCompDot3" cx="310" cy="20" r="7" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer;"/>
+            <text x="15" y="18" fill="#94a3b8" font-size="7.5">COMPRESSOR (DRAG DOTS)</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -1682,7 +1682,7 @@ const tftDatabase = {
   eq: {
     title: "PARAMETRIC EQ / CHANNEL PROCESSOR (3 FADER)",
     footerCh: "CH 02: PEQ",
-    footerSt: "3 Fader (Freq, Q, Gain): Mengatur Kurva Parametik 3 Titik",
+    footerSt: "3 Fader (Freq, Q, Gain): Geser titik kuning pada kurva untuk mengubah parameter",
     content: `
       <div class="tft-peq">
         <div class="tft-peq-head"><strong>PEQ • CH 02 (3 FADER)</strong><span style="color:#10b981;">● AUDIO DSP ACTIVE</span></div>
@@ -1693,7 +1693,7 @@ const tftDatabase = {
           </g>
           <path id="tftPeqSvgCurve" d="M28 72 C86 72 117 72 145 69 C166 66 176 55 184 31 C189 16 192 13 196 31 C204 55 214 66 235 69 C260 72 285 72 310 72" fill="none" stroke="#facc15" stroke-width="3" stroke-linecap="round"/>
           <path id="tftPeqSvgFill" d="M28 72 C86 72 117 72 145 69 C166 66 176 55 184 31 C189 16 192 13 196 31 C204 55 214 66 235 69 C260 72 285 72 310 72 L310 72 L28 72Z" fill="#06b6d4" opacity=".12"/>
-          <circle id="tftPeqSvgDot" cx="192" cy="17" r="6" fill="#e0f2fe" stroke="#22d3ee" stroke-width="2" style="cursor: pointer;"/>
+          <circle id="tftPeqSvgDot" cx="192" cy="17" r="7" fill="#e0f2fe" stroke="#22d3ee" stroke-width="2" style="cursor: pointer;"/>
         </svg>
         <div class="tft-peq-controls">
           <div class="tft-peq-control">
@@ -1719,16 +1719,16 @@ const tftDatabase = {
   sends: {
     title: "BUS SENDS & FX ROUTING (2 FADER)",
     footerCh: "CH 01: Lead Vocal",
-    footerSt: "2 Fader (Send 1 & Send 2): Mengatur 2 Titik Kurva Send Bus",
+    footerSt: "2 Fader / Titik: Geser titik kurva untuk Send 1 & Send 2",
     content: `
       <div class="tft-module-view">
-        <div class="tft-module-graph-box">
+        <div class="tft-module-graph-box" id="tftSendsBox">
           <svg id="tftSendsSvgContainer" viewBox="0 0 320 60" style="width:100%; height:100%; touch-action:none;">
             <path id="tftSendsSvgCurve" d="M10 40 L 160 25 L 310 10" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round"/>
             <path id="tftSendsSvgFill" d="M10 40 L 160 25 L 310 10 L 310 50 L 10 50 Z" fill="#a855f7" opacity=".1"/>
-            <circle id="tftSendsDot1" cx="160" cy="25" r="5.5" fill="#f3e8ff" stroke="#a855f7" stroke-width="2"/>
-            <circle id="tftSendsDot2" cx="310" cy="10" r="5.5" fill="#f3e8ff" stroke="#a855f7" stroke-width="2"/>
-            <text x="15" y="18" fill="#94a3b8" font-size="7.5">SEND BUS (2 FADER ACTIVE)</text>
+            <circle id="tftSendsDot1" cx="160" cy="25" r="7" fill="#f3e8ff" stroke="#a855f7" stroke-width="2" style="cursor:pointer;"/>
+            <circle id="tftSendsDot2" cx="310" cy="10" r="7" fill="#f3e8ff" stroke="#a855f7" stroke-width="2" style="cursor:pointer;"/>
+            <text x="15" y="18" fill="#94a3b8" font-size="7.5">SEND BUS (DRAG DOTS)</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -1743,16 +1743,16 @@ const tftDatabase = {
   main: {
     title: "MAIN FOH OUTPUT & MATRIX (2 FADER)",
     footerCh: "MASTER FOH",
-    footerSt: "2 Fader (Main Level & Limiter): Mengatur 2 Titik Kurva Master",
+    footerSt: "2 Fader / Titik: Geser titik kurva untuk Level & Limiter",
     content: `
       <div class="tft-module-view">
-        <div class="tft-module-graph-box">
+        <div class="tft-module-graph-box" id="tftMainBox">
           <svg id="tftMainSvgContainer" viewBox="0 0 320 60" style="width:100%; height:100%; touch-action:none;">
             <path id="tftMainSvgCurve" d="M10 30 Q 160 10, 310 30" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
             <path id="tftMainSvgFill" d="M10 30 Q 160 10, 310 30 L 310 50 L 10 50 Z" fill="#ef4444" opacity=".1"/>
-            <circle id="tftMainDot1" cx="160" cy="10" r="5.5" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
-            <circle id="tftMainDot2" cx="310" cy="30" r="5.5" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
-            <text x="15" y="18" fill="#94a3b8" font-size="7.5">MAIN FOH (2 FADER ACTIVE)</text>
+            <circle id="tftMainDot1" cx="160" cy="10" r="7" fill="#fee2e2" stroke="#ef4444" stroke-width="2" style="cursor:pointer;"/>
+            <circle id="tftMainDot2" cx="310" cy="30" r="7" fill="#fee2e2" stroke="#ef4444" stroke-width="2" style="cursor:pointer;"/>
+            <text x="15" y="18" fill="#94a3b8" font-size="7.5">MAIN FOH (DRAG DOTS)</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -1767,7 +1767,7 @@ const tftDatabase = {
   home: {
     title: "HOME / OVERVIEW CONSOLE",
     footerCh: "SYSTEM OVERVIEW",
-    footerSt: "Sentuh & geser kurva overview",
+    footerSt: "Tampilan Ringkasan Sistem Konsole",
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box">
@@ -1775,7 +1775,7 @@ const tftDatabase = {
             <path id="tftHomeSvgCurve" d="M10 45 L 80 20 L 160 35 L 240 15 L 310 40" fill="none" stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round"/>
             <path id="tftHomeSvgFill" d="M10 45 L 80 20 L 160 35 L 240 15 L 310 40 L 310 50 L 10 50 Z" fill="#22d3ee" opacity=".1"/>
             <circle id="tftHomeSvgDot" cx="160" cy="35" r="5.5" fill="#cffafe" stroke="#22d3ee" stroke-width="2"/>
-            <text x="15" y="18" fill="#94a3b8" font-size="7.5">OVERVIEW STATUS METER (INTERACTIVE)</text>
+            <text x="15" y="18" fill="#94a3b8" font-size="7.5">OVERVIEW STATUS METER</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -1790,7 +1790,7 @@ const tftDatabase = {
   meters: {
     title: "METERS / RTA SPECTRUM ANALYZER (1 FADER ZOOM)",
     footerCh: "RTA SPECTRUM",
-    footerSt: "1 Fader Zoom: Mengatur Detail Tampilan Spektrum RTA",
+    footerSt: "1 Fader Zoom: Geser slider atau grafik untuk memperbesar tampilan RTA",
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box">
@@ -1813,7 +1813,7 @@ const tftDatabase = {
   routing: {
     title: "ROUTING MATRIX & PATCHBAY",
     footerCh: "IO PATCHBAY",
-    footerSt: "Sentuh & geser kurva routing patchbay",
+    footerSt: "Konfigurasi Jalur Sinyal Konsole",
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box">
@@ -1821,7 +1821,7 @@ const tftDatabase = {
             <path id="tftRoutingSvgCurve" d="M20 15 L 120 15 L 160 45 L 300 45" fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round"/>
             <path id="tftRoutingSvgFill" d="M20 15 L 120 15 L 160 45 L 300 45 L 300 50 L 20 50 Z" fill="#f43f5e" opacity=".1"/>
             <circle id="tftRoutingSvgDot" cx="160" cy="45" r="5.5" fill="#ffe4e6" stroke="#f43f5e" stroke-width="2"/>
-            <text x="15" y="18" fill="#94a3b8" font-size="7.5">PATCHBAY SIGNAL PATH (INTERACTIVE)</text>
+            <text x="15" y="18" fill="#94a3b8" font-size="7.5">PATCHBAY SIGNAL PATH</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -1858,7 +1858,7 @@ const tftDatabase = {
   library: {
     title: "SCENE & PRESET LIBRARY",
     footerCh: "SCENE MANAGER",
-    footerSt: "Sentuh & geser kurva scene bank",
+    footerSt: "Manajemen Penyimpanan Scene & Preset",
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box">
@@ -1866,7 +1866,7 @@ const tftDatabase = {
             <path id="tftLibrarySvgCurve" d="M15 40 L 80 20 L 160 35 L 240 15 L 305 30" fill="none" stroke="#eab308" stroke-width="2.5" stroke-linecap="round"/>
             <path id="tftLibrarySvgFill" d="M15 40 L 80 20 L 160 35 L 240 15 L 305 30 L 305 50 L 15 50 Z" fill="#eab308" opacity=".1"/>
             <circle id="tftLibrarySvgDot" cx="160" cy="35" r="5.5" fill="#fef9c3" stroke="#eab308" stroke-width="2"/>
-            <text x="15" y="18" fill="#94a3b8" font-size="7.5">SCENE MEMORY PRESET BANK (INTERACTIVE)</text>
+            <text x="15" y="18" fill="#94a3b8" font-size="7.5">SCENE MEMORY PRESET BANK</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -1881,16 +1881,16 @@ const tftDatabase = {
   effects: {
     title: "FX RACK & PROCESSOR (2 FADER)",
     footerCh: "VIRTUAL FX RACK",
-    footerSt: "2 Fader (Delay & Feedback/Mix): Mengatur 2 Titik Kurva Alesis FX",
+    footerSt: "2 Fader / Titik: Geser titik kurva untuk Delay & Feedback",
     content: `
       <div class="tft-module-view">
-        <div class="tft-module-graph-box">
+        <div class="tft-module-graph-box" id="tftEffectsBox">
           <svg id="tftEffectsSvgContainer" viewBox="0 0 320 60" style="width:100%; height:100%; touch-action:none;">
             <path id="tftEffectsSvgCurve" d="M10 50 Q 80 5, 160 30 T 310 20" fill="none" stroke="#ec4899" stroke-width="2.5" stroke-linecap="round"/>
             <path id="tftEffectsSvgFill" d="M10 50 Q 80 5, 160 30 T 310 20 L 310 50 L 10 50 Z" fill="#ec4899" opacity=".1"/>
-            <circle id="tftEffectsDot1" cx="80" cy="5" r="5.5" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
-            <circle id="tftEffectsDot2" cx="240" cy="25" r="5.5" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
-            <text x="15" y="18" fill="#94a3b8" font-size="7.5">FX RACK (2 FADER ACTIVE)</text>
+            <circle id="tftEffectsDot1" cx="80" cy="5" r="7" fill="#fce7f3" stroke="#ec4899" stroke-width="2" style="cursor:pointer;"/>
+            <circle id="tftEffectsDot2" cx="240" cy="25" r="7" fill="#fce7f3" stroke="#ec4899" stroke-width="2" style="cursor:pointer;"/>
+            <text x="15" y="18" fill="#94a3b8" font-size="7.5">FX RACK (DRAG DOTS)</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -1932,6 +1932,7 @@ function updateTftPeqVisuals() {
 }
 
 function bindTftDynamicEventListeners(key) {
+  // --- PEQ (EQ) ---
   if (key === "eq") {
     const freqInput = document.getElementById("tftPeqFreq");
     const qInput = document.getElementById("tftPeqQ");
@@ -2033,6 +2034,7 @@ function bindTftDynamicEventListeners(key) {
     const curve = document.getElementById("tftConfigSvgCurve");
     const fill = document.getElementById("tftConfigSvgFill");
     const dot = document.getElementById("tftConfigSvgDot");
+    const box = document.getElementById("tftConfigBox");
 
     const updateSvg = (val) => {
       if (!curve || !dot) return;
@@ -2041,12 +2043,35 @@ function bindTftDynamicEventListeners(key) {
       fill.setAttribute("d", `M10 45 Q 160 ${cy.toFixed(1)}, 310 15 L310 50 L10 50 Z`);
       dot.setAttribute("cy", cy.toFixed(1));
     };
+
     if (cfgGain) {
       cfgGain.addEventListener("input", () => {
         const val = Number(cfgGain.value);
         if (cfgGainVal) cfgGainVal.textContent = val.toFixed(0) + "dB";
         updateSvg(val);
       });
+    }
+
+    if (box) {
+      let isDragging = false;
+      const onMove = (e) => {
+        if (!isDragging) return;
+        const rect = box.getBoundingClientRect();
+        const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
+        if (clientY === undefined) return;
+        const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
+        const val = Math.round(60 * (1 - (relY / rect.height)));
+        const clamped = Math.max(0, Math.min(60, val));
+        if (cfgGain) {
+          cfgGain.value = clamped;
+          cfgGain.dispatchEvent(new Event("input"));
+        }
+      };
+      box.addEventListener("pointerdown", (e) => { isDragging = true; box.setPointerCapture(e.pointerId); onMove(e); });
+      box.addEventListener("pointermove", onMove);
+      const stopDrag = (e) => { if (!isDragging) return; isDragging = false; try { box.releasePointerCapture(e.pointerId); } catch(err){} };
+      box.addEventListener("pointerup", stopDrag);
+      box.addEventListener("pointercancel", stopDrag);
     }
     updateSvg(cfgGain ? Number(cfgGain.value) : 12);
   }
@@ -2061,6 +2086,7 @@ function bindTftDynamicEventListeners(key) {
     const fill = document.getElementById("tftGateSvgFill");
     const dot1 = document.getElementById("tftGateDot1");
     const dot2 = document.getElementById("tftGateDot2");
+    const box = document.getElementById("tftGateBox");
 
     const updateSvg = (thresh, ratio) => {
       if (!curve || !dot1 || !dot2) return;
@@ -2070,25 +2096,48 @@ function bindTftDynamicEventListeners(key) {
       const cy2 = Math.max(10, Math.min(50, 50 - (ratio * 4)));
       curve.setAttribute("d", `M10 50 L ${cx1.toFixed(1)} ${cy1} L ${cx2} ${cy2}`);
       fill.setAttribute("d", `M10 50 L ${cx1.toFixed(1)} ${cy1} L ${cx2} ${cy2} L 310 50 Z`);
-      dot1.setAttribute("cx", cx1.toFixed(1));
-      dot1.setAttribute("cy", cy1);
-      dot2.setAttribute("cx", cx2);
-      dot2.setAttribute("cy", cy2);
+      dot1.setAttribute("cx", cx1.toFixed(1)); dot1.setAttribute("cy", cy1);
+      dot2.setAttribute("cx", cx2); dot2.setAttribute("cy", cy2);
     };
 
-    if (gateThresh) {
-      gateThresh.addEventListener("input", () => {
-        const val = Number(gateThresh.value);
-        if (gateThreshVal) gateThreshVal.textContent = val.toFixed(0) + "dB";
-        updateSvg(val, Number(gateRatio?.value || 2.5));
-      });
-    }
-    if (gateRatio) {
-      gateRatio.addEventListener("input", () => {
-        const val = Number(gateRatio.value);
-        if (gateRatioVal) gateRatioVal.textContent = "1:" + val.toFixed(1);
-        updateSvg(Number(gateThresh?.value || -45), val);
-      });
+    if (gateThresh) gateThresh.addEventListener("input", () => {
+      const val = Number(gateThresh.value);
+      if (gateThreshVal) gateThreshVal.textContent = val.toFixed(0) + "dB";
+      updateSvg(val, Number(gateRatio?.value || 2.5));
+    });
+    if (gateRatio) gateRatio.addEventListener("input", () => {
+      const val = Number(gateRatio.value);
+      if (gateRatioVal) gateRatioVal.textContent = "1:" + val.toFixed(1);
+      updateSvg(Number(gateThresh?.value || -45), val);
+    });
+
+    if (box) {
+      let activeDot = null;
+      const onMove = (e) => {
+        if (!activeDot) return;
+        const rect = box.getBoundingClientRect();
+        const clientX = e.clientX !== undefined ? e.clientX : e.touches?.[0]?.clientX;
+        const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
+        if (clientX === undefined || clientY === undefined) return;
+        const relX = Math.max(0, Math.min(rect.width, clientX - rect.left));
+        const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
+
+        if (activeDot === 1 && gateThresh) {
+          const val = Math.round(-80 + (relX / rect.width) * 80);
+          gateThresh.value = Math.max(-80, Math.min(0, val));
+          gateThresh.dispatchEvent(new Event("input"));
+        } else if (activeDot === 2 && gateRatio) {
+          const val = Number((((rect.height - relY) / rect.height) * 9 + 1).toFixed(1));
+          gateRatio.value = Math.max(1, Math.min(10, val));
+          gateRatio.dispatchEvent(new Event("input"));
+        }
+      };
+      dot1?.addEventListener("pointerdown", (e) => { activeDot = 1; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
+      dot2?.addEventListener("pointerdown", (e) => { activeDot = 2; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
+      box.addEventListener("pointermove", onMove);
+      const stopDrag = (e) => { if (!activeDot) return; activeDot = null; try { box.releasePointerCapture(e.pointerId); } catch(err){} };
+      box.addEventListener("pointerup", stopDrag);
+      box.addEventListener("pointercancel", stopDrag);
     }
     updateSvg(Number(gateThresh?.value || -45), Number(gateRatio?.value || 2.5));
   }
@@ -2107,11 +2156,11 @@ function bindTftDynamicEventListeners(key) {
     const dot1 = document.getElementById("tftCompDot1");
     const dot2 = document.getElementById("tftCompDot2");
     const dot3 = document.getElementById("tftCompDot3");
+    const box = document.getElementById("tftCompBox");
 
     const updateSvg = (thresh, ratio, makeup) => {
       if (!curve || !dot1 || !dot2 || !dot3) return;
-      const cx1 = 10;
-      const cy1 = 50;
+      const cx1 = 10; const cy1 = 50;
       const cx2 = 10 + ((thresh + 60) / 60) * 200;
       const slope = 1 / ratio;
       const cy2 = Math.max(10, Math.min(50, 50 - ((thresh + 60) / 60) * 35 * slope));
@@ -2140,6 +2189,35 @@ function bindTftDynamicEventListeners(key) {
       if (compMakeupVal) compMakeupVal.textContent = "+" + v.toFixed(0) + "dB";
       updateSvg(Number(compThresh?.value || -18), Number(compRatio?.value || 3), v);
     });
+
+    if (box) {
+      let activeDot = null;
+      const onMove = (e) => {
+        if (!activeDot) return;
+        const rect = box.getBoundingClientRect();
+        const clientX = e.clientX !== undefined ? e.clientX : e.touches?.[0]?.clientX;
+        const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
+        if (clientX === undefined || clientY === undefined) return;
+        const relX = Math.max(0, Math.min(rect.width, clientX - rect.left));
+        const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
+
+        if (activeDot === 2 && compThresh) {
+          const val = Math.round(-60 + (relX / rect.width) * 60);
+          compThresh.value = Math.max(-60, Math.min(0, val));
+          compThresh.dispatchEvent(new Event("input"));
+        } else if (activeDot === 3 && compMakeup) {
+          const val = Math.round(24 * (1 - (relY / rect.height)));
+          compMakeup.value = Math.max(0, Math.min(24, val));
+          compMakeup.dispatchEvent(new Event("input"));
+        }
+      };
+      dot2?.addEventListener("pointerdown", (e) => { activeDot = 2; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
+      dot3?.addEventListener("pointerdown", (e) => { activeDot = 3; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
+      box.addEventListener("pointermove", onMove);
+      const stopDrag = (e) => { if (!activeDot) return; activeDot = null; try { box.releasePointerCapture(e.pointerId); } catch(err){} };
+      box.addEventListener("pointerup", stopDrag);
+      box.addEventListener("pointercancel", stopDrag);
+    }
     updateSvg(Number(compThresh?.value || -18), Number(compRatio?.value || 3), Number(compMakeup?.value || 2));
   }
 
@@ -2153,6 +2231,7 @@ function bindTftDynamicEventListeners(key) {
     const fill = document.getElementById("tftSendsSvgFill");
     const dot1 = document.getElementById("tftSendsDot1");
     const dot2 = document.getElementById("tftSendsDot2");
+    const box = document.getElementById("tftSendsBox");
 
     const updateSvg = (s1, s2) => {
       if (!curve || !dot1 || !dot2) return;
@@ -2160,8 +2239,7 @@ function bindTftDynamicEventListeners(key) {
       const cy2 = 50 - ((s2 + 60) / 60) * 35;
       curve.setAttribute("d", `M10 40 L 160 ${cy1.toFixed(1)} L 310 ${cy2.toFixed(1)}`);
       fill.setAttribute("d", `M10 40 L 160 ${cy1.toFixed(1)} L 310 ${cy2.toFixed(1)} L 310 50 L 10 50 Z`);
-      dot1.setAttribute("cy", cy1.toFixed(1));
-      dot2.setAttribute("cy", cy2.toFixed(1));
+      dot1.setAttribute("cy", cy1.toFixed(1)); dot2.setAttribute("cy", cy2.toFixed(1));
     };
 
     if (send1Lvl) send1Lvl.addEventListener("input", () => {
@@ -2174,6 +2252,32 @@ function bindTftDynamicEventListeners(key) {
       if (send2LvlVal) send2LvlVal.textContent = v.toFixed(0) + "dB";
       updateSvg(Number(send1Lvl?.value || -6), v);
     });
+
+    if (box) {
+      let activeDot = null;
+      const onMove = (e) => {
+        if (!activeDot) return;
+        const rect = box.getBoundingClientRect();
+        const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
+        if (clientY === undefined) return;
+        const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
+        const val = Math.round(-60 + (1 - (relY / rect.height)) * 60);
+
+        if (activeDot === 1 && send1Lvl) {
+          send1Lvl.value = Math.max(-60, Math.min(0, val));
+          send1Lvl.dispatchEvent(new Event("input"));
+        } else if (activeDot === 2 && send2Lvl) {
+          send2Lvl.value = Math.max(-60, Math.min(0, val));
+          send2Lvl.dispatchEvent(new Event("input"));
+        }
+      };
+      dot1?.addEventListener("pointerdown", (e) => { activeDot = 1; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
+      dot2?.addEventListener("pointerdown", (e) => { activeDot = 2; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
+      box.addEventListener("pointermove", onMove);
+      const stopDrag = (e) => { if (!activeDot) return; activeDot = null; try { box.releasePointerCapture(e.pointerId); } catch(err){} };
+      box.addEventListener("pointerup", stopDrag);
+      box.addEventListener("pointercancel", stopDrag);
+    }
     updateSvg(Number(send1Lvl?.value || -6), Number(send2Lvl?.value || -12));
   }
 
@@ -2187,6 +2291,7 @@ function bindTftDynamicEventListeners(key) {
     const fill = document.getElementById("tftMainSvgFill");
     const dot1 = document.getElementById("tftMainDot1");
     const dot2 = document.getElementById("tftMainDot2");
+    const box = document.getElementById("tftMainBox");
 
     const updateSvg = (m, l) => {
       if (!curve || !dot1 || !dot2) return;
@@ -2194,8 +2299,7 @@ function bindTftDynamicEventListeners(key) {
       const cy2 = 10 + (Math.abs(l) / 20) * 25;
       curve.setAttribute("d", `M10 30 Q 160 ${cy1.toFixed(1)}, 310 ${cy2.toFixed(1)}`);
       fill.setAttribute("d", `M10 30 Q 160 ${cy1.toFixed(1)}, 310 ${cy2.toFixed(1)} L 310 50 L 10 50 Z`);
-      dot1.setAttribute("cy", cy1.toFixed(1));
-      dot2.setAttribute("cy", cy2.toFixed(1));
+      dot1.setAttribute("cy", cy1.toFixed(1)); dot2.setAttribute("cy", cy2.toFixed(1));
     };
 
     if (mainFohLvl) mainFohLvl.addEventListener("input", () => {
@@ -2208,6 +2312,33 @@ function bindTftDynamicEventListeners(key) {
       if (mainLimitLvlVal) mainLimitLvlVal.textContent = v.toFixed(1) + "dB";
       updateSvg(Number(mainFohLvl?.value || 0), v);
     });
+
+    if (box) {
+      let activeDot = null;
+      const onMove = (e) => {
+        if (!activeDot) return;
+        const rect = box.getBoundingClientRect();
+        const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
+        if (clientY === undefined) return;
+        const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
+
+        if (activeDot === 1 && mainFohLvl) {
+          const val = Math.round(-50 + (1 - (relY / rect.height)) * 56);
+          mainFohLvl.value = Math.max(-50, Math.min(6, val));
+          mainFohLvl.dispatchEvent(new Event("input"));
+        } else if (activeDot === 2 && mainLimitLvl) {
+          const val = Number((-20 * (relY / rect.height)).toFixed(1));
+          mainLimitLvl.value = Math.max(-20, Math.min(0, val));
+          mainLimitLvl.dispatchEvent(new Event("input"));
+        }
+      };
+      dot1?.addEventListener("pointerdown", (e) => { activeDot = 1; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
+      dot2?.addEventListener("pointerdown", (e) => { activeDot = 2; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
+      box.addEventListener("pointermove", onMove);
+      const stopDrag = (e) => { if (!activeDot) return; activeDot = null; try { box.releasePointerCapture(e.pointerId); } catch(err){} };
+      box.addEventListener("pointerup", stopDrag);
+      box.addEventListener("pointercancel", stopDrag);
+    }
     updateSvg(Number(mainFohLvl?.value || 0), Number(mainLimitLvl?.value || -0.5));
   }
 
@@ -2221,6 +2352,7 @@ function bindTftDynamicEventListeners(key) {
     const fill = document.getElementById("tftEffectsSvgFill");
     const dot1 = document.getElementById("tftEffectsDot1");
     const dot2 = document.getElementById("tftEffectsDot2");
+    const box = document.getElementById("tftEffectsBox");
 
     const updateSvg = (f1, f2) => {
       if (!curve || !dot1 || !dot2) return;
@@ -2228,8 +2360,7 @@ function bindTftDynamicEventListeners(key) {
       const cy2 = 50 - (f2 / 0.9) * 30;
       curve.setAttribute("d", `M10 50 Q 80 ${cy1.toFixed(1)}, 160 30 T 310 ${cy2.toFixed(1)}`);
       fill.setAttribute("d", `M10 50 Q 80 ${cy1.toFixed(1)}, 160 30 T 310 ${cy2.toFixed(1)} L 310 50 L 10 50 Z`);
-      dot1.setAttribute("cy", cy1.toFixed(1));
-      dot2.setAttribute("cy", cy2.toFixed(1));
+      dot1.setAttribute("cy", cy1.toFixed(1)); dot2.setAttribute("cy", cy2.toFixed(1));
     };
 
     if (fxFader1) fxFader1.addEventListener("input", () => {
@@ -2242,6 +2373,33 @@ function bindTftDynamicEventListeners(key) {
       if (fxFader2Val) fxFader2Val.textContent = Math.round(v * 100) + "%";
       updateSvg(Number(fxFader1?.value || 0.3), v);
     });
+
+    if (box) {
+      let activeDot = null;
+      const onMove = (e) => {
+        if (!activeDot) return;
+        const rect = box.getBoundingClientRect();
+        const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
+        if (clientY === undefined) return;
+        const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
+
+        if (activeDot === 1 && fxFader1) {
+          const val = Number((1.0 * (1 - (relY / rect.height))).toFixed(2));
+          fxFader1.value = Math.max(0.05, Math.min(1.0, val));
+          fxFader1.dispatchEvent(new Event("input"));
+        } else if (activeDot === 2 && fxFader2) {
+          const val = Number((0.9 * (1 - (relY / rect.height))).toFixed(2));
+          fxFader2.value = Math.max(0, Math.min(0.9, val));
+          fxFader2.dispatchEvent(new Event("input"));
+        }
+      };
+      dot1?.addEventListener("pointerdown", (e) => { activeDot = 1; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
+      dot2?.addEventListener("pointerdown", (e) => { activeDot = 2; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
+      box.addEventListener("pointermove", onMove);
+      const stopDrag = (e) => { if (!activeDot) return; activeDot = null; try { box.releasePointerCapture(e.pointerId); } catch(err){} };
+      box.addEventListener("pointerup", stopDrag);
+      box.addEventListener("pointercancel", stopDrag);
+    }
     updateSvg(Number(fxFader1?.value || 0.3), Number(fxFader2?.value || 0.4));
   }
 
