@@ -33,14 +33,14 @@ header, .topbar {
 .actions button:hover, .actions button.active { background: #00d9ff; color: #000; border-color: #00d9ff; }
 
 /* =========================================================
-   TIGA TAB NAVIGASI UTAMA
+   EMPAT TAB NAVIGASI UTAMA (TERMASUK ESP32)
 ========================================================= */
 .mode-switch-bar {
   position: relative;
   z-index: 50;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
   margin-bottom: 12px;
   pointer-events: auto;
 }
@@ -55,10 +55,10 @@ header, .topbar {
   background: #1a222d;
   color: #94a3b8;
   border: 1px solid #3a414b;
-  padding: 10px;
+  padding: 8px 4px;
   border-radius: 6px;
   font-weight: bold;
-  font-size: 12px;
+  font-size: 11px;
   text-align: center;
   transition: all 0.2s;
 }
@@ -246,9 +246,15 @@ header, .topbar {
 .echo-val { font-size: 11px; color: #f59e0b; font-family: monospace; text-align: right; }
 
 /* =========================================================
-   DIGITAL MIXER CONSOLE
+   DIGITAL MIXER CONSOLE & AUDIO PLAYER TERINTEGRASI
 ========================================================= */
 .mixer-console { background: #0d1117; border: 1px solid #30363d; border-radius: 12px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+
+/* Panel Audio Player Khusus di dalam Mixer */
+.integrated-audio-deck { background: #141b24; border: 1px solid #1e293b; border-radius: 8px; padding: 12px; margin-bottom: 16px; }
+.deck-title { font-size: 11px; font-weight: bold; color: #38bdf8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.deck-controls-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
 .mixer-top-console { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; background: #040609; border: 1px solid #21262d; border-radius: 8px; padding: 12px; margin-bottom: 16px; }
 .mixer-tft-screen { background: #05080c; border: 2px solid #2d3748; border-radius: 8px; padding: 8px; box-shadow: inset 0 0 20px rgba(0,0,0,0.9); display: flex; flex-direction: column; justify-content: space-between; }
 .tft-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 4px; margin-bottom: 6px; font-size: 10px; font-weight: bold; color: #38bdf8; }
@@ -353,23 +359,17 @@ header, .topbar {
 .console-action-btn.mute.active { background: #dc2626; color: #fff; border-color: #f87171; }
 .console-action-btn.solo.active { background: #facc15; color: #111827; border-color: #fde047; }
 
-/* Audio & Bluetooth Panel */
-.audio-panel { display: none; background: #1b2027; border: 1px solid #3a414b; border-radius: 8px; padding: 12px; margin-top: 14px; }
-.audio-panel.active { display: block; }
-.audio-panel h3 { margin: 0 0 10px 0; font-size: 12px; color: #38bdf8; }
-.audio-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
-.bt-panel { width: 100%; background: #101216; padding: 10px; border-radius: 6px; border: 1px solid #2a323d; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.bt-info { font-size: 10px; color: #94a3b8; }
-#connectBtButton { background: #3b82f6; color: white; border: 1px solid #60a5fa; padding: 6px 14px; border-radius: 4px; font-weight: bold; }
+/* =========================================================
+   PANEL TAB 4: ESP32 & HARDWARE
+========================================================= */
+.esp32-panel-box { background: #161a22; border: 1px solid #3a414b; border-radius: 8px; padding: 20px; }
+.esp32-panel-box h3 { color: #38bdf8; margin: 0 0 10px 0; font-size: 14px; }
+.bt-panel { width: 100%; background: #101216; padding: 15px; border-radius: 6px; border: 1px solid #2a323d; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.bt-info { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+#connectBtButton { background: #3b82f6; color: white; border: 1px solid #60a5fa; padding: 8px 16px; border-radius: 4px; font-weight: bold; font-size: 11px; }
 #connectBtButton.connected { background: #10b981; border-color: #34d399; }
 
-.audio-actions button, .file-button { background: #252b35; color: #fff; border: 1px solid #485260; padding: 6px 12px; font-size: 11px; border-radius: 4px; font-weight: bold; display: inline-flex; align-items: center; cursor: pointer; }
-.audio-actions button.active { background: #10b981; border-color: #34d399; color: #000; }
-.playlist-container { width: 100%; background: #101216; border: 1px solid #2a323d; border-radius: 6px; padding: 8px; margin: 8px 0; max-height: 100px; overflow-y: auto; font-size: 10px; color: #94a3b8; }
-.playlist-item { display: flex; justify-content: space-between; padding: 3px 6px; border-bottom: 1px solid #1e293b; cursor: pointer; }
-.playlist-item.playing { color: #38bdf8; font-weight: bold; }
-
-.output-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #101216; padding: 8px; border-radius: 6px; margin-top: 8px; }
+.output-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #101216; padding: 12px; border-radius: 6px; margin-top: 10px; }
 .output-control label { display: block; font-size: 9px; color: #94a3b8; margin-bottom: 3px; }
 .output-control input[type="range"] { width: 100%; accent-color: #f59e0b; }
 .master-value { font-size: 10px; color: #f59e0b; font-family: monospace; text-align: center; }
@@ -378,6 +378,14 @@ header, .topbar {
 
 .device-status, .feedback-status, .audio-status, .status { font-size: 10px; color: #94a3b8; margin-top: 4px; }
 .footer { text-align: center; font-size: 10px; color: #64748b; margin-top: 15px; }
+
+/* Tombol file & audio actions umum */
+.audio-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.audio-actions button, .file-button { background: #252b35; color: #fff; border: 1px solid #485260; padding: 6px 12px; font-size: 11px; border-radius: 4px; font-weight: bold; display: inline-flex; align-items: center; cursor: pointer; }
+.audio-actions button.active { background: #10b981; border-color: #34d399; color: #000; }
+.playlist-container { width: 100%; background: #101216; border: 1px solid #2a323d; border-radius: 6px; padding: 8px; margin: 6px 0; max-height: 90px; overflow-y: auto; font-size: 10px; color: #94a3b8; }
+.playlist-item { display: flex; justify-content: space-between; padding: 3px 6px; border-bottom: 1px solid #1e293b; cursor: pointer; }
+.playlist-item.playing { color: #38bdf8; font-weight: bold; }
 
 /* Parametric EQ TFT view styles */
 .tft-peq { display:grid; grid-template-columns:minmax(0,1fr); gap:7px; height:100%; }
@@ -388,7 +396,6 @@ header, .topbar {
 .tft-peq-control label { display:block; color:#94a3b8; font-size:8px; margin-bottom:3px; }
 .tft-peq-control input { width:100%; accent-color:#38bdf8; margin:3px 0; cursor: pointer; }
 .tft-peq-value { display:block; color:#e2e8f0; font-size:9px; font-weight:700; }
-.tft-peq-foot { display:flex; justify-content:space-between; color:#64748b; font-size:8px; }
 .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
   </style>
 </head>
@@ -407,11 +414,12 @@ header, .topbar {
       </div>
     </header>
 
-    <!-- TIGA TAB NAVIGASI UTAMA -->
+    <!-- EMPAT TAB NAVIGASI UTAMA (TERMASUK ESP32) -->
     <nav class="mode-switch-bar" id="mainTabNavigation" aria-label="Main pages">
       <button type="button" class="tab-btn active" id="tabEqBtn" data-main-tab="eq" aria-controls="tabEqContent" aria-selected="true">🎛️ EQUALIZER</button>
       <button type="button" class="tab-btn" id="tabEchoBtn" data-main-tab="echo" aria-controls="tabEchoContent" aria-selected="false">🔊 ALESIS FX</button>
       <button type="button" class="tab-btn" id="tabMixerBtn" data-main-tab="mixer" aria-controls="tabMixerContent" aria-selected="false">🎚️ DIGITAL MIXER</button>
+      <button type="button" class="tab-btn" id="tabEspBtn" data-main-tab="esp32" aria-controls="tabEspContent" aria-selected="false">📡 ESP32 & HW</button>
     </nav>
 
     <!-- KONTEN TAB 1: EQUALIZER -->
@@ -570,10 +578,29 @@ header, .topbar {
       </div>
     </div>
 
-    <!-- KONTEN TAB 3: DIGITAL MIXER CONSOLE -->
+    <!-- KONTEN TAB 3: DIGITAL MIXER CONSOLE & AUDIO PLAYER TERINTEGRASI -->
     <div class="tab-content" id="tabMixerContent">
       <div class="mixer-console">
         
+        <!-- AUDIO PLAYER DECK YANG DITEMPATKAN DI TEMPAT YANG COCOK -->
+        <div class="integrated-audio-deck">
+          <div class="deck-title">🎵 AUDIO PLAYER & INPUT SUMBER</div>
+          <div class="audio-actions">
+            <button id="startMicButton">INPUT FISIK / MIC</button>
+            <label for="physicalInputDevice" class="sr-only">Pilih sumber input fisik</label>
+            <select id="physicalInputDevice" aria-label="Sumber input fisik" title="Pilih mikrofon atau USB audio interface">
+              <option value="">Input default HP</option>
+            </select>
+            <label class="file-button">PILIH BANYAK FILE AUDIO<input id="audioFilesInput" type="file" accept="audio/*" multiple hidden></label>
+            <button id="startAudioButton">START PLAYLIST</button>
+            <button id="stopAudioButton">STOP AUDIO</button>
+          </div>
+          <div class="playlist-container" id="playlistContainer">
+            <div style="text-align: center; padding: 4px; color: #64748b;">Belum ada file audio dipilih.</div>
+          </div>
+          <div id="audioStatus" class="audio-status" style="margin-top: 4px;">Audio belum aktif.</div>
+        </div>
+
         <!-- BAGIAN LAYAR UTAMA & KONTROL ATAS -->
         <div class="mixer-top-console">
           
@@ -714,56 +741,43 @@ header, .topbar {
       </div>
     </div>
 
-    <!-- PANEL AUDIO & BLUETOOTH -->
-    <section class="audio-panel">
-      <h3>AUDIO PLAYER, MIXER & BLUETOOTH ESP32</h3>
+    <!-- KONTEN TAB 4: ESP32 & HARDWARE -->
+    <div class="tab-content" id="tabEspContent">
+      <div class="esp32-panel-box">
+        <h3>KONTROL HARDWARE ESP32 & KONEKTIVITAS BLUETOOTH</h3>
+        <p style="font-size: 11px; color: #94a3b8; margin-bottom: 15px;">Hubungkan perangkat mikrokontroler ESP32 via Web Bluetooth untuk sinkronisasi hardware equalizer secara real-time.</p>
 
-      <div class="bt-panel">
-        <div>
-          <strong>KONEKSI HARDWARE ESP32</strong>
-          <div id="btStatus" class="bt-info">Bluetooth terputus.</div>
+        <div class="bt-panel">
+          <div>
+            <strong>STATUS KONEKSI BLE ESP32</strong>
+            <div id="btStatus" class="bt-info">Bluetooth terputus.</div>
+          </div>
+          <button id="connectBtButton">SAMBUNGKAN ESP32</button>
         </div>
-        <button id="connectBtButton">SAMBUNGKAN ESP32</button>
-      </div>
 
-      <div class="audio-actions">
-        <button id="startMicButton">INPUT FISIK / MIC</button>
-        <label for="physicalInputDevice" class="sr-only">Pilih sumber input fisik</label>
-        <select id="physicalInputDevice" aria-label="Sumber input fisik" title="Pilih mikrofon atau USB audio interface">
-          <option value="">Input default HP</option>
-        </select>
-        <label class="file-button">PILIH BANYAK FILE AUDIO<input id="audioFilesInput" type="file" accept="audio/*" multiple hidden></label>
-        <button id="startAudioButton">START PLAYLIST</button>
-        <button id="stopAudioButton">STOP AUDIO</button>
-      </div>
-
-      <div class="playlist-container" id="playlistContainer">
-        <div style="text-align: center; padding: 6px; color: #64748b;">Belum ada file audio dipilih.</div>
-      </div>
-
-      <div class="output-panel">
-        <div class="output-control">
-          <label for="masterGainControl">MASTER OUTPUT</label>
-          <input id="masterGainControl" type="range" min="-30" max="0" step="1" value="-6">
-          <div id="masterGainValue" class="master-value">-6 dB</div>
+        <div class="output-panel">
+          <div class="output-control">
+            <label for="masterGainControl">MASTER OUTPUT</label>
+            <input id="masterGainControl" type="range" min="-30" max="0" step="1" value="-6">
+            <div id="masterGainValue" class="master-value">-6 dB</div>
+          </div>
+          <div class="output-control">
+            <label for="outputMode">OUTPUT MODE</label>
+            <select id="outputMode">
+              <option value="safe" selected>SAFE MODE</option>
+              <option value="normal">NORMAL MODE</option>
+            </select>
+            <label for="physicalOutputDevice" style="display:block;margin-top:8px;">OUTPUT KE MIXER FISIK</label>
+            <select id="physicalOutputDevice" aria-label="Pilih output audio" style="width:100%;">
+              <option value="">Output default HP / USB</option>
+            </select>
+            <button id="muteOutputButton" style="width:100%; margin-top:8px;">MUTE OUTPUT</button>
+          </div>
         </div>
-        <div class="output-control">
-          <label for="outputMode">OUTPUT MODE</label>
-          <select id="outputMode">
-            <option value="safe" selected>SAFE MODE</option>
-            <option value="normal">NORMAL MODE</option>
-          </select>
-          <label for="physicalOutputDevice" style="display:block;margin-top:8px;">OUTPUT KE MIXER FISIK</label>
-          <select id="physicalOutputDevice" aria-label="Pilih output audio" style="width:100%;">
-            <option value="">Output default HP / USB</option>
-          </select>
-          <button id="muteOutputButton" style="width:100%; margin-top:8px;">MUTE OUTPUT</button>
-        </div>
-      </div>
 
-      <div id="feedbackStatus" class="feedback-status">Alur Sinyal: [MUSIC PLAYER DI MIXER] ➡️ [OUTPUT MIXER] ➡️ [EQUALIZER + ALESIS FX] ➡️ [OUTPUT]</div>
-      <div id="audioStatus" class="audio-status">Audio belum aktif.</div>
-    </section>
+        <div id="feedbackStatus" class="feedback-status" style="margin-top: 15px;">Alur Sinyal: [MUSIC PLAYER] ➡️ [DIGITAL MIXER CONSOLE] ➡️ [EQUALIZER + ALESIS FX] ➡️ [OUTPUT]</div>
+      </div>
+    </div>
 
     <div id="status" class="status">Status: sistem siap digunakan.</div>
     <div class="footer">Equalizer & Alesis FX Online • Web/PWA • Bluetooth ESP32 Ready</div>
@@ -793,14 +807,15 @@ function initMixerVerticalMeters() {
 initMixerVerticalMeters();
 
 /* =========================================================
-   NAVIGASI TIGA TAB UTAMA
+   NAVIGASI EMPAT TAB UTAMA (TERMASUK ESP32)
 ========================================================= */
 const mainTabNavigation = document.getElementById("mainTabNavigation");
 const mainTabButtons = Array.from(document.querySelectorAll("[data-main-tab]"));
 const mainTabContents = {
   eq: document.getElementById("tabEqContent"),
   echo: document.getElementById("tabEchoContent"),
-  mixer: document.getElementById("tabMixerContent")
+  mixer: document.getElementById("tabMixerContent"),
+  esp32: document.getElementById("tabEspContent")
 };
 
 function activateMainTab(tabName) {
@@ -813,8 +828,6 @@ function activateMainTab(tabName) {
   Object.entries(mainTabContents).forEach(([name, panel]) => {
     if (panel) panel.classList.toggle("active", name === tabName);
   });
-  const audioPanel = document.querySelector(".audio-panel");
-  if (audioPanel) audioPanel.classList.toggle("active", tabName === "mixer");
 }
 
 if (mainTabNavigation) {
@@ -888,7 +901,7 @@ function setStatus(msg) { const el = document.getElementById("status"); if (el) 
 function setAudioStatus(msg) { const el = document.getElementById("audioStatus"); if (el) el.textContent = msg; }
 function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed(1); }
 
-/* PENYESUAIAN STABILITAS DRAG: BATASAN DELTA MAKSIMAL AGAR TIDAK KEBURU KENCANG */
+/* PENYESUAIAN STABILITAS DRAG: BATASAN DELTA MAKSIMAL AGAR HALUS DAN PRESISI */
 (function enableStableRangeDragging() {
   const SENSITIVITY = 0.08; 
   let active = null;
@@ -928,7 +941,6 @@ function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed
       ? active.startCoord - coord
       : coord - active.startCoord;
     
-    // Pembatasan delta maksimal per frame agar pergerakan selalu halus dan tidak melompat liar
     const maxDeltaStep = (active.max - active.min) * 0.15;
     const delta = Math.max(-maxDeltaStep, Math.min(maxDeltaStep, rawDelta * SENSITIVITY));
 
@@ -992,7 +1004,7 @@ function createBands(channel) {
 /* =========================================================
    AUDIO ENGINE & ROUTING
 ========================================================= */
-const CONTROL_SMOOTHING_SECONDS = 0.15; // Dibuat lebih stabil dan lembut
+const CONTROL_SMOOTHING_SECONDS = 0.15;
 
 let audioContext = null;
 let microphoneStream = null;
@@ -1176,7 +1188,7 @@ function renderPlaylistUI() {
     const empty = document.createElement("div");
     empty.textContent = "Tidak ada file audio dipilih.";
     empty.style.textAlign = "center";
-    empty.style.padding = "6px";
+    empty.style.padding = "4px";
     playlistContainer.appendChild(empty);
     return;
   }
@@ -1281,7 +1293,6 @@ function initializeAudioGraph() {
   buildEqualizerChannel(0);
   buildEqualizerChannel(1);
 
-  /* INISIALISASI FILTER PARAMETRIC EQ DIGITAL MIXER */
   tftPeqFilter = audioContext.createBiquadFilter();
   tftPeqFilter.type = "peaking";
   tftPeqFilter.frequency.value = tftPeqFreqVal;
@@ -1318,7 +1329,6 @@ function initializeAudioGraph() {
   audioChannels[0].analyser.connect(outputMergerNode, 0, 0);
   audioChannels[1].analyser.connect(outputMergerNode, 0, 1);
   
-  /* ROUTING MELALUI PARAMETRIC EQ DIGITAL MIXER SEBELUM MASTER GAIN */
   outputMergerNode.connect(tftPeqFilter);
   tftPeqFilter.connect(masterStripGainNode);
 
@@ -1686,7 +1696,7 @@ document.querySelectorAll(".mixer-desk-surface .console-channel-strip").forEach(
 });
 
 /* =========================================================
-   UI SYNC & TFT DISPLAY INTERAKTIF (PERBAIKAN EVENT SLIDER EQ LAYAR)
+   UI SYNC & TFT DISPLAY INTERAKTIF
 ========================================================= */
 const tftSectionTitle = document.getElementById("tftSectionTitle");
 const tftContentArea = document.getElementById("tftContentArea");
