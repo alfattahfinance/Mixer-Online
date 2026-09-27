@@ -13,6 +13,7 @@
    RESET & STYLING DASAR
 ========================================================= */
 * { box-sizing: border-box; }
+input[type="range"] { touch-action: none; -webkit-user-select: none; user-select: none; }
 html, body { width: 100%; min-height: 100%; margin: 0; padding: 0; overflow-x: hidden; }
 body { font-family: Arial, Helvetica, sans-serif; background: #0c0f15; color: #ffffff; -webkit-text-size-adjust: 100%; }
 button, input, select { font: inherit; -webkit-tap-highlight-color: transparent; cursor: pointer; }
@@ -272,7 +273,9 @@ header, .topbar {
   padding: 0;
   background: transparent;
   cursor: pointer;
-  touch-action: pan-y;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 .echo-control-card input[type="range"]::-webkit-slider-runnable-track {
   height: 6px;
@@ -1420,7 +1423,7 @@ function createBands(channel) {
    AUDIO ENGINE & ROUTING (DIPERBAIKI 100% TEMBUS KE HP)
 ========================================================= */
 // Smooth control response for EQ, echo FX, channel and master faders.
-const CONTROL_SMOOTHING_SECONDS = 0.08;
+const CONTROL_SMOOTHING_SECONDS = 0.20;
 
 let audioContext = null;
 let microphoneStream = null;
