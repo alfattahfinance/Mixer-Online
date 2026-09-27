@@ -905,9 +905,9 @@ function createBands(channel) {
 }
 
 /* =========================================================
-   AUDIO ENGINE & ROUTING
+   AUDIO ENGINE & ROUTING (OPTIMIZED FOR ANDROID & USB AUDIO)
 ========================================================= */
-const CONTROL_SMOOTHING_SECONDS = 0.15;
+const CONTROL_SMOOTHING_SECONDS = 0.05; // Dipercepat agar respon kontrol instan
 
 let audioContext = null;
 let microphoneStream = null;
@@ -998,7 +998,8 @@ const echoToggleBtn = document.getElementById("echoToggleBtn");
 function createAudioContext() {
   if (!audioContext) {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    audioContext = new AudioContextClass();
+    // Mengatur latencyHint: "interactive" agar responsif dan minim jeda di Android
+    audioContext = new AudioContextClass({ latencyHint: "interactive" });
   }
   if (audioContext.state === "suspended") audioContext.resume();
   return audioContext;
@@ -1401,15 +1402,16 @@ startMicButton.addEventListener("click", async () => {
     await applyPhysicalOutputDevice();
     await refreshPhysicalInputDevices();
     const selectedInputId = physicalInputDevice?.value || "";
+    // Konfigurasi stream yang dioptimalkan untuk minim latency di Android & USB Audio Device
     const audioConstraints = selectedInputId
-      ? { deviceId: { exact: selectedInputId }, echoCancellation: false, noiseSuppression: false, autoGainControl: false }
-      : { echoCancellation: false, noiseSuppression: false, autoGainControl: false };
+      ? { deviceId: { exact: selectedInputId }, echoCancellation: false, noiseSuppression: false, autoGainControl: false, latency: 0.01 }
+      : { echoCancellation: false, noiseSuppression: false, autoGainControl: false, latency: 0.01 };
     microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
     microphoneSource = audioContext.createMediaStreamSource(microphoneStream);
     microphoneSource.connect(mixerStripGains[0]);
     startMicButton.classList.add("active");
-    setAudioStatus("Mikrofon aktif.");
-  } catch (err) { setAudioStatus("Gagal mengakses mikrofon."); }
+    setAudioStatus("Mikrofon / Input Fisik aktif.");
+  } catch (err) { setAudioStatus("Gagal mengakses mikrofon atau USB interface."); }
 });
 
 stopAudioButton.addEventListener("click", () => {
