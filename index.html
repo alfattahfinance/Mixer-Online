@@ -1621,8 +1621,8 @@ const tftDatabase = {
         </div>
         <div class="tft-module-controls-grid">
           <div class="tft-mod-ctrl"><label>Analog Gain</label><input type="range" id="cfgGain" min="0" max="60" value="12"><span class="tft-val-disp" id="cfgGainVal">12dB</span></div>
-          <div class="tft-mod-ctrl"><label>Phantom 48V</label><button id="cfgPhantomBtn" class="active-action">ON</button></div>
-          <div class="tft-mod-ctrl"><label>Phase Invert</label><button id="cfgPhaseBtn">NORMAL</button></div>
+          <div class="tft-mod-ctrl"><label>Phantom 48V</label><button id="cfgPhantomBtn" class="active-action" type="button">ON</button></div>
+          <div class="tft-mod-ctrl"><label>Phase Invert</label><button id="cfgPhaseBtn" type="button">NORMAL</button></div>
         </div>
       </div>
     `,
@@ -1643,7 +1643,7 @@ const tftDatabase = {
         <div class="tft-module-controls-grid">
           <div class="tft-mod-ctrl"><label>Threshold</label><input type="range" id="gateThresh" min="-80" max="0" value="-45"><span class="tft-val-disp" id="gateThreshVal">-45dB</span></div>
           <div class="tft-mod-ctrl"><label>Ratio</label><input type="range" id="gateRatio" min="1" max="10" step="0.5" value="2.5"><span class="tft-val-disp" id="gateRatioVal">1:2.5</span></div>
-          <div class="tft-mod-ctrl"><label>Gate Status</label><button id="gateStateBtn" class="active-action">ACTIVE</button></div>
+          <div class="tft-mod-ctrl"><label>Gate Status</label><button id="gateStateBtn" class="active-action" type="button">ACTIVE</button></div>
         </div>
       </div>
     `,
@@ -1743,7 +1743,7 @@ const tftDatabase = {
         <div class="tft-module-controls-grid">
           <div class="tft-mod-ctrl"><label>Main FOH Level</label><input type="range" id="mainFohLvl" min="-50" max="6" value="0"><span class="tft-val-disp" id="mainFohLvlVal">0dB</span></div>
           <div class="tft-mod-ctrl"><label>Brickwall Limiter</label><input type="range" id="mainLimitLvl" min="-20" max="0" value="-0.5"><span class="tft-val-disp" id="mainLimitLvlVal">-0.5dB</span></div>
-          <div class="tft-mod-ctrl"><label>Mono Sum</label><button id="mainMonoBtn">OFF</button></div>
+          <div class="tft-mod-ctrl"><label>Mono Sum</label><button id="mainMonoBtn" type="button">OFF</button></div>
         </div>
       </div>
     `,
@@ -1762,9 +1762,9 @@ const tftDatabase = {
           </svg>
         </div>
         <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>Global Mute All</label><button id="homeMuteAllBtn">MUTE ALL</button></div>
+          <div class="tft-mod-ctrl"><label>Global Mute All</label><button id="homeMuteAllBtn" type="button">MUTE ALL</button></div>
           <div class="tft-mod-ctrl"><label>DSP Clock</label><select id="homeClockSelect"><option>48 kHz / 32-bit</option><option>96 kHz / 32-bit</option></select></div>
-          <div class="tft-mod-ctrl"><label>Talkback Mic</label><button id="homeTalkBtn">TALK ON</button></div>
+          <div class="tft-mod-ctrl"><label>Talkback Mic</label><button id="homeTalkBtn" type="button">TALK ON</button></div>
         </div>
       </div>
     `,
@@ -1826,7 +1826,7 @@ const tftDatabase = {
         </div>
         <div class="tft-module-controls-grid">
           <div class="tft-mod-ctrl"><label>Brightness</label><input type="range" id="setupBright" min="20" max="100" value="85"><span class="tft-val-disp" id="setupBrightVal">85%</span></div>
-          <div class="tft-mod-ctrl"><label>BLE ESP32 Link</label><button id="setupBleBtn" class="active-action">CONNECTED</button></div>
+          <div class="tft-mod-ctrl"><label>BLE ESP32 Link</label><button id="setupBleBtn" class="active-action" type="button">CONNECTED</button></div>
           <div class="tft-mod-ctrl"><label>Buffer Size</label><select id="setupBuffer"><option>512 Samples</option><option>256 Samples</option></select></div>
         </div>
       </div>
@@ -1847,8 +1847,8 @@ const tftDatabase = {
         </div>
         <div class="tft-module-controls-grid">
           <div class="tft-mod-ctrl"><label>Active Scene</label><select id="libSceneSelect"><option>#01 Live Stage</option><option>#02 Acoustic Night</option></select></div>
-          <div class="tft-mod-ctrl"><label>Store Preset</label><button id="libStoreBtn">STORE</button></div>
-          <div class="tft-mod-ctrl"><label>Recall Safe</label><button id="libSafeBtn" class="active-action">SAFE ON</button></div>
+          <div class="tft-mod-ctrl"><label>Store Preset</label><button id="libStoreBtn" type="button">STORE</button></div>
+          <div class="tft-mod-ctrl"><label>Recall Safe</label><button id="libSafeBtn" class="active-action" type="button">SAFE ON</button></div>
         </div>
       </div>
     `,
@@ -1869,7 +1869,7 @@ const tftDatabase = {
         <div class="tft-module-controls-grid">
           <div class="tft-mod-ctrl"><label>FX Preset 1</label><select id="fxPreset1"><option>Stage Reverb</option><option>Plate Reverb</option></select></div>
           <div class="tft-mod-ctrl"><label>FX Preset 2</label><select id="fxPreset2"><option>Chorus</option><option>Delay</option></select></div>
-          <div class="tft-mod-ctrl"><label>FX Master</label><button id="fxBypassBtn" class="active-action">ACTIVE</button></div>
+          <div class="tft-mod-ctrl"><label>FX Master</label><button id="fxBypassBtn" class="active-action" type="button">ACTIVE</button></div>
         </div>
       </div>
     `,
