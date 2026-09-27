@@ -1309,9 +1309,9 @@ function setAudioStatus(msg) { const el = document.getElementById("audioStatus")
 function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed(1); }
 
 // Slow, controlled touch/mouse dragging for audio sliders.
-// A full-range change now takes about 4x the usual finger travel.
+// A full-range change takes about 5x the slider travel for finer control.
 (function enableStableRangeDragging() {
-  const SENSITIVITY = 0.25;
+  const SENSITIVITY = 0.20;
   let active = null;
 
   document.addEventListener("pointerdown", (event) => {
