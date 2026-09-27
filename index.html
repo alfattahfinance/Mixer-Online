@@ -89,7 +89,7 @@ header, .topbar {
 .status-led { width: 8px; height: 8px; border-radius: 50%; background: #252b35; border: 1px solid #485260; display: inline-block; }
 .status-led.active-led { background: #10b981; border-color: #34d399; box-shadow: 0 0 6px #10b981; }
 .status-led.bypass-led { background: #ef4444; border-color: #f87171; box-shadow: 0 0 6px #ef4444; }
-.status-led.test-led { background: #f59e0b; border-color: #fbbf24; box-shadow: 0 0 6px #f59e0b; }
+.status-led.test-led { background: #f59e0b; border-color: #fbbf24; box-shadow: 0 0 6px #fbbf24; }
 
 .channel-title { font-size: 12px; font-weight: bold; color: #38bdf8; }
 .channel-controls { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; max-width: 58%; }
@@ -1696,7 +1696,7 @@ document.querySelectorAll(".mixer-desk-surface .console-channel-strip").forEach(
 });
 
 /* =========================================================
-   UI SYNC & TFT DISPLAY INTERAKTIF
+   UI SYNC & TFT DISPLAY INTERAKTIF (DIPERBAIKI & DINAMIS)
 ========================================================= */
 const tftSectionTitle = document.getElementById("tftSectionTitle");
 const tftContentArea = document.getElementById("tftContentArea");
@@ -1757,18 +1757,18 @@ const tftDatabase = {
   eq: {
     title: "PARAMETRIC EQ / CHANNEL PROCESSOR",
     footerCh: "CH 02: PEQ",
-    footerSt: "3-band PEQ controls active",
+    footerSt: "3-band PEQ controls active & fully functional",
     content: `
       <div class="tft-peq">
-        <div class="tft-peq-head"><strong>PEQ • CH 02</strong><span style="color:#eab308;">● ACTIVE</span></div>
+        <div class="tft-peq-head"><strong>PEQ • CH 02</strong><span style="color:#10b981;" id="tftPeqStatusIndicator">● AUDIO DSP ACTIVE</span></div>
         <svg class="tft-peq-graph" viewBox="0 0 320 150" preserveAspectRatio="none" role="img" aria-label="Parametric equalizer response curve">
           <g stroke="#475569" stroke-width=".7" opacity=".8">
             <path d="M28 12H310 M28 42H310 M28 72H310 M28 102H310 M28 132H310"/>
             <path d="M28 12V132 M84 12V132 M140 12V132 M196 12V132 M252 12V132 M310 12V132"/>
           </g>
-          <path d="M28 72 C86 72 117 72 145 69 C166 66 176 55 184 31 C189 16 192 13 196 31 C204 55 214 66 235 69 C260 72 285 72 310 72" fill="none" stroke="#facc15" stroke-width="3" stroke-linecap="round"/>
-          <path d="M28 72 C86 72 117 72 145 69 C166 66 176 55 184 31 C189 16 192 13 196 31 C204 55 214 66 235 69 C260 72 285 72 310 72 L310 72 L28 72Z" fill="#06b6d4" opacity=".12"/>
-          <circle cx="192" cy="17" r="4" fill="#e0f2fe" stroke="#22d3ee" stroke-width="2"/>
+          <path id="tftPeqSvgCurve" d="M28 72 C86 72 117 72 145 69 C166 66 176 55 184 31 C189 16 192 13 196 31 C204 55 214 66 235 69 C260 72 285 72 310 72" fill="none" stroke="#facc15" stroke-width="3" stroke-linecap="round"/>
+          <path id="tftPeqSvgFill" d="M28 72 C86 72 117 72 145 69 C166 66 176 55 184 31 C189 16 192 13 196 31 C204 55 214 66 235 69 C260 72 285 72 310 72 L310 72 L28 72Z" fill="#06b6d4" opacity=".12"/>
+          <circle id="tftPeqSvgDot" cx="192" cy="17" r="4" fill="#e0f2fe" stroke="#22d3ee" stroke-width="2"/>
         </svg>
         <div class="tft-peq-controls">
           <div class="tft-peq-control">
@@ -1897,6 +1897,37 @@ const tftDatabase = {
   }
 };
 
+function updateTftPeqVisuals() {
+  const dot = document.getElementById("tftPeqSvgDot");
+  const curve = document.getElementById("tftPeqSvgCurve");
+  const fill = document.getElementById("tftPeqSvgFill");
+  if (!dot || !curve || !fill) return;
+
+  // Petakan Frekuensi (20Hz - 20000Hz secara logaritmik) ke koordinat X SVG (28 hingga 310)
+  const minLog = Math.log10(20);
+  const maxLog = Math.log10(20000);
+  const currentLog = Math.log10(Math.max(20, Math.min(20000, tftPeqFreqVal)));
+  const cx = 28 + ((currentLog - minLog) / (maxLog - minLog)) * (310 - 28);
+
+  // Petakan Gain (-15dB hingga +15dB) ke koordinat Y SVG (132 bawah, 12 atas, tengah 72)
+  const cy = 72 - (tftPeqGainVal / 15) * 60;
+  
+  dot.setAttribute("cx", cx.toFixed(1));
+  dot.setAttribute("cy", cy.toFixed(1));
+
+  // Bentuk kurva respons dinamis berdasarkan titik puncak (cx, cy) dan nilai Q
+  const widthOffset = Math.max(20, 100 / tftPeqQVal);
+  const x1 = Math.max(28, cx - widthOffset);
+  const x2 = Math.min(310, cx + widthOffset);
+  const baseline = 72;
+
+  const pathData = `M28 ${baseline} L${x1.toFixed(1)} ${baseline} C${((28+x1)/2).toFixed(1)} ${baseline} ${cx.toFixed(1)} ${cy.toFixed(1)} ${cx.toFixed(1)} ${cy.toFixed(1)} C${cx.toFixed(1)} ${cy.toFixed(1)} ${((x2+310)/2).toFixed(1)} ${baseline} ${x2.toFixed(1)} ${baseline} L310 ${baseline}`;
+  const fillData = `${pathData} L310 ${baseline} L28 ${baseline} Z`;
+
+  curve.setAttribute("d", pathData);
+  fill.setAttribute("d", fillData);
+}
+
 function bindTftEqEvents() {
   const freqInput = document.getElementById("tftPeqFreq");
   const qInput = document.getElementById("tftPeqQ");
@@ -1911,6 +1942,7 @@ function bindTftEqEvents() {
       if (tftPeqFilter && audioContext) {
         tftPeqFilter.frequency.setTargetAtTime(tftPeqFreqVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
       }
+      updateTftPeqVisuals();
     });
   }
   if (qInput) {
@@ -1921,6 +1953,7 @@ function bindTftEqEvents() {
       if (tftPeqFilter && audioContext) {
         tftPeqFilter.Q.setTargetAtTime(tftPeqQVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
       }
+      updateTftPeqVisuals();
     });
   }
   if (gainInput) {
@@ -1931,8 +1964,10 @@ function bindTftEqEvents() {
       if (tftPeqFilter && audioContext) {
         tftPeqFilter.gain.setTargetAtTime(tftPeqGainVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
       }
+      updateTftPeqVisuals();
     });
   }
+  updateTftPeqVisuals();
 }
 
 function loadTftPage(key) {
