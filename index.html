@@ -140,67 +140,68 @@ header, .topbar {
   user-select: none;
 }
 
-/* Physical graphic-EQ fader cap; the invisible range input remains the control */
-.eq-rotary-knob {
-  position: relative;
-  width: 44px;
-  height: 18px;
-  flex: 0 0 44px;
-  border: 1px solid #65717e;
-  border-radius: 4px;
-  background:
-    linear-gradient(to bottom, #f1f3f5 0%, #c3cbd3 16%, #87919c 42%, #3e4854 50%, #aab3bd 83%, #e8ebef 100%);
-  box-shadow: 0 2px 4px rgba(0,0,0,.78), inset 0 1px 1px rgba(255,255,255,.9), inset 0 -1px 2px rgba(15,20,28,.9);
-  pointer-events: none;
-}
-.eq-rotary-knob::before {
-  content: "";
-  position: absolute;
-  left: 2px;
-  right: 2px;
-  top: 50%;
-  height: 1px;
-  background: rgba(24,31,40,.9);
-  box-shadow: 0 2px 0 rgba(255,255,255,.42);
-  transform: translateY(-50%);
-}
-.eq-rotary-knob::after {
-  content: "";
-  position: absolute;
-  top: 1px;
-  bottom: 1px;
-  left: 50%;
-  width: 2px;
-  background: linear-gradient(to right, #202833, #eef2f5, #202833);
-  box-shadow: 0 0 1px rgba(0,0,0,.85);
-  transform: translateX(-50%);
-}
-
+/* Keep the actual range control visible and draggable; avoid a static fake cap */
 .band input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  position: relative;
+  display: block;
+  width: 26px;
+  min-width: 26px;
+  height: 165px;
   margin: 0;
   padding: 0;
-  opacity: 0;
+  opacity: 1;
   writing-mode: vertical-lr;
   direction: rtl;
   background: transparent;
   cursor: ns-resize;
-  z-index: 3;
+  z-index: 1;
   touch-action: none;
   -webkit-user-select: none;
   user-select: none;
 }
-.band input[type="range"]:focus-visible + .eq-rotary-knob,
-.band input[type="range"]:focus-visible {
-  outline: 2px solid #38bdf8;
-  outline-offset: 2px;
+
+.band input[type="range"]::-webkit-slider-runnable-track {
+  width: 4px;
+  height: 100%;
+  border: 1px solid #46515f;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #080b10 0%, #26303b 35%, #10151c 70%, #080b10 100%);
+  box-shadow: inset 0 0 2px #000, 0 0 0 1px rgba(148,163,184,.12);
 }
 
+.band input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 26px;
+  height: 13px;
+  border: 1px solid #626d7a;
+  border-radius: 3px;
+  background:
+    linear-gradient(90deg, transparent 0 37%, rgba(22,28,36,.85) 37% 41%, transparent 41% 59%, rgba(22,28,36,.85) 59% 63%, transparent 63%),
+    linear-gradient(to bottom, #f1f3f5 0%, #b9c0c8 17%, #737d89 46%, #414b57 52%, #9ba4af 82%, #e6e9ed 100%);
+  box-shadow: 0 2px 3px rgba(0,0,0,.85), inset 0 1px 1px rgba(255,255,255,.85), inset 0 -1px 1px rgba(20,25,32,.9);
+}
+
+.band input[type="range"]::-moz-range-track {
+  width: 4px;
+  border: 1px solid #46515f;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #080b10 0%, #26303b 35%, #10151c 70%, #080b10 100%);
+  box-shadow: inset 0 0 2px #000;
+}
+
+.band input[type="range"]::-moz-range-thumb {
+  width: 26px;
+  height: 13px;
+  border: 1px solid #626d7a;
+  border-radius: 3px;
+  background:
+    linear-gradient(90deg, transparent 0 37%, rgba(22,28,36,.85) 37% 41%, transparent 41% 59%, rgba(22,28,36,.85) 59% 63%, transparent 63%),
+    linear-gradient(to bottom, #f1f3f5 0%, #b9c0c8 17%, #737d89 46%, #414b57 52%, #9ba4af 82%, #e6e9ed 100%);
+  box-shadow: 0 2px 3px rgba(0,0,0,.85), inset 0 1px 1px rgba(255,255,255,.85), inset 0 -1px 1px rgba(20,25,32,.9);
+}
 .band-value { font-size: 8px; color: #38bdf8; margin-top: 4px; font-family: monospace; text-align: center; }
 .scale { display: flex; justify-content: space-between; font-size: 9px; color: #64748b; padding: 2px 4px; }
 
@@ -1266,7 +1267,7 @@ function createBands(channel) {
       sendDataToESP32(JSON.stringify({ type: "eq", band: index, val: slider.value }));
     });
 
-    trackContainer.append(knob, slider);
+    trackContainer.append(slider);
     band.append(frequencyLabel, trackContainer, value);
     eq.appendChild(band);
   });
