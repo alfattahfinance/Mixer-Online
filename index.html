@@ -122,6 +122,13 @@ header, .topbar {
 .clip.on { background: #ef4444; color: #fff; border-color: #f87171; box-shadow: 0 0 8px #ef4444; }
 
 .eq-section { width: 100%; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+.eq-response-curve { margin: 4px 0 5px; padding: 4px 6px 5px; border: 1px solid #2d3748; border-radius: 5px; background: #0d121c; }
+.eq-response-heading { color: #94a3b8; font-size: 7px; font-weight: 700; letter-spacing: .5px; margin-bottom: 2px; }
+.eq-response-svg { display: block; width: 100%; height: 38px; overflow: visible; }
+.eq-response-grid line { stroke: #293548; stroke-width: .7; }
+.eq-response-grid line:nth-child(3) { stroke: #64748b; stroke-width: 1; stroke-dasharray: 3 3; }
+.eq-response-path { fill: none; stroke: #38bdf8; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 2px rgba(56,189,248,.45)); }
+
 .eq { display: grid; grid-template-columns: repeat(31, 34px); gap: 3px; min-width: max-content; align-items: stretch; }
 
 /* FADER VERTIKAL GRAFIK EQUALIZER */
@@ -639,6 +646,18 @@ header, .topbar {
                 <div class="meter"></div>
               </div>
               <div class="clip">CLIP</div>
+            </div>
+            <div class="eq-response-curve" aria-label="EQ frequency response curve">
+              <div class="eq-response-heading">EQ RESPONSE</div>
+              <svg class="eq-response-svg" viewBox="0 0 320 64" preserveAspectRatio="none" role="img" aria-label="Channel EQ curve">
+                <g class="eq-response-grid">
+                  <line x1="0" y1="8" x2="320" y2="8"/><line x1="0" y1="24" x2="320" y2="24"/>
+                  <line x1="0" y1="32" x2="320" y2="32"/><line x1="0" y1="40" x2="320" y2="40"/>
+                  <line x1="0" y1="56" x2="320" y2="56"/>
+                  <line x1="80" y1="0" x2="80" y2="64"/><line x1="160" y1="0" x2="160" y2="64"/><line x1="240" y1="0" x2="240" y2="64"/>
+                </g>
+                <path class="eq-response-path" d="M0 32 L320 32"/>
+              </svg>
             </div>
             <div class="eq-section"><div class="eq"></div></div>
             <div class="scale"><span>+15 dB</span><span>0 dB</span><span>-15 dB</span></div>
@@ -1801,6 +1820,21 @@ function syncAudioControlsFromUI() {
   });
 }
 
+function updateEqResponseCurve(channel) {
+  const path = channel.querySelector(".eq-response-path");
+  if (!path) return;
+  const sliders = [...channel.querySelectorAll(".band input.eq-range")];
+  if (!sliders.length) return;
+  const range = Math.max(1, Number(channel.querySelector(".range")?.value || 15));
+  const points = sliders.map((slider, index) => {
+    const x = (index / Math.max(1, sliders.length - 1)) * 320;
+    const gain = Math.max(-range, Math.min(range, Number(slider.value) || 0));
+    const y = 32 - (gain / range) * 24;
+    return [x.toFixed(1), y.toFixed(1)];
+  });
+  path.setAttribute("d", points.map((p, i) => (i ? "L" : "M") + p[0] + " " + p[1]).join(" "));
+}
+
 function updateValues(channel) {
   const gain = channel.querySelector(".gain");
   const gainVal = channel.querySelector(".gain-value");
@@ -1811,6 +1845,7 @@ function updateValues(channel) {
     if (s && v) v.textContent = Number(s.value).toFixed(1);
   });
   syncAudioControlsFromUI();
+  updateEqResponseCurve(channel);
 }
 
 function setRange(channel, range) {
