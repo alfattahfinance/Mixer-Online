@@ -33,8 +33,6 @@ header, .topbar {
   background: linear-gradient(135deg, #1b202c, #11151d); padding: 5px 10px; border-radius: 6px; border: 1px solid #2d3748;
   box-shadow: 0 2px 8px rgba(0,0,0,0.8); flex: 0 0 auto;
 }
-.brand { font-weight: 800; font-size: 11px; color: #38bdf8; letter-spacing: 0.5px; }
-.subtitle { font-size: 7.5px; color: #94a3b8; }
 .actions { display: flex; gap: 4px; flex-wrap: wrap; }
 .actions button {
   background: #222938; color: #e2e8f0; border: 1px solid #475569; padding: 3px 6px; border-radius: 4px; font-size: 8px; font-weight: 700; transition: all 0.2s;
@@ -42,54 +40,25 @@ header, .topbar {
 .actions button:hover, .actions button.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; }
 
 /* =========================================================
-   EMPAT TAB NAVIGASI UTAMA
+   EMPAT TAB NAVIGASI UTAMA & HAMBURGER MENU
 ========================================================= */
 .mode-switch-bar {
-  position: relative;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex: 0 0 auto;
-  pointer-events: auto;
-  min-height: 30px; padding: 2px 4px;
+  position: relative; z-index: 50; display: flex; align-items: center; gap: 6px; flex: 0 0 auto; min-height: 30px; padding: 2px 4px;
 }
 .mode-menu-wrap { position: relative; flex: 0 0 auto; }
 .mode-menu-trigger {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  min-height: 34px;
-  padding: 0;
-  border: 1px solid #3b4758;
-  border-radius: 6px;
-  background: #171d28;
-  color: #dbeafe;
-  font-size: 20px;
-  line-height: 1;
-  touch-action: manipulation;
+  display: inline-flex; align-items: center; justify-content: center; width: 42px; min-height: 34px; padding: 0;
+  border: 1px solid #3b4758; border-radius: 6px; background: #171d28; color: #dbeafe; font-size: 20px; line-height: 1; touch-action: manipulation;
 }
 .mode-menu-trigger:active { background: #263449; }
 .mode-menu {
-  display: none;
-  position: absolute;
-  left: 0;
-  top: calc(100% + 5px);
-  z-index: 100;
-  width: min(230px, 72vw);
-  padding: 5px;
-  border: 1px solid #3b4758;
-  border-radius: 8px;
-  background: #101722;
-  box-shadow: 0 10px 24px rgba(0,0,0,.55);
+  display: none; position: absolute; left: 0; top: calc(100% + 5px); z-index: 100; width: min(230px, 72vw); padding: 5px;
+  border: 1px solid #3b4758; border-radius: 8px; background: #101722; box-shadow: 0 10px 24px rgba(0,0,0,.55);
 }
 .mode-menu.open { display: flex; flex-direction: column; gap: 5px; }
 .mode-menu .tab-btn { width: 100%; min-height: 38px; text-align: left; padding: 8px 10px; font-size: 12px; }
-.mode-switch-bar > .tab-btn { flex: 1 1 auto; min-height: 34px; }
-.mode-switch-bar .tab-btn { position: relative; z-index: 1; pointer-events: auto; touch-action: manipulation; }
 .tab-btn {
-  background: #171d28; color: #94a3b8; border: 1px solid #2d3748; padding: 4px 2px; border-radius: 6px; font-weight: 800; font-size: 8.5px; text-align: center; transition: all 0.2s;
+  background: #171d28; color: #94a3b8; border: 1px solid #2d3748; padding: 4px 8px; border-radius: 6px; font-weight: 800; font-size: 8.5px; text-align: center; transition: all 0.2s;
 }
 .tab-btn.active { background: #0284c7; color: #fff; border-color: #38bdf8; box-shadow: 0 0 10px rgba(2, 132, 199, 0.6); }
 
@@ -157,8 +126,7 @@ header, .topbar {
 .band-frequency { box-sizing: border-box; width: 100%; min-height: 14px; font-size: 7px; color: #94a3b8; margin: 0 0 2px; text-align: center; white-space: nowrap; font-weight: 600; }
 
 .slider-track-container {
-  box-sizing: border-box;
-  position: relative; width: 22px; height: 124px; flex: 0 0 124px; display: flex; justify-content: center; align-items: center;
+  box-sizing: border-box; position: relative; width: 22px; height: 124px; flex: 0 0 124px; display: flex; justify-content: center; align-items: center;
   background: #0d121c; border: 1px solid #222d3d; border-radius: 4px; cursor: ns-resize; touch-action: none; overflow: visible;
 }
 .slider-track-container::before {
@@ -166,28 +134,19 @@ header, .topbar {
 }
 
 .band input.eq-range {
-  box-sizing: border-box;
-  -webkit-appearance: none; appearance: none;
-  writing-mode: vertical-lr; direction: rtl;
-  position: absolute; left: 50%; top: 50%;
-  width: 18px; height: 124px;
-  margin: 0; padding: 0;
-  transform: translate(-50%, -50%);
-  background: transparent; cursor: ns-resize;
-  z-index: 2; touch-action: none;
+  box-sizing: border-box; -webkit-appearance: none; appearance: none; writing-mode: vertical-lr; direction: rtl;
+  position: absolute; left: 50%; top: 50%; width: 18px; height: 124px; margin: 0; padding: 0;
+  transform: translate(-50%, -50%); background: transparent; cursor: ns-resize; z-index: 2; touch-action: none;
 }
 .band input.eq-range::-webkit-slider-runnable-track { width: 3px; background: transparent; border: 0; }
 .band input.eq-range::-webkit-slider-thumb {
-  -webkit-appearance: none; appearance: none;
-  width: 26px; height: 13px; margin: 0;
-  border: 1px solid #64748b; border-radius: 2px;
+  -webkit-appearance: none; appearance: none; width: 26px; height: 13px; margin: 0; border: 1px solid #64748b; border-radius: 2px;
   background: linear-gradient(to bottom, #cbd5e1 0%, #94a3b8 20%, #475569 50%, #1e293b 52%, #64748b 80%, #f1f5f9 100%);
   box-shadow: 0 2px 4px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.7);
 }
 .band input.eq-range::-moz-range-track { width: 3px; background: transparent; border: 0; }
 .band input.eq-range::-moz-range-thumb {
-  width: 26px; height: 13px; margin: 0;
-  border: 1px solid #64748b; border-radius: 2px;
+  width: 26px; height: 13px; margin: 0; border: 1px solid #64748b; border-radius: 2px;
   background: linear-gradient(to bottom, #cbd5e1 0%, #94a3b8 20%, #475569 50%, #1e293b 52%, #64748b 80%, #f1f5f9 100%);
   box-shadow: 0 2px 4px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.7);
 }
@@ -271,7 +230,7 @@ header, .topbar {
 }
 .tft-peq-graph #tftPeqSvgCurve { stroke: #38bdf8; stroke-width: 3.5; filter: drop-shadow(0 0 3px rgba(56,189,248,.65)); }
 .tft-peq-graph #tftPeqSvgFill { opacity: .22; }
-.tft-peq-graph #tftPeqDot1, .tft-peq-graph #tftPeqDot2, .tft-peq-graph #tftPeqDot3, .tft-peq-graph #tftPeqDot4 { r: 7; stroke-width: 2.5; }
+.tft-peq-graph #tftPeqDot2 { r: 7; stroke-width: 2.5; }
 .tft-peq-controls { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:3px; flex:0 0 auto; }
 .tft-peq-control { background:#162030; border:1px solid #334155; border-radius:4px; padding:2px; text-align:center; }
 .tft-peq-control label { display:block; color:#94a3b8; font-size:6.5px; margin-bottom:1px; font-weight:700; }
@@ -321,37 +280,18 @@ header, .topbar {
 
 /* PERMUKAAN KONSOLE (FADER STRIPS) */
 .mixer-desk-surface {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  align-items: stretch;
-  gap: 5px;
-  width: 100%;
-  min-width: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 2px 2px 5px;
-  flex: 1 1 0;
-  min-height: 0;
-  scrollbar-width: thin;
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: stretch; gap: 5px;
+  width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 2px 2px 5px; flex: 1 1 0; min-height: 0; scrollbar-width: thin;
 }
 .mixer-desk-surface .console-channel-strip {
-  min-width: 0;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  padding: 5px 4px 4px;
+  min-width: 0; width: 100%; height: 100%; min-height: 0; padding: 5px 4px 4px;
   background: linear-gradient(180deg, #1b2635 0%, #121925 55%, #0e1520 100%);
-  border: 1px solid #35445a;
-  border-radius: 6px;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
+  border: 1px solid #35445a; border-radius: 6px; display: flex; flex-direction: column; align-items: stretch;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.035),0 3px 10px rgba(0,0,0,.22);
 }
 .console-channel-strip.master-strip { 
   background: linear-gradient(180deg, #30220f 0%, #1a140b 60%, #110d07 100%); 
-  border-color: #b7791f; 
-  box-shadow: inset 0 0 0 1px rgba(245,158,11,.09),0 3px 12px rgba(0,0,0,.28);
+  border-color: #b7791f; box-shadow: inset 0 0 0 1px rgba(245,158,11,.09),0 3px 12px rgba(0,0,0,.28);
 }
 .strip-label-box { background: #10b981; color: #022c22; border: 1px solid #34d399; border-radius: 4px; width: 100%; min-height: 25px; padding: 2px; display: flex; align-items: center; justify-content: center; text-align: center; margin: 0 0 2px; font-size: 9px; font-weight: 800; letter-spacing: .2px; }
 .master-strip .strip-label-box { color: #fff; border-color: #f59e0b; background: #d97706; }
@@ -427,7 +367,6 @@ header, .topbar {
 #muteOutputButton.active { background: #ef4444 !important; color: #fff !important; }
 
 .device-status, .feedback-status, .audio-status, .status { font-size: 8px; color: #94a3b8; margin-top: 3px; font-weight: 600; }
-.footer { text-align: center; font-size: 7.5px; color: #64748b; margin-top: 4px; font-weight: 600; }
 .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
 
 @media(max-width:600px) {
@@ -1926,7 +1865,7 @@ const tftDatabase = {
       <div class="tft-peq">
         <div class="tft-peq-head">
           <span>PEQ • 4-BAND SQ-7</span>
-          <span style="color:#10b981;">● 4 Control Points Active</span>
+          <span style="color:#10b981;">● Control Point Active</span>
         </div>
         <svg class="tft-peq-graph" id="tftPeqSvgContainer" viewBox="0 0 320 120" preserveAspectRatio="none" role="img" aria-label="SQ-7 PEQ frequency response" style="touch-action:none;">
           <rect x="0" y="0" width="320" height="120" fill="#080d16"/>
@@ -1958,7 +1897,7 @@ const tftDatabase = {
           </g>
           <path id="tftPeqSvgFill" d="M0 60 L320 60 Z" fill="#38bdf8" opacity=".14"/>
           <path id="tftPeqSvgCurve" d="M0 60 L320 60" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle id="tftPeqDot2" cx="160" cy="60" r="5" fill="#f8fafc" stroke="#0284c7" stroke-width="2" style="cursor:grab;touch-action:none;" title="PEQ center frequency / gain"/>
+          <circle id="tftPeqDot2" cx="160" cy="60" r="7" fill="#f8fafc" stroke="#0284c7" stroke-width="2" style="cursor:grab;touch-action:none;" title="PEQ center frequency / gain"/>
         </svg>
         <div class="tft-peq-controls">
           <div class="tft-peq-control">
@@ -1993,10 +1932,9 @@ const tftDatabase = {
               <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
               <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
             </g>
-            <path id="tftSendsSvgCurve" d="M10 45 L ${s.dot1X} ${s.dot1Y} L ${s.dot2X} ${s.dot2Y}" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftSendsSvgFill" d="M10 45 L ${s.dot1X} ${s.dot1Y} L ${s.dot2X} ${s.dot2Y} L 310 65 L 10 65 Z" fill="#a855f7" opacity=".12"/>
+            <path id="tftSendsSvgCurve" d="M10 45 L ${s.dot1X} ${s.dot1Y} L 310 45" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round"/>
+            <path id="tftSendsSvgFill" d="M10 45 L ${s.dot1X} ${s.dot1Y} L 310 45 L 310 65 L 10 65 Z" fill="#a855f7" opacity=".12"/>
             <circle id="tftSendsDot1" cx="160" cy="${s.dot1Y}" r="9" fill="#f3e8ff" stroke="#a855f7" stroke-width="2.5" style="cursor:grab; touch-action:none;" aria-label="GEQ master level point" title="Drag vertically to adjust GEQ master level"/>
-            <circle id="tftSendsDot2" cx="310" cy="15" r="9" fill="#f3e8ff" stroke="#a855f7" stroke-width="2.5" style="display:none; pointer-events:none;" aria-hidden="true"/>
             <text x="10" y="10" fill="#94a3b8" font-size="5.5">MASTER GEQ LEVEL · DRAG POINT VERTICALLY</text>
           </svg>
         </div>
@@ -2024,8 +1962,7 @@ const tftDatabase = {
             <path id="tftMainSvgCurve" d="M10 35 Q ${s.dot1X} ${s.dot1Y}, 310 35" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
             <path id="tftMainSvgFill" d="M10 35 Q ${s.dot1X} ${s.dot1Y}, 310 35 L 310 65 L 10 65 Z" fill="#ef4444" opacity=".12"/>
             <circle id="tftMainDot1" cx="${s.dot1X}" cy="${s.dot1Y}" r="7" fill="#fee2e2" stroke="#ef4444" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Send Peak Point"/>
-            <circle id="tftMainDot2" cx="${s.dot2X}" cy="${s.dot2Y}" r="7" fill="#fee2e2" stroke="#ef4444" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Return Point"/>
-            <text x="12" y="12" fill="#94a3b8" font-size="6.5">INSERT ROUTING VIEW (2 Points)</text>
+            <text x="12" y="12" fill="#94a3b8" font-size="6.5">INSERT ROUTING VIEW (Point)</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -2051,7 +1988,7 @@ const tftDatabase = {
             </g>
             <path id="tftRoutingSvgCurve" d="M20 16 L 120 16 L ${s.dotX} ${s.dotY} L 300 48" fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round"/>
             <circle id="tftRoutingDot" cx="${s.dotX}" cy="${s.dotY}" r="7" fill="#ffe4e6" stroke="#f43f5e" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Routing Node"/>
-            <text x="12" y="12" fill="#94a3b8" font-size="6.5">ROUTING MATRIX VIEW (1 Point)</text>
+            <text x="12" y="12" fill="#94a3b8" font-size="6.5">ROUTING MATRIX VIEW</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -2153,11 +2090,10 @@ const tftDatabase = {
               <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
               <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
             </g>
-            <path id="tftEffectsSvgCurve" d="M10 50 Q ${s.dot1X} ${s.dot1Y}, 160 32 T ${s.dot2X} ${s.dot2Y}" fill="none" stroke="#ec4899" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftEffectsSvgFill" d="M10 50 Q ${s.dot1X} ${s.dot1Y}, 160 32 T ${s.dot2X} ${s.dot2Y} L 310 65 L 10 65 Z" fill="#ec4899" opacity=".12"/>
+            <path id="tftEffectsSvgCurve" d="M10 50 Q ${s.dot1X} ${s.dot1Y}, 160 32" fill="none" stroke="#ec4899" stroke-width="2.5" stroke-linecap="round"/>
+            <path id="tftEffectsSvgFill" d="M10 50 Q ${s.dot1X} ${s.dot1Y}, 160 32 L 310 65 L 10 65 Z" fill="#ec4899" opacity=".12"/>
             <circle id="tftEffectsDot1" cx="${s.dot1X}" cy="${s.dot1Y}" r="7" fill="#fce7f3" stroke="#ec4899" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Delay Point"/>
-            <circle id="tftEffectsDot2" cx="${s.dot2X}" cy="${s.dot2Y}" r="7" fill="#fce7f3" stroke="#ec4899" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Feedback Point"/>
-            <text x="12" y="12" fill="#94a3b8" font-size="6.5">ALESIS FX PROCESSOR (2 Points)</text>
+            <text x="12" y="12" fill="#94a3b8" font-size="6.5">ALESIS FX PROCESSOR (Point)</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -2233,14 +2169,13 @@ function updateTftModuleCurve(key) {
     points = [[10,55],[x,y],[190,y],[310,endY]];
   } else if (key === "sends") {
     const y = clamp(32 - s.lvl*1.35,8,56);
-    points = s.preset === 1 ? [[10,48],[95,48],[160,y],[230,24],[310,18]]
-      : s.preset === 2 ? [[10,18],[85,42],[160,y],[235,42],[310,18]]
+    points = s.preset === 1 ? [[10,48],[160,y],[310,18]]
+      : s.preset === 2 ? [[10,18],[160,y],[310,18]]
       : [[10,32],[160,y],[310,32]];
     if (!s.state) points = [[10,32],[160,32],[310,32]];
   } else if (key === "main") {
     const y1 = clamp(35 - ((s.send+50)/56)*25,8,58);
-    const y2 = clamp(35 + (s.limit+20)*1.25,8,58);
-    points = [[10,35],[clamp(90+((s.send+50)/56)*95,40,240),y1],[310,y2]];
+    points = [[10,35],[clamp(90+((s.send+50)/56)*95,40,240),y1],[310,35]];
     if (s.bypass) points = [[10,35],[160,35],[310,35]];
   } else if (key === "routing") {
     const y = s.usb ? clamp(48 - s.source*9 + s.dout*4,8,58) : 58;
@@ -2270,10 +2205,8 @@ function updateTftModuleCurve(key) {
     const levelY = clamp(32 - s.lvl * 1.35, 8, 56);
     if (dot) { dot.setAttribute("cx", "160"); dot.setAttribute("cy", levelY.toFixed(1)); dot.setAttribute("aria-valuetext", s.lvl + " dB"); }
   } else {
-    points.slice(1,3).forEach((p,i) => {
-      const dot = document.getElementById(prefix + "Dot" + (i+1));
-      if (dot) { dot.setAttribute("cx",p[0].toFixed(1)); dot.setAttribute("cy",p[1].toFixed(1)); }
-    });
+    const dot1 = document.getElementById(prefix + "Dot1") || document.getElementById(prefix + "Dot");
+    if (dot1 && points[1]) { dot1.setAttribute("cx", points[1][0].toFixed(1)); dot1.setAttribute("cy", points[1][1].toFixed(1)); }
   }
 }
 
@@ -2291,21 +2224,29 @@ function applyTftGraphPointToControl(key, pointIndex, x, y) {
     el.selectedIndex = index;
     el.dispatchEvent(new Event("change", { bubbles: true }));
   };
-  if (key === "config" && pointIndex === 1) setRange("cfgGain", Math.round(clamp((58-y)/48*60,0,60)));
-  else if (key === "gate" && pointIndex === 1) setRange("gateThresh", Math.round(clamp((x-20)/130*80-80,-80,0)));
-  else if (key === "gate" && pointIndex === 2) setRange("gateRatio", Math.round(clamp((55-y)/3.8+1,1,10)*2)/2);
-  else if (key === "dynamics" && pointIndex === 1) setRange("compThresh", Math.round(clamp((x-20)/145*60-60,-60,0)));
-  else if (key === "dynamics" && pointIndex === 2) setRange("compRatio", Math.round(clamp((55-y)/2.3+1,1,20)));
-  else if (key === "dynamics" && pointIndex === 3) setRange("compMakeup", Math.round(clamp((20-y)/0.65,0,24)));
-  else if (key === "sends" && pointIndex === 1) setRange("send1Lvl", Math.round(clamp((32-y)/1.35,-15,15)));
-  else if (key === "main" && pointIndex === 1) setRange("mainFohLvl", Math.round(clamp((35-y)/25*56-50,-50,6)));
-  else if (key === "main" && pointIndex === 2) setRange("mainLimitLvl", Math.round(clamp((y-35)/1.25-20,-20,0)*2)/2);
-  else if (key === "routing" && pointIndex === 1) setSelectIndex("routeSourceSel", Math.round(clamp(x/320*3,0,3)));
-  else if (key === "meters" && pointIndex === 1) setRange("meterZoomInp", clamp((50-y)/10,0.5,4));
-  else if (key === "scenes" && pointIndex === 1) setSelectIndex("sceneActiveSel", Math.round(clamp((x-70)/45,0,3)));
-  else if (key === "setup" && pointIndex === 1) setRange("setupBrightInp", Math.round(clamp((58-y)/0.55,0,100)));
-  else if (key === "effects" && pointIndex === 1) setRange("fxDelayInp", clamp((x-40)/230,0,1.2));
-  else if (key === "effects" && pointIndex === 2) setRange("fxFeedbackInp", clamp((52-y)/75,0,0.85));
+  if (key === "config") setRange("cfgGain", Math.round(clamp((58-y)/48*60,0,60)));
+  else if (key === "gate") {
+    if (pointIndex === 1) setRange("gateThresh", Math.round(clamp((x-20)/130*80-80,-80,0)));
+    else setRange("gateRatio", Math.round(clamp((55-y)/3.8+1,1,10)*2)/2);
+  }
+  else if (key === "dynamics") {
+    if (pointIndex === 1) setRange("compThresh", Math.round(clamp((x-20)/145*60-60,-60,0)));
+    else if (pointIndex === 2) setRange("compRatio", Math.round(clamp((55-y)/2.3+1,1,20)));
+    else setRange("compMakeup", Math.round(clamp((20-y)/0.65,0,24)));
+  }
+  else if (key === "sends") setRange("send1Lvl", Math.round(clamp((32-y)/1.35,-15,15)));
+  else if (key === "main") {
+    if (pointIndex === 1) setRange("mainFohLvl", Math.round(clamp((35-y)/25*56-50,-50,6)));
+    else setRange("mainLimitLvl", Math.round(clamp((y-35)/1.25-20,-20,0)*2)/2);
+  }
+  else if (key === "routing") setSelectIndex("routeSourceSel", Math.round(clamp(x/320*3,0,3)));
+  else if (key === "meters") setRange("meterZoomInp", clamp((50-y)/10,0.5,4));
+  else if (key === "scenes") setSelectIndex("sceneActiveSel", Math.round(clamp((x-70)/45,0,3)));
+  else if (key === "setup") setRange("setupBrightInp", Math.round(clamp((58-y)/0.55,0,100)));
+  else if (key === "effects") {
+    if (pointIndex === 1) setRange("fxDelayInp", clamp((x-40)/230,0,1.2));
+    else setRange("fxFeedbackInp", clamp((52-y)/75,0,0.85));
+  }
 }
 
 function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback) {
@@ -2515,6 +2456,7 @@ function bindTftDynamicEventListeners(key) {
     const curve = document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}SvgCurve`);
     const dot1 = document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}Dot1`) || document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}Dot`);
     const dot2 = document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}Dot2`);
+    const dot3 = document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}Dot3`);
 
     if (container && dot1 && curve) {
       makeSpecificDotDraggable(container, dot1, (x, y) => {
@@ -2529,6 +2471,14 @@ function bindTftDynamicEventListeners(key) {
       makeSpecificDotDraggable(container, dot2, (x, y) => {
         applyTftGraphPointToControl(key, 2, x, y);
         s.dot2X = x; s.dot2Y = y;
+        updateTftModuleCurve(key);
+      });
+    }
+
+    if (container && dot3 && curve) {
+      makeSpecificDotDraggable(container, dot3, (x, y) => {
+        applyTftGraphPointToControl(key, 3, x, y);
+        s.dot3X = x; s.dot3Y = y;
         updateTftModuleCurve(key);
       });
     }
