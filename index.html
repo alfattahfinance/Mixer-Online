@@ -1021,6 +1021,41 @@ header, .topbar {
   #tabMixerContent .master-meter-column .master-led-meter { width:7px; }
 }
 
+
+/* Match reference console: full-height, clearly segmented stereo L/R meters beside upright master fader */
+#tabMixerContent .master-stereo-meter-vertical {
+  flex:0 0 34px;
+  width:34px;
+  min-height:0;
+  align-self:stretch;
+  display:flex;
+  flex-direction:row;
+  align-items:stretch;
+  justify-content:center;
+  gap:4px;
+  padding:4px 3px;
+  border:1px solid #80500f;
+  border-radius:5px;
+  background:#080b10;
+}
+#tabMixerContent .master-meter-column { flex:1 1 0; min-height:0; }
+#tabMixerContent .master-meter-column .master-led-meter {
+  flex:1 1 0;
+  width:8px;
+  min-height:0;
+  height:auto;
+  padding:2px 1px;
+  gap:1px;
+}
+#tabMixerContent .master-meter-column .master-led-meter span { flex:1 1 0; min-height:1px; }
+#tabMixerContent .master-strip .fader-panel-area { flex:1 1 0; min-height:130px; align-items:stretch; gap:6px; }
+#tabMixerContent .master-strip .fader-slot { flex:1 1 0; min-width:28px; max-width:68px; min-height:130px; height:auto; }
+@media(max-width:600px) {
+  #tabMixerContent .master-stereo-meter-vertical { flex-basis:30px; width:30px; gap:3px; }
+  #tabMixerContent .master-strip .fader-panel-area { min-height:115px; }
+  #tabMixerContent .master-strip .fader-slot { min-height:115px; }
+}
+
 </style>
 </head>
 
@@ -1437,10 +1472,11 @@ function initMixerVerticalMeters() {
     const container = document.getElementById(id);
     if (!container) return;
     container.innerHTML = "";
-    for (let i = 0; i < 10; i++) {
+    const segmentCount = (id === "masterMeterL" || id === "masterMeterR") ? 16 : 10;
+    for (let i = 0; i < segmentCount; i++) {
       const span = document.createElement("span");
-      if (i < 2) span.className = "red";
-      else if (i < 4) span.className = "yellow";
+      if (i >= segmentCount - 2) span.className = "red";
+      else if (i >= segmentCount - 5) span.className = "yellow";
       else span.className = "green";
       container.appendChild(span);
     }
@@ -1473,7 +1509,7 @@ function updateMasterStereoMeters() {
     for (let i = 0; i < data.length; i++) sum += data[i] * data[i];
     const rms = Math.sqrt(sum / data.length);
     const db = rms > 0 ? 20 * Math.log10(rms) : -72;
-    const level = Math.max(0, Math.min(16, Math.round((db + 60) / 60 * 16)));
+    const level = Math.max(0, Math.min(16, Math.round((db + 54) / 54 * 16)));
     const meter = document.getElementById(channel === 0 ? "masterMeterL" : "masterMeterR");
     if (!meter) return;
     Array.from(meter.children).forEach((segment, index) => {
