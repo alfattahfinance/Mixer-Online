@@ -458,6 +458,88 @@ header, .topbar {
   #tabMixerContent .master-strip .fader-slot { min-height: 125px; }
 }
 
+
+/* WIDE MIXER LAYOUT: TFT above four input strips, master spanning full height */
+@media (min-width: 1200px) {
+  #tabMixerContent .mixer-workspace-main {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-rows: 238px minmax(0, 1fr);
+    column-gap: 5px;
+    row-gap: 5px;
+    overflow: visible;
+  }
+  #tabMixerContent .mixer-top-console {
+    grid-column: 1 / span 4;
+    grid-row: 1;
+    padding-left: 1px;
+    padding-right: 4px;
+  }
+  #tabMixerContent .mixer-desk-surface { display: contents; }
+  #tabMixerContent .mixer-desk-surface > .console-channel-strip:nth-child(1) { grid-column: 1; grid-row: 2; }
+  #tabMixerContent .mixer-desk-surface > .console-channel-strip:nth-child(2) { grid-column: 2; grid-row: 2; }
+  #tabMixerContent .mixer-desk-surface > .console-channel-strip:nth-child(3) { grid-column: 3; grid-row: 2; }
+  #tabMixerContent .mixer-desk-surface > .console-channel-strip:nth-child(4) { grid-column: 4; grid-row: 2; }
+  #tabMixerContent .mixer-desk-surface > .console-channel-strip.master-strip {
+    grid-column: 5;
+    grid-row: 1 / span 2;
+    min-height: 0;
+  }
+  #tabMixerContent .master-strip .fader-panel-area {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 5px;
+  }
+  #tabMixerContent .master-strip .master-meter-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 0 0 auto;
+    width: 100%;
+  }
+  #tabMixerContent .master-combined-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    color: #fbbf24;
+    font: 800 7px/1 monospace;
+    text-align: center;
+  }
+  #tabMixerContent .master-combined-meter {
+    flex-direction: row;
+    height: 7px;
+    width: 100%;
+    flex: 0 0 7px;
+    gap: 1px;
+    padding: 1px 2px;
+  }
+  #tabMixerContent .master-combined-meter span { min-width: 1px; }
+  #tabMixerContent .master-strip .master-stereo-meter-vertical {
+    width: 100%;
+    flex: 0 0 36px;
+    height: 36px;
+    min-height: 36px;
+    padding: 2px 5px;
+  }
+  #tabMixerContent .master-strip .master-meter-column {
+    flex-direction: row;
+    gap: 3px;
+  }
+  #tabMixerContent .master-strip .master-meter-column .master-led-meter {
+    height: 8px;
+    width: auto;
+    flex: 1 1 auto;
+    flex-direction: row;
+  }
+  #tabMixerContent .master-strip .master-meter-column .master-led-meter span { min-height: 0; }
+  #tabMixerContent .master-strip .fader-slot {
+    width: 100%;
+    max-width: none;
+    min-height: 0;
+    flex: 1 1 auto;
+  }
+}
+
 </style>
 </head>
 
@@ -803,11 +885,14 @@ header, .topbar {
             </div>
             <div class="fader-readout">0.0 dB</div>
             <div class="fader-panel-area">
-              <div class="fader-slot"><input type="range" min="-50" max="6" step="0.5" value="0" aria-label="Master LR fader"></div>
-              <div class="master-stereo-meter-vertical" aria-label="Master stereo output meters">
+              <div class="master-meter-stack" aria-label="Master combined and stereo meters">
+                <div class="master-combined-wrap"><span>MASTER</span><div class="vert-led-meter master-led-meter master-combined-meter" id="masterMeterCombined"></div></div>
+                <div class="master-stereo-meter-vertical" aria-label="Master stereo output meters">
                 <div class="master-meter-column"><span>L</span><div class="vert-led-meter master-led-meter" id="masterMeterL"></div></div>
                 <div class="master-meter-column"><span>R</span><div class="vert-led-meter master-led-meter" id="masterMeterR"></div></div>
+                </div>
               </div>
+              <div class="fader-slot"><input type="range" min="-50" max="6" step="0.5" value="0" aria-label="Master LR fader"></div>
             </div>
             <div class="strip-action-buttons">
               <button class="console-action-btn mute" style="background:#b45309; color:#fff;">MUTE</button>
@@ -868,12 +953,12 @@ header, .topbar {
    INISIALISASI LED METER & TFT STEREO METER
 ========================================================= */
 function initMixerVerticalMeters() {
-  const meterIds = ["mixerMeter1", "mixerMeter2", "mixerMeter3", "mixerMeter4", "masterMeterL", "masterMeterR"];
+  const meterIds = ["mixerMeter1", "mixerMeter2", "mixerMeter3", "mixerMeter4", "masterMeterL", "masterMeterR", "masterMeterCombined"];
   meterIds.forEach(id => {
     const container = document.getElementById(id);
     if (!container) return;
     container.innerHTML = "";
-    const segmentCount = (id === "masterMeterL" || id === "masterMeterR") ? 16 : 10;
+    const segmentCount = (id === "masterMeterL" || id === "masterMeterR" || id === "masterMeterCombined") ? 16 : 10;
     for (let i = 0; i < segmentCount; i++) {
       const span = document.createElement("span");
       if (i >= segmentCount - 2) span.className = "red";
@@ -923,6 +1008,19 @@ function updateMasterStereoMeters() {
       segment.classList.toggle("on", index >= 16 - level);
     });
   });
+  if (masterMeterAnalyser) {
+    const combinedData = masterStereoMeterBuffers[0];
+    masterMeterAnalyser.getFloatTimeDomainData(combinedData);
+    let combinedSum = 0;
+    for (let i = 0; i < combinedData.length; i++) combinedSum += combinedData[i] * combinedData[i];
+    const combinedRms = Math.sqrt(combinedSum / combinedData.length);
+    const combinedDb = combinedRms > 0 ? 20 * Math.log10(combinedRms) : -72;
+    const combinedLevel = Math.max(0, Math.min(16, Math.round((combinedDb + 54) / 54 * 16)));
+    const combinedMeter = document.getElementById("masterMeterCombined");
+    if (combinedMeter) Array.from(combinedMeter.children).forEach((segment, index) => {
+      segment.classList.toggle("on", index >= 16 - combinedLevel);
+    });
+  }
   masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
 }
 updateMasterStereoMeters();
