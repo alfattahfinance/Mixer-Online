@@ -140,7 +140,8 @@ header, .topbar {
 
 .slider-track-container {
   box-sizing: border-box; position: relative; width: 22px; height: 124px; flex: 0 0 124px; display: flex; justify-content: center; align-items: center;
-  background: #0d121c; border: 1px solid #222d3d; border-radius: 4px; cursor: ns-resize; touch-action: none; overflow: visible;
+  background: #0d121c; border: 1px solid #222d3d; border-radius: 4px; cursor: ns-resize;
+  touch-action: none; -webkit-user-select: none; user-select: none; overflow: visible;
 }
 .slider-track-container::before {
   content: ""; position: absolute; width: 3px; height: 100%; background: linear-gradient(90deg, #090d14, #1e293b, #090d14); border-radius: 1px;
@@ -148,8 +149,9 @@ header, .topbar {
 
 .band input.eq-range {
   box-sizing: border-box; -webkit-appearance: none; appearance: none; writing-mode: vertical-lr; direction: rtl;
-  position: absolute; left: 50%; top: 50%; width: 18px; height: 124px; margin: 0; padding: 0;
-  transform: translate(-50%, -50%); background: transparent; cursor: ns-resize; z-index: 2; touch-action: none;
+  position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0;
+  transform: none; background: transparent; cursor: ns-resize; z-index: 2;
+  touch-action: none; -webkit-user-select: none; user-select: none; overscroll-behavior: contain;
 }
 .band input.eq-range::-webkit-slider-runnable-track { width: 3px; background: transparent; border: 0; }
 .band input.eq-range::-webkit-slider-thumb {
