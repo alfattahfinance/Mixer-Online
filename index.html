@@ -10,13 +10,13 @@
   <title>GQX-3102 Equalizer & Digital Mixer Online Pro</title>
   <style>
 /* =========================================================
-   RESET & STYLING FULLSCREEN MOBILE AUDIO CONSOLE
+   RESET & STYLING FULLSCREEN MOBILE AUDIO CONSOLE (SQ-STYLE)
 ========================================================= */
 * { box-sizing: border-box; }
 input[type="range"] { touch-action: manipulation; -webkit-user-select: none; user-select: none; }
 html, body { 
   width: 100vw; height: 100vh; margin: 0; padding: 0; 
-  overflow: hidden; background: #040609; color: #f8fafc; 
+  overflow: hidden; background: #12151c; color: #f8fafc; 
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
   -webkit-text-size-adjust: 100%;
 }
@@ -30,14 +30,14 @@ button, input, select { font: inherit; -webkit-tap-highlight-color: transparent;
 
 header, .topbar {
   display: flex; align-items: center; justify-content: space-between; flex-wrap: nowrap; gap: 6px;
-  background: linear-gradient(135deg, #0b0f17, #131a26); padding: 6px 10px; border-radius: 6px; border: 1px solid #1e293b;
+  background: linear-gradient(135deg, #1b202c, #11151d); padding: 5px 10px; border-radius: 6px; border: 1px solid #2d3748;
   box-shadow: 0 2px 8px rgba(0,0,0,0.8); flex: 0 0 auto;
 }
-.brand { font-weight: 800; font-size: 12px; color: #38bdf8; letter-spacing: 0.5px; }
+.brand { font-weight: 800; font-size: 11px; color: #38bdf8; letter-spacing: 0.5px; }
 .subtitle { font-size: 7.5px; color: #94a3b8; }
 .actions { display: flex; gap: 4px; flex-wrap: wrap; }
 .actions button {
-  background: #1e293b; color: #e2e8f0; border: 1px solid #475569; padding: 3px 6px; border-radius: 4px; font-size: 8.5px; font-weight: 700; transition: all 0.2s;
+  background: #222938; color: #e2e8f0; border: 1px solid #475569; padding: 3px 6px; border-radius: 4px; font-size: 8px; font-weight: 700; transition: all 0.2s;
 }
 .actions button:hover, .actions button.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; }
 
@@ -47,9 +47,9 @@ header, .topbar {
 .mode-switch-bar {
   position: relative; z-index: 50; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; flex: 0 0 auto; pointer-events: auto;
 }
-.mode-switch-bar .tab-btn { position: relative; z-index: 1; min-height: 36px; pointer-events: auto; touch-action: manipulation; }
+.mode-switch-bar .tab-btn { position: relative; z-index: 1; min-height: 32px; pointer-events: auto; touch-action: manipulation; }
 .tab-btn {
-  background: #0d121c; color: #94a3b8; border: 1px solid #27303f; padding: 5px 2px; border-radius: 6px; font-weight: 800; font-size: 8.5px; text-align: center; transition: all 0.2s;
+  background: #171d28; color: #94a3b8; border: 1px solid #2d3748; padding: 4px 2px; border-radius: 6px; font-weight: 800; font-size: 8.5px; text-align: center; transition: all 0.2s;
 }
 .tab-btn.active { background: #0284c7; color: #fff; border-color: #38bdf8; box-shadow: 0 0 10px rgba(2, 132, 199, 0.6); }
 
@@ -59,13 +59,13 @@ header, .topbar {
 /* =========================================================
    RACK & CHANNEL CONTAINER (EQUALIZER)
 ========================================================= */
-.rack { background: #0f141d; border: 1px solid #2d3748; border-radius: 8px; padding: 8px; display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
-.rack-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; border-bottom: 1px solid #1e293b; padding-bottom: 4px; flex: 0 0 auto; }
+.rack { background: #171d28; border: 1px solid #2d3748; border-radius: 8px; padding: 8px; display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
+.rack-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; border-bottom: 1px solid #2d3748; padding-bottom: 4px; flex: 0 0 auto; }
 .model { font-size: 11px; font-weight: 800; color: #f59e0b; }
 .grade { font-size: 8px; color: #94a3b8; letter-spacing: 0.5px; }
 
 .channels { display: flex; flex-direction: column; gap: 6px; flex: 1; min-height: 0; overflow-y: auto; }
-.channel { background: #131b26; border: 1px solid #2d3748; border-radius: 6px; padding: 6px; flex: 0 0 auto; }
+.channel { background: #1b2230; border: 1px solid #2d3748; border-radius: 6px; padding: 6px; flex: 0 0 auto; }
 .channel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
 .channel-title-group { display: flex; align-items: center; gap: 6px; }
 
@@ -86,13 +86,13 @@ header, .topbar {
 .eq-action-button.eq-solo-button.active { background: #10b981; border-color: #6ee7b7; color: #052e1b; }
 .eq-action-button.eq-reset-button { background: #1f2937; border-color: #4b5563; color: #e2e8f0; }
 
-.control-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 6px; background: #0a0e14; padding: 5px; border-radius: 4px; margin-bottom: 4px; align-items: center; border: 1px solid #1e293b; }
+.control-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 6px; background: #121722; padding: 5px; border-radius: 4px; margin-bottom: 4px; align-items: center; border: 1px solid #2d3748; }
 .control label { display: block; font-size: 7.5px; color: #94a3b8; margin-bottom: 2px; font-weight: 700; }
 .control input[type="range"] { width: 100%; accent-color: #f59e0b; }
 .gain-value { font-size: 8.5px; color: #f59e0b; text-align: center; font-family: monospace; font-weight: bold; }
-.control select { width: 100%; background: #1e293b; color: #fff; border: 1px solid #475569; padding: 2px; font-size: 8.5px; border-radius: 3px; }
+.control select { width: 100%; background: #222d3d; color: #fff; border: 1px solid #475569; padding: 2px; font-size: 8.5px; border-radius: 3px; }
 
-.meter-area { display: flex; align-items: center; justify-content: space-between; background: #0a0e14; padding: 4px 8px; border-radius: 4px; margin-bottom: 4px; border: 1px solid #1e293b; }
+.meter-area { display: flex; align-items: center; justify-content: space-between; background: #121722; padding: 4px 8px; border-radius: 4px; margin-bottom: 4px; border: 1px solid #2d3748; }
 .meter-container-box { display: flex; flex-direction: column; gap: 2px; flex-grow: 1; margin-right: 8px; }
 .meter-scale-labels { display: flex; justify-content: space-between; font-size: 6.5px; color: #64748b; font-family: monospace; }
 .meter { display: flex; gap: 2px; height: 10px; align-items: center; }
@@ -108,17 +108,17 @@ header, .topbar {
 
 /* FADER VERTIKAL GRAFIK EQUALIZER */
 .band {
-  box-sizing: border-box; background: #0b0f17; border: 1px solid #222d3d; border-radius: 5px; padding: 4px 1px;
+  box-sizing: border-box; background: #171d28; border: 1px solid #2d3748; border-radius: 5px; padding: 4px 1px;
   display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 180px; min-width: 0; position: relative;
 }
 .band-frequency { box-sizing: border-box; width: 100%; min-height: 14px; font-size: 7px; color: #94a3b8; margin: 0 0 2px; text-align: center; white-space: nowrap; font-weight: 600; }
 
 .slider-track-container {
   position: relative; width: 22px; height: 130px; flex: 0 0 130px; display: flex; justify-content: center; align-items: center;
-  background: #05070a; border: 1px solid #1a2332; border-radius: 4px; cursor: ns-resize; touch-action: none;
+  background: #0d121c; border: 1px solid #222d3d; border-radius: 4px; cursor: ns-resize; touch-action: none;
 }
 .slider-track-container::before {
-  content: ""; position: absolute; width: 3px; height: 100%; background: linear-gradient(90deg, #0d121c, #2b374a, #0d121c); border-radius: 1px;
+  content: ""; position: absolute; width: 3px; height: 100%; background: linear-gradient(90deg, #090d14, #1e293b, #090d14); border-radius: 1px;
 }
 
 .band input.eq-range {
@@ -137,14 +137,14 @@ header, .topbar {
 /* =========================================================
    PANEL ALESIS (EFFECTS PROCESSOR)
 ========================================================= */
-.echo-panel-box { background: #11151d; border: 1px solid #2d3748; border-radius: 8px; padding: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); flex: 1; overflow-y: auto; }
+.echo-panel-box { background: #171d28; border: 1px solid #2d3748; border-radius: 8px; padding: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); flex: 1; overflow-y: auto; }
 .echo-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.echo-onoff-btn { background: #1e293b; color: #fff; border: 1px solid #475569; padding: 6px 12px; border-radius: 5px; font-weight: 800; font-size: 9.5px; }
+.echo-onoff-btn { background: #222d3d; color: #fff; border: 1px solid #475569; padding: 6px 12px; border-radius: 5px; font-weight: 800; font-size: 9px; }
 .echo-onoff-btn.active { background: #10b981; border-color: #34d399; color: #000; box-shadow: 0 0 8px #10b981; }
 .echo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 @media(max-width: 600px) { .echo-grid { grid-template-columns: 1fr; } }
-.echo-control-card { background: #0a0e14; border: 1px solid #1e293b; padding: 8px; border-radius: 6px; }
-.echo-control-card label { display: block; font-size: 8.5px; color: #38bdf8; margin-bottom: 4px; font-weight: 800; }
+.echo-control-card { background: #121722; border: 1px solid #2d3748; padding: 8px; border-radius: 6px; }
+.echo-control-card label { display: block; font-size: 8px; color: #38bdf8; margin-bottom: 4px; font-weight: 800; }
 .echo-control-card input[type="range"] {
   -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 24px; margin: 0 0 3px; padding: 0; background: transparent; cursor: pointer; touch-action: manipulation;
 }
@@ -158,90 +158,110 @@ header, .topbar {
 .echo-val { font-size: 9px; color: #f59e0b; font-family: monospace; text-align: right; font-weight: bold; }
 
 /* =========================================================
-   DIGITAL MIXER CONSOLE & AUDIO PLAYER TERINTEGRASI
+   DIGITAL MIXER CONSOLE & AUDIO PLAYER TERINTEGRASI (SQ-STYLE)
 ========================================================= */
-.mixer-console { background: #0a0e14; border: 1px solid #2d3748; border-radius: 8px; padding: 8px; display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+.mixer-console { background: #121722; border: 1px solid #2d3748; border-radius: 8px; padding: 6px; display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
 
-.integrated-audio-deck { background: #111620; border: 1px solid #1e293b; border-radius: 6px; padding: 6px; margin-bottom: 6px; flex: 0 0 auto; }
-.deck-title { font-size: 9px; font-weight: 800; color: #38bdf8; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
+.integrated-audio-deck { background: #171d28; border: 1px solid #2d3748; border-radius: 6px; padding: 5px 8px; margin-bottom: 4px; flex: 0 0 auto; }
+.deck-title { font-size: 8.5px; font-weight: 800; color: #38bdf8; margin-bottom: 3px; display: flex; align-items: center; gap: 4px; }
+.audio-actions { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin-bottom: 3px; }
+.audio-actions button, .file-button { 
+  background: #222d3d; color: #fff; border: 1px solid #475569; padding: 3px 7px; 
+  font-size: 7.5px; border-radius: 4px; font-weight: 800; display: inline-flex; align-items: center; cursor: pointer; white-space: nowrap; 
+}
+.audio-actions select { background: #162030; color: #fff; border: 1px solid #334155; font-size: 7.5px; padding: 2px; border-radius: 3px; max-width: 130px; }
+.playlist-container { width: 100%; background: #0f141d; border: 1px solid #2d3748; border-radius: 4px; padding: 4px; margin: 3px 0; max-height: 48px; overflow-y: auto; font-size: 8px; color: #94a3b8; }
+.playlist-item { display: flex; justify-content: space-between; padding: 1px 3px; border-bottom: 1px solid #1a2230; cursor: pointer; }
+.playlist-item.playing { color: #38bdf8; font-weight: 800; }
 
 .mixer-top-console { 
-  display: grid; grid-template-columns: 1fr 240px; gap: 8px; 
-  background: #05070a; border: 1px solid #1e293b; border-radius: 6px; 
-  padding: 8px; margin-bottom: 6px; align-items: stretch; flex: 0 0 auto;
+  display: grid; grid-template-columns: 1fr 220px; gap: 6px; 
+  background: #0b0f16; border: 1px solid #2d3748; border-radius: 6px; 
+  padding: 6px; margin-bottom: 4px; align-items: stretch; flex: 0 0 auto;
 }
 @media(max-width: 900px) { .mixer-top-console { grid-template-columns: 1fr; } }
 
+/* LAYAR TFT UTAMA (SQ-7 STYLE) */
 .mixer-tft-screen { 
-  background: #030508; border: 2px solid #1e293b; border-radius: 6px; 
-  padding: 6px; box-shadow: inset 0 0 15px rgba(0,0,0,0.9); 
+  background: #080c14; border: 2px solid #2d3748; border-radius: 6px; 
+  padding: 5px; box-shadow: inset 0 0 15px rgba(0,0,0,0.9); 
   display: flex; flex-direction: column; justify-content: space-between; 
-  height: 100%; min-height: 180px;
+  height: 100%; min-height: 165px;
 }
-.tft-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 2px; margin-bottom: 4px; font-size: 8px; font-weight: 800; color: #38bdf8; }
-.tft-top-tabs { display: flex; gap: 2px; background: #0a0e16; padding: 2px; border-radius: 4px; margin-bottom: 4px; border: 1px solid #1e293b; overflow-x: auto; }
-.tft-tab { background: #1e293b; color: #94a3b8; border: none; font-size: 7.5px; font-weight: 800; padding: 3px 5px; border-radius: 3px; cursor: pointer; white-space: nowrap; }
+.tft-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222d3d; padding-bottom: 2px; margin-bottom: 3px; font-size: 8px; font-weight: 800; color: #38bdf8; }
+.tft-top-tabs { display: flex; gap: 2px; background: #121824; padding: 2px; border-radius: 4px; margin-bottom: 3px; border: 1px solid #2d3748; overflow-x: auto; }
+.tft-tab { background: #222d3d; color: #94a3b8; border: none; font-size: 7px; font-weight: 800; padding: 2px 5px; border-radius: 3px; cursor: pointer; white-space: nowrap; }
 .tft-tab.active { background: #0284c7; color: #fff; }
-.tft-main-viewport { background: #010204; border: 1px solid #1e293b; border-radius: 4px; min-height: 75px; padding: 4px; display: flex; flex-direction: column; justify-content: space-between; position: relative; flex: 1; }
+.tft-main-viewport { background: #05080f; border: 1px solid #222d3d; border-radius: 4px; min-height: 68px; padding: 3px; display: flex; flex-direction: column; justify-content: space-between; position: relative; flex: 1; }
 .tft-content-screen { font-size: 8px; color: #38bdf8; line-height: 1.2; height: 100%; }
 
-/* LAYAR TFT MODUL INTERAKTIF */
-.tft-module-view { display: flex; flex-direction: column; gap: 4px; height: 100%; }
-.tft-module-graph-box { width: 100%; height: 45px; background: #0a0e16; border: 1px solid #1e293b; border-radius: 4px; padding: 3px; display: flex; align-items: center; justify-content: center; position: relative; cursor: crosshair; touch-action: none; }
-.tft-module-controls-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
-.tft-mod-ctrl { background: #0f1520; border: 1px solid #1e293b; border-radius: 4px; padding: 3px; text-align: center; }
-.tft-mod-ctrl label { display: block; color: #94a3b8; font-size: 7px; margin-bottom: 1px; font-weight: 700; }
-.tft-mod-ctrl input[type="range"] { width: 100%; accent-color: #38bdf8; margin: 1px 0; cursor: pointer; touch-action: manipulation; }
-.tft-mod-ctrl select { width: 100%; background: #162030; color: #fff; border: 1px solid #334155; font-size: 7.5px; padding: 1px; border-radius: 2px; }
-.tft-mod-ctrl button { width: 100%; background: #0284c7; color: #fff; border: none; padding: 2px; font-size: 7.5px; font-weight: 800; border-radius: 2px; }
-.tft-mod-ctrl button.active-action { background: #10b981; }
-.tft-val-disp { font-size: 7.5px; color: #f59e0b; font-family: monospace; font-weight: bold; display: block; }
+/* LAYAR PEQ SQ-7 STYLE DENGAN GRID & MULTI-CONTROL POINTS */
+.tft-peq { display:grid; grid-template-columns:minmax(0,1fr); gap:3px; height:100%; }
+.tft-peq-head { display:flex; justify-content:space-between; align-items:center; gap:4px; color:#cbd5e1; font-size:7.5px; font-weight:700; }
+.tft-peq-graph { width:100%; height:55px; background:#080d16; border:1px solid #334155; border-radius:4px; display:block; cursor: crosshair; touch-action: none; }
+.tft-peq-controls { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:3px; }
+.tft-peq-control { background:#162030; border:1px solid #334155; border-radius:4px; padding:2px; text-align:center; }
+.tft-peq-control label { display:block; color:#94a3b8; font-size:6.5px; margin-bottom:1px; font-weight:700; }
+.tft-peq-control input { width:100%; accent-color:#38bdf8; margin:1px 0; cursor: pointer; touch-action: manipulation; }
+.tft-peq-value { display:block; color:#e2e8f0; font-size:7.5px; font-weight:800; }
 
-.tft-encoders-bar { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; margin-top: 4px; background: #05070c; padding: 3px; border-radius: 4px; border: 1px solid #1e293b; }
-.tft-encoder-knob { background: linear-gradient(180deg, #162030, #0a0e16); border: 1px solid #334155; border-radius: 3px; text-align: center; padding: 2px 1px; font-size: 6.5px; color: #cbd5e1; font-family: monospace; font-weight: 700; }
-.tft-encoder-knob span { display: block; color: #38bdf8; font-weight: 800; font-size: 7.5px; margin-top: 1px; }
+.tft-module-view { display: flex; flex-direction: column; gap: 3px; height: 100%; }
+.tft-module-graph-box { width: 100%; height: 42px; background: #0d131f; border: 1px solid #2d3748; border-radius: 4px; padding: 2px; display: flex; align-items: center; justify-content: center; position: relative; cursor: crosshair; touch-action: none; }
+.tft-module-controls-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+.tft-mod-ctrl { background: #131b28; border: 1px solid #2d3748; border-radius: 4px; padding: 2px; text-align: center; }
+.tft-mod-ctrl label { display: block; color: #94a3b8; font-size: 6.5px; margin-bottom: 1px; font-weight: 700; }
+.tft-mod-ctrl input[type="range"] { width: 100%; accent-color: #38bdf8; margin: 1px 0; cursor: pointer; touch-action: manipulation; }
+.tft-mod-ctrl select { width: 100%; background: #1a2536; color: #fff; border: 1px solid #334155; font-size: 7px; padding: 1px; border-radius: 2px; }
+.tft-mod-ctrl button { width: 100%; background: #0284c7; color: #fff; border: none; padding: 2px; font-size: 7px; font-weight: 800; border-radius: 2px; }
+.tft-mod-ctrl button.active-action { background: #10b981; }
+.tft-val-disp { font-size: 7px; color: #f59e0b; font-family: monospace; font-weight: bold; display: block; }
+
+.tft-encoders-bar { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; margin-top: 3px; background: #060910; padding: 2px; border-radius: 4px; border: 1px solid #222d3d; }
+.tft-encoder-knob { background: linear-gradient(180deg, #182232, #0d131f); border: 1px solid #334155; border-radius: 3px; text-align: center; padding: 2px 1px; font-size: 6px; color: #cbd5e1; font-family: monospace; font-weight: 700; }
+.tft-encoder-knob span { display: block; color: #38bdf8; font-weight: 800; font-size: 7px; margin-top: 1px; }
 
 /* INDIKATOR METER STEREO PROFESIONAL DI DALAM LAYAR TFT */
 .tft-stereo-meter-box {
-  display: flex; align-items: center; gap: 6px; background: #05070a; border: 1px solid #1e293b; border-radius: 4px; padding: 3px 6px; margin-top: 4px;
+  display: flex; align-items: center; gap: 6px; background: #060910; border: 1px solid #222d3d; border-radius: 4px; padding: 2px 5px; margin-top: 3px;
 }
 .tft-meter-channel { flex: 1; display: flex; flex-direction: column; gap: 1px; }
-.tft-meter-label { display: flex; justify-content: space-between; font-size: 6.5px; color: #64748b; font-family: monospace; font-weight: bold; }
-.tft-led-bar { display: flex; gap: 1px; height: 6px; align-items: center; }
-.tft-led-bar span { flex: 1; height: 5px; background: #0d121c; border-radius: 1px; }
+.tft-meter-label { display: flex; justify-content: space-between; font-size: 6px; color: #64748b; font-family: monospace; font-weight: bold; }
+.tft-led-bar { display: flex; gap: 1px; height: 5px; align-items: center; }
+.tft-led-bar span { flex: 1; height: 4px; background: #0f1520; border-radius: 1px; }
 .tft-led-bar span.green.on { background: #10b981; box-shadow: 0 0 3px #10b981; }
 .tft-led-bar span.yellow.on { background: #f59e0b; box-shadow: 0 0 3px #f59e0b; }
 .tft-led-bar span.red.on { background: #ef4444; box-shadow: 0 0 4px #ef4444; }
 
-.mixer-control-section { background: #0f141e; border: 1px solid #1e293b; border-radius: 6px; padding: 8px; display: flex; flex-direction: column; justify-content: flex-start; height: 100%; }
-.section-grid-btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; margin-top: 4px; }
-.console-btn { background: #1e293b; color: #cbd5e1; border: 1px solid #334155; font-size: 8px; font-weight: 800; padding: 6px 3px; border-radius: 4px; text-align: center; transition: all 0.2s; }
+.mixer-control-section { background: #171d28; border: 1px solid #2d3748; border-radius: 6px; padding: 6px; display: flex; flex-direction: column; justify-content: flex-start; height: 100%; }
+.section-grid-btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3px; margin-top: 3px; }
+.console-btn { background: #222d3d; color: #cbd5e1; border: 1px solid #334155; font-size: 7.5px; font-weight: 800; padding: 5px 2px; border-radius: 4px; text-align: center; transition: all 0.2s; }
 .console-btn.active { background: #0284c7; color: #fff; border-color: #38bdf8; box-shadow: 0 0 6px rgba(2,132,199,0.5); }
 
-/* PERMUKAAN FADER MIXER */
-.mixer-desk-surface { display: flex; flex-flow: row nowrap; align-items: stretch; gap: 6px; width: 100%; overflow-x: auto; overflow-y: hidden; padding: 2px 2px 6px; flex: 1; min-height: 0; scrollbar-width: thin; }
+/* PERMUKAAN FADER MIXER (GAYA SQ-7) */
+.mixer-desk-surface { display: flex; flex-flow: row nowrap; align-items: stretch; gap: 5px; width: 100%; overflow-x: auto; overflow-y: hidden; padding: 2px 2px 4px; flex: 1; min-height: 0; scrollbar-width: thin; }
 .mixer-desk-surface .console-channel-strip {
-  flex: 0 0 76px; min-width: 76px; height: 100%; padding: 6px 4px; 
-  background: linear-gradient(180deg, #131a26, #0a0e14 58%); border: 1px solid #2d3748; border-radius: 6px; 
+  flex: 0 0 72px; min-width: 72px; height: 100%; padding: 5px 3px; 
+  background: linear-gradient(180deg, #1b2230, #111620 60%); border: 1px solid #2d3748; border-radius: 6px; 
   display: flex; flex-direction: column; align-items: stretch;
 }
-.console-channel-strip.master-strip { background: linear-gradient(180deg, #1f170b, #0a0703); border-color: #d97706; }
-.strip-label-box { background: #e2e8f0; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 4px; width: 100%; min-height: 28px; padding: 2px; display: flex; align-items: center; justify-content: center; text-align: center; margin: 0 0 4px; font-size: 8.5px; font-weight: 800; }
-.master-strip .strip-label-box { color: #fbbf24; border-color: #b45309; background: #110802; }
-.strip-knobs-area { width: 100%; background: #070a0f; border: 1px solid #1e293b; border-radius: 4px; padding: 3px; margin-bottom: 3px; display: flex; flex-direction: column; gap: 2px; }
-.knob-row { display: flex; justify-content: space-between; align-items: center; font-size: 7.5px; color: #94a3b8; font-weight: 700; }
-.knob-row select { background: #0f172a; color: #fff; border: 1px solid #334155; font-size: 7.5px; padding: 1px; border-radius: 2px; }
+.console-channel-strip.master-strip { background: linear-gradient(180deg, #261c0d, #110c04); border-color: #d97706; }
+.strip-label-box { background: #10b981; color: #022c22; border: 1px solid #34d399; border-radius: 4px; width: 100%; min-height: 24px; padding: 2px; display: flex; align-items: center; justify-content: center; text-align: center; margin: 0 0 3px; font-size: 8px; font-weight: 800; }
+.master-strip .strip-label-box { color: #fff; border-color: #f59e0b; background: #d97706; }
+.strip-knobs-area { width: 100%; background: #0b0f16; border: 1px solid #222d3d; border-radius: 4px; padding: 2px 4px; margin-bottom: 3px; display: flex; flex-direction: column; gap: 1px; }
+.knob-row { display: flex; justify-content: space-between; align-items: center; font-size: 7px; color: #94a3b8; font-weight: 700; }
+.knob-row select { background: #131b28; color: #fff; border: 1px solid #334155; font-size: 7px; padding: 1px; border-radius: 2px; }
 
-.fader-panel-area { display: flex; flex: 1 1 auto; align-items: stretch; justify-content: center; gap: 4px; margin: 2px 0; min-height: 100px; }
-.vert-led-meter { display: flex; flex-direction: column; gap: 1px; flex: 0 0 6px; width: 6px; background: #020406; border: 1px solid #1e293b; padding: 2px 0; border-radius: 2px; }
-.vert-led-meter span { flex: 1; background: #0f172a; border-radius: 1px; }
+.fader-panel-area { display: flex; flex: 1 1 auto; align-items: stretch; justify-content: center; gap: 3px; margin: 2px 0; min-height: 90px; }
+.vert-led-meter { display: flex; flex-direction: column; gap: 1px; flex: 0 0 5px; width: 5px; background: #04060a; border: 1px solid #222d3d; padding: 2px 0; border-radius: 2px; }
+.vert-led-meter span { flex: 1; background: #0f1520; border-radius: 1px; }
 .vert-led-meter span.green.on { background: #10b981 !important; box-shadow: 0 0 3px #10b981; }
 .vert-led-meter span.yellow.on { background: #f59e0b !important; box-shadow: 0 0 3px #f59e0b; }
 .vert-led-meter span.red.on { background: #ef4444 !important; box-shadow: 0 0 4px #ef4444; }
 
-.fader-slot { position: relative; flex: 0 0 28px; width: 28px; height: 100%; display: flex; justify-content: center; align-items: center; background: #05070a; border: 1px solid #1e293b; border-radius: 4px; }
+/* FADER VERTIKAL MODEL SQ-SERIES ASLI */
+.fader-slot { position: relative; flex: 0 0 26px; width: 26px; height: 100%; display: flex; justify-content: center; align-items: center; background: #080c14; border: 1px solid #222d3d; border-radius: 4px; }
 .fader-slot::before {
-  content: ""; position: absolute; width: 3px; height: 90%; background: linear-gradient(90deg, #0a0e14, #2d3748, #0a0e14); border-radius: 1px;
+  content: ""; position: absolute; width: 3px; height: 90%; background: linear-gradient(90deg, #04060a, #1f293d, #04060a); border-radius: 1px;
 }
 .fader-slot input[type="range"] {
   -webkit-appearance: none; appearance: none; writing-mode: vertical-lr; direction: rtl; position: absolute; left: 50%; top: 50%;
@@ -249,57 +269,40 @@ header, .topbar {
 }
 .fader-slot input[type="range"]::-webkit-slider-runnable-track { width: 3px; background: transparent; border: 0; }
 .fader-slot input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none; appearance: none; width: 32px; height: 16px; margin-left: -14.5px; border: 1px solid #64748b; border-radius: 2px;
-  background: linear-gradient(to bottom, #cbd5e1 0%, #94a3b8 18%, #475569 48%, #1e293b 52%, #64748b 74%, #f1f5f9 100%);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.7);
+  -webkit-appearance: none; appearance: none; width: 30px; height: 16px; margin-left: -13.5px; border: 1px solid #94a3b8; border-radius: 3px;
+  background: linear-gradient(to bottom, #e2e8f0 0%, #cbd5e1 20%, #64748b 48%, #1e293b 52%, #475569 80%, #f8fafc 100%);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.9), inset 0 1px 1px rgba(255,255,255,0.8);
 }
-.master-strip .fader-slot input[type="range"]::-webkit-slider-thumb { border-color: #f59e0b; }
+.master-strip .fader-slot input[type="range"]::-webkit-slider-thumb { border-color: #f59e0b; background: linear-gradient(to bottom, #fef3c7 0%, #f59e0b 20%, #b45309 48%, #451a03 52%, #d97706 80%, #fffbeb 100%); }
 
-.fader-readout { font-size: 8px; font-family: monospace; color: #38bdf8; margin-bottom: 2px; font-weight: 800; text-align: center; }
+.fader-readout { font-size: 7.5px; font-family: monospace; color: #38bdf8; margin-bottom: 2px; font-weight: 800; text-align: center; }
 .master-strip .fader-readout { color: #fbbf24; }
 
 .strip-action-buttons { display: flex; gap: 2px; width: 100%; margin-top: auto !important; }
-.console-action-btn { flex: 1; background: #1e293b; color: #e2e8f0; border: 1px solid #334155; padding: 4px 1px; font-size: 7.5px; font-weight: 800; border-radius: 3px; text-align: center; }
+.console-action-btn { flex: 1; background: #222d3d; color: #e2e8f0; border: 1px solid #334155; padding: 3px 1px; font-size: 7px; font-weight: 800; border-radius: 3px; text-align: center; }
 .console-action-btn.mute.active { background: #dc2626; color: #fff; border-color: #f87171; box-shadow: 0 0 5px #dc2626; }
 .console-action-btn.solo.active { background: #facc15; color: #0f172a; border-color: #fde047; box-shadow: 0 0 5px #facc15; }
 
 /* =========================================================
    PANEL TAB 4: ESP32 & HARDWARE
 ========================================================= */
-.esp32-panel-box { background: #11151d; border: 1px solid #2d3748; border-radius: 8px; padding: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); flex: 1; overflow-y: auto; }
-.esp32-panel-box h3 { color: #38bdf8; margin: 0 0 6px 0; font-size: 12px; font-weight: 800; }
-.bt-panel { width: 100%; background: #0a0e14; padding: 10px; border-radius: 6px; border: 1px solid #1e293b; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.bt-info { font-size: 8.5px; color: #94a3b8; margin-top: 2px; font-weight: 600; }
-#connectBtButton { background: #0284c7; color: white; border: 1px solid #38bdf8; padding: 6px 12px; border-radius: 5px; font-weight: 800; font-size: 9px; }
+.esp32-panel-box { background: #171d28; border: 1px solid #2d3748; border-radius: 8px; padding: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); flex: 1; overflow-y: auto; }
+.esp32-panel-box h3 { color: #38bdf8; margin: 0 0 6px 0; font-size: 11px; font-weight: 800; }
+.bt-panel { width: 100%; background: #121722; padding: 8px 10px; border-radius: 6px; border: 1px solid #2d3748; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.bt-info { font-size: 8px; color: #94a3b8; margin-top: 2px; font-weight: 600; }
+#connectBtButton { background: #0284c7; color: white; border: 1px solid #38bdf8; padding: 5px 10px; border-radius: 5px; font-weight: 800; font-size: 8.5px; }
 #connectBtButton.connected { background: #10b981; border-color: #34d399; }
 
-.output-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #0a0e14; padding: 10px; border-radius: 6px; margin-top: 8px; border: 1px solid #1e293b; }
+.output-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #121722; padding: 8px 10px; border-radius: 6px; margin-top: 6px; border: 1px solid #2d3748; }
 @media(max-width: 600px) { .output-panel { grid-template-columns: 1fr; } }
-.output-control label { display: block; font-size: 8px; color: #94a3b8; margin-bottom: 2px; font-weight: 700; }
+.output-control label { display: block; font-size: 7.5px; color: #94a3b8; margin-bottom: 2px; font-weight: 700; }
 .output-control input[type="range"] { width: 100%; accent-color: #f59e0b; touch-action: manipulation; }
-.master-value { font-size: 9px; color: #f59e0b; font-family: monospace; text-align: center; font-weight: bold; }
-.output-control select { width: 100%; background: #1e293b; color: #fff; border: 1px solid #475569; padding: 3px; font-size: 9px; border-radius: 3px; }
+.master-value { font-size: 8.5px; color: #f59e0b; font-family: monospace; text-align: center; font-weight: bold; }
+.output-control select { width: 100%; background: #222d3d; color: #fff; border: 1px solid #475569; padding: 2px; font-size: 8.5px; border-radius: 3px; }
 #muteOutputButton.active { background: #ef4444 !important; color: #fff !important; }
 
-.device-status, .feedback-status, .audio-status, .status { font-size: 8.5px; color: #94a3b8; margin-top: 3px; font-weight: 600; }
-.footer { text-align: center; font-size: 8px; color: #64748b; margin-top: 6px; font-weight: 600; }
-
-.audio-actions { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin-bottom: 4px; }
-.audio-actions button, .file-button { background: #1e293b; color: #fff; border: 1px solid #475569; padding: 4px 8px; font-size: 8.5px; border-radius: 4px; font-weight: 800; display: inline-flex; align-items: center; cursor: pointer; }
-.audio-actions button.active { background: #10b981; border-color: #34d399; color: #000; }
-.playlist-container { width: 100%; background: #0a0e14; border: 1px solid #1e293b; border-radius: 4px; padding: 6px; margin: 4px 0; max-height: 70px; overflow-y: auto; font-size: 8.5px; color: #94a3b8; }
-.playlist-item { display: flex; justify-content: space-between; padding: 2px 4px; border-bottom: 1px solid #1e293b; cursor: pointer; }
-.playlist-item.playing { color: #38bdf8; font-weight: 800; }
-
-/* Parametric EQ TFT view styles dengan kurva gradasi biru ke oranye/merah */
-.tft-peq { display:grid; grid-template-columns:minmax(0,1fr); gap:4px; height:100%; }
-.tft-peq-head { display:flex; justify-content:space-between; align-items:center; gap:4px; color:#cbd5e1; font-size:8px; font-weight:700; }
-.tft-peq-graph { width:100%; height:48px; background:#0a0e16; border:1px solid #334155; border-radius:4px; display:block; cursor: crosshair; touch-action: none; }
-.tft-peq-controls { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; }
-.tft-peq-control { background:#162030; border:1px solid #334155; border-radius:4px; padding:3px; text-align:center; }
-.tft-peq-control label { display:block; color:#94a3b8; font-size:7px; margin-bottom:1px; font-weight:700; }
-.tft-peq-control input { width:100%; accent-color:#38bdf8; margin:1px 0; cursor: pointer; touch-action: manipulation; }
-.tft-peq-value { display:block; color:#e2e8f0; font-size:8px; font-weight:800; }
+.device-status, .feedback-status, .audio-status, .status { font-size: 8px; color: #94a3b8; margin-top: 3px; font-weight: 600; }
+.footer { text-align: center; font-size: 7.5px; color: #64748b; margin-top: 4px; font-weight: 600; }
 .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
   </style>
 </head>
@@ -308,7 +311,7 @@ header, .topbar {
   <main class="app">
     <header class="topbar">
       <div>
-        <div class="brand">AUDIO PROCESSOR ONLINE PRO</div>
+        <div class="brand">SQ-SERIES DIGITAL AUDIO CONSOLE</div>
         <div class="subtitle">GQX-3102 Equalizer, Alesis FX & Digital Mixer Console + ESP32 BLE</div>
       </div>
       <div class="actions">
@@ -448,8 +451,8 @@ header, .topbar {
       <div class="echo-panel-box">
         <div class="echo-header-row">
           <div>
-            <h3 style="color: #38bdf8; margin:0 0 2px 0; font-size: 13px;">ALESIS DIGITAL EFFECTS PROCESSOR</h3>
-            <p style="font-size: 9px; color: #94a3b8; margin:0;">Prosesor Efek Studio (Reverb & Delay) di antara Mixer dan Equalizer.</p>
+            <h3 style="color: #38bdf8; margin:0 0 2px 0; font-size: 12px;">ALESIS DIGITAL EFFECTS PROCESSOR</h3>
+            <p style="font-size: 8.5px; color: #94a3b8; margin:0;">Prosesor Efek Studio (Reverb & Delay) di antara Mixer dan Equalizer.</p>
           </div>
           <button class="echo-onoff-btn" id="echoToggleBtn">ALESIS FX: OFF</button>
         </div>
@@ -490,38 +493,38 @@ header, .topbar {
         <div class="integrated-audio-deck">
           <div class="deck-title">🎵 AUDIO PLAYER & INPUT SUMBER</div>
           <div class="audio-actions">
-            <button id="startMicButton">INPUT FISIK / MIC</button>
+            <button id="startMicButton">MIC</button>
             <label for="physicalInputDevice" class="sr-only">Pilih sumber input fisik</label>
             <select id="physicalInputDevice" aria-label="Sumber input fisik" title="Pilih mikrofon atau USB audio interface">
-              <option value="">Input default HP</option>
+              <option value="">Default HP</option>
             </select>
-            <label class="file-button">PILIH BANYAK FILE AUDIO<input id="audioFilesInput" type="file" accept="audio/*" multiple hidden></label>
-            <button id="startAudioButton">START PLAYLIST</button>
-            <button id="stopAudioButton">STOP AUDIO</button>
+            <label class="file-button">📁 FILE<input id="audioFilesInput" type="file" accept="audio/*" multiple hidden></label>
+            <button id="startAudioButton">▶ PLAY</button>
+            <button id="stopAudioButton">⏹ STOP</button>
           </div>
           <div class="playlist-container" id="playlistContainer">
             <div style="text-align: center; padding: 2px; color: #64748b;">Belum ada file audio dipilih.</div>
           </div>
-          <div id="audioStatus" class="audio-status" style="margin-top: 2px;">Audio belum aktif.</div>
+          <div id="audioStatus" class="audio-status" style="margin-top: 1px;">Audio belum aktif.</div>
         </div>
 
         <!-- BAGIAN LAYAR UTAMA & SECTION SELECT DI KANAN -->
         <div class="mixer-top-console">
           
-          <!-- LAYAR TFT UTAMA -->
+          <!-- LAYAR TFT UTAMA (SQ-7 STYLE) -->
           <div class="mixer-tft-screen">
             <div class="tft-header">
-              <span id="tftSectionTitle">HOME / OVERVIEW CONSOLE</span>
-              <span style="color: #10b981;">● DSP: 48kHz / 32-bit</span>
+              <span id="tftSectionTitle">SQ-7 PEQ / PROCESSING</span>
+              <span style="color: #10b981;">● 48kHz / 32-bit</span>
             </div>
 
             <div class="tft-top-tabs">
-              <button class="tft-tab active" data-tft-tab="home">HOME</button>
-              <button class="tft-tab" data-tft-tab="meters">METERS</button>
-              <button class="tft-tab" data-tft-tab="routing">ROUTING</button>
-              <button class="tft-tab" data-tft-tab="setup">SETUP</button>
-              <button class="tft-tab" data-tft-tab="library">LIBRARY</button>
-              <button class="tft-tab" data-tft-tab="effects">EFFECTS</button>
+              <button class="tft-tab active" data-tft-tab="eq">Processing</button>
+              <button class="tft-tab" data-tft-tab="routing">Routing</button>
+              <button class="tft-tab" data-tft-tab="meters">Meters</button>
+              <button class="tft-tab" data-tft-tab="scenes">Scenes</button>
+              <button class="tft-tab" data-tft-tab="setup">Setup</button>
+              <button class="tft-tab" data-tft-tab="effects">Utility</button>
             </div>
 
             <div class="tft-main-viewport">
@@ -540,9 +543,9 @@ header, .topbar {
               </div>
             </div>
 
-            <div style="font-size: 7.5px; color: #64748b; border-top: 1px solid #1e293b; padding-top: 2px; display: flex; justify-content: space-between; margin-top: 3px;">
-              <span id="tftFooterChannel">CH 01: Lead Vocal</span>
-              <span id="tftFooterStatus">Gate/Comp/EQ Active</span>
+            <div style="font-size: 7px; color: #64748b; border-top: 1px solid #222d3d; padding-top: 2px; display: flex; justify-content: space-between; margin-top: 2px;">
+              <span id="tftFooterChannel">Current: Live Stage</span>
+              <span id="tftFooterStatus">Next: Main LR</span>
             </div>
 
             <div class="tft-encoders-bar">
@@ -550,32 +553,32 @@ header, .topbar {
               <div class="tft-encoder-knob">HPF<span id="enc2Val">80Hz</span></div>
               <div class="tft-encoder-knob">THRESH<span id="enc3Val">-18dB</span></div>
               <div class="tft-encoder-knob">RATIO<span id="enc4Val">3:1</span></div>
-              <div class="tft-encoder-knob">FREQUENCY<span id="enc5Val">2.5kHz</span></div>
-              <div class="tft-encoder-knob">MIX/SEND<span id="enc6Val">0.0dB</span></div>
+              <div class="tft-encoder-knob">FREQ<span id="enc5Val">2.5kHz</span></div>
+              <div class="tft-encoder-knob">SEND<span id="enc6Val">0.0dB</span></div>
             </div>
           </div>
 
           <!-- SECTION SELECT DI KANAN -->
           <div class="mixer-control-section">
-            <div style="font-size: 9px; font-weight: 800; color: #38bdf8; margin-bottom: 2px;">SECTION SELECT</div>
-            <div style="font-size: 7.5px; color: #94a3b8; margin-bottom: 3px;">Pilih modul prosesor console</div>
+            <div style="font-size: 8.5px; font-weight: 800; color: #38bdf8; margin-bottom: 2px;">SQ-7 PROCESSING</div>
+            <div style="font-size: 7px; color: #94a3b8; margin-bottom: 3px;">Pilih modul DSP Console</div>
             <div class="section-grid-btns">
-              <button class="console-btn" data-section="config">CONFIG</button>
-              <button class="console-btn" data-section="gate">GATE</button>
-              <button class="console-btn" data-section="dynamics">DYNAMICS</button>
-              <button class="console-btn active" data-section="eq">EQ</button>
-              <button class="console-btn" data-section="sends">SENDS</button>
-              <button class="console-btn" data-section="main">MAIN</button>
+              <button class="console-btn" data-section="config">Preamp</button>
+              <button class="console-btn" data-section="gate">Gate</button>
+              <button class="console-btn" data-section="dynamics">Comp</button>
+              <button class="console-btn active" data-section="eq">PEQ</button>
+              <button class="console-btn" data-section="sends">GEQ</button>
+              <button class="console-btn" data-section="main">Insert</button>
             </div>
           </div>
         </div>
 
-        <!-- PERMUKAAN KONSOLE -->
+        <!-- PERMUKAAN KONSOLE (FADER STRIPS) -->
         <div class="mixer-desk-surface">
           <div class="console-channel-strip">
-            <div class="strip-label-box">CH 1: MIC</div>
+            <div class="strip-label-box">Ip1</div>
             <div class="strip-knobs-area">
-              <div class="knob-row"><span>GAIN</span><span>+0 dB</span></div>
+              <div class="knob-row"><span>GAIN</span><span>+0dB</span></div>
               <div class="knob-row"><span>HPF</span><select><option>OFF</option><option>80Hz</option></select></div>
             </div>
             <div class="fader-readout">0.0 dB</div>
@@ -585,14 +588,14 @@ header, .topbar {
             </div>
             <div class="strip-action-buttons">
               <button class="console-action-btn mute">MUTE</button>
-              <button class="console-action-btn solo">SOLO</button>
+              <button class="console-action-btn solo">PAFL</button>
             </div>
           </div>
 
           <div class="console-channel-strip">
-            <div class="strip-label-box">CH 2: MUSIC</div>
+            <div class="strip-label-box">Ip2</div>
             <div class="strip-knobs-area">
-              <div class="knob-row"><span>GAIN</span><span>+0 dB</span></div>
+              <div class="knob-row"><span>GAIN</span><span>+0dB</span></div>
               <div class="knob-row"><span>HPF</span><select><option>OFF</option><option>80Hz</option></select></div>
             </div>
             <div class="fader-readout">0.0 dB</div>
@@ -602,14 +605,14 @@ header, .topbar {
             </div>
             <div class="strip-action-buttons">
               <button class="console-action-btn mute">MUTE</button>
-              <button class="console-action-btn solo">SOLO</button>
+              <button class="console-action-btn solo">PAFL</button>
             </div>
           </div>
 
           <div class="console-channel-strip">
-            <div class="strip-label-box">CH 3: AUX</div>
+            <div class="strip-label-box">Ip3</div>
             <div class="strip-knobs-area">
-              <div class="knob-row"><span>GAIN</span><span>+0 dB</span></div>
+              <div class="knob-row"><span>GAIN</span><span>+0dB</span></div>
               <div class="knob-row"><span>HPF</span><select><option>OFF</option><option>80Hz</option></select></div>
             </div>
             <div class="fader-readout">0.0 dB</div>
@@ -619,14 +622,14 @@ header, .topbar {
             </div>
             <div class="strip-action-buttons">
               <button class="console-action-btn mute">MUTE</button>
-              <button class="console-action-btn solo">SOLO</button>
+              <button class="console-action-btn solo">PAFL</button>
             </div>
           </div>
 
           <div class="console-channel-strip">
-            <div class="strip-label-box">CH 4: FX</div>
+            <div class="strip-label-box">Ip4</div>
             <div class="strip-knobs-area">
-              <div class="knob-row"><span>GAIN</span><span>+0 dB</span></div>
+              <div class="knob-row"><span>GAIN</span><span>+0dB</span></div>
               <div class="knob-row"><span>HPF</span><select><option>OFF</option><option>80Hz</option></select></div>
             </div>
             <div class="fader-readout">0.0 dB</div>
@@ -636,13 +639,13 @@ header, .topbar {
             </div>
             <div class="strip-action-buttons">
               <button class="console-action-btn mute">MUTE</button>
-              <button class="console-action-btn solo">SOLO</button>
+              <button class="console-action-btn solo">PAFL</button>
             </div>
           </div>
 
           <div class="console-channel-strip master-strip">
-            <div class="strip-label-box">MASTER L/R</div>
-            <div class="strip-knobs-area" style="border-color: #b45309;">
+            <div class="strip-label-box">Main LR</div>
+            <div class="strip-knobs-area" style="border-color: #d97706;">
               <div class="knob-row"><span>LIMIT</span><span>ON</span></div>
               <div class="knob-row"><span>PROC</span><select><option>EQ+ALESIS</option><option>BYPASS</option></select></div>
             </div>
@@ -664,7 +667,7 @@ header, .topbar {
     <div class="tab-content" id="tabEspContent">
       <div class="esp32-panel-box">
         <h3>KONTROL HARDWARE ESP32 & KONEKTIVITAS BLUETOOTH</h3>
-        <p style="font-size: 9px; color: #94a3b8; margin-bottom: 8px;">Hubungkan perangkat mikrokontroler ESP32 via Web Bluetooth untuk sinkronisasi hardware equalizer secara real-time.</p>
+        <p style="font-size: 8.5px; color: #94a3b8; margin-bottom: 6px;">Hubungkan mikrokontroler ESP32 via Web Bluetooth untuk sinkronisasi hardware secara real-time.</p>
 
         <div class="bt-panel">
           <div>
@@ -686,15 +689,15 @@ header, .topbar {
               <option value="safe" selected>SAFE MODE</option>
               <option value="normal">NORMAL MODE</option>
             </select>
-            <label for="physicalOutputDevice" style="display:block;margin-top:6px;">OUTPUT KE MIXER FISIK</label>
+            <label for="physicalOutputDevice" style="display:block;margin-top:4px;">OUTPUT KE MIXER FISIK</label>
             <select id="physicalOutputDevice" aria-label="Pilih output audio" style="width:100%;">
               <option value="">Output default HP / USB</option>
             </select>
-            <button id="muteOutputButton" style="width:100%; margin-top:6px;">MUTE OUTPUT</button>
+            <button id="muteOutputButton" style="width:100%; margin-top:5px;">MUTE OUTPUT</button>
           </div>
         </div>
 
-        <div id="feedbackStatus" class="feedback-status" style="margin-top: 8px;">Alur Sinyal: [MUSIC PLAYER] ➡️ [DIGITAL MIXER CONSOLE] ➡️ [EQUALIZER + ALESIS FX] ➡️ [OUTPUT]</div>
+        <div id="feedbackStatus" class="feedback-status" style="margin-top: 6px;">Alur Sinyal: [PLAYER] ➡️ [SQ-7 DIGITAL MIXER] ➡️ [EQ + ALESIS FX] ➡️ [OUTPUT]</div>
       </div>
     </div>
 
@@ -972,11 +975,11 @@ async function refreshPhysicalInputDevices() {
     if (physicalInputDevice) {
       const inputs = devices.filter(device => device.kind === "audioinput");
       const previous = physicalInputDevice.value;
-      physicalInputDevice.innerHTML = '<option value="">Input default HP / USB</option>';
+      physicalInputDevice.innerHTML = '<option value="">Default HP</option>';
       inputs.forEach((device, index) => {
         const option = document.createElement("option");
         option.value = device.deviceId;
-        option.textContent = device.label || ("Input audio " + (index + 1));
+        option.textContent = device.label || ("Input " + (index + 1));
         physicalInputDevice.appendChild(option);
       });
       if (inputs.some(device => device.deviceId === previous)) physicalInputDevice.value = previous;
@@ -988,7 +991,7 @@ async function refreshPhysicalInputDevices() {
       outputs.forEach((device, index) => {
         const option = document.createElement("option");
         option.value = device.deviceId;
-        option.textContent = device.label || ("Output audio " + (index + 1));
+        option.textContent = device.label || ("Output " + (index + 1));
         physicalOutputDevice.appendChild(option);
       });
       if (outputs.some(device => device.deviceId === previous)) physicalOutputDevice.value = previous;
@@ -1610,7 +1613,7 @@ document.querySelectorAll(".mixer-desk-surface .console-channel-strip").forEach(
 });
 
 /* =========================================================
-   DATABASE TFT INTERAKTIF LENGKAP DENGAN DRAG & DROP PADA KURVA
+   DATABASE TFT INTERAKTIF SQ-7 STYLE (DENGAN GRID & MULTI-DOT)
 ========================================================= */
 const tftSectionTitle = document.getElementById("tftSectionTitle");
 const tftContentArea = document.getElementById("tftContentArea");
@@ -1630,9 +1633,9 @@ function updateEncoders(data) {
 
 const tftDatabase = {
   config: {
-    title: "CONFIG / PREAMP INTERFACE",
-    footerCh: "CH 01: Lead Vocal",
-    footerSt: "Preamp Gain & Phantom Power Setting",
+    title: "SQ-7 PREAMP CONFIG",
+    footerCh: "Current: Ip1 Preamp",
+    footerSt: "Next: Gain & Phantom Setting",
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftConfigBox">
@@ -1640,7 +1643,7 @@ const tftDatabase = {
             <path id="tftConfigSvgCurve" d="M10 45 Q 160 30, 310 15" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
             <path id="tftConfigSvgFill" d="M10 45 Q 160 30, 310 15 L310 50 L10 50 Z" fill="#0284c7" opacity=".12"/>
             <circle id="tftConfigSvgDot" cx="160" cy="30" r="7" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2" style="cursor:pointer;"/>
-            <text x="15" y="18" fill="#94a3b8" font-size="7">CONFIG CURVE (DRAG TO ADJUST)</text>
+            <text x="15" y="16" fill="#94a3b8" font-size="6.5">PREAMP GAIN CURVE</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -1653,9 +1656,9 @@ const tftDatabase = {
     encoders: [{name:"GAIN", val:"+12dB"}, {name:"HPF", val:"80Hz"}, {name:"POLARITY", val:"NORM"}, {name:"DELAY", val:"0.0ms"}, {name:"WIDTH", val:"100%"}, {name:"TRIM", val:"0.0dB"}]
   },
   gate: {
-    title: "NOISE GATE / EXPANDER PROCESSOR",
-    footerCh: "CH 01: Lead Vocal",
-    footerSt: "Threshold & Ratio Gate Setting",
+    title: "SQ-7 NOISE GATE",
+    footerCh: "Current: Ip1 Gate",
+    footerSt: "Next: Threshold & Hold",
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftGateBox">
@@ -1664,22 +1667,22 @@ const tftDatabase = {
             <path id="tftGateSvgFill" d="M10 50 L 140 50 L 310 10 L 310 50 Z" fill="#f59e0b" opacity=".1"/>
             <circle id="tftGateDot1" cx="140" cy="50" r="7" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" style="cursor:pointer;"/>
             <circle id="tftGateDot2" cx="310" cy="10" r="7" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" style="cursor:pointer;"/>
-            <text x="15" y="18" fill="#94a3b8" font-size="7">GATE TRANSFER (DRAG DOTS)</text>
+            <text x="15" y="16" fill="#94a3b8" font-size="6.5">GATE TRANSFER CURVE</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
           <div class="tft-mod-ctrl"><label>Threshold</label><input type="range" id="gateThresh" min="-80" max="0" value="-45"><span class="tft-val-disp" id="gateThreshVal">-45dB</span></div>
           <div class="tft-mod-ctrl"><label>Ratio</label><input type="range" id="gateRatio" min="1" max="10" step="0.5" value="2.5"><span class="tft-val-disp" id="gateRatioVal">1:2.5</span></div>
-          <div class="tft-mod-ctrl"><label>Gate Status</label><button id="gateStateBtn" class="active-action" type="button">ACTIVE</button></div>
+          <div class="tft-mod-ctrl"><label>Gate State</label><button id="gateStateBtn" class="active-action" type="button">ACTIVE</button></div>
         </div>
       </div>
     `,
     encoders: [{name:"THRESH", val:"-45dB"}, {name:"RATIO", val:"1:2.5"}, {name:"ATTACK", val:"5ms"}, {name:"HOLD", val:"20ms"}, {name:"RELEASE", val:"300ms"}, {name:"FILTER", val:"OFF"}]
   },
   dynamics: {
-    title: "DYNAMICS / COMPRESSOR PROCESSOR",
-    footerCh: "CH 01: Lead Vocal",
-    footerSt: "Compressor Threshold, Ratio & Makeup",
+    title: "SQ-7 COMPRESSOR DYNAMICS",
+    footerCh: "Current: Ip1 Comp",
+    footerSt: "Next: Threshold & Ratio",
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftCompBox">
@@ -1689,7 +1692,7 @@ const tftDatabase = {
             <circle id="tftCompDot1" cx="10" cy="50" r="7" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer;"/>
             <circle id="tftCompDot2" cx="180" cy="30" r="7" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer;"/>
             <circle id="tftCompDot3" cx="310" cy="20" r="7" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer;"/>
-            <text x="15" y="18" fill="#94a3b8" font-size="7">COMPRESSOR (DRAG DOTS)</text>
+            <text x="15" y="16" fill="#94a3b8" font-size="6.5">COMPRESSOR CURVE</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -1702,21 +1705,44 @@ const tftDatabase = {
     encoders: [{name:"THRESH", val:"-18dB"}, {name:"RATIO", val:"3:1"}, {name:"ATTACK", val:"10ms"}, {name:"RELEASE", val:"300ms"}, {name:"MAKEUP", val:"+2dB"}, {name:"KNEE", val:"Soft"}]
   },
   eq: {
-    title: "PARAMETRIC EQ / CHANNEL PROCESSOR",
-    footerCh: "CH 02: PEQ",
-    footerSt: "Geser titik kuning pada kurva atau slider untuk mengatur PEQ",
+    title: "SQ-7 PARAMETRIC EQUALIZER (PEQ)",
+    footerCh: "Current: Ip1 PEQ",
+    footerSt: "Next: 4-Band PEQ Response",
     content: `
       <div class="tft-peq">
-        <div class="tft-peq-head"><strong>PEQ • CH 02</strong><span style="color:#10b981;">● AUDIO DSP ACTIVE</span></div>
-        <svg class="tft-peq-graph" id="tftPeqSvgContainer" viewBox="0 0 320 120" preserveAspectRatio="none" role="img" aria-label="Parametric equalizer response curve" style="touch-action:none;">
-          <g stroke="#475569" stroke-width=".5" opacity=".6">
-            <path d="M0 30H320 M0 60H320 M0 90H320"/>
-            <path d="M80 0V120 M160 0V120 M240 0V120"/>
+        <div class="tft-peq-head">
+          <span>PEQ • 4-BAND SQ-7</span>
+          <span style="color:#10b981;">● 50Hz | 200Hz | 2k | 10k Active</span>
+        </div>
+        <svg class="tft-peq-graph" id="tftPeqSvgContainer" viewBox="0 0 320 120" preserveAspectRatio="none" role="img" aria-label="SQ-7 Parametric equalizer response curve" style="touch-action:none;">
+          <!-- GRID GARIS SQ-7 STYLE -->
+          <g stroke="#334155" stroke-width=".7" opacity=".7">
+            <line x1="0" y1="20" x2="320" y2="20" />
+            <line x1="0" y1="40" x2="320" y2="40" />
+            <line x1="0" y1="60" x2="320" y2="60" stroke="#64748b" stroke-width="1.2" />
+            <line x1="0" y1="80" x2="320" y2="80" />
+            <line x1="0" y1="100" x2="320" y2="100" />
+            <line x1="50" y1="0" x2="50" y2="120" />
+            <line x1="100" y1="0" x2="100" y2="120" />
+            <line x1="160" y1="0" x2="160" y2="120" stroke="#475569" stroke-width="1" />
+            <line x1="220" y1="0" x2="220" y2="120" />
+            <line x1="280" y1="0" x2="280" y2="120" />
           </g>
+          <text x="52" y="112" fill="#94a3b8" font-size="6">50</text>
+          <text x="102" y="112" fill="#94a3b8" font-size="6">100</text>
+          <text x="162" y="112" fill="#94a3b8" font-size="6">1k</text>
+          <text x="222" y="112" fill="#94a3b8" font-size="6">5k</text>
+          <text x="278" y="112" fill="#94a3b8" font-size="6">10k</text>
+
           <path id="tftPeqSvgFill" d="M0 60 C80 60 120 20 160 50 C200 80 260 15 320 60 L320 120 L0 120 Z" fill="url(#blueRedGradient)" opacity="0.3"/>
           <path id="tftPeqSvgCurve" d="M0 60 C80 60 120 20 160 50 C200 80 260 15 320 60" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
-          <circle id="tftPeqSvgDot" cx="160" cy="50" r="6.5" fill="#fef08a" stroke="#f59e0b" stroke-width="2" style="cursor:pointer;"/>
-          <circle id="tftPeqDot2" cx="260" cy="15" r="6.5" fill="#fca5a5" stroke="#ef4444" stroke-width="2" style="cursor:pointer;"/>
+          
+          <!-- EMPAT TITIK KONTROL PEQ SQ-7 (UNGU, BIRU, TOSCA, MERAH) -->
+          <circle id="tftPeqDot1" cx="64" cy="50" r="6" fill="#c084fc" stroke="#a855f7" stroke-width="2" style="cursor:pointer;" title="Band 1: 50Hz"/>
+          <circle id="tftPeqDot2" cx="130" cy="60" r="6" fill="#38bdf8" stroke="#0284c7" stroke-width="2" style="cursor:pointer;" title="Band 2: 200Hz"/>
+          <circle id="tftPeqDot3" cx="220" cy="60" r="6" fill="#2dd4bf" stroke="#0d9488" stroke-width="2" style="cursor:pointer;" title="Band 3: 2.5kHz"/>
+          <circle id="tftPeqDot4" cx="280" cy="20" r="6" fill="#f87171" stroke="#dc2626" stroke-width="2" style="cursor:pointer;" title="Band 4: 10kHz"/>
+
           <defs>
             <linearGradient id="blueRedGradient" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stop-color="#38bdf8"/>
@@ -1732,7 +1758,7 @@ const tftDatabase = {
             <span class="tft-peq-value" id="tftPeqFreqVal">${tftPeqFreqVal >= 1000 ? (tftPeqFreqVal/1000).toFixed(2)+' kHz' : tftPeqFreqVal+' Hz'}</span>
           </div>
           <div class="tft-peq-control">
-            <label for="tftPeqQ">Q</label>
+            <label for="tftPeqQ">Q BAND</label>
             <input id="tftPeqQ" type="range" min="0.1" max="10" step="0.1" value="${tftPeqQVal}">
             <span class="tft-peq-value" id="tftPeqQVal">${tftPeqQVal.toFixed(1)}</span>
           </div>
@@ -1744,12 +1770,12 @@ const tftDatabase = {
         </div>
       </div>
     `,
-    encoders: [{name:"FREQ", val: tftPeqFreqVal>=1000?(tftPeqFreqVal/1000).toFixed(2)+'kHz':tftPeqFreqVal+'Hz'}, {name:"Q", val: tftPeqQVal.toFixed(1)}, {name:"GAIN", val: tftPeqGainVal.toFixed(1)+'dB'}, {name:"BAND", val:"MID"}, {name:"TYPE", val:"PEAK"}, {name:"BYPASS", val:"OFF"}]
+    encoders: [{name:"FREQ", val: tftPeqFreqVal>=1000?(tftPeqFreqVal/1000).toFixed(2)+'kHz':tftPeqFreqVal+'Hz'}, {name:"Q", val: tftPeqQVal.toFixed(1)}, {name:"GAIN", val: tftPeqGainVal.toFixed(1)+'dB'}, {name:"BAND", val:"PEQ"}, {name:"TYPE", val:"PEAK"}, {name:"BYPASS", val:"OFF"}]
   },
   sends: {
-    title: "BUS SENDS & FX ROUTING",
-    footerCh: "CH 01: Lead Vocal",
-    footerSt: "Send Bus 1 & Send Bus 2 Routing",
+    title: "SQ-7 GRAPHIC EQUALIZER (GEQ)",
+    footerCh: "Current: Master GEQ",
+    footerSt: "Next: 31-Band GEQ Graphic",
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftSendsBox">
@@ -1758,22 +1784,22 @@ const tftDatabase = {
             <path id="tftSendsSvgFill" d="M10 40 L 160 25 L 310 10 L 310 50 L 10 50 Z" fill="#a855f7" opacity=".1"/>
             <circle id="tftSendsDot1" cx="160" cy="25" r="7" fill="#f3e8ff" stroke="#a855f7" stroke-width="2" style="cursor:pointer;"/>
             <circle id="tftSendsDot2" cx="310" cy="10" r="7" fill="#f3e8ff" stroke="#a855f7" stroke-width="2" style="cursor:pointer;"/>
-            <text x="15" y="18" fill="#94a3b8" font-size="7">SEND BUS (DRAG DOTS)</text>
+            <text x="15" y="16" fill="#94a3b8" font-size="6.5">GEQ CURVE VIEW</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>Send 1</label><input type="range" id="send1Lvl" min="-60" max="0" value="-6"><span class="tft-val-disp" id="send1LvlVal">-6dB</span></div>
-          <div class="tft-mod-ctrl"><label>Send 2</label><input type="range" id="send2Lvl" min="-60" max="0" value="-12"><span class="tft-val-disp" id="send2LvlVal">-12dB</span></div>
-          <div class="tft-mod-ctrl"><label>Send Mode</label><select id="sendModeSelect"><option>Post-Fader</option><option>Pre-Fader</option></select></div>
+          <div class="tft-mod-ctrl"><label>GEQ Master</label><input type="range" id="send1Lvl" min="-15" max="15" value="0"><span class="tft-val-disp" id="send1LvlVal">0dB</span></div>
+          <div class="tft-mod-ctrl"><label>Preset GEQ</label><select><option>Flat</option><option>Vocal Boost</option><option>Music V-Shape</option></select></div>
+          <div class="tft-mod-ctrl"><label>GEQ State</label><button class="active-action" type="button">ACTIVE</button></div>
         </div>
       </div>
     `,
-    encoders: [{name:"SEND 1", val:"-6dB"}, {name:"SEND 2", val:"-12dB"}, {name:"SEND 3", val:"-inf"}, {name:"SEND 4", val:"-inf"}, {name:"PAN", val:"C (0)"}, {name:"MODE", val:"POST"}]
+    encoders: [{name:"GEQ", val:"31-BAND"}, {name:"MODE", val:"MASTER"}, {name:"BYPASS", val:"OFF"}, {name:"PRESET", val:"FLAT"}, {name:"RTA", val:"ON"}, {name:"GAIN", val:"0.0dB"}]
   },
   main: {
-    title: "MAIN FOH OUTPUT & MATRIX",
-    footerCh: "MASTER FOH",
-    footerSt: "Main FOH Level & Limiter Setting",
+    title: "SQ-7 INSERT PROCESSOR",
+    footerCh: "Current: Main Insert",
+    footerSt: "Next: External FX / Limiter Insert",
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftMainBox">
@@ -1782,174 +1808,145 @@ const tftDatabase = {
             <path id="tftMainSvgFill" d="M10 30 Q 160 10, 310 30 L 310 50 L 10 50 Z" fill="#ef4444" opacity=".1"/>
             <circle id="tftMainDot1" cx="160" cy="10" r="7" fill="#fee2e2" stroke="#ef4444" stroke-width="2" style="cursor:pointer;"/>
             <circle id="tftMainDot2" cx="310" cy="30" r="7" fill="#fee2e2" stroke="#ef4444" stroke-width="2" style="cursor:pointer;"/>
-            <text x="15" y="18" fill="#94a3b8" font-size="7">MAIN FOH (DRAG DOTS)</text>
+            <text x="15" y="16" fill="#94a3b8" font-size="6.5">INSERT ROUTING VIEW</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>Main FOH</label><input type="range" id="mainFohLvl" min="-50" max="6" value="0"><span class="tft-val-disp" id="mainFohLvlVal">0dB</span></div>
-          <div class="tft-mod-ctrl"><label>Limiter</label><input type="range" id="mainLimitLvl" min="-20" max="0" value="-0.5"><span class="tft-val-disp" id="mainLimitLvlVal">-0.5dB</span></div>
-          <div class="tft-mod-ctrl"><label>Mono Sum</label><button id="mainMonoBtn" type="button">OFF</button></div>
+          <div class="tft-mod-ctrl"><label>Insert Send</label><input type="range" id="mainFohLvl" min="-50" max="6" value="0"><span class="tft-val-disp" id="mainFohLvlVal">0dB</span></div>
+          <div class="tft-mod-ctrl"><label>Limiter Peak</label><input type="range" id="mainLimitLvl" min="-20" max="0" value="-0.5"><span class="tft-val-disp" id="mainLimitLvlVal">-0.5dB</span></div>
+          <div class="tft-mod-ctrl"><label>Insert State</label><button id="mainMonoBtn" type="button">BYPASS</button></div>
         </div>
       </div>
     `,
-    encoders: [{name:"MASTER", val:"0dB"}, {name:"LIMITER", val:"-0.5dB"}, {name:"BALANCE", val:"CENTER"}, {name:"MONO", val:"OFF"}, {name:"MATRIX 1", val:"-inf"}, {name:"MATRIX 2", val:"-inf"}]
-  },
-  home: {
-    title: "HOME / OVERVIEW CONSOLE",
-    footerCh: "SYSTEM OVERVIEW",
-    footerSt: "Tampilan Ringkasan Sistem Konsole",
-    content: `
-      <div class="tft-module-view">
-        <div class="tft-module-graph-box">
-          <svg id="tftHomeSvgContainer" viewBox="0 0 320 60" style="width:100%; height:100%; touch-action:none;">
-            <path id="tftHomeSvgCurve" d="M10 45 L 80 20 L 160 35 L 240 15 L 310 40" fill="none" stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftHomeSvgFill" d="M10 45 L 80 20 L 160 35 L 240 15 L 310 40 L 310 50 L 10 50 Z" fill="#22d3ee" opacity=".1"/>
-            <circle id="tftHomeSvgDot" cx="160" cy="35" r="5.5" fill="#cffafe" stroke="#22d3ee" stroke-width="2"/>
-            <text x="15" y="18" fill="#94a3b8" font-size="7">OVERVIEW STATUS METER</text>
-          </svg>
-        </div>
-        <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>Global Mute All</label><button id="homeMuteAllBtn" type="button">MUTE ALL</button></div>
-          <div class="tft-mod-ctrl"><label>DSP Clock</label><select id="homeClockSelect"><option>48 kHz / 32-bit</option><option>96 kHz / 32-bit</option></select></div>
-          <div class="tft-mod-ctrl"><label>Talkback Mic</label><button id="homeTalkBtn" type="button">TALK ON</button></div>
-        </div>
-      </div>
-    `,
-    encoders: [{name:"CH 1 LVL", val:"0dB"}, {name:"CH 2 LVL", val:"0dB"}, {name:"CH 3 LVL", val:"0dB"}, {name:"CH 4 LVL", val:"0dB"}, {name:"FX RET", val:"-6dB"}, {name:"MASTER", val:"0dB"}]
-  },
-  meters: {
-    title: "METERS / RTA SPECTRUM ANALYZER",
-    footerCh: "RTA SPECTRUM",
-    footerSt: "RTA Spectrum & Peak Hold Display",
-    content: `
-      <div class="tft-module-view">
-        <div class="tft-module-graph-box">
-          <svg id="tftMetersSvgContainer" viewBox="0 0 320 60" style="width:100%; height:100%; touch-action:none;">
-            <path id="tftMetersSvgCurve" d="M10 45 L 40 20 L 80 35 L 120 15 L 160 40 L 200 18 L 240 30 L 280 12 L 310 42" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftMetersSvgFill" d="M10 45 L 40 20 L 80 35 L 120 15 L 160 40 L 200 18 L 240 30 L 280 12 L 310 42 L 310 50 L 10 50 Z" fill="#38bdf8" opacity=".1"/>
-            <circle id="tftMetersSvgDot" cx="160" cy="40" r="5.5" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2"/>
-            <text x="15" y="18" fill="#94a3b8" font-size="7">RTA SPECTRUM</text>
-          </svg>
-        </div>
-        <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>RTA Source</label><select id="rtaSourceSelect"><option>Post-EQ Main</option><option>Pre-EQ Input</option></select></div>
-          <div class="tft-mod-ctrl"><label>Peak Hold</label><select id="rtaHoldSelect"><option>3.0 Seconds</option><option>Infinite</option></select></div>
-          <div class="tft-mod-ctrl"><label>Zoom</label><input type="range" id="rtaZoom" min="1" max="4" value="1"><span class="tft-val-disp" id="rtaZoomVal">1x</span></div>
-        </div>
-      </div>
-    `,
-    encoders: [{name:"SOURCE", val:"POST-EQ"}, {name:"DECAY", val:"Fast"}, {name:"PEAK HOLD", val:"3.0s"}, {name:"ZOOM", val:"1x"}, {name:"WEIGHT", val:"A-EQ"}, {name:"VIEW", val:"31-BAND"}]
+    encoders: [{name:"INSERT", val:"FX RACK"}, {name:"SEND", val:"0dB"}, {name:"RETURN", val:"0dB"}, {name:"LIMITER", val:"-0.5dB"}, {name:"TAP", val:"POST"}, {name:"STATUS", val:"ACTIVE"}]
   },
   routing: {
-    title: "ROUTING MATRIX & PATCHBAY",
-    footerCh: "IO PATCHBAY",
-    footerSt: "Konfigurasi Jalur Sinyal Konsole",
+    title: "SQ-7 ROUTING & PATCHBAY",
+    footerCh: "Current: I/O Patch",
+    footerSt: "Next: Direct Out & USB Audio Routing",
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box">
           <svg id="tftRoutingSvgContainer" viewBox="0 0 320 60" style="width:100%; height:100%; touch-action:none;">
-            <path id="tftRoutingSvgCurve" d="M20 15 L 120 15 L 160 45 L 300 45" fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftRoutingSvgFill" d="M20 15 L 120 15 L 160 45 L 300 45 L 300 50 L 20 50 Z" fill="#f43f5e" opacity=".1"/>
-            <circle id="tftRoutingSvgDot" cx="160" cy="45" r="5.5" fill="#ffe4e6" stroke="#f43f5e" stroke-width="2"/>
-            <text x="15" y="18" fill="#94a3b8" font-size="7">PATCHBAY SIGNAL PATH</text>
+            <path d="M20 15 L 120 15 L 160 45 L 300 45" fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="160" cy="45" r="5.5" fill="#ffe4e6" stroke="#f43f5e" stroke-width="2"/>
+            <text x="15" y="16" fill="#94a3b8" font-size="6.5">ROUTING MATRIX VIEW</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>Input 1 Source</label><select id="routeIn1"><option>Playlist Audio</option><option>Physical Mic</option></select></div>
-          <div class="tft-mod-ctrl"><label>Input 2 Source</label><select id="routeIn2"><option>Mic / Line 2</option><option>Bluetooth In</option></select></div>
-          <div class="tft-mod-ctrl"><label>Direct Out Tap</label><select id="routeTap"><option>Post-Fader</option><option>Pre-Fader</option></select></div>
+          <div class="tft-mod-ctrl"><label>Input Source</label><select><option>Playlist Audio</option><option>Physical Mic</option></select></div>
+          <div class="tft-mod-ctrl"><label>Direct Out</label><select><option>Post-Fader</option><option>Pre-Fader</option></select></div>
+          <div class="tft-mod-ctrl"><label>USB Streaming</label><button class="active-action" type="button">ACTIVE</button></div>
         </div>
       </div>
     `,
-    encoders: [{name:"IN 1", val:"PLAYLIST"}, {name:"IN 2", val:"MIC 2"}, {name:"IN 3", val:"AUX 1"}, {name:"IN 4", val:"AUX 2"}, {name:"USB IN", val:"CH 1-2"}, {name:"OUT", val:"MAIN L/R"}]
+    encoders: [{name:"IN 1", val:"IP1"}, {name:"IN 2", val:"IP2"}, {name:"IN 3", val:"IP3"}, {name:"IN 4", val:"IP4"}, {name:"USB STREAM", val:"CH 1-2"}, {name:"OUT", val:"MAIN L/R"}]
+  },
+  meters: {
+    title: "SQ-7 RTA & METERS",
+    footerCh: "Current: RTA Analyzer",
+    footerSt: "Next: Peak Hold & Spectrum View",
+    content: `
+      <div class="tft-module-view">
+        <div class="tft-module-graph-box">
+          <svg viewBox="0 0 320 60" style="width:100%; height:100%; touch-action:none;">
+            <path d="M10 45 L 40 20 L 80 35 L 120 15 L 160 40 L 200 18 L 240 30 L 280 12 L 310 42" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
+            <text x="15" y="16" fill="#94a3b8" font-size="6.5">RTA SPECTRUM ANALYZER</text>
+          </svg>
+        </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>RTA Source</label><select><option>Post-EQ Main</option><option>Pre-EQ Input</option></select></div>
+          <div class="tft-mod-ctrl"><label>Peak Hold</label><select><option>3.0 Seconds</option><option>Infinite</option></select></div>
+          <div class="tft-mod-ctrl"><label>Zoom</label><input type="range" min="1" max="4" value="1"><span class="tft-val-disp">1x</span></div>
+        </div>
+      </div>
+    `,
+    encoders: [{name:"SOURCE", val:"POST-EQ"}, {name:"DECAY", val:"Fast"}, {name:"HOLD", val:"3.0s"}, {name:"ZOOM", val:"1x"}, {name:"WEIGHT", val:"A-EQ"}, {name:"VIEW", val:"RTA"}]
+  },
+  scenes: {
+    title: "SQ-7 SCENE MANAGER",
+    footerCh: "Current: Scene #01",
+    footerSt: "Next: Store & Recall Memories",
+    content: `
+      <div class="tft-module-view">
+        <div class="tft-module-graph-box">
+          <svg viewBox="0 0 320 60" style="width:100%; height:100%; touch-action:none;">
+            <path d="M15 40 L 80 20 L 160 35 L 240 15 L 305 30" fill="none" stroke="#eab308" stroke-width="2.5" stroke-linecap="round"/>
+            <text x="15" y="16" fill="#94a3b8" font-size="6.5">SCENE MEMORY BANK</text>
+          </svg>
+        </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>Active Scene</label><select><option>#01 Live Stage</option><option>#02 Acoustic Night</option></select></div>
+          <div class="tft-mod-ctrl"><label>Store Scene</label><button type="button">STORE</button></div>
+          <div class="tft-mod-ctrl"><label>Recall Safe</label><button class="active-action" type="button">SAFE ON</button></div>
+        </div>
+      </div>
+    `,
+    encoders: [{name:"SCENE", val:"#01"}, {name:"RECALL", val:"SAFE"}, {name:"STORE", val:"READY"}, {name:"SNIPPET", val:"ALL"}, {name:"USB SAVE", val:"READY"}, {name:"AUTO", val:"ON"}]
   },
   setup: {
-    title: "SYSTEM SETUP & HARDWARE PREFERENCES",
-    footerCh: "HARDWARE PREF",
-    footerSt: "System Brightness & Hardware Preferences",
+    title: "SQ-7 SYSTEM SETUP & HARDWARE",
+    footerCh: "Current: Hardware Pref",
+    footerSt: "Next: Brightness & Audio Clock",
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box">
-          <svg id="tftSetupSvgContainer" viewBox="0 0 320 60" style="width:100%; height:100%; touch-action:none;">
-            <path id="tftSetupSvgCurve" d="M10 30 L 160 30 L 310 30" fill="none" stroke="#64748b" stroke-width="2.5" stroke-dasharray="4" stroke-linecap="round"/>
-            <circle id="tftSetupSvgDot" cx="160" cy="30" r="5.5" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
-            <text x="15" y="18" fill="#94a3b8" font-size="7">SETUP BRIGHTNESS</text>
+          <svg viewBox="0 0 320 60" style="width:100%; height:100%; touch-action:none;">
+            <path d="M10 30 L 160 30 L 310 30" fill="none" stroke="#64748b" stroke-width="2.5" stroke-dasharray="4" stroke-linecap="round"/>
+            <text x="15" y="16" fill="#94a3b8" font-size="6.5">SYSTEM PREFERENCES</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>Brightness</label><input type="range" id="setupBright" min="20" max="100" value="85"><span class="tft-val-disp" id="setupBrightVal">85%</span></div>
-          <div class="tft-mod-ctrl"><label>BLE ESP32 Link</label><button id="setupBleBtn" class="active-action" type="button">CONNECTED</button></div>
-          <div class="tft-mod-ctrl"><label>Buffer Size</label><select id="setupBuffer"><option>512 Samples</option><option>256 Samples</option></select></div>
+          <div class="tft-mod-ctrl"><label>Brightness</label><input type="range" min="20" max="100" value="85"><span class="tft-val-disp">85%</span></div>
+          <div class="tft-mod-ctrl"><label>BLE Link</label><button class="active-action" type="button">ACTIVE</button></div>
+          <div class="tft-mod-ctrl"><label>Buffer Size</label><select><option>512 Samples</option><option>256 Samples</option></select></div>
         </div>
       </div>
     `,
-    encoders: [{name:"CLOCK", val:"INTERNAL"}, {name:"SAMPLE", val:"48kHz"}, {name:"BUFFER", val:"512smpl"}, {name:"MIDI CH", val:"1"}, {name:"BLE LINK", val:"ACTIVE"}, {name:"BRIGHTNESS", val:"85%"}]
-  },
-  library: {
-    title: "SCENE & PRESET LIBRARY",
-    footerCh: "SCENE MANAGER",
-    footerSt: "Manajemen Penyimpanan Scene & Preset",
-    content: `
-      <div class="tft-module-view">
-        <div class="tft-module-graph-box">
-          <svg id="tftLibrarySvgContainer" viewBox="0 0 320 60" style="width:100%; height:100%; touch-action:none;">
-            <path id="tftLibrarySvgCurve" d="M15 40 L 80 20 L 160 35 L 240 15 L 305 30" fill="none" stroke="#eab308" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftLibrarySvgFill" d="M15 40 L 80 20 L 160 35 L 240 15 L 305 30 L 305 50 L 15 50 Z" fill="#eab308" opacity=".1"/>
-            <circle id="tftLibrarySvgDot" cx="160" cy="35" r="5.5" fill="#fef9c3" stroke="#eab308" stroke-width="2"/>
-            <text x="15" y="18" fill="#94a3b8" font-size="7">SCENE MEMORY PRESET BANK</text>
-          </svg>
-        </div>
-        <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>Active Scene</label><select id="libSceneSelect"><option>#01 Live Stage</option><option>#02 Acoustic Night</option></select></div>
-          <div class="tft-mod-ctrl"><label>Store Preset</label><button id="libStoreBtn" type="button">STORE</button></div>
-          <div class="tft-mod-ctrl"><label>Recall Safe</label><button id="libSafeBtn" class="active-action" type="button">SAFE ON</button></div>
-        </div>
-      </div>
-    `,
-    encoders: [{name:"SCENE", val:"#01"}, {name:"RECALL", val:"SAFE"}, {name:"STORE", val:"READY"}, {name:"SNIPPET", val:"ALL"}, {name:"USB BACKUP", val:"READY"}, {name:"AUTO SAVE", val:"ON"}]
+    encoders: [{name:"CLOCK", val:"INTERNAL"}, {name:"SAMPLE", val:"48kHz"}, {name:"BUFFER", val:"512smpl"}, {name:"MIDI", val:"1"}, {name:"BLE LINK", val:"ACTIVE"}, {name:"BRIGHT", val:"85%"}]
   },
   effects: {
-    title: "FX RACK & PROCESSOR",
-    footerCh: "VIRTUAL FX RACK",
-    footerSt: "Virtual FX Rack Delay & Reverb Settings",
+    title: "SQ-7 UTILITY & FX RACK",
+    footerCh: "Current: Alesis FX",
+    footerSt: "Next: Reverb & Delay Rack",
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftEffectsBox">
           <svg id="tftEffectsSvgContainer" viewBox="0 0 320 60" style="width:100%; height:100%; touch-action:none;">
             <path id="tftEffectsSvgCurve" d="M10 50 Q 80 5, 160 30 T 310 20" fill="none" stroke="#ec4899" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftEffectsSvgFill" d="M10 50 Q 80 5, 160 30 T 310 20 L 310 50 L 10 50 Z" fill="#ec4899" opacity=".1"/>
-            <circle id="tftEffectsDot1" cx="80" cy="5" r="7" fill="#fce7f3" stroke="#ec4899" stroke-width="2" style="cursor:pointer;"/>
-            <circle id="tftEffectsDot2" cx="240" cy="25" r="7" fill="#fce7f3" stroke="#ec4899" stroke-width="2" style="cursor:pointer;"/>
-            <text x="15" y="18" fill="#94a3b8" font-size="7">FX RACK (DRAG DOTS)</text>
+            <text x="15" y="16" fill="#94a3b8" font-size="6.5">ALESIS FX PROCESSOR</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>Delay Time</label><input type="range" id="fxFader1" min="0.05" max="1.0" step="0.05" value="0.3"><span class="tft-val-disp" id="fxFader1Val">0.30s</span></div>
-          <div class="tft-mod-ctrl"><label>Feedback</label><input type="range" id="fxFader2" min="0" max="0.9" step="0.05" value="0.4"><span class="tft-val-disp" id="fxFader2Val">40%</span></div>
-          <div class="tft-mod-ctrl"><label>FX Master</label><button id="fxBypassBtn" class="active-action" type="button">ACTIVE</button></div>
+          <div class="tft-mod-ctrl"><label>Delay Time</label><input type="range" min="0.05" max="1.0" step="0.05" value="0.3"><span class="tft-val-disp">0.30s</span></div>
+          <div class="tft-mod-ctrl"><label>Feedback</label><input type="range" min="0" max="0.9" step="0.05" value="0.4"><span class="tft-val-disp">40%</span></div>
+          <div class="tft-mod-ctrl"><label>FX Master</label><button class="active-action" type="button">ACTIVE</button></div>
         </div>
       </div>
     `,
-    encoders: [{name:"FX TYPE 1", val:"REVERB"}, {name:"TIME 1", val:"2.2s"}, {name:"FX TYPE 2", val:"DELAY"}, {name:"TIME 2", val:"350ms"}, {name:"MIX 1", val:"25%"}, {name:"MIX 2", val:"30%"}]
+    encoders: [{name:"FX 1", val:"REVERB"}, {name:"TIME 1", val:"2.2s"}, {name:"FX 2", val:"DELAY"}, {name:"TIME 2", val:"350ms"}, {name:"MIX 1", val:"25%"}, {name:"MIX 2", val:"30%"}]
   }
 };
 
 function updateTftPeqVisuals() {
-  const dot = document.getElementById("tftPeqSvgDot");
   const curve = document.getElementById("tftPeqSvgCurve");
   const fill = document.getElementById("tftPeqSvgFill");
-  if (!dot || !curve || !fill) return;
+  if (!curve || !fill) return;
 
   const minLog = Math.log10(20);
   const maxLog = Math.log10(20000);
   const currentLog = Math.log10(Math.max(20, Math.min(20000, tftPeqFreqVal)));
   const cx = ((currentLog - minLog) / (maxLog - minLog)) * 320;
   const cy = 60 - (tftPeqGainVal / 15) * 45;
-  
-  dot.setAttribute("cx", cx.toFixed(1));
-  dot.setAttribute("cy", cy.toFixed(1));
 
-  const widthSpread = Math.max(20, 120 / tftPeqQVal);
+  // Sesuaikan titik aktif berdasarkan freq
+  const dot2 = document.getElementById("tftPeqDot2");
+  if (dot2) {
+    dot2.setAttribute("cx", cx.toFixed(1));
+    dot2.setAttribute("cy", cy.toFixed(1));
+  }
+
+  const widthSpread = Math.max(25, 120 / tftPeqQVal);
   const x1 = Math.max(0, cx - widthSpread);
   const x2 = Math.min(320, cx + widthSpread);
   const baseline = 60;
@@ -1962,7 +1959,6 @@ function updateTftPeqVisuals() {
 }
 
 function bindTftDynamicEventListeners(key) {
-  // --- PEQ (EQ) ---
   if (key === "eq") {
     const freqInput = document.getElementById("tftPeqFreq");
     const qInput = document.getElementById("tftPeqQ");
@@ -2058,415 +2054,6 @@ function bindTftDynamicEventListeners(key) {
     }
     updateTftPeqVisuals();
   }
-
-  // --- CONFIG ---
-  if (key === "config") {
-    const cfgGain = document.getElementById("cfgGain");
-    const cfgGainVal = document.getElementById("cfgGainVal");
-    const curve = document.getElementById("tftConfigSvgCurve");
-    const fill = document.getElementById("tftConfigSvgFill");
-    const dot = document.getElementById("tftConfigSvgDot");
-    const box = document.getElementById("tftConfigBox");
-
-    const updateSvg = (val) => {
-      if (!curve || !dot) return;
-      const cy = 10 + (1 - (val / 60)) * 40;
-      curve.setAttribute("d", `M10 45 Q 160 ${cy.toFixed(1)}, 310 15`);
-      fill.setAttribute("d", `M10 45 Q 160 ${cy.toFixed(1)}, 310 15 L310 50 L10 50 Z`);
-      dot.setAttribute("cy", cy.toFixed(1));
-    };
-
-    if (cfgGain) {
-      cfgGain.addEventListener("input", () => {
-        const val = Number(cfgGain.value);
-        if (cfgGainVal) cfgGainVal.textContent = val.toFixed(0) + "dB";
-        updateSvg(val);
-      });
-    }
-
-    if (box) {
-      let isDragging = false;
-      const onMove = (e) => {
-        if (!isDragging) return;
-        const rect = box.getBoundingClientRect();
-        const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
-        if (clientY === undefined) return;
-        const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
-        const val = Math.round(60 * (1 - (relY / rect.height)));
-        const clamped = Math.max(0, Math.min(60, val));
-        if (cfgGain) {
-          cfgGain.value = clamped;
-          cfgGain.dispatchEvent(new Event("input"));
-        }
-      };
-      box.addEventListener("pointerdown", (e) => { isDragging = true; box.setPointerCapture(e.pointerId); onMove(e); });
-      box.addEventListener("pointermove", onMove);
-      const stopDrag = (e) => { if (!isDragging) return; isDragging = false; try { box.releasePointerCapture(e.pointerId); } catch(err){} };
-      box.addEventListener("pointerup", stopDrag);
-      box.addEventListener("pointercancel", stopDrag);
-    }
-    updateSvg(cfgGain ? Number(cfgGain.value) : 12);
-  }
-
-  // --- GATE ---
-  if (key === "gate") {
-    const gateThresh = document.getElementById("gateThresh");
-    const gateThreshVal = document.getElementById("gateThreshVal");
-    const gateRatio = document.getElementById("gateRatio");
-    const gateRatioVal = document.getElementById("gateRatioVal");
-    const curve = document.getElementById("tftGateSvgCurve");
-    const fill = document.getElementById("tftGateSvgFill");
-    const dot1 = document.getElementById("tftGateDot1");
-    const dot2 = document.getElementById("tftGateDot2");
-    const box = document.getElementById("tftGateBox");
-
-    const updateSvg = (thresh, ratio) => {
-      if (!curve || !dot1 || !dot2) return;
-      const cx1 = 10 + ((thresh + 80) / 80) * 200;
-      const cy1 = 50;
-      const cx2 = 310;
-      const cy2 = Math.max(10, Math.min(50, 50 - (ratio * 4)));
-      curve.setAttribute("d", `M10 50 L ${cx1.toFixed(1)} ${cy1} L ${cx2} ${cy2}`);
-      fill.setAttribute("d", `M10 50 L ${cx1.toFixed(1)} ${cy1} L ${cx2} ${cy2} L 310 50 Z`);
-      dot1.setAttribute("cx", cx1.toFixed(1)); dot1.setAttribute("cy", cy1);
-      dot2.setAttribute("cx", cx2); dot2.setAttribute("cy", cy2);
-    };
-
-    if (gateThresh) gateThresh.addEventListener("input", () => {
-      const val = Number(gateThresh.value);
-      if (gateThreshVal) gateThreshVal.textContent = val.toFixed(0) + "dB";
-      updateSvg(val, Number(gateRatio?.value || 2.5));
-    });
-    if (gateRatio) gateRatio.addEventListener("input", () => {
-      const val = Number(gateRatio.value);
-      if (gateRatioVal) gateRatioVal.textContent = "1:" + val.toFixed(1);
-      updateSvg(Number(gateThresh?.value || -45), val);
-    });
-
-    if (box) {
-      let activeDot = null;
-      const onMove = (e) => {
-        if (!activeDot) return;
-        const rect = box.getBoundingClientRect();
-        const clientX = e.clientX !== undefined ? e.clientX : e.touches?.[0]?.clientX;
-        const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
-        if (clientX === undefined || clientY === undefined) return;
-        const relX = Math.max(0, Math.min(rect.width, clientX - rect.left));
-        const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
-
-        if (activeDot === 1 && gateThresh) {
-          const val = Math.round(-80 + (relX / rect.width) * 80);
-          gateThresh.value = Math.max(-80, Math.min(0, val));
-          gateThresh.dispatchEvent(new Event("input"));
-        } else if (activeDot === 2 && gateRatio) {
-          const val = Number((((rect.height - relY) / rect.height) * 9 + 1).toFixed(1));
-          gateRatio.value = Math.max(1, Math.min(10, val));
-          gateRatio.dispatchEvent(new Event("input"));
-        }
-      };
-      dot1?.addEventListener("pointerdown", (e) => { activeDot = 1; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
-      dot2?.addEventListener("pointerdown", (e) => { activeDot = 2; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
-      box.addEventListener("pointermove", onMove);
-      const stopDrag = (e) => { if (!activeDot) return; activeDot = null; try { box.releasePointerCapture(e.pointerId); } catch(err){} };
-      box.addEventListener("pointerup", stopDrag);
-      box.addEventListener("pointercancel", stopDrag);
-    }
-    updateSvg(Number(gateThresh?.value || -45), Number(gateRatio?.value || 2.5));
-  }
-
-  // --- DYNAMICS / COMPRESSOR ---
-  if (key === "dynamics") {
-    const compThresh = document.getElementById("compThresh");
-    const compThreshVal = document.getElementById("compThreshVal");
-    const compRatio = document.getElementById("compRatio");
-    const compRatioVal = document.getElementById("compRatioVal");
-    const compMakeup = document.getElementById("compMakeup");
-    const compMakeupVal = document.getElementById("compMakeupVal");
-
-    const curve = document.getElementById("tftCompSvgCurve");
-    const fill = document.getElementById("tftCompSvgFill");
-    const dot1 = document.getElementById("tftCompDot1");
-    const dot2 = document.getElementById("tftCompDot2");
-    const dot3 = document.getElementById("tftCompDot3");
-    const box = document.getElementById("tftCompBox");
-
-    const updateSvg = (thresh, ratio, makeup) => {
-      if (!curve || !dot1 || !dot2 || !dot3) return;
-      const cx1 = 10; const cy1 = 50;
-      const cx2 = 10 + ((thresh + 60) / 60) * 200;
-      const slope = 1 / ratio;
-      const cy2 = Math.max(10, Math.min(50, 50 - ((thresh + 60) / 60) * 35 * slope));
-      const cx3 = 310;
-      const cy3 = Math.max(10, Math.min(50, cy2 - (makeup / 24) * 15));
-
-      curve.setAttribute("d", `M${cx1} ${cy1} L ${cx2.toFixed(1)} ${cy2.toFixed(1)} L ${cx3} ${cy3.toFixed(1)}`);
-      fill.setAttribute("d", `M${cx1} ${cy1} L ${cx2.toFixed(1)} ${cy2.toFixed(1)} L ${cx3} ${cy3.toFixed(1)} L 310 50 Z`);
-      dot1.setAttribute("cx", cx1); dot1.setAttribute("cy", cy1);
-      dot2.setAttribute("cx", cx2.toFixed(1)); dot2.setAttribute("cy", cy2.toFixed(1));
-      dot3.setAttribute("cx", cx3); dot3.setAttribute("cy", cy3.toFixed(1));
-    };
-
-    if (compThresh) compThresh.addEventListener("input", () => {
-      const v = Number(compThresh.value);
-      if (compThreshVal) compThreshVal.textContent = v.toFixed(0) + "dB";
-      updateSvg(v, Number(compRatio?.value || 3), Number(compMakeup?.value || 2));
-    });
-    if (compRatio) compRatio.addEventListener("input", () => {
-      const v = Number(compRatio.value);
-      if (compRatioVal) compRatioVal.textContent = v.toFixed(0) + ":1";
-      updateSvg(Number(compThresh?.value || -18), v, Number(compMakeup?.value || 2));
-    });
-    if (compMakeup) compMakeup.addEventListener("input", () => {
-      const v = Number(compMakeup.value);
-      if (compMakeupVal) compMakeupVal.textContent = "+" + v.toFixed(0) + "dB";
-      updateSvg(Number(compThresh?.value || -18), Number(compRatio?.value || 3), v);
-    });
-
-    if (box) {
-      let activeDot = null;
-      const onMove = (e) => {
-        if (!activeDot) return;
-        const rect = box.getBoundingClientRect();
-        const clientX = e.clientX !== undefined ? e.clientX : e.touches?.[0]?.clientX;
-        const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
-        if (clientX === undefined || clientY === undefined) return;
-        const relX = Math.max(0, Math.min(rect.width, clientX - rect.left));
-        const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
-
-        if (activeDot === 2 && compThresh) {
-          const val = Math.round(-60 + (relX / rect.width) * 60);
-          compThresh.value = Math.max(-60, Math.min(0, val));
-          compThresh.dispatchEvent(new Event("input"));
-        } else if (activeDot === 3 && compMakeup) {
-          const val = Math.round(24 * (1 - (relY / rect.height)));
-          compMakeup.value = Math.max(0, Math.min(24, val));
-          compMakeup.dispatchEvent(new Event("input"));
-        }
-      };
-      dot2?.addEventListener("pointerdown", (e) => { activeDot = 2; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
-      dot3?.addEventListener("pointerdown", (e) => { activeDot = 3; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
-      box.addEventListener("pointermove", onMove);
-      const stopDrag = (e) => { if (!activeDot) return; activeDot = null; try { box.releasePointerCapture(e.pointerId); } catch(err){} };
-      box.addEventListener("pointerup", stopDrag);
-      box.addEventListener("pointercancel", stopDrag);
-    }
-    updateSvg(Number(compThresh?.value || -18), Number(compRatio?.value || 3), Number(compMakeup?.value || 2));
-  }
-
-  // --- SENDS ---
-  if (key === "sends") {
-    const send1Lvl = document.getElementById("send1Lvl");
-    const send1LvlVal = document.getElementById("send1LvlVal");
-    const send2Lvl = document.getElementById("send2Lvl");
-    const send2LvlVal = document.getElementById("send2LvlVal");
-    const curve = document.getElementById("tftSendsSvgCurve");
-    const fill = document.getElementById("tftSendsSvgFill");
-    const dot1 = document.getElementById("tftSendsDot1");
-    const dot2 = document.getElementById("tftSendsDot2");
-    const box = document.getElementById("tftSendsBox");
-
-    const updateSvg = (s1, s2) => {
-      if (!curve || !dot1 || !dot2) return;
-      const cy1 = 50 - ((s1 + 60) / 60) * 35;
-      const cy2 = 50 - ((s2 + 60) / 60) * 35;
-      curve.setAttribute("d", `M10 40 L 160 ${cy1.toFixed(1)} L 310 ${cy2.toFixed(1)}`);
-      fill.setAttribute("d", `M10 40 L 160 ${cy1.toFixed(1)} L 310 ${cy2.toFixed(1)} L 310 50 L 10 50 Z`);
-      dot1.setAttribute("cy", cy1.toFixed(1)); dot2.setAttribute("cy", cy2.toFixed(1));
-    };
-
-    if (send1Lvl) send1Lvl.addEventListener("input", () => {
-      const v = Number(send1Lvl.value);
-      if (send1LvlVal) send1LvlVal.textContent = v.toFixed(0) + "dB";
-      updateSvg(v, Number(send2Lvl?.value || -12));
-    });
-    if (send2Lvl) send2Lvl.addEventListener("input", () => {
-      const v = Number(send2Lvl.value);
-      if (send2LvlVal) send2LvlVal.textContent = v.toFixed(0) + "dB";
-      updateSvg(Number(send1Lvl?.value || -6), v);
-    });
-
-    if (box) {
-      let activeDot = null;
-      const onMove = (e) => {
-        if (!activeDot) return;
-        const rect = box.getBoundingClientRect();
-        const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
-        if (clientY === undefined) return;
-        const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
-        const val = Math.round(-60 + (1 - (relY / rect.height)) * 60);
-
-        if (activeDot === 1 && send1Lvl) {
-          send1Lvl.value = Math.max(-60, Math.min(0, val));
-          send1Lvl.dispatchEvent(new Event("input"));
-        } else if (activeDot === 2 && send2Lvl) {
-          send2Lvl.value = Math.max(-60, Math.min(0, val));
-          send2Lvl.dispatchEvent(new Event("input"));
-        }
-      };
-      dot1?.addEventListener("pointerdown", (e) => { activeDot = 1; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
-      dot2?.addEventListener("pointerdown", (e) => { activeDot = 2; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
-      box.addEventListener("pointermove", onMove);
-      const stopDrag = (e) => { if (!activeDot) return; activeDot = null; try { box.releasePointerCapture(e.pointerId); } catch(err){} };
-      box.addEventListener("pointerup", stopDrag);
-      box.addEventListener("pointercancel", stopDrag);
-    }
-    updateSvg(Number(send1Lvl?.value || -6), Number(send2Lvl?.value || -12));
-  }
-
-  // --- MAIN FOH ---
-  if (key === "main") {
-    const mainFohLvl = document.getElementById("mainFohLvl");
-    const mainFohLvlVal = document.getElementById("mainFohLvlVal");
-    const mainLimitLvl = document.getElementById("mainLimitLvl");
-    const mainLimitLvlVal = document.getElementById("mainLimitLvlVal");
-    const curve = document.getElementById("tftMainSvgCurve");
-    const fill = document.getElementById("tftMainSvgFill");
-    const dot1 = document.getElementById("tftMainDot1");
-    const dot2 = document.getElementById("tftMainDot2");
-    const box = document.getElementById("tftMainBox");
-
-    const updateSvg = (m, l) => {
-      if (!curve || !dot1 || !dot2) return;
-      const cy1 = 30 - (m / 56) * 15;
-      const cy2 = 10 + (Math.abs(l) / 20) * 25;
-      curve.setAttribute("d", `M10 30 Q 160 ${cy1.toFixed(1)}, 310 ${cy2.toFixed(1)}`);
-      fill.setAttribute("d", `M10 30 Q 160 ${cy1.toFixed(1)}, 310 ${cy2.toFixed(1)} L 310 50 L 10 50 Z`);
-      dot1.setAttribute("cy", cy1.toFixed(1)); dot2.setAttribute("cy", cy2.toFixed(1));
-    };
-
-    if (mainFohLvl) mainFohLvl.addEventListener("input", () => {
-      const v = Number(mainFohLvl.value);
-      if (mainFohLvlVal) mainFohLvlVal.textContent = v.toFixed(0) + "dB";
-      updateSvg(v, Number(mainLimitLvl?.value || -0.5));
-    });
-    if (mainLimitLvl) mainLimitLvl.addEventListener("input", () => {
-      const v = Number(mainLimitLvl.value);
-      if (mainLimitLvlVal) mainLimitLvlVal.textContent = v.toFixed(1) + "dB";
-      updateSvg(Number(mainFohLvl?.value || 0), v);
-    });
-
-    if (box) {
-      let activeDot = null;
-      const onMove = (e) => {
-        if (!activeDot) return;
-        const rect = box.getBoundingClientRect();
-        const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
-        if (clientY === undefined) return;
-        const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
-
-        if (activeDot === 1 && mainFohLvl) {
-          const val = Math.round(-50 + (1 - (relY / rect.height)) * 56);
-          mainFohLvl.value = Math.max(-50, Math.min(6, val));
-          mainFohLvl.dispatchEvent(new Event("input"));
-        } else if (activeDot === 2 && mainLimitLvl) {
-          const val = Number((-20 * (relY / rect.height)).toFixed(1));
-          mainLimitLvl.value = Math.max(-20, Math.min(0, val));
-          mainLimitLvl.dispatchEvent(new Event("input"));
-        }
-      };
-      dot1?.addEventListener("pointerdown", (e) => { activeDot = 1; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
-      dot2?.addEventListener("pointerdown", (e) => { activeDot = 2; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
-      box.addEventListener("pointermove", onMove);
-      const stopDrag = (e) => { if (!activeDot) return; activeDot = null; try { box.releasePointerCapture(e.pointerId); } catch(err){} };
-      box.addEventListener("pointerup", stopDrag);
-      box.addEventListener("pointercancel", stopDrag);
-    }
-    updateSvg(Number(mainFohLvl?.value || 0), Number(mainLimitLvl?.value || -0.5));
-  }
-
-  // --- EFFECTS ---
-  if (key === "effects") {
-    const fxFader1 = document.getElementById("fxFader1");
-    const fxFader1Val = document.getElementById("fxFader1Val");
-    const fxFader2 = document.getElementById("fxFader2");
-    const fxFader2Val = document.getElementById("fxFader2Val");
-    const curve = document.getElementById("tftEffectsSvgCurve");
-    const fill = document.getElementById("tftEffectsSvgFill");
-    const dot1 = document.getElementById("tftEffectsDot1");
-    const dot2 = document.getElementById("tftEffectsDot2");
-    const box = document.getElementById("tftEffectsBox");
-
-    const updateSvg = (f1, f2) => {
-      if (!curve || !dot1 || !dot2) return;
-      const cy1 = 50 - (f1 / 1.0) * 40;
-      const cy2 = 50 - (f2 / 0.9) * 30;
-      curve.setAttribute("d", `M10 50 Q 80 ${cy1.toFixed(1)}, 160 30 T 310 ${cy2.toFixed(1)}`);
-      fill.setAttribute("d", `M10 50 Q 80 ${cy1.toFixed(1)}, 160 30 T 310 ${cy2.toFixed(1)} L 310 50 L 10 50 Z`);
-      dot1.setAttribute("cy", cy1.toFixed(1)); dot2.setAttribute("cy", cy2.toFixed(1));
-    };
-
-    if (fxFader1) fxFader1.addEventListener("input", () => {
-      const v = Number(fxFader1.value);
-      if (fxFader1Val) fxFader1Val.textContent = v.toFixed(2) + "s";
-      updateSvg(v, Number(fxFader2?.value || 0.4));
-    });
-    if (fxFader2) fxFader2.addEventListener("input", () => {
-      const v = Number(fxFader2.value);
-      if (fxFader2Val) fxFader2Val.textContent = Math.round(v * 100) + "%";
-      updateSvg(Number(fxFader1?.value || 0.3), v);
-    });
-
-    if (box) {
-      let activeDot = null;
-      const onMove = (e) => {
-        if (!activeDot) return;
-        const rect = box.getBoundingClientRect();
-        const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
-        if (clientY === undefined) return;
-        const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
-
-        if (activeDot === 1 && fxFader1) {
-          const val = Number((1.0 * (1 - (relY / rect.height))).toFixed(2));
-          fxFader1.value = Math.max(0.05, Math.min(1.0, val));
-          fxFader1.dispatchEvent(new Event("input"));
-        } else if (activeDot === 2 && fxFader2) {
-          const val = Number((0.9 * (1 - (relY / rect.height))).toFixed(2));
-          fxFader2.value = Math.max(0, Math.min(0.9, val));
-          fxFader2.dispatchEvent(new Event("input"));
-        }
-      };
-      dot1?.addEventListener("pointerdown", (e) => { activeDot = 1; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
-      dot2?.addEventListener("pointerdown", (e) => { activeDot = 2; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
-      box.addEventListener("pointermove", onMove);
-      const stopDrag = (e) => { if (!activeDot) return; activeDot = null; try { box.releasePointerCapture(e.pointerId); } catch(err){} };
-      box.addEventListener("pointerup", stopDrag);
-      box.addEventListener("pointercancel", stopDrag);
-    }
-    updateSvg(Number(fxFader1?.value || 0.3), Number(fxFader2?.value || 0.4));
-  }
-
-  // Tombol aksi tambahan
-  const cfgPhantomBtn = document.getElementById("cfgPhantomBtn");
-  if (cfgPhantomBtn) cfgPhantomBtn.addEventListener("click", () => { cfgPhantomBtn.classList.toggle("active-action"); cfgPhantomBtn.textContent = cfgPhantomBtn.classList.contains("active-action") ? "ON" : "OFF"; });
-  const cfgPhaseBtn = document.getElementById("cfgPhaseBtn");
-  if (cfgPhaseBtn) cfgPhaseBtn.addEventListener("click", () => { cfgPhaseBtn.classList.toggle("active-action"); cfgPhaseBtn.textContent = cfgPhaseBtn.classList.contains("active-action") ? "INVERT" : "NORMAL"; });
-
-  const gateStateBtn = document.getElementById("gateStateBtn");
-  if (gateStateBtn) gateStateBtn.addEventListener("click", () => { gateStateBtn.classList.toggle("active-action"); gateStateBtn.textContent = gateStateBtn.classList.contains("active-action") ? "ACTIVE" : "BYPASS"; });
-
-  const mainMonoBtn = document.getElementById("mainMonoBtn");
-  if (mainMonoBtn) mainMonoBtn.addEventListener("click", () => { mainMonoBtn.classList.toggle("active-action"); mainMonoBtn.textContent = mainMonoBtn.classList.contains("active-action") ? "MONO ON" : "OFF"; });
-
-  const homeMuteAllBtn = document.getElementById("homeMuteAllBtn");
-  if (homeMuteAllBtn) homeMuteAllBtn.addEventListener("click", () => { homeMuteAllBtn.classList.toggle("active-action"); setStatus(homeMuteAllBtn.classList.contains("active-action") ? "Global Mute All Aktif." : "Mute All Nonaktif."); });
-  const homeTalkBtn = document.getElementById("homeTalkBtn");
-  if (homeTalkBtn) homeTalkBtn.addEventListener("click", () => { homeTalkBtn.classList.toggle("active-action"); homeTalkBtn.textContent = homeTalkBtn.classList.contains("active-action") ? "TALK ON" : "TALK OFF"; });
-
-  const rtaZoom = document.getElementById("rtaZoom");
-  if (rtaZoom) rtaZoom.addEventListener("input", () => { document.getElementById("rtaZoomVal").textContent = rtaZoom.value + "x"; });
-
-  const setupBright = document.getElementById("setupBright");
-  if (setupBright) setupBright.addEventListener("input", () => { document.getElementById("setupBrightVal").textContent = setupBright.value + "%"; });
-  const setupBleBtn = document.getElementById("setupBleBtn");
-  if (setupBleBtn) setupBleBtn.addEventListener("click", () => { setupBleBtn.classList.toggle("active-action"); setupBleBtn.textContent = setupBleBtn.classList.contains("active-action") ? "CONNECTED" : "DISCONNECTED"; });
-
-  const libStoreBtn = document.getElementById("libStoreBtn");
-  if (libStoreBtn) libStoreBtn.addEventListener("click", () => { alert("Konfigurasi preset mixer berhasil disimpan ke Scene!"); });
-  const libSafeBtn = document.getElementById("libSafeBtn");
-  if (libSafeBtn) libSafeBtn.addEventListener("click", () => { libSafeBtn.classList.toggle("active-action"); libSafeBtn.textContent = libSafeBtn.classList.contains("active-action") ? "SAFE ON" : "SAFE OFF"; });
-
-  const fxBypassBtn = document.getElementById("fxBypassBtn");
-  if (fxBypassBtn) fxBypassBtn.addEventListener("click", () => { fxBypassBtn.classList.toggle("active-action"); fxBypassBtn.textContent = fxBypassBtn.classList.contains("active-action") ? "ACTIVE" : "BYPASSED"; });
 }
 
 function loadTftPage(key) {
@@ -2500,7 +2087,7 @@ tftTabs.forEach(tab => {
   });
 });
 
-// Inisialisasi awal ke EQ
+// Inisialisasi awal ke EQ (Processing)
 switchActiveSection("eq");
 
 /* =========================================================
