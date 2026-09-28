@@ -743,7 +743,11 @@ header, .topbar {
 }
 @media(max-width:600px) {
   #tabMixerContent .mixer-top-console { grid-template-columns:minmax(0,1fr); height:clamp(145px,22vh,190px); max-height:25vh; }
-  #tabMixerContent .mixer-control-section { display:none; }
+  #tabMixerContent .mixer-control-section { display:flex; padding:3px; }
+  #tabMixerContent .mixer-control-section > div:first-child,
+  #tabMixerContent .mixer-control-section > div:nth-child(2) { display:none; }
+  #tabMixerContent .section-grid-btns { grid-template-columns:repeat(6,minmax(0,1fr)); margin:0; gap:3px; }
+  #tabMixerContent .console-btn { min-height:22px; padding:3px 1px; font-size:7px; }
   #tabMixerContent .mixer-desk-surface { grid-template-columns:repeat(5,minmax(76px,1fr)); }
 }
 @media(max-height:520px) and (orientation:landscape) {
