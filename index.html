@@ -307,7 +307,19 @@ header, .topbar {
 .device-status, .feedback-status, .audio-status, .status { font-size: 8px; color: #94a3b8; margin-top: 3px; font-weight: 600; }
 .footer { text-align: center; font-size: 7.5px; color: #64748b; margin-top: 4px; font-weight: 600; }
 .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
-  </style>
+  
+/* Responsive and touch-safe graph controls shared by the processing pages. */
+.tft-module-view, .tft-module-graph-box, .tft-peq-graph { min-width: 0; max-width: 100%; }
+.tft-module-graph-box, .tft-peq-graph { overflow: hidden; }
+.tft-module-graph-box svg, .tft-peq-graph svg { display: block; width: 100%; max-width: 100%; touch-action: none; user-select: none; -webkit-user-select: none; }
+.tft-module-graph-box svg [id*="Dot"], .tft-peq-graph svg [id*="Dot"] { touch-action: none; cursor: grab; }
+.tft-module-graph-box svg [id*="Dot"]:focus-visible, .tft-peq-graph svg [id*="Dot"]:focus-visible { outline: none; stroke: #fff; stroke-width: 3; }
+@media (max-width: 700px) {
+  .tft-module-view { width: 100%; min-width: 0; }
+  .tft-module-graph-box, .tft-peq-graph { width: 100%; min-width: 0; }
+  .tft-module-controls-grid, .tft-peq-controls { min-width: 0; }
+}
+</style>
 </head>
 
 <body>
@@ -2024,43 +2036,65 @@ function updateTftPeqVisuals() {
 }
 
 function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback) {
-  if (!svgContainer || !dotElement) return;
-  let isDragging = false;
+  if (!svgContainer || !dotElement || dotElement.dataset.dragReady === "1") return;
+  dotElement.dataset.dragReady = "1";
+  dotElement.style.touchAction = "none";
+  dotElement.style.cursor = "grab";
+  dotElement.setAttribute("tabindex", "0");
+  dotElement.setAttribute("role", "slider");
+  let activePointerId = null;
 
   const onPointerMove = (e) => {
-    if (!isDragging) return;
-    const rect = svgContainer.getBoundingClientRect();
-    const clientX = e.clientX !== undefined ? e.clientX : e.touches?.[0]?.clientX;
-    const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
-    if (clientX === undefined || clientY === undefined) return;
-
-    const svgWidth = svgContainer.viewBox.baseVal.width || 320;
-    const svgHeight = svgContainer.viewBox.baseVal.height || (svgContainer.classList.contains('tft-peq-graph') ? 120 : 65);
-
-    const relX = Math.max(10, Math.min(svgWidth - 10, ((clientX - rect.left) / rect.width) * svgWidth));
-    const relY = Math.max(10, Math.min(svgHeight - 10, ((clientY - rect.top) / rect.height) * svgHeight));
-
-    dotElement.setAttribute("cx", relX.toFixed(1));
-    dotElement.setAttribute("cy", relY.toFixed(1));
-
-    if (typeof onUpdateCallback === "function") {
-      onUpdateCallback(relX, relY, svgWidth, svgHeight);
+    if (activePointerId === null || e.pointerId !== activePointerId) return;
+    e.preventDefault();
+    const vb = svgContainer.viewBox && svgContainer.viewBox.baseVal;
+    const svgWidth = vb && vb.width ? vb.width : 320;
+    const svgHeight = vb && vb.height ? vb.height : 65;
+    let x, y;
+    try {
+      const matrix = svgContainer.getScreenCTM();
+      if (matrix && svgContainer.createSVGPoint) {
+        const point = svgContainer.createSVGPoint();
+        point.x = e.clientX;
+        point.y = e.clientY;
+        const local = point.matrixTransform(matrix.inverse());
+        x = local.x;
+        y = local.y;
+      }
+    } catch (_) {}
+    if (!Number.isFinite(x) || !Number.isFinite(y)) {
+      const rect = svgContainer.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      x = ((e.clientX - rect.left) / rect.width) * svgWidth;
+      y = ((e.clientY - rect.top) / rect.height) * svgHeight;
     }
+    const radius = Number(dotElement.getAttribute("r")) || 7;
+    const relX = Math.max(radius, Math.min(svgWidth - radius, x));
+    const relY = Math.max(radius, Math.min(svgHeight - radius, y));
+    dotElement.setAttribute("cx", relX.toFixed(2));
+    dotElement.setAttribute("cy", relY.toFixed(2));
+    if (typeof onUpdateCallback === "function") onUpdateCallback(relX, relY, svgWidth, svgHeight);
   };
 
   dotElement.addEventListener("pointerdown", (e) => {
-    isDragging = true;
-    svgContainer.setPointerCapture(e.pointerId);
+    if (e.button !== undefined && e.button !== 0) return;
+    e.preventDefault();
     e.stopPropagation();
+    activePointerId = e.pointerId;
+    dotElement.style.cursor = "grabbing";
+    try { svgContainer.setPointerCapture(e.pointerId); } catch (_) {}
   });
-  svgContainer.addEventListener("pointermove", onPointerMove);
+  svgContainer.addEventListener("pointermove", onPointerMove, { passive: false });
   const stopDrag = (e) => {
-    if (!isDragging) return;
-    isDragging = false;
-    try { svgContainer.releasePointerCapture(e.pointerId); } catch (err) {}
+    if (activePointerId === null || (e.pointerId !== undefined && e.pointerId !== activePointerId)) return;
+    const pointerId = activePointerId;
+    activePointerId = null;
+    dotElement.style.cursor = "grab";
+    try { if (svgContainer.hasPointerCapture(pointerId)) svgContainer.releasePointerCapture(pointerId); } catch (_) {}
   };
   svgContainer.addEventListener("pointerup", stopDrag);
   svgContainer.addEventListener("pointercancel", stopDrag);
+  svgContainer.addEventListener("lostpointercapture", stopDrag);
 }
 
 function bindTftDynamicEventListeners(key) {
