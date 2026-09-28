@@ -45,9 +45,48 @@ header, .topbar {
    EMPAT TAB NAVIGASI UTAMA
 ========================================================= */
 .mode-switch-bar {
-  position: relative; z-index: 50; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; flex: 0 0 auto; pointer-events: auto;
+  position: relative;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  pointer-events: auto;
 }
-.mode-switch-bar .tab-btn { position: relative; z-index: 1; min-height: 32px; pointer-events: auto; touch-action: manipulation; }
+.mode-menu-wrap { position: relative; flex: 0 0 auto; }
+.mode-menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  min-height: 34px;
+  padding: 0;
+  border: 1px solid #3b4758;
+  border-radius: 6px;
+  background: #171d28;
+  color: #dbeafe;
+  font-size: 20px;
+  line-height: 1;
+  touch-action: manipulation;
+}
+.mode-menu-trigger:active { background: #263449; }
+.mode-menu {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: calc(100% + 5px);
+  z-index: 100;
+  width: min(230px, 72vw);
+  padding: 5px;
+  border: 1px solid #3b4758;
+  border-radius: 8px;
+  background: #101722;
+  box-shadow: 0 10px 24px rgba(0,0,0,.55);
+}
+.mode-menu.open { display: flex; flex-direction: column; gap: 5px; }
+.mode-menu .tab-btn { width: 100%; min-height: 38px; text-align: left; padding: 8px 10px; font-size: 12px; }
+.mode-switch-bar > .tab-btn { flex: 1 1 auto; min-height: 34px; }
+.mode-switch-bar .tab-btn { position: relative; z-index: 1; pointer-events: auto; touch-action: manipulation; }
 .tab-btn {
   background: #171d28; color: #94a3b8; border: 1px solid #2d3748; padding: 4px 2px; border-radius: 6px; font-weight: 800; font-size: 8.5px; text-align: center; transition: all 0.2s;
 }
@@ -385,12 +424,17 @@ header, .topbar {
       </div>
     </header>
 
-    <!-- EMPAT TAB NAVIGASI UTAMA -->
+    <!-- MENU UTAMA RINGKAS: halaman tambahan di dalam tombol tiga garis -->
     <nav class="mode-switch-bar" id="mainTabNavigation" aria-label="Main pages">
-      <button type="button" class="tab-btn active" id="tabEqBtn" data-main-tab="eq" aria-controls="tabEqContent" aria-selected="true">🎛️ EQUALIZER</button>
-      <button type="button" class="tab-btn" id="tabEchoBtn" data-main-tab="echo" aria-controls="tabEchoContent" aria-selected="false">🔊 ALESIS FX</button>
+      <div class="mode-menu-wrap">
+        <button type="button" class="mode-menu-trigger" id="modeMenuTrigger" aria-label="Buka menu halaman" aria-expanded="false" aria-controls="modeMenu">☰</button>
+        <div class="mode-menu" id="modeMenu">
+          <button type="button" class="tab-btn active" id="tabEqBtn" data-main-tab="eq" aria-controls="tabEqContent" aria-selected="true">🎛️ EQUALIZER</button>
+          <button type="button" class="tab-btn" id="tabEchoBtn" data-main-tab="echo" aria-controls="tabEchoContent" aria-selected="false">🔊 ALESIS FX</button>
+          <button type="button" class="tab-btn" id="tabEspBtn" data-main-tab="esp32" aria-controls="tabEspContent" aria-selected="false">📡 ESP32 &amp; HW</button>
+        </div>
+      </div>
       <button type="button" class="tab-btn" id="tabMixerBtn" data-main-tab="mixer" aria-controls="tabMixerContent" aria-selected="false">🎚️ DIGITAL MIXER</button>
-      <button type="button" class="tab-btn" id="tabEspBtn" data-main-tab="esp32" aria-controls="tabEspContent" aria-selected="false">📡 ESP32 & HW</button>
     </nav>
 
     <!-- KONTEN TAB 1: EQUALIZER -->
@@ -831,12 +875,29 @@ function activateMainTab(tabName) {
   });
 }
 
+const modeMenu = document.getElementById("modeMenu");
+const modeMenuTrigger = document.getElementById("modeMenuTrigger");
+function closeModeMenu() {
+  if (modeMenu) modeMenu.classList.remove("open");
+  if (modeMenuTrigger) modeMenuTrigger.setAttribute("aria-expanded", "false");
+}
+if (modeMenuTrigger && modeMenu) {
+  modeMenuTrigger.addEventListener("click", event => {
+    event.preventDefault();
+    const isOpen = modeMenu.classList.toggle("open");
+    modeMenuTrigger.setAttribute("aria-expanded", String(isOpen));
+  });
+}
 if (mainTabNavigation) {
   mainTabNavigation.addEventListener("click", event => {
     const button = event.target.closest("[data-main-tab]");
     if (!button || !mainTabNavigation.contains(button)) return;
     event.preventDefault();
     activateMainTab(button.dataset.mainTab);
+    closeModeMenu();
+  });
+  document.addEventListener("click", event => {
+    if (!mainTabNavigation.contains(event.target)) closeModeMenu();
   });
 }
 
