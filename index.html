@@ -2095,6 +2095,37 @@ function updateTftModuleCurve(key) {
   });
 }
 
+function applyTftGraphPointToControl(key, pointIndex, x, y) {
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  const setRange = (id, value) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.value = String(value);
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+  };
+  const setSelectIndex = (id, index) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.selectedIndex = index;
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+  };
+  if (key === "config" && pointIndex === 1) setRange("cfgGain", Math.round(clamp((58-y)/48*60,0,60)));
+  else if (key === "gate" && pointIndex === 1) setRange("gateThresh", Math.round(clamp((x-20)/130*80-80,-80,0)));
+  else if (key === "gate" && pointIndex === 2) setRange("gateRatio", Math.round(clamp((55-y)/3.8+1,1,10)*2)/2);
+  else if (key === "dynamics" && pointIndex === 1) setRange("compThresh", Math.round(clamp((x-20)/145*60-60,-60,0)));
+  else if (key === "dynamics" && pointIndex === 2) setRange("compRatio", Math.round(clamp((55-y)/2.3+1,1,20)));
+  else if (key === "dynamics" && pointIndex === 3) setRange("compMakeup", Math.round(clamp((20-y)/0.65,0,24)));
+  else if (key === "sends" && pointIndex === 1) setRange("send1Lvl", Math.round(clamp((32-y)/1.35,-15,15)));
+  else if (key === "main" && pointIndex === 1) setRange("mainFohLvl", Math.round(clamp((35-y)/25*56-50,-50,6)));
+  else if (key === "main" && pointIndex === 2) setRange("mainLimitLvl", Math.round(clamp((y-35)/1.25-20,-20,0)*2)/2);
+  else if (key === "routing" && pointIndex === 1) setSelectIndex("routeSourceSel", Math.round(clamp(x/320*3,0,3)));
+  else if (key === "meters" && pointIndex === 1) setRange("meterZoomInp", clamp((50-y)/10,0.5,4));
+  else if (key === "scenes" && pointIndex === 1) setSelectIndex("sceneActiveSel", Math.round(clamp((x-70)/45,0,3)));
+  else if (key === "setup" && pointIndex === 1) setRange("setupBrightInp", Math.round(clamp((58-y)/0.55,0,100)));
+  else if (key === "effects" && pointIndex === 1) setRange("fxDelayInp", clamp((x-40)/230,0,1.2));
+  else if (key === "effects" && pointIndex === 2) setRange("fxFeedbackInp", clamp((52-y)/75,0,0.85));
+}
+
 function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback) {
   if (!svgContainer || !dotElement || dotElement.dataset.dragReady === "1") return;
   dotElement.dataset.dragReady = "1";
@@ -2300,6 +2331,7 @@ function bindTftDynamicEventListeners(key) {
 
     if (container && dot1 && curve) {
       makeSpecificDotDraggable(container, dot1, (x, y) => {
+        applyTftGraphPointToControl(key, 1, x, y);
         s.dotX = s.dot1X = x; s.dotY = s.dot1Y = y;
         if (key === "config") curve.setAttribute("d", `M10 50 Q ${x} ${y}, 310 15`);
         else if (key === "gate") curve.setAttribute("d", `M10 55 L ${x} ${y} L ${s.dot2X} ${s.dot2Y}`);
@@ -2315,6 +2347,7 @@ function bindTftDynamicEventListeners(key) {
 
     if (container && dot2 && curve) {
       makeSpecificDotDraggable(container, dot2, (x, y) => {
+        applyTftGraphPointToControl(key, 2, x, y);
         s.dot2X = x; s.dot2Y = y;
         const cx1 = s.dot1X || 80, cy1 = s.dot1Y || 12;
         if (key === "gate") curve.setAttribute("d", `M10 55 L ${cx1} ${cy1} L ${x} ${y}`);
