@@ -974,6 +974,53 @@ header, .topbar {
   #tabMixerContent .master-strip .strip-knobs-area { padding:1px 2px; }
 }
 
+
+/* TRUE STEREO MASTER METERS — vertical, beside the master fader */
+#tabMixerContent .master-stereo-meter-vertical {
+  display:flex;
+  align-items:stretch;
+  justify-content:center;
+  gap:5px;
+  flex:0 0 28px;
+  height:100%;
+  min-height:0;
+  padding:3px 2px;
+  border:1px solid #80500f;
+  border-radius:4px;
+  background:linear-gradient(180deg,#17130d,#0d1119);
+}
+#tabMixerContent .master-meter-column {
+  display:flex;
+  flex:1 1 0;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  min-width:0;
+  color:#fbbf24;
+  font:800 7px/1 monospace;
+}
+#tabMixerContent .master-meter-column .master-led-meter {
+  flex:1 1 0;
+  width:8px;
+  min-height:0;
+  height:100%;
+  padding:2px 1px;
+  gap:1px;
+}
+#tabMixerContent .master-meter-column .master-led-meter span {
+  flex:1 1 0;
+  min-height:1px;
+}
+#tabMixerContent .master-strip .fader-panel-area {
+  align-items:stretch;
+  gap:5px;
+}
+#tabMixerContent .master-strip .fader-slot { flex:1 1 0; min-width:22px; }
+@media(max-width:600px) {
+  #tabMixerContent .master-stereo-meter-vertical { flex-basis:24px; gap:3px; padding:2px 1px; }
+  #tabMixerContent .master-meter-column .master-led-meter { width:7px; }
+}
+
 </style>
 </head>
 
@@ -1316,18 +1363,17 @@ header, .topbar {
 
           <div class="console-channel-strip master-strip">
             <div class="strip-label-box">Main LR</div>
-            <div class="master-stereo-meter" aria-label="Main left and right level indicators">
-              <div class="master-stereo-meter-channel"><span>L</span><div class="tft-led-bar" id="masterMeterL"></div></div>
-              <div class="master-stereo-meter-channel"><span>R</span><div class="tft-led-bar" id="masterMeterR"></div></div>
-            </div>
             <div class="strip-knobs-area" style="border-color: #d97706;">
               <div class="knob-row"><span>LIMIT</span><span>ON</span></div>
               <div class="knob-row"><span>PROC</span><select><option>EQ+ALESIS</option><option>BYPASS</option></select></div>
             </div>
             <div class="fader-readout">0.0 dB</div>
             <div class="fader-panel-area">
-              <div class="fader-slot"><input type="range" min="-50" max="6" step="0.5" value="0"></div>
-              <div class="vert-led-meter" id="mixerMeterMaster"></div>
+              <div class="fader-slot"><input type="range" min="-50" max="6" step="0.5" value="0" aria-label="Master LR fader"></div>
+              <div class="master-stereo-meter-vertical" aria-label="Master stereo output meters">
+                <div class="master-meter-column"><span>L</span><div class="vert-led-meter master-led-meter" id="masterMeterL"></div></div>
+                <div class="master-meter-column"><span>R</span><div class="vert-led-meter master-led-meter" id="masterMeterR"></div></div>
+              </div>
             </div>
             <div class="strip-action-buttons">
               <button class="console-action-btn mute" style="background:#b45309; color:#fff;">MUTE</button>
@@ -1386,7 +1432,7 @@ header, .topbar {
    INISIALISASI LED METER & TFT STEREO METER
 ========================================================= */
 function initMixerVerticalMeters() {
-  const meterIds = ["mixerMeter1", "mixerMeter2", "mixerMeter3", "mixerMeter4", "mixerMeterMaster"];
+  const meterIds = ["mixerMeter1", "mixerMeter2", "mixerMeter3", "mixerMeter4", "mixerMeterMaster", "masterMeterL", "masterMeterR"];
   meterIds.forEach(id => {
     const container = document.getElementById(id);
     if (!container) return;
@@ -1400,7 +1446,7 @@ function initMixerVerticalMeters() {
     }
   });
 
-  ['tftMeterL', 'tftMeterR', 'masterMeterL', 'masterMeterR'].forEach(id => {
+  ['tftMeterL', 'tftMeterR'].forEach(id => {
     const box = document.getElementById(id);
     if (!box) return;
     box.innerHTML = "";
@@ -1414,6 +1460,31 @@ function initMixerVerticalMeters() {
   });
 }
 initMixerVerticalMeters();
+
+function updateMasterStereoMeters() {
+  if (!audioGraphReady || !masterStereoAnalysers.every(Boolean)) {
+    masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
+    return;
+  }
+  masterStereoAnalysers.forEach((analyser, channel) => {
+    const data = masterStereoMeterBuffers[channel];
+    analyser.getFloatTimeDomainData(data);
+    let sum = 0;
+    for (let i = 0; i < data.length; i++) sum += data[i] * data[i];
+    const rms = Math.sqrt(sum / data.length);
+    const db = rms > 0 ? 20 * Math.log10(rms) : -72;
+    const level = Math.max(0, Math.min(16, Math.round((db + 60) / 60 * 16)));
+    const meter = document.getElementById(channel === 0 ? "masterMeterL" : "masterMeterR");
+    if (!meter) return;
+    Array.from(meter.children).forEach((segment, index) => {
+      segment.classList.toggle("on", index >= 16 - level);
+    });
+  });
+  masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
+}
+updateMasterStereoMeters();
+
+
 
 /* =========================================================
    NAVIGASI EMPAT TAB UTAMA
@@ -1641,6 +1712,10 @@ let mixerStripGains = [null, null, null, null];
 let mixerStripAnalysers = [null, null, null, null];
 let masterStripGainNode = null;
 let masterMeterAnalyser = null;
+let masterStereoSplitter = null;
+let masterStereoAnalysers = [null, null];
+let masterStereoMeterBuffers = [new Float32Array(1024), new Float32Array(1024)];
+let masterStereoMeterFrame = null;
 let mixerStripMuted = [false, false, false, false];
 let mixerStripSolo = [false, false, false, false];
 let alesisDelayNode = null, alesisFeedbackNode = null, alesisFilterNode = null, alesisWetNode = null, alesisDryNode = null;
@@ -1922,6 +1997,9 @@ function initializeAudioGraph() {
   masterStripGainNode = audioContext.createGain();
   masterMeterAnalyser = audioContext.createAnalyser();
   masterMeterAnalyser.fftSize = 1024;
+  masterStereoSplitter = audioContext.createChannelSplitter(2);
+  masterStereoAnalysers = [audioContext.createAnalyser(), audioContext.createAnalyser()];
+  masterStereoAnalysers.forEach(analyser => { analyser.fftSize = 1024; analyser.smoothingTimeConstant = 0.35; });
 
   buildEqualizerChannel(0);
   buildEqualizerChannel(1);
@@ -1966,6 +2044,9 @@ function initializeAudioGraph() {
   tftPeqFilter.connect(masterStripGainNode);
 
   masterStripGainNode.connect(masterMeterAnalyser);
+  masterStripGainNode.connect(masterStereoSplitter);
+  masterStereoSplitter.connect(masterStereoAnalysers[0], 0);
+  masterStereoSplitter.connect(masterStereoAnalysers[1], 1);
   masterMeterAnalyser.connect(masterGainNode);
   masterGainNode.connect(outputMuteGainNode);
   outputMuteGainNode.connect(audioContext.destination);
