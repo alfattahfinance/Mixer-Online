@@ -2035,6 +2035,66 @@ function updateTftPeqVisuals() {
   fill.setAttribute("d", `${pathStr} L320 120 L0 120 Z`);
 }
 
+function updateTftModuleCurve(key) {
+  const s = tftStatesData[key];
+  if (!s || key === "eq") return;
+  const prefix = "tft" + key.charAt(0).toUpperCase() + key.slice(1);
+  const svg = document.getElementById(prefix + "SvgContainer");
+  const curve = document.getElementById(prefix + "SvgCurve");
+  const fill = document.getElementById(prefix + "SvgFill");
+  if (!svg || !curve) return;
+  let points = [];
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  if (key === "config") {
+    points = [[10,50],[160,clamp(58-(s.gain/60)*48,8,58)],[310,15]];
+  } else if (key === "gate") {
+    const x = clamp(20 + ((s.thresh+80)/80)*130,20,180);
+    const y = clamp(55 - (s.ratio-1)*3.8,8,55);
+    points = [[10,55],[x,55],[x+18,y],[310,y]];
+  } else if (key === "dynamics") {
+    const x = clamp(20 + ((s.thresh+60)/60)*145,20,190);
+    const y = clamp(55 - (s.ratio-1)*2.3,8,55);
+    const endY = clamp(y - s.makeup*0.65,5,55);
+    points = [[10,55],[x,y],[190,y],[310,endY]];
+  } else if (key === "sends") {
+    const y = clamp(32 - s.lvl*1.35,8,56);
+    points = s.preset === 1 ? [[10,48],[95,48],[160,y],[230,24],[310,18]]
+      : s.preset === 2 ? [[10,18],[85,42],[160,y],[235,42],[310,18]]
+      : [[10,32],[160,y],[310,32]];
+    if (!s.state) points = [[10,32],[160,32],[310,32]];
+  } else if (key === "main") {
+    const y1 = clamp(35 - ((s.send+50)/56)*25,8,58);
+    const y2 = clamp(35 + (s.limit+20)*1.25,8,58);
+    points = [[10,35],[clamp(90+((s.send+50)/56)*95,40,240),y1],[310,y2]];
+    if (s.bypass) points = [[10,35],[160,35],[310,35]];
+  } else if (key === "routing") {
+    const y = s.usb ? clamp(48 - s.source*9 + s.dout*4,8,58) : 58;
+    points = [[10,48],[160,y],[310,s.usb?18:58]];
+  } else if (key === "meters") {
+    const y = clamp(50 - s.zoom*10 - s.hold*5,5,58);
+    points = [[10,55],[160,y],[310,clamp(y-8,5,58)]];
+  } else if (key === "scenes") {
+    const y = s.safe ? 22 : 48;
+    const x = clamp(70 + s.active*45,70,250);
+    points = [[10,48],[x,y],[310,s.safe?18:48]];
+  } else if (key === "setup") {
+    const y = clamp(58 - s.bright*0.55,8,58);
+    points = [[10,50],[160,y],[310,s.ble?18:52]];
+  } else if (key === "effects") {
+    const x = clamp(40 + s.delay*230,40,280);
+    const y = clamp(52 - s.feedback*75,5,52);
+    points = [[10,52],[x,y],[310,s.active?18:52]];
+  }
+  if (!points.length) return;
+  const d = points.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
+  curve.setAttribute("d", d);
+  if (fill) fill.setAttribute("d", d + " L310 65 L10 65 Z");
+  points.slice(1,3).forEach((p,i) => {
+    const dot = document.getElementById(prefix + "Dot" + (i+1));
+    if (dot) { dot.setAttribute("cx",p[0].toFixed(1)); dot.setAttribute("cy",p[1].toFixed(1)); }
+  });
+}
+
 function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback) {
   if (!svgContainer || !dotElement || dotElement.dataset.dragReady === "1") return;
   dotElement.dataset.dragReady = "1";
@@ -2104,6 +2164,16 @@ function bindTftDynamicEventListeners(key) {
 
   if (!activeState) return;
   const s = tftStatesData[key];
+
+  // Keep every module graph synchronized with its visible controls.
+  const moduleRoot = document.getElementById("tftContentArea");
+  if (moduleRoot && !moduleRoot.dataset.curveSyncBound) {
+    moduleRoot.dataset.curveSyncBound = "1";
+    ["input", "change", "click"].forEach(type => {
+      moduleRoot.addEventListener(type, () => updateTftModuleCurve(activeCurrentSectionKey));
+    });
+  }
+  updateTftModuleCurve(key);
 
   if (key === "eq") {
     const freqInput = document.getElementById("tftPeqFreq");
