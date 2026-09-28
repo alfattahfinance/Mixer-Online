@@ -1760,33 +1760,37 @@ const tftDatabase = {
           <span>PEQ • 4-BAND SQ-7</span>
           <span style="color:#10b981;">● 4 Control Points Active</span>
         </div>
-        <svg class="tft-peq-graph" id="tftPeqSvgContainer" viewBox="0 0 320 120" preserveAspectRatio="none" role="img" aria-label="SQ-7 PEQ" style="touch-action:none;">
-          <g stroke="#334155" stroke-width=".7" opacity=".7">
-            <line x1="0" y1="20" x2="320" y2="20" />
-            <line x1="0" y1="40" x2="320" y2="40" />
-            <line x1="0" y1="60" x2="320" y2="60" stroke="#64748b" stroke-width="1.2" />
-            <line x1="0" y1="80" x2="320" y2="80" />
-            <line x1="0" y1="100" x2="320" y2="100" />
-            <line x1="50" y1="0" x2="50" y2="120" />
-            <line x1="100" y1="0" x2="100" y2="120" />
-            <line x1="160" y1="0" x2="160" y2="120" stroke="#475569" stroke-width="1" />
-            <line x1="220" y1="0" x2="220" y2="120" />
-            <line x1="280" y1="0" x2="280" y2="120" />
+        <svg class="tft-peq-graph" id="tftPeqSvgContainer" viewBox="0 0 320 120" preserveAspectRatio="none" role="img" aria-label="SQ-7 PEQ frequency response" style="touch-action:none;">
+          <rect x="0" y="0" width="320" height="120" fill="#080d16"/>
+          <g stroke="#253448" stroke-width=".65" opacity=".95">
+            <line x1="0" y1="15" x2="320" y2="15"/>
+            <line x1="0" y1="30" x2="320" y2="30"/>
+            <line x1="0" y1="45" x2="320" y2="45"/>
+            <line x1="0" y1="60" x2="320" y2="60" stroke="#94a3b8" stroke-width="1.3"/>
+            <line x1="0" y1="75" x2="320" y2="75"/>
+            <line x1="0" y1="90" x2="320" y2="90"/>
+            <line x1="0" y1="105" x2="320" y2="105"/>
           </g>
-          <text x="52" y="112" fill="#94a3b8" font-size="6">50</text>
-          <text x="102" y="112" fill="#94a3b8" font-size="6">100</text>
-          <text x="162" y="112" fill="#94a3b8" font-size="6">1k</text>
-          <text x="222" y="112" fill="#94a3b8" font-size="6">5k</text>
-          <text x="278" y="112" fill="#94a3b8" font-size="6">10k</text>
-
-          <path id="tftPeqSvgFill" d="M0 60 C80 60 120 20 160 50 C200 80 260 15 320 60 L320 120 L0 120 Z" fill="url(#blueRedGradient)" opacity="0.3"/>
-          <path id="tftPeqSvgCurve" d="M0 60 C80 60 120 20 160 50 C200 80 260 15 320 60" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
-          
-          <!-- 4 Titik Kendali PEQ Sesuai 4 Band Fader -->
-          <circle id="tftPeqDot1" cx="64" cy="50" r="7" fill="#c084fc" stroke="#a855f7" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Band 1: 50Hz"/>
-          <circle id="tftPeqDot2" cx="130" cy="60" r="7" fill="#38bdf8" stroke="#0284c7" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Band 2: 200Hz"/>
-          <circle id="tftPeqDot3" cx="220" cy="60" r="7" fill="#2dd4bf" stroke="#0d9488" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Band 3: 2.5kHz"/>
-          <circle id="tftPeqDot4" cx="280" cy="20" r="7" fill="#f87171" stroke="#dc2626" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Band 4: 10kHz"/>
+          <g stroke="#334155" stroke-width=".6" opacity=".9">
+            <line x1="0" y1="0" x2="0" y2="108"/>
+            <line x1="32" y1="0" x2="32" y2="108"/>
+            <line x1="64" y1="0" x2="64" y2="108"/>
+            <line x1="96" y1="0" x2="96" y2="108"/>
+            <line x1="160" y1="0" x2="160" y2="108"/>
+            <line x1="224" y1="0" x2="224" y2="108"/>
+            <line x1="256" y1="0" x2="256" y2="108"/>
+            <line x1="288" y1="0" x2="288" y2="108"/>
+            <line x1="320" y1="0" x2="320" y2="108"/>
+          </g>
+          <g fill="#94a3b8" font-size="6" font-family="Arial, sans-serif">
+            <text x="3" y="12">+15</text><text x="3" y="27">+10</text><text x="3" y="42">+5</text>
+            <text x="3" y="57">0 dB</text><text x="3" y="72">-5</text><text x="3" y="87">-10</text><text x="3" y="102">-15</text>
+            <text x="1" y="116">20</text><text x="43" y="116">50</text><text x="73" y="116">100</text>
+            <text x="155" y="116">1k</text><text x="249" y="116">5k</text><text x="286" y="116">10k</text><text x="302" y="116">20k Hz</text>
+          </g>
+          <path id="tftPeqSvgFill" d="M0 60 L320 60 Z" fill="#38bdf8" opacity=".14"/>
+          <path id="tftPeqSvgCurve" d="M0 60 L320 60" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle id="tftPeqDot2" cx="160" cy="60" r="5" fill="#f8fafc" stroke="#0284c7" stroke-width="2" style="cursor:grab;touch-action:none;" title="PEQ center frequency / gain"/>
 
           <defs>
             <linearGradient id="blueRedGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -2020,19 +2024,36 @@ function updateTftPeqVisuals() {
   const curve = document.getElementById("tftPeqSvgCurve");
   const fill = document.getElementById("tftPeqSvgFill");
   if (!curve || !fill) return;
+
+  // Draw a bell-shaped PEQ response on a logarithmic 20 Hz–20 kHz axis.
   const minLog = Math.log10(20), maxLog = Math.log10(20000);
-  const currentLog = Math.log10(Math.max(20, Math.min(20000, tftPeqFreqVal)));
-  const cx = ((currentLog - minLog) / (maxLog - minLog)) * 320;
-  const cy = 60 - (tftPeqGainVal / 15) * 45;
+  const freq = Math.max(20, Math.min(20000, Number(tftPeqFreqVal) || 20));
+  const q = Math.max(0.1, Math.min(10, Number(tftPeqQVal) || 0.7));
+  const gain = Math.max(-15, Math.min(15, Number(tftPeqGainVal) || 0));
+  const centerX = ((Math.log10(freq) - minLog) / (maxLog - minLog)) * 320;
+  const centerY = 60 - (gain / 15) * 45;
+  const bandwidthOctaves = (2 * Math.asinh(1 / (2 * q))) / Math.LN2;
+  const points = [];
+
+  for (let i = 0; i <= 160; i++) {
+    const x = (i / 160) * 320;
+    const hz = Math.pow(10, minLog + (x / 320) * (maxLog - minLog));
+    const octaves = Math.log2(hz / freq);
+    const response = gain * Math.exp(-4 * Math.LN2 * Math.pow(octaves / bandwidthOctaves, 2));
+    const y = Math.max(15, Math.min(105, 60 - (response / 15) * 45));
+    points.push([x, y]);
+  }
+
+  const pathStr = points.map((p, i) => (i ? "L" : "M") + p[0].toFixed(2) + " " + p[1].toFixed(2)).join(" ");
+  curve.setAttribute("d", pathStr);
+  fill.setAttribute("d", pathStr + " L320 60 L0 60 Z");
 
   const dot2 = document.getElementById("tftPeqDot2");
-  if (dot2) { dot2.setAttribute("cx", cx.toFixed(1)); dot2.setAttribute("cy", cy.toFixed(1)); }
-
-  const widthSpread = Math.max(25, 120 / tftPeqQVal);
-  const x1 = Math.max(0, cx - widthSpread), x2 = Math.min(320, cx + widthSpread);
-  const pathStr = `M0 60 L${x1.toFixed(1)} 60 C${((0+x1)/2).toFixed(1)} 60 ${cx.toFixed(1)} ${cy.toFixed(1)} ${cx.toFixed(1)} ${cy.toFixed(1)} C${cx.toFixed(1)} ${cy.toFixed(1)} ${((x2+320)/2).toFixed(1)} 60 ${x2.toFixed(1)} 60 L320 60`;
-  curve.setAttribute("d", pathStr);
-  fill.setAttribute("d", `${pathStr} L320 120 L0 120 Z`);
+  if (dot2) {
+    dot2.setAttribute("cx", centerX.toFixed(2));
+    dot2.setAttribute("cy", centerY.toFixed(2));
+    dot2.setAttribute("aria-label", `PEQ center ${freq} Hz, ${gain.toFixed(1)} dB`);
+  }
 }
 
 function updateTftModuleCurve(key) {
