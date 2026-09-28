@@ -429,16 +429,16 @@ header, .topbar {
       <div class="mode-menu-wrap">
         <button type="button" class="mode-menu-trigger" id="modeMenuTrigger" aria-label="Buka menu halaman" aria-expanded="false" aria-controls="modeMenu">☰</button>
         <div class="mode-menu" id="modeMenu">
-          <button type="button" class="tab-btn active" id="tabEqBtn" data-main-tab="eq" aria-controls="tabEqContent" aria-selected="true">🎛️ EQUALIZER</button>
+          <button type="button" class="tab-btn active" id="tabMixerBtn" data-main-tab="mixer" aria-controls="tabMixerContent" aria-selected="true">🎚️ DIGITAL MIXER</button>
+          <button type="button" class="tab-btn" id="tabEqBtn" data-main-tab="eq" aria-controls="tabEqContent" aria-selected="false">🎛️ EQUALIZER</button>
           <button type="button" class="tab-btn" id="tabEchoBtn" data-main-tab="echo" aria-controls="tabEchoContent" aria-selected="false">🔊 ALESIS FX</button>
           <button type="button" class="tab-btn" id="tabEspBtn" data-main-tab="esp32" aria-controls="tabEspContent" aria-selected="false">📡 ESP32 &amp; HW</button>
         </div>
       </div>
-      <button type="button" class="tab-btn" id="tabMixerBtn" data-main-tab="mixer" aria-controls="tabMixerContent" aria-selected="false">🎚️ DIGITAL MIXER</button>
     </nav>
 
     <!-- KONTEN TAB 1: EQUALIZER -->
-    <div class="tab-content active" id="tabEqContent">
+    <div class="tab-content" id="tabEqContent">
       <section class="rack">
         <div class="rack-header">
           <div>
@@ -594,7 +594,7 @@ header, .topbar {
     </div>
 
     <!-- KONTEN TAB 3: DIGITAL MIXER CONSOLE & AUDIO PLAYER TERINTEGRASI -->
-    <div class="tab-content" id="tabMixerContent">
+    <div class="tab-content active" id="tabMixerContent">
       <div class="mixer-console">
         
         <!-- AUDIO PLAYER DECK -->
