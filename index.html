@@ -44,7 +44,13 @@ header, .topbar {
 ========================================================= */
 .mode-switch-bar {
   position: relative; z-index: 50; display: flex; align-items: center; gap: 6px; flex: 0 0 auto; min-height: 30px; padding: 2px 4px;
+  flex-wrap: wrap;
 }
+.top-audio-controls { flex: 1 1 auto; min-width: 0; margin: 0; gap: 4px; }
+.top-audio-controls button, .top-audio-controls .file-button { min-height: 24px; padding: 3px 7px; font-size: 8px; }
+.top-audio-controls select { width: clamp(78px, 12vw, 130px); max-width: 130px; min-width: 70px; min-height: 24px; font-size: 8px; }
+.top-audio-status { min-width: 0; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #94a3b8; font-size: 7px; }
+
 .mode-menu-wrap { position: relative; flex: 0 0 auto; }
 .mode-menu-trigger {
   display: inline-flex; align-items: center; justify-content: center; width: 42px; min-height: 34px; padding: 0;
@@ -555,6 +561,17 @@ header, .topbar {
           <button type="button" class="tab-btn" id="tabEspBtn" data-main-tab="esp32" aria-controls="tabEspContent" aria-selected="false">📡 ESP32 &amp; HW</button>
         </div>
       </div>
+      <div class="audio-actions top-audio-controls" aria-label="Audio player and input source">
+        <button id="startMicButton" type="button">MIC</button>
+        <label for="physicalInputDevice" class="sr-only">Pilih sumber input fisik</label>
+        <select id="physicalInputDevice" aria-label="Sumber input fisik" title="Pilih mikrofon atau USB audio interface">
+          <option value="">Default HP</option>
+        </select>
+        <label class="file-button">📁 FILE<input id="audioFilesInput" type="file" accept="audio/*" multiple hidden></label>
+        <button id="startAudioButton" type="button">▶ PLAY</button>
+        <button id="stopAudioButton" type="button">⏹ STOP</button>
+        <span id="audioStatus" class="top-audio-status">Audio belum aktif.</span>
+      </div>
       <div class="actions compact-top-actions" aria-label="Preset actions">
         <button id="saveButton" type="button">SAVE</button>
         <button id="loadButton" type="button">RECALL</button>
@@ -722,23 +739,9 @@ header, .topbar {
     <div class="tab-content active" id="tabMixerContent">
       <div class="mixer-console">
         
-        <!-- AUDIO PLAYER DECK -->
-        <div class="integrated-audio-deck">
-          <div class="deck-title">🎵 AUDIO PLAYER & INPUT SUMBER</div>
-          <div class="audio-actions">
-            <button id="startMicButton">MIC</button>
-            <label for="physicalInputDevice" class="sr-only">Pilih sumber input fisik</label>
-            <select id="physicalInputDevice" aria-label="Sumber input fisik" title="Pilih mikrofon atau USB audio interface">
-              <option value="">Default HP</option>
-            </select>
-            <label class="file-button">📁 FILE<input id="audioFilesInput" type="file" accept="audio/*" multiple hidden></label>
-            <button id="startAudioButton">▶ PLAY</button>
-            <button id="stopAudioButton">⏹ STOP</button>
-          </div>
-          <div class="playlist-container" id="playlistContainer">
-            <div style="text-align: center; padding: 2px; color: #64748b;">Belum ada file audio dipilih.</div>
-          </div>
-          <div id="audioStatus" class="audio-status" style="margin-top: 1px;">Audio belum aktif.</div>
+        <!-- Playlist data node retained for existing audio selection logic; audio controls live in the top bar. -->
+        <div class="playlist-container" id="playlistContainer" hidden>
+          <div style="text-align: center; padding: 2px; color: #64748b;">Belum ada file audio dipilih.</div>
         </div>
 
         <!-- WORKSPACE: NAVIGASI VERTIKAL DI KIRI, TFT + FADER DI KANAN -->
