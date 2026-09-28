@@ -178,6 +178,7 @@ header, .topbar {
   border-radius: 4px;
   cursor: ns-resize;
   touch-action: none;
+  overscroll-behavior: contain;
   -webkit-user-select: none;
   user-select: none;
   overflow: visible;
@@ -191,6 +192,7 @@ header, .topbar {
   position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0;
   transform: none; background: transparent; cursor: ns-resize; z-index: 2;
   touch-action: none; -webkit-user-select: none; user-select: none; overscroll-behavior: contain;
+  -webkit-touch-callout: none;
 }
 .band input.eq-range::-webkit-slider-runnable-track { width: 3px; background: transparent; border: 0; }
 .band input.eq-range::-webkit-slider-thumb {
@@ -1285,7 +1287,7 @@ function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed
 
 /* DRAG STABILIZER: start only from the visible fader cap; dampen travel */
 (function enableStableRangeDragging() {
-  const SENSITIVITY = 0.62; // fraction of full range per one track-length drag
+  const SENSITIVITY = 0.42; // dampened travel; normalized to each fader's actual track length
   let active = null;
 
   document.addEventListener("pointerdown", (event) => {
