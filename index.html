@@ -197,13 +197,32 @@ header, .topbar {
 .playlist-item { display: flex; justify-content: space-between; padding: 1px 3px; border-bottom: 1px solid #1a2230; cursor: pointer; }
 .playlist-item.playing { color: #38bdf8; font-weight: 800; }
 
-.mixer-top-console { 
-  display: grid; grid-template-columns: minmax(0,1fr) 150px; gap: 5px; 
-  background: #0b0f16; border: 1px solid #2d3748; border-radius: 6px; 
-  padding: 4px; margin-bottom: 0; align-items: stretch; flex: 0 0 auto;
+.mixer-workspace {
+  display:grid; grid-template-columns:104px minmax(0,1fr);
+  grid-template-rows:238px minmax(0,1fr); gap:5px;
+  flex:1 1 0; min-height:0; min-width:0; overflow:hidden;
 }
-@media(max-width: 900px) { .mixer-top-console { grid-template-columns: minmax(0,1fr) 128px; } }
-@media(max-width: 600px) { .mixer-top-console { grid-template-columns: minmax(0,1fr); } }
+.mixer-side-nav {
+  grid-column:1; grid-row:1 / span 2; min-height:0; min-width:0;
+  display:flex; flex-direction:column; gap:4px; padding:5px; overflow-y:auto;
+  background:linear-gradient(180deg,#151e2b,#101722);
+  border:1px solid #2d3748; border-radius:6px;
+}
+.side-nav-caption { color:#7dd3fc; font-size:7px; font-weight:900; letter-spacing:.7px; padding:2px 3px; }
+.side-nav-divider { height:1px; background:#334155; margin:3px 0; flex:0 0 auto; }
+.mixer-side-nav .tft-tab, .mixer-side-nav .console-btn {
+  width:100%; min-height:27px; padding:4px 2px; font-size:7.5px; white-space:normal; line-height:1.1;
+}
+.mixer-workspace-main {
+  grid-column:2; grid-row:1 / span 2; display:grid;
+  grid-template-rows:238px minmax(0,1fr); gap:5px;
+  min-height:0; min-width:0; overflow:hidden;
+}
+.mixer-top-console {
+  display:block; min-height:0; height:100%;
+  background:#0b0f16; border:1px solid #2d3748; border-radius:6px;
+  padding:4px; margin:0; overflow:hidden;
+}
 
 /* LAYAR TFT UTAMA (SQ-7 STYLE) - DIPERBAIKI AGAR TIDAK MEMANJANG BERLEBIHAN */
 .mixer-tft-screen {
@@ -634,7 +653,27 @@ header, .topbar {
           <div id="audioStatus" class="audio-status" style="margin-top: 1px;">Audio belum aktif.</div>
         </div>
 
-        <!-- BAGIAN LAYAR UTAMA & SECTION SELECT DI KANAN -->
+        <!-- WORKSPACE: NAVIGASI VERTIKAL DI KIRI, TFT + FADER DI KANAN -->
+        <div class="mixer-workspace">
+          <aside class="mixer-side-nav" aria-label="Navigasi mixer">
+            <div class="side-nav-caption">PAGES</div>
+            <button class="tft-tab active" data-tft-tab="eq">Processing</button>
+            <button class="tft-tab" data-tft-tab="routing">Routing</button>
+            <button class="tft-tab" data-tft-tab="meters">Meters</button>
+            <button class="tft-tab" data-tft-tab="scenes">Scenes</button>
+            <button class="tft-tab" data-tft-tab="setup">Setup</button>
+            <button class="tft-tab" data-tft-tab="effects">Utility</button>
+            <div class="side-nav-divider"></div>
+            <div class="side-nav-caption">CHANNEL DSP</div>
+            <button class="console-btn" data-section="config">Preamp</button>
+            <button class="console-btn" data-section="gate">Gate</button>
+            <button class="console-btn" data-section="dynamics">Comp</button>
+            <button class="console-btn active" data-section="eq">PEQ</button>
+            <button class="console-btn" data-section="sends">GEQ</button>
+            <button class="console-btn" data-section="main">Insert</button>
+          </aside>
+          <div class="mixer-workspace-main">
+        <!-- BAGIAN LAYAR UTAMA -->
         <div class="mixer-top-console">
           
           <!-- LAYAR TFT UTAMA (SQ-7 STYLE) -->
@@ -645,15 +684,6 @@ header, .topbar {
                 <button type="button" class="tft-curve-toggle active" id="tftCurveToggleBtn">CURVE: ON</button>
                 <span style="color: #10b981;">● 48kHz / 32-bit</span>
               </div>
-            </div>
-
-            <div class="tft-top-tabs">
-              <button class="tft-tab active" data-tft-tab="eq">Processing</button>
-              <button class="tft-tab" data-tft-tab="routing">Routing</button>
-              <button class="tft-tab" data-tft-tab="meters">Meters</button>
-              <button class="tft-tab" data-tft-tab="scenes">Scenes</button>
-              <button class="tft-tab" data-tft-tab="setup">Setup</button>
-              <button class="tft-tab" data-tft-tab="effects">Utility</button>
             </div>
 
             <div class="tft-main-viewport">
@@ -687,19 +717,6 @@ header, .topbar {
             </div>
           </div>
 
-          <!-- SECTION SELECT DI KANAN -->
-          <div class="mixer-control-section">
-            <div style="font-size: 8.5px; font-weight: 800; color: #38bdf8; margin-bottom: 2px;">SQ-7 PROCESSING</div>
-            <div style="font-size: 7px; color: #94a3b8; margin-bottom: 3px;">Pilih modul DSP Console</div>
-            <div class="section-grid-btns">
-              <button class="console-btn" data-section="config">Preamp</button>
-              <button class="console-btn" data-section="gate">Gate</button>
-              <button class="console-btn" data-section="dynamics">Comp</button>
-              <button class="console-btn active" data-section="eq">PEQ</button>
-              <button class="console-btn" data-section="sends">GEQ</button>
-              <button class="console-btn" data-section="main">Insert</button>
-            </div>
-          </div>
         </div>
 
         <!-- PERMUKAAN KONSOLE (FADER STRIPS) -->
@@ -790,6 +807,8 @@ header, .topbar {
               <button class="console-action-btn mute" style="background:#b45309; color:#fff;">MUTE</button>
               <button class="console-action-btn active" style="background:#fbbf24; color:#000;">LR</button>
             </div>
+          </div>
+        </div>
           </div>
         </div>
       </div>
