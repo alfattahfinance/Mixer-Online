@@ -18,7 +18,7 @@ html, body { width: 100%; min-height: 100%; margin: 0; padding: 0; overflow-x: h
 body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #07090e; color: #f8fafc; -webkit-text-size-adjust: 100%; }
 button, input, select { font: inherit; -webkit-tap-highlight-color: transparent; cursor: pointer; }
 
-.app { width: 100%; max-width: 100%; margin: 0 auto; padding: 8px; }
+.app { width: 100%; max-width: 1200px; margin: 0 auto; padding: 10px; }
 
 header, .topbar {
   display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
@@ -157,20 +157,31 @@ header, .topbar {
 .integrated-audio-deck { background: #111620; border: 1px solid #1e293b; border-radius: 8px; padding: 10px; margin-bottom: 12px; }
 .deck-title { font-size: 10px; font-weight: 800; color: #38bdf8; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
 
-.mixer-top-console { display: grid; grid-template-columns: 1fr 260px; gap: 10px; background: #05070a; border: 1px solid #1e293b; border-radius: 8px; padding: 10px; margin-bottom: 12px; align-items: stretch; }
-@media(max-width: 900px) { .mixer-top-console { grid-template-columns: 1fr; } }
+/* PENYESUAIAN LANDSCAPE TABLET & MIXER CONSOLE */
+.mixer-top-console { 
+  display: grid; grid-template-columns: 1fr 280px; gap: 12px; 
+  background: #05070a; border: 1px solid #1e293b; border-radius: 8px; 
+  padding: 12px; margin-bottom: 12px; align-items: stretch; 
+  max-height: 400px; /* Batasi tinggi maksimal agar tidak terlalu melar ke bawah dalam mode landscape */
+}
+@media(max-width: 900px) { .mixer-top-console { grid-template-columns: 1fr; max-height: none; } }
 
-.mixer-tft-screen { background: #030508; border: 2px solid #1e293b; border-radius: 8px; padding: 8px; box-shadow: inset 0 0 20px rgba(0,0,0,0.9); display: flex; flex-direction: column; justify-content: space-between; }
+.mixer-tft-screen { 
+  background: #030508; border: 2px solid #1e293b; border-radius: 8px; 
+  padding: 8px; box-shadow: inset 0 0 20px rgba(0,0,0,0.9); 
+  display: flex; flex-direction: column; justify-content: space-between; 
+  height: 100%; min-height: 280px;
+}
 .tft-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 4px; margin-bottom: 6px; font-size: 9px; font-weight: 800; color: #38bdf8; }
 .tft-top-tabs { display: flex; gap: 3px; background: #0a0e16; padding: 3px; border-radius: 5px; margin-bottom: 6px; border: 1px solid #1e293b; overflow-x: auto; }
 .tft-tab { background: #1e293b; color: #94a3b8; border: none; font-size: 8px; font-weight: 800; padding: 4px 6px; border-radius: 3px; cursor: pointer; white-space: nowrap; }
 .tft-tab.active { background: #0284c7; color: #fff; }
-.tft-main-viewport { background: #010204; border: 1px solid #1e293b; border-radius: 5px; min-height: 110px; padding: 6px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
-.tft-content-screen { font-size: 9px; color: #38bdf8; line-height: 1.3; }
+.tft-main-viewport { background: #010204; border: 1px solid #1e293b; border-radius: 5px; min-height: 110px; padding: 6px; display: flex; flex-direction: column; justify-content: space-between; position: relative; flex: 1; }
+.tft-content-screen { font-size: 9px; color: #38bdf8; line-height: 1.3; height: 100%; }
 
 /* LAYAR TFT MODUL INTERAKTIF */
 .tft-module-view { display: flex; flex-direction: column; gap: 6px; height: 100%; }
-.tft-module-graph-box { width: 100%; height: 60px; background: #0a0e16; border: 1px solid #1e293b; border-radius: 5px; padding: 4px; display: flex; align-items: center; justify-content: center; position: relative; cursor: crosshair; touch-action: none; }
+.tft-module-graph-box { width: 100%; height: 55px; background: #0a0e16; border: 1px solid #1e293b; border-radius: 5px; padding: 4px; display: flex; align-items: center; justify-content: center; position: relative; cursor: crosshair; touch-action: none; }
 .tft-module-controls-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
 .tft-mod-ctrl { background: #0f1520; border: 1px solid #1e293b; border-radius: 5px; padding: 4px; text-align: center; }
 .tft-mod-ctrl label { display: block; color: #94a3b8; font-size: 7.5px; margin-bottom: 2px; font-weight: 700; }
@@ -196,36 +207,39 @@ header, .topbar {
 .tft-led-bar span.yellow.on { background: #f59e0b; box-shadow: 0 0 4px #f59e0b; }
 .tft-led-bar span.red.on { background: #ef4444; box-shadow: 0 0 6px #ef4444; }
 
-.mixer-control-section { background: #0f141e; border: 1px solid #1e293b; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; justify-content: flex-start; }
+.mixer-control-section { background: #0f141e; border: 1px solid #1e293b; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; justify-content: flex-start; height: 100%; }
 .section-grid-btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 6px; }
 .console-btn { background: #1e293b; color: #cbd5e1; border: 1px solid #334155; font-size: 9px; font-weight: 800; padding: 8px 4px; border-radius: 5px; text-align: center; transition: all 0.2s; }
 .console-btn.active { background: #0284c7; color: #fff; border-color: #38bdf8; box-shadow: 0 0 8px rgba(2,132,199,0.5); }
 
-.mixer-desk-surface { display: flex; flex-flow: row nowrap; align-items: stretch; gap: 6px; width: 100%; overflow-x: auto; overflow-y: hidden; padding: 2px 2px 8px; scrollbar-width: thin; }
+/* PENYESUAIAN STRIP CHANNEL & FADER AGAR PROPORSIONAL DI LANDSCAPE TABLET */
+.mixer-desk-surface { display: flex; flex-flow: row nowrap; align-items: stretch; gap: 8px; width: 100%; overflow-x: auto; overflow-y: hidden; padding: 4px 2px 10px; scrollbar-width: thin; }
 .mixer-desk-surface .console-channel-strip {
-  flex: 0 0 84px; min-width: 84px; min-height: 520px; padding: 6px 4px; background: linear-gradient(180deg, #131a26, #0a0e14 58%); border: 1px solid #2d3748; border-radius: 8px; display: flex; flex-direction: column; align-items: stretch;
+  flex: 0 0 90px; min-width: 90px; height: 460px; padding: 8px 6px; 
+  background: linear-gradient(180deg, #131a26, #0a0e14 58%); border: 1px solid #2d3748; border-radius: 8px; 
+  display: flex; flex-direction: column; align-items: stretch;
 }
 .console-channel-strip.master-strip { background: linear-gradient(180deg, #1f170b, #0a0703); border-color: #d97706; }
-.strip-label-box { background: #e2e8f0; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 6px; width: 100%; min-height: 40px; padding: 4px 2px; display: flex; align-items: center; justify-content: center; text-align: center; margin: 0 0 6px; font-size: 10px; font-weight: 800; }
+.strip-label-box { background: #e2e8f0; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 6px; width: 100%; min-height: 38px; padding: 4px 2px; display: flex; align-items: center; justify-content: center; text-align: center; margin: 0 0 6px; font-size: 10px; font-weight: 800; }
 .master-strip .strip-label-box { color: #fbbf24; border-color: #b45309; background: #110802; }
 .strip-knobs-area { width: 100%; background: #070a0f; border: 1px solid #1e293b; border-radius: 5px; padding: 4px; margin-bottom: 4px; display: flex; flex-direction: column; gap: 4px; }
 .knob-row { display: flex; justify-content: space-between; align-items: center; font-size: 8.5px; color: #94a3b8; font-weight: 700; }
 .knob-row select { background: #0f172a; color: #fff; border: 1px solid #334155; font-size: 8.5px; padding: 2px; border-radius: 3px; }
 
-.fader-panel-area { display: flex; flex: 1 1 auto; align-items: stretch; justify-content: center; gap: 4px; margin: 4px 0 6px; min-height: 280px; }
-.vert-led-meter { display: flex; flex-direction: column; gap: 2px; flex: 0 0 8px; width: 8px; height: 280px; background: #020406; border: 1px solid #1e293b; padding: 3px 1px; border-radius: 3px; }
+.fader-panel-area { display: flex; flex: 1 1 auto; align-items: stretch; justify-content: center; gap: 6px; margin: 4px 0; height: 230px; }
+.vert-led-meter { display: flex; flex-direction: column; gap: 2px; flex: 0 0 8px; width: 8px; height: 230px; background: #020406; border: 1px solid #1e293b; padding: 3px 1px; border-radius: 3px; }
 .vert-led-meter span { flex: 1; background: #0f172a; border-radius: 1px; }
 .vert-led-meter span.green.on { background: #10b981 !important; box-shadow: 0 0 4px #10b981; }
 .vert-led-meter span.yellow.on { background: #f59e0b !important; box-shadow: 0 0 4px #f59e0b; }
 .vert-led-meter span.red.on { background: #ef4444 !important; box-shadow: 0 0 6px #ef4444; }
 
-.fader-slot { position: relative; flex: 0 0 36px; height: 280px; width: 36px; display: flex; justify-content: center; align-items: center; background: #05070a; border: 1px solid #1e293b; border-radius: 5px; }
+.fader-slot { position: relative; flex: 0 0 36px; height: 230px; width: 36px; display: flex; justify-content: center; align-items: center; background: #05070a; border: 1px solid #1e293b; border-radius: 5px; }
 .fader-slot::before {
-  content: ""; position: absolute; width: 4px; height: 266px; background: linear-gradient(90deg, #0a0e14, #2d3748, #0a0e14); border-radius: 2px;
+  content: ""; position: absolute; width: 4px; height: 216px; background: linear-gradient(90deg, #0a0e14, #2d3748, #0a0e14); border-radius: 2px;
 }
 .fader-slot input[type="range"] {
   -webkit-appearance: none; appearance: none; writing-mode: vertical-lr; direction: rtl; position: absolute; left: 50%; top: 50%;
-  width: 28px; height: 266px; margin: 0; padding: 0; transform: translate(-50%, -50%); background: transparent; cursor: pointer; z-index: 2; touch-action: manipulation;
+  width: 28px; height: 216px; margin: 0; padding: 0; transform: translate(-50%, -50%); background: transparent; cursor: pointer; z-index: 2; touch-action: none;
 }
 .fader-slot input[type="range"]::-webkit-slider-runnable-track { width: 4px; background: transparent; border: 0; }
 .fader-slot input[type="range"]::-webkit-slider-thumb {
@@ -274,7 +288,7 @@ header, .topbar {
 /* Parametric EQ TFT view styles */
 .tft-peq { display:grid; grid-template-columns:minmax(0,1fr); gap:6px; height:100%; }
 .tft-peq-head { display:flex; justify-content:space-between; align-items:center; gap:6px; color:#cbd5e1; font-size:9px; font-weight:700; }
-.tft-peq-graph { width:100%; height:60px; background:#0a0e16; border:1px solid #334155; border-radius:5px; display:block; cursor: crosshair; touch-action: none; }
+.tft-peq-graph { width:100%; height:55px; background:#0a0e16; border:1px solid #334155; border-radius:5px; display:block; cursor: crosshair; touch-action: none; }
 .tft-peq-controls { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:5px; }
 .tft-peq-control { background:#162030; border:1px solid #334155; border-radius:5px; padding:4px; text-align:center; }
 .tft-peq-control label { display:block; color:#94a3b8; font-size:7.5px; margin-bottom:2px; font-weight:700; }
@@ -813,13 +827,13 @@ function setStatus(msg) { const el = document.getElementById("status"); if (el) 
 function setAudioStatus(msg) { const el = document.getElementById("audioStatus"); if (el) el.textContent = msg; }
 function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed(1); }
 
-/* DRAG STABILIZER KHUSUS UNTUK FADER EQ 31-BAND */
+/* DRAG STABILIZER KHUSUS UNTUK SEMUA FADER VERTIKAL (EQ & MIXER) */
 (function enableStableRangeDragging() {
   const SENSITIVITY = 0.08; 
   let active = null;
 
   document.addEventListener("pointerdown", (event) => {
-    const slider = event.target.closest('input.eq-range');
+    const slider = event.target.closest('input.eq-range, .fader-slot input[type="range"]');
     if (!slider || slider.disabled || event.button > 0) return;
 
     const rect = slider.getBoundingClientRect();
@@ -1935,6 +1949,7 @@ function updateTftPeqVisuals() {
 }
 
 function bindTftDynamicEventListeners(key) {
+  // --- PEQ (EQ) ---
   if (key === "eq") {
     const freqInput = document.getElementById("tftPeqFreq");
     const qInput = document.getElementById("tftPeqQ");
@@ -2029,6 +2044,383 @@ function bindTftDynamicEventListeners(key) {
     updateTftPeqVisuals();
   }
 
+  // --- CONFIG ---
+  if (key === "config") {
+    const cfgGain = document.getElementById("cfgGain");
+    const cfgGainVal = document.getElementById("cfgGainVal");
+    const curve = document.getElementById("tftConfigSvgCurve");
+    const fill = document.getElementById("tftConfigSvgFill");
+    const dot = document.getElementById("tftConfigSvgDot");
+    const box = document.getElementById("tftConfigBox");
+
+    const updateSvg = (val) => {
+      if (!curve || !dot) return;
+      const cy = 10 + (1 - (val / 60)) * 40;
+      curve.setAttribute("d", `M10 45 Q 160 ${cy.toFixed(1)}, 310 15`);
+      fill.setAttribute("d", `M10 45 Q 160 ${cy.toFixed(1)}, 310 15 L310 50 L10 50 Z`);
+      dot.setAttribute("cy", cy.toFixed(1));
+    };
+
+    if (cfgGain) {
+      cfgGain.addEventListener("input", () => {
+        const val = Number(cfgGain.value);
+        if (cfgGainVal) cfgGainVal.textContent = val.toFixed(0) + "dB";
+        updateSvg(val);
+      });
+    }
+
+    if (box) {
+      let isDragging = false;
+      const onMove = (e) => {
+        if (!isDragging) return;
+        const rect = box.getBoundingClientRect();
+        const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
+        if (clientY === undefined) return;
+        const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
+        const val = Math.round(60 * (1 - (relY / rect.height)));
+        const clamped = Math.max(0, Math.min(60, val));
+        if (cfgGain) {
+          cfgGain.value = clamped;
+          cfgGain.dispatchEvent(new Event("input"));
+        }
+      };
+      box.addEventListener("pointerdown", (e) => { isDragging = true; box.setPointerCapture(e.pointerId); onMove(e); });
+      box.addEventListener("pointermove", onMove);
+      const stopDrag = (e) => { if (!isDragging) return; isDragging = false; try { box.releasePointerCapture(e.pointerId); } catch(err){} };
+      box.addEventListener("pointerup", stopDrag);
+      box.addEventListener("pointercancel", stopDrag);
+    }
+    updateSvg(cfgGain ? Number(cfgGain.value) : 12);
+  }
+
+  // --- GATE ---
+  if (key === "gate") {
+    const gateThresh = document.getElementById("gateThresh");
+    const gateThreshVal = document.getElementById("gateThreshVal");
+    const gateRatio = document.getElementById("gateRatio");
+    const gateRatioVal = document.getElementById("gateRatioVal");
+    const curve = document.getElementById("tftGateSvgCurve");
+    const fill = document.getElementById("tftGateSvgFill");
+    const dot1 = document.getElementById("tftGateDot1");
+    const dot2 = document.getElementById("tftGateDot2");
+    const box = document.getElementById("tftGateBox");
+
+    const updateSvg = (thresh, ratio) => {
+      if (!curve || !dot1 || !dot2) return;
+      const cx1 = 10 + ((thresh + 80) / 80) * 200;
+      const cy1 = 50;
+      const cx2 = 310;
+      const cy2 = Math.max(10, Math.min(50, 50 - (ratio * 4)));
+      curve.setAttribute("d", `M10 50 L ${cx1.toFixed(1)} ${cy1} L ${cx2} ${cy2}`);
+      fill.setAttribute("d", `M10 50 L ${cx1.toFixed(1)} ${cy1} L ${cx2} ${cy2} L 310 50 Z`);
+      dot1.setAttribute("cx", cx1.toFixed(1)); dot1.setAttribute("cy", cy1);
+      dot2.setAttribute("cx", cx2); dot2.setAttribute("cy", cy2);
+    };
+
+    if (gateThresh) gateThresh.addEventListener("input", () => {
+      const val = Number(gateThresh.value);
+      if (gateThreshVal) gateThreshVal.textContent = val.toFixed(0) + "dB";
+      updateSvg(val, Number(gateRatio?.value || 2.5));
+    });
+    if (gateRatio) gateRatio.addEventListener("input", () => {
+      const val = Number(gateRatio.value);
+      if (gateRatioVal) gateRatioVal.textContent = "1:" + val.toFixed(1);
+      updateSvg(Number(gateThresh?.value || -45), val);
+    });
+
+    if (box) {
+      let activeDot = null;
+      const onMove = (e) => {
+        if (!activeDot) return;
+        const rect = box.getBoundingClientRect();
+        const clientX = e.clientX !== undefined ? e.clientX : e.touches?.[0]?.clientX;
+        const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
+        if (clientX === undefined || clientY === undefined) return;
+        const relX = Math.max(0, Math.min(rect.width, clientX - rect.left));
+        const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
+
+        if (activeDot === 1 && gateThresh) {
+          const val = Math.round(-80 + (relX / rect.width) * 80);
+          gateThresh.value = Math.max(-80, Math.min(0, val));
+          gateThresh.dispatchEvent(new Event("input"));
+        } else if (activeDot === 2 && gateRatio) {
+          const val = Number((((rect.height - relY) / rect.height) * 9 + 1).toFixed(1));
+          gateRatio.value = Math.max(1, Math.min(10, val));
+          gateRatio.dispatchEvent(new Event("input"));
+        }
+      };
+      dot1?.addEventListener("pointerdown", (e) => { activeDot = 1; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
+      dot2?.addEventListener("pointerdown", (e) => { activeDot = 2; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
+      box.addEventListener("pointermove", onMove);
+      const stopDrag = (e) => { if (!activeDot) return; activeDot = null; try { box.releasePointerCapture(e.pointerId); } catch(err){} };
+      box.addEventListener("pointerup", stopDrag);
+      box.addEventListener("pointercancel", stopDrag);
+    }
+    updateSvg(Number(gateThresh?.value || -45), Number(gateRatio?.value || 2.5));
+  }
+
+  // --- DYNAMICS / COMPRESSOR ---
+  if (key === "dynamics") {
+    const compThresh = document.getElementById("compThresh");
+    const compThreshVal = document.getElementById("compThreshVal");
+    const compRatio = document.getElementById("compRatio");
+    const compRatioVal = document.getElementById("compRatioVal");
+    const compMakeup = document.getElementById("compMakeup");
+    const compMakeupVal = document.getElementById("compMakeupVal");
+
+    const curve = document.getElementById("tftCompSvgCurve");
+    const fill = document.getElementById("tftCompSvgFill");
+    const dot1 = document.getElementById("tftCompDot1");
+    const dot2 = document.getElementById("tftCompDot2");
+    const dot3 = document.getElementById("tftCompDot3");
+    const box = document.getElementById("tftCompBox");
+
+    const updateSvg = (thresh, ratio, makeup) => {
+      if (!curve || !dot1 || !dot2 || !dot3) return;
+      const cx1 = 10; const cy1 = 50;
+      const cx2 = 10 + ((thresh + 60) / 60) * 200;
+      const slope = 1 / ratio;
+      const cy2 = Math.max(10, Math.min(50, 50 - ((thresh + 60) / 60) * 35 * slope));
+      const cx3 = 310;
+      const cy3 = Math.max(10, Math.min(50, cy2 - (makeup / 24) * 15));
+
+      curve.setAttribute("d", `M${cx1} ${cy1} L ${cx2.toFixed(1)} ${cy2.toFixed(1)} L ${cx3} ${cy3.toFixed(1)}`);
+      fill.setAttribute("d", `M${cx1} ${cy1} L ${cx2.toFixed(1)} ${cy2.toFixed(1)} L ${cx3} ${cy3.toFixed(1)} L 310 50 Z`);
+      dot1.setAttribute("cx", cx1); dot1.setAttribute("cy", cy1);
+      dot2.setAttribute("cx", cx2.toFixed(1)); dot2.setAttribute("cy", cy2.toFixed(1));
+      dot3.setAttribute("cx", cx3); dot3.setAttribute("cy", cy3.toFixed(1));
+    };
+
+    if (compThresh) compThresh.addEventListener("input", () => {
+      const v = Number(compThresh.value);
+      if (compThreshVal) compThreshVal.textContent = v.toFixed(0) + "dB";
+      updateSvg(v, Number(compRatio?.value || 3), Number(compMakeup?.value || 2));
+    });
+    if (compRatio) compRatio.addEventListener("input", () => {
+      const v = Number(compRatio.value);
+      if (compRatioVal) compRatioVal.textContent = v.toFixed(0) + ":1";
+      updateSvg(Number(compThresh?.value || -18), v, Number(compMakeup?.value || 2));
+    });
+    if (compMakeup) compMakeup.addEventListener("input", () => {
+      const v = Number(compMakeup.value);
+      if (compMakeupVal) compMakeupVal.textContent = "+" + v.toFixed(0) + "dB";
+      updateSvg(Number(compThresh?.value || -18), Number(compRatio?.value || 3), v);
+    });
+
+    if (box) {
+      let activeDot = null;
+      const onMove = (e) => {
+        if (!activeDot) return;
+        const rect = box.getBoundingClientRect();
+        const clientX = e.clientX !== undefined ? e.clientX : e.touches?.[0]?.clientX;
+        const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
+        if (clientX === undefined || clientY === undefined) return;
+        const relX = Math.max(0, Math.min(rect.width, clientX - rect.left));
+        const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
+
+        if (activeDot === 2 && compThresh) {
+          const val = Math.round(-60 + (relX / rect.width) * 60);
+          compThresh.value = Math.max(-60, Math.min(0, val));
+          compThresh.dispatchEvent(new Event("input"));
+        } else if (activeDot === 3 && compMakeup) {
+          const val = Math.round(24 * (1 - (relY / rect.height)));
+          compMakeup.value = Math.max(0, Math.min(24, val));
+          compMakeup.dispatchEvent(new Event("input"));
+        }
+      };
+      dot2?.addEventListener("pointerdown", (e) => { activeDot = 2; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
+      dot3?.addEventListener("pointerdown", (e) => { activeDot = 3; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
+      box.addEventListener("pointermove", onMove);
+      const stopDrag = (e) => { if (!activeDot) return; activeDot = null; try { box.releasePointerCapture(e.pointerId); } catch(err){} };
+      box.addEventListener("pointerup", stopDrag);
+      box.addEventListener("pointercancel", stopDrag);
+    }
+    updateSvg(Number(compThresh?.value || -18), Number(compRatio?.value || 3), Number(compMakeup?.value || 2));
+  }
+
+  // --- SENDS ---
+  if (key === "sends") {
+    const send1Lvl = document.getElementById("send1Lvl");
+    const send1LvlVal = document.getElementById("send1LvlVal");
+    const send2Lvl = document.getElementById("send2Lvl");
+    const send2LvlVal = document.getElementById("send2LvlVal");
+    const curve = document.getElementById("tftSendsSvgCurve");
+    const fill = document.getElementById("tftSendsSvgFill");
+    const dot1 = document.getElementById("tftSendsDot1");
+    const dot2 = document.getElementById("tftSendsDot2");
+    const box = document.getElementById("tftSendsBox");
+
+    const updateSvg = (s1, s2) => {
+      if (!curve || !dot1 || !dot2) return;
+      const cy1 = 50 - ((s1 + 60) / 60) * 35;
+      const cy2 = 50 - ((s2 + 60) / 60) * 35;
+      curve.setAttribute("d", `M10 40 L 160 ${cy1.toFixed(1)} L 310 ${cy2.toFixed(1)}`);
+      fill.setAttribute("d", `M10 40 L 160 ${cy1.toFixed(1)} L 310 ${cy2.toFixed(1)} L 310 50 L 10 50 Z`);
+      dot1.setAttribute("cy", cy1.toFixed(1)); dot2.setAttribute("cy", cy2.toFixed(1));
+    };
+
+    if (send1Lvl) send1Lvl.addEventListener("input", () => {
+      const v = Number(send1Lvl.value);
+      if (send1LvlVal) send1LvlVal.textContent = v.toFixed(0) + "dB";
+      updateSvg(v, Number(send2Lvl?.value || -12));
+    });
+    if (send2Lvl) send2Lvl.addEventListener("input", () => {
+      const v = Number(send2Lvl.value);
+      if (send2LvlVal) send2LvlVal.textContent = v.toFixed(0) + "dB";
+      updateSvg(Number(send1Lvl?.value || -6), v);
+    });
+
+    if (box) {
+      let activeDot = null;
+      const onMove = (e) => {
+        if (!activeDot) return;
+        const rect = box.getBoundingClientRect();
+        const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
+        if (clientY === undefined) return;
+        const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
+        const val = Math.round(-60 + (1 - (relY / rect.height)) * 60);
+
+        if (activeDot === 1 && send1Lvl) {
+          send1Lvl.value = Math.max(-60, Math.min(0, val));
+          send1Lvl.dispatchEvent(new Event("input"));
+        } else if (activeDot === 2 && send2Lvl) {
+          send2Lvl.value = Math.max(-60, Math.min(0, val));
+          send2Lvl.dispatchEvent(new Event("input"));
+        }
+      };
+      dot1?.addEventListener("pointerdown", (e) => { activeDot = 1; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
+      dot2?.addEventListener("pointerdown", (e) => { activeDot = 2; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
+      box.addEventListener("pointermove", onMove);
+      const stopDrag = (e) => { if (!activeDot) return; activeDot = null; try { box.releasePointerCapture(e.pointerId); } catch(err){} };
+      box.addEventListener("pointerup", stopDrag);
+      box.addEventListener("pointercancel", stopDrag);
+    }
+    updateSvg(Number(send1Lvl?.value || -6), Number(send2Lvl?.value || -12));
+  }
+
+  // --- MAIN FOH ---
+  if (key === "main") {
+    const mainFohLvl = document.getElementById("mainFohLvl");
+    const mainFohLvlVal = document.getElementById("mainFohLvlVal");
+    const mainLimitLvl = document.getElementById("mainLimitLvl");
+    const mainLimitLvlVal = document.getElementById("mainLimitLvlVal");
+    const curve = document.getElementById("tftMainSvgCurve");
+    const fill = document.getElementById("tftMainSvgFill");
+    const dot1 = document.getElementById("tftMainDot1");
+    const dot2 = document.getElementById("tftMainDot2");
+    const box = document.getElementById("tftMainBox");
+
+    const updateSvg = (m, l) => {
+      if (!curve || !dot1 || !dot2) return;
+      const cy1 = 30 - (m / 56) * 15;
+      const cy2 = 10 + (Math.abs(l) / 20) * 25;
+      curve.setAttribute("d", `M10 30 Q 160 ${cy1.toFixed(1)}, 310 ${cy2.toFixed(1)}`);
+      fill.setAttribute("d", `M10 30 Q 160 ${cy1.toFixed(1)}, 310 ${cy2.toFixed(1)} L 310 50 L 10 50 Z`);
+      dot1.setAttribute("cy", cy1.toFixed(1)); dot2.setAttribute("cy", cy2.toFixed(1));
+    };
+
+    if (mainFohLvl) mainFohLvl.addEventListener("input", () => {
+      const v = Number(mainFohLvl.value);
+      if (mainFohLvlVal) mainFohLvlVal.textContent = v.toFixed(0) + "dB";
+      updateSvg(v, Number(mainLimitLvl?.value || -0.5));
+    });
+    if (mainLimitLvl) mainLimitLvl.addEventListener("input", () => {
+      const v = Number(mainLimitLvl.value);
+      if (mainLimitLvlVal) mainLimitLvlVal.textContent = v.toFixed(1) + "dB";
+      updateSvg(Number(mainFohLvl?.value || 0), v);
+    });
+
+    if (box) {
+      let activeDot = null;
+      const onMove = (e) => {
+        if (!activeDot) return;
+        const rect = box.getBoundingClientRect();
+        const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
+        if (clientY === undefined) return;
+        const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
+
+        if (activeDot === 1 && mainFohLvl) {
+          const val = Math.round(-50 + (1 - (relY / rect.height)) * 56);
+          mainFohLvl.value = Math.max(-50, Math.min(6, val));
+          mainFohLvl.dispatchEvent(new Event("input"));
+        } else if (activeDot === 2 && mainLimitLvl) {
+          const val = Number((-20 * (relY / rect.height)).toFixed(1));
+          mainLimitLvl.value = Math.max(-20, Math.min(0, val));
+          mainLimitLvl.dispatchEvent(new Event("input"));
+        }
+      };
+      dot1?.addEventListener("pointerdown", (e) => { activeDot = 1; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
+      dot2?.addEventListener("pointerdown", (e) => { activeDot = 2; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
+      box.addEventListener("pointermove", onMove);
+      const stopDrag = (e) => { if (!activeDot) return; activeDot = null; try { box.releasePointerCapture(e.pointerId); } catch(err){} };
+      box.addEventListener("pointerup", stopDrag);
+      box.addEventListener("pointercancel", stopDrag);
+    }
+    updateSvg(Number(mainFohLvl?.value || 0), Number(mainLimitLvl?.value || -0.5));
+  }
+
+  // --- EFFECTS ---
+  if (key === "effects") {
+    const fxFader1 = document.getElementById("fxFader1");
+    const fxFader1Val = document.getElementById("fxFader1Val");
+    const fxFader2 = document.getElementById("fxFader2");
+    const fxFader2Val = document.getElementById("fxFader2Val");
+    const curve = document.getElementById("tftEffectsSvgCurve");
+    const fill = document.getElementById("tftEffectsSvgFill");
+    const dot1 = document.getElementById("tftEffectsDot1");
+    const dot2 = document.getElementById("tftEffectsDot2");
+    const box = document.getElementById("tftEffectsBox");
+
+    const updateSvg = (f1, f2) => {
+      if (!curve || !dot1 || !dot2) return;
+      const cy1 = 50 - (f1 / 1.0) * 40;
+      const cy2 = 50 - (f2 / 0.9) * 30;
+      curve.setAttribute("d", `M10 50 Q 80 ${cy1.toFixed(1)}, 160 30 T 310 ${cy2.toFixed(1)}`);
+      fill.setAttribute("d", `M10 50 Q 80 ${cy1.toFixed(1)}, 160 30 T 310 ${cy2.toFixed(1)} L 310 50 L 10 50 Z`);
+      dot1.setAttribute("cy", cy1.toFixed(1)); dot2.setAttribute("cy", cy2.toFixed(1));
+    };
+
+    if (fxFader1) fxFader1.addEventListener("input", () => {
+      const v = Number(fxFader1.value);
+      if (fxFader1Val) fxFader1Val.textContent = v.toFixed(2) + "s";
+      updateSvg(v, Number(fxFader2?.value || 0.4));
+    });
+    if (fxFader2) fxFader2.addEventListener("input", () => {
+      const v = Number(fxFader2.value);
+      if (fxFader2Val) fxFader2Val.textContent = Math.round(v * 100) + "%";
+      updateSvg(Number(fxFader1?.value || 0.3), v);
+    });
+
+    if (box) {
+      let activeDot = null;
+      const onMove = (e) => {
+        if (!activeDot) return;
+        const rect = box.getBoundingClientRect();
+        const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
+        if (clientY === undefined) return;
+        const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
+
+        if (activeDot === 1 && fxFader1) {
+          const val = Number((1.0 * (1 - (relY / rect.height))).toFixed(2));
+          fxFader1.value = Math.max(0.05, Math.min(1.0, val));
+          fxFader1.dispatchEvent(new Event("input"));
+        } else if (activeDot === 2 && fxFader2) {
+          const val = Number((0.9 * (1 - (relY / rect.height))).toFixed(2));
+          fxFader2.value = Math.max(0, Math.min(0.9, val));
+          fxFader2.dispatchEvent(new Event("input"));
+        }
+      };
+      dot1?.addEventListener("pointerdown", (e) => { activeDot = 1; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
+      dot2?.addEventListener("pointerdown", (e) => { activeDot = 2; box.setPointerCapture(e.pointerId); e.stopPropagation(); });
+      box.addEventListener("pointermove", onMove);
+      const stopDrag = (e) => { if (!activeDot) return; activeDot = null; try { box.releasePointerCapture(e.pointerId); } catch(err){} };
+      box.addEventListener("pointerup", stopDrag);
+      box.addEventListener("pointercancel", stopDrag);
+    }
+    updateSvg(Number(fxFader1?.value || 0.3), Number(fxFader2?.value || 0.4));
+  }
+
+  // Tombol aksi tambahan
   const cfgPhantomBtn = document.getElementById("cfgPhantomBtn");
   if (cfgPhantomBtn) cfgPhantomBtn.addEventListener("click", () => { cfgPhantomBtn.classList.toggle("active-action"); cfgPhantomBtn.textContent = cfgPhantomBtn.classList.contains("active-action") ? "ON" : "OFF"; });
   const cfgPhaseBtn = document.getElementById("cfgPhaseBtn");
