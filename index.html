@@ -621,6 +621,13 @@ header, .topbar {
 #tftSendsSvgContainer { touch-action:none; user-select:none; -webkit-user-select:none; }
 #tftSendsDot1 { r:9; stroke-width:2.5; }
 #tftSendsDot1:focus-visible { outline:none; stroke:#fff; stroke-width:3.5; }
+
+/* Consistent larger touch targets for all editable curve control points */
+.tft-module-graph-box svg [id*="Dot"],
+.tft-peq-graph [id*="Dot"] { cursor:grab; touch-action:none; }
+.tft-module-graph-box svg [id*="Dot"]:active,
+.tft-peq-graph [id*="Dot"]:active { cursor:grabbing; }
+
 </style>
 </head>
 
@@ -2484,6 +2491,8 @@ function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback) {
   dotElement.dataset.dragReady = "1";
   dotElement.style.touchAction = "none";
   dotElement.style.cursor = "grab";
+  // Expand the actual hit target so touch and stylus can grab points reliably.
+  if (dotElement.tagName.toLowerCase() === "circle") dotElement.setAttribute("r", "10");
   dotElement.setAttribute("tabindex", "0");
   dotElement.setAttribute("role", "slider");
   let activePointerId = null;
@@ -2543,7 +2552,8 @@ function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback) {
 
 function bindTftDynamicEventListeners(key) {
   const activeState = tftCurveActiveStates[key] !== false;
-  const svgBox = document.querySelector(`.tft-module-graph-box, .tft-peq-graph`);
+  const graphPrefix = "tft" + key.charAt(0).toUpperCase() + key.slice(1);
+  const svgBox = document.getElementById(graphPrefix + "SvgContainer") || document.getElementById("tftPeqSvgContainer");
   if (svgBox) svgBox.style.opacity = activeState ? "1" : "0.3";
 
   if (!activeState) return;
@@ -2554,7 +2564,11 @@ function bindTftDynamicEventListeners(key) {
   if (moduleRoot && !moduleRoot.dataset.curveSyncBound) {
     moduleRoot.dataset.curveSyncBound = "1";
     ["input", "change", "click"].forEach(type => {
-      moduleRoot.addEventListener(type, () => updateTftModuleCurve(activeCurrentSectionKey));
+      moduleRoot.addEventListener(type, (event) => {
+        const keyNow = activeCurrentSectionKey;
+        if (keyNow === "eq") updateTftPeqVisuals();
+        else updateTftModuleCurve(keyNow);
+      });
     });
   }
   updateTftModuleCurve(key);
@@ -2696,6 +2710,7 @@ function bindTftDynamicEventListeners(key) {
         else if (key === "meters" || key === "scenes") curve.setAttribute("d", `M15 42 L 80 20 L ${x} ${y} L 240 16 L 305 34`);
         else if (key === "setup") curve.setAttribute("d", `M10 32 L ${x} ${y} L 310 32`);
         else if (key === "effects") curve.setAttribute("d", `M10 50 Q ${x} ${y}, 160 32 T ${s.dot2X} ${s.dot2Y}`);
+        updateTftModuleCurve(key);
       });
     }
 
@@ -2708,6 +2723,7 @@ function bindTftDynamicEventListeners(key) {
         else if (key === "dynamics") curve.setAttribute("d", `M10 55 L ${cx1} ${cy1} L ${x} ${y}`);
         else if (key === "sends") curve.setAttribute("d", `M10 45 L ${cx1} ${cy1} L ${x} ${y}`);
         else if (key === "effects") curve.setAttribute("d", `M10 50 Q ${cx1} ${cy1}, 160 32 T ${x} ${y}`);
+        updateTftModuleCurve(key);
       });
     }
   }
