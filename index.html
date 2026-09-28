@@ -424,6 +424,55 @@ header, .topbar {
   .tft-module-graph-box, .tft-peq-graph { width: 100%; min-width: 0; }
   .tft-module-controls-grid, .tft-peq-controls { min-width: 0; }
 }
+
+/* Konsistensi tata letak semua slider/fader pada tab EQ, Alesis FX, dan Digital Mixer */
+.control input[type="range"],
+.echo-control-card input[type="range"],
+.tft-mod-ctrl input[type="range"],
+.output-control input[type="range"] {
+  box-sizing: border-box;
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  align-self: stretch;
+}
+
+.band .slider-track-container {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  flex: 0 0 124px;
+  width: 100%;
+  min-width: 0;
+  height: 124px;
+  justify-content: center;
+  align-items: center;
+  overflow: visible;
+}
+
+.band input.eq-range {
+  box-sizing: border-box;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: 0;
+  transform: translate(-50%, -50%);
+}
+
+.fader-slot {
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+.fader-slot input[type="range"] {
+  box-sizing: border-box;
+  left: 50%;
+  top: 50%;
+  margin: 0;
+  transform: translate(-50%, -50%);
+}
 </style>
 </head>
 
