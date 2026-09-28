@@ -891,6 +891,89 @@ header, .topbar {
   #tabMixerContent .tft-peq { grid-template-rows:auto minmax(75px,1fr) auto; }
 }
 
+
+/* MASTER L/R METER + SCREEN/DESK SEPARATION */
+#tabMixerContent > .mixer-console {
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+  overflow:hidden;
+  gap:5px;
+}
+#tabMixerContent .mixer-top-console {
+  position:relative;
+  z-index:1;
+  flex:0 0 clamp(210px,30vh,270px);
+  min-height:0;
+  max-height:none;
+  overflow:hidden;
+}
+#tabMixerContent .mixer-desk-surface {
+  position:relative;
+  z-index:0;
+  flex:1 1 0;
+  min-height:0;
+  overflow:auto;
+  align-content:stretch;
+}
+#tabMixerContent .mixer-tft-screen { min-height:0; overflow:hidden; }
+#tabMixerContent .tft-main-viewport {
+  display:flex;
+  flex:1 1 0;
+  flex-direction:column;
+  min-height:0;
+  overflow:hidden;
+}
+#tabMixerContent .tft-content-screen {
+  flex:1 1 0;
+  min-height:0;
+  height:auto;
+  overflow:auto;
+}
+#tabMixerContent .tft-stereo-meter-box {
+  flex:0 0 auto;
+  min-height:17px;
+  padding:2px 5px;
+  margin-top:2px;
+}
+#tabMixerContent .tft-meter-label { font-size:7px; }
+#tabMixerContent .tft-led-bar { height:7px; gap:2px; }
+#tabMixerContent .tft-led-bar span { height:6px; }
+#tabMixerContent .master-stereo-meter {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4px;
+  padding:4px 5px;
+  margin:3px 0 2px;
+  border:1px solid #80500f;
+  border-radius:4px;
+  background:linear-gradient(180deg,#17130d,#0d1119);
+}
+#tabMixerContent .master-stereo-meter-channel {
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  min-width:0;
+  color:#fbbf24;
+  font:800 8px/1 monospace;
+}
+#tabMixerContent .master-stereo-meter-channel > span { text-align:center; }
+#tabMixerContent .master-stereo-meter .tft-led-bar { height:9px; }
+#tabMixerContent .master-stereo-meter .tft-led-bar span { height:8px; }
+#tabMixerContent .master-strip .fader-panel-area { flex:1 1 0; min-height:65px; }
+#tabMixerContent .master-strip .fader-slot { min-height:0; }
+@media(max-width:900px) {
+  #tabMixerContent .mixer-top-console { flex-basis:clamp(185px,28vh,235px); }
+}
+@media(max-width:600px) {
+  #tabMixerContent .mixer-top-console { flex-basis:clamp(175px,27vh,220px); }
+}
+@media(max-height:520px) and (orientation:landscape) {
+  #tabMixerContent .mixer-top-console { flex-basis:clamp(145px,30vh,185px); }
+  #tabMixerContent .master-stereo-meter { padding:2px 3px; margin:1px 0; }
+  #tabMixerContent .master-strip .strip-knobs-area { padding:1px 2px; }
+}
+
 </style>
 </head>
 
@@ -1233,6 +1316,10 @@ header, .topbar {
 
           <div class="console-channel-strip master-strip">
             <div class="strip-label-box">Main LR</div>
+            <div class="master-stereo-meter" aria-label="Main left and right level indicators">
+              <div class="master-stereo-meter-channel"><span>L</span><div class="tft-led-bar" id="masterMeterL"></div></div>
+              <div class="master-stereo-meter-channel"><span>R</span><div class="tft-led-bar" id="masterMeterR"></div></div>
+            </div>
             <div class="strip-knobs-area" style="border-color: #d97706;">
               <div class="knob-row"><span>LIMIT</span><span>ON</span></div>
               <div class="knob-row"><span>PROC</span><select><option>EQ+ALESIS</option><option>BYPASS</option></select></div>
@@ -1313,7 +1400,7 @@ function initMixerVerticalMeters() {
     }
   });
 
-  ['tftMeterL', 'tftMeterR'].forEach(id => {
+  ['tftMeterL', 'tftMeterR', 'masterMeterL', 'masterMeterR'].forEach(id => {
     const box = document.getElementById(id);
     if (!box) return;
     box.innerHTML = "";
