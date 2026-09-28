@@ -473,6 +473,56 @@ header, .topbar {
   margin: 0;
   transform: translate(-50%, -50%);
 }
+
+/* CURVE / GRAPH PRESENTATION REFRESH — layout only; DSP and controls unchanged */
+.tft-module-view { min-width:0; width:100%; }
+.tft-module-graph-box,
+.tft-peq-graph {
+  width:100%;
+  height:clamp(180px, 28vh, 300px);
+  min-height:180px;
+  max-height:300px;
+  padding:0;
+  margin:6px 0 10px;
+  border:1px solid #3b4b61;
+  border-radius:8px;
+  background:
+    linear-gradient(rgba(71,85,105,.22) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(71,85,105,.22) 1px, transparent 1px),
+    linear-gradient(180deg,#080e19,#0b1422);
+  background-size:10% 20%, 10% 20%, auto;
+  box-shadow:inset 0 0 0 1px rgba(148,163,184,.05), 0 5px 16px rgba(0,0,0,.24);
+  overflow:hidden;
+}
+.tft-module-graph-box { display:block; }
+.tft-module-graph-box svg,
+.tft-peq-graph svg { display:block; width:100%; height:100%; min-width:0; }
+.tft-peq-graph { touch-action:none; }
+.tft-peq-graph #tftPeqSvgCurve { stroke-width:3.5; }
+.tft-peq-graph #tftPeqDot1,
+.tft-peq-graph #tftPeqDot2,
+.tft-peq-graph #tftPeqDot3,
+.tft-peq-graph #tftPeqDot4 { r:7; }
+@media (max-width:700px) {
+  .tft-module-graph-box,
+  .tft-peq-graph {
+    height:clamp(190px, 32vh, 270px);
+    min-height:190px;
+    max-height:270px;
+    margin:5px 0 9px;
+  }
+  .tft-peq { gap:8px; }
+  .tft-peq-head { font-size:11px; flex-wrap:wrap; }
+}
+@media (orientation:landscape) and (max-height:520px) {
+  .tft-module-graph-box,
+  .tft-peq-graph {
+    height:clamp(150px, 42vh, 220px);
+    min-height:150px;
+    max-height:220px;
+  }
+}
+
 </style>
 </head>
 
