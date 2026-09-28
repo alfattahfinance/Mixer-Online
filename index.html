@@ -569,6 +569,53 @@ header, .topbar {
   .mixer-desk-surface .fader-slot input[type="range"]::-moz-range-thumb { width:28px; height:16px; }
 }
 
+
+/* MIXER SCREEN SPACE BALANCE — compact non-fader cards, prioritize channel strips */
+.mixer-console { gap:4px; }
+.integrated-audio-deck { padding:3px 6px; margin-bottom:2px; }
+.deck-title { margin-bottom:2px; }
+.audio-actions { gap:3px; margin-bottom:1px; }
+.playlist-container { max-height:28px; padding:2px 4px; margin:2px 0; }
+.mixer-top-console {
+  height:clamp(205px, 32vh, 285px);
+  max-height:36vh;
+  min-height:0;
+  padding:4px;
+  gap:4px;
+  margin-bottom:2px;
+  flex:0 0 auto;
+}
+.mixer-tft-screen { min-height:0; height:100%; padding:4px; justify-content:flex-start; gap:2px; }
+.tft-main-viewport { min-height:0; }
+.mixer-control-section { padding:4px; }
+.mixer-desk-surface { min-height:0; align-content:stretch; }
+.mixer-desk-surface .console-channel-strip {
+  height:auto;
+  min-height:190px;
+  padding:4px 3px;
+}
+.mixer-desk-surface .strip-label-box { min-height:20px; margin-bottom:2px; }
+.mixer-desk-surface .strip-knobs-area { padding:2px 3px; margin-bottom:2px; }
+.mixer-desk-surface .fader-readout { margin-bottom:1px; }
+.mixer-desk-surface .fader-panel-area {
+  flex:1 1 auto;
+  min-height:145px;
+  margin:1px 0 2px;
+}
+.mixer-desk-surface .fader-slot { height:auto; min-height:145px; }
+@media(max-width:900px) {
+  .mixer-top-console { height:clamp(190px, 30vh, 250px); max-height:34vh; }
+  .mixer-desk-surface .console-channel-strip { min-height:175px; }
+  .mixer-desk-surface .fader-panel-area,
+  .mixer-desk-surface .fader-slot { min-height:130px; }
+}
+@media(max-height:520px) and (orientation:landscape) {
+  .mixer-top-console { height:clamp(155px, 38vh, 205px); max-height:40vh; }
+  .mixer-desk-surface .console-channel-strip { min-height:145px; }
+  .mixer-desk-surface .fader-panel-area,
+  .mixer-desk-surface .fader-slot { min-height:110px; }
+}
+
 </style>
 </head>
 
