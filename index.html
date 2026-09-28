@@ -186,19 +186,19 @@ header, .topbar {
   background: #080c14; border: 2px solid #2d3748; border-radius: 6px; 
   padding: 6px; box-shadow: inset 0 0 15px rgba(0,0,0,0.9); 
   display: flex; flex-direction: column; justify-content: space-between; 
-  height: 100%; min-height: 235px;
+  height: 100%; min-height: 245px;
 }
 .tft-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222d3d; padding-bottom: 2px; margin-bottom: 3px; font-size: 8px; font-weight: 800; color: #38bdf8; }
 .tft-top-tabs { display: flex; gap: 2px; background: #121824; padding: 2px; border-radius: 4px; margin-bottom: 3px; border: 1px solid #2d3748; overflow-x: auto; }
 .tft-tab { background: #222d3d; color: #94a3b8; border: none; font-size: 7px; font-weight: 800; padding: 2px 5px; border-radius: 3px; cursor: pointer; white-space: nowrap; }
 .tft-tab.active { background: #0284c7; color: #fff; }
-.tft-main-viewport { background: #05080f; border: 1px solid #222d3d; border-radius: 4px; min-height: 110px; padding: 4px; display: flex; flex-direction: column; justify-content: space-between; position: relative; flex: 1; }
+.tft-main-viewport { background: #05080f; border: 1px solid #222d3d; border-radius: 4px; min-height: 120px; padding: 4px; display: flex; flex-direction: column; justify-content: space-between; position: relative; flex: 1; }
 .tft-content-screen { font-size: 8px; color: #38bdf8; line-height: 1.2; height: 100%; }
 
 /* LAYAR PEQ SQ-7 STYLE DENGAN GRID & MULTI-CONTROL POINTS */
 .tft-peq { display:grid; grid-template-columns:minmax(0,1fr); gap:4px; height:100%; }
 .tft-peq-head { display:flex; justify-content:space-between; align-items:center; gap:4px; color:#cbd5e1; font-size:7.5px; font-weight:700; }
-.tft-peq-graph { width:100%; height:95px; background:#080d16; border:1px solid #334155; border-radius:4px; display:block; touch-action: none; }
+.tft-peq-graph { width:100%; height:105px; background:#080d16; border:1px solid #334155; border-radius:4px; display:block; touch-action: none; }
 .tft-peq-controls { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:3px; }
 .tft-peq-control { background:#162030; border:1px solid #334155; border-radius:4px; padding:2px; text-align:center; }
 .tft-peq-control label { display:block; color:#94a3b8; font-size:6.5px; margin-bottom:1px; font-weight:700; }
@@ -206,7 +206,7 @@ header, .topbar {
 .tft-peq-value { display:block; color:#e2e8f0; font-size:7.5px; font-weight:800; }
 
 .tft-module-view { display: flex; flex-direction: column; gap: 4px; height: 100%; }
-.tft-module-graph-box { width: 100%; height: 100px; background: #080d16; border: 1px solid #334155; border-radius: 4px; padding: 2px; display: flex; align-items: center; justify-content: center; position: relative; touch-action: none; }
+.tft-module-graph-box { width: 100%; height: 110px; background: #080d16; border: 1px solid #334155; border-radius: 4px; padding: 2px; display: flex; align-items: center; justify-content: center; position: relative; touch-action: none; }
 .tft-module-controls-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
 .tft-mod-ctrl { background: #131b28; border: 1px solid #2d3748; border-radius: 4px; padding: 2px; text-align: center; }
 .tft-mod-ctrl label { display: block; color: #94a3b8; font-size: 6.5px; margin-bottom: 1px; font-weight: 700; }
@@ -964,11 +964,23 @@ let isAlesisFxEnabled = false;
 let audioGraphReady = false, meterAnimationId = null, outputMuted = false;
 
 let tftPeqFilter = null;
-let tftPeqFreqVal = 2500;
-let tftPeqQVal = 1.5;
-let tftPeqGainVal = 4.5;
 let tftCurveActiveStates = { config: true, gate: true, dynamics: true, eq: true, sends: true, main: true, routing: true, meters: true, scenes: true, setup: true, effects: true };
 let activeCurrentSectionKey = "eq";
+
+/* STATE MEMORY PERSISTEN SUPAYA TIDAK RESET SAAT PINDAH MENU */
+const tftStatesData = {
+  config: { gain: 12, phantom: true, phase: false, dotX: 160, dotY: 32 },
+  gate: { thresh: -45, ratio: 2.5, state: true, dot1X: 140, dot1Y: 55, dot2X: 310, dot2Y: 12 },
+  dynamics: { thresh: -18, ratio: 3, makeup: 2, dot1X: 10, dot1Y: 55, dot2X: 180, dot2Y: 35, dot3X: 310, dot3Y: 20 },
+  eq: { freq: 2500, q: 1.5, gain: 4.5 },
+  sends: { lvl: 0, preset: 0, state: true, dot1X: 160, dot1Y: 30, dot2X: 310, dot2Y: 15 },
+  main: { send: 0, limit: -0.5, bypass: false, dot1X: 160, dot1Y: 12, dot2X: 310, dot2Y: 35 },
+  routing: { source: 0, dout: 0, usb: true, dotX: 160, dotY: 48 },
+  meters: { source: 0, hold: 0, zoom: 1, dotX: 160, dotY: 42 },
+  scenes: { active: 0, safe: true, dotX: 160, dotY: 36 },
+  setup: { bright: 85, ble: true, buf: 0, dotX: 160, dotY: 32 },
+  effects: { delay: 0.3, feedback: 0.4, active: true, dot1X: 80, dot1Y: 12, dot2X: 240, dot2Y: 24 }
+};
 
 const audioFilesInput = document.getElementById("audioFilesInput");
 const playlistContainer = document.getElementById("playlistContainer");
@@ -1208,7 +1220,6 @@ function initializeAudioGraph() {
   if (audioGraphReady) { 
     updateMasterGain(); 
     updateOutputMute(); 
-    startRealMeters(); 
     return; 
   }
 
@@ -1231,9 +1242,9 @@ function initializeAudioGraph() {
 
   tftPeqFilter = audioContext.createBiquadFilter();
   tftPeqFilter.type = "peaking";
-  tftPeqFilter.frequency.value = tftPeqFreqVal;
-  tftPeqFilter.Q.value = tftPeqQVal;
-  tftPeqFilter.gain.value = tftPeqGainVal;
+  tftPeqFilter.frequency.value = tftStatesData.eq.freq;
+  tftPeqFilter.Q.value = tftStatesData.eq.q;
+  tftPeqFilter.gain.value = tftStatesData.eq.gain;
 
   masterGainNode = audioContext.createGain();
   outputMuteGainNode = audioContext.createGain();
@@ -1279,7 +1290,6 @@ function initializeAudioGraph() {
   updateOutputMute();
   updateMixerStripControls();
   updateEqChannelStates();
-  startRealMeters();
 }
 
 function updateMixerStripControls() {
@@ -1622,7 +1632,7 @@ document.querySelectorAll(".mixer-desk-surface .console-channel-strip").forEach(
 });
 
 /* =========================================================
-   DATABASE TFT INTERAKTIF SQ-7 STYLE (DENGAN JUMLAH TITIK TEPAT & ON/OFF)
+   DATABASE TFT INTERAKTIF SQ-7 STYLE (DENGAN JUMLAH TITIK TEPAT & PERSISTEN)
 ========================================================= */
 const tftSectionTitle = document.getElementById("tftSectionTitle");
 const tftContentArea = document.getElementById("tftContentArea");
@@ -1645,7 +1655,7 @@ const tftDatabase = {
     title: "SQ-7 PREAMP CONFIG",
     footerCh: "Current: Ip1 Preamp",
     footerSt: "Next: Gain & Phantom Setting",
-    content: `
+    content: (s) => `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftConfigBox">
           <svg id="tftConfigSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
@@ -1653,27 +1663,27 @@ const tftDatabase = {
               <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
               <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
             </g>
-            <path id="tftConfigSvgCurve" d="M10 50 Q 160 32, 310 15" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftConfigSvgFill" d="M10 50 Q 160 32, 310 15 L310 65 L10 65 Z" fill="#0284c7" opacity=".15"/>
+            <path id="tftConfigSvgCurve" d="M10 50 Q ${s.dotX} ${s.dotY}, 310 15" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
+            <path id="tftConfigSvgFill" d="M10 50 Q ${s.dotX} ${s.dotY}, 310 15 L310 65 L10 65 Z" fill="#0284c7" opacity=".15"/>
             <!-- 1 Titik Kendali Fader Preamp -->
-            <circle id="tftConfigDot1" cx="160" cy="32" r="7" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Preamp Gain Point"/>
+            <circle id="tftConfigDot1" cx="${s.dotX}" cy="${s.dotY}" r="7" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Preamp Gain Point"/>
             <text x="12" y="12" fill="#94a3b8" font-size="6.5">PREAMP GAIN CURVE (1 Point)</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>Analog Gain</label><input type="range" id="cfgGain" min="0" max="60" value="12"><span class="tft-val-disp" id="cfgGainVal">12dB</span></div>
-          <div class="tft-mod-ctrl"><label>Phantom 48V</label><button id="cfgPhantomBtn" class="active-action" type="button">ON</button></div>
-          <div class="tft-mod-ctrl"><label>Phase Invert</label><button id="cfgPhaseBtn" type="button">NORMAL</button></div>
+          <div class="tft-mod-ctrl"><label>Analog Gain</label><input type="range" id="cfgGain" min="0" max="60" value="${s.gain}"><span class="tft-val-disp" id="cfgGainVal">${s.gain}dB</span></div>
+          <div class="tft-mod-ctrl"><label>Phantom 48V</label><button id="cfgPhantomBtn" class="${s.phantom ? 'active-action' : ''}" type="button">${s.phantom ? 'ON' : 'OFF'}</button></div>
+          <div class="tft-mod-ctrl"><label>Phase Invert</label><button id="cfgPhaseBtn" class="${s.phase ? 'active-action' : ''}" type="button">${s.phase ? 'INVERT' : 'NORMAL'}</button></div>
         </div>
       </div>
     `,
-    encoders: [{name:"GAIN", val:"+12dB"}, {name:"HPF", val:"80Hz"}, {name:"POLARITY", val:"NORM"}, {name:"DELAY", val:"0.0ms"}, {name:"WIDTH", val:"100%"}, {name:"TRIM", val:"0.0dB"}]
+    encoders: (s) => [{name:"GAIN", val:`+${s.gain}dB`}, {name:"HPF", val:"80Hz"}, {name:"POLARITY", val:s.phase?"INV":"NORM"}, {name:"DELAY", val:"0.0ms"}, {name:"WIDTH", val:"100%"}, {name:"TRIM", val:"0.0dB"}]
   },
   gate: {
     title: "SQ-7 NOISE GATE",
     footerCh: "Current: Ip1 Gate",
     footerSt: "Next: Threshold & Hold",
-    content: `
+    content: (s) => `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftGateBox">
           <svg id="tftGateSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
@@ -1681,28 +1691,28 @@ const tftDatabase = {
               <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
               <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
             </g>
-            <path id="tftGateSvgCurve" d="M10 55 L 140 55 L 310 12" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftGateSvgFill" d="M10 55 L 140 55 L 310 12 L 310 65 L 10 65 Z" fill="#f59e0b" opacity=".12"/>
-            <!-- 2 Titik Kendali Gate (Threshold & Ratio) -->
-            <circle id="tftGateDot1" cx="140" cy="55" r="7" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Threshold Point"/>
-            <circle id="tftGateDot2" cx="310" cy="12" r="7" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Ratio Point"/>
+            <path id="tftGateSvgCurve" d="M10 55 L ${s.dot1X} ${s.dot1Y} L ${s.dot2X} ${s.dot2Y}" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+            <path id="tftGateSvgFill" d="M10 55 L ${s.dot1X} ${s.dot1Y} L ${s.dot2X} ${s.dot2Y} L 310 65 L 10 65 Z" fill="#f59e0b" opacity=".12"/>
+            <!-- 2 Titik Kendali Gate -->
+            <circle id="tftGateDot1" cx="${s.dot1X}" cy="${s.dot1Y}" r="7" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Threshold Point"/>
+            <circle id="tftGateDot2" cx="${s.dot2X}" cy="${s.dot2Y}" r="7" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Ratio Point"/>
             <text x="12" y="12" fill="#94a3b8" font-size="6.5">GATE TRANSFER CURVE (2 Points)</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>Threshold</label><input type="range" id="gateThresh" min="-80" max="0" value="-45"><span class="tft-val-disp" id="gateThreshVal">-45dB</span></div>
-          <div class="tft-mod-ctrl"><label>Ratio</label><input type="range" id="gateRatio" min="1" max="10" step="0.5" value="2.5"><span class="tft-val-disp" id="gateRatioVal">1:2.5</span></div>
-          <div class="tft-mod-ctrl"><label>Gate State</label><button id="gateStateBtn" class="active-action" type="button">ACTIVE</button></div>
+          <div class="tft-mod-ctrl"><label>Threshold</label><input type="range" id="gateThresh" min="-80" max="0" value="${s.thresh}"><span class="tft-val-disp" id="gateThreshVal">${s.thresh}dB</span></div>
+          <div class="tft-mod-ctrl"><label>Ratio</label><input type="range" id="gateRatio" min="1" max="10" step="0.5" value="${s.ratio}"><span class="tft-val-disp" id="gateRatioVal">1:${s.ratio}</span></div>
+          <div class="tft-mod-ctrl"><label>Gate State</label><button id="gateStateBtn" class="${s.state ? 'active-action' : ''}" type="button">${s.state ? 'ACTIVE' : 'BYPASS'}</button></div>
         </div>
       </div>
     `,
-    encoders: [{name:"THRESH", val:"-45dB"}, {name:"RATIO", val:"1:2.5"}, {name:"ATTACK", val:"5ms"}, {name:"HOLD", val:"20ms"}, {name:"RELEASE", val:"300ms"}, {name:"FILTER", val:"OFF"}]
+    encoders: (s) => [{name:"THRESH", val:`${s.thresh}dB`}, {name:"RATIO", val:`1:${s.ratio}`}, {name:"ATTACK", val:"5ms"}, {name:"HOLD", val:"20ms"}, {name:"RELEASE", val:"300ms"}, {name:"FILTER", val:"OFF"}]
   },
   dynamics: {
     title: "SQ-7 COMPRESSOR DYNAMICS",
     footerCh: "Current: Ip1 Comp",
     footerSt: "Next: Threshold & Ratio",
-    content: `
+    content: (s) => `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftCompBox">
           <svg id="tftCompSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
@@ -1710,29 +1720,29 @@ const tftDatabase = {
               <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
               <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
             </g>
-            <path id="tftCompSvgCurve" d="M10 55 L 180 35 L 310 20" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftCompSvgFill" d="M10 55 L 180 35 L 310 20 L 310 65 L 10 65 Z" fill="#10b981" opacity=".12"/>
+            <path id="tftCompSvgCurve" d="M10 55 L ${s.dot2X} ${s.dot2Y} L ${s.dot3X} ${s.dot3Y}" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>
+            <path id="tftCompSvgFill" d="M10 55 L ${s.dot2X} ${s.dot2Y} L ${s.dot3X} ${s.dot3Y} L 310 65 L 10 65 Z" fill="#10b981" opacity=".12"/>
             <!-- 3 Titik Kendali Compressor -->
-            <circle id="tftCompDot1" cx="10" cy="55" r="7" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Start Point"/>
-            <circle id="tftCompDot2" cx="180" cy="35" r="7" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Threshold Point"/>
-            <circle id="tftCompDot3" cx="310" cy="20" r="7" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Ratio/Makeup Point"/>
+            <circle id="tftCompDot1" cx="${s.dot1X}" cy="${s.dot1Y}" r="7" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Start Point"/>
+            <circle id="tftCompDot2" cx="${s.dot2X}" cy="${s.dot2Y}" r="7" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Threshold Point"/>
+            <circle id="tftCompDot3" cx="${s.dot3X}" cy="${s.dot3Y}" r="7" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Ratio/Makeup Point"/>
             <text x="12" y="12" fill="#94a3b8" font-size="6.5">COMPRESSOR CURVE (3 Points)</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>Threshold</label><input type="range" id="compThresh" min="-60" max="0" value="-18"><span class="tft-val-disp" id="compThreshVal">-18dB</span></div>
-          <div class="tft-mod-ctrl"><label>Ratio</label><input type="range" id="compRatio" min="1" max="20" value="3"><span class="tft-val-disp" id="compRatioVal">3:1</span></div>
-          <div class="tft-mod-ctrl"><label>Makeup</label><input type="range" id="compMakeup" min="0" max="24" value="2"><span class="tft-val-disp" id="compMakeupVal">+2dB</span></div>
+          <div class="tft-mod-ctrl"><label>Threshold</label><input type="range" id="compThresh" min="-60" max="0" value="${s.thresh}"><span class="tft-val-disp" id="compThreshVal">${s.thresh}dB</span></div>
+          <div class="tft-mod-ctrl"><label>Ratio</label><input type="range" id="compRatio" min="1" max="20" value="${s.ratio}"><span class="tft-val-disp" id="compRatioVal">${s.ratio}:1</span></div>
+          <div class="tft-mod-ctrl"><label>Makeup</label><input type="range" id="compMakeup" min="0" max="24" value="${s.makeup}"><span class="tft-val-disp" id="compMakeupVal">+${s.makeup}dB</span></div>
         </div>
       </div>
     `,
-    encoders: [{name:"THRESH", val:"-18dB"}, {name:"RATIO", val:"3:1"}, {name:"ATTACK", val:"10ms"}, {name:"RELEASE", val:"300ms"}, {name:"MAKEUP", val:"+2dB"}, {name:"KNEE", val:"Soft"}]
+    encoders: (s) => [{name:"THRESH", val:`${s.thresh}dB`}, {name:"RATIO", val:`${s.ratio}:1`}, {name:"ATTACK", val:"10ms"}, {name:"RELEASE", val:"300ms"}, {name:"MAKEUP", val:`+${s.makeup}dB`}, {name:"KNEE", val:"Soft"}]
   },
   eq: {
     title: "SQ-7 PARAMETRIC EQUALIZER (PEQ)",
     footerCh: "Current: Ip1 PEQ",
     footerSt: "Next: 4-Band PEQ Response",
-    content: `
+    content: (s) => `
       <div class="tft-peq">
         <div class="tft-peq-head">
           <span>PEQ • 4-BAND SQ-7</span>
@@ -1777,29 +1787,29 @@ const tftDatabase = {
         <div class="tft-peq-controls">
           <div class="tft-peq-control">
             <label for="tftPeqFreq">FREQ</label>
-            <input id="tftPeqFreq" type="range" min="20" max="20000" step="10" value="${tftPeqFreqVal}">
-            <span class="tft-peq-value" id="tftPeqFreqVal">${tftPeqFreqVal >= 1000 ? (tftPeqFreqVal/1000).toFixed(2)+' kHz' : tftPeqFreqVal+' Hz'}</span>
+            <input id="tftPeqFreq" type="range" min="20" max="20000" step="10" value="${s.freq}">
+            <span class="tft-peq-value" id="tftPeqFreqVal">${s.freq >= 1000 ? (s.freq/1000).toFixed(2)+' kHz' : s.freq+' Hz'}</span>
           </div>
           <div class="tft-peq-control">
             <label for="tftPeqQ">Q BAND</label>
-            <input id="tftPeqQ" type="range" min="0.1" max="10" step="0.1" value="${tftPeqQVal}">
-            <span class="tft-peq-value" id="tftPeqQVal">${tftPeqQVal.toFixed(1)}</span>
+            <input id="tftPeqQ" type="range" min="0.1" max="10" step="0.1" value="${s.q}">
+            <span class="tft-peq-value" id="tftPeqQVal">${s.q.toFixed(1)}</span>
           </div>
           <div class="tft-peq-control">
             <label for="tftPeqGain">GAIN</label>
-            <input id="tftPeqGain" type="range" min="-15" max="15" step="0.5" value="${tftPeqGainVal}">
-            <span class="tft-peq-value" id="tftPeqGainVal">${tftPeqGainVal.toFixed(1)} dB</span>
+            <input id="tftPeqGain" type="range" min="-15" max="15" step="0.5" value="${s.gain}">
+            <span class="tft-peq-value" id="tftPeqGainVal">${s.gain.toFixed(1)} dB</span>
           </div>
         </div>
       </div>
     `,
-    encoders: [{name:"FREQ", val: tftPeqFreqVal>=1000?(tftPeqFreqVal/1000).toFixed(2)+'kHz':tftPeqFreqVal+'Hz'}, {name:"Q", val: tftPeqQVal.toFixed(1)}, {name:"GAIN", val: tftPeqGainVal.toFixed(1)+'dB'}, {name:"BAND", val:"PEQ"}, {name:"TYPE", val:"PEAK"}, {name:"BYPASS", val:"OFF"}]
+    encoders: (s) => [{name:"FREQ", val: s.freq>=1000?(s.freq/1000).toFixed(2)+'kHz':s.freq+'Hz'}, {name:"Q", val: s.q.toFixed(1)}, {name:"GAIN", val: s.gain.toFixed(1)+'dB'}, {name:"BAND", val:"PEQ"}, {name:"TYPE", val:"PEAK"}, {name:"BYPASS", val:"OFF"}]
   },
   sends: {
     title: "SQ-7 GRAPHIC EQUALIZER (GEQ)",
     footerCh: "Current: Master GEQ",
     footerSt: "Next: 31-Band GEQ Graphic",
-    content: `
+    content: (s) => `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftSendsBox">
           <svg id="tftSendsSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
@@ -1807,28 +1817,28 @@ const tftDatabase = {
               <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
               <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
             </g>
-            <path id="tftSendsSvgCurve" d="M10 45 L 160 30 L 310 15" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftSendsSvgFill" d="M10 45 L 160 30 L 310 15 L 310 65 L 10 65 Z" fill="#a855f7" opacity=".12"/>
+            <path id="tftSendsSvgCurve" d="M10 45 L ${s.dot1X} ${s.dot1Y} L ${s.dot2X} ${s.dot2Y}" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round"/>
+            <path id="tftSendsSvgFill" d="M10 45 L ${s.dot1X} ${s.dot1Y} L ${s.dot2X} ${s.dot2Y} L 310 65 L 10 65 Z" fill="#a855f7" opacity=".12"/>
             <!-- 2 Titik Kendali GEQ -->
-            <circle id="tftSendsDot1" cx="160" cy="30" r="7" fill="#f3e8ff" stroke="#a855f7" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Mid GEQ Point"/>
-            <circle id="tftSendsDot2" cx="310" cy="15" r="7" fill="#f3e8ff" stroke="#a855f7" stroke-width="2" style="cursor:pointer; touch-action:none;" title="High GEQ Point"/>
+            <circle id="tftSendsDot1" cx="${s.dot1X}" cy="${s.dot1Y}" r="7" fill="#f3e8ff" stroke="#a855f7" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Mid GEQ Point"/>
+            <circle id="tftSendsDot2" cx="${s.dot2X}" cy="${s.dot2Y}" r="7" fill="#f3e8ff" stroke="#a855f7" stroke-width="2" style="cursor:pointer; touch-action:none;" title="High GEQ Point"/>
             <text x="12" y="12" fill="#94a3b8" font-size="6.5">GEQ CURVE VIEW (2 Points)</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>GEQ Master</label><input type="range" id="send1Lvl" min="-15" max="15" value="0"><span class="tft-val-disp" id="send1LvlVal">0dB</span></div>
-          <div class="tft-mod-ctrl"><label>Preset GEQ</label><select><option>Flat</option><option>Vocal Boost</option><option>Music V-Shape</option></select></div>
-          <div class="tft-mod-ctrl"><label>GEQ State</label><button class="active-action" type="button">ACTIVE</button></div>
+          <div class="tft-mod-ctrl"><label>GEQ Master</label><input type="range" id="send1Lvl" min="-15" max="15" value="${s.lvl}"><span class="tft-val-disp" id="send1LvlVal">${s.lvl}dB</span></div>
+          <div class="tft-mod-ctrl"><label>Preset GEQ</label><select id="geqPresetSel"><option ${s.preset===0?'selected':''}>Flat</option><option ${s.preset===1?'selected':''}>Vocal Boost</option><option ${s.preset===2?'selected':''}>Music V-Shape</option></select></div>
+          <div class="tft-mod-ctrl"><label>GEQ State</label><button id="geqStateBtn" class="${s.state ? 'active-action' : ''}" type="button">${s.state ? 'ACTIVE' : 'BYPASS'}</button></div>
         </div>
       </div>
     `,
-    encoders: [{name:"GEQ", val:"31-BAND"}, {name:"MODE", val:"MASTER"}, {name:"BYPASS", val:"OFF"}, {name:"PRESET", val:"FLAT"}, {name:"RTA", val:"ON"}, {name:"GAIN", val:"0.0dB"}]
+    encoders: (s) => [{name:"GEQ", val:"31-BAND"}, {name:"MODE", val:"MASTER"}, {name:"BYPASS", val:s.state?"OFF":"ON"}, {name:"PRESET", val:["Flat","Vocal","Music"][s.preset]}, {name:"RTA", val:"ON"}, {name:"GAIN", val:`${s.lvl}dB`}]
   },
   main: {
     title: "SQ-7 INSERT PROCESSOR",
     footerCh: "Current: Main Insert",
     footerSt: "Next: External FX / Limiter Insert",
-    content: `
+    content: (s) => `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftMainBox">
           <svg id="tftMainSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
@@ -1836,28 +1846,28 @@ const tftDatabase = {
               <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
               <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
             </g>
-            <path id="tftMainSvgCurve" d="M10 35 Q 160 12, 310 35" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftMainSvgFill" d="M10 35 Q 160 12, 310 35 L 310 65 L 10 65 Z" fill="#ef4444" opacity=".12"/>
+            <path id="tftMainSvgCurve" d="M10 35 Q ${s.dot1X} ${s.dot1Y}, 310 35" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+            <path id="tftMainSvgFill" d="M10 35 Q ${s.dot1X} ${s.dot1Y}, 310 35 L 310 65 L 10 65 Z" fill="#ef4444" opacity=".12"/>
             <!-- 2 Titik Kendali Insert -->
-            <circle id="tftMainDot1" cx="160" cy="12" r="7" fill="#fee2e2" stroke="#ef4444" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Send Peak Point"/>
-            <circle id="tftMainDot2" cx="310" cy="35" r="7" fill="#fee2e2" stroke="#ef4444" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Return Point"/>
+            <circle id="tftMainDot1" cx="${s.dot1X}" cy="${s.dot1Y}" r="7" fill="#fee2e2" stroke="#ef4444" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Send Peak Point"/>
+            <circle id="tftMainDot2" cx="${s.dot2X}" cy="${s.dot2Y}" r="7" fill="#fee2e2" stroke="#ef4444" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Return Point"/>
             <text x="12" y="12" fill="#94a3b8" font-size="6.5">INSERT ROUTING VIEW (2 Points)</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>Insert Send</label><input type="range" id="mainFohLvl" min="-50" max="6" value="0"><span class="tft-val-disp" id="mainFohLvlVal">0dB</span></div>
-          <div class="tft-mod-ctrl"><label>Limiter Peak</label><input type="range" id="mainLimitLvl" min="-20" max="0" value="-0.5"><span class="tft-val-disp" id="mainLimitLvlVal">-0.5dB</span></div>
-          <div class="tft-mod-ctrl"><label>Insert State</label><button id="mainMonoBtn" type="button">BYPASS</button></div>
+          <div class="tft-mod-ctrl"><label>Insert Send</label><input type="range" id="mainFohLvl" min="-50" max="6" value="${s.send}"><span class="tft-val-disp" id="mainFohLvlVal">${s.send}dB</span></div>
+          <div class="tft-mod-ctrl"><label>Limiter Peak</label><input type="range" id="mainLimitLvl" min="-20" max="0" step="0.5" value="${s.limit}"><span class="tft-val-disp" id="mainLimitLvlVal">${s.limit}dB</span></div>
+          <div class="tft-mod-ctrl"><label>Insert State</label><button id="mainMonoBtn" class="${!s.bypass ? 'active-action' : ''}" type="button">${s.bypass ? 'BYPASS' : 'ACTIVE'}</button></div>
         </div>
       </div>
     `,
-    encoders: [{name:"INSERT", val:"FX RACK"}, {name:"SEND", val:"0dB"}, {name:"RETURN", val:"0dB"}, {name:"LIMITER", val:"-0.5dB"}, {name:"TAP", val:"POST"}, {name:"STATUS", val:"ACTIVE"}]
+    encoders: (s) => [{name:"INSERT", val:"FX RACK"}, {name:"SEND", val:`${s.send}dB`}, {name:"RETURN", val:"0dB"}, {name:"LIMITER", val:`${s.limit}dB`}, {name:"TAP", val:"POST"}, {name:"STATUS", val:s.bypass?"BYPASS":"ACTIVE"}]
   },
   routing: {
     title: "SQ-7 ROUTING & PATCHBAY",
     footerCh: "Current: I/O Patch",
     footerSt: "Next: Direct Out & USB Audio Routing",
-    content: `
+    content: (s) => `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftRoutingBox">
           <svg id="tftRoutingSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
@@ -1865,26 +1875,26 @@ const tftDatabase = {
               <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
               <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
             </g>
-            <path id="tftRoutingSvgCurve" d="M20 16 L 120 16 L 160 48 L 300 48" fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round"/>
+            <path id="tftRoutingSvgCurve" d="M20 16 L 120 16 L ${s.dotX} ${s.dotY} L 300 48" fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round"/>
             <!-- 1 Titik Kendali Routing Matrix -->
-            <circle id="tftRoutingDot" cx="160" cy="48" r="7" fill="#ffe4e6" stroke="#f43f5e" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Routing Node"/>
+            <circle id="tftRoutingDot" cx="${s.dotX}" cy="${s.dotY}" r="7" fill="#ffe4e6" stroke="#f43f5e" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Routing Node"/>
             <text x="12" y="12" fill="#94a3b8" font-size="6.5">ROUTING MATRIX VIEW (1 Point)</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>Input Source</label><select><option>Playlist Audio</option><option>Physical Mic</option></select></div>
-          <div class="tft-mod-ctrl"><label>Direct Out</label><select><option>Post-Fader</option><option>Pre-Fader</option></select></div>
-          <div class="tft-mod-ctrl"><label>USB Streaming</label><button class="active-action" type="button">ACTIVE</button></div>
+          <div class="tft-mod-ctrl"><label>Input Source</label><select id="routeSourceSel"><option ${s.source===0?'selected':''}>Playlist Audio</option><option ${s.source===1?'selected':''}>Physical Mic</option></select></div>
+          <div class="tft-mod-ctrl"><label>Direct Out</label><select id="routeDoutSel"><option ${s.dout===0?'selected':''}>Post-Fader</option><option ${s.dout===1?'selected':''}>Pre-Fader</option></select></div>
+          <div class="tft-mod-ctrl"><label>USB Streaming</label><button id="routeUsbBtn" class="${s.usb ? 'active-action' : ''}" type="button">${s.usb ? 'ACTIVE' : 'OFF'}</button></div>
         </div>
       </div>
     `,
-    encoders: [{name:"IN 1", val:"IP1"}, {name:"IN 2", val:"IP2"}, {name:"IN 3", val:"IP3"}, {name:"IN 4", val:"IP4"}, {name:"USB STREAM", val:"CH 1-2"}, {name:"OUT", val:"MAIN L/R"}]
+    encoders: (s) => [{name:"IN 1", val:"IP1"}, {name:"IN 2", val:"IP2"}, {name:"IN 3", val:"IP3"}, {name:"IN 4", val:"IP4"}, {name:"USB STREAM", val:s.usb?"CH 1-2":"OFF"}, {name:"OUT", val:"MAIN L/R"}]
   },
   meters: {
     title: "SQ-7 RTA & METERS",
     footerCh: "Current: RTA Analyzer",
     footerSt: "Next: Peak Hold & Spectrum View",
-    content: `
+    content: (s) => `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftMetersBox">
           <svg id="tftMetersSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
@@ -1892,26 +1902,26 @@ const tftDatabase = {
               <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
               <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
             </g>
-            <path id="tftMetersSvgCurve" d="M10 45 L 40 22 L 80 38 L 120 18 L 160 42 L 200 20 L 240 32 L 280 14 L 310 45" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
+            <path id="tftMetersSvgCurve" d="M10 45 L 40 22 L 80 38 L 120 18 L ${s.dotX} ${s.dotY} L 200 20 L 240 32 L 280 14 L 310 45" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
             <!-- 1 Titik RTA Peak -->
-            <circle id="tftMetersDot" cx="160" cy="42" r="7" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2" style="cursor:pointer; touch-action:none;" title="RTA Peak Node"/>
+            <circle id="tftMetersDot" cx="${s.dotX}" cy="${s.dotY}" r="7" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2" style="cursor:pointer; touch-action:none;" title="RTA Peak Node"/>
             <text x="12" y="12" fill="#94a3b8" font-size="6.5">RTA SPECTRUM ANALYZER</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>RTA Source</label><select><option>Post-EQ Main</option><option>Pre-EQ Input</option></select></div>
-          <div class="tft-mod-ctrl"><label>Peak Hold</label><select><option>3.0 Seconds</option><option>Infinite</option></select></div>
-          <div class="tft-mod-ctrl"><label>Zoom</label><input type="range" min="1" max="4" value="1"><span class="tft-val-disp">1x</span></div>
+          <div class="tft-mod-ctrl"><label>RTA Source</label><select id="meterSrcSel"><option ${s.source===0?'selected':''}>Post-EQ Main</option><option ${s.source===1?'selected':''}>Pre-EQ Input</option></select></div>
+          <div class="tft-mod-ctrl"><label>Peak Hold</label><select id="meterHoldSel"><option ${s.hold===0?'selected':''}>3.0 Seconds</option><option ${s.hold===1?'selected':''}>Infinite</option></select></div>
+          <div class="tft-mod-ctrl"><label>Zoom</label><input type="range" id="meterZoomInp" min="1" max="4" value="${s.zoom}"><span class="tft-val-disp" id="meterZoomVal">${s.zoom}x</span></div>
         </div>
       </div>
     `,
-    encoders: [{name:"SOURCE", val:"POST-EQ"}, {name:"DECAY", val:"Fast"}, {name:"HOLD", val:"3.0s"}, {name:"ZOOM", val:"1x"}, {name:"WEIGHT", val:"A-EQ"}, {name:"VIEW", val:"RTA"}]
+    encoders: (s) => [{name:"SOURCE", val:s.source===0?"POST-EQ":"PRE-EQ"}, {name:"DECAY", val:"Fast"}, {name:"HOLD", val:s.hold===0?"3.0s":"Inf"}, {name:"ZOOM", val:`${s.zoom}x`}, {name:"WEIGHT", val:"A-EQ"}, {name:"VIEW", val:"RTA"}]
   },
   scenes: {
     title: "SQ-7 SCENE MANAGER",
     footerCh: "Current: Scene #01",
     footerSt: "Next: Store & Recall Memories",
-    content: `
+    content: (s) => `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftScenesBox">
           <svg id="tftScenesSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
@@ -1919,25 +1929,25 @@ const tftDatabase = {
               <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
               <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
             </g>
-            <path id="tftScenesSvgCurve" d="M15 42 L 80 20 L 160 36 L 240 16 L 305 34" fill="none" stroke="#eab308" stroke-width="2.5" stroke-linecap="round"/>
-            <circle id="tftScenesDot" cx="160" cy="36" r="7" fill="#fef9c3" stroke="#eab308" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Scene Node"/>
+            <path id="tftScenesSvgCurve" d="M15 42 L 80 20 L ${s.dotX} ${s.dotY} L 240 16 L 305 34" fill="none" stroke="#eab308" stroke-width="2.5" stroke-linecap="round"/>
+            <circle id="tftScenesDot" cx="${s.dotX}" cy="${s.dotY}" r="7" fill="#fef9c3" stroke="#eab308" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Scene Node"/>
             <text x="12" y="12" fill="#94a3b8" font-size="6.5">SCENE MEMORY BANK</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>Active Scene</label><select><option>#01 Live Stage</option><option>#02 Acoustic</option></select></div>
-          <div class="tft-mod-ctrl"><label>Store Scene</label><button type="button">STORE</button></div>
-          <div class="tft-mod-ctrl"><label>Recall Safe</label><button class="active-action" type="button">SAFE ON</button></div>
+          <div class="tft-mod-ctrl"><label>Active Scene</label><select id="sceneActiveSel"><option ${s.active===0?'selected':''}>#01 Live Stage</option><option ${s.active===1?'selected':''}>#02 Acoustic</option></select></div>
+          <div class="tft-mod-ctrl"><label>Store Scene</label><button id="sceneStoreBtn" type="button">STORE</button></div>
+          <div class="tft-mod-ctrl"><label>Recall Safe</label><button id="sceneSafeBtn" class="${s.safe ? 'active-action' : ''}" type="button">${s.safe ? 'SAFE ON' : 'SAFE OFF'}</button></div>
         </div>
       </div>
     `,
-    encoders: [{name:"SCENE", val:"#01"}, {name:"RECALL", val:"SAFE"}, {name:"STORE", val:"READY"}, {name:"SNIPPET", val:"ALL"}, {name:"USB SAVE", val:"READY"}, {name:"AUTO", val:"ON"}]
+    encoders: (s) => [{name:"SCENE", val:s.active===0?"#01":"#02"}, {name:"RECALL", val:s.safe?"SAFE":"DIR"}, {name:"STORE", val:"READY"}, {name:"SNIPPET", val:"ALL"}, {name:"USB SAVE", val:"READY"}, {name:"AUTO", val:"ON"}]
   },
   setup: {
     title: "SQ-7 SYSTEM SETUP & HARDWARE",
     footerCh: "Current: Hardware Pref",
     footerSt: "Next: Brightness & Audio Clock",
-    content: `
+    content: (s) => `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftSetupBox">
           <svg id="tftSetupSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
@@ -1945,25 +1955,25 @@ const tftDatabase = {
               <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
               <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
             </g>
-            <path id="tftSetupSvgCurve" d="M10 32 L 160 32 L 310 32" fill="none" stroke="#64748b" stroke-width="2.5" stroke-dasharray="4" stroke-linecap="round"/>
-            <circle id="tftSetupDot" cx="160" cy="32" r="7" fill="#f1f5f9" stroke="#64748b" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Clock Node"/>
+            <path id="tftSetupSvgCurve" d="M10 32 L ${s.dotX} ${s.dotY} L 310 32" fill="none" stroke="#64748b" stroke-width="2.5" stroke-dasharray="4" stroke-linecap="round"/>
+            <circle id="tftSetupDot" cx="${s.dotX}" cy="${s.dotY}" r="7" fill="#f1f5f9" stroke="#64748b" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Clock Node"/>
             <text x="12" y="12" fill="#94a3b8" font-size="6.5">SYSTEM PREFERENCES</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>Brightness</label><input type="range" min="20" max="100" value="85"><span class="tft-val-disp">85%</span></div>
-          <div class="tft-mod-ctrl"><label>BLE Link</label><button class="active-action" type="button">ACTIVE</button></div>
-          <div class="tft-mod-ctrl"><label>Buffer Size</label><select><option>512 Samples</option></select></div>
+          <div class="tft-mod-ctrl"><label>Brightness</label><input type="range" id="setupBrightInp" min="20" max="100" value="${s.bright}"><span class="tft-val-disp" id="setupBrightVal">${s.bright}%</span></div>
+          <div class="tft-mod-ctrl"><label>BLE Link</label><button id="setupBleBtn" class="${s.ble ? 'active-action' : ''}" type="button">${s.ble ? 'ACTIVE' : 'OFF'}</button></div>
+          <div class="tft-mod-ctrl"><label>Buffer Size</label><select id="setupBufSel"><option ${s.buf===0?'selected':''}>512 Samples</option><option ${s.buf===1?'selected':''}>256 Samples</option></select></div>
         </div>
       </div>
     `,
-    encoders: [{name:"CLOCK", val:"INTERNAL"}, {name:"SAMPLE", val:"48kHz"}, {name:"BUFFER", val:"512smpl"}, {name:"MIDI", val:"1"}, {name:"BLE LINK", val:"ACTIVE"}, {name:"BRIGHT", val:"85%"}]
+    encoders: (s) => [{name:"CLOCK", val:"INTERNAL"}, {name:"SAMPLE", val:"48kHz"}, {name:"BUFFER", val:s.buf===0?"512smpl":"256smpl"}, {name:"MIDI", val:"1"}, {name:"BLE LINK", val:s.ble?"ACTIVE":"OFF"}, {name:"BRIGHT", val:`${s.bright}%`}]
   },
   effects: {
     title: "SQ-7 UTILITY & FX RACK",
     footerCh: "Current: Alesis FX",
     footerSt: "Next: Reverb & Delay Rack",
-    content: `
+    content: (s) => `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftEffectsBox">
           <svg id="tftEffectsSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
@@ -1971,24 +1981,28 @@ const tftDatabase = {
               <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
               <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
             </g>
-            <path id="tftEffectsSvgCurve" d="M10 50 Q 80 12, 160 32 T 310 24" fill="none" stroke="#ec4899" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftEffectsSvgFill" d="M10 50 Q 80 12, 160 32 T 310 24 L 310 65 L 10 65 Z" fill="#ec4899" opacity=".12"/>
+            <path id="tftEffectsSvgCurve" d="M10 50 Q ${s.dot1X} ${s.dot1Y}, 160 32 T ${s.dot2X} ${s.dot2Y}" fill="none" stroke="#ec4899" stroke-width="2.5" stroke-linecap="round"/>
+            <path id="tftEffectsSvgFill" d="M10 50 Q ${s.dot1X} ${s.dot1Y}, 160 32 T ${s.dot2X} ${s.dot2Y} L 310 65 L 10 65 Z" fill="#ec4899" opacity=".12"/>
             <!-- 2 Titik Alesis FX -->
-            <circle id="tftEffectsDot1" cx="80" cy="12" r="7" fill="#fce7f3" stroke="#ec4899" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Delay Point"/>
-            <circle id="tftEffectsDot2" cx="240" cy="24" r="7" fill="#fce7f3" stroke="#ec4899" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Feedback Point"/>
+            <circle id="tftEffectsDot1" cx="${s.dot1X}" cy="${s.dot1Y}" r="7" fill="#fce7f3" stroke="#ec4899" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Delay Point"/>
+            <circle id="tftEffectsDot2" cx="${s.dot2X}" cy="${s.dot2Y}" r="7" fill="#fce7f3" stroke="#ec4899" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Feedback Point"/>
             <text x="12" y="12" fill="#94a3b8" font-size="6.5">ALESIS FX PROCESSOR (2 Points)</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>Delay Time</label><input type="range" min="0.05" max="1.0" step="0.05" value="0.3"><span class="tft-val-disp">0.30s</span></div>
-          <div class="tft-mod-ctrl"><label>Feedback</label><input type="range" min="0" max="0.9" step="0.05" value="0.4"><span class="tft-val-disp">40%</span></div>
-          <div class="tft-mod-ctrl"><label>FX Master</label><button class="active-action" type="button">ACTIVE</button></div>
+          <div class="tft-mod-ctrl"><label>Delay Time</label><input type="range" id="fxDelayInp" min="0.05" max="1.0" step="0.05" value="${s.delay}"><span class="tft-val-disp" id="fxDelayVal">${s.delay.toFixed(2)}s</span></div>
+          <div class="tft-mod-ctrl"><label>Feedback</label><input type="range" id="fxFeedbackInp" min="0" max="0.9" step="0.05" value="${s.feedback}"><span class="tft-val-disp" id="fxFeedbackVal">${Math.round(s.feedback*100)}%</span></div>
+          <div class="tft-mod-ctrl"><label>FX Master</label><button id="fxStateBtn" class="${s.active ? 'active-action' : ''}" type="button">${s.active ? 'ACTIVE' : 'OFF'}</button></div>
         </div>
       </div>
     `,
-    encoders: [{name:"FX 1", val:"REVERB"}, {name:"TIME 1", val:"2.2s"}, {name:"FX 2", val:"DELAY"}, {name:"TIME 2", val:"350ms"}, {name:"MIX 1", val:"25%"}, {name:"MIX 2", val:"30%"}]
+    encoders: (s) => [{name:"FX 1", val:"REVERB"}, {name:"TIME 1", val:`${s.delay.toFixed(2)}s`}, {name:"FX 2", val:"DELAY"}, {name:"TIME 2", val:"350ms"}, {name:"MIX 1", val:`${Math.round(s.feedback*100)}%`}, {name:"MIX 2", val:"30%"}]
   }
 };
+
+let tftPeqFreqVal = tftStatesData.eq.freq;
+let tftPeqQVal = tftStatesData.eq.q;
+let tftPeqGainVal = tftStatesData.eq.gain;
 
 function updateTftPeqVisuals() {
   const curve = document.getElementById("tftPeqSvgCurve");
@@ -2009,7 +2023,6 @@ function updateTftPeqVisuals() {
   fill.setAttribute("d", `${pathStr} L320 120 L0 120 Z`);
 }
 
-/* FUNGSI DRAG HANYA PADA TITIK / DOT TERTENTU (DINORMALISASI KE VIEWBOX SVG) */
 function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback) {
   if (!svgContainer || !dotElement) return;
   let isDragging = false;
@@ -2056,6 +2069,7 @@ function bindTftDynamicEventListeners(key) {
   if (svgBox) svgBox.style.opacity = activeState ? "1" : "0.3";
 
   if (!activeState) return;
+  const s = tftStatesData[key];
 
   if (key === "eq") {
     const freqInput = document.getElementById("tftPeqFreq");
@@ -2064,36 +2078,119 @@ function bindTftDynamicEventListeners(key) {
     const svgContainer = document.getElementById("tftPeqSvgContainer");
 
     if (freqInput) freqInput.addEventListener("input", () => {
-      tftPeqFreqVal = Number(freqInput.value);
+      s.freq = tftPeqFreqVal = Number(freqInput.value);
       document.getElementById("tftPeqFreqVal").textContent = tftPeqFreqVal >= 1000 ? (tftPeqFreqVal/1000).toFixed(2)+' kHz' : tftPeqFreqVal+' Hz';
+      updateEncoders(tftDatabase.eq.encoders(s));
       updateTftPeqVisuals();
+      if (tftPeqFilter && audioContext) tftPeqFilter.frequency.setTargetAtTime(tftPeqFreqVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
     });
     if (qInput) qInput.addEventListener("input", () => {
-      tftPeqQVal = Number(qInput.value);
+      s.q = tftPeqQVal = Number(qInput.value);
       document.getElementById("tftPeqQVal").textContent = tftPeqQVal.toFixed(1);
+      updateEncoders(tftDatabase.eq.encoders(s));
       updateTftPeqVisuals();
+      if (tftPeqFilter && audioContext) tftPeqFilter.Q.setTargetAtTime(tftPeqQVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
     });
     if (gainInput) gainInput.addEventListener("input", () => {
-      tftPeqGainVal = Number(gainInput.value);
+      s.gain = tftPeqGainVal = Number(gainInput.value);
       document.getElementById("tftPeqGainVal").textContent = tftPeqGainVal.toFixed(1) + " dB";
+      updateEncoders(tftDatabase.eq.encoders(s));
       updateTftPeqVisuals();
+      if (tftPeqFilter && audioContext) tftPeqFilter.gain.setTargetAtTime(tftPeqGainVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
     });
 
     const dot2 = document.getElementById("tftPeqDot2");
     if (svgContainer && dot2) {
       makeSpecificDotDraggable(svgContainer, dot2, (rx, ry) => {
         const minLog = Math.log10(20), maxLog = Math.log10(20000);
-        tftPeqFreqVal = Math.round(Math.pow(10, minLog + (rx / 320) * (maxLog - minLog)) / 10) * 10;
-        tftPeqGainVal = Math.round(((60 - ry) / 45) * 15 * 2) / 2;
+        s.freq = tftPeqFreqVal = Math.round(Math.pow(10, minLog + (rx / 320) * (maxLog - minLog)) / 10) * 10;
+        s.gain = tftPeqGainVal = Math.round(((60 - ry) / 45) * 15 * 2) / 2;
         if (freqInput) freqInput.value = tftPeqFreqVal;
         if (gainInput) gainInput.value = tftPeqGainVal;
         document.getElementById("tftPeqFreqVal").textContent = tftPeqFreqVal >= 1000 ? (tftPeqFreqVal/1000).toFixed(2)+' kHz' : tftPeqFreqVal+' Hz';
         document.getElementById("tftPeqGainVal").textContent = tftPeqGainVal.toFixed(1) + " dB";
+        updateEncoders(tftDatabase.eq.encoders(s));
         updateTftPeqVisuals();
+        if (tftPeqFilter && audioContext) {
+          tftPeqFilter.frequency.setTargetAtTime(tftPeqFreqVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+          tftPeqFilter.gain.setTargetAtTime(tftPeqGainVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+        }
       });
     }
     updateTftPeqVisuals();
   } else {
+    // Binding kontrol interaktif untuk modul non-EQ (Config, Gate, Comp, Sends, Main, Routing, Meters, Scenes, Setup, Effects)
+    if (key === "config") {
+      const gInp = document.getElementById("cfgGain");
+      const phBtn = document.getElementById("cfgPhantomBtn");
+      const phBtn2 = document.getElementById("cfgPhaseBtn");
+      gInp?.addEventListener("input", () => { s.gain = Number(gInp.value); document.getElementById("cfgGainVal").textContent = s.gain + "dB"; updateEncoders(tftDatabase.config.encoders(s)); });
+      phBtn?.addEventListener("click", () => { s.phantom = !s.phantom; phBtn.textContent = s.phantom ? "ON" : "OFF"; phBtn.classList.toggle("active-action", s.phantom); });
+      phBtn2?.addEventListener("click", () => { s.phase = !s.phase; phBtn2.textContent = s.phase ? "INVERT" : "NORMAL"; phBtn2.classList.toggle("active-action", s.phase); updateEncoders(tftDatabase.config.encoders(s)); });
+    } else if (key === "gate") {
+      const thInp = document.getElementById("gateThresh");
+      const ratInp = document.getElementById("gateRatio");
+      const stBtn = document.getElementById("gateStateBtn");
+      thInp?.addEventListener("input", () => { s.thresh = Number(thInp.value); document.getElementById("gateThreshVal").textContent = s.thresh + "dB"; updateEncoders(tftDatabase.gate.encoders(s)); });
+      ratInp?.addEventListener("input", () => { s.ratio = Number(ratInp.value); document.getElementById("gateRatioVal").textContent = "1:" + s.ratio; updateEncoders(tftDatabase.gate.encoders(s)); });
+      stBtn?.addEventListener("click", () => { s.state = !s.state; stBtn.textContent = s.state ? "ACTIVE" : "BYPASS"; stBtn.classList.toggle("active-action", s.state); });
+    } else if (key === "dynamics") {
+      const thInp = document.getElementById("compThresh");
+      const ratInp = document.getElementById("compRatio");
+      const mkInp = document.getElementById("compMakeup");
+      thInp?.addEventListener("input", () => { s.thresh = Number(thInp.value); document.getElementById("compThreshVal").textContent = s.thresh + "dB"; updateEncoders(tftDatabase.dynamics.encoders(s)); });
+      ratInp?.addEventListener("input", () => { s.ratio = Number(ratInp.value); document.getElementById("compRatioVal").textContent = s.ratio + ":1"; updateEncoders(tftDatabase.dynamics.encoders(s)); });
+      mkInp?.addEventListener("input", () => { s.makeup = Number(mkInp.value); document.getElementById("compMakeupVal").textContent = "+" + s.makeup + "dB"; updateEncoders(tftDatabase.dynamics.encoders(s)); });
+    } else if (key === "sends") {
+      const lvlInp = document.getElementById("send1Lvl");
+      const presetSel = document.getElementById("geqPresetSel");
+      const stBtn = document.getElementById("geqStateBtn");
+      lvlInp?.addEventListener("input", () => { s.lvl = Number(lvlInp.value); document.getElementById("send1LvlVal").textContent = s.lvl + "dB"; updateEncoders(tftDatabase.sends.encoders(s)); });
+      presetSel?.addEventListener("change", () => { s.preset = presetSel.selectedIndex; updateEncoders(tftDatabase.sends.encoders(s)); });
+      stBtn?.addEventListener("click", () => { s.state = !s.state; stBtn.textContent = s.state ? "ACTIVE" : "BYPASS"; stBtn.classList.toggle("active-action", s.state); updateEncoders(tftDatabase.sends.encoders(s)); });
+    } else if (key === "main") {
+      const sendInp = document.getElementById("mainFohLvl");
+      const limInp = document.getElementById("mainLimitLvl");
+      const byBtn = document.getElementById("mainMonoBtn");
+      sendInp?.addEventListener("input", () => { s.send = Number(sendInp.value); document.getElementById("mainFohLvlVal").textContent = s.send + "dB"; updateEncoders(tftDatabase.main.encoders(s)); });
+      limInp?.addEventListener("input", () => { s.limit = Number(limInp.value); document.getElementById("mainLimitLvlVal").textContent = s.limit + "dB"; updateEncoders(tftDatabase.main.encoders(s)); });
+      byBtn?.addEventListener("click", () => { s.bypass = !s.bypass; byBtn.textContent = s.bypass ? "BYPASS" : "ACTIVE"; byBtn.classList.toggle("active-action", !s.bypass); updateEncoders(tftDatabase.main.encoders(s)); });
+    } else if (key === "routing") {
+      const srcSel = document.getElementById("routeSourceSel");
+      const doutSel = document.getElementById("routeDoutSel");
+      const usbBtn = document.getElementById("routeUsbBtn");
+      srcSel?.addEventListener("change", () => { s.source = srcSel.selectedIndex; });
+      doutSel?.addEventListener("change", () => { s.dout = doutSel.selectedIndex; });
+      usbBtn?.addEventListener("click", () => { s.usb = !s.usb; usbBtn.textContent = s.usb ? "ACTIVE" : "OFF"; usbBtn.classList.toggle("active-action", s.usb); updateEncoders(tftDatabase.routing.encoders(s)); });
+    } else if (key === "meters") {
+      const srcSel = document.getElementById("meterSrcSel");
+      const holdSel = document.getElementById("meterHoldSel");
+      const zoomInp = document.getElementById("meterZoomInp");
+      srcSel?.addEventListener("change", () => { s.source = srcSel.selectedIndex; updateEncoders(tftDatabase.meters.encoders(s)); });
+      holdSel?.addEventListener("change", () => { s.hold = holdSel.selectedIndex; updateEncoders(tftDatabase.meters.encoders(s)); });
+      zoomInp?.addEventListener("input", () => { s.zoom = Number(zoomInp.value); document.getElementById("meterZoomVal").textContent = s.zoom + "x"; updateEncoders(tftDatabase.meters.encoders(s)); });
+    } else if (key === "scenes") {
+      const actSel = document.getElementById("sceneActiveSel");
+      const safeBtn = document.getElementById("sceneSafeBtn");
+      actSel?.addEventListener("change", () => { s.active = actSel.selectedIndex; updateEncoders(tftDatabase.scenes.encoders(s)); });
+      safeBtn?.addEventListener("click", () => { s.safe = !s.safe; safeBtn.textContent = s.safe ? "SAFE ON" : "SAFE OFF"; safeBtn.classList.toggle("active-action", s.safe); updateEncoders(tftDatabase.scenes.encoders(s)); });
+    } else if (key === "setup") {
+      const brInp = document.getElementById("setupBrightInp");
+      const bleBtn = document.getElementById("setupBleBtn");
+      const bufSel = document.getElementById("setupBufSel");
+      brInp?.addEventListener("input", () => { s.bright = Number(brInp.value); document.getElementById("setupBrightVal").textContent = s.bright + "%"; updateEncoders(tftDatabase.setup.encoders(s)); });
+      bleBtn?.addEventListener("click", () => { s.ble = !s.ble; bleBtn.textContent = s.ble ? "ACTIVE" : "OFF"; bleBtn.classList.toggle("active-action", s.ble); updateEncoders(tftDatabase.setup.encoders(s)); });
+      bufSel?.addEventListener("change", () => { s.buf = bufSel.selectedIndex; updateEncoders(tftDatabase.setup.encoders(s)); });
+    } else if (key === "effects") {
+      const delInp = document.getElementById("fxDelayInp");
+      const fbkInp = document.getElementById("fxFeedbackInp");
+      const stBtn = document.getElementById("fxStateBtn");
+      delInp?.addEventListener("input", () => { s.delay = Number(delInp.value); document.getElementById("fxDelayVal").textContent = s.delay.toFixed(2) + "s"; updateEncoders(tftDatabase.effects.encoders(s)); });
+      fbkInp?.addEventListener("input", () => { s.feedback = Number(fbkInp.value); document.getElementById("fxFeedbackVal").textContent = Math.round(s.feedback * 100) + "%"; updateEncoders(tftDatabase.effects.encoders(s)); });
+      stBtn?.addEventListener("click", () => { s.active = !s.active; stBtn.textContent = s.active ? "ACTIVE" : "OFF"; stBtn.classList.toggle("active-action", s.active); });
+    }
+
+    // Penanganan Drag Titik SVG Persisten untuk setiap modul non-EQ
     const container = document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}SvgContainer`);
     const curve = document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}SvgCurve`);
     const dot1 = document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}Dot1`) || document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}Dot`);
@@ -2101,21 +2198,23 @@ function bindTftDynamicEventListeners(key) {
 
     if (container && dot1 && curve) {
       makeSpecificDotDraggable(container, dot1, (x, y) => {
+        s.dotX = s.dot1X = x; s.dotY = s.dot1Y = y;
         if (key === "config") curve.setAttribute("d", `M10 50 Q ${x} ${y}, 310 15`);
-        else if (key === "gate") curve.setAttribute("d", `M10 55 L ${x} ${y} L 310 12`);
-        else if (key === "dynamics") curve.setAttribute("d", `M10 55 L ${x} ${y} L 310 20`);
-        else if (key === "sends") curve.setAttribute("d", `M10 45 L ${x} ${y} L 310 15`);
+        else if (key === "gate") curve.setAttribute("d", `M10 55 L ${x} ${y} L ${s.dot2X} ${s.dot2Y}`);
+        else if (key === "dynamics") curve.setAttribute("d", `M10 55 L ${x} ${y} L ${s.dot3X} ${s.dot3Y}`);
+        else if (key === "sends") curve.setAttribute("d", `M10 45 L ${x} ${y} L ${s.dot2X} ${s.dot2Y}`);
         else if (key === "main") curve.setAttribute("d", `M10 35 Q ${x} ${y}, 310 35`);
         else if (key === "routing") curve.setAttribute("d", `M20 16 L 120 16 L ${x} ${y} L 300 48`);
         else if (key === "meters" || key === "scenes") curve.setAttribute("d", `M15 42 L 80 20 L ${x} ${y} L 240 16 L 305 34`);
-        else if (key === "effects") curve.setAttribute("d", `M10 50 Q ${x} ${y}, 160 32 T 310 24`);
+        else if (key === "setup") curve.setAttribute("d", `M10 32 L ${x} ${y} L 310 32`);
+        else if (key === "effects") curve.setAttribute("d", `M10 50 Q ${x} ${y}, 160 32 T ${s.dot2X} ${s.dot2Y}`);
       });
     }
 
     if (container && dot2 && curve) {
       makeSpecificDotDraggable(container, dot2, (x, y) => {
-        const cx1 = dot1 ? dot1.getAttribute("cx") : "80";
-        const cy1 = dot1 ? dot1.getAttribute("cy") : "12";
+        s.dot2X = x; s.dot2Y = y;
+        const cx1 = s.dot1X || 80, cy1 = s.dot1Y || 12;
         if (key === "gate") curve.setAttribute("d", `M10 55 L ${cx1} ${cy1} L ${x} ${y}`);
         else if (key === "dynamics") curve.setAttribute("d", `M10 55 L ${cx1} ${cy1} L ${x} ${y}`);
         else if (key === "sends") curve.setAttribute("d", `M10 45 L ${cx1} ${cy1} L ${x} ${y}`);
@@ -2138,10 +2237,11 @@ function loadTftPage(key) {
   const data = tftDatabase[key];
   if (!data) return;
   tftSectionTitle.textContent = data.title;
-  tftContentArea.innerHTML = data.content;
+  const s = tftStatesData[key];
+  tftContentArea.innerHTML = typeof data.content === 'function' ? data.content(s) : data.content;
   tftFooterChannel.textContent = data.footerCh;
   tftFooterStatus.textContent = data.footerSt;
-  updateEncoders(data.encoders);
+  updateEncoders(typeof data.encoders === 'function' ? data.encoders(s) : data.encoders);
 
   const isActive = tftCurveActiveStates[key] !== false;
   tftCurveToggleBtn.textContent = isActive ? "CURVE: ON" : "CURVE: OFF";
