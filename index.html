@@ -186,19 +186,19 @@ header, .topbar {
   background: #080c14; border: 2px solid #2d3748; border-radius: 6px; 
   padding: 5px; box-shadow: inset 0 0 15px rgba(0,0,0,0.9); 
   display: flex; flex-direction: column; justify-content: space-between; 
-  height: 100%; min-height: 165px;
+  height: 100%; min-height: 185px;
 }
 .tft-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222d3d; padding-bottom: 2px; margin-bottom: 3px; font-size: 8px; font-weight: 800; color: #38bdf8; }
 .tft-top-tabs { display: flex; gap: 2px; background: #121824; padding: 2px; border-radius: 4px; margin-bottom: 3px; border: 1px solid #2d3748; overflow-x: auto; }
 .tft-tab { background: #222d3d; color: #94a3b8; border: none; font-size: 7px; font-weight: 800; padding: 2px 5px; border-radius: 3px; cursor: pointer; white-space: nowrap; }
 .tft-tab.active { background: #0284c7; color: #fff; }
-.tft-main-viewport { background: #05080f; border: 1px solid #222d3d; border-radius: 4px; min-height: 68px; padding: 3px; display: flex; flex-direction: column; justify-content: space-between; position: relative; flex: 1; }
+.tft-main-viewport { background: #05080f; border: 1px solid #222d3d; border-radius: 4px; min-height: 80px; padding: 3px; display: flex; flex-direction: column; justify-content: space-between; position: relative; flex: 1; }
 .tft-content-screen { font-size: 8px; color: #38bdf8; line-height: 1.2; height: 100%; }
 
 /* LAYAR PEQ SQ-7 STYLE DENGAN GRID & MULTI-CONTROL POINTS */
 .tft-peq { display:grid; grid-template-columns:minmax(0,1fr); gap:3px; height:100%; }
 .tft-peq-head { display:flex; justify-content:space-between; align-items:center; gap:4px; color:#cbd5e1; font-size:7.5px; font-weight:700; }
-.tft-peq-graph { width:100%; height:55px; background:#080d16; border:1px solid #334155; border-radius:4px; display:block; cursor: crosshair; touch-action: none; }
+.tft-peq-graph { width:100%; height:70px; background:#080d16; border:1px solid #334155; border-radius:4px; display:block; touch-action: none; }
 .tft-peq-controls { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:3px; }
 .tft-peq-control { background:#162030; border:1px solid #334155; border-radius:4px; padding:2px; text-align:center; }
 .tft-peq-control label { display:block; color:#94a3b8; font-size:6.5px; margin-bottom:1px; font-weight:700; }
@@ -206,7 +206,7 @@ header, .topbar {
 .tft-peq-value { display:block; color:#e2e8f0; font-size:7.5px; font-weight:800; }
 
 .tft-module-view { display: flex; flex-direction: column; gap: 3px; height: 100%; }
-.tft-module-graph-box { width: 100%; height: 50px; background: #080d16; border: 1px solid #334155; border-radius: 4px; padding: 2px; display: flex; align-items: center; justify-content: center; position: relative; cursor: crosshair; touch-action: none; }
+.tft-module-graph-box { width: 100%; height: 75px; background: #080d16; border: 1px solid #334155; border-radius: 4px; padding: 2px; display: flex; align-items: center; justify-content: center; position: relative; touch-action: none; }
 .tft-module-controls-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
 .tft-mod-ctrl { background: #131b28; border: 1px solid #2d3748; border-radius: 4px; padding: 2px; text-align: center; }
 .tft-mod-ctrl label { display: block; color: #94a3b8; font-size: 6.5px; margin-bottom: 1px; font-weight: 700; }
@@ -215,6 +215,9 @@ header, .topbar {
 .tft-mod-ctrl button { width: 100%; background: #0284c7; color: #fff; border: none; padding: 2px; font-size: 7px; font-weight: 800; border-radius: 2px; }
 .tft-mod-ctrl button.active-action { background: #10b981; }
 .tft-val-disp { font-size: 7px; color: #f59e0b; font-family: monospace; font-weight: bold; display: block; }
+
+.tft-curve-toggle { background: #334155; color: #cbd5e1; border: 1px solid #475569; padding: 1px 6px; font-size: 7px; font-weight: 800; border-radius: 3px; cursor: pointer; }
+.tft-curve-toggle.active { background: #10b981; color: #022c22; border-color: #34d399; }
 
 .tft-encoders-bar { display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; margin-top: 3px; background: #060910; padding: 2px; border-radius: 4px; border: 1px solid #222d3d; }
 .tft-encoder-knob { background: linear-gradient(180deg, #182232, #0d131f); border: 1px solid #334155; border-radius: 3px; text-align: center; padding: 2px 1px; font-size: 6px; color: #cbd5e1; font-family: monospace; font-weight: 700; }
@@ -515,7 +518,10 @@ header, .topbar {
           <div class="mixer-tft-screen">
             <div class="tft-header">
               <span id="tftSectionTitle">SQ-7 PEQ / PROCESSING</span>
-              <span style="color: #10b981;">● 48kHz / 32-bit</span>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <button type="button" class="tft-curve-toggle active" id="tftCurveToggleBtn">CURVE: ON</button>
+                <span style="color: #10b981;">● 48kHz / 32-bit</span>
+              </div>
             </div>
 
             <div class="tft-top-tabs">
@@ -961,12 +967,15 @@ let tftPeqFilter = null;
 let tftPeqFreqVal = 2500;
 let tftPeqQVal = 1.5;
 let tftPeqGainVal = 4.5;
+let tftCurveActiveStates = { config: true, gate: true, dynamics: true, eq: true, sends: true, main: true, routing: true, meters: true, scenes: true, setup: true, effects: true };
+let activeCurrentSectionKey = "eq";
 
 const audioFilesInput = document.getElementById("audioFilesInput");
 const playlistContainer = document.getElementById("playlistContainer");
 const startMicButton = document.getElementById("startMicButton");
 const physicalInputDevice = document.getElementById("physicalInputDevice");
 const physicalOutputDevice = document.getElementById("physicalOutputDevice");
+const tftCurveToggleBtn = document.getElementById("tftCurveToggleBtn");
 
 async function refreshPhysicalInputDevices() {
   if (!navigator.mediaDevices?.enumerateDevices) return;
@@ -1613,7 +1622,7 @@ document.querySelectorAll(".mixer-desk-surface .console-channel-strip").forEach(
 });
 
 /* =========================================================
-   DATABASE TFT INTERAKTIF SQ-7 STYLE (DENGAN GRID & MULTI-DOT)
+   DATABASE TFT INTERAKTIF SQ-7 STYLE (DENGAN JUMLAH TITIK TEPAT & ON/OFF)
 ========================================================= */
 const tftSectionTitle = document.getElementById("tftSectionTitle");
 const tftContentArea = document.getElementById("tftContentArea");
@@ -1639,15 +1648,16 @@ const tftDatabase = {
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftConfigBox">
-          <svg id="tftConfigSvgContainer" viewBox="0 0 320 50" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
+          <svg id="tftConfigSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
             <g stroke="#334155" stroke-width=".7" opacity=".6">
-              <line x1="0" y1="12" x2="320" y2="12" /><line x1="0" y1="25" x2="320" y2="25" stroke="#475569" stroke-width="1"/><line x1="0" y1="37" x2="320" y2="37" />
-              <line x1="80" y1="0" x2="80" y2="50" /><line x1="160" y1="0" x2="160" y2="50" /><line x1="240" y1="0" x2="240" y2="50" />
+              <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
+              <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
             </g>
-            <path id="tftConfigSvgCurve" d="M10 40 Q 160 25, 310 10" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftConfigSvgFill" d="M10 40 Q 160 25, 310 10 L310 50 L10 50 Z" fill="#0284c7" opacity=".15"/>
-            <circle id="tftConfigSvgDot" cx="160" cy="25" r="6" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2" style="cursor:pointer;"/>
-            <text x="12" y="10" fill="#94a3b8" font-size="6">PREAMP GAIN CURVE</text>
+            <path id="tftConfigSvgCurve" d="M10 50 Q 160 32, 310 15" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
+            <path id="tftConfigSvgFill" d="M10 50 Q 160 32, 310 15 L310 65 L10 65 Z" fill="#0284c7" opacity=".15"/>
+            <!-- 1 Titik Kendali Fader Preamp -->
+            <circle id="tftConfigDot1" cx="160" cy="32" r="7" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Preamp Gain Point"/>
+            <text x="12" y="12" fill="#94a3b8" font-size="6.5">PREAMP GAIN CURVE (1 Point)</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -1666,16 +1676,17 @@ const tftDatabase = {
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftGateBox">
-          <svg id="tftGateSvgContainer" viewBox="0 0 320 50" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
+          <svg id="tftGateSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
             <g stroke="#334155" stroke-width=".7" opacity=".6">
-              <line x1="0" y1="12" x2="320" y2="12" /><line x1="0" y1="25" x2="320" y2="25" stroke="#475569" stroke-width="1"/><line x1="0" y1="37" x2="320" y2="37" />
-              <line x1="80" y1="0" x2="80" y2="50" /><line x1="160" y1="0" x2="160" y2="50" /><line x1="240" y1="0" x2="240" y2="50" />
+              <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
+              <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
             </g>
-            <path id="tftGateSvgCurve" d="M10 45 L 140 45 L 310 10" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftGateSvgFill" d="M10 45 L 140 45 L 310 10 L 310 50 L 10 50 Z" fill="#f59e0b" opacity=".12"/>
-            <circle id="tftGateDot1" cx="140" cy="45" r="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" style="cursor:pointer;"/>
-            <circle id="tftGateDot2" cx="310" cy="10" r="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" style="cursor:pointer;"/>
-            <text x="12" y="10" fill="#94a3b8" font-size="6">GATE TRANSFER CURVE</text>
+            <path id="tftGateSvgCurve" d="M10 55 L 140 55 L 310 12" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+            <path id="tftGateSvgFill" d="M10 55 L 140 55 L 310 12 L 310 65 L 10 65 Z" fill="#f59e0b" opacity=".12"/>
+            <!-- 2 Titik Kendali Gate (Threshold & Ratio) -->
+            <circle id="tftGateDot1" cx="140" cy="55" r="7" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Threshold Point"/>
+            <circle id="tftGateDot2" cx="310" cy="12" r="7" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Ratio Point"/>
+            <text x="12" y="12" fill="#94a3b8" font-size="6.5">GATE TRANSFER CURVE (2 Points)</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -1694,17 +1705,18 @@ const tftDatabase = {
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftCompBox">
-          <svg id="tftCompSvgContainer" viewBox="0 0 320 50" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
+          <svg id="tftCompSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
             <g stroke="#334155" stroke-width=".7" opacity=".6">
-              <line x1="0" y1="12" x2="320" y2="12" /><line x1="0" y1="25" x2="320" y2="25" stroke="#475569" stroke-width="1"/><line x1="0" y1="37" x2="320" y2="37" />
-              <line x1="80" y1="0" x2="80" y2="50" /><line x1="160" y1="0" x2="160" y2="50" /><line x1="240" y1="0" x2="240" y2="50" />
+              <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
+              <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
             </g>
-            <path id="tftCompSvgCurve" d="M10 45 L 180 28 L 310 18" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftCompSvgFill" d="M10 45 L 180 28 L 310 18 L 310 50 L 10 50 Z" fill="#10b981" opacity=".12"/>
-            <circle id="tftCompDot1" cx="10" cy="45" r="6" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer;"/>
-            <circle id="tftCompDot2" cx="180" cy="28" r="6" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer;"/>
-            <circle id="tftCompDot3" cx="310" cy="18" r="6" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer;"/>
-            <text x="12" y="10" fill="#94a3b8" font-size="6">COMPRESSOR CURVE</text>
+            <path id="tftCompSvgCurve" d="M10 55 L 180 35 L 310 20" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>
+            <path id="tftCompSvgFill" d="M10 55 L 180 35 L 310 20 L 310 65 L 10 65 Z" fill="#10b981" opacity=".12"/>
+            <!-- 3 Titik Kendali Compressor -->
+            <circle id="tftCompDot1" cx="10" cy="55" r="7" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Start Point"/>
+            <circle id="tftCompDot2" cx="180" cy="35" r="7" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Threshold Point"/>
+            <circle id="tftCompDot3" cx="310" cy="20" r="7" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Ratio/Makeup Point"/>
+            <text x="12" y="12" fill="#94a3b8" font-size="6.5">COMPRESSOR CURVE (3 Points)</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -1724,9 +1736,9 @@ const tftDatabase = {
       <div class="tft-peq">
         <div class="tft-peq-head">
           <span>PEQ • 4-BAND SQ-7</span>
-          <span style="color:#10b981;">● 50Hz | 200Hz | 2k | 10k Active</span>
+          <span style="color:#10b981;">● 4 Control Points Active</span>
         </div>
-        <svg class="tft-peq-graph" id="tftPeqSvgContainer" viewBox="0 0 320 120" preserveAspectRatio="none" role="img" aria-label="SQ-7 Parametric equalizer response curve" style="touch-action:none;">
+        <svg class="tft-peq-graph" id="tftPeqSvgContainer" viewBox="0 0 320 120" preserveAspectRatio="none" role="img" aria-label="SQ-7 PEQ" style="touch-action:none;">
           <g stroke="#334155" stroke-width=".7" opacity=".7">
             <line x1="0" y1="20" x2="320" y2="20" />
             <line x1="0" y1="40" x2="320" y2="40" />
@@ -1748,10 +1760,11 @@ const tftDatabase = {
           <path id="tftPeqSvgFill" d="M0 60 C80 60 120 20 160 50 C200 80 260 15 320 60 L320 120 L0 120 Z" fill="url(#blueRedGradient)" opacity="0.3"/>
           <path id="tftPeqSvgCurve" d="M0 60 C80 60 120 20 160 50 C200 80 260 15 320 60" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
           
-          <circle id="tftPeqDot1" cx="64" cy="50" r="6" fill="#c084fc" stroke="#a855f7" stroke-width="2" style="cursor:pointer;" title="Band 1: 50Hz"/>
-          <circle id="tftPeqDot2" cx="130" cy="60" r="6" fill="#38bdf8" stroke="#0284c7" stroke-width="2" style="cursor:pointer;" title="Band 2: 200Hz"/>
-          <circle id="tftPeqDot3" cx="220" cy="60" r="6" fill="#2dd4bf" stroke="#0d9488" stroke-width="2" style="cursor:pointer;" title="Band 3: 2.5kHz"/>
-          <circle id="tftPeqDot4" cx="280" cy="20" r="6" fill="#f87171" stroke="#dc2626" stroke-width="2" style="cursor:pointer;" title="Band 4: 10kHz"/>
+          <!-- 4 Titik Kendali PEQ Sesuai 4 Band Fader -->
+          <circle id="tftPeqDot1" cx="64" cy="50" r="7" fill="#c084fc" stroke="#a855f7" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Band 1: 50Hz"/>
+          <circle id="tftPeqDot2" cx="130" cy="60" r="7" fill="#38bdf8" stroke="#0284c7" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Band 2: 200Hz"/>
+          <circle id="tftPeqDot3" cx="220" cy="60" r="7" fill="#2dd4bf" stroke="#0d9488" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Band 3: 2.5kHz"/>
+          <circle id="tftPeqDot4" cx="280" cy="20" r="7" fill="#f87171" stroke="#dc2626" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Band 4: 10kHz"/>
 
           <defs>
             <linearGradient id="blueRedGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -1789,16 +1802,17 @@ const tftDatabase = {
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftSendsBox">
-          <svg id="tftSendsSvgContainer" viewBox="0 0 320 50" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
+          <svg id="tftSendsSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
             <g stroke="#334155" stroke-width=".7" opacity=".6">
-              <line x1="0" y1="12" x2="320" y2="12" /><line x1="0" y1="25" x2="320" y2="25" stroke="#475569" stroke-width="1"/><line x1="0" y1="37" x2="320" y2="37" />
-              <line x1="80" y1="0" x2="80" y2="50" /><line x1="160" y1="0" x2="160" y2="50" /><line x1="240" y1="0" x2="240" y2="50" />
+              <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
+              <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
             </g>
-            <path id="tftSendsSvgCurve" d="M10 38 L 160 22 L 310 10" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftSendsSvgFill" d="M10 38 L 160 22 L 310 10 L 310 50 L 10 50 Z" fill="#a855f7" opacity=".12"/>
-            <circle id="tftSendsDot1" cx="160" cy="22" r="6" fill="#f3e8ff" stroke="#a855f7" stroke-width="2" style="cursor:pointer;"/>
-            <circle id="tftSendsDot2" cx="310" cy="10" r="6" fill="#f3e8ff" stroke="#a855f7" stroke-width="2" style="cursor:pointer;"/>
-            <text x="12" y="10" fill="#94a3b8" font-size="6">GEQ CURVE VIEW</text>
+            <path id="tftSendsSvgCurve" d="M10 45 L 160 30 L 310 15" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round"/>
+            <path id="tftSendsSvgFill" d="M10 45 L 160 30 L 310 15 L 310 65 L 10 65 Z" fill="#a855f7" opacity=".12"/>
+            <!-- 2 Titik Kendali GEQ -->
+            <circle id="tftSendsDot1" cx="160" cy="30" r="7" fill="#f3e8ff" stroke="#a855f7" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Mid GEQ Point"/>
+            <circle id="tftSendsDot2" cx="310" cy="15" r="7" fill="#f3e8ff" stroke="#a855f7" stroke-width="2" style="cursor:pointer; touch-action:none;" title="High GEQ Point"/>
+            <text x="12" y="12" fill="#94a3b8" font-size="6.5">GEQ CURVE VIEW (2 Points)</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -1817,16 +1831,17 @@ const tftDatabase = {
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftMainBox">
-          <svg id="tftMainSvgContainer" viewBox="0 0 320 50" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
+          <svg id="tftMainSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
             <g stroke="#334155" stroke-width=".7" opacity=".6">
-              <line x1="0" y1="12" x2="320" y2="12" /><line x1="0" y1="25" x2="320" y2="25" stroke="#475569" stroke-width="1"/><line x1="0" y1="37" x2="320" y2="37" />
-              <line x1="80" y1="0" x2="80" y2="50" /><line x1="160" y1="0" x2="160" y2="50" /><line x1="240" y1="0" x2="240" y2="50" />
+              <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
+              <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
             </g>
-            <path id="tftMainSvgCurve" d="M10 28 Q 160 8, 310 28" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftMainSvgFill" d="M10 28 Q 160 8, 310 28 L 310 50 L 10 50 Z" fill="#ef4444" opacity=".12"/>
-            <circle id="tftMainDot1" cx="160" cy="8" r="6" fill="#fee2e2" stroke="#ef4444" stroke-width="2" style="cursor:pointer;"/>
-            <circle id="tftMainDot2" cx="310" cy="28" r="6" fill="#fee2e2" stroke="#ef4444" stroke-width="2" style="cursor:pointer;"/>
-            <text x="12" y="10" fill="#94a3b8" font-size="6">INSERT ROUTING VIEW</text>
+            <path id="tftMainSvgCurve" d="M10 35 Q 160 12, 310 35" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+            <path id="tftMainSvgFill" d="M10 35 Q 160 12, 310 35 L 310 65 L 10 65 Z" fill="#ef4444" opacity=".12"/>
+            <!-- 2 Titik Kendali Insert -->
+            <circle id="tftMainDot1" cx="160" cy="12" r="7" fill="#fee2e2" stroke="#ef4444" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Send Peak Point"/>
+            <circle id="tftMainDot2" cx="310" cy="35" r="7" fill="#fee2e2" stroke="#ef4444" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Return Point"/>
+            <text x="12" y="12" fill="#94a3b8" font-size="6.5">INSERT ROUTING VIEW (2 Points)</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -1845,14 +1860,15 @@ const tftDatabase = {
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftRoutingBox">
-          <svg id="tftRoutingSvgContainer" viewBox="0 0 320 50" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
+          <svg id="tftRoutingSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
             <g stroke="#334155" stroke-width=".7" opacity=".6">
-              <line x1="0" y1="12" x2="320" y2="12" /><line x1="0" y1="25" x2="320" y2="25" stroke="#475569" stroke-width="1"/><line x1="0" y1="37" x2="320" y2="37" />
-              <line x1="80" y1="0" x2="80" y2="50" /><line x1="160" y1="0" x2="160" y2="50" /><line x1="240" y1="0" x2="240" y2="50" />
+              <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
+              <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
             </g>
-            <path id="tftRoutingSvgCurve" d="M20 12 L 120 12 L 160 38 L 300 38" fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round"/>
-            <circle id="tftRoutingDot" cx="160" cy="38" r="6" fill="#ffe4e6" stroke="#f43f5e" stroke-width="2" style="cursor:pointer;"/>
-            <text x="12" y="10" fill="#94a3b8" font-size="6">ROUTING MATRIX VIEW</text>
+            <path id="tftRoutingSvgCurve" d="M20 16 L 120 16 L 160 48 L 300 48" fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round"/>
+            <!-- 1 Titik Kendali Routing Matrix -->
+            <circle id="tftRoutingDot" cx="160" cy="48" r="7" fill="#ffe4e6" stroke="#f43f5e" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Routing Node"/>
+            <text x="12" y="12" fill="#94a3b8" font-size="6.5">ROUTING MATRIX VIEW (1 Point)</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -1871,14 +1887,15 @@ const tftDatabase = {
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftMetersBox">
-          <svg id="tftMetersSvgContainer" viewBox="0 0 320 50" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
+          <svg id="tftMetersSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
             <g stroke="#334155" stroke-width=".7" opacity=".6">
-              <line x1="0" y1="12" x2="320" y2="12" /><line x1="0" y1="25" x2="320" y2="25" stroke="#475569" stroke-width="1"/><line x1="0" y1="37" x2="320" y2="37" />
-              <line x1="80" y1="0" x2="80" y2="50" /><line x1="160" y1="0" x2="160" y2="50" /><line x1="240" y1="0" x2="240" y2="50" />
+              <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
+              <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
             </g>
-            <path id="tftMetersSvgCurve" d="M10 38 L 40 18 L 80 32 L 120 14 L 160 35 L 200 16 L 240 28 L 280 12 L 310 36" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
-            <circle id="tftMetersDot" cx="160" cy="35" r="6" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2" style="cursor:pointer;"/>
-            <text x="12" y="10" fill="#94a3b8" font-size="6">RTA SPECTRUM ANALYZER</text>
+            <path id="tftMetersSvgCurve" d="M10 45 L 40 22 L 80 38 L 120 18 L 160 42 L 200 20 L 240 32 L 280 14 L 310 45" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
+            <!-- 1 Titik RTA Peak -->
+            <circle id="tftMetersDot" cx="160" cy="42" r="7" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2" style="cursor:pointer; touch-action:none;" title="RTA Peak Node"/>
+            <text x="12" y="12" fill="#94a3b8" font-size="6.5">RTA SPECTRUM ANALYZER</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -1897,18 +1914,18 @@ const tftDatabase = {
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftScenesBox">
-          <svg id="tftScenesSvgContainer" viewBox="0 0 320 50" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
+          <svg id="tftScenesSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
             <g stroke="#334155" stroke-width=".7" opacity=".6">
-              <line x1="0" y1="12" x2="320" y2="12" /><line x1="0" y1="25" x2="320" y2="25" stroke="#475569" stroke-width="1"/><line x1="0" y1="37" x2="320" y2="37" />
-              <line x1="80" y1="0" x2="80" y2="50" /><line x1="160" y1="0" x2="160" y2="50" /><line x1="240" y1="0" x2="240" y2="50" />
+              <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
+              <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
             </g>
-            <path id="tftScenesSvgCurve" d="M15 35 L 80 18 L 160 30 L 240 14 L 305 28" fill="none" stroke="#eab308" stroke-width="2.5" stroke-linecap="round"/>
-            <circle id="tftScenesDot" cx="160" cy="30" r="6" fill="#fef9c3" stroke="#eab308" stroke-width="2" style="cursor:pointer;"/>
-            <text x="12" y="10" fill="#94a3b8" font-size="6">SCENE MEMORY BANK</text>
+            <path id="tftScenesSvgCurve" d="M15 42 L 80 20 L 160 36 L 240 16 L 305 34" fill="none" stroke="#eab308" stroke-width="2.5" stroke-linecap="round"/>
+            <circle id="tftScenesDot" cx="160" cy="36" r="7" fill="#fef9c3" stroke="#eab308" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Scene Node"/>
+            <text x="12" y="12" fill="#94a3b8" font-size="6.5">SCENE MEMORY BANK</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>Active Scene</label><select><option>#01 Live Stage</option><option>#02 Acoustic Night</option></select></div>
+          <div class="tft-mod-ctrl"><label>Active Scene</label><select><option>#01 Live Stage</option><option>#02 Acoustic</option></select></div>
           <div class="tft-mod-ctrl"><label>Store Scene</label><button type="button">STORE</button></div>
           <div class="tft-mod-ctrl"><label>Recall Safe</label><button class="active-action" type="button">SAFE ON</button></div>
         </div>
@@ -1923,20 +1940,20 @@ const tftDatabase = {
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftSetupBox">
-          <svg id="tftSetupSvgContainer" viewBox="0 0 320 50" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
+          <svg id="tftSetupSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
             <g stroke="#334155" stroke-width=".7" opacity=".6">
-              <line x1="0" y1="12" x2="320" y2="12" /><line x1="0" y1="25" x2="320" y2="25" stroke="#475569" stroke-width="1"/><line x1="0" y1="37" x2="320" y2="37" />
-              <line x1="80" y1="0" x2="80" y2="50" /><line x1="160" y1="0" x2="160" y2="50" /><line x1="240" y1="0" x2="240" y2="50" />
+              <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
+              <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
             </g>
-            <path id="tftSetupSvgCurve" d="M10 25 L 160 25 L 310 25" fill="none" stroke="#64748b" stroke-width="2.5" stroke-dasharray="4" stroke-linecap="round"/>
-            <circle id="tftSetupDot" cx="160" cy="25" r="6" fill="#f1f5f9" stroke="#64748b" stroke-width="2" style="cursor:pointer;"/>
-            <text x="12" y="10" fill="#94a3b8" font-size="6">SYSTEM PREFERENCES</text>
+            <path id="tftSetupSvgCurve" d="M10 32 L 160 32 L 310 32" fill="none" stroke="#64748b" stroke-width="2.5" stroke-dasharray="4" stroke-linecap="round"/>
+            <circle id="tftSetupDot" cx="160" cy="32" r="7" fill="#f1f5f9" stroke="#64748b" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Clock Node"/>
+            <text x="12" y="12" fill="#94a3b8" font-size="6.5">SYSTEM PREFERENCES</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
           <div class="tft-mod-ctrl"><label>Brightness</label><input type="range" min="20" max="100" value="85"><span class="tft-val-disp">85%</span></div>
           <div class="tft-mod-ctrl"><label>BLE Link</label><button class="active-action" type="button">ACTIVE</button></div>
-          <div class="tft-mod-ctrl"><label>Buffer Size</label><select><option>512 Samples</option><option>256 Samples</option></select></div>
+          <div class="tft-mod-ctrl"><label>Buffer Size</label><select><option>512 Samples</option></select></div>
         </div>
       </div>
     `,
@@ -1949,16 +1966,17 @@ const tftDatabase = {
     content: `
       <div class="tft-module-view">
         <div class="tft-module-graph-box" id="tftEffectsBox">
-          <svg id="tftEffectsSvgContainer" viewBox="0 0 320 50" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
+          <svg id="tftEffectsSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
             <g stroke="#334155" stroke-width=".7" opacity=".6">
-              <line x1="0" y1="12" x2="320" y2="12" /><line x1="0" y1="25" x2="320" y2="25" stroke="#475569" stroke-width="1"/><line x1="0" y1="37" x2="320" y2="37" />
-              <line x1="80" y1="0" x2="80" y2="50" /><line x1="160" y1="0" x2="160" y2="50" /><line x1="240" y1="0" x2="240" y2="50" />
+              <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
+              <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
             </g>
-            <path id="tftEffectsSvgCurve" d="M10 40 Q 80 8, 160 25 T 310 18" fill="none" stroke="#ec4899" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftEffectsSvgFill" d="M10 40 Q 80 8, 160 25 T 310 18 L 310 50 L 10 50 Z" fill="#ec4899" opacity=".12"/>
-            <circle id="tftEffectsDot1" cx="80" cy="8" r="6" fill="#fce7f3" stroke="#ec4899" stroke-width="2" style="cursor:pointer;"/>
-            <circle id="tftEffectsDot2" cx="240" cy="18" r="6" fill="#fce7f3" stroke="#ec4899" stroke-width="2" style="cursor:pointer;"/>
-            <text x="12" y="10" fill="#94a3b8" font-size="6">ALESIS FX PROCESSOR</text>
+            <path id="tftEffectsSvgCurve" d="M10 50 Q 80 12, 160 32 T 310 24" fill="none" stroke="#ec4899" stroke-width="2.5" stroke-linecap="round"/>
+            <path id="tftEffectsSvgFill" d="M10 50 Q 80 12, 160 32 T 310 24 L 310 65 L 10 65 Z" fill="#ec4899" opacity=".12"/>
+            <!-- 2 Titik Alesis FX -->
+            <circle id="tftEffectsDot1" cx="80" cy="12" r="7" fill="#fce7f3" stroke="#ec4899" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Delay Point"/>
+            <circle id="tftEffectsDot2" cx="240" cy="24" r="7" fill="#fce7f3" stroke="#ec4899" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Feedback Point"/>
+            <text x="12" y="12" fill="#94a3b8" font-size="6.5">ALESIS FX PROCESSOR (2 Points)</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -1976,32 +1994,23 @@ function updateTftPeqVisuals() {
   const curve = document.getElementById("tftPeqSvgCurve");
   const fill = document.getElementById("tftPeqSvgFill");
   if (!curve || !fill) return;
-
-  const minLog = Math.log10(20);
-  const maxLog = Math.log10(20000);
+  const minLog = Math.log10(20), maxLog = Math.log10(20000);
   const currentLog = Math.log10(Math.max(20, Math.min(20000, tftPeqFreqVal)));
   const cx = ((currentLog - minLog) / (maxLog - minLog)) * 320;
   const cy = 60 - (tftPeqGainVal / 15) * 45;
 
   const dot2 = document.getElementById("tftPeqDot2");
-  if (dot2) {
-    dot2.setAttribute("cx", cx.toFixed(1));
-    dot2.setAttribute("cy", cy.toFixed(1));
-  }
+  if (dot2) { dot2.setAttribute("cx", cx.toFixed(1)); dot2.setAttribute("cy", cy.toFixed(1)); }
 
   const widthSpread = Math.max(25, 120 / tftPeqQVal);
-  const x1 = Math.max(0, cx - widthSpread);
-  const x2 = Math.min(320, cx + widthSpread);
-  const baseline = 60;
-
-  const pathStr = `M0 ${baseline} L${x1.toFixed(1)} ${baseline} C${((0+x1)/2).toFixed(1)} ${baseline} ${cx.toFixed(1)} ${cy.toFixed(1)} ${cx.toFixed(1)} ${cy.toFixed(1)} C${cx.toFixed(1)} ${cy.toFixed(1)} ${((x2+320)/2).toFixed(1)} ${baseline} ${x2.toFixed(1)} ${baseline} L320 ${baseline}`;
-  const fillStr = `${pathStr} L320 120 L0 120 Z`;
-
+  const x1 = Math.max(0, cx - widthSpread), x2 = Math.min(320, cx + widthSpread);
+  const pathStr = `M0 60 L${x1.toFixed(1)} 60 C${((0+x1)/2).toFixed(1)} 60 ${cx.toFixed(1)} ${cy.toFixed(1)} ${cx.toFixed(1)} ${cy.toFixed(1)} C${cx.toFixed(1)} ${cy.toFixed(1)} ${((x2+320)/2).toFixed(1)} 60 ${x2.toFixed(1)} 60 L320 60`;
   curve.setAttribute("d", pathStr);
-  fill.setAttribute("d", fillStr);
+  fill.setAttribute("d", `${pathStr} L320 120 L0 120 Z`);
 }
 
-function makeSvgDotDraggable(svgContainer, dotElement, onUpdateCallback) {
+/* FUNGSI DRAG HANYA PADA TITIK / DOT TERTENTU */
+function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback) {
   if (!svgContainer || !dotElement) return;
   let isDragging = false;
 
@@ -2012,17 +2021,14 @@ function makeSvgDotDraggable(svgContainer, dotElement, onUpdateCallback) {
     const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
     if (clientX === undefined || clientY === undefined) return;
 
-    const relX = Math.max(0, Math.min(rect.width, clientX - rect.left));
-    const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
-
-    const normX = relX / rect.width;
-    const normY = relY / rect.height;
+    const relX = Math.max(10, Math.min(rect.width - 10, clientX - rect.left));
+    const relY = Math.max(10, Math.min(rect.height - 10, clientY - rect.top));
 
     dotElement.setAttribute("cx", relX.toFixed(1));
     dotElement.setAttribute("cy", relY.toFixed(1));
 
     if (typeof onUpdateCallback === "function") {
-      onUpdateCallback(normX, normY);
+      onUpdateCallback(relX, relY);
     }
   };
 
@@ -2042,136 +2048,90 @@ function makeSvgDotDraggable(svgContainer, dotElement, onUpdateCallback) {
 }
 
 function bindTftDynamicEventListeners(key) {
+  const activeState = tftCurveActiveStates[key] !== false;
+  const svgBox = document.querySelector(`.tft-module-graph-box, .tft-peq-graph`);
+  if (svgBox) svgBox.style.opacity = activeState ? "1" : "0.3";
+
+  if (!activeState) return;
+
   if (key === "eq") {
     const freqInput = document.getElementById("tftPeqFreq");
     const qInput = document.getElementById("tftPeqQ");
     const gainInput = document.getElementById("tftPeqGain");
     const svgContainer = document.getElementById("tftPeqSvgContainer");
 
-    if (freqInput) {
-      freqInput.addEventListener("input", () => {
-        tftPeqFreqVal = Number(freqInput.value);
-        const valText = tftPeqFreqVal >= 1000 ? (tftPeqFreqVal/1000).toFixed(2)+' kHz' : tftPeqFreqVal+' Hz';
-        const valSpan = document.getElementById("tftPeqFreqVal");
-        if (valSpan) valSpan.textContent = valText;
-        if (tftPeqFilter && audioContext) {
-          tftPeqFilter.frequency.setTargetAtTime(tftPeqFreqVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
-        }
-        updateTftPeqVisuals();
-      });
-    }
-    if (qInput) {
-      qInput.addEventListener("input", () => {
-        tftPeqQVal = Number(qInput.value);
-        const valSpan = document.getElementById("tftPeqQVal");
-        if (valSpan) valSpan.textContent = tftPeqQVal.toFixed(1);
-        if (tftPeqFilter && audioContext) {
-          tftPeqFilter.Q.setTargetAtTime(tftPeqQVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
-        }
-        updateTftPeqVisuals();
-      });
-    }
-    if (gainInput) {
-      gainInput.addEventListener("input", () => {
-        tftPeqGainVal = Number(gainInput.value);
-        const valSpan = document.getElementById("tftPeqGainVal");
-        if (valSpan) valSpan.textContent = tftPeqGainVal.toFixed(1) + " dB";
-        if (tftPeqFilter && audioContext) {
-          tftPeqFilter.gain.setTargetAtTime(tftPeqGainVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
-        }
-        updateTftPeqVisuals();
-      });
-    }
+    if (freqInput) freqInput.addEventListener("input", () => {
+      tftPeqFreqVal = Number(freqInput.value);
+      document.getElementById("tftPeqFreqVal").textContent = tftPeqFreqVal >= 1000 ? (tftPeqFreqVal/1000).toFixed(2)+' kHz' : tftPeqFreqVal+' Hz';
+      updateTftPeqVisuals();
+    });
+    if (qInput) qInput.addEventListener("input", () => {
+      tftPeqQVal = Number(qInput.value);
+      document.getElementById("tftPeqQVal").textContent = tftPeqQVal.toFixed(1);
+      updateTftPeqVisuals();
+    });
+    if (gainInput) gainInput.addEventListener("input", () => {
+      tftPeqGainVal = Number(gainInput.value);
+      document.getElementById("tftPeqGainVal").textContent = tftPeqGainVal.toFixed(1) + " dB";
+      updateTftPeqVisuals();
+    });
 
-    if (svgContainer) {
-      let isDraggingDot = false;
-      const handleSvgPointerMove = (e) => {
-        if (!isDraggingDot) return;
-        const rect = svgContainer.getBoundingClientRect();
-        const clientX = e.clientX !== undefined ? e.clientX : e.touches?.[0]?.clientX;
-        const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
-        if (clientX === undefined || clientY === undefined) return;
-
-        const relX = Math.max(0, Math.min(rect.width, clientX - rect.left));
-        const relY = Math.max(0, Math.min(rect.height, clientY - rect.top));
-
-        const minLog = Math.log10(20);
-        const maxLog = Math.log10(20000);
-        const ratioX = relX / rect.width;
-        tftPeqFreqVal = Math.round(Math.pow(10, minLog + ratioX * (maxLog - minLog)) / 10) * 10;
-        
-        const ratioY = (relY / rect.height) * 120;
-        tftPeqGainVal = Math.round(((60 - ratioY) / 45) * 15 * 2) / 2;
-
-        tftPeqFreqVal = Math.max(20, Math.min(20000, tftPeqFreqVal));
-        tftPeqGainVal = Math.max(-15, Math.min(15, tftPeqGainVal));
-
+    const dot2 = document.getElementById("tftPeqDot2");
+    if (svgContainer && dot2) {
+      makeSpecificDotDraggable(svgContainer, dot2, (rx, ry) => {
+        const minLog = Math.log10(20), maxLog = Math.log10(20000);
+        tftPeqFreqVal = Math.round(Math.pow(10, minLog + (rx / 320) * (maxLog - minLog)) / 10) * 10;
+        tftPeqGainVal = Math.round(((60 - ry) / 45) * 15 * 2) / 2;
         if (freqInput) freqInput.value = tftPeqFreqVal;
         if (gainInput) gainInput.value = tftPeqGainVal;
-
-        const valFreqSpan = document.getElementById("tftPeqFreqVal");
-        if (valFreqSpan) valFreqSpan.textContent = tftPeqFreqVal >= 1000 ? (tftPeqFreqVal/1000).toFixed(2)+' kHz' : tftPeqFreqVal+' Hz';
-        const valGainSpan = document.getElementById("tftPeqGainVal");
-        if (valGainSpan) valGainSpan.textContent = tftPeqGainVal.toFixed(1) + " dB";
-
-        if (tftPeqFilter && audioContext) {
-          tftPeqFilter.frequency.setTargetAtTime(tftPeqFreqVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
-          tftPeqFilter.gain.setTargetAtTime(tftPeqGainVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
-        }
+        document.getElementById("tftPeqFreqVal").textContent = tftPeqFreqVal >= 1000 ? (tftPeqFreqVal/1000).toFixed(2)+' kHz' : tftPeqFreqVal+' Hz';
+        document.getElementById("tftPeqGainVal").textContent = tftPeqGainVal.toFixed(1) + " dB";
         updateTftPeqVisuals();
-      };
-
-      svgContainer.addEventListener("pointerdown", (e) => {
-        isDraggingDot = true;
-        svgContainer.setPointerCapture(e.pointerId);
-        handleSvgPointerMove(e);
       });
-      svgContainer.addEventListener("pointermove", handleSvgPointerMove);
-      const stopDragging = (e) => {
-        if (!isDraggingDot) return;
-        isDraggingDot = false;
-        try { svgContainer.releasePointerCapture(e.pointerId); } catch (err) {}
-      };
-      svgContainer.addEventListener("pointerup", stopDragging);
-      svgContainer.addEventListener("pointercancel", stopDragging);
     }
     updateTftPeqVisuals();
   } else {
-    // AKTIFKAN DRAG PADA SEMUA KURVA LAINNYA DI PANEL TFT
-    const svgBox = document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}Box`);
-    const svgContainer = document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}SvgContainer`);
-    const dot1 = document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}Dot1`) || document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}Dot`);
+    const container = document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}SvgContainer`);
     const curve = document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}SvgCurve`);
+    const dot1 = document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}Dot1`) || document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}Dot`);
+    const dot2 = document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}Dot2`);
 
-    if (svgContainer && dot1 && curve) {
-      makeSvgDotDraggable(svgContainer, dot1, (nx, ny) => {
-        const x = nx * 320;
-        const y = ny * 50;
-        dot1.setAttribute("cx", x.toFixed(1));
-        dot1.setAttribute("cy", y.toFixed(1));
+    if (container && dot1 && curve) {
+      makeSpecificDotDraggable(container, dot1, (x, y) => {
+        if (key === "config") curve.setAttribute("d", `M10 50 Q ${x} ${y}, 310 15`);
+        else if (key === "gate") curve.setAttribute("d", `M10 55 L ${x} ${y} L 310 12`);
+        else if (key === "dynamics") curve.setAttribute("d", `M10 55 L ${x} ${y} L 310 20`);
+        else if (key === "sends") curve.setAttribute("d", `M10 45 L ${x} ${y} L 310 15`);
+        else if (key === "main") curve.setAttribute("d", `M10 35 Q ${x} ${y}, 310 35`);
+        else if (key === "routing") curve.setAttribute("d", `M20 16 L 120 16 L ${x} ${y} L 300 48`);
+        else if (key === "meters" || key === "scenes") curve.setAttribute("d", `M15 42 L 80 20 L ${x} ${y} L 240 16 L 305 34`);
+        else if (key === "effects") curve.setAttribute("d", `M10 50 Q ${x} ${y}, 160 32 T 310 24`);
+      });
+    }
 
-        // Ubah bentuk kurva secara interaktif berdasarkan pergerakan titik
-        if (key === "config") {
-          curve.setAttribute("d", `M10 40 Q ${x.toFixed(1)} ${y.toFixed(1)}, 310 10`);
-        } else if (key === "gate") {
-          curve.setAttribute("d", `M10 45 L ${x.toFixed(1)} ${y.toFixed(1)} L 310 10`);
-        } else if (key === "dynamics") {
-          curve.setAttribute("d", `M10 45 L ${x.toFixed(1)} ${y.toFixed(1)} L 310 18`);
-        } else if (key === "sends") {
-          curve.setAttribute("d", `M10 38 L ${x.toFixed(1)} ${y.toFixed(1)} L 310 10`);
-        } else if (key === "main") {
-          curve.setAttribute("d", `M10 28 Q ${x.toFixed(1)} ${y.toFixed(1)}, 310 28`);
-        } else if (key === "routing") {
-          curve.setAttribute("d", `M20 12 L 120 12 L ${x.toFixed(1)} ${y.toFixed(1)} L 300 38`);
-        } else if (key === "meters" || key === "scenes") {
-          curve.setAttribute("d", `M15 35 L 80 18 L ${x.toFixed(1)} ${y.toFixed(1)} L 240 14 L 305 28`);
-        }
+    if (container && dot2 && curve) {
+      makeSpecificDotDraggable(container, dot2, (x, y) => {
+        const cx1 = dot1 ? dot1.getAttribute("cx") : "80";
+        const cy1 = dot1 ? dot1.getAttribute("cy") : "12";
+        if (key === "gate") curve.setAttribute("d", `M10 55 L ${cx1} ${cy1} L ${x} ${y}`);
+        else if (key === "dynamics") curve.setAttribute("d", `M10 55 L ${cx1} ${cy1} L ${x} ${y}`);
+        else if (key === "sends") curve.setAttribute("d", `M10 45 L ${cx1} ${cy1} L ${x} ${y}`);
+        else if (key === "effects") curve.setAttribute("d", `M10 50 Q ${cx1} ${cy1}, 160 32 T ${x} ${y}`);
       });
     }
   }
 }
 
+tftCurveToggleBtn.addEventListener("click", () => {
+  const currentState = tftCurveActiveStates[activeCurrentSectionKey] !== false;
+  tftCurveActiveStates[activeCurrentSectionKey] = !currentState;
+  tftCurveToggleBtn.textContent = tftCurveActiveStates[activeCurrentSectionKey] ? "CURVE: ON" : "CURVE: OFF";
+  tftCurveToggleBtn.classList.toggle("active", tftCurveActiveStates[activeCurrentSectionKey]);
+  bindTftDynamicEventListeners(activeCurrentSectionKey);
+});
+
 function loadTftPage(key) {
+  activeCurrentSectionKey = key;
   const data = tftDatabase[key];
   if (!data) return;
   tftSectionTitle.textContent = data.title;
@@ -2179,6 +2139,11 @@ function loadTftPage(key) {
   tftFooterChannel.textContent = data.footerCh;
   tftFooterStatus.textContent = data.footerSt;
   updateEncoders(data.encoders);
+
+  const isActive = tftCurveActiveStates[key] !== false;
+  tftCurveToggleBtn.textContent = isActive ? "CURVE: ON" : "CURVE: OFF";
+  tftCurveToggleBtn.classList.toggle("active", isActive);
+
   setTimeout(() => bindTftDynamicEventListeners(key), 10);
 }
 
@@ -2189,158 +2154,14 @@ function switchActiveSection(key) {
 }
 
 consoleSectionBtns.forEach(btn => {
-  btn.addEventListener("click", () => {
-    const sectionKey = btn.getAttribute("data-section");
-    switchActiveSection(sectionKey);
-  });
+  btn.addEventListener("click", () => switchActiveSection(btn.getAttribute("data-section")));
 });
 
 tftTabs.forEach(tab => {
-  tab.addEventListener("click", () => {
-    const tabKey = tab.getAttribute("data-tft-tab");
-    switchActiveSection(tabKey);
-  });
+  tab.addEventListener("click", () => switchActiveSection(tab.getAttribute("data-tft-tab")));
 });
 
-// Inisialisasi awal ke EQ (Processing)
 switchActiveSection("eq");
-
-/* =========================================================
-   LOGIKA METER LED REAL-TIME & STEREO METER TFT
-========================================================= */
-function startRealMeters() {
-  if (meterAnimationId) return;
-  const meterBuffers = [new Uint8Array(1024), new Uint8Array(1024)];
-  const vertMeterBuffers = [new Uint8Array(512), new Uint8Array(512), new Uint8Array(512), new Uint8Array(512), new Uint8Array(512)];
-  
-  function updateAllMeters() {
-    meterAnimationId = requestAnimationFrame(updateAllMeters);
-
-    const micHasLiveTrack = !!(microphoneStream && microphoneStream.getAudioTracks().some(track => track.readyState === "live" && track.enabled));
-    const hasActiveInput = isPlaying || micHasLiveTrack;
-    const isAudioRunning = !!(audioContext && audioContext.state === "running" && hasActiveInput);
-
-    audioChannels.forEach((audioChannel, index) => {
-      const channel = channels[index];
-      if (!channel) return;
-      const meter = channel.querySelector(".meter");
-      const clip = channel.querySelector(".clip");
-      if (!meter || !clip) return;
-
-      if (!isAudioRunning || !audioChannel.analyser) {
-        meter.innerHTML = "";
-        for (let s = 0; s < 12; s++) {
-          const seg = document.createElement("span");
-          if (s >= 9) seg.classList.add("red"); else if (s >= 7) seg.classList.add("yellow"); else seg.classList.add("green");
-          meter.appendChild(seg);
-        }
-        clip.classList.remove("on");
-        return;
-      }
-
-      const buffer = meterBuffers[index];
-      audioChannel.analyser.getByteTimeDomainData(buffer);
-
-      let sum = 0, peak = 0;
-      for (let i = 0; i < buffer.length; i++) {
-        const sample = (buffer[i] - 128) / 128;
-        sum += sample * sample;
-        if (Math.abs(sample) > peak) peak = Math.abs(sample);
-      }
-
-      let rms = Math.sqrt(sum / buffer.length);
-      const db = 20 * Math.log10(Math.max(rms, 0.0001));
-      const level = rms < 0.001 ? 0 : Math.max(1, Math.min(12, Math.round(((db + 50) / 50) * 12)));
-
-      meter.innerHTML = "";
-      for (let segmentIndex = 0; segmentIndex < 12; segmentIndex++) {
-        const segment = document.createElement("span");
-        if (segmentIndex >= 9) segment.classList.add("red");
-        else if (segmentIndex >= 7) segment.classList.add("yellow");
-        else segment.classList.add("green");
-        if (segmentIndex < level) segment.classList.add("on");
-        meter.appendChild(segment);
-      }
-      clip.classList.toggle("on", peak >= 0.95);
-    });
-
-    const mixerMeters = [
-      document.querySelectorAll("#mixerMeter1 span"),
-      document.querySelectorAll("#mixerMeter2 span"),
-      document.querySelectorAll("#mixerMeter3 span"),
-      document.querySelectorAll("#mixerMeter4 span"),
-      document.querySelectorAll("#mixerMeterMaster span")
-    ];
-
-    mixerMeters.forEach((meterSpans, mIdx) => {
-      if (!meterSpans || meterSpans.length === 0) return;
-      if (!isAudioRunning) { meterSpans.forEach(span => span.classList.remove("on")); return; }
-
-      let rms = 0;
-      const analyser = mIdx === 4 ? masterMeterAnalyser : mixerStripAnalysers[mIdx];
-      if (analyser) {
-        try {
-          analyser.getByteTimeDomainData(vertMeterBuffers[mIdx]);
-          let sum = 0;
-          for (let i = 0; i < vertMeterBuffers[mIdx].length; i++) {
-            const sample = (vertMeterBuffers[mIdx][i] - 128) / 128;
-            sum += sample * sample;
-          }
-          rms = Math.sqrt(sum / vertMeterBuffers[mIdx].length);
-        } catch (e) { rms = 0; }
-      }
-
-      const db = 20 * Math.log10(Math.max(rms, 0.0001));
-      const activeCount = rms < 0.001 ? 0 : Math.max(1, Math.min(10, Math.round(((db + 50) / 50) * 10)));
-
-      meterSpans.forEach((span, idx) => {
-        const reverseIdx = meterSpans.length - 1 - idx;
-        if (reverseIdx < activeCount) span.classList.add("on"); else span.classList.remove("on");
-      });
-    });
-
-    const tftSpansL = document.querySelectorAll("#tftMeterL span");
-    const tftSpansR = document.querySelectorAll("#tftMeterR span");
-    const tftMeterLVal = document.getElementById("tftMeterLVal");
-    const tftMeterRVal = document.getElementById("tftMeterRVal");
-
-    if (tftSpansL.length > 0 && audioChannels[0]?.analyser) {
-      if (!isAudioRunning) {
-        tftSpansL.forEach(s => s.classList.remove("on"));
-        tftSpansR.forEach(s => s.classList.remove("on"));
-        if (tftMeterLVal) tftMeterLVal.textContent = "-inf dB";
-        if (tftMeterRVal) tftMeterRVal.textContent = "-inf dB";
-      } else {
-        const bufL = meterBuffers[0];
-        const bufR = meterBuffers[1] || meterBuffers[0];
-        audioChannels[0].analyser.getByteTimeDomainData(bufL);
-        audioChannels[1]?.analyser?.getByteTimeDomainData(bufR);
-
-        let sumL = 0, sumR = 0;
-        for (let i = 0; i < bufL.length; i++) {
-          let sL = (bufL[i] - 128) / 128;
-          let sR = (bufR[i] - 128) / 128;
-          sumL += sL * sL;
-          sumR += sR * sR;
-        }
-        let rmsL = Math.sqrt(sumL / bufL.length);
-        let rmsR = Math.sqrt(sumR / bufR.length);
-        let dbL = 20 * Math.log10(Math.max(rmsL, 0.0001));
-        let dbR = 20 * Math.log10(Math.max(rmsR, 0.0001));
-
-        let activeL = rmsL < 0.001 ? 0 : Math.max(1, Math.min(16, Math.round(((dbL + 50) / 50) * 16)));
-        let activeR = rmsR < 0.001 ? 0 : Math.max(1, Math.min(16, Math.round(((dbR + 50) / 50) * 16)));
-
-        tftSpansL.forEach((span, idx) => { if (idx < activeL) span.classList.add("on"); else span.classList.remove("on"); });
-        tftSpansR.forEach((span, idx) => { if (idx < activeR) span.classList.add("on"); else span.classList.remove("on"); });
-
-        if (tftMeterLVal) tftMeterLVal.textContent = (dbL < -45 ? "-inf" : dbL.toFixed(1)) + " dB";
-        if (tftMeterRVal) tftMeterRVal.textContent = (dbR < -45 ? "-inf" : dbR.toFixed(1)) + " dB";
-      }
-    }
-  }
-  updateAllMeters();
-}
   </script>
 </body>
 </html>
