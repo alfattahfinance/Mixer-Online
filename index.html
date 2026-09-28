@@ -628,24 +628,23 @@ header, .topbar {
 .tft-module-graph-box svg [id*="Dot"]:active,
 .tft-peq-graph [id*="Dot"]:active { cursor:grabbing; }
 
+
+/* Compact navigation after removing the unused branding header */
+.mode-switch-bar { min-height:30px; padding:2px 4px; flex:0 0 auto; }
+.compact-top-actions { margin-left:auto; align-items:center; flex-wrap:nowrap; }
+.compact-top-actions button { padding:3px 7px; min-height:23px; font-size:8px; }
+@media(max-width:520px) {
+  .mode-switch-bar { gap:3px; }
+  .compact-top-actions { gap:3px; }
+  .compact-top-actions button { padding:2px 5px; font-size:7px; }
+}
+
 </style>
 </head>
 
 <body>
   <main class="app">
-    <header class="topbar">
-      <div>
-        <div class="brand">SQ-SERIES DIGITAL AUDIO CONSOLE</div>
-        <div class="subtitle">GQX-3102 Equalizer, Alesis FX & Digital Mixer Console + ESP32 BLE</div>
-      </div>
-      <div class="actions">
-        <button id="saveButton">SAVE</button>
-        <button id="loadButton">RECALL</button>
-        <button id="resetButton">RESET</button>
-      </div>
-    </header>
-
-    <!-- MENU UTAMA RINGKAS: halaman tambahan di dalam tombol tiga garis -->
+    <!-- Header branding dihilangkan untuk menghemat ruang layar mixer. Aksi preset tetap tersedia. -->
     <nav class="mode-switch-bar" id="mainTabNavigation" aria-label="Main pages">
       <div class="mode-menu-wrap">
         <button type="button" class="mode-menu-trigger" id="modeMenuTrigger" aria-label="Buka menu halaman" aria-expanded="false" aria-controls="modeMenu">☰</button>
@@ -655,6 +654,11 @@ header, .topbar {
           <button type="button" class="tab-btn" id="tabEchoBtn" data-main-tab="echo" aria-controls="tabEchoContent" aria-selected="false">🔊 ALESIS FX</button>
           <button type="button" class="tab-btn" id="tabEspBtn" data-main-tab="esp32" aria-controls="tabEspContent" aria-selected="false">📡 ESP32 &amp; HW</button>
         </div>
+      </div>
+      <div class="actions compact-top-actions" aria-label="Preset actions">
+        <button id="saveButton" type="button">SAVE</button>
+        <button id="loadButton" type="button">RECALL</button>
+        <button id="resetButton" type="button">RESET</button>
       </div>
     </nav>
 
