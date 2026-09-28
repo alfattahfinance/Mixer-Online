@@ -113,7 +113,7 @@ header, .topbar {
 .meter-area { display: flex; align-items: center; justify-content: space-between; background: #121722; padding: 4px 8px; border-radius: 4px; margin-bottom: 4px; border: 1px solid #2d3748; }
 .meter-container-box { display: flex; flex-direction: column; gap: 2px; flex-grow: 1; margin-right: 8px; }
 .meter-scale-labels { display: flex; justify-content: space-between; font-size: 6.5px; color: #64748b; font-family: monospace; }
-.meter { display: flex; gap: 2px; height: 10px; align-items: center; }
+.meter { display: flex; flex-direction: row; direction: ltr; gap: 2px; height: 10px; align-items: center; }
 .meter span { flex: 1; height: 6px; background: #1a2230; border-radius: 1px; border: 1px solid #2a3441; }
 .meter span.green.on { background: #10b981; border-color: #34d399; box-shadow: 0 0 4px #10b981; }
 .meter span.yellow.on { background: #f59e0b; border-color: #fbbf24; box-shadow: 0 0 4px #f59e0b; }
@@ -1100,6 +1100,66 @@ function updateMasterStereoMeters() {
   masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
 }
 updateMasterStereoMeters();
+
+/* Update channel, EQ and TFT meters from live Web Audio analyser data.
+   Horizontal bars light left-to-right; vertical LED ladders light bottom-up. */
+function readMeterDb(analyser) {
+  if (!analyser) return -72;
+  const samples = new Float32Array(analyser.fftSize || 1024);
+  analyser.getFloatTimeDomainData(samples);
+  let sum = 0;
+  for (let i = 0; i < samples.length; i++) sum += samples[i] * samples[i];
+  const rms = Math.sqrt(sum / samples.length);
+  return rms > 0 ? 20 * Math.log10(rms) : -72;
+}
+
+function paintMeter(container, db, direction) {
+  if (!container) return;
+  const leds = Array.from(container.children);
+  if (!leds.length) return;
+  const litCount = Math.max(0, Math.min(leds.length, Math.round((db + 54) / 54 * leds.length)));
+  leds.forEach((led, index) => {
+    const isLit = direction === "horizontal" ? index < litCount : index >= leds.length - litCount;
+    led.classList.toggle("on", isLit);
+  });
+}
+
+function updateAllSignalMeters() {
+  mixerStripAnalysers.forEach((analyser, index) => {
+    if (!analyser) return;
+    paintMeter(document.getElementById("mixerMeter" + (index + 1)), readMeterDb(analyser), "vertical");
+  });
+
+  [0, 1].forEach(channelIndex => {
+    const channel = audioChannels[channelIndex];
+    if (!channel || !channel.analyser) return;
+    const db = readMeterDb(channel.analyser);
+    const eqMeter = channels[channelIndex]?.querySelector(".meter");
+    if (eqMeter) {
+      if (!eqMeter.children.length) {
+        for (let i = 0; i < 24; i++) {
+          const led = document.createElement("span");
+          led.className = i >= 21 ? "red" : i >= 17 ? "yellow" : "green";
+          eqMeter.appendChild(led);
+        }
+      }
+      paintMeter(eqMeter, db, "horizontal");
+    }
+    const clip = channels[channelIndex]?.querySelector(".clip");
+    if (clip) clip.classList.toggle("on", db >= -1);
+  });
+
+  masterStereoAnalysers.forEach((analyser, channelIndex) => {
+    if (!analyser) return;
+    const db = readMeterDb(analyser);
+    paintMeter(document.getElementById(channelIndex === 0 ? "tftMeterL" : "tftMeterR"), db, "horizontal");
+    const readout = document.getElementById(channelIndex === 0 ? "tftMeterLVal" : "tftMeterRVal");
+    if (readout) readout.textContent = db <= -70 ? "-inf dB" : db.toFixed(1) + " dB";
+  });
+  requestAnimationFrame(updateAllSignalMeters);
+}
+updateAllSignalMeters();
+
 
 /* =========================================================
    NAVIGASI EMPAT TAB UTAMA & HAMBURGER MENU
