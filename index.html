@@ -1723,6 +1723,7 @@ let masterGainNode = null, outputMuteGainNode = null, outputMergerNode = null;
 
 let isAlesisFxEnabled = false;
 let audioGraphReady = false, meterAnimationId = null, outputMuted = false;
+updateMasterStereoMeters();
 
 let tftPeqFilter = null;
 let tftCurveActiveStates = { config: true, gate: true, dynamics: true, eq: true, sends: true, main: true, routing: true, meters: true, scenes: true, setup: true, effects: true };
