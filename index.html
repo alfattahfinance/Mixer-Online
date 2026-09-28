@@ -2119,7 +2119,6 @@ function bindTftDynamicEventListeners(key) {
     }
     updateTftPeqVisuals();
   } else {
-    // Binding kontrol interaktif untuk modul non-EQ (Config, Gate, Comp, Sends, Main, Routing, Meters, Scenes, Setup, Effects)
     if (key === "config") {
       const gInp = document.getElementById("cfgGain");
       const phBtn = document.getElementById("cfgPhantomBtn");
@@ -2190,7 +2189,6 @@ function bindTftDynamicEventListeners(key) {
       stBtn?.addEventListener("click", () => { s.active = !s.active; stBtn.textContent = s.active ? "ACTIVE" : "OFF"; stBtn.classList.toggle("active-action", s.active); });
     }
 
-    // Penanganan Drag Titik SVG Persisten untuk setiap modul non-EQ
     const container = document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}SvgContainer`);
     const curve = document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}SvgCurve`);
     const dot1 = document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}Dot1`) || document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}Dot`);
