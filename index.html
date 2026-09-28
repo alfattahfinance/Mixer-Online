@@ -198,7 +198,17 @@ header, .topbar {
 /* LAYAR PEQ SQ-7 STYLE DENGAN GRID & MULTI-CONTROL POINTS */
 .tft-peq { display:grid; grid-template-columns:minmax(0,1fr); gap:4px; height:100%; }
 .tft-peq-head { display:flex; justify-content:space-between; align-items:center; gap:4px; color:#cbd5e1; font-size:7.5px; font-weight:700; }
-.tft-peq-graph { width:100%; height:105px; background:#080d16; border:1px solid #334155; border-radius:4px; display:block; touch-action: none; }
+.tft-peq-graph {
+  width: 100%;
+  height: clamp(150px, 23vh, 230px);
+  min-height: 150px;
+  background: linear-gradient(180deg, #090e17 0%, #0b111c 100%);
+  border: 1px solid #475569;
+  border-radius: 6px;
+  display: block;
+  touch-action: none;
+  box-shadow: inset 0 0 0 1px rgba(148,163,184,.06), 0 3px 10px rgba(0,0,0,.25);
+}
 .tft-peq-controls { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:3px; }
 .tft-peq-control { background:#162030; border:1px solid #334155; border-radius:4px; padding:2px; text-align:center; }
 .tft-peq-control label { display:block; color:#94a3b8; font-size:6.5px; margin-bottom:1px; font-weight:700; }
@@ -262,7 +272,7 @@ header, .topbar {
 .vert-led-meter span.red.on { background: #ef4444 !important; box-shadow: 0 0 4px #ef4444; }
 
 /* FADER VERTIKAL MODEL SQ-SERIES ASLI */
-.fader-slot { position: relative; flex: 0 0 26px; width: 26px; height: 100%; display: flex; justify-content: center; align-items: center; background: #080c14; border: 1px solid #222d3d; border-radius: 4px; }
+.fader-slot { position: relative; flex: 0 0 34px; width: 34px; height: 100%; display: flex; justify-content: center; align-items: center; background: #080c14; border: 1px solid #222d3d; border-radius: 4px; }
 .fader-slot::before {
   content: ""; position: absolute; width: 3px; height: 90%; background: linear-gradient(90deg, #04060a, #1f293d, #04060a); border-radius: 1px;
 }
@@ -272,7 +282,7 @@ header, .topbar {
 }
 .fader-slot input[type="range"]::-webkit-slider-runnable-track { width: 3px; background: transparent; border: 0; }
 .fader-slot input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none; appearance: none; width: 30px; height: 16px; margin-left: -13.5px; border: 1px solid #94a3b8; border-radius: 3px;
+  -webkit-appearance: none; appearance: none; width: 34px; height: 18px; margin-left: -15.5px; border: 1px solid #94a3b8; border-radius: 3px;
   background: linear-gradient(to bottom, #e2e8f0 0%, #cbd5e1 20%, #64748b 48%, #1e293b 52%, #475569 80%, #f8fafc 100%);
   box-shadow: 0 2px 5px rgba(0,0,0,0.9), inset 0 1px 1px rgba(255,255,255,0.8);
 }
