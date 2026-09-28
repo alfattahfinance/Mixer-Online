@@ -181,32 +181,32 @@ header, .topbar {
 }
 @media(max-width: 900px) { .mixer-top-console { grid-template-columns: 1fr; } }
 
-/* LAYAR TFT UTAMA (SQ-7 STYLE) */
+/* LAYAR TFT UTAMA (SQ-7 STYLE) - DIPERLUAS AGAR TIDAK SEMPIT */
 .mixer-tft-screen { 
   background: #080c14; border: 2px solid #2d3748; border-radius: 6px; 
-  padding: 5px; box-shadow: inset 0 0 15px rgba(0,0,0,0.9); 
+  padding: 6px; box-shadow: inset 0 0 15px rgba(0,0,0,0.9); 
   display: flex; flex-direction: column; justify-content: space-between; 
-  height: 100%; min-height: 185px;
+  height: 100%; min-height: 235px;
 }
 .tft-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222d3d; padding-bottom: 2px; margin-bottom: 3px; font-size: 8px; font-weight: 800; color: #38bdf8; }
 .tft-top-tabs { display: flex; gap: 2px; background: #121824; padding: 2px; border-radius: 4px; margin-bottom: 3px; border: 1px solid #2d3748; overflow-x: auto; }
 .tft-tab { background: #222d3d; color: #94a3b8; border: none; font-size: 7px; font-weight: 800; padding: 2px 5px; border-radius: 3px; cursor: pointer; white-space: nowrap; }
 .tft-tab.active { background: #0284c7; color: #fff; }
-.tft-main-viewport { background: #05080f; border: 1px solid #222d3d; border-radius: 4px; min-height: 80px; padding: 3px; display: flex; flex-direction: column; justify-content: space-between; position: relative; flex: 1; }
+.tft-main-viewport { background: #05080f; border: 1px solid #222d3d; border-radius: 4px; min-height: 110px; padding: 4px; display: flex; flex-direction: column; justify-content: space-between; position: relative; flex: 1; }
 .tft-content-screen { font-size: 8px; color: #38bdf8; line-height: 1.2; height: 100%; }
 
 /* LAYAR PEQ SQ-7 STYLE DENGAN GRID & MULTI-CONTROL POINTS */
-.tft-peq { display:grid; grid-template-columns:minmax(0,1fr); gap:3px; height:100%; }
+.tft-peq { display:grid; grid-template-columns:minmax(0,1fr); gap:4px; height:100%; }
 .tft-peq-head { display:flex; justify-content:space-between; align-items:center; gap:4px; color:#cbd5e1; font-size:7.5px; font-weight:700; }
-.tft-peq-graph { width:100%; height:70px; background:#080d16; border:1px solid #334155; border-radius:4px; display:block; touch-action: none; }
+.tft-peq-graph { width:100%; height:95px; background:#080d16; border:1px solid #334155; border-radius:4px; display:block; touch-action: none; }
 .tft-peq-controls { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:3px; }
 .tft-peq-control { background:#162030; border:1px solid #334155; border-radius:4px; padding:2px; text-align:center; }
 .tft-peq-control label { display:block; color:#94a3b8; font-size:6.5px; margin-bottom:1px; font-weight:700; }
 .tft-peq-control input { width:100%; accent-color:#38bdf8; margin:1px 0; cursor: pointer; touch-action: manipulation; }
 .tft-peq-value { display:block; color:#e2e8f0; font-size:7.5px; font-weight:800; }
 
-.tft-module-view { display: flex; flex-direction: column; gap: 3px; height: 100%; }
-.tft-module-graph-box { width: 100%; height: 75px; background: #080d16; border: 1px solid #334155; border-radius: 4px; padding: 2px; display: flex; align-items: center; justify-content: center; position: relative; touch-action: none; }
+.tft-module-view { display: flex; flex-direction: column; gap: 4px; height: 100%; }
+.tft-module-graph-box { width: 100%; height: 100px; background: #080d16; border: 1px solid #334155; border-radius: 4px; padding: 2px; display: flex; align-items: center; justify-content: center; position: relative; touch-action: none; }
 .tft-module-controls-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
 .tft-mod-ctrl { background: #131b28; border: 1px solid #2d3748; border-radius: 4px; padding: 2px; text-align: center; }
 .tft-mod-ctrl label { display: block; color: #94a3b8; font-size: 6.5px; margin-bottom: 1px; font-weight: 700; }
@@ -2009,7 +2009,7 @@ function updateTftPeqVisuals() {
   fill.setAttribute("d", `${pathStr} L320 120 L0 120 Z`);
 }
 
-/* FUNGSI DRAG HANYA PADA TITIK / DOT TERTENTU */
+/* FUNGSI DRAG HANYA PADA TITIK / DOT TERTENTU (DINORMALISASI KE VIEWBOX SVG) */
 function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback) {
   if (!svgContainer || !dotElement) return;
   let isDragging = false;
@@ -2021,14 +2021,17 @@ function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback) {
     const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
     if (clientX === undefined || clientY === undefined) return;
 
-    const relX = Math.max(10, Math.min(rect.width - 10, clientX - rect.left));
-    const relY = Math.max(10, Math.min(rect.height - 10, clientY - rect.top));
+    const svgWidth = svgContainer.viewBox.baseVal.width || 320;
+    const svgHeight = svgContainer.viewBox.baseVal.height || (svgContainer.classList.contains('tft-peq-graph') ? 120 : 65);
+
+    const relX = Math.max(10, Math.min(svgWidth - 10, ((clientX - rect.left) / rect.width) * svgWidth));
+    const relY = Math.max(10, Math.min(svgHeight - 10, ((clientY - rect.top) / rect.height) * svgHeight));
 
     dotElement.setAttribute("cx", relX.toFixed(1));
     dotElement.setAttribute("cy", relY.toFixed(1));
 
     if (typeof onUpdateCallback === "function") {
-      onUpdateCallback(relX, relY);
+      onUpdateCallback(relX, relY, svgWidth, svgHeight);
     }
   };
 
