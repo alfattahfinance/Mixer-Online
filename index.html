@@ -2379,6 +2379,65 @@ input[type="range"] { accent-color:#b8bec6 !important; }
 #tabMixerContent .tft-module-graph-box line {
   stroke: rgba(88,145,181,.26) !important;
 }
+
+/* RESPONSIVE CURVE VIEWPORT: scale to the available mixer TFT, avoid clipping/zoom gestures, keep touch dragging precise. */
+#tabMixerContent .mixer-tft-screen,
+#tabMixerContent .tft-main-viewport,
+#tabMixerContent .tft-content-screen {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+}
+#tabMixerContent .tft-peq {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-width: 0;
+  min-height: 0;
+}
+#tabMixerContent .tft-peq-graph {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: clamp(76px, 18vh, 150px);
+  max-height: none;
+  box-sizing: border-box;
+  touch-action: none;
+  overscroll-behavior: contain;
+  -webkit-user-select: none;
+  user-select: none;
+}
+#tabMixerContent .tft-peq-graph svg,
+#tabMixerContent .tft-module-graph-box svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  touch-action: none;
+}
+#tabMixerContent .tft-module-graph-box {
+  min-width: 0;
+  min-height: clamp(76px, 18vh, 150px);
+  max-height: none;
+  touch-action: none;
+  overscroll-behavior: contain;
+  -webkit-user-select: none;
+  user-select: none;
+}
+#tabMixerContent .tft-peq-graph circle,
+#tabMixerContent .tft-module-graph-box circle {
+  cursor: grab;
+  touch-action: none;
+}
+#tabMixerContent .tft-peq-graph circle:active,
+#tabMixerContent .tft-module-graph-box circle:active {
+  cursor: grabbing;
+}
+@media (max-width: 600px) {
+  #tabMixerContent .tft-peq-graph,
+  #tabMixerContent .tft-module-graph-box {
+    min-height: 82px;
+  }
+}
+
 </style>
 </head>
 
