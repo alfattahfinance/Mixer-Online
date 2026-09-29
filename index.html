@@ -2345,6 +2345,40 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   box-shadow:inset 0 2px 12px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.045) !important;
 }
 
+
+/* Glossy black display treatment for all live curve graphics. */
+#tabMixerContent .tft-peq-graph,
+#tabMixerContent .tft-module-graph-box {
+  background: radial-gradient(ellipse at 50% 0%, rgba(45,75,105,.22), transparent 68%),
+              linear-gradient(180deg, #03070d 0%, #07101b 55%, #02050a 100%) !important;
+  border: 1px solid rgba(125,161,190,.42) !important;
+  border-radius: 5px !important;
+  box-shadow: inset 0 1px 9px rgba(0,0,0,.85), inset 0 0 18px rgba(26,91,145,.10),
+              0 0 5px rgba(0,0,0,.55) !important;
+}
+#tabMixerContent .tft-peq-graph #tftPeqSvgCurve,
+#tabMixerContent .tft-module-graph-box path[id$="SvgCurve"] {
+  stroke: #20d8ff !important;
+  stroke-width: 2.5 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  filter: drop-shadow(0 0 3px rgba(32,216,255,.72)) !important;
+}
+#tabMixerContent .tft-peq-graph #tftPeqSvgFill,
+#tabMixerContent .tft-module-graph-box path[id$="SvgFill"] {
+  fill: #0ea5e9 !important;
+  opacity: .2 !important;
+}
+#tabMixerContent .tft-module-graph-box circle,
+#tabMixerContent .tft-peq-graph circle {
+  stroke: #d8f7ff !important;
+  stroke-width: 1.8 !important;
+  filter: drop-shadow(0 0 3px rgba(32,216,255,.75));
+}
+#tabMixerContent .tft-peq-graph line,
+#tabMixerContent .tft-module-graph-box line {
+  stroke: rgba(88,145,181,.26) !important;
+}
 </style>
 </head>
 
@@ -4276,16 +4310,39 @@ function updateTftModuleCurve(key) {
   }
   if (!points.length) return;
   points = points.map(([x, y]) => [clamp(x, 5, 315), clamp(y, 5, 60)]);
-  const d = points.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
+  // Catmull-Rom to cubic Bezier: smooth response curve that passes through each
+  // computed control point, so the curve and draggable handles stay in sync.
+  let d = "M" + points[0][0].toFixed(2) + " " + points[0][1].toFixed(2);
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i], p1 = points[i + 1];
+    const prev = points[i - 1] || p0, next = points[i + 2] || p1;
+    const c1x = p0[0] + (p1[0] - prev[0]) / 6;
+    const c1y = p0[1] + (p1[1] - prev[1]) / 6;
+    const c2x = p1[0] - (next[0] - p0[0]) / 6;
+    const c2y = p1[1] - (next[1] - p0[1]) / 6;
+    d += " C" + c1x.toFixed(2) + " " + c1y.toFixed(2) + " " +
+      c2x.toFixed(2) + " " + c2y.toFixed(2) + " " +
+      p1[0].toFixed(2) + " " + p1[1].toFixed(2);
+  }
   curve.setAttribute("d", d);
   if (fill) fill.setAttribute("d", d + " L315 63 L5 63 Z");
+
+  // Refresh every visible handle from the same calculated point list after
+  // either a slider change or a drag, preventing stale/misaligned dots.
   if (key === "sends") {
     const dot = document.getElementById("tftSendsDot1");
     const levelY = clamp(32 - s.lvl * 1.35, 8, 56);
     if (dot) { dot.setAttribute("cx", "160"); dot.setAttribute("cy", levelY.toFixed(1)); dot.setAttribute("aria-valuetext", s.lvl + " dB"); }
   } else {
-    const dot1 = document.getElementById(prefix + "Dot1") || document.getElementById(prefix + "Dot");
-    if (dot1 && points[1]) { dot1.setAttribute("cx", points[1][0].toFixed(1)); dot1.setAttribute("cy", points[1][1].toFixed(1)); }
+    [1, 2, 3].forEach((n) => {
+      const dot = document.getElementById(prefix + "Dot" + n) ||
+        (n === 1 ? document.getElementById(prefix + "Dot") : null);
+      const point = points[n];
+      if (dot && point) {
+        dot.setAttribute("cx", point[0].toFixed(2));
+        dot.setAttribute("cy", point[1].toFixed(2));
+      }
+    });
   }
 }
 
