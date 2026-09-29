@@ -1440,6 +1440,33 @@ header, .topbar {
 #tabMixerContent .mixer-desk-surface .master-strip .master-meter-column .master-led-meter span { flex:1 1 0; min-height:1px; }
 #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .vert-led-meter,
 #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-led-meter { background:rgba(7,12,20,.55); border-color:rgba(148,163,184,.32); }
+
+/* CONSISTENT SIX-STEP LED GRADIENT — all vertical and horizontal meters */
+#tabMixerContent .vert-led-meter span,
+#tabMixerContent .master-led-meter span,
+#tabMixerContent .meter span,
+#tabMixerContent .tft-meter span { transition:background-color .08s linear, box-shadow .08s linear; }
+#tabMixerContent .vert-led-meter span.mint.on,
+#tabMixerContent .master-led-meter span.mint.on,
+#tabMixerContent .meter span.mint.on,
+#tabMixerContent .tft-meter span.mint.on { background:#34d399 !important; box-shadow:0 0 3px rgba(52,211,153,.7); }
+#tabMixerContent .vert-led-meter span.lime.on,
+#tabMixerContent .master-led-meter span.lime.on,
+#tabMixerContent .meter span.lime.on,
+#tabMixerContent .tft-meter span.lime.on { background:#a3e635 !important; box-shadow:0 0 3px rgba(163,230,53,.65); }
+#tabMixerContent .vert-led-meter span.orange.on,
+#tabMixerContent .master-led-meter span.orange.on,
+#tabMixerContent .meter span.orange.on,
+#tabMixerContent .tft-meter span.orange.on { background:#fb923c !important; box-shadow:0 0 4px rgba(251,146,60,.75); }
+#tabMixerContent .vert-led-meter span.yellow.on,
+#tabMixerContent .master-led-meter span.yellow.on,
+#tabMixerContent .meter span.yellow.on,
+#tabMixerContent .tft-meter span.yellow.on { background:#facc15 !important; box-shadow:0 0 4px rgba(250,204,21,.7); }
+#tabMixerContent .vert-led-meter span.red.on,
+#tabMixerContent .master-led-meter span.red.on,
+#tabMixerContent .meter span.red.on,
+#tabMixerContent .tft-meter span.red.on { background:#ef4444 !important; box-shadow:0 0 5px rgba(239,68,68,.8); }
+
 </style>
 </head>
 
@@ -1864,6 +1891,14 @@ header, .topbar {
    INISIALISASI LED METER & TFT STEREO METER
 ========================================================= */
 function initMixerVerticalMeters() {
+  const assignVerticalColor = (span, index, count) => {
+    const level = count <= 1 ? 1 : (count - 1 - index) / (count - 1);
+    span.className = level >= .92 ? "red" :
+      level >= .82 ? "orange" :
+      level >= .70 ? "yellow" :
+      level >= .56 ? "lime" :
+      level >= .40 ? "mint" : "green";
+  };
   const meterIds = ["mixerMeter1", "mixerMeter2", "mixerMeter3", "mixerMeter4", "masterMeterL", "masterMeterR", "masterMeterCombined"];
   meterIds.forEach(id => {
     const container = document.getElementById(id);
@@ -1872,10 +1907,7 @@ function initMixerVerticalMeters() {
     const segmentCount = (id === "masterMeterL" || id === "masterMeterR" || id === "masterMeterCombined") ? 16 : 10;
     for (let i = 0; i < segmentCount; i++) {
       const span = document.createElement("span");
-      // Vertical ladder is painted bottom-up: green at the bottom, yellow mid, red at the top.
-      if (i < 2) span.className = "red";
-      else if (i < 5) span.className = "yellow";
-      else span.className = "green";
+      assignVerticalColor(span, i, segmentCount);
       container.appendChild(span);
     }
   });
@@ -1884,11 +1916,15 @@ function initMixerVerticalMeters() {
     const box = document.getElementById(id);
     if (!box) return;
     box.innerHTML = "";
-    for (let i = 0; i < 16; i++) {
+    const segmentCount = 16;
+    for (let i = 0; i < segmentCount; i++) {
       const span = document.createElement("span");
-      if (i >= 13) span.className = "red";
-      else if (i >= 10) span.className = "yellow";
-      else span.className = "green";
+      const level = i / (segmentCount - 1);
+      span.className = level >= .92 ? "red" :
+        level >= .82 ? "orange" :
+        level >= .70 ? "yellow" :
+        level >= .56 ? "lime" :
+        level >= .40 ? "mint" : "green";
       box.appendChild(span);
     }
   });
