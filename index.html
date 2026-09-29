@@ -2678,6 +2678,104 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   grid-template-rows: auto minmax(76px, 1fr) auto !important;
 }
 
+
+/* CONSISTENT CURVE DISPLAY — match PEQ viewport proportions across all mixer curve pages. */
+#tabMixerContent #tftContentArea .tft-module-view {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 5px !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  background: #03070d !important;
+}
+#tabMixerContent #tftContentArea .tft-module-graph-box {
+  display: block !important;
+  position: relative;
+  flex: 1 1 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: clamp(96px, 28vh, 150px) !important;
+  max-height: min(54%, 170px) !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  background-color: #050b15 !important;
+  background-image:
+    linear-gradient(rgba(56,189,248,.10) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56,189,248,.10) 1px, transparent 1px) !important;
+  background-size: 10% 20% !important;
+  border: 1px solid #1e4058 !important;
+  border-radius: 4px !important;
+  touch-action: none !important;
+  overscroll-behavior: contain;
+  -webkit-user-select: none;
+  user-select: none;
+}
+#tabMixerContent #tftContentArea .tft-module-graph-box svg,
+#tabMixerContent #tftContentArea .tft-peq-graph {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  box-sizing: border-box;
+  touch-action: none !important;
+}
+#tabMixerContent #tftContentArea .tft-module-controls-grid,
+#tabMixerContent #tftContentArea .tft-peq-controls {
+  flex: 0 0 auto !important;
+  width: 100%;
+  min-width: 0 !important;
+}
+#tabMixerContent #tftContentArea .tft-peq {
+  display: grid !important;
+  grid-template-rows: auto minmax(96px, 1fr) auto !important;
+  gap: 5px !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  background: #03070d !important;
+}
+#tabMixerContent #tftContentArea .tft-peq-graph {
+  min-height: 0 !important;
+  max-height: none !important;
+  border-radius: 4px !important;
+  background-color: #050b15 !important;
+  background-image:
+    linear-gradient(rgba(56,189,248,.10) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56,189,248,.10) 1px, transparent 1px) !important;
+  background-size: 10% 20% !important;
+  touch-action: none !important;
+}
+#tabMixerContent #tftContentArea .tft-module-graph-box circle,
+#tabMixerContent #tftContentArea .tft-peq-graph circle {
+  cursor: grab;
+  touch-action: none !important;
+}
+#tabMixerContent #tftContentArea .tft-module-graph-box circle:active,
+#tabMixerContent #tftContentArea .tft-peq-graph circle:active {
+  cursor: grabbing;
+}
+@media (max-height: 560px) {
+  #tabMixerContent #tftContentArea .tft-module-graph-box {
+    min-height: 76px !important;
+    max-height: 48% !important;
+  }
+  #tabMixerContent #tftContentArea .tft-peq {
+    grid-template-rows: auto minmax(76px, 1fr) auto !important;
+  }
+}
+
 </style>
 </head>
 
