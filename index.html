@@ -3200,6 +3200,35 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   border-bottom: 0 !important;
   box-shadow: none !important;
 }
+
+/* MASTER MUTE / LR BUTTON BAR: keep controls visible and easy to tap. */
+#tabMixerContent .mixer-desk-surface .master-strip .strip-action-buttons {
+  display:flex !important;
+  flex:0 0 auto !important;
+  width:100% !important;
+  min-height:36px !important;
+  gap:6px !important;
+  margin:6px 0 0 !important;
+  position:relative;
+  z-index:5;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .strip-action-buttons .console-action-btn {
+  display:flex !important;
+  flex:1 1 0 !important;
+  align-items:center !important;
+  justify-content:center !important;
+  min-width:0 !important;
+  min-height:36px !important;
+  padding:7px 3px !important;
+  font-size:10px !important;
+  line-height:1.2 !important;
+  touch-action:manipulation;
+  pointer-events:auto !important;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot input[type="range"] {
+  pointer-events:auto !important;
+  touch-action:none !important;
+}
 </style>
 </head>
 
@@ -4828,6 +4857,54 @@ document.querySelectorAll(".mixer-desk-surface .console-channel-strip").forEach(
     else strip.querySelector(".console-action-btn.solo").classList.toggle("active", mixerStripSolo[index]);
   });
 });
+
+/* MASTER LR TOUCH DRAG FIX: use pointer coordinates so mobile/tablet dragging is reliable. */
+(function enableMasterFaderPointerDrag() {
+  const masterStrip = document.querySelector("#tabMixerContent .master-strip");
+  const slider = masterStrip?.querySelector('.master-fader-row .fader-slot input[type="range"]');
+  if (!slider) return;
+  let drag = null;
+  const setFromY = (clientY) => {
+    const rect = slider.getBoundingClientRect();
+    if (!rect.height) return;
+    const min = Number(slider.min || 0);
+    const max = Number(slider.max || 100);
+    const step = Number(slider.step || 1);
+    const fraction = Math.max(0, Math.min(1, (rect.bottom - clientY) / rect.height));
+    const raw = min + fraction * (max - min);
+    const value = Math.max(min, Math.min(max, min + Math.round((raw - min) / step) * step));
+    if (value !== Number(slider.value)) {
+      slider.value = String(value);
+      slider.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  };
+  slider.addEventListener("pointerdown", (event) => {
+    if (event.button > 0 || slider.disabled) return;
+    event.preventDefault();
+    event.stopPropagation();
+    drag = { id: event.pointerId };
+    try { slider.setPointerCapture(event.pointerId); } catch (_) {}
+    setFromY(event.clientY);
+  }, { capture: true, passive: false });
+  slider.addEventListener("pointermove", (event) => {
+    if (!drag || event.pointerId !== drag.id) return;
+    event.preventDefault();
+    setFromY(event.clientY);
+  }, { capture: true, passive: false });
+  const finish = (event) => {
+    if (!drag || event.pointerId !== drag.id) return;
+    drag = null;
+    slider.dispatchEvent(new Event("change", { bubbles: true }));
+  };
+  slider.addEventListener("pointerup", finish, { capture: true });
+  slider.addEventListener("pointercancel", finish, { capture: true });
+  slider.addEventListener("lostpointercapture", finish, { capture: true });
+  window.addEventListener("blur", () => {
+    if (!drag) return;
+    drag = null;
+    slider.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+})();
 
 /* =========================================================
    DATABASE TFT INTERAKTIF SQ-7 STYLE
