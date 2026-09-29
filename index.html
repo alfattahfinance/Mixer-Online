@@ -3926,6 +3926,15 @@ function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed
     try { slider.setPointerCapture(event.pointerId); } catch (_) {}
   }, { capture: true, passive: false });
 
+  // Suppress the browser's synthetic click on the range: only our thumb drag may change it.
+  document.addEventListener("click", (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    const slider = target && target.closest('input.eq-range, .fader-slot input[type="range"]');
+    if (!slider) return;
+    event.preventDefault();
+    event.stopPropagation();
+  }, { capture: true });
+
   document.addEventListener("pointermove", (event) => {
     if (!active || event.pointerId !== active.pointerId) return;
     event.preventDefault();
