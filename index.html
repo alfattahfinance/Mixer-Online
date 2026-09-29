@@ -3114,6 +3114,10 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   }
 }
 
+/* Compressor control handles must remain hit-testable and stable while dragging. */
+#tabMixerContent #tftContentArea #tftCompSvgContainer { touch-action:none; overflow:visible; }
+#tabMixerContent #tftContentArea #tftCompSvgContainer circle { pointer-events:all; cursor:grab; }
+#tabMixerContent #tftContentArea #tftCompSvgContainer circle:active { cursor:grabbing; }
 </style>
 </head>
 
@@ -5187,7 +5191,7 @@ function applyTftGraphPointToControl(key, pointIndex, x, y) {
     const el = document.getElementById(id);
     if (!el) return;
     el.value = String(value);
-    el.dispatchEvent(new Event("input", { bubbles: true }));
+    const inputEvent = new Event("input", { bubbles: true }); inputEvent.__fromCurveDrag = true; el.dispatchEvent(inputEvent);
   };
   if (key === "gate") {
     if (pointIndex === 1) setRange("gateThresh", clamp((x-15)/280*80-80,-80,0));
@@ -5206,6 +5210,8 @@ function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback) {
   dotElement.dataset.dragReady = "1";
   dotElement.style.touchAction = "none";
   dotElement.style.cursor = "grab";
+  dotElement.style.pointerEvents = "all";
+  dotElement.style.userSelect = "none";
   if (dotElement.tagName.toLowerCase() === "circle") dotElement.setAttribute("r", "5.5");
   dotElement.setAttribute("tabindex", "0");
   dotElement.setAttribute("role", "slider");
@@ -5289,11 +5295,12 @@ function bindTftDynamicEventListeners(key) {
   if (moduleRoot && !moduleRoot.dataset.curveSyncBound) {
     moduleRoot.dataset.curveSyncBound = "1";
     ["input", "change", "click"].forEach(type => {
-      moduleRoot.addEventListener(type, () => {
+      moduleRoot.addEventListener(type, (event) => {
         const keyNow = activeCurrentSectionKey;
         if (keyNow === "eq") updateTftPeqVisuals();
         else updateTftModuleCurve(keyNow);
-        refreshTftInfoPanel(keyNow);
+        // Synthetic range inputs from graph dragging must not replace the SVG mid-gesture.
+        if (!event.__fromCurveDrag) refreshTftInfoPanel(keyNow);
         persistTftState();
       });
     });
