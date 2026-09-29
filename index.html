@@ -3439,7 +3439,8 @@ let masterStereoMeterFrame = null;
 
 function updateMasterStereoMeters() {
   if (!audioGraphReady || !masterStereoAnalysers.every(Boolean)) {
-    masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
+    updateTftMetersFromAudio();
+  masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
     return;
   }
   masterStereoAnalysers.forEach((analyser, channel) => {
@@ -3473,6 +3474,34 @@ function readMeterDb(analyser) {
   return rms > 0 ? 20 * Math.log10(rms) : -72;
 }
 
+// Live TFT meter/RTA values read from the active Web Audio graph.
+let tftMeterPeakDb = [-72, -72];
+function updateTftMetersFromAudio() {
+  const root = document.getElementById('tftContentArea');
+  if (!root || root.dataset.pageKey !== 'meters') return;
+  const s = tftStatesData.meters;
+  const left = s.source === 0 ? masterStereoAnalysers[0] : mixerStripAnalysers[0];
+  const right = s.source === 0 ? masterStereoAnalysers[1] : mixerStripAnalysers[1];
+  [left, right].forEach((analyser, i) => {
+    const db = analyser ? readMeterDb(analyser) : -72;
+    if (s.hold === 0 || db >= tftMeterPeakDb[i]) tftMeterPeakDb[i] = db;
+    const bar = root.querySelectorAll('.tft-digital-meter .meter-track i')[i];
+    const label = root.querySelectorAll('.tft-digital-meter strong')[i];
+    if (bar) bar.style.height = Math.max(0, Math.min(100, (db + 60) / 60 * 100)) + '%';
+    if (label) label.textContent = db <= -71 ? '-∞ dB' : db.toFixed(1) + ' dB';
+  });
+  const spectrum = root.querySelector('.tft-spectrum');
+  if (spectrum) {
+    const bars = spectrum.children;
+    if (left && left.getByteFrequencyData) {
+      const bins = new Uint8Array(left.frequencyBinCount); left.getByteFrequencyData(bins);
+      for (let i = 0; i < bars.length; i++) {
+        const idx = Math.min(bins.length - 1, Math.floor(Math.pow(i / Math.max(1, bars.length - 1), 2) * (bins.length - 1)));
+        bars[i].style.height = Math.max(2, Math.min(100, bins[idx] * s.zoom / 2.5)) + '%';
+      }
+    } else Array.from(bars).forEach(bar => bar.style.height = '2%');
+  }
+}
 const meterLevelState = new WeakMap();
 function paintMeter(container, db, direction) {
   if (!container) return;
@@ -4761,7 +4790,7 @@ const tftDatabase = {
     <div class="tft-info-note">Choose a scene, then use Store and Recall Safe controls below.</div>
   </div>
         <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>Active Scene</label><select id="sceneActiveSel"><option ${s.active===0?'selected':''}>#01 Live Stage</option><option ${s.active===1?'selected':''}>#02 Acoustic</option></select></div>
+          <div class="tft-mod-ctrl"><label>Active Scene</label><select id="sceneActiveSel"><option value="0" ${s.active===0?'selected':''}>#01 Live Stage</option><option value="1" ${s.active===1?'selected':''}>#02 Acoustic</option><option value="2" ${s.active===2?'selected':''}>#03 Scene 3</option><option value="3" ${s.active===3?'selected':''}>#04 Scene 4</option></select></div>
           <div class="tft-mod-ctrl"><label>Store Scene</label><button id="sceneStoreBtn" type="button">STORE</button></div>
           <div class="tft-mod-ctrl"><label>Recall Scene</label><button id="sceneRecallBtn" type="button">RECALL</button></div>
           <div class="tft-mod-ctrl"><label>Recall Safe</label><button id="sceneSafeBtn" class="${s.safe ? 'active-action' : ''}" type="button">${s.safe ? 'SAFE ON' : 'SAFE OFF'}</button></div>
@@ -5173,7 +5202,7 @@ function bindTftDynamicEventListeners(key) {
       const storeBtn = document.getElementById("sceneStoreBtn");
       const recallBtn = document.getElementById("sceneRecallBtn");
       const safeBtn = document.getElementById("sceneSafeBtn");
-      actSel?.addEventListener("change", () => { s.active = actSel.selectedIndex; s.stored = Boolean(tftSceneSnapshots[s.active]); updateEncoders(tftDatabase.scenes.encoders(s)); });
+      actSel?.addEventListener("change", () => { s.active = Number(actSel.value); s.stored = Boolean(tftSceneSnapshots[s.active]); updateEncoders(tftDatabase.scenes.encoders(s)); refreshTftInfoPanel("scenes"); });
       storeBtn?.addEventListener("click", () => {
         tftSceneSnapshots[s.active] = JSON.parse(JSON.stringify(tftStatesData));
         s.stored = true;
