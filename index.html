@@ -436,7 +436,7 @@ header, .topbar {
 
 .fader-readout { font-size: 9px; font-family: monospace; color: #7dd3fc; margin: 2px 0; font-weight: 800; text-align: center; font-variant-numeric: tabular-nums; }
 .master-strip .fader-readout { color: #fbbf24; }
-.fader-slot .in-fader-readout { position:absolute; top:2px; left:50%; transform:translateX(-50%); z-index:3; margin:0; padding:1px 2px; max-width:calc(100% - 4px); font-size:7px; line-height:1.1; white-space:nowrap; border-radius:2px; background:rgba(8,13,22,.88); pointer-events:none; }
+.fader-slot .in-fader-readout { position:absolute; top:0; left:50%; transform:translateX(-50%); z-index:3; margin:0; padding:1px 2px; max-width:calc(100% - 4px); font-size:7px; line-height:1.1; white-space:nowrap; border-radius:2px; background:rgba(8,13,22,.88); pointer-events:none; }
 .mic-input-fader-area { gap:3px; }
 .hpf-fader-control { flex:0 0 27px; width:27px; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:3px; padding-top:3px; color:#94a3b8; font-size:7px; font-weight:800; }
 .hpf-fader-control label { font-size:7px; }
@@ -2596,9 +2596,8 @@ input[type="range"] { accent-color:#b8bec6 !important; }
               <div class="knob-row"><span>SOURCE</span><span>FILE / MP3</span></div>
               <div class="knob-row"><span>PLAYER</span><span>PLAY / STOP</span></div>
             </div>
-            <div class="fader-readout">0.0 dB</div>
             <div class="fader-panel-area">
-              <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="Audio MP3 channel level"></div>
+              <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="Audio MP3 channel level"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
               <div class="vert-led-meter" id="mixerMeter2"></div>
             </div>
             <div class="strip-action-buttons">
@@ -2613,9 +2612,8 @@ input[type="range"] { accent-color:#b8bec6 !important; }
               <div class="knob-row"><span>ROUTE</span><span>MAIN → FX</span></div>
               <div class="knob-row"><span>FX SEND</span><span>LEVEL</span></div>
             </div>
-            <div class="fader-readout">0.0 dB</div>
             <div class="fader-panel-area">
-              <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="FX send level"></div>
+              <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="FX send level"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
               <div class="vert-led-meter" id="mixerMeter3"></div>
             </div>
             <div class="strip-action-buttons">
