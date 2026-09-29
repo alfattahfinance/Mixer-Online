@@ -1467,6 +1467,21 @@ header, .topbar {
 #tabMixerContent .meter span.red.on,
 #tabMixerContent .tft-meter span.red.on { background:#ef4444 !important; box-shadow:0 0 5px rgba(239,68,68,.8); }
 
+
+/* METER COLOR + ACTIVITY OVERRIDE: explicit per-segment active colors */
+#tabMixerContent .vert-led-meter span.green.on,
+#tabMixerContent .master-led-meter span.green.on { background:#10b981 !important; box-shadow:0 0 3px rgba(16,185,129,.85) !important; }
+#tabMixerContent .vert-led-meter span.mint.on,
+#tabMixerContent .master-led-meter span.mint.on { background:#34d399 !important; box-shadow:0 0 3px rgba(52,211,153,.85) !important; }
+#tabMixerContent .vert-led-meter span.lime.on,
+#tabMixerContent .master-led-meter span.lime.on { background:#a3e635 !important; box-shadow:0 0 3px rgba(163,230,53,.8) !important; }
+#tabMixerContent .vert-led-meter span.yellow.on,
+#tabMixerContent .master-led-meter span.yellow.on { background:#facc15 !important; box-shadow:0 0 4px rgba(250,204,21,.85) !important; }
+#tabMixerContent .vert-led-meter span.orange.on,
+#tabMixerContent .master-led-meter span.orange.on { background:#fb923c !important; box-shadow:0 0 4px rgba(251,146,60,.85) !important; }
+#tabMixerContent .vert-led-meter span.red.on,
+#tabMixerContent .master-led-meter span.red.on { background:#ef4444 !important; box-shadow:0 0 5px rgba(239,68,68,.9) !important; }
+
 </style>
 </head>
 
@@ -1943,31 +1958,13 @@ function updateMasterStereoMeters() {
     return;
   }
   masterStereoAnalysers.forEach((analyser, channel) => {
-    const data = masterStereoMeterBuffers[channel];
-    analyser.getFloatTimeDomainData(data);
-    let sum = 0;
-    for (let i = 0; i < data.length; i++) sum += data[i] * data[i];
-    const rms = Math.sqrt(sum / data.length);
-    const db = rms > 0 ? 20 * Math.log10(rms) : -72;
-    const level = Math.max(0, Math.min(16, Math.round((db + 54) / 54 * 16)));
+    const db = readMeterDb(analyser);
     const meter = document.getElementById(channel === 0 ? "masterMeterL" : "masterMeterR");
-    if (!meter) return;
-    Array.from(meter.children).forEach((segment, index) => {
-      segment.classList.toggle("on", index >= 16 - level);
-    });
+    paintMeter(meter, db, "vertical");
   });
   if (masterMeterAnalyser) {
-    const combinedData = masterStereoMeterBuffers[0];
-    masterMeterAnalyser.getFloatTimeDomainData(combinedData);
-    let combinedSum = 0;
-    for (let i = 0; i < combinedData.length; i++) combinedSum += combinedData[i] * combinedData[i];
-    const combinedRms = Math.sqrt(combinedSum / combinedData.length);
-    const combinedDb = combinedRms > 0 ? 20 * Math.log10(combinedRms) : -72;
-    const combinedLevel = Math.max(0, Math.min(16, Math.round((combinedDb + 54) / 54 * 16)));
-    const combinedMeter = document.getElementById("masterMeterCombined");
-    if (combinedMeter) Array.from(combinedMeter.children).forEach((segment, index) => {
-      segment.classList.toggle("on", index >= 16 - combinedLevel);
-    });
+    const db = readMeterDb(masterMeterAnalyser);
+    paintMeter(document.getElementById("masterMeterCombined"), db, "vertical");
   }
   masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
 }
@@ -1989,13 +1986,19 @@ function paintMeter(container, db, direction) {
   if (!container) return;
   const leds = Array.from(container.children);
   if (!leds.length) return;
+  // Calibrated LED ladder: quietest green at the bottom/left, progressively
+  // brighter green, yellow-green, yellow, orange, then red at the top/right.
   const litCount = Math.max(0, Math.min(leds.length, Math.round((db + 54) / 54 * leds.length)));
   leds.forEach((led, index) => {
+    const position = direction === "horizontal" ? index : (leds.length - 1 - index);
+    const t = leds.length <= 1 ? 1 : position / (leds.length - 1);
+    const colorClass = t >= .92 ? "red" : t >= .82 ? "orange" : t >= .70 ? "yellow" : t >= .56 ? "lime" : t >= .40 ? "mint" : "green";
+    led.classList.remove("green", "mint", "lime", "yellow", "orange", "red");
+    led.classList.add(colorClass);
     const isLit = direction === "horizontal" ? index < litCount : index >= leds.length - litCount;
     led.classList.toggle("on", isLit);
   });
 }
-
 function updateAllSignalMeters() {
   mixerStripAnalysers.forEach((analyser, index) => {
     if (!analyser) return;
