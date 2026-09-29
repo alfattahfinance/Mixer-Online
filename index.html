@@ -2188,13 +2188,16 @@ function paintMeter(container, db, direction) {
   if (!leds.length) return;
 
   // Smooth fast attack and gentle release so LEDs follow audio without flicker.
-  const target = Math.max(0, Math.min(1, (db + 48) / 54));
+  // Use a wider practical range so quiet signals are visible; faster attack and smooth release.
+  const target = Math.max(0, Math.min(1, (db + 60) / 66));
   const previous = meterLevelState.get(container) ?? 0;
   const smoothed = target > previous
-    ? previous + (target - previous) * 0.68
-    : previous + (target - previous) * 0.16;
+    ? previous + (target - previous) * 0.78
+    : previous + (target - previous) * 0.22;
   meterLevelState.set(container, smoothed);
-  const litCount = smoothed < 0.025 ? 0 : Math.max(1, Math.min(leds.length, Math.ceil(smoothed * leds.length)));
+  const litCount = db <= -60 || smoothed < 0.012
+    ? 0
+    : Math.max(1, Math.min(leds.length, Math.ceil(smoothed * leds.length)));
 
   leds.forEach((led, index) => {
     const vertical = direction !== "horizontal";
@@ -2802,13 +2805,16 @@ function initializeAudioGraph() {
   outputMergerNode.connect(tftPeqFilter);
   tftPeqFilter.connect(masterStripGainNode);
 
-  masterStripGainNode.connect(masterMeterAnalyser);
-  masterStripGainNode.connect(masterStereoSplitter);
+  // MAIN L/R meters read the signal after the master fader/gain.
+  masterStripGainNode.connect(masterGainNode);
+  masterGainNode.connect(masterStereoSplitter);
   masterStereoSplitter.connect(masterStereoAnalysers[0], 0);
   masterStereoSplitter.connect(masterStereoAnalysers[1], 1);
-  masterMeterAnalyser.connect(masterGainNode);
+
+  // Combined MASTER meter reads the final output after mute; analyser remains in the audio path.
   masterGainNode.connect(outputMuteGainNode);
-  outputMuteGainNode.connect(audioContext.destination);
+  outputMuteGainNode.connect(masterMeterAnalyser);
+  masterMeterAnalyser.connect(audioContext.destination);
 
   audioGraphReady = true;
   rebuildAudioRouting();
