@@ -3903,12 +3903,16 @@ function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed
 
     // Ignore track taps: block native range jump unless the visible thumb was pressed.
     const fraction = Math.max(0, Math.min(1, (value - min) / (max - min)));
-    const thumbY = rect.top + (1 - fraction) * rect.height;
-    const thumbX = rect.left + rect.width / 2;
     const isEq = slider.matches("input.eq-range");
+    // Range thumbs travel between the inner edges, not the full input bounds.
+    const thumbHalf = isEq ? 6.5 : 8;
+    const travel = Math.max(1, rect.height - thumbHalf * 2);
+    const thumbY = rect.bottom - thumbHalf - fraction * travel;
+    const thumbX = rect.left + rect.width / 2;
     const isTouch = event.pointerType === "touch";
-    const hitY = isTouch ? (isEq ? 25 : 29) : (isEq ? 10 : 12);
-    const hitX = isTouch ? (isEq ? 28 : 32) : (isEq ? 16 : 19);
+    // Tight vertical hit zone: tapping blank track above/below must never begin a drag.
+    const hitY = isTouch ? 12 : (isEq ? 8 : 9);
+    const hitX = isTouch ? (isEq ? 25 : 28) : (isEq ? 13 : 15);
     if (Math.abs(event.clientY - thumbY) > hitY || Math.abs(event.clientX - thumbX) > hitX) {
       event.preventDefault();
       event.stopPropagation();
