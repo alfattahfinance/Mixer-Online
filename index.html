@@ -5028,7 +5028,7 @@ const tftDatabase = {
         </div>
       </div>
     `,
-    encoders: (s) => [{name:"SCENE", val:s.active===0?"#01":"#02"}, {name:"RECALL", val:s.safe?"SAFE":"DIR"}, {name:"STORE", val:s.stored?"SAVED":"READY"}, {name:"SNIPPET", val:"ALL"}, {name:"USB SAVE", val:"READY"}, {name:"AUTO", val:"ON"}]
+    encoders: (s) => [{name:"SCENE", val:`#${String(s.active+1).padStart(2,"0")}`}, {name:"RECALL", val:s.safe?"SAFE":"DIR"}, {name:"STORE", val:s.stored?"SAVED":"READY"}, {name:"SNIPPET", val:"ALL"}, {name:"USB SAVE", val:"READY"}, {name:"AUTO", val:"ON"}]
   },
   setup: {
     title: "SQ-7 SYSTEM SETUP & HARDWARE",
@@ -5443,8 +5443,8 @@ function bindTftDynamicEventListeners(key) {
         try { localStorage.setItem('mixerOnlineTftScenes', JSON.stringify(tftSceneSnapshots)); } catch (err) { /* Storage may be disabled. */ }
         s.stored = true;
         storeBtn.textContent = "STORED";
-        updateEncoders(tftDatabase.scenes.encoders(s));
-        refreshTftInfoPanel("scenes");
+        persistTftState();
+        loadTftPage("scenes");
       });
       recallBtn?.addEventListener("click", () => {
         const snapshot = tftSceneSnapshots[s.active];
@@ -5468,8 +5468,8 @@ function bindTftDynamicEventListeners(key) {
         }
         s.stored = true;
         recallBtn.textContent = "RECALLED";
-        updateEncoders(tftDatabase.scenes.encoders(s));
-        refreshTftInfoPanel("scenes");
+        persistTftState();
+        loadTftPage("scenes");
       });
       safeBtn?.addEventListener("click", () => { s.safe = !s.safe; safeBtn.textContent = s.safe ? "SAFE ON" : "SAFE OFF"; safeBtn.classList.toggle("active-action", s.safe); updateEncoders(tftDatabase.scenes.encoders(s)); });
     } else if (key === "setup") {
