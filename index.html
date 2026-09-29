@@ -2301,11 +2301,12 @@ input[type="range"] { accent-color:#b8bec6 !important; }
 #tabMixerContent .mixer-desk-surface { border:0 !important; }
 
 
-/* Show transfer/response curves only on pages where they communicate audio behavior */
+/* Only show real transfer/response curves on Gate and Compressor pages.
+   PEQ has its own dedicated response graph; utility/config/routing/GEQ pages
+   must not display placeholder curves or reserve a graph panel. */
 #tabMixerContent #tftContentArea .tft-module-graph-box { display:none !important; }
 #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
-#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
-#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box { display:block !important; }
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box { display:block !important; }
 
 
 /* Keep all four input strip tops aligned with the bottom edge of the TFT screen. */
@@ -3559,7 +3560,7 @@ let isAlesisFxEnabled = false;
 let outputMuted = false;
 
 let tftPeqFilter = null;
-let tftCurveActiveStates = { config: true, gate: true, dynamics: true, eq: true, sends: true, main: true, routing: true, meters: true, scenes: true, setup: true, effects: true };
+let tftCurveActiveStates = { config: false, gate: true, dynamics: true, eq: true, sends: false, main: false, routing: false, meters: false, scenes: false, setup: false, effects: false };
 let activeCurrentSectionKey = "eq";
 
 const tftStatesData = {
