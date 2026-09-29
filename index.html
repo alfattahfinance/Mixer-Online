@@ -3230,7 +3230,7 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   touch-action:none !important;
 }
 
-/* Widen channel and master LED indicators (width only; keep height behavior). */
+/* Match master LED bar dimensions to the channel indicators. */
 #tabMixerContent .mixer-desk-surface .console-channel-strip:not(.master-strip) .fader-panel-area > .vert-led-meter {
   flex: 0 0 16px !important; width:16px !important; min-width:16px !important;
   box-sizing:border-box !important; align-self:stretch !important; min-height:0 !important;
@@ -3239,9 +3239,12 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   flex-basis:52px !important; width:52px !important; min-width:52px !important;
   box-sizing:border-box !important; padding:4px !important; gap:4px !important;
 }
+#tabMixerContent .master-strip .master-meter-column {
+  min-width:0 !important; min-height:0 !important; align-self:stretch !important;
+}
 #tabMixerContent .master-strip .master-meter-column .master-led-meter {
-  width:14px !important; min-width:14px !important; box-sizing:border-box !important;
-  flex:1 1 0 !important; min-height:0 !important;
+  flex:1 1 0 !important; width:16px !important; min-width:16px !important;
+  max-width:16px !important; box-sizing:border-box !important; min-height:0 !important;
 }
 #tabMixerContent .master-strip .master-meter-column {
   min-width:0 !important; min-height:0 !important; align-self:stretch !important;
