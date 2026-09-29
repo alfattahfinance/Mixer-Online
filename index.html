@@ -802,6 +802,36 @@ header, .topbar {
   #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row { gap:4px; }
   #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot { min-width:20px; }
 }
+
+/* Match the L/R meter card width to the master fader assembly below */
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack {
+  flex:0 0 84px;
+  width:84px;
+  max-width:calc(100% - 12px);
+  align-self:center;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-stereo-meter-vertical {
+  width:100%;
+  flex:1 1 auto;
+  padding:4px 6px;
+  gap:5px;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-column {
+  flex:1 1 0;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row {
+  flex:1 1 0;
+  width:84px;
+  max-width:calc(100% - 12px);
+  align-self:center;
+}
+@media (max-width:700px) {
+  #tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack,
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row {
+    width:76px;
+    flex-basis:76px;
+  }
+}
 </style>
 </head>
 
