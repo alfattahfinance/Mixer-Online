@@ -3884,9 +3884,9 @@ function setStatus(msg) { const el = document.getElementById("status"); if (el) 
 function setAudioStatus(msg) { const el = document.getElementById("audioStatus"); if (el) el.textContent = msg; }
 function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed(1); }
 
-/* DRAG STABILIZER: start only from the visible fader cap; dampen travel */
+/* DRAG STABILIZER: all vertical faders only start from their visible cap */
 (function enableStableRangeDragging() {
-  const SENSITIVITY = 0.20; // dampened travel; normalized to each fader's actual track length
+  const SENSITIVITY = 0.14; // slower, finer travel to reduce jumps
   let active = null;
 
   document.addEventListener("pointerdown", (event) => {
@@ -3899,25 +3899,25 @@ function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed
     const value = Number(slider.value);
     if (!rect.height || max <= min) return;
 
-    // EQ slider occupies the full slot; accept touch only close to the current cap.
-    if (slider.matches("input.eq-range")) {
-      const fraction = (value - min) / (max - min);
-      const capY = rect.top + (1 - fraction) * rect.height;
-      const capX = rect.left + rect.width / 2;
-      if (Math.abs(event.clientY - capY) > 20 || Math.abs(event.clientX - capX) > 24) return;
+    // Ignore track taps: block native range jump unless the visible thumb was pressed.
+    const fraction = Math.max(0, Math.min(1, (value - min) / (max - min)));
+    const thumbY = rect.top + (1 - fraction) * rect.height;
+    const thumbX = rect.left + rect.width / 2;
+    const isEq = slider.matches("input.eq-range");
+    const hitY = isEq ? 10 : 12;
+    const hitX = isEq ? 16 : 19;
+    if (Math.abs(event.clientY - thumbY) > hitY || Math.abs(event.clientX - thumbX) > hitX) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
     }
 
     event.preventDefault();
     event.stopPropagation();
     active = {
-      slider,
-      pointerId: event.pointerId,
-      startCoord: event.clientY,
-      startValue: value,
-      min,
-      max,
-      step: Number(slider.step || 1),
-      length: rect.height
+      slider, pointerId: event.pointerId, startCoord: event.clientY,
+      startValue: value, min, max, step: Number(slider.step || 1),
+      length: Math.max(1, rect.height - (isEq ? 13 : 16))
     };
     try { slider.setPointerCapture(event.pointerId); } catch (_) {}
   }, { capture: true, passive: false });
@@ -3926,11 +3926,10 @@ function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed
     if (!active || event.pointerId !== active.pointerId) return;
     event.preventDefault();
     const rawDelta = active.startCoord - event.clientY;
-    const rangeTravel = (rawDelta / active.length) * (active.max - active.min) * SENSITIVITY;
-    const raw = active.startValue + rangeTravel;
+    const raw = active.startValue + (rawDelta / active.length) *
+      (active.max - active.min) * SENSITIVITY;
     const stepped = active.min + Math.round((raw - active.min) / active.step) * active.step;
     const next = Math.max(active.min, Math.min(active.max, stepped));
-
     if (next !== Number(active.slider.value)) {
       active.slider.value = String(next);
       active.slider.dispatchEvent(new Event("input", { bubbles: true }));
