@@ -1748,6 +1748,58 @@ button, .eq-action-button, .console-action-btn,
 #tabMixerContent .console-channel-strip .fader-slot::before {
   background:linear-gradient(90deg,#262b31,#aeb5bd,#262b31) !important;
 }
+
+/* SITE-WIDE GRAPHITE PALETTE — applies to every page/tab, not mixer-only */
+:root {
+  --ui-bg:#30343a;
+  --ui-surface:#3b4047;
+  --ui-card:#454b53;
+  --ui-card-deep:#363b42;
+  --ui-border:#737b84;
+  --ui-text:#e5e7eb;
+  --ui-muted:#c0c6cd;
+  --ui-control:#555b63;
+}
+body, #app, .app, main, .page, .page-content, .tab-content,
+.tab-pane, .content, .workspace, .view, .screen {
+  background-color:var(--ui-bg) !important;
+  color:var(--ui-text);
+}
+header, .topbar, .app-header, .page-header, .toolbar, .nav-bar {
+  background:linear-gradient(135deg,#555b63,#3b4047) !important;
+  color:var(--ui-text) !important;
+  border-color:#707780 !important;
+}
+[class*="card"], [class*="panel"], [class*="section"], [class*="module"],
+.rack, .channel, .control-row, .meter-area, .output-control,
+.echo-control-card, .esp32-panel-box, .rack-header {
+  background-color:var(--ui-card) !important;
+  border-color:var(--ui-border) !important;
+  color:var(--ui-text);
+}
+[class*="card"] [class*="card"], [class*="panel"] [class*="panel"],
+[class*="module"] [class*="module"] {
+  background-color:var(--ui-surface) !important;
+}
+button, .btn, [role="button"], .tab-btn, .mode-menu-trigger,
+.eq-action-button, .console-action-btn {
+  background-color:var(--ui-control);
+  color:#f3f4f6;
+  border-color:#858d96;
+}
+button:hover, .btn:hover, [role="button"]:hover {
+  border-color:#d1d5db;
+}
+input:not([type="range"]), textarea, select {
+  background-color:#343940 !important;
+  color:#f3f4f6 !important;
+  border-color:#7b838c !important;
+}
+label, small, .muted, .hint, .description, .subtitle {
+  color:var(--ui-muted);
+}
+hr, .divider, [class*="separator"] { border-color:var(--ui-border) !important; }
+
 /* Keep live signal LEDs vivid and distinguishable; this theme changes only their surrounding UI. */
 
   </style>
