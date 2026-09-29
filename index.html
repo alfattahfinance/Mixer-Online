@@ -2564,6 +2564,90 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   #tabMixerContent .tft-peq-head { flex-wrap: wrap; }
 }
 
+
+/* FINAL TFT GRAPH LAYOUT: every curve page fills the usable display, no gray blank panel or zoom. */
+#tabMixerContent .mixer-tft-screen,
+#tabMixerContent .tft-main-viewport,
+#tabMixerContent .tft-content-screen,
+#tabMixerContent #tftContentArea,
+#tabMixerContent #tftContentArea .tft-module-view {
+  background: #03070d !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+#tabMixerContent #tftContentArea .tft-module-view {
+  width: 100%;
+  height: 100%;
+  flex: 1 1 0;
+  gap: 3px;
+  overflow: hidden;
+}
+#tabMixerContent #tftContentArea[data-page-key] .tft-module-graph-box {
+  display: block !important;
+  flex: 1 1 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  padding: 0 !important;
+  box-sizing: border-box;
+  overflow: hidden;
+  background:
+    linear-gradient(rgba(56,189,248,.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56,189,248,.09) 1px, transparent 1px),
+    linear-gradient(180deg, #050b15 0%, #071525 100%) !important;
+  background-size: 10% 20%, 10% 20%, auto !important;
+  border: 1px solid #1e4058 !important;
+  border-radius: 4px !important;
+  touch-action: none;
+  overscroll-behavior: contain;
+  -webkit-user-select: none;
+  user-select: none;
+}
+#tabMixerContent #tftContentArea .tft-module-graph-box svg,
+#tabMixerContent #tftContentArea .tft-peq-graph svg {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  touch-action: none;
+}
+#tabMixerContent #tftContentArea .tft-peq {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto !important;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: #03070d !important;
+}
+#tabMixerContent #tftContentArea .tft-peq-graph {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  box-sizing: border-box;
+  touch-action: none;
+  overscroll-behavior: contain;
+  background: #050b15 !important;
+}
+#tabMixerContent #tftContentArea .tft-module-controls-grid,
+#tabMixerContent #tftContentArea .tft-peq-controls {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+#tabMixerContent #tftContentArea > * {
+  background-color: transparent;
+  min-width: 0;
+  max-width: 100%;
+}
+
 </style>
 </head>
 
