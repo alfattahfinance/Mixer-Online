@@ -3464,6 +3464,74 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   }
 }
 
+
+/* Align the master fader and its adjacent indicator as one clean, equal-height row. */
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row {
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:stretch !important;
+  justify-content:center !important;
+  gap:7px !important;
+  width:100% !important;
+  box-sizing:border-box !important;
+  padding:0 5px !important;
+  margin-top:18px !important;
+  min-width:0 !important;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row > .fader-slot {
+  position:relative !important;
+  flex:1 1 0 !important;
+  width:auto !important;
+  min-width:0 !important;
+  height:100% !important;
+  min-height:0 !important;
+  box-sizing:border-box !important;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row > .master-combined-wrap {
+  position:relative !important;
+  flex:0 0 36px !important;
+  width:36px !important;
+  min-width:36px !important;
+  max-width:36px !important;
+  height:100% !important;
+  min-height:0 !important;
+  margin:0 !important;
+  box-sizing:border-box !important;
+  align-self:stretch !important;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-combined-meter {
+  flex:1 1 0 !important;
+  width:24px !important;
+  min-width:24px !important;
+  max-width:24px !important;
+  height:auto !important;
+  min-height:0 !important;
+  margin:0 auto !important;
+  align-self:stretch !important;
+  box-sizing:border-box !important;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot input[type="range"] {
+  height:100% !important;
+  min-height:0 !important;
+}
+@media (max-width:700px) {
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row {
+    gap:5px !important;
+    padding:0 3px !important;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row > .master-combined-wrap {
+    flex-basis:32px !important;
+    width:32px !important;
+    min-width:32px !important;
+    max-width:32px !important;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-combined-meter {
+    width:20px !important;
+    min-width:20px !important;
+    max-width:20px !important;
+  }
+}
+
 </style>
 </head>
 
