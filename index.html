@@ -832,6 +832,72 @@ header, .topbar {
     flex-basis:76px;
   }
 }
+
+/* MASTER STRIP PROPORTION REFINEMENT — match meter card to fader assembly and avoid over-tall controls */
+@media (min-width:1200px) {
+  #tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack,
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row {
+    box-sizing:border-box;
+    width:84px;
+    max-width:calc(100% - 12px);
+    align-self:center;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack {
+    flex:0 0 118px;
+    height:118px;
+    min-height:118px;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row {
+    flex:0 0 auto;
+    height:clamp(250px, 40vh, 390px);
+    min-height:250px;
+    max-height:390px;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot,
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-combined-wrap {
+    min-height:0;
+    height:100%;
+  }
+}
+@media (min-width:701px) and (max-width:1199px) {
+  #tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack {
+    flex:0 0 94px;
+    height:94px;
+    min-height:94px;
+    width:76px;
+    box-sizing:border-box;
+    align-self:center;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row {
+    flex:0 0 auto;
+    height:clamp(190px, 34vh, 300px);
+    min-height:190px;
+    max-height:300px;
+    width:76px;
+    box-sizing:border-box;
+    align-self:center;
+  }
+}
+@media (max-width:700px) {
+  #tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack {
+    flex:0 0 76px;
+    width:76px;
+    height:88px;
+    min-height:88px;
+    box-sizing:border-box;
+    align-self:center;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row {
+    flex:0 0 auto;
+    width:76px;
+    height:clamp(175px, 30vh, 260px);
+    min-height:175px;
+    max-height:260px;
+    box-sizing:border-box;
+    align-self:center;
+  }
+}
+
 </style>
 </head>
 
