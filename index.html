@@ -1299,6 +1299,62 @@ header, .topbar {
   #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot::after { font-size:6px; left:1px; }
 }
 
+
+/* FIX SCALE: evenly spaced labels and visible tick marks in every fader lane */
+#tabMixerContent .mixer-desk-surface .fader-slot {
+  overflow:visible;
+  background-color:rgba(148,163,184,.08);
+  background-image:none;
+}
+#tabMixerContent .mixer-desk-surface .fader-slot::after { content:none !important; display:none !important; }
+#tabMixerContent .mixer-desk-surface .fader-slot .fader-scale {
+  position:absolute;
+  z-index:1;
+  left:2px;
+  top:5%;
+  bottom:5%;
+  width:16px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  align-items:flex-start;
+  color:rgba(226,232,240,.78);
+  font:600 6px/1 ui-monospace,monospace;
+  pointer-events:none;
+}
+#tabMixerContent .mixer-desk-surface .fader-slot .fader-ticks {
+  position:absolute;
+  z-index:1;
+  left:0;
+  right:0;
+  top:5%;
+  bottom:5%;
+  pointer-events:none;
+  background:repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(12.5% - 1px),
+    rgba(226,232,240,.32) calc(12.5% - 1px),
+    rgba(226,232,240,.32) 12.5%
+  );
+}
+#tabMixerContent .mixer-desk-surface .fader-slot::before {
+  z-index:1;
+  left:50%;
+  transform:translateX(-50%);
+  pointer-events:none;
+}
+#tabMixerContent .mixer-desk-surface .fader-slot input[type="range"] { z-index:2; }
+#tabMixerContent .mixer-desk-surface .fader-slot .fader-scale span {
+  display:block;
+  line-height:1;
+  white-space:nowrap;
+}
+@media(max-width:700px) {
+  #tabMixerContent .mixer-desk-surface .fader-slot .fader-scale { font-size:5px; left:1px; width:13px; }
+  #tabMixerContent .mixer-desk-surface .fader-slot .fader-ticks { background:repeating-linear-gradient(to bottom,transparent 0,transparent calc(12.5% - 1px),rgba(226,232,240,.28) calc(12.5% - 1px),rgba(226,232,240,.28) 12.5%); }
+}
+
 </style>
 </head>
 
@@ -1585,7 +1641,7 @@ header, .topbar {
             </div>
             <div class="fader-readout">0.0 dB</div>
             <div class="fader-panel-area">
-              <div class="fader-slot"><input type="range" min="-40" max="10" step="0.5" value="0"></div>
+              <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0"></div>
               <div class="vert-led-meter" id="mixerMeter1"></div>
             </div>
             <div class="strip-action-buttons">
@@ -1602,7 +1658,7 @@ header, .topbar {
             </div>
             <div class="fader-readout">0.0 dB</div>
             <div class="fader-panel-area">
-              <div class="fader-slot"><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="Audio MP3 channel level"></div>
+              <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="Audio MP3 channel level"></div>
               <div class="vert-led-meter" id="mixerMeter2"></div>
             </div>
             <div class="strip-action-buttons">
@@ -1619,7 +1675,7 @@ header, .topbar {
             </div>
             <div class="fader-readout">0.0 dB</div>
             <div class="fader-panel-area">
-              <div class="fader-slot"><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="FX send level"></div>
+              <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="FX send level"></div>
               <div class="vert-led-meter" id="mixerMeter3"></div>
             </div>
             <div class="strip-action-buttons">
@@ -1636,7 +1692,7 @@ header, .topbar {
             </div>
             <div class="fader-readout">0.0 dB</div>
             <div class="fader-panel-area">
-              <div class="fader-slot"><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="FX return level"></div>
+              <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="FX return level"></div>
               <div class="vert-led-meter" id="mixerMeter4"></div>
             </div>
             <div class="strip-action-buttons">
@@ -1660,7 +1716,7 @@ header, .topbar {
                 </div>
               </div>
               <div class="master-fader-row">
-                <div class="fader-slot"><input type="range" min="-50" max="6" step="0.5" value="0" aria-label="Master LR fader"></div>
+                <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-50" max="6" step="0.5" value="0" aria-label="Master LR fader"></div>
                 <div class="master-combined-wrap"><span>MASTER</span><div class="vert-led-meter master-led-meter master-combined-meter" id="masterMeterCombined"></div></div>
               </div>
             </div>
