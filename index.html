@@ -2934,7 +2934,7 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box { min-height:88px !important; }
 }
 /* PAGE SEMANTICS: no curve canvas or empty plotting area on non-curve pages. */
-#tabMixerContent #tftContentArea:not([data-page-key="gate"]):not([data-page-key="dynamics"]) .tft-module-graph-box { display:none !important; }
+#tabMixerContent #tftContentArea:not([data-page-key="gate"]):not([data-page-key="dynamics"]):not([data-page-key="sends"]) .tft-module-graph-box { display:none !important; }
 #tabMixerContent #tftContentArea .tft-info-panel {
   flex:1 1 auto !important; min-height:0 !important; height:auto !important;
   background:linear-gradient(145deg,#070b12 0%,#0b111b 52%,#05080e 100%) !important;
@@ -5267,7 +5267,7 @@ function loadTftPage(key) {
   tftFooterStatus.textContent = data.footerSt;
   updateEncoders(typeof data.encoders === 'function' ? data.encoders(s) : data.encoders);
 
-  const isCurvePage = key === "eq" || key === "gate" || key === "dynamics";
+  const isCurvePage = key === "eq" || key === "gate" || key === "dynamics" || key === "sends";
   tftCurveToggleBtn.hidden = !isCurvePage;
   tftCurveToggleBtn.setAttribute("aria-hidden", String(!isCurvePage));
   const isActive = tftCurveActiveStates[key] !== false;
