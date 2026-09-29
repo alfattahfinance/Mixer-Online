@@ -3007,6 +3007,50 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   flex-shrink: 0;
 }
 
+
+/* Landscape tablet/desktop: curve viewports scale in BOTH axes, not width alone.
+   Keep graph height tied to the available viewport while preserving room for controls. */
+@media (orientation: landscape) and (min-width: 700px) {
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+  #tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box {
+    flex: 0 1 auto !important;
+    height: clamp(140px, 34vh, 390px) !important;
+    min-height: clamp(140px, 34vh, 390px) !important;
+    max-height: min(48vh, 390px) !important;
+    width: 100% !important;
+  }
+  #tabMixerContent #tftContentArea .tft-peq {
+    grid-template-rows: auto minmax(clamp(150px, 38vh, 420px), 1fr) auto !important;
+    min-height: 0 !important;
+  }
+  #tabMixerContent #tftContentArea .tft-peq-graph {
+    height: 100% !important;
+    min-height: clamp(150px, 38vh, 420px) !important;
+    max-height: min(52vh, 420px) !important;
+    width: 100% !important;
+  }
+  #tabMixerContent .eq-response-svg {
+    height: clamp(44px, 7vh, 88px) !important;
+  }
+}
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 560px) {
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+  #tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box {
+    height: clamp(112px, 28vh, 180px) !important;
+    min-height: clamp(112px, 28vh, 180px) !important;
+    max-height: 34vh !important;
+  }
+  #tabMixerContent #tftContentArea .tft-peq {
+    grid-template-rows: auto minmax(clamp(112px, 30vh, 190px), 1fr) auto !important;
+  }
+  #tabMixerContent #tftContentArea .tft-peq-graph {
+    min-height: clamp(112px, 30vh, 190px) !important;
+    max-height: 36vh !important;
+  }
+}
+
 </style>
 </head>
 
