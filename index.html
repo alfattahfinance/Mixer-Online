@@ -3752,6 +3752,8 @@ const tftStatesData = {
   effects: { delay: 0.3, feedback: 0.4, active: true, dot1X: 80, dot1Y: 12, dot2X: 240, dot2Y: 24 }
 };
 
+const tftSceneSnapshots = Object.create(null);
+
 const audioFilesInput = document.getElementById("audioFilesInput");
 const playlistContainer = document.getElementById("playlistContainer");
 const startMicButton = document.getElementById("startMicButton");
@@ -4716,6 +4718,7 @@ const tftDatabase = {
         <div class="tft-module-controls-grid">
           <div class="tft-mod-ctrl"><label>Active Scene</label><select id="sceneActiveSel"><option ${s.active===0?'selected':''}>#01 Live Stage</option><option ${s.active===1?'selected':''}>#02 Acoustic</option></select></div>
           <div class="tft-mod-ctrl"><label>Store Scene</label><button id="sceneStoreBtn" type="button">STORE</button></div>
+          <div class="tft-mod-ctrl"><label>Recall Scene</label><button id="sceneRecallBtn" type="button">RECALL</button></div>
           <div class="tft-mod-ctrl"><label>Recall Safe</label><button id="sceneSafeBtn" class="${s.safe ? 'active-action' : ''}" type="button">${s.safe ? 'SAFE ON' : 'SAFE OFF'}</button></div>
         </div>
       </div>
@@ -5122,11 +5125,27 @@ function bindTftDynamicEventListeners(key) {
     } else if (key === "scenes") {
       const actSel = document.getElementById("sceneActiveSel");
       const storeBtn = document.getElementById("sceneStoreBtn");
+      const recallBtn = document.getElementById("sceneRecallBtn");
       const safeBtn = document.getElementById("sceneSafeBtn");
-      actSel?.addEventListener("change", () => { s.active = actSel.selectedIndex; s.stored = false; updateEncoders(tftDatabase.scenes.encoders(s)); });
+      actSel?.addEventListener("change", () => { s.active = actSel.selectedIndex; s.stored = Boolean(tftSceneSnapshots[s.active]); updateEncoders(tftDatabase.scenes.encoders(s)); });
       storeBtn?.addEventListener("click", () => {
+        tftSceneSnapshots[s.active] = JSON.parse(JSON.stringify(tftStatesData));
         s.stored = true;
         storeBtn.textContent = "STORED";
+        updateEncoders(tftDatabase.scenes.encoders(s));
+        refreshTftInfoPanel("scenes");
+      });
+      recallBtn?.addEventListener("click", () => {
+        const snapshot = tftSceneSnapshots[s.active];
+        if (!snapshot) {
+          recallBtn.textContent = "EMPTY";
+          return;
+        }
+        Object.keys(snapshot).forEach(sectionKey => {
+          if (tftStatesData[sectionKey]) Object.assign(tftStatesData[sectionKey], snapshot[sectionKey]);
+        });
+        s.stored = true;
+        recallBtn.textContent = "RECALLED";
         updateEncoders(tftDatabase.scenes.encoders(s));
         refreshTftInfoPanel("scenes");
       });
