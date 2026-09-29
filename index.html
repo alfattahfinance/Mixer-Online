@@ -2648,6 +2648,36 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   max-width: 100%;
 }
 
+/* Keep curve handles round on wide TFTs: SVGs use non-uniform scaling to
+   fill the panel, so compensate the X stretch on the draggable nodes. */
+#tabMixerContent #tftContentArea .tft-peq-graph circle {
+  transform: scaleX(.42);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+#tabMixerContent #tftContentArea .tft-module-graph-box svg circle {
+  transform: scaleX(.72);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+/* Keep curves sized to the usable TFT area instead of forcing a zoom-like
+   full-height graph; leave room for the controls directly below. */
+#tabMixerContent #tftContentArea .tft-module-view {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+#tabMixerContent #tftContentArea .tft-module-graph-box {
+  flex: 0 1 clamp(76px, 44%, 148px) !important;
+  height: clamp(76px, 44%, 148px) !important;
+  min-height: 76px !important;
+  max-height: 148px !important;
+}
+#tabMixerContent #tftContentArea .tft-peq {
+  grid-template-rows: auto minmax(76px, 1fr) auto !important;
+}
+
 </style>
 </head>
 
