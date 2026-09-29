@@ -942,6 +942,119 @@ header, .topbar {
   }
 }
 
+
+
+/* MASTER L/R FINAL LAYOUT — stacked meters above a shorter master fader */
+#tabMixerContent .mixer-desk-surface .master-strip .fader-panel-area {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  flex:1 1 0;
+  min-height:0;
+  gap:6px;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack {
+  order:0;
+  box-sizing:border-box;
+  flex:0 0 148px;
+  width:84px;
+  max-width:calc(100% - 12px);
+  height:148px;
+  min-height:148px;
+  align-self:center;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-stereo-meter-vertical {
+  display:flex;
+  flex:1 1 auto;
+  width:100%;
+  height:100%;
+  min-height:0;
+  flex-direction:row;
+  align-items:stretch;
+  justify-content:center;
+  gap:5px;
+  padding:4px 6px;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-column {
+  display:flex;
+  flex:1 1 0;
+  min-width:0;
+  min-height:0;
+  flex-direction:column;
+  align-items:center;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-column .master-led-meter {
+  display:flex;
+  flex:1 1 0;
+  width:10px;
+  height:auto;
+  min-height:0;
+  flex-direction:column;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row {
+  order:1;
+  box-sizing:border-box;
+  display:flex;
+  flex:0 0 290px;
+  width:84px;
+  max-width:calc(100% - 12px);
+  height:290px;
+  min-height:0;
+  max-height:none;
+  align-self:center;
+  align-items:stretch;
+  justify-content:center;
+  gap:5px;
+  margin:0;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot {
+  flex:1 1 0;
+  width:auto;
+  min-width:24px;
+  max-width:none;
+  height:100%;
+  min-height:0;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-combined-wrap {
+  flex:0 0 10px;
+  height:100%;
+  min-height:0;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-combined-meter {
+  flex:1 1 0;
+  width:8px;
+  height:auto;
+  min-height:0;
+  flex-direction:column;
+}
+@media (min-width:701px) and (max-width:1199px) {
+  #tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack {
+    flex-basis:126px;
+    height:126px;
+    min-height:126px;
+    width:76px;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row {
+    flex-basis:220px;
+    width:76px;
+    height:220px;
+  }
+}
+@media (max-width:700px) {
+  #tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack {
+    flex-basis:112px;
+    width:76px;
+    height:112px;
+    min-height:112px;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row {
+    flex-basis:190px;
+    width:76px;
+    height:190px;
+  }
+}
+
 </style>
 </head>
 
