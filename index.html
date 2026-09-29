@@ -2838,6 +2838,50 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   border-color: rgba(32,216,255,.3) !important;
 }
 
+
+/* Non-curve TFT pages use purpose-built panels instead of blank graph canvases. */
+#tabMixerContent #tftContentArea .tft-info-panel {
+  flex: 1 1 auto !important; width:100%; min-width:0; min-height:0;
+  box-sizing:border-box; padding:clamp(7px,1.2vw,14px);
+  display:flex; flex-direction:column; justify-content:center; gap:clamp(7px,1.2vh,14px);
+  color:#dbeafe; background:radial-gradient(ellipse at 50% 0%,#101d2c 0%,#050a12 72%) !important;
+  border:1px solid rgba(56,189,248,.2); border-radius:4px; overflow:auto;
+  overscroll-behavior:contain; -webkit-overflow-scrolling:touch;
+}
+#tabMixerContent #tftContentArea .tft-info-heading {font-size:clamp(8px,1vw,12px);font-weight:800;letter-spacing:.09em;color:#7dd3fc;border-bottom:1px solid #20364a;padding-bottom:6px;}
+#tabMixerContent #tftContentArea .tft-info-cards {display:grid;grid-template-columns:repeat(auto-fit,minmax(95px,1fr));gap:6px;}
+#tabMixerContent #tftContentArea .tft-info-card {min-width:0;padding:clamp(6px,1vw,12px);background:linear-gradient(180deg,#101b29,#080e17);border:1px solid #26394d;border-radius:4px;display:flex;flex-direction:column;gap:5px;}
+#tabMixerContent #tftContentArea .tft-info-card small {font-size:clamp(6px,.7vw,9px);color:#94a3b8;font-weight:700;}
+#tabMixerContent #tftContentArea .tft-info-card strong {font-size:clamp(10px,1.4vw,17px);color:#e2e8f0;font-family:monospace;}
+#tabMixerContent #tftContentArea .tft-info-card em {font-size:clamp(6px,.7vw,9px);color:#64748b;font-style:normal;}
+#tabMixerContent #tftContentArea .tft-info-note {font-size:clamp(7px,.8vw,10px);color:#7890a8;line-height:1.4;}
+#tabMixerContent #tftContentArea .tft-signal-flow {display:flex;align-items:center;justify-content:center;gap:clamp(3px,.7vw,10px);flex-wrap:wrap;}
+#tabMixerContent #tftContentArea .tft-signal-flow span {padding:7px 9px;background:#0b1725;border:1px solid #27506b;border-radius:3px;color:#bae6fd;font-size:clamp(6px,.75vw,10px);font-weight:800;text-align:center;}
+#tabMixerContent #tftContentArea .tft-signal-flow b {color:#38bdf8;font-size:12px;}
+#tabMixerContent #tftContentArea .tft-patch-grid {display:grid;grid-template-columns:minmax(75px,1.5fr) repeat(3,minmax(42px,1fr));gap:3px;align-items:stretch;}
+#tabMixerContent #tftContentArea .patch-head,#tabMixerContent #tftContentArea .patch-label,#tabMixerContent #tftContentArea .patch-cell {padding:clamp(4px,.7vw,8px);border:1px solid #26394d;background:#0b1420;font-size:clamp(6px,.75vw,10px);text-align:center;}
+#tabMixerContent #tftContentArea .patch-head {color:#7dd3fc;font-weight:800;background:#101e2d;}
+#tabMixerContent #tftContentArea .patch-label {text-align:left;color:#cbd5e1;}
+#tabMixerContent #tftContentArea .patch-cell {color:#526477;font-size:12px;}
+#tabMixerContent #tftContentArea .patch-cell.active {color:#34d399;background:#0d2928;text-shadow:0 0 7px #10b981;}
+#tabMixerContent #tftContentArea .tft-meter-overview {display:flex;align-items:stretch;justify-content:center;gap:clamp(10px,3vw,35px);min-height:0;flex:1;}
+#tabMixerContent #tftContentArea .tft-digital-meter {display:flex;flex-direction:column;align-items:center;gap:5px;color:#94a3b8;font-size:8px;}
+#tabMixerContent #tftContentArea .meter-track {height:clamp(45px,12vh,100px);width:12px;background:#07101b;border:1px solid #26394d;display:flex;align-items:flex-end;overflow:hidden;}
+#tabMixerContent #tftContentArea .meter-track i {display:block;width:100%;background:linear-gradient(to top,#10b981 0 65%,#facc15 65% 86%,#ef4444 86%);box-shadow:0 0 6px #10b981;}
+#tabMixerContent #tftContentArea .tft-digital-meter strong {font-family:monospace;color:#cbd5e1;font-size:8px;}
+#tabMixerContent #tftContentArea .tft-spectrum {display:flex;align-items:flex-end;gap:3px;flex:1;max-width:65%;height:100%;min-height:55px;padding:5px;background:#070e18;border:1px solid #22364a;}
+#tabMixerContent #tftContentArea .tft-spectrum div {flex:1;min-width:2px;background:linear-gradient(to top,#0d9488,#22d3ee 72%,#facc15);box-shadow:0 0 4px rgba(34,211,238,.2);}
+#tabMixerContent #tftContentArea .tft-scene-list {display:flex;flex-direction:column;gap:4px;}
+#tabMixerContent #tftContentArea .tft-scene-row {display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:8px;padding:6px 9px;background:#0a121d;border:1px solid #26394d;border-radius:3px;color:#cbd5e1;font-size:clamp(7px,.85vw,11px);}
+#tabMixerContent #tftContentArea .tft-scene-row b {color:#7dd3fc;font-family:monospace;}
+#tabMixerContent #tftContentArea .tft-scene-row small {color:#64748b;font-size:7px;}
+#tabMixerContent #tftContentArea .tft-scene-row.selected {border-color:#0ea5e9;background:#0b2030;}
+@media (max-width:520px) {
+ #tabMixerContent #tftContentArea .tft-info-panel {padding:6px;gap:6px;}
+ #tabMixerContent #tftContentArea .tft-info-cards {grid-template-columns:repeat(2,minmax(0,1fr));}
+ #tabMixerContent #tftContentArea .tft-signal-flow span {padding:5px;}
+}
+
 </style>
 </head>
 
@@ -4351,18 +4395,15 @@ const tftDatabase = {
     footerSt: "Next: Gain & Phantom Setting",
     content: (s) => `
       <div class="tft-module-view">
-        <div class="tft-module-graph-box" id="tftConfigBox">
-          <svg id="tftConfigSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
-            <g stroke="#334155" stroke-width=".7" opacity=".6">
-              <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
-              <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
-            </g>
-            <path id="tftConfigSvgCurve" d="M10 50 Q ${s.dotX} ${s.dotY}, 310 15" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftConfigSvgFill" d="M10 50 Q ${s.dotX} ${s.dotY}, 310 15 L310 65 L10 65 Z" fill="#0284c7" opacity=".15"/>
-            <circle id="tftConfigDot1" cx="${s.dotX}" cy="${s.dotY}" r="7" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Preamp Gain Point"/>
-            <text x="12" y="12" fill="#94a3b8" font-size="6.5">PREAMP GAIN CURVE (1 Point)</text>
-          </svg>
-        </div>
+        <div class="tft-info-panel" id="tftConfigInfo">
+    <div class="tft-info-heading">PREAMP / INPUT STATUS</div>
+    <div class="tft-info-cards">
+      <div class="tft-info-card"><small>ANALOG GAIN</small><strong>+${s.gain} dB</strong><em>Input trim</em></div>
+      <div class="tft-info-card"><small>PHANTOM POWER</small><strong>${s.phantom ? '48V ON' : 'OFF'}</strong><em>Condenser mic supply</em></div>
+      <div class="tft-info-card"><small>PHASE</small><strong>${s.phase ? 'INVERTED' : 'NORMAL'}</strong><em>Polarity</em></div>
+    </div>
+    <div class="tft-info-note">Select an input channel, then adjust gain and hardware options below.</div>
+  </div>
         <div class="tft-module-controls-grid">
           <div class="tft-mod-ctrl"><label>Analog Gain</label><input type="range" id="cfgGain" min="0" max="60" value="${s.gain}"><span class="tft-val-disp" id="cfgGainVal">${s.gain}dB</span></div>
           <div class="tft-mod-ctrl"><label>Phantom 48V</label><button id="cfgPhantomBtn" class="${s.phantom ? 'active-action' : ''}" type="button">${s.phantom ? 'ON' : 'OFF'}</button></div>
@@ -4525,18 +4566,15 @@ const tftDatabase = {
     footerSt: "Next: External FX / Limiter Insert",
     content: (s) => `
       <div class="tft-module-view">
-        <div class="tft-module-graph-box" id="tftMainBox">
-          <svg id="tftMainSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
-            <g stroke="#334155" stroke-width=".7" opacity=".6">
-              <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
-              <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
-            </g>
-            <path id="tftMainSvgCurve" d="M10 35 Q ${s.dot1X} ${s.dot1Y}, 310 35" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftMainSvgFill" d="M10 35 Q ${s.dot1X} ${s.dot1Y}, 310 35 L 310 65 L 10 65 Z" fill="#ef4444" opacity=".12"/>
-            <circle id="tftMainDot1" cx="${s.dot1X}" cy="${s.dot1Y}" r="7" fill="#fee2e2" stroke="#ef4444" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Send Peak Point"/>
-            <text x="12" y="12" fill="#94a3b8" font-size="6.5">INSERT ROUTING VIEW (Point)</text>
-          </svg>
-        </div>
+        <div class="tft-info-panel" id="tftInsertInfo">
+    <div class="tft-info-heading">INSERT / FX SIGNAL PATH</div>
+    <div class="tft-signal-flow"><span>INPUT</span><b>→</b><span>INSERT SEND</span><b>→</b><span>FX / LIMITER</span><b>→</b><span>RETURN</span><b>→</b><span>MAIN L/R</span></div>
+    <div class="tft-info-cards">
+      <div class="tft-info-card"><small>INSERT SEND</small><strong>${s.send} dB</strong><em>Send level</em></div>
+      <div class="tft-info-card"><small>LIMITER PEAK</small><strong>${s.limit} dB</strong><em>Ceiling</em></div>
+      <div class="tft-info-card"><small>INSERT STATE</small><strong>${s.bypass ? 'BYPASS' : 'ACTIVE'}</strong><em>Processor status</em></div>
+    </div>
+  </div>
         <div class="tft-module-controls-grid">
           <div class="tft-mod-ctrl"><label>Insert Send</label><input type="range" id="mainFohLvl" min="-50" max="6" value="${s.send}"><span class="tft-val-disp" id="mainFohLvlVal">${s.send}dB</span></div>
           <div class="tft-mod-ctrl"><label>Limiter Peak</label><input type="range" id="mainLimitLvl" min="-20" max="0" step="0.5" value="${s.limit}"><span class="tft-val-disp" id="mainLimitLvlVal">${s.limit}dB</span></div>
@@ -4552,17 +4590,16 @@ const tftDatabase = {
     footerSt: "Next: Direct Out & USB Audio Routing",
     content: (s) => `
       <div class="tft-module-view">
-        <div class="tft-module-graph-box" id="tftRoutingBox">
-          <svg id="tftRoutingSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
-            <g stroke="#334155" stroke-width=".7" opacity=".6">
-              <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
-              <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
-            </g>
-            <path id="tftRoutingSvgCurve" d="M20 16 L 120 16 L ${s.dotX} ${s.dotY} L 300 48" fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round"/>
-            <circle id="tftRoutingDot" cx="${s.dotX}" cy="${s.dotY}" r="7" fill="#ffe4e6" stroke="#f43f5e" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Routing Node"/>
-            <text x="12" y="12" fill="#94a3b8" font-size="6.5">ROUTING MATRIX VIEW</text>
-          </svg>
-        </div>
+        <div class="tft-info-panel" id="tftRoutingInfo">
+    <div class="tft-info-heading">INPUT / OUTPUT PATCHBAY</div>
+    <div class="tft-patch-grid"><div class="patch-head">SOURCE</div><div class="patch-head">MAIN L/R</div><div class="patch-head">BUS 1–2</div><div class="patch-head">USB 1–2</div>
+      <div class="patch-label">Input 1 · ${s.source===0?'Playlist':'Physical Mic'}</div><div class="patch-cell active">●</div><div class="patch-cell">○</div><div class="patch-cell ${s.usb?'active':''}">${s.usb?'●':'○'}</div>
+      <div class="patch-label">Input 2 · IP2</div><div class="patch-cell active">●</div><div class="patch-cell">○</div><div class="patch-cell ${s.usb?'active':''}">${s.usb?'●':'○'}</div>
+      <div class="patch-label">Input 3 · IP3</div><div class="patch-cell">○</div><div class="patch-cell active">●</div><div class="patch-cell">○</div>
+      <div class="patch-label">Input 4 · IP4</div><div class="patch-cell">○</div><div class="patch-cell active">●</div><div class="patch-cell">○</div>
+    </div>
+    <div class="tft-info-note">Patch indicators are a visual routing overview; use the selectors and USB switch below to change settings.</div>
+  </div>
         <div class="tft-module-controls-grid">
           <div class="tft-mod-ctrl"><label>Input Source</label><select id="routeSourceSel"><option ${s.source===0?'selected':''}>Playlist Audio</option><option ${s.source===1?'selected':''}>Physical Mic</option></select></div>
           <div class="tft-mod-ctrl"><label>Direct Out</label><select id="routeDoutSel"><option ${s.dout===0?'selected':''}>Post-Fader</option><option ${s.dout===1?'selected':''}>Pre-Fader</option></select></div>
@@ -4578,17 +4615,14 @@ const tftDatabase = {
     footerSt: "Next: Peak Hold & Spectrum View",
     content: (s) => `
       <div class="tft-module-view">
-        <div class="tft-module-graph-box" id="tftMetersBox">
-          <svg id="tftMetersSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
-            <g stroke="#334155" stroke-width=".7" opacity=".6">
-              <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
-              <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
-            </g>
-            <path id="tftMetersSvgCurve" d="M10 45 L 40 22 L 80 38 L 120 18 L ${s.dotX} ${s.dotY} L 200 20 L 240 32 L 280 14 L 310 45" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
-            <circle id="tftMetersDot" cx="${s.dotX}" cy="${s.dotY}" r="7" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2" style="cursor:pointer; touch-action:none;" title="RTA Peak Node"/>
-            <text x="12" y="12" fill="#94a3b8" font-size="6.5">RTA SPECTRUM ANALYZER</text>
-          </svg>
-        </div>
+        <div class="tft-info-panel" id="tftMetersInfo">
+    <div class="tft-info-heading">DIGITAL LEVEL METERS · RTA SPECTRUM</div>
+    <div class="tft-meter-overview">
+      <div class="tft-digital-meter"><label>LEFT</label><div class="meter-track"><i style="height:68%"></i></div><strong>-12.4 dB</strong></div>
+      <div class="tft-digital-meter"><label>RIGHT</label><div class="meter-track"><i style="height:61%"></i></div><strong>-14.1 dB</strong></div>
+      <div class="tft-spectrum"><div style="height:24%"></div><div style="height:38%"></div><div style="height:30%"></div><div style="height:52%"></div><div style="height:72%"></div><div style="height:86%"></div><div style="height:64%"></div><div style="height:48%"></div><div style="height:36%"></div><div style="height:23%"></div><div style="height:31%"></div><div style="height:18%"></div><div style="height:12%"></div><div style="height:20%"></div><div style="height:9%"></div><div style="height:6%"></div></div>
+    </div><div class="tft-info-note">Peak hold: ${s.hold===0?'3 seconds':'Infinite'} · Zoom: ${s.zoom}× · Source: ${s.source===0?'Post-EQ Main':'Pre-EQ Input'}</div>
+  </div>
         <div class="tft-module-controls-grid">
           <div class="tft-mod-ctrl"><label>RTA Source</label><select id="meterSrcSel"><option ${s.source===0?'selected':''}>Post-EQ Main</option><option ${s.source===1?'selected':''}>Pre-EQ Input</option></select></div>
           <div class="tft-mod-ctrl"><label>Peak Hold</label><select id="meterHoldSel"><option ${s.hold===0?'selected':''}>3.0 Seconds</option><option ${s.hold===1?'selected':''}>Infinite</option></select></div>
@@ -4604,17 +4638,11 @@ const tftDatabase = {
     footerSt: "Next: Store & Recall Memories",
     content: (s) => `
       <div class="tft-module-view">
-        <div class="tft-module-graph-box" id="tftScenesBox">
-          <svg id="tftScenesSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
-            <g stroke="#334155" stroke-width=".7" opacity=".6">
-              <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
-              <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
-            </g>
-            <path id="tftScenesSvgCurve" d="M15 42 L 80 20 L ${s.dotX} ${s.dotY} L 240 16 L 305 34" fill="none" stroke="#eab308" stroke-width="2.5" stroke-linecap="round"/>
-            <circle id="tftScenesDot" cx="${s.dotX}" cy="${s.dotY}" r="7" fill="#fef9c3" stroke="#eab308" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Scene Node"/>
-            <text x="12" y="12" fill="#94a3b8" font-size="6.5">SCENE MEMORY BANK</text>
-          </svg>
-        </div>
+        <div class="tft-info-panel" id="tftScenesInfo">
+    <div class="tft-info-heading">SCENE MEMORY BANK</div>
+    <div class="tft-scene-list"><div class="tft-scene-row ${s.active===0?'selected':''}"><b>#01</b><span>Live Stage</span><small>${s.active===0?'ACTIVE':'SAVED'}</small></div><div class="tft-scene-row ${s.active===1?'selected':''}"><b>#02</b><span>Acoustic</span><small>${s.active===1?'ACTIVE':'SAVED'}</small></div><div class="tft-scene-row"><b>#03</b><span>Empty scene</span><small>EMPTY</small></div><div class="tft-scene-row"><b>#04</b><span>Empty scene</span><small>EMPTY</small></div></div>
+    <div class="tft-info-note">Choose a scene, then use Store and Recall Safe controls below.</div>
+  </div>
         <div class="tft-module-controls-grid">
           <div class="tft-mod-ctrl"><label>Active Scene</label><select id="sceneActiveSel"><option ${s.active===0?'selected':''}>#01 Live Stage</option><option ${s.active===1?'selected':''}>#02 Acoustic</option></select></div>
           <div class="tft-mod-ctrl"><label>Store Scene</label><button id="sceneStoreBtn" type="button">STORE</button></div>
@@ -4630,17 +4658,15 @@ const tftDatabase = {
     footerSt: "Next: Brightness & Audio Clock",
     content: (s) => `
       <div class="tft-module-view">
-        <div class="tft-module-graph-box" id="tftSetupBox">
-          <svg id="tftSetupSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
-            <g stroke="#334155" stroke-width=".7" opacity=".6">
-              <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
-              <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
-            </g>
-            <path id="tftSetupSvgCurve" d="M10 32 L ${s.dotX} ${s.dotY} L 310 32" fill="none" stroke="#64748b" stroke-width="2.5" stroke-dasharray="4" stroke-linecap="round"/>
-            <circle id="tftSetupDot" cx="${s.dotX}" cy="${s.dotY}" r="7" fill="#f1f5f9" stroke="#64748b" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Clock Node"/>
-            <text x="12" y="12" fill="#94a3b8" font-size="6.5">SYSTEM PREFERENCES</text>
-          </svg>
-        </div>
+        <div class="tft-info-panel" id="tftSetupInfo">
+    <div class="tft-info-heading">SYSTEM CONFIGURATION</div>
+    <div class="tft-info-cards">
+      <div class="tft-info-card"><small>SCREEN BRIGHTNESS</small><strong>${s.bright}%</strong><em>Display backlight</em></div>
+      <div class="tft-info-card"><small>AUDIO CLOCK</small><strong>48 kHz</strong><em>Internal sync</em></div>
+      <div class="tft-info-card"><small>BUFFER</small><strong>${s.buf===0?'512':'256'} samples</strong><em>Audio latency</em></div>
+      <div class="tft-info-card"><small>BLE LINK</small><strong>${s.ble?'CONNECTED':'OFFLINE'}</strong><em>Wireless control</em></div>
+    </div><div class="tft-info-note">Adjust system options using the controls below. Changes are reflected in the status readouts.</div>
+  </div>
         <div class="tft-module-controls-grid">
           <div class="tft-mod-ctrl"><label>Brightness</label><input type="range" id="setupBrightInp" min="20" max="100" value="${s.bright}"><span class="tft-val-disp" id="setupBrightVal">${s.bright}%</span></div>
           <div class="tft-mod-ctrl"><label>BLE Link</label><button id="setupBleBtn" class="${s.ble ? 'active-action' : ''}" type="button">${s.ble ? 'ACTIVE' : 'OFF'}</button></div>
@@ -4656,18 +4682,15 @@ const tftDatabase = {
     footerSt: "Next: Reverb & Delay Rack",
     content: (s) => `
       <div class="tft-module-view">
-        <div class="tft-module-graph-box" id="tftEffectsBox">
-          <svg id="tftEffectsSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
-            <g stroke="#334155" stroke-width=".7" opacity=".6">
-              <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
-              <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
-            </g>
-            <path id="tftEffectsSvgCurve" d="M10 50 Q ${s.dot1X} ${s.dot1Y}, 160 32" fill="none" stroke="#ec4899" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftEffectsSvgFill" d="M10 50 Q ${s.dot1X} ${s.dot1Y}, 160 32 L 310 65 L 10 65 Z" fill="#ec4899" opacity=".12"/>
-            <circle id="tftEffectsDot1" cx="${s.dot1X}" cy="${s.dot1Y}" r="7" fill="#fce7f3" stroke="#ec4899" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Delay Point"/>
-            <text x="12" y="12" fill="#94a3b8" font-size="6.5">ALESIS FX PROCESSOR (Point)</text>
-          </svg>
-        </div>
+        <div class="tft-info-panel" id="tftUtilityInfo">
+    <div class="tft-info-heading">UTILITY · FX RACK STATUS</div>
+    <div class="tft-info-cards">
+      <div class="tft-info-card"><small>FX 1</small><strong>REVERB</strong><em>Time ${s.delay.toFixed(2)} s</em></div>
+      <div class="tft-info-card"><small>FX 2</small><strong>DELAY</strong><em>350 ms</em></div>
+      <div class="tft-info-card"><small>FEEDBACK / MIX</small><strong>${Math.round(s.feedback*100)}%</strong><em>FX 1 feedback</em></div>
+      <div class="tft-info-card"><small>FX MASTER</small><strong>${s.active?'ACTIVE':'OFF'}</strong><em>Rack enable</em></div>
+    </div><div class="tft-info-note">Set delay time, feedback, and FX master state with the controls below.</div>
+  </div>
         <div class="tft-module-controls-grid">
           <div class="tft-mod-ctrl"><label>Delay Time</label><input type="range" id="fxDelayInp" min="0.05" max="1.0" step="0.05" value="${s.delay}"><span class="tft-val-disp" id="fxDelayVal">${s.delay.toFixed(2)}s</span></div>
           <div class="tft-mod-ctrl"><label>Feedback</label><input type="range" id="fxFeedbackInp" min="0" max="0.9" step="0.05" value="${s.feedback}"><span class="tft-val-disp" id="fxFeedbackVal">${Math.round(s.feedback*100)}%</span></div>
