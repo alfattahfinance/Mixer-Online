@@ -2139,6 +2139,47 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   box-shadow:0 0 7px rgba(250,204,21,.3) !important;
 }
 
+  
+/* SQ-7 navigation color coding: each page and DSP module has its own family;
+   inactive = dark tinted metal, active = brighter color for clear state feedback. */
+#tabMixerContent .mixer-side-nav .tft-tab,
+#tabMixerContent .mixer-side-nav .console-btn {
+  color:#f3f4f6 !important;
+  border:1px solid rgba(255,255,255,.24) !important;
+  box-shadow:inset 0 1px rgba(255,255,255,.08) !important;
+  transition:background .16s ease,border-color .16s ease,box-shadow .16s ease;
+}
+/* PAGE buttons */
+#tabMixerContent .mixer-side-nav .tft-tab[data-tft-tab="eq"] { background:linear-gradient(180deg,#24557b,#193b58) !important; }
+#tabMixerContent .mixer-side-nav .tft-tab[data-tft-tab="routing"] { background:linear-gradient(180deg,#286c70,#1d484c) !important; }
+#tabMixerContent .mixer-side-nav .tft-tab[data-tft-tab="meters"] { background:linear-gradient(180deg,#397044,#274c30) !important; }
+#tabMixerContent .mixer-side-nav .tft-tab[data-tft-tab="scenes"] { background:linear-gradient(180deg,#67508a,#45365f) !important; }
+#tabMixerContent .mixer-side-nav .tft-tab[data-tft-tab="setup"] { background:linear-gradient(180deg,#8a642d,#5c431f) !important; }
+#tabMixerContent .mixer-side-nav .tft-tab[data-tft-tab="effects"] { background:linear-gradient(180deg,#526170,#38434f) !important; }
+#tabMixerContent .mixer-side-nav .tft-tab[data-tft-tab].active {
+  color:#171a1e !important;
+  background:linear-gradient(180deg,#fff,#dfe3e8) !important;
+  border-color:#fff !important;
+  box-shadow:0 0 0 2px rgba(255,255,255,.14),0 2px 8px rgba(0,0,0,.25) !important;
+  font-weight:800 !important;
+}
+/* CHANNEL DSP buttons */
+#tabMixerContent .mixer-side-nav .console-btn[data-section="config"] { background:linear-gradient(180deg,#245d8c,#183f60) !important; }
+#tabMixerContent .mixer-side-nav .console-btn[data-section="gate"] { background:linear-gradient(180deg,#88444b,#5b2d32) !important; }
+#tabMixerContent .mixer-side-nav .console-btn[data-section="dynamics"] { background:linear-gradient(180deg,#96602e,#64401f) !important; }
+#tabMixerContent .mixer-side-nav .console-btn[data-section="eq"] { background:linear-gradient(180deg,#256f9b,#194a6a) !important; }
+#tabMixerContent .mixer-side-nav .console-btn[data-section="sends"] { background:linear-gradient(180deg,#69528c,#463763) !important; }
+#tabMixerContent .mixer-side-nav .console-btn[data-section="main"] { background:linear-gradient(180deg,#28776e,#1c514b) !important; }
+#tabMixerContent .mixer-side-nav .console-btn.active {
+  color:#fff !important;
+  border-color:#fff !important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),0 0 8px rgba(255,255,255,.15) !important;
+  filter:brightness(1.35) saturate(1.12);
+  font-weight:800 !important;
+}
+#tabMixerContent .mixer-side-nav .tft-tab:hover,
+#tabMixerContent .mixer-side-nav .console-btn:hover { filter:brightness(1.2); }
+
   </style>
 </head>
 
