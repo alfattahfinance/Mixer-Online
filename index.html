@@ -3928,12 +3928,13 @@ function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed
     event.preventDefault();
     event.stopPropagation();
     active = {
-      slider, pointerId: event.pointerId, startCoord: event.clientY,
+      slider, captureTarget: slot || slider, pointerId: event.pointerId, startCoord: event.clientY,
       startValue: value, min, max, step: Number(slider.step || 1),
       sensitivity: event.pointerType === "touch" ? TOUCH_SENSITIVITY : SENSITIVITY,
       length: Math.max(1, rect.height - (isEq ? 13 : 16))
     };
-    try { slider.setPointerCapture(event.pointerId); } catch (_) {}
+    // Capture on the actual hit surface so movement remains tracked outside the knob.
+    try { active.captureTarget.setPointerCapture(event.pointerId); } catch (_) {}
   }, { capture: true, passive: false });
 
   // Suppress the browser's synthetic click on the range: only our thumb drag may change it.
@@ -3967,6 +3968,13 @@ function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed
   };
   document.addEventListener("pointerup", finish, { capture: true });
   document.addEventListener("pointercancel", finish, { capture: true });
+  document.addEventListener("lostpointercapture", finish, { capture: true });
+  window.addEventListener("blur", () => {
+    if (!active) return;
+    const slider = active.slider;
+    active = null;
+    slider.dispatchEvent(new Event("change", { bubbles: true }));
+  });
 })();
 function createBands(channel) {
   const eq = channel.querySelector(".eq");
