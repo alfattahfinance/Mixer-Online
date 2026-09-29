@@ -3253,38 +3253,65 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   min-width:0 !important; min-height:0 !important; align-self:stretch !important;
 }
 
-/* Restore upper L/R meter sizing; widen the combined MASTER bar beside the fader. */
-#tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack {
-  width:84px !important;
-  flex:0 0 84px !important;
-  max-width:calc(100% - 12px) !important;
-}
-#tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack #masterMeterL,
-#tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack #masterMeterR {
-  flex:1 1 auto !important;
-  width:11px !important;
-  min-width:11px !important;
-  max-width:11px !important;
-  margin-left:15px !important;
-}
+/* Size and style the complete MASTER indicator holder beside the fader. */
 #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-combined-wrap {
-  flex:0 0 26px !important;
-  width:26px !important;
-  min-width:26px !important;
+  box-sizing:border-box !important;
+  flex:0 0 34px !important;
+  width:34px !important;
+  min-width:34px !important;
+  max-width:34px !important;
+  height:100% !important;
+  min-height:0 !important;
+  padding:4px 3px 3px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  gap:4px !important;
+  border:1px solid #6b5b28 !important;
+  border-radius:4px !important;
+  background:linear-gradient(180deg,#202833,#111923) !important;
+  overflow:hidden !important;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-combined-wrap > span {
+  flex:0 0 auto !important;
+  width:100% !important;
+  line-height:9px !important;
+  white-space:nowrap !important;
+  text-align:center !important;
+  font-size:7px !important;
 }
 #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-combined-meter {
-  flex:1 1 auto !important;
-  width:18px !important;
-  min-width:18px !important;
-  max-width:18px !important;
   box-sizing:border-box !important;
+  flex:1 1 0 !important;
+  width:22px !important;
+  min-width:22px !important;
+  max-width:22px !important;
+  min-height:0 !important;
+  height:auto !important;
+  align-self:center !important;
+  border:1px solid #3d4856 !important;
+  border-radius:2px !important;
+  background:#080e17 !important;
+  padding:2px !important;
+  overflow:hidden !important;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-combined-meter span {
+  flex:1 1 0 !important;
+  min-height:1px !important;
 }
 @media (max-width:700px) {
-  #tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack { width:84px !important; flex-basis:84px !important; }
-  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-combined-wrap { flex-basis:22px !important; width:22px !important; min-width:22px !important; }
-  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-combined-meter { width:16px !important; min-width:16px !important; max-width:16px !important; }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-combined-wrap {
+    flex-basis:30px !important;
+    width:30px !important;
+    min-width:30px !important;
+    max-width:30px !important;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-combined-meter {
+    width:20px !important;
+    min-width:20px !important;
+    max-width:20px !important;
+  }
 }
-
 </style>
 </head>
 
