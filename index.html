@@ -3118,6 +3118,34 @@ input[type="range"] { accent-color:#b8bec6 !important; }
 #tabMixerContent #tftContentArea #tftCompSvgContainer { touch-action:none; overflow:visible; }
 #tabMixerContent #tftContentArea #tftCompSvgContainer circle { pointer-events:all; cursor:grab; }
 #tabMixerContent #tftContentArea #tftCompSvgContainer circle:active { cursor:grabbing; }
+
+/* Wide-display curve layout: keep Gate/Comp plotting canvases readable without
+   stretching them edge-to-edge on very wide tablets or desktop tabs. */
+@media (orientation: landscape) and (min-width: 700px) {
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+  #tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box {
+    box-sizing: border-box !important;
+    width: min(100%, 720px) !important;
+    max-width: 720px !important;
+    align-self: center !important;
+    margin-inline: auto !important;
+    flex: 0 1 auto !important;
+  }
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-view,
+  #tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-view {
+    align-items: stretch !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+}
+@media (orientation: landscape) and (min-width: 1200px) {
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+  #tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box {
+    width: min(100%, 640px) !important;
+    max-width: 640px !important;
+  }
+}
+
 </style>
 </head>
 
