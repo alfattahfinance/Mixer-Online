@@ -2868,6 +2868,12 @@ input[type="range"] { accent-color:#b8bec6 !important; }
 #tabMixerContent #tftContentArea .tft-digital-meter {display:flex;flex-direction:column;align-items:center;gap:5px;color:#94a3b8;font-size:8px;}
 #tabMixerContent #tftContentArea .meter-track {height:clamp(45px,12vh,100px);width:12px;background:#07101b;border:1px solid #26394d;display:flex;align-items:flex-end;overflow:hidden;}
 #tabMixerContent #tftContentArea .meter-track i {display:block;width:100%;background:linear-gradient(to top,#10b981 0 65%,#facc15 65% 86%,#ef4444 86%);box-shadow:0 0 6px #10b981;}
+#tabMixerContent #tftContentArea .meter-track {position:relative;flex:0 0 auto;align-self:center;border-radius:3px;}
+#tabMixerContent #tftContentArea .meter-track i {position:absolute;left:0;bottom:0;transition:height 55ms linear;}
+#tabMixerContent #tftContentArea .meter-peak-marker {position:absolute;left:-2px;right:-2px;height:2px;background:#f8fafc;box-shadow:0 0 4px #fff;z-index:2;pointer-events:none;}
+#tabMixerContent #tftContentArea .meter-peak-marker.peak-clip {background:#ef4444;box-shadow:0 0 5px #ef4444;}
+#tabMixerContent #tftContentArea .tft-digital-meter strong.meter-clipping {color:#f87171;}
+#tabMixerContent #tftContentArea .tft-spectrum div {transition:height 70ms linear;}
 #tabMixerContent #tftContentArea .tft-digital-meter strong {font-family:monospace;color:#cbd5e1;font-size:8px;}
 #tabMixerContent #tftContentArea .tft-spectrum {display:flex;align-items:flex-end;gap:3px;flex:1;max-width:65%;height:100%;min-height:55px;padding:5px;background:#070e18;border:1px solid #22364a;}
 #tabMixerContent #tftContentArea .tft-spectrum div {flex:1;min-width:2px;background:linear-gradient(to top,#0d9488,#22d3ee 72%,#facc15);box-shadow:0 0 4px rgba(34,211,238,.2);}
@@ -3476,31 +3482,69 @@ function readMeterDb(analyser) {
 
 // Live TFT meter/RTA values read from the active Web Audio graph.
 let tftMeterPeakDb = [-72, -72];
+let tftMeterPeakAt = [0, 0];
+let tftMeterFreqBuffer = null;
 function updateTftMetersFromAudio() {
   const root = document.getElementById('tftContentArea');
   if (!root || root.dataset.pageKey !== 'meters') return;
   const s = tftStatesData.meters;
-  const left = s.source === 0 ? masterStereoAnalysers[0] : mixerStripAnalysers[0];
-  const right = s.source === 0 ? masterStereoAnalysers[1] : mixerStripAnalysers[1];
+  const left = s.source === 0 ? masterStereoAnalysers[0] : (mixerStripAnalysers[0] || audioChannels[0]?.analyser);
+  const right = s.source === 0 ? masterStereoAnalysers[1] : (mixerStripAnalysers[1] || audioChannels[1]?.analyser);
+  const now = performance.now();
+  const tracks = root.querySelectorAll('.tft-digital-meter .meter-track');
+  const bars = root.querySelectorAll('.tft-digital-meter .meter-track i');
+  const labels = root.querySelectorAll('.tft-digital-meter strong');
+  const dbToPct = db => Math.max(0, Math.min(100, ((db + 60) / 60) * 100));
   [left, right].forEach((analyser, i) => {
     const db = analyser ? readMeterDb(analyser) : -72;
-    if (s.hold === 0 || db >= tftMeterPeakDb[i]) tftMeterPeakDb[i] = db;
-    const bar = root.querySelectorAll('.tft-digital-meter .meter-track i')[i];
-    const label = root.querySelectorAll('.tft-digital-meter strong')[i];
-    if (bar) bar.style.height = Math.max(0, Math.min(100, (db + 60) / 60 * 100)) + '%';
-    if (label) label.textContent = db <= -71 ? '-∞ dB' : db.toFixed(1) + ' dB';
+    const track = tracks[i], bar = bars[i], label = labels[i];
+    if (db >= tftMeterPeakDb[i]) {
+      tftMeterPeakDb[i] = db;
+      tftMeterPeakAt[i] = now;
+    } else if (s.hold === 0 && now - tftMeterPeakAt[i] > 3000) {
+      // 3-second peak hold, then a slow fall-back to the live signal.
+      tftMeterPeakDb[i] = Math.max(db, tftMeterPeakDb[i] - (now - tftMeterPeakAt[i] - 3000) * 0.0015);
+    }
+    const livePct = dbToPct(db);
+    if (bar) bar.style.height = livePct + '%';
+    if (track) {
+      let marker = track.querySelector('.meter-peak-marker');
+      if (!marker) {
+        marker = document.createElement('span');
+        marker.className = 'meter-peak-marker';
+        marker.setAttribute('aria-hidden', 'true');
+        track.appendChild(marker);
+      }
+      marker.style.bottom = dbToPct(tftMeterPeakDb[i]) + '%';
+      marker.classList.toggle('peak-clip', tftMeterPeakDb[i] >= -1);
+    }
+    if (label) {
+      label.textContent = db <= -71 ? '-∞ dB' : db.toFixed(1) + ' dB';
+      label.classList.toggle('meter-clipping', db >= -1);
+    }
   });
   const spectrum = root.querySelector('.tft-spectrum');
   if (spectrum) {
-    const bars = spectrum.children;
+    const spectrumBars = spectrum.children;
     if (left && left.getByteFrequencyData) {
-      const bins = new Uint8Array(left.frequencyBinCount); left.getByteFrequencyData(bins);
-      for (let i = 0; i < bars.length; i++) {
-        const idx = Math.min(bins.length - 1, Math.floor(Math.pow(i / Math.max(1, bars.length - 1), 2) * (bins.length - 1)));
-        bars[i].style.height = Math.max(2, Math.min(100, bins[idx] * s.zoom / 2.5)) + '%';
+      if (!tftMeterFreqBuffer || tftMeterFreqBuffer.length !== left.frequencyBinCount) {
+        tftMeterFreqBuffer = new Uint8Array(left.frequencyBinCount);
       }
-    } else Array.from(bars).forEach(bar => bar.style.height = '2%');
+      left.getByteFrequencyData(tftMeterFreqBuffer);
+      const bins = tftMeterFreqBuffer;
+      for (let i = 0; i < spectrumBars.length; i++) {
+        const ratio = i / Math.max(1, spectrumBars.length - 1);
+        const idx = Math.min(bins.length - 1, Math.floor(Math.pow(ratio, 2) * (bins.length - 1)));
+        const magnitude = bins[idx] / 255;
+        const scaled = Math.max(0, Math.min(100, Math.pow(magnitude, 0.8) * 100 * s.zoom / 2));
+        spectrumBars[i].style.height = Math.max(2, scaled) + '%';
+      }
+    } else {
+      Array.from(spectrumBars).forEach(bar => bar.style.height = '2%');
+    }
   }
+  const status = root.querySelector('#tftMeterSignalStatus');
+  if (status) status.textContent = left || right ? 'LIVE · ' + (s.source === 0 ? 'POST-EQ MAIN' : 'PRE-EQ INPUT') : 'NO SIGNAL SOURCE';
 }
 const meterLevelState = new WeakMap();
 function paintMeter(container, db, direction) {
@@ -3564,6 +3608,7 @@ function updateAllSignalMeters() {
     const readout = document.getElementById(channelIndex === 0 ? "tftMeterLVal" : "tftMeterRVal");
     if (readout) readout.textContent = db <= -70 ? "-inf dB" : db.toFixed(1) + " dB";
   });
+  updateTftMetersFromAudio();
   requestAnimationFrame(updateAllSignalMeters);
 }
 requestAnimationFrame(updateAllSignalMeters);
@@ -4792,10 +4837,10 @@ const tftDatabase = {
         <div class="tft-info-panel" id="tftMetersInfo">
     <div class="tft-info-heading">DIGITAL LEVEL METERS · RTA SPECTRUM</div>
     <div class="tft-meter-overview">
-      <div class="tft-digital-meter"><label>LEFT</label><div class="meter-track"><i style="height:68%"></i></div><strong>-12.4 dB</strong></div>
-      <div class="tft-digital-meter"><label>RIGHT</label><div class="meter-track"><i style="height:61%"></i></div><strong>-14.1 dB</strong></div>
-      <div class="tft-spectrum"><div style="height:24%"></div><div style="height:38%"></div><div style="height:30%"></div><div style="height:52%"></div><div style="height:72%"></div><div style="height:86%"></div><div style="height:64%"></div><div style="height:48%"></div><div style="height:36%"></div><div style="height:23%"></div><div style="height:31%"></div><div style="height:18%"></div><div style="height:12%"></div><div style="height:20%"></div><div style="height:9%"></div><div style="height:6%"></div></div>
-    </div><div class="tft-info-note">Peak hold: ${s.hold===0?'3 seconds':'Infinite'} · Zoom: ${s.zoom}× · Source: ${s.source===0?'Post-EQ Main':'Pre-EQ Input'}</div>
+      <div class="tft-digital-meter"><label>LEFT</label><div class="meter-track" role="meter" aria-label="Left audio level" aria-valuemin="-60" aria-valuemax="0"><i style="height:0%"></i></div><strong>-∞ dB</strong></div>
+      <div class="tft-digital-meter"><label>RIGHT</label><div class="meter-track" role="meter" aria-label="Right audio level" aria-valuemin="-60" aria-valuemax="0"><i style="height:0%"></i></div><strong>-∞ dB</strong></div>
+      <div class="tft-spectrum" role="img" aria-label="Live audio frequency spectrum">${Array.from({length:24}, () => '<div style="height:2%"></div>').join('')}</div>
+    </div><div class="tft-info-note"><span id="tftMeterSignalStatus">WAITING FOR AUDIO</span> · Peak hold: ${s.hold===0?'3 seconds':'Infinite'} · Zoom: ${s.zoom}× · Source: ${s.source===0?'Post-EQ Main':'Pre-EQ Input'}</div>
   </div>
         <div class="tft-module-controls-grid">
           <div class="tft-mod-ctrl"><label>RTA Source</label><select id="meterSrcSel"><option ${s.source===0?'selected':''}>Post-EQ Main</option><option ${s.source===1?'selected':''}>Pre-EQ Input</option></select></div>
@@ -5223,9 +5268,9 @@ function bindTftDynamicEventListeners(key) {
       const srcSel = document.getElementById("meterSrcSel");
       const holdSel = document.getElementById("meterHoldSel");
       const zoomInp = document.getElementById("meterZoomInp");
-      srcSel?.addEventListener("change", () => { s.source = srcSel.selectedIndex; updateEncoders(tftDatabase.meters.encoders(s)); });
-      holdSel?.addEventListener("change", () => { s.hold = holdSel.selectedIndex; updateEncoders(tftDatabase.meters.encoders(s)); });
-      zoomInp?.addEventListener("input", () => { s.zoom = Number(zoomInp.value); document.getElementById("meterZoomVal").textContent = s.zoom + "x"; updateEncoders(tftDatabase.meters.encoders(s)); });
+      srcSel?.addEventListener("change", () => { s.source = srcSel.selectedIndex; tftMeterPeakDb = [-72, -72]; tftMeterPeakAt = [0, 0]; updateEncoders(tftDatabase.meters.encoders(s)); updateTftMetersFromAudio(); persistTftState(); });
+      holdSel?.addEventListener("change", () => { s.hold = holdSel.selectedIndex; tftMeterPeakDb = [-72, -72]; tftMeterPeakAt = [0, 0]; updateEncoders(tftDatabase.meters.encoders(s)); persistTftState(); });
+      zoomInp?.addEventListener("input", () => { s.zoom = Number(zoomInp.value); const zoomLabel = document.getElementById("meterZoomVal"); if (zoomLabel) zoomLabel.textContent = s.zoom + "x"; updateEncoders(tftDatabase.meters.encoders(s)); updateTftMetersFromAudio(); persistTftState(); });
     } else if (key === "scenes") {
       const actSel = document.getElementById("sceneActiveSel");
       const storeBtn = document.getElementById("sceneStoreBtn");
