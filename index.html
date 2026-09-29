@@ -3827,6 +3827,12 @@ const tftStatesData = {
 };
 
 const tftSceneSnapshots = Object.create(null);
+try {
+  const savedScenes = JSON.parse(localStorage.getItem('mixerOnlineTftScenes') || '{}');
+  if (savedScenes && typeof savedScenes === 'object' && !Array.isArray(savedScenes)) {
+    [0, 1, 2, 3].forEach(index => { if (savedScenes[index] && typeof savedScenes[index] === 'object') tftSceneSnapshots[index] = savedScenes[index]; });
+  }
+} catch (err) { /* Ignore invalid or unavailable browser storage. */ }
 
 const audioFilesInput = document.getElementById("audioFilesInput");
 const playlistContainer = document.getElementById("playlistContainer");
@@ -5205,6 +5211,7 @@ function bindTftDynamicEventListeners(key) {
       actSel?.addEventListener("change", () => { s.active = Number(actSel.value); s.stored = Boolean(tftSceneSnapshots[s.active]); updateEncoders(tftDatabase.scenes.encoders(s)); refreshTftInfoPanel("scenes"); });
       storeBtn?.addEventListener("click", () => {
         tftSceneSnapshots[s.active] = JSON.parse(JSON.stringify(tftStatesData));
+        try { localStorage.setItem('mixerOnlineTftScenes', JSON.stringify(tftSceneSnapshots)); } catch (err) { /* Storage may be disabled. */ }
         s.stored = true;
         storeBtn.textContent = "STORED";
         updateEncoders(tftDatabase.scenes.encoders(s));
@@ -5216,9 +5223,20 @@ function bindTftDynamicEventListeners(key) {
           recallBtn.textContent = "EMPTY";
           return;
         }
+        const protectedKeys = s.safe ? new Set(['routing', 'setup']) : new Set();
         Object.keys(snapshot).forEach(sectionKey => {
-          if (tftStatesData[sectionKey]) Object.assign(tftStatesData[sectionKey], snapshot[sectionKey]);
+          if (sectionKey !== 'scenes' && !protectedKeys.has(sectionKey) && tftStatesData[sectionKey]) {
+            Object.assign(tftStatesData[sectionKey], snapshot[sectionKey]);
+          }
         });
+        tftPeqFreqVal = tftStatesData.eq.freq;
+        tftPeqQVal = tftStatesData.eq.q;
+        tftPeqGainVal = tftStatesData.eq.gain;
+        if (tftPeqFilter && audioContext) {
+          tftPeqFilter.frequency.setTargetAtTime(tftPeqFreqVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+          tftPeqFilter.Q.setTargetAtTime(tftPeqQVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+          tftPeqFilter.gain.setTargetAtTime(tftPeqGainVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+        }
         s.stored = true;
         recallBtn.textContent = "RECALLED";
         updateEncoders(tftDatabase.scenes.encoders(s));
