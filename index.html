@@ -1179,6 +1179,48 @@ header, .topbar {
   }
 }
 
+
+
+/* MATCH MASTER FADER CHANNEL WIDTH TO THE L/R METER CARD */
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row {
+  box-sizing:border-box;
+  width:99px;
+  max-width:calc(100% - 12px);
+  gap:5px;
+  justify-content:center;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot {
+  box-sizing:border-box;
+  flex:0 0 84px;
+  width:84px;
+  min-width:0;
+  max-width:84px;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-combined-wrap {
+  flex:0 0 10px;
+  width:10px;
+}
+@media (min-width:701px) and (max-width:1199px) {
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row {
+    width:91px;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot {
+    flex-basis:76px;
+    width:76px;
+    max-width:76px;
+  }
+}
+@media (max-width:700px) {
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row {
+    width:91px;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot {
+    flex-basis:76px;
+    width:76px;
+    max-width:76px;
+  }
+}
+
 </style>
 </head>
 
