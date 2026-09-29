@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#040609">
+  <meta name="theme-color" content="#30343a">
   <meta name="description" content="GQX-3102 Equalizer, Alesis FX & Digital Mixer Console + ESP32 BLE - Fullscreen Mobile Pro Audio">
   <link rel="manifest" href="manifest.json">
 
@@ -1681,7 +1681,76 @@ header, .topbar {
 #tabMixerContent #tftMeterL span.red.on,
 #tabMixerContent #tftMeterR span.red.on { background:#ef3340 !important; border-color:#ff6670 !important; box-shadow:0 0 5px rgba(239,51,64,.65) !important; }
 
-</style>
+
+/* NEUTRAL GRAPHITE THEME — UI surfaces shift from blue-black to layered greys.
+   Signal-meter LED colors remain semantic (green→lime→yellow→orange→red). */
+:root { color-scheme: dark; }
+html, body { background:#30343a !important; color:#e5e7eb; }
+.app { background:#30343a !important; }
+header, .topbar {
+  background:linear-gradient(135deg,#555b63,#3b4047) !important;
+  border-color:#707780 !important;
+  box-shadow:0 2px 8px rgba(0,0,0,.38) !important;
+}
+.mode-menu, .rack, .echo-panel-box, .esp32-panel-box,
+#tabMixerContent .mixer-desk-surface,
+#tabMixerContent .mixer-console,
+#tabMixerContent .mixer-main-panel {
+  background:#3b4047 !important;
+  border-color:#69717a !important;
+}
+.mode-menu-trigger, .tab-btn, .actions button,
+button, .eq-action-button, .console-action-btn,
+.top-audio-controls select, select {
+  background-color:#555b63;
+  color:#f3f4f6;
+  border-color:#858d96;
+}
+.tab-btn { background:#4a5057 !important; color:#d1d5db !important; border-color:#737b84 !important; }
+.tab-btn.active {
+  background:#aeb5bd !important; color:#20252b !important;
+  border-color:#e5e7eb !important; box-shadow:0 0 8px rgba(226,232,240,.25) !important;
+}
+.mode-menu { background:#343940 !important; border-color:#737b84 !important; }
+.mode-menu-trigger:active { background:#707780 !important; }
+.actions button:hover, .actions button.active {
+  background:#c2c8ce !important; color:#20252b !important; border-color:#eef0f2 !important;
+}
+.rack-header, .channel, .control-row, .meter-area, .eq-response-curve,
+.echo-control-card, .output-panel, .output-control,
+#tabMixerContent .console-channel-strip,
+#tabMixerContent .fader-slot,
+#tabMixerContent .fader-panel-area,
+#tabMixerContent .mixer-control-card,
+#tabMixerContent .mixer-section,
+#tabMixerContent .master-panel,
+#tabMixerContent .tft-panel {
+  background-color:#454b53 !important;
+  border-color:#737b84 !important;
+}
+#tabMixerContent .console-channel-strip { background:linear-gradient(180deg,#4a5058,#363b42) !important; }
+#tabMixerContent .fader-slot { background:linear-gradient(180deg,#3b4148,#2d3238) !important; }
+.control label, .grade, .eq-response-heading, .top-audio-status,
+.band-frequency, .scale, .channel-controls label { color:#c0c6cd; }
+.channel-title, .echo-control-card label { color:#d1d5db !important; }
+.model, .gain-value { color:#e5e7eb !important; }
+.control input[type="range"], .echo-control-card input[type="range"] { accent-color:#c0c6cd; }
+.control select, .top-audio-controls select, select {
+  background:#343940 !important; color:#f3f4f6 !important; border-color:#7b838c !important;
+}
+.eq-response-grid line { stroke:#737b84; }
+.eq-response-path { stroke:#d1d5db; filter:drop-shadow(0 0 2px rgba(226,232,240,.35)); }
+#tabMixerContent .tft-module-graph-box,
+#tabMixerContent .tft-peq-graph {
+  border-color:#737b84 !important;
+  background-color:#292e34 !important;
+}
+#tabMixerContent .console-channel-strip .fader-slot::before {
+  background:linear-gradient(90deg,#262b31,#aeb5bd,#262b31) !important;
+}
+/* Keep live signal LEDs vivid and distinguishable; this theme changes only their surrounding UI. */
+
+  </style>
 </head>
 
 <body>
