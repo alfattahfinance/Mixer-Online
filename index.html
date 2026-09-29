@@ -1482,6 +1482,23 @@ header, .topbar {
 #tabMixerContent .vert-led-meter span.red.on,
 #tabMixerContent .master-led-meter span.red.on { background:#ef4444 !important; box-shadow:0 0 5px rgba(239,68,68,.9) !important; }
 
+
+/* Keep every LED segment visibly tinted while unlit; active level uses brighter color. */
+#tabMixerContent .vert-led-meter span.green,
+#tabMixerContent .master-led-meter span.green { background:#123c35 !important; }
+#tabMixerContent .vert-led-meter span.mint,
+#tabMixerContent .master-led-meter span.mint { background:#155044 !important; }
+#tabMixerContent .vert-led-meter span.lime,
+#tabMixerContent .master-led-meter span.lime { background:#3c4d20 !important; }
+#tabMixerContent .vert-led-meter span.yellow,
+#tabMixerContent .master-led-meter span.yellow { background:#55451a !important; }
+#tabMixerContent .vert-led-meter span.orange,
+#tabMixerContent .master-led-meter span.orange { background:#57321c !important; }
+#tabMixerContent .vert-led-meter span.red,
+#tabMixerContent .master-led-meter span.red { background:#54252d !important; }
+#tabMixerContent .vert-led-meter span.on,
+#tabMixerContent .master-led-meter span.on { transition:background-color 45ms linear, box-shadow 45ms linear; }
+
 </style>
 </head>
 
@@ -1982,20 +1999,30 @@ function readMeterDb(analyser) {
   return rms > 0 ? 20 * Math.log10(rms) : -72;
 }
 
+const meterLevelState = new WeakMap();
 function paintMeter(container, db, direction) {
   if (!container) return;
   const leds = Array.from(container.children);
   if (!leds.length) return;
-  // Calibrated LED ladder: quietest green at the bottom/left, progressively
-  // brighter green, yellow-green, yellow, orange, then red at the top/right.
-  const litCount = Math.max(0, Math.min(leds.length, Math.round((db + 54) / 54 * leds.length)));
+
+  // Smooth fast attack and gentle release so LEDs follow audio without flicker.
+  const target = Math.max(0, Math.min(1, (db + 48) / 54));
+  const previous = meterLevelState.get(container) ?? 0;
+  const smoothed = target > previous
+    ? previous + (target - previous) * 0.68
+    : previous + (target - previous) * 0.16;
+  meterLevelState.set(container, smoothed);
+  const litCount = smoothed < 0.025 ? 0 : Math.max(1, Math.min(leds.length, Math.ceil(smoothed * leds.length)));
+
   leds.forEach((led, index) => {
-    const position = direction === "horizontal" ? index : (leds.length - 1 - index);
-    const t = leds.length <= 1 ? 1 : position / (leds.length - 1);
+    const vertical = direction !== "horizontal";
+    const t = vertical
+      ? (leds.length <= 1 ? 1 : (leds.length - 1 - index) / (leds.length - 1))
+      : (leds.length <= 1 ? 1 : index / (leds.length - 1));
     const colorClass = t >= .92 ? "red" : t >= .82 ? "orange" : t >= .70 ? "yellow" : t >= .56 ? "lime" : t >= .40 ? "mint" : "green";
     led.classList.remove("green", "mint", "lime", "yellow", "orange", "red");
     led.classList.add(colorClass);
-    const isLit = direction === "horizontal" ? index < litCount : index >= leds.length - litCount;
+    const isLit = vertical ? index >= leds.length - litCount : index < litCount;
     led.classList.toggle("on", isLit);
   });
 }
