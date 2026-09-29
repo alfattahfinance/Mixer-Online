@@ -1890,6 +1890,112 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   accent-color:#c4c9cf !important;
 }
 
+  
+/* PAGE-SPECIFIC COLOR SYSTEMS: Mixer graphite, EQ silver/white, Echo charcoal-blue */
+/* Mixer left navigation: remove the blue-black cast while retaining blue as a clear selection accent. */
+#tabMixerContent .mixer-side-nav {
+  background:linear-gradient(180deg,#3c4249 0%,#30353b 100%) !important;
+  border-color:#737b84 !important;
+}
+#tabMixerContent .mixer-side-nav .side-nav-caption { color:#d1d5db !important; }
+#tabMixerContent .mixer-side-nav .side-nav-divider { background:#737b84 !important; }
+#tabMixerContent .mixer-side-nav .tft-tab,
+#tabMixerContent .mixer-side-nav .console-btn {
+  background:#4a5057 !important; color:#e5e7eb !important; border:1px solid #737b84 !important;
+}
+#tabMixerContent .mixer-side-nav .tft-tab.active,
+#tabMixerContent .mixer-side-nav .console-btn.active {
+  background:linear-gradient(180deg,#2876b8,#18558c) !important;
+  color:#fff !important; border-color:#69b8f4 !important;
+  box-shadow:0 0 5px rgba(40,118,184,.35) !important;
+}
+/* Mixer: neutral metallic channel surfaces, deep display, blue interaction accents. */
+#tabMixerContent .mixer-console { background:#292e34 !important; }
+#tabMixerContent .mixer-top-console { background:#20252b !important; border-color:#737b84 !important; }
+#tabMixerContent .console-channel-strip,
+#tabMixerContent .console-channel-strip.master-strip {
+  background:linear-gradient(180deg,#484e56 0%,#3b4047 58%,#30353b 100%) !important;
+  border-color:#858d96 !important;
+}
+#tabMixerContent .strip-label-box,
+#tabMixerContent .master-strip .strip-label-box {
+  background:linear-gradient(180deg,#737b84,#555b63) !important;
+  color:#f3f4f6 !important; border-color:#aeb5bd !important;
+}
+#tabMixerContent .mixer-side-nav .console-btn.active,
+#tabMixerContent .console-btn.active:not(.mute):not(.solo) {
+  background:linear-gradient(180deg,#2876b8,#18558c) !important;
+  border-color:#69b8f4 !important; color:#fff !important;
+}
+/* Equalizer: light silver chassis with white work areas, charcoal typography and restrained blue controls. */
+#tabEqContent { background:#c7ccd2 !important; color:#20252b !important; }
+#tabEqContent .rack,
+#tabEqContent .channels,
+#tabEqContent .channel,
+#tabEqContent .rack-header {
+  background:#e1e4e8 !important; color:#20252b !important;
+  border-color:#9aa2ab !important;
+}
+#tabEqContent .channel-header,
+#tabEqContent .control-row,
+#tabEqContent .control,
+#tabEqContent .meter-area,
+#tabEqContent .eq-band,
+#tabEqContent .eq-controls,
+#tabEqContent .eq-control,
+#tabEqContent .control-panel {
+  background:#f5f6f7 !important; color:#20252b !important;
+  border-color:#b4bbc3 !important;
+}
+#tabEqContent label,
+#tabEqContent .channel-title,
+#tabEqContent .model,
+#tabEqContent .grade,
+#tabEqContent .gain-value,
+#tabEqContent .control-value { color:#252a30 !important; }
+#tabEqContent input:not([type="range"]),
+#tabEqContent select { background:#fff !important; color:#20252b !important; border-color:#a3abb4 !important; }
+#tabEqContent input[type="range"] { accent-color:#2876b8 !important; }
+#tabEqContent button,
+#tabEqContent .eq-action-button {
+  background:#d4d9df !important; color:#20252b !important; border-color:#929ba5 !important;
+}
+#tabEqContent button:hover,
+#tabEqContent .eq-action-button[aria-pressed="true"] {
+  background:#2876b8 !important; color:#fff !important; border-color:#69b8f4 !important;
+}
+#tabEqContent .eq-response-grid line { stroke:#b0b7bf !important; }
+#tabEqContent .eq-response-path { stroke:#1768a8 !important; }
+/* Alesis Echo: dark charcoal equipment face, blue screen/controls, silver knobs and readable white labels. */
+#tabEchoContent { background:#30343a !important; color:#e5e7eb !important; }
+#tabEchoContent .echo-panel-box {
+  background:linear-gradient(180deg,#3b4149,#292e34) !important;
+  border:1px solid #737b84 !important; color:#e5e7eb !important;
+}
+#tabEchoContent .echo-header-row,
+#tabEchoContent .echo-control-card,
+#tabEchoContent .echo-section,
+#tabEchoContent .echo-module,
+#tabEchoContent .echo-parameter,
+#tabEchoContent .echo-display,
+#tabEchoContent .echo-controls {
+  background:#41474f !important; color:#e5e7eb !important; border-color:#737b84 !important;
+}
+#tabEchoContent h3,
+#tabEchoContent h4,
+#tabEchoContent label,
+#tabEchoContent .echo-label,
+#tabEchoContent .echo-value { color:#e5e7eb !important; }
+#tabEchoContent input:not([type="range"]),
+#tabEchoContent select { background:#252a30 !important; color:#f3f4f6 !important; border-color:#737b84 !important; }
+#tabEchoContent input[type="range"] { accent-color:#3182c5 !important; }
+#tabEchoContent button,
+#tabEchoContent .echo-onoff-btn {
+  background:linear-gradient(180deg,#2876b8,#18558c) !important;
+  color:#fff !important; border:1px solid #69b8f4 !important;
+}
+#tabEchoContent button:disabled { background:#555b63 !important; color:#cbd5e1 !important; border-color:#737b84 !important; }
+
   </style>
 </head>
 
