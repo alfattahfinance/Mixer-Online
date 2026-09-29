@@ -898,7 +898,7 @@ header, .topbar {
         <!-- PERMUKAAN KONSOLE (FADER STRIPS) -->
         <div class="mixer-desk-surface">
           <div class="console-channel-strip">
-            <div class="strip-label-box">CHANNEL 1</div>
+            <div class="strip-label-box">MIC / USB INPUT</div>
             <div class="strip-knobs-area">
               <div class="knob-row"><span>GAIN</span><span>+0dB</span></div>
               <div class="knob-row"><span>HPF</span><select><option>OFF</option><option>80Hz</option></select></div>
@@ -915,14 +915,14 @@ header, .topbar {
           </div>
 
           <div class="console-channel-strip">
-            <div class="strip-label-box">CHANNEL 2</div>
+            <div class="strip-label-box">AUDIO / MP3</div>
             <div class="strip-knobs-area">
-              <div class="knob-row"><span>GAIN</span><span>+0dB</span></div>
-              <div class="knob-row"><span>HPF</span><select><option>OFF</option><option>80Hz</option></select></div>
+              <div class="knob-row"><span>SOURCE</span><span>FILE / MP3</span></div>
+              <div class="knob-row"><span>PLAYER</span><span>PLAY / STOP</span></div>
             </div>
             <div class="fader-readout">0.0 dB</div>
             <div class="fader-panel-area">
-              <div class="fader-slot"><input type="range" min="-40" max="10" step="0.5" value="0"></div>
+              <div class="fader-slot"><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="Audio MP3 channel level"></div>
               <div class="vert-led-meter" id="mixerMeter2"></div>
             </div>
             <div class="strip-action-buttons">
@@ -932,14 +932,14 @@ header, .topbar {
           </div>
 
           <div class="console-channel-strip">
-            <div class="strip-label-box">CHANNEL 3</div>
+            <div class="strip-label-box">FX SEND</div>
             <div class="strip-knobs-area">
-              <div class="knob-row"><span>GAIN</span><span>+0dB</span></div>
-              <div class="knob-row"><span>HPF</span><select><option>OFF</option><option>80Hz</option></select></div>
+              <div class="knob-row"><span>ROUTE</span><span>MAIN → FX</span></div>
+              <div class="knob-row"><span>FX SEND</span><span>LEVEL</span></div>
             </div>
             <div class="fader-readout">0.0 dB</div>
             <div class="fader-panel-area">
-              <div class="fader-slot"><input type="range" min="-40" max="10" step="0.5" value="0"></div>
+              <div class="fader-slot"><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="FX send level"></div>
               <div class="vert-led-meter" id="mixerMeter3"></div>
             </div>
             <div class="strip-action-buttons">
@@ -949,14 +949,14 @@ header, .topbar {
           </div>
 
           <div class="console-channel-strip">
-            <div class="strip-label-box">CHANNEL 4</div>
+            <div class="strip-label-box">FX RETURN</div>
             <div class="strip-knobs-area">
-              <div class="knob-row"><span>GAIN</span><span>+0dB</span></div>
-              <div class="knob-row"><span>HPF</span><select><option>OFF</option><option>80Hz</option></select></div>
+              <div class="knob-row"><span>PROCESSOR</span><span>ALESIS FX</span></div>
+              <div class="knob-row"><span>RETURN</span><span>WET LEVEL</span></div>
             </div>
             <div class="fader-readout">0.0 dB</div>
             <div class="fader-panel-area">
-              <div class="fader-slot"><input type="range" min="-40" max="10" step="0.5" value="0"></div>
+              <div class="fader-slot"><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="FX return level"></div>
               <div class="vert-led-meter" id="mixerMeter4"></div>
             </div>
             <div class="strip-action-buttons">
@@ -1779,7 +1779,8 @@ function rebuildAudioRouting() {
     mixerInputGain.connect(alesisDryNode);
     alesisDryNode.connect(audioChannels[0].inputGain);
     alesisDryNode.connect(audioChannels[1].inputGain);
-    mixerInputGain.connect(alesisDelayNode);
+    mixerInputGain.connect(mixerStripGains[2]);
+    mixerStripAnalysers[2].connect(alesisDelayNode);
     alesisDelayNode.connect(alesisWetNode);
     alesisWetNode.connect(mixerStripGains[3]);
     try { mixerStripAnalysers[3].disconnect(); } catch (err) {}
