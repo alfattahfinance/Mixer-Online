@@ -294,7 +294,7 @@ header, .topbar {
 }
 .mixer-workspace-main {
   grid-column:2; grid-row:1 / span 2; display:grid;
-  grid-template-rows:238px minmax(0,1fr); gap:5px;
+  grid-template-rows:318px minmax(0,1fr); gap:5px;
   min-height:0; min-width:0; overflow:hidden;
 }
 .mixer-workspace-main .mixer-tft-screen { height:100%; min-height:0; max-height:none; flex:1 1 auto; }
@@ -547,7 +547,7 @@ header, .topbar {
 @media (min-width: 1200px) {
   #tabMixerContent .mixer-workspace-main {
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    grid-template-rows: 238px minmax(0, 1fr);
+    grid-template-rows: 318px minmax(0, 1fr);
     column-gap: 5px;
     row-gap: 5px;
     overflow: visible;
@@ -2308,13 +2308,41 @@ input[type="range"] { accent-color:#b8bec6 !important; }
 #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box { display:block !important; }
 
 
-/* SHORTEN THE FOUR INPUT STRIPS: align their top edge with the master fader card. */
+/* Keep all four input strip tops aligned with the bottom edge of the TFT screen. */
 @media (min-width: 1200px) {
   #tabMixerContent .mixer-desk-surface > .console-channel-strip:not(.master-strip) {
-    align-self: end;
+    align-self: stretch;
     box-sizing: border-box;
-    height: calc(100% - 80px);
+    height: 100%;
   }
+}
+
+
+
+/* Physical-console inspired TFT: deep black glass with a restrained glossy reflection. */
+#tabMixerContent .mixer-top-console {
+  background: linear-gradient(145deg, #07090d 0%, #111722 48%, #050609 100%) !important;
+  border: 1px solid rgba(150,165,185,.28) !important;
+  border-radius: 9px !important;
+  padding: 5px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.16), inset 0 -8px 18px rgba(0,0,0,.72), 0 2px 7px rgba(0,0,0,.55) !important;
+}
+#tabMixerContent .mixer-tft-screen {
+  position:relative;
+  background: linear-gradient(118deg, #030509 0%, #080c13 56%, #030509 100%) !important;
+  border: 2px solid #4a5360 !important;
+  border-radius: 7px !important;
+  padding: 7px !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.07), inset 0 8px 22px rgba(255,255,255,.035), inset 0 -12px 24px rgba(0,0,0,.9), 0 0 8px rgba(0,0,0,.65) !important;
+}
+#tabMixerContent .mixer-tft-screen::after {
+  content:""; position:absolute; inset:2px; pointer-events:none; border-radius:4px;
+  background:linear-gradient(112deg, transparent 0%, rgba(255,255,255,.025) 38%, rgba(255,255,255,.09) 47%, rgba(255,255,255,.018) 54%, transparent 72%);
+}
+#tabMixerContent .mixer-tft-screen .tft-main-viewport {
+  background:linear-gradient(180deg,#030509,#070b12 60%,#020408) !important;
+  border-color:rgba(116,137,164,.32) !important;
+  box-shadow:inset 0 2px 12px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.045) !important;
 }
 
 </style>
