@@ -2952,6 +2952,51 @@ input[type="range"] { accent-color:#b8bec6 !important; }
 #tabMixerContent #tftContentArea[data-page-key="setup"] .tft-info-cards,
 #tabMixerContent #tftContentArea[data-page-key="effects"] .tft-info-cards { grid-template-columns:repeat(auto-fit,minmax(100px,1fr)); }
 .tft-curve-toggle[hidden] { display:none !important; }
+
+
+/* Responsive TFT content: use the full display area and avoid the old gray
+   dead-space on non-curve pages. Controls remain independently scrollable. */
+#tabMixerContent .mixer-tft-screen .tft-main-viewport {
+  min-height: 0 !important;
+  background: #03070d !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-content-screen,
+#tabMixerContent #tftContentArea {
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  flex: 1 1 auto;
+  background: transparent !important;
+}
+#tabMixerContent #tftContentArea .tft-module-view {
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  background: transparent !important;
+}
+#tabMixerContent #tftContentArea .tft-module-graph-box {
+  flex: 1 1 auto;
+  min-height: clamp(110px, 22vh, 260px);
+  max-height: none;
+  background-color: #03070d !important;
+  border-color: rgba(56,189,248,.32) !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box {
+  display: block !important;
+}
+#tabMixerContent #tftContentArea .tft-info-panel {
+  background: linear-gradient(180deg,#070b12 0%,#03060b 100%) !important;
+  border-color: rgba(56,189,248,.24) !important;
+}
+#tabMixerContent #tftContentArea .tft-module-controls-grid {
+  flex-shrink: 0;
+}
+
 </style>
 </head>
 
@@ -5008,7 +5053,8 @@ function bindTftDynamicEventListeners(key) {
   const svgBox = document.getElementById(graphPrefix + "SvgContainer") || document.getElementById("tftPeqSvgContainer");
   if (svgBox) svgBox.style.opacity = activeState ? "1" : "0.3";
 
-  if (!activeState) return;
+  // Curve visibility is presentation-only: controls on the page must remain
+  // interactive even when the user switches the curve overlay off.
   const s = tftStatesData[key];
 
   const moduleRoot = document.getElementById("tftContentArea");
@@ -5204,7 +5250,9 @@ tftCurveToggleBtn.addEventListener("click", () => {
   tftCurveActiveStates[activeCurrentSectionKey] = !currentState;
   tftCurveToggleBtn.textContent = tftCurveActiveStates[activeCurrentSectionKey] ? "CURVE: ON" : "CURVE: OFF";
   tftCurveToggleBtn.classList.toggle("active", tftCurveActiveStates[activeCurrentSectionKey]);
-  bindTftDynamicEventListeners(activeCurrentSectionKey);
+  const graphPrefix = "tft" + activeCurrentSectionKey.charAt(0).toUpperCase() + activeCurrentSectionKey.slice(1);
+  const graph = document.getElementById(graphPrefix + "SvgContainer") || document.getElementById("tftPeqSvgContainer");
+  if (graph) graph.style.opacity = tftCurveActiveStates[activeCurrentSectionKey] ? "1" : "0.3";
 });
 
 function loadTftPage(key) {
@@ -5247,6 +5295,4 @@ switchActiveSection("eq");
   </script>
 </body>
 </html>
-
-/* Remove MAIN L/R audio level bars from the central TFT only. */
-#tabMixerContent .tft-stereo-meter-box { display:none !important; }
+\n
