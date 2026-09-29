@@ -3886,7 +3886,7 @@ function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed
 
 /* DRAG STABILIZER: start only from the visible fader cap; dampen travel */
 (function enableStableRangeDragging() {
-  const SENSITIVITY = 0.42; // dampened travel; normalized to each fader's actual track length
+  const SENSITIVITY = 0.20; // dampened travel; normalized to each fader's actual track length
   let active = null;
 
   document.addEventListener("pointerdown", (event) => {
@@ -5244,10 +5244,8 @@ function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback) {
   dotElement.setAttribute("tabindex", "0");
   dotElement.setAttribute("role", "slider");
   let activePointerId = null;
-
-  const onPointerMove = (e) => {
-    if (activePointerId === null || e.pointerId !== activePointerId) return;
-    e.preventDefault();
+  let dragStart = null;
+  const getSvgPoint = (clientX, clientY) => {
     const vb = svgContainer.viewBox && svgContainer.viewBox.baseVal;
     const svgWidth = vb && vb.width ? vb.width : 320;
     const svgHeight = vb && vb.height ? vb.height : 65;
@@ -5256,25 +5254,33 @@ function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback) {
       const matrix = svgContainer.getScreenCTM();
       if (matrix && svgContainer.createSVGPoint) {
         const point = svgContainer.createSVGPoint();
-        point.x = e.clientX;
-        point.y = e.clientY;
+        point.x = clientX; point.y = clientY;
         const local = point.matrixTransform(matrix.inverse());
-        x = local.x;
-        y = local.y;
+        x = local.x; y = local.y;
       }
     } catch (_) {}
     if (!Number.isFinite(x) || !Number.isFinite(y)) {
       const rect = svgContainer.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
-      x = ((e.clientX - rect.left) / rect.width) * svgWidth;
-      y = ((e.clientY - rect.top) / rect.height) * svgHeight;
+      if (!rect.width || !rect.height) return null;
+      x = ((clientX - rect.left) / rect.width) * svgWidth;
+      y = ((clientY - rect.top) / rect.height) * svgHeight;
     }
+    return { x, y, svgWidth, svgHeight };
+  };
+  const onPointerMove = (e) => {
+    if (activePointerId === null || e.pointerId !== activePointerId || !dragStart) return;
+    e.preventDefault();
+    const point = getSvgPoint(e.clientX, e.clientY);
+    if (!point) return;
+    // Keep the grabbed offset and dampen relative travel to avoid snapping.
     const radius = Number(dotElement.getAttribute("r")) || 7;
-    const relX = Math.max(radius, Math.min(svgWidth - radius, x));
-    const relY = Math.max(radius, Math.min(svgHeight - radius, y));
+    const relX = Math.max(radius, Math.min(point.svgWidth - radius,
+      dragStart.dotX + (point.x - dragStart.pointerX) * 0.55));
+    const relY = Math.max(radius, Math.min(point.svgHeight - radius,
+      dragStart.dotY + (point.y - dragStart.pointerY) * 0.55));
     dotElement.setAttribute("cx", relX.toFixed(2));
     dotElement.setAttribute("cy", relY.toFixed(2));
-    if (typeof onUpdateCallback === "function") onUpdateCallback(relX, relY, svgWidth, svgHeight);
+    if (typeof onUpdateCallback === "function") onUpdateCallback(relX, relY, point.svgWidth, point.svgHeight);
   };
 
   dotElement.addEventListener("pointerdown", (e) => {
@@ -5282,6 +5288,11 @@ function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback) {
     e.preventDefault();
     e.stopPropagation();
     activePointerId = e.pointerId;
+    const point = getSvgPoint(e.clientX, e.clientY);
+    const cx = Number(dotElement.getAttribute("cx"));
+    const cy = Number(dotElement.getAttribute("cy"));
+    dragStart = point && Number.isFinite(cx) && Number.isFinite(cy)
+      ? { pointerX: point.x, pointerY: point.y, dotX: cx, dotY: cy } : null;
     dotElement.style.cursor = "grabbing";
     try { svgContainer.setPointerCapture(e.pointerId); } catch (_) {}
   });
@@ -5290,6 +5301,7 @@ function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback) {
     if (activePointerId === null || (e.pointerId !== undefined && e.pointerId !== activePointerId)) return;
     const pointerId = activePointerId;
     activePointerId = null;
+    dragStart = null;
     dotElement.style.cursor = "grab";
     try { if (svgContainer.hasPointerCapture(pointerId)) svgContainer.releasePointerCapture(pointerId); } catch (_) {}
   };
