@@ -2262,7 +2262,40 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   display:none !important;
 }
 
-  </style>
+  
+/* OPEN CHANNEL STRIPS + AREAS ABOVE/BELOW TFT: soften excess separators */
+#tabMixerContent .mixer-desk-surface,
+#tabMixerContent .mixer-top-console,
+#tabMixerContent .mixer-main-panel,
+#tabMixerContent .console-channel-strip,
+#tabMixerContent .console-channel-strip.master-strip {
+  outline:0 !important;
+  box-shadow:none !important;
+}
+#tabMixerContent .console-channel-strip,
+#tabMixerContent .console-channel-strip.master-strip {
+  border:0 !important;
+  border-right:1px solid rgba(190,198,207,.18) !important;
+  border-radius:0 !important;
+}
+#tabMixerContent .console-channel-strip:last-child { border-right:0 !important; }
+#tabMixerContent .console-channel-strip .strip-label-box,
+#tabMixerContent .console-channel-strip .strip-action-buttons,
+#tabMixerContent .console-channel-strip .fader-panel-area,
+#tabMixerContent .console-channel-strip .mixer-control-section,
+#tabMixerContent .console-channel-strip .fader-slot {
+  box-shadow:none !important;
+}
+#tabMixerContent .console-channel-strip .strip-label-box,
+#tabMixerContent .console-channel-strip .strip-action-buttons {
+  border-color:rgba(190,198,207,.22) !important;
+}
+#tabMixerContent .mixer-top-console > *,
+#tabMixerContent .mixer-desk-surface > * { outline:0 !important; }
+#tabMixerContent .mixer-top-console { border-width:0 0 1px !important; }
+#tabMixerContent .mixer-desk-surface { border:0 !important; }
+
+</style>
 </head>
 
 <body>
