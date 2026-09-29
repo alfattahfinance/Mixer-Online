@@ -2933,6 +2933,25 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   #tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
   #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box { min-height:88px !important; }
 }
+/* PAGE SEMANTICS: no curve canvas or empty plotting area on non-curve pages. */
+#tabMixerContent #tftContentArea:not([data-page-key="gate"]):not([data-page-key="dynamics"]) .tft-module-graph-box { display:none !important; }
+#tabMixerContent #tftContentArea .tft-info-panel {
+  flex:1 1 auto !important; min-height:0 !important; height:auto !important;
+  background:linear-gradient(145deg,#070b12 0%,#0b111b 52%,#05080e 100%) !important;
+  border:1px solid rgba(125,161,190,.24) !important;
+  color:#dbe4ee !important; overflow:auto !important;
+}
+#tabMixerContent #tftContentArea .tft-module-view {
+  background:#03070d !important; min-height:0 !important; height:100% !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="routing"] .tft-patch-grid { width:100%; }
+#tabMixerContent #tftContentArea[data-page-key="meters"] .tft-meter-overview { min-height:clamp(70px,12vh,150px); }
+#tabMixerContent #tftContentArea[data-page-key="scenes"] .tft-scene-list { width:100%; }
+#tabMixerContent #tftContentArea[data-page-key="main"] .tft-signal-flow { width:100%; }
+#tabMixerContent #tftContentArea[data-page-key="main"] .tft-signal-flow span { flex:1 1 55px; }
+#tabMixerContent #tftContentArea[data-page-key="setup"] .tft-info-cards,
+#tabMixerContent #tftContentArea[data-page-key="effects"] .tft-info-cards { grid-template-columns:repeat(auto-fit,minmax(100px,1fr)); }
+.tft-curve-toggle[hidden] { display:none !important; }
 </style>
 </head>
 
@@ -4793,8 +4812,11 @@ function updateTftPeqVisuals() {
 }
 
 function updateTftModuleCurve(key) {
+  // Only Gate and Compressor expose editable transfer curves.
+  // Other pages use purpose-built patch, meter, scene, setup, utility, or insert views.
+  if (key !== "gate" && key !== "dynamics") return;
   const s = tftStatesData[key];
-  if (!s || key === "eq") return;
+  if (!s) return;
   const prefix = "tft" + key.charAt(0).toUpperCase() + key.slice(1);
   const svg = document.getElementById(prefix + "SvgContainer");
   const curve = document.getElementById(prefix + "SvgCurve");
@@ -4891,34 +4913,13 @@ function applyTftGraphPointToControl(key, pointIndex, x, y) {
     el.value = String(value);
     el.dispatchEvent(new Event("input", { bubbles: true }));
   };
-  const setSelectIndex = (id, index) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.selectedIndex = index;
-    el.dispatchEvent(new Event("change", { bubbles: true }));
-  };
-  if (key === "config") setRange("cfgGain", Math.round(clamp((58-y)/48*60,0,60)));
-  else if (key === "gate") {
+  if (key === "gate") {
     if (pointIndex === 1) setRange("gateThresh", Math.round(clamp((x-20)/130*80-80,-80,0)));
     else setRange("gateRatio", Math.round(clamp((55-y)/3.8+1,1,10)*2)/2);
-  }
-  else if (key === "dynamics") {
+  } else if (key === "dynamics") {
     if (pointIndex === 1) setRange("compThresh", Math.round(clamp((x-20)/145*60-60,-60,0)));
     else if (pointIndex === 2) setRange("compRatio", Math.round(clamp((55-y)/2.3+1,1,20)));
     else setRange("compMakeup", Math.round(clamp((20-y)/0.65,0,24)));
-  }
-  else if (key === "sends") setRange("send1Lvl", Math.round(clamp((32-y)/1.35,-15,15)));
-  else if (key === "main") {
-    if (pointIndex === 1) setRange("mainFohLvl", Math.round(clamp((35-y)/25*56-50,-50,6)));
-    else setRange("mainLimitLvl", Math.round(clamp((y-35)/1.25-20,-20,0)*2)/2);
-  }
-  else if (key === "routing") setSelectIndex("routeSourceSel", Math.round(clamp(x/320*3,0,3)));
-  else if (key === "meters") setRange("meterZoomInp", clamp((50-y)/10,0.5,4));
-  else if (key === "scenes") setSelectIndex("sceneActiveSel", Math.round(clamp((x-70)/45,0,3)));
-  else if (key === "setup") setRange("setupBrightInp", Math.round(clamp((58-y)/0.55,0,100)));
-  else if (key === "effects") {
-    if (pointIndex === 1) setRange("fxDelayInp", clamp((x-40)/230,0,1.2));
-    else setRange("fxFeedbackInp", clamp((52-y)/75,0,0.85));
   }
 }
 
@@ -5178,6 +5179,9 @@ function loadTftPage(key) {
   tftFooterStatus.textContent = data.footerSt;
   updateEncoders(typeof data.encoders === 'function' ? data.encoders(s) : data.encoders);
 
+  const isCurvePage = key === "eq" || key === "gate" || key === "dynamics";
+  tftCurveToggleBtn.hidden = !isCurvePage;
+  tftCurveToggleBtn.setAttribute("aria-hidden", String(!isCurvePage));
   const isActive = tftCurveActiveStates[key] !== false;
   tftCurveToggleBtn.textContent = isActive ? "CURVE: ON" : "CURVE: OFF";
   tftCurveToggleBtn.classList.toggle("active", isActive);
