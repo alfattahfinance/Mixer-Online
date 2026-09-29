@@ -5097,7 +5097,7 @@ function updateTftModuleCurve(key) {
   if (key !== "gate" && key !== "dynamics" && key !== "sends") return;
   const s = tftStatesData[key];
   if (!s) return;
-  const prefix = "tft" + key.charAt(0).toUpperCase() + key.slice(1);
+  const prefix = key === "dynamics" ? "tftComp" : "tft" + key.charAt(0).toUpperCase() + key.slice(1);
   const svg = document.getElementById(prefix + "SvgContainer");
   const curve = document.getElementById(prefix + "SvgCurve");
   const fill = document.getElementById(prefix + "SvgFill");
@@ -5283,7 +5283,7 @@ function refreshTftInfoPanel(key) {
 
 function bindTftDynamicEventListeners(key) {
   const activeState = tftCurveActiveStates[key] !== false;
-  const graphPrefix = "tft" + key.charAt(0).toUpperCase() + key.slice(1);
+  const graphPrefix = key === "dynamics" ? "tftComp" : "tft" + key.charAt(0).toUpperCase() + key.slice(1);
   const svgBox = document.getElementById(graphPrefix + "SvgContainer") || document.getElementById("tftPeqSvgContainer");
   if (svgBox) svgBox.style.opacity = activeState ? "1" : "0.3";
 
@@ -5460,11 +5460,12 @@ function bindTftDynamicEventListeners(key) {
       stBtn?.addEventListener("click", () => { s.active = !s.active; stBtn.textContent = s.active ? "ACTIVE" : "OFF"; stBtn.classList.toggle("active-action", s.active); });
     }
 
-    const container = document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}SvgContainer`);
-    const curve = document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}SvgCurve`);
-    const dot1 = document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}Dot1`) || document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}Dot`);
-    const dot2 = document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}Dot2`);
-    const dot3 = document.getElementById(`tft${key.charAt(0).toUpperCase() + key.slice(1)}Dot3`);
+    const container = document.getElementById(key === "dynamics" ? "tftCompSvgContainer" : `tft${key.charAt(0).toUpperCase() + key.slice(1)}SvgContainer`);
+    const curve = document.getElementById(key === "dynamics" ? "tftCompSvgCurve" : `tft${key.charAt(0).toUpperCase() + key.slice(1)}SvgCurve`);
+    const dotPrefix = key === "dynamics" ? "tftComp" : `tft${key.charAt(0).toUpperCase() + key.slice(1)}`;
+    const dot1 = document.getElementById(`${dotPrefix}Dot1`) || document.getElementById(`${dotPrefix}Dot`);
+    const dot2 = document.getElementById(`${dotPrefix}Dot2`);
+    const dot3 = document.getElementById(`${dotPrefix}Dot3`);
 
     if (container && dot1 && curve) {
       makeSpecificDotDraggable(container, dot1, (x, y) => {
