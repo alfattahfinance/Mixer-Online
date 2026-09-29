@@ -3152,6 +3152,30 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   }
 }
 
+
+/* FINAL METERS ALIGNMENT: keep the spectrum centered between the side meters. */
+#tabMixerContent #tftContentArea[data-page-key="meters"] .tft-meter-overview {
+  display: grid !important;
+  grid-template-columns: 54px minmax(0, 1fr) 54px !important;
+  grid-template-rows: minmax(0, 1fr) !important;
+  width: 100% !important;
+  align-items: stretch !important;
+  justify-content: stretch !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="meters"] .tft-digital-meter:first-child {
+  grid-column: 1 !important; grid-row: 1 !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="meters"] .tft-digital-meter:nth-child(2) {
+  grid-column: 3 !important; grid-row: 1 !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="meters"] .tft-spectrum {
+  grid-column: 2 !important; grid-row: 1 !important;
+  justify-self: stretch !important; align-self: stretch !important;
+  width: 100% !important; max-width: none !important;
+  min-width: 0 !important; height: auto !important;
+  min-height: 0 !important; max-height: none !important;
+  margin: 0 !important; box-sizing: border-box !important;
+}
 </style>
 </head>
 
