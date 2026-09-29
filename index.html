@@ -841,12 +841,12 @@ header, .topbar {
             <button class="tft-tab" data-tft-tab="effects">Utility</button>
             <div class="side-nav-divider"></div>
             <div class="side-nav-caption">CHANNEL DSP</div>
-            <button class="console-btn" data-section="config">Preamp</button>
-            <button class="console-btn" data-section="gate">Gate</button>
-            <button class="console-btn" data-section="dynamics">Comp</button>
-            <button class="console-btn active" data-section="eq">PEQ</button>
-            <button class="console-btn" data-section="sends">GEQ</button>
-            <button class="console-btn" data-section="main">Insert</button>
+            <button type="button" class="console-btn" data-section="config">Preamp</button>
+            <button type="button" class="console-btn" data-section="gate">Gate</button>
+            <button type="button" class="console-btn" data-section="dynamics">Comp</button>
+            <button type="button" class="console-btn active" data-section="eq">PEQ</button>
+            <button type="button" class="console-btn" data-section="sends">GEQ</button>
+            <button type="button" class="console-btn" data-section="main">Insert</button>
           </aside>
           <div class="mixer-workspace-main">
         <!-- BAGIAN LAYAR UTAMA -->
@@ -2110,7 +2110,9 @@ const tftContentArea = document.getElementById("tftContentArea");
 const tftFooterChannel = document.getElementById("tftFooterChannel");
 const tftFooterStatus = document.getElementById("tftFooterStatus");
 const tftTabs = document.querySelectorAll(".tft-tab");
-const consoleSectionBtns = document.querySelectorAll(".mixer-control-section .console-btn");
+// DSP navigation lives in the mixer-side-nav (not .mixer-control-section).
+// Keep this selector aligned with the actual markup so each DSP page receives its click handler.
+const consoleSectionBtns = document.querySelectorAll(".mixer-side-nav .console-btn[data-section]");
 
 function updateEncoders(data) {
   const encoderBoxes = document.querySelectorAll(".tft-encoder-knob");
