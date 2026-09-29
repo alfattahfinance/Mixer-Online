@@ -898,6 +898,50 @@ header, .topbar {
   }
 }
 
+
+/* MASTER FADER POSITION — extend down to sit immediately above MUTE / LR buttons */
+#tabMixerContent .mixer-desk-surface .master-strip {
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .fader-panel-area {
+  flex:1 1 auto;
+  min-height:0;
+  height:auto;
+  justify-content:flex-start;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row {
+  flex:1 1 auto;
+  height:auto;
+  min-height:180px;
+  max-height:none;
+  margin-top:auto;
+  align-self:center;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot,
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-combined-wrap {
+  height:100%;
+  min-height:0;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .strip-action-buttons {
+  flex:0 0 auto;
+  margin-top:6px;
+}
+@media (min-width:1200px) {
+  #tabMixerContent .mixer-desk-surface .master-strip .fader-panel-area {
+    min-height:0;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row {
+    min-height:260px;
+  }
+}
+@media (max-width:700px) {
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row {
+    min-height:150px;
+  }
+}
+
 </style>
 </head>
 
