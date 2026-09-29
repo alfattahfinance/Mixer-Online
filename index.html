@@ -1273,14 +1273,14 @@ header, .topbar {
 /* Compact dB scale values aligned alongside the fader travel */
 #tabMixerContent .mixer-desk-surface .console-channel-strip:not(.master-strip) .fader-slot::after,
 #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot::after {
-  content:"10\\A 5\\A 0\\A 5\\A 10\\A 20\\A 30\\A 40\\A ∞";
+  content:"10\A 5\A 0\A 5\A 10\A 20\A 30\A 40\A ∞";
   white-space:pre;
   position:absolute;
   left:2px;
   top:4%;
   height:92%;
   display:flex;
-  align-items:space-between;
+  display:block; line-height:2.2;
   color:rgba(226,232,240,.72);
   font:7px/1.0 ui-monospace,monospace;
   pointer-events:none;
