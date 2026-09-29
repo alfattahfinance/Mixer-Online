@@ -3747,7 +3747,7 @@ const tftStatesData = {
   main: { send: 0, limit: -0.5, bypass: false, dot1X: 160, dot1Y: 12, dot2X: 310, dot2Y: 35 },
   routing: { source: 0, dout: 0, usb: true, dotX: 160, dotY: 48 },
   meters: { source: 0, hold: 0, zoom: 1, dotX: 160, dotY: 42 },
-  scenes: { active: 0, safe: true, dotX: 160, dotY: 36 },
+  scenes: { active: 0, safe: true, stored: false, dotX: 160, dotY: 36 },
   setup: { bright: 85, ble: true, buf: 0, dotX: 160, dotY: 32 },
   effects: { delay: 0.3, feedback: 0.4, active: true, dot1X: 80, dot1Y: 12, dot2X: 240, dot2Y: 24 }
 };
@@ -4720,7 +4720,7 @@ const tftDatabase = {
         </div>
       </div>
     `,
-    encoders: (s) => [{name:"SCENE", val:s.active===0?"#01":"#02"}, {name:"RECALL", val:s.safe?"SAFE":"DIR"}, {name:"STORE", val:"READY"}, {name:"SNIPPET", val:"ALL"}, {name:"USB SAVE", val:"READY"}, {name:"AUTO", val:"ON"}]
+    encoders: (s) => [{name:"SCENE", val:s.active===0?"#01":"#02"}, {name:"RECALL", val:s.safe?"SAFE":"DIR"}, {name:"STORE", val:s.stored?"SAVED":"READY"}, {name:"SNIPPET", val:"ALL"}, {name:"USB SAVE", val:"READY"}, {name:"AUTO", val:"ON"}]
   },
   setup: {
     title: "SQ-7 SYSTEM SETUP & HARDWARE",
@@ -4814,7 +4814,7 @@ function updateTftPeqVisuals() {
 function updateTftModuleCurve(key) {
   // Only Gate and Compressor expose editable transfer curves.
   // Other pages use purpose-built patch, meter, scene, setup, utility, or insert views.
-  if (key !== "gate" && key !== "dynamics") return;
+  if (key !== "gate" && key !== "dynamics" && key !== "sends") return;
   const s = tftStatesData[key];
   if (!s) return;
   const prefix = "tft" + key.charAt(0).toUpperCase() + key.slice(1);
@@ -4920,6 +4920,8 @@ function applyTftGraphPointToControl(key, pointIndex, x, y) {
     if (pointIndex === 1) setRange("compThresh", Math.round(clamp((x-20)/145*60-60,-60,0)));
     else if (pointIndex === 2) setRange("compRatio", Math.round(clamp((55-y)/2.3+1,1,20)));
     else setRange("compMakeup", Math.round(clamp((20-y)/0.65,0,24)));
+  } else if (key === "sends" && pointIndex === 1) {
+    setRange("send1Lvl", Math.round(clamp((32-y)/1.35,-15,15)));
   }
 }
 
@@ -4986,6 +4988,17 @@ function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback) {
   svgContainer.addEventListener("lostpointercapture", stopDrag);
 }
 
+function refreshTftInfoPanel(key) {
+  const data = tftDatabase[key];
+  const state = tftStatesData[key];
+  const currentPanel = document.querySelector("#tftContentArea .tft-info-panel");
+  if (!data || !state || !currentPanel || typeof data.content !== "function") return;
+  const template = document.createElement("template");
+  template.innerHTML = data.content(state);
+  const nextPanel = template.content.querySelector(".tft-info-panel");
+  if (nextPanel) currentPanel.replaceWith(nextPanel);
+}
+
 function bindTftDynamicEventListeners(key) {
   const activeState = tftCurveActiveStates[key] !== false;
   const graphPrefix = "tft" + key.charAt(0).toUpperCase() + key.slice(1);
@@ -5003,6 +5016,7 @@ function bindTftDynamicEventListeners(key) {
         const keyNow = activeCurrentSectionKey;
         if (keyNow === "eq") updateTftPeqVisuals();
         else updateTftModuleCurve(keyNow);
+        refreshTftInfoPanel(keyNow);
       });
     });
   }
@@ -5082,7 +5096,7 @@ function bindTftDynamicEventListeners(key) {
       const presetSel = document.getElementById("geqPresetSel");
       const stBtn = document.getElementById("geqStateBtn");
       lvlInp?.addEventListener("input", () => { s.lvl = Number(lvlInp.value); document.getElementById("send1LvlVal").textContent = s.lvl + "dB"; updateEncoders(tftDatabase.sends.encoders(s)); });
-      presetSel?.addEventListener("change", () => { s.preset = presetSel.selectedIndex; updateEncoders(tftDatabase.sends.encoders(s)); });
+      presetSel?.addEventListener("change", () => { s.preset = presetSel.selectedIndex; updateEncoders(tftDatabase.sends.encoders(s)); updateTftModuleCurve("sends"); refreshTftInfoPanel("sends"); });
       stBtn?.addEventListener("click", () => { s.state = !s.state; stBtn.textContent = s.state ? "ACTIVE" : "BYPASS"; stBtn.classList.toggle("active-action", s.state); updateEncoders(tftDatabase.sends.encoders(s)); });
     } else if (key === "main") {
       const sendInp = document.getElementById("mainFohLvl");
@@ -5095,8 +5109,8 @@ function bindTftDynamicEventListeners(key) {
       const srcSel = document.getElementById("routeSourceSel");
       const doutSel = document.getElementById("routeDoutSel");
       const usbBtn = document.getElementById("routeUsbBtn");
-      srcSel?.addEventListener("change", () => { s.source = srcSel.selectedIndex; });
-      doutSel?.addEventListener("change", () => { s.dout = doutSel.selectedIndex; });
+      srcSel?.addEventListener("change", () => { s.source = srcSel.selectedIndex; updateEncoders(tftDatabase.routing.encoders(s)); refreshTftInfoPanel("routing"); });
+      doutSel?.addEventListener("change", () => { s.dout = doutSel.selectedIndex; updateEncoders(tftDatabase.routing.encoders(s)); refreshTftInfoPanel("routing"); });
       usbBtn?.addEventListener("click", () => { s.usb = !s.usb; usbBtn.textContent = s.usb ? "ACTIVE" : "OFF"; usbBtn.classList.toggle("active-action", s.usb); updateEncoders(tftDatabase.routing.encoders(s)); });
     } else if (key === "meters") {
       const srcSel = document.getElementById("meterSrcSel");
@@ -5107,8 +5121,15 @@ function bindTftDynamicEventListeners(key) {
       zoomInp?.addEventListener("input", () => { s.zoom = Number(zoomInp.value); document.getElementById("meterZoomVal").textContent = s.zoom + "x"; updateEncoders(tftDatabase.meters.encoders(s)); });
     } else if (key === "scenes") {
       const actSel = document.getElementById("sceneActiveSel");
+      const storeBtn = document.getElementById("sceneStoreBtn");
       const safeBtn = document.getElementById("sceneSafeBtn");
-      actSel?.addEventListener("change", () => { s.active = actSel.selectedIndex; updateEncoders(tftDatabase.scenes.encoders(s)); });
+      actSel?.addEventListener("change", () => { s.active = actSel.selectedIndex; s.stored = false; updateEncoders(tftDatabase.scenes.encoders(s)); });
+      storeBtn?.addEventListener("click", () => {
+        s.stored = true;
+        storeBtn.textContent = "STORED";
+        updateEncoders(tftDatabase.scenes.encoders(s));
+        refreshTftInfoPanel("scenes");
+      });
       safeBtn?.addEventListener("click", () => { s.safe = !s.safe; safeBtn.textContent = s.safe ? "SAFE ON" : "SAFE OFF"; safeBtn.classList.toggle("active-action", s.safe); updateEncoders(tftDatabase.scenes.encoders(s)); });
     } else if (key === "setup") {
       const brInp = document.getElementById("setupBrightInp");
