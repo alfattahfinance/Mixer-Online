@@ -2589,7 +2589,9 @@ function updateMasterGain() {
   const appliedDb = getSafeMasterGainDb();
   masterGainValue.textContent = appliedDb.toFixed(0) + " dB";
   if (masterGainNode && audioContext) {
-    masterGainNode.gain.setTargetAtTime(dbToGain(appliedDb), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+    // Dedicated gentle ramp for the ESP32/HW master output control to avoid
+    // zipper/click artifacts while the output level is being adjusted.
+    masterGainNode.gain.setTargetAtTime(dbToGain(appliedDb), audioContext.currentTime, 0.12);
   }
 }
 
