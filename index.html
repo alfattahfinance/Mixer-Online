@@ -2295,6 +2295,13 @@ input[type="range"] { accent-color:#b8bec6 !important; }
 #tabMixerContent .mixer-top-console { border-width:0 0 1px !important; }
 #tabMixerContent .mixer-desk-surface { border:0 !important; }
 
+
+/* Show transfer/response curves only on pages where they communicate audio behavior */
+#tabMixerContent #tftContentArea .tft-module-graph-box { display:none !important; }
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box { display:block !important; }
+
 </style>
 </head>
 
@@ -4559,6 +4566,7 @@ function loadTftPage(key) {
   tftSectionTitle.textContent = data.title;
   const s = tftStatesData[key];
   tftContentArea.innerHTML = typeof data.content === 'function' ? data.content(s) : data.content;
+  tftContentArea.dataset.pageKey = key;
   tftFooterChannel.textContent = data.footerCh;
   tftFooterStatus.textContent = data.footerSt;
   updateEncoders(typeof data.encoders === 'function' ? data.encoders(s) : data.encoders);
