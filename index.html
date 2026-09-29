@@ -2777,6 +2777,67 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   }
 }
 
+
+/* FINAL FIX: only DSP pages that actually use a response/transfer curve show one.
+   Keep all other TFT pages clean and black instead of leaving a gray graph placeholder. */
+#tabMixerContent #tftContentArea .tft-module-graph-box {
+  display: none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box {
+  display: block !important;
+}
+#tabMixerContent .mixer-tft-screen,
+#tabMixerContent .tft-main-viewport,
+#tabMixerContent .tft-content-screen,
+#tabMixerContent #tftContentArea,
+#tabMixerContent #tftContentArea > *,
+#tabMixerContent #tftContentArea .tft-module-view,
+#tabMixerContent #tftContentArea .tft-module-card {
+  background-color: #03070d !important;
+}
+#tabMixerContent #tftContentArea .tft-module-view {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  overflow: hidden !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box {
+  flex: 1 1 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  background-color: #03070d !important;
+  border: 1px solid rgba(32,216,255,.3) !important;
+  border-radius: 3px !important;
+  overflow: hidden !important;
+  touch-action: none !important;
+}
+#tabMixerContent #tftContentArea .tft-module-graph-box svg,
+#tabMixerContent #tftContentArea .tft-peq-graph svg {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+#tabMixerContent #tftContentArea .tft-peq {
+  background: #03070d !important;
+}
+#tabMixerContent #tftContentArea .tft-peq-graph {
+  background-color: #03070d !important;
+  border-color: rgba(32,216,255,.3) !important;
+}
+
 </style>
 </head>
 
