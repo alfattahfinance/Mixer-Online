@@ -436,6 +436,11 @@ header, .topbar {
 
 .fader-readout { font-size: 9px; font-family: monospace; color: #7dd3fc; margin: 2px 0; font-weight: 800; text-align: center; font-variant-numeric: tabular-nums; }
 .master-strip .fader-readout { color: #fbbf24; }
+.fader-slot .in-fader-readout { position:absolute; top:2px; left:50%; transform:translateX(-50%); z-index:3; margin:0; padding:1px 2px; max-width:calc(100% - 4px); font-size:7px; line-height:1.1; white-space:nowrap; border-radius:2px; background:rgba(8,13,22,.88); pointer-events:none; }
+.mic-input-fader-area { gap:3px; }
+.hpf-fader-control { flex:0 0 27px; width:27px; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:3px; padding-top:3px; color:#94a3b8; font-size:7px; font-weight:800; }
+.hpf-fader-control label { font-size:7px; }
+.hpf-fader-control select { width:100%; min-width:0; padding:2px 0; font-size:7px; color:#e2e8f0; background:#131b28; border:1px solid #475569; border-radius:3px; }
 
 .strip-action-buttons { display: flex; gap: 3px; width: 100%; margin-top: auto !important; }
 .console-action-btn { flex: 1; background: #222d3d; color: #e2e8f0; border: 1px solid #334155; padding: 3px 1px; font-size: 8px; font-weight: 800; border-radius: 3px; text-align: center; min-height: 25px; }
@@ -2573,11 +2578,10 @@ input[type="range"] { accent-color:#b8bec6 !important; }
             <div class="strip-label-box">MIC / USB INPUT</div>
             <div class="strip-knobs-area">
               <div class="knob-row"><span>GAIN</span><span>+0dB</span></div>
-              <div class="knob-row"><span>HPF</span><select><option>OFF</option><option>80Hz</option></select></div>
             </div>
-            <div class="fader-readout">0.0 dB</div>
-            <div class="fader-panel-area">
-              <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0"></div>
+            <div class="fader-panel-area mic-input-fader-area">
+              <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
+              <div class="hpf-fader-control"><label for="micStripHpf">HPF</label><select id="micStripHpf"><option>OFF</option><option>80Hz</option></select></div>
               <div class="vert-led-meter" id="mixerMeter1"></div>
             </div>
             <div class="strip-action-buttons">
@@ -2626,9 +2630,8 @@ input[type="range"] { accent-color:#b8bec6 !important; }
               <div class="knob-row"><span>PROCESSOR</span><span>ALESIS FX</span></div>
               <div class="knob-row"><span>RETURN</span><span>WET LEVEL</span></div>
             </div>
-            <div class="fader-readout">0.0 dB</div>
             <div class="fader-panel-area">
-              <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="FX return level"></div>
+              <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="FX return level"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
               <div class="vert-led-meter" id="mixerMeter4"></div>
             </div>
             <div class="strip-action-buttons">
