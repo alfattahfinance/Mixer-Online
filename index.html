@@ -2882,6 +2882,57 @@ input[type="range"] { accent-color:#b8bec6 !important; }
  #tabMixerContent #tftContentArea .tft-signal-flow span {padding:5px;}
 }
 
+/* FINAL RESPONSIVE TFT + LIVE CURVE FIX: authoritative overrides for every DSP curve page. */
+#tabMixerContent .tft-main-viewport,
+#tabMixerContent .tft-content-screen,
+#tabMixerContent #tftContentArea,
+#tabMixerContent #tftContentArea .tft-module-view,
+#tabMixerContent #tftContentArea .tft-peq {
+  background: #03070d !important; background-color: #03070d !important;
+  min-width: 0 !important; min-height: 0 !important; max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+#tabMixerContent #tftContentArea { width:100% !important; height:100% !important; overflow:hidden !important; }
+#tabMixerContent #tftContentArea .tft-module-view {
+  display:flex !important; flex-direction:column !important; align-items:stretch !important;
+  justify-content:flex-start !important; gap:clamp(4px,.7vh,8px) !important;
+  width:100% !important; height:100% !important; flex:1 1 auto !important; overflow:hidden !important;
+}
+#tabMixerContent #tftContentArea .tft-module-graph-box {
+  display:none !important; flex:1 1 auto !important; width:100% !important; height:auto !important;
+  min-height:0 !important; max-height:none !important; padding:0 !important; overflow:hidden !important;
+  background-color:#050b15 !important;
+  background-image:linear-gradient(rgba(56,189,248,.11) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.11) 1px,transparent 1px) !important;
+  background-size:10% 20% !important; touch-action:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box {
+  display:block !important; min-height:clamp(110px,24vh,240px) !important;
+}
+#tabMixerContent #tftContentArea .tft-module-graph-box svg,
+#tabMixerContent #tftContentArea .tft-peq-graph {
+  display:block !important; width:100% !important; height:100% !important;
+  min-width:0 !important; min-height:0 !important; max-width:100% !important; max-height:100% !important;
+  touch-action:none !important;
+}
+#tabMixerContent #tftContentArea .tft-module-controls-grid,
+#tabMixerContent #tftContentArea .tft-peq-controls { flex:0 0 auto !important; width:100% !important; min-width:0 !important; }
+#tabMixerContent #tftContentArea .tft-info-panel {
+  background:radial-gradient(ellipse at 50% 0%,#101d2c 0%,#050a12 72%) !important;
+  border-color:rgba(56,189,248,.2) !important; color:#dbeafe !important;
+}
+#tabMixerContent #tftContentArea .tft-peq {
+  display:grid !important; grid-template-rows:auto minmax(0,1fr) auto !important;
+  gap:clamp(4px,.7vh,8px) !important; width:100% !important; height:100% !important; overflow:hidden !important;
+}
+#tabMixerContent #tftContentArea .tft-peq-graph { min-height:0 !important; max-height:none !important; border-radius:4px !important; background-color:#050b15 !important; }
+#tabMixerContent #tftContentArea svg circle { vector-effect:non-scaling-stroke; }
+@media (max-height:560px) {
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+  #tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box { min-height:88px !important; }
+}
 </style>
 </head>
 
@@ -4756,7 +4807,11 @@ function updateTftModuleCurve(key) {
   } else if (key === "gate") {
     const x = clamp(20 + ((s.thresh+80)/80)*130,20,180);
     const y = clamp(55 - (s.ratio-1)*3.8,8,55);
-    points = [[10,55],[x,55],[x+18,y],[310,y]];
+    // Keep the knee handle visibly separate from the threshold handle.
+    const kneeX = clamp(x + 30, x + 24, 300);
+    points = s.state
+      ? [[10,55],[x,55],[kneeX,y],[310,y]]
+      : [[10,55],[x,55],[kneeX,55],[310,55]];
   } else if (key === "dynamics") {
     const x = clamp(20 + ((s.thresh+60)/60)*145,20,190);
     const y = clamp(55 - (s.ratio-1)*2.3,8,55);
