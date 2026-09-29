@@ -2866,10 +2866,12 @@ function rebuildAudioRouting() {
   if (isAlesisFxEnabled) {
     mixerStripAnalysers[2].connect(alesisDelayNode);
     alesisDelayNode.connect(alesisWetNode);
-    alesisWetNode.connect(mixerStripGains[3]);
-    mixerStripGains[3].connect(mixerStripAnalysers[3]);
-    mixerStripAnalysers[3].connect(audioChannels[0].inputGain);
-    mixerStripAnalysers[3].connect(audioChannels[1].inputGain);
+    // FX RETURN meter taps the wet processor output before the return fader.
+    // The fader remains downstream and still controls the audible return level.
+    alesisWetNode.connect(mixerStripAnalysers[3]);
+    mixerStripAnalysers[3].connect(mixerStripGains[3]);
+    mixerStripGains[3].connect(audioChannels[0].inputGain);
+    mixerStripGains[3].connect(audioChannels[1].inputGain);
   }
 }
 
