@@ -2207,6 +2207,61 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   filter:none !important;
 }
 
+  
+/* CLEAN TFT SCREEN: reduce nested frames and divider bars for a more open console display */
+#tabMixerContent .mixer-tft-screen {
+  border:1px solid #454b52 !important;
+  box-shadow:inset 0 0 8px rgba(0,0,0,.55) !important;
+  padding:4px !important;
+  gap:2px !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-main-viewport {
+  border:0 !important;
+  border-radius:2px !important;
+  box-shadow:none !important;
+  background:#101317 !important;
+  padding:2px !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-content-screen {
+  border:0 !important;
+  outline:0 !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-header {
+  border-bottom:0 !important;
+  margin-bottom:1px !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-top-tabs {
+  border:0 !important;
+  background:transparent !important;
+  padding:0 !important;
+  margin-bottom:1px !important;
+  gap:3px !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-top-tabs .tft-tab {
+  border:0 !important;
+  box-shadow:none !important;
+  border-radius:2px !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-top-tabs .tft-tab.active {
+  outline:1px solid #aeb5bd !important;
+  outline-offset:-1px !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-peq-graph,
+#tabMixerContent .mixer-tft-screen .tft-module-graph-box {
+  border:1px solid #555c64 !important;
+  border-radius:2px !important;
+  box-shadow:none !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-peq-control,
+#tabMixerContent .mixer-tft-screen .tft-mod-ctrl,
+#tabMixerContent .mixer-tft-screen .tft-module-card {
+  border:0 !important;
+  box-shadow:none !important;
+}
+#tabMixerContent .mixer-side-nav .side-nav-divider {
+  display:none !important;
+}
+
   </style>
 </head>
 
