@@ -2484,6 +2484,87 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   }
 }
 
+
+/* Responsive TFT curve viewport: use the available screen area without zooming. */
+#tabMixerContent .mixer-workspace-main {
+  grid-template-rows: clamp(250px, 38vh, 420px) minmax(0, 1fr) !important;
+  min-width: 0;
+  min-height: 0;
+}
+#tabMixerContent .mixer-tft-screen {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+}
+#tabMixerContent .tft-main-viewport {
+  min-width: 0;
+  min-height: 0 !important;
+  background: #03070d !important;
+}
+#tabMixerContent #tftContentArea {
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent !important;
+  overflow: hidden;
+}
+#tabMixerContent #tftContentArea > * {
+  min-width: 0;
+  max-width: 100%;
+}
+#tabMixerContent .tft-peq {
+  grid-template-rows: auto minmax(0, 1fr) auto !important;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+#tabMixerContent .tft-peq-graph {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0 !important;
+  max-height: none !important;
+  box-sizing: border-box;
+  touch-action: none;
+}
+#tabMixerContent .tft-module-view {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  background: transparent !important;
+}
+#tabMixerContent .tft-module-graph-box {
+  width: 100%;
+  height: auto;
+  min-width: 0;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 1 1 0;
+  box-sizing: border-box;
+  touch-action: none;
+}
+#tabMixerContent .tft-module-graph-box svg,
+#tabMixerContent .tft-peq-graph svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+}
+#tabMixerContent .tft-content-screen,
+#tabMixerContent .tft-content-screen *:not(svg):not(path):not(line):not(circle):not(rect) {
+  background-color: transparent;
+}
+@media (max-width: 700px) {
+  #tabMixerContent .mixer-workspace-main {
+    grid-template-rows: clamp(240px, 42vh, 390px) minmax(0, 1fr) !important;
+  }
+  #tabMixerContent .tft-peq-head { flex-wrap: wrap; }
+}
+
 </style>
 </head>
 
