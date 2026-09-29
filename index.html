@@ -2835,8 +2835,9 @@ function updateMixerStripControls() {
     readout.textContent = db.toFixed(1) + " dB";
     const allowedBySolo = !anySolo || mixerStripSolo[index];
     const gain = (mixerStripMuted[index] || !allowedBySolo) ? 0 : dbToGain(db);
-    if (index < 3 && mixerStripGains[index]) mixerStripGains[index].gain.setTargetAtTime(gain, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
-    if (index === 3 && alesisWetNode) alesisWetNode.gain.setTargetAtTime(gain * Number(echoMix.value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+    if (index < 4 && mixerStripGains[index]) {
+      mixerStripGains[index].gain.setTargetAtTime(gain, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+    }
     if (index === 4 && masterStripGainNode) masterStripGainNode.gain.setTargetAtTime(gain, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
     const muteBtn = strip.querySelector(".console-action-btn.mute");
     const soloBtn = strip.querySelector(".console-action-btn.solo");
@@ -2848,23 +2849,33 @@ function updateMixerStripControls() {
 function rebuildAudioRouting() {
   if (!audioGraphReady || !audioContext || !mixerInputGain || !alesisDryNode || !alesisWetNode) return;
 
+  // Clear old branches first so toggling FX never stacks duplicate signal routes.
   mixerInputGain.disconnect();
+  mixerStripAnalysers[2].disconnect();
+  mixerStripAnalysers[3].disconnect();
   alesisDryNode.disconnect();
   alesisWetNode.disconnect();
+  mixerStripGains[3].disconnect();
   try { alesisDelayNode.disconnect(alesisWetNode); } catch (err) {}
 
   if (isAlesisFxEnabled) {
+    // Dry path: input blend -> dry level -> both channel buses.
     mixerInputGain.connect(alesisDryNode);
     alesisDryNode.connect(audioChannels[0].inputGain);
     alesisDryNode.connect(audioChannels[1].inputGain);
+
+    // FX send: dedicated send fader and meter feed the delay processor.
     mixerInputGain.connect(mixerStripGains[2]);
     mixerStripAnalysers[2].connect(alesisDelayNode);
+
+    // FX return: wet mix -> independent return fader -> meter -> channel buses.
     alesisDelayNode.connect(alesisWetNode);
     alesisWetNode.connect(mixerStripGains[3]);
-    try { mixerStripAnalysers[3].disconnect(); } catch (err) {}
+    mixerStripGains[3].connect(mixerStripAnalysers[3]);
     mixerStripAnalysers[3].connect(audioChannels[0].inputGain);
     mixerStripAnalysers[3].connect(audioChannels[1].inputGain);
   } else {
+    // FX bypass: dry input remains routed to both channel buses.
     mixerInputGain.connect(audioChannels[0].inputGain);
     mixerInputGain.connect(audioChannels[1].inputGain);
   }
@@ -2903,7 +2914,7 @@ echoMix.addEventListener("input", () => {
   document.getElementById("echoMixVal").textContent = Math.round(echoMix.value * 100) + "%";
   if (alesisWetNode && alesisDryNode && audioContext) {
     alesisDryNode.gain.setTargetAtTime(1.0 - Number(echoMix.value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
-    updateMixerStripControls();
+    alesisWetNode.gain.setTargetAtTime(Number(echoMix.value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
   }
 });
 
