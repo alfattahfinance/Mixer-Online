@@ -3089,6 +3089,31 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   }
 }
 
+
+/* Final compact curve viewport for Gate/Comp on landscape tablet and desktop.
+   Avoid stretching a shallow 65-unit transfer graph into a tall panel. */
+@media (orientation: landscape) and (min-width: 700px) {
+  #tabMixerContent #tftContentArea .tft-module-view { height:auto !important; min-height:0 !important; }
+  #tabMixerContent #tftContentArea .tft-module-graph-box {
+    flex:0 0 clamp(78px, 15vh, 126px) !important;
+    height:clamp(78px, 15vh, 126px) !important;
+    min-height:clamp(78px, 15vh, 126px) !important;
+    max-height:clamp(78px, 15vh, 126px) !important;
+  }
+  #tabMixerContent #tftContentArea .tft-module-graph-box svg { width:100% !important; height:100% !important; }
+  #tabMixerContent #tftContentArea #tftGateSvgContainer circle,
+  #tabMixerContent #tftContentArea #tftCompSvgContainer circle,
+  #tabMixerContent #tftContentArea #tftSendsSvgContainer circle { r:4.5px !important; stroke-width:1.5 !important; }
+}
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 560px) {
+  #tabMixerContent #tftContentArea .tft-module-graph-box {
+    flex-basis:clamp(68px, 13vh, 94px) !important;
+    height:clamp(68px, 13vh, 94px) !important;
+    min-height:clamp(68px, 13vh, 94px) !important;
+    max-height:clamp(68px, 13vh, 94px) !important;
+  }
+}
+
 </style>
 </head>
 
@@ -5181,7 +5206,7 @@ function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback) {
   dotElement.dataset.dragReady = "1";
   dotElement.style.touchAction = "none";
   dotElement.style.cursor = "grab";
-  if (dotElement.tagName.toLowerCase() === "circle") dotElement.setAttribute("r", "10");
+  if (dotElement.tagName.toLowerCase() === "circle") dotElement.setAttribute("r", "5.5");
   dotElement.setAttribute("tabindex", "0");
   dotElement.setAttribute("role", "slider");
   let activePointerId = null;
@@ -5341,9 +5366,9 @@ function bindTftDynamicEventListeners(key) {
       const thInp = document.getElementById("compThresh");
       const ratInp = document.getElementById("compRatio");
       const mkInp = document.getElementById("compMakeup");
-      thInp?.addEventListener("input", () => { s.thresh = Number(thInp.value); document.getElementById("compThreshVal").textContent = s.thresh + "dB"; updateEncoders(tftDatabase.dynamics.encoders(s)); });
-      ratInp?.addEventListener("input", () => { s.ratio = Number(ratInp.value); document.getElementById("compRatioVal").textContent = s.ratio + ":1"; updateEncoders(tftDatabase.dynamics.encoders(s)); });
-      mkInp?.addEventListener("input", () => { s.makeup = Number(mkInp.value); document.getElementById("compMakeupVal").textContent = "+" + s.makeup + "dB"; updateEncoders(tftDatabase.dynamics.encoders(s)); });
+      thInp?.addEventListener("input", () => { s.thresh = Number(thInp.value); document.getElementById("compThreshVal").textContent = s.thresh.toFixed(1) + "dB"; updateEncoders(tftDatabase.dynamics.encoders(s)); updateTftModuleCurve("dynamics"); });
+      ratInp?.addEventListener("input", () => { s.ratio = Number(ratInp.value); document.getElementById("compRatioVal").textContent = s.ratio.toFixed(1) + ":1"; updateEncoders(tftDatabase.dynamics.encoders(s)); updateTftModuleCurve("dynamics"); });
+      mkInp?.addEventListener("input", () => { s.makeup = Number(mkInp.value); document.getElementById("compMakeupVal").textContent = "+" + s.makeup.toFixed(1) + "dB"; updateEncoders(tftDatabase.dynamics.encoders(s)); updateTftModuleCurve("dynamics"); });
     } else if (key === "sends") {
       const lvlInp = document.getElementById("send1Lvl");
       const presetSel = document.getElementById("geqPresetSel");
