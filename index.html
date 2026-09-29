@@ -3396,6 +3396,74 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   }
 }
 
+
+/* Reference sizing for the UPPER Main L/R meter card above the master fader. */
+#tabMixerContent .mixer-desk-surface .master-strip .fader-panel-area > .master-meter-stack {
+  box-sizing:border-box !important;
+  flex:0 0 220px !important;
+  width:100px !important;
+  min-width:100px !important;
+  max-width:100% !important;
+  height:220px !important;
+  min-height:220px !important;
+  align-self:center !important;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack > .master-stereo-meter-vertical {
+  box-sizing:border-box !important;
+  width:100% !important;
+  height:100% !important;
+  min-height:0 !important;
+  padding:5px 4px !important;
+  gap:5px !important;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack .master-meter-column {
+  flex:1 1 0 !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  align-items:center !important;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack .master-meter-column > .master-led-meter {
+  box-sizing:border-box !important;
+  flex:1 1 0 !important;
+  width:18px !important;
+  min-width:18px !important;
+  max-width:18px !important;
+  height:auto !important;
+  min-height:0 !important;
+  margin-left:15px !important;
+  align-self:center !important;
+}
+@media (min-width:701px) and (max-width:1199px) {
+  #tabMixerContent .mixer-desk-surface .master-strip .fader-panel-area > .master-meter-stack {
+    flex-basis:190px !important;
+    height:190px !important;
+    min-height:190px !important;
+    width:88px !important;
+    min-width:88px !important;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack .master-meter-column > .master-led-meter {
+    width:16px !important;
+    min-width:16px !important;
+    max-width:16px !important;
+    margin-left:13px !important;
+  }
+}
+@media (max-width:700px) {
+  #tabMixerContent .mixer-desk-surface .master-strip .fader-panel-area > .master-meter-stack {
+    flex-basis:160px !important;
+    height:160px !important;
+    min-height:160px !important;
+    width:80px !important;
+    min-width:80px !important;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack .master-meter-column > .master-led-meter {
+    width:14px !important;
+    min-width:14px !important;
+    max-width:14px !important;
+    margin-left:11px !important;
+  }
+}
+
 </style>
 </head>
 
