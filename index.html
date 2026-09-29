@@ -2380,6 +2380,52 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   stroke: rgba(88,145,181,.26) !important;
 }
 
+
+/* Keep every TFT response/transfer graph inside a compact, predictable viewport.
+   The graph must not flex-grow to fill the whole screen on Gate/Comp pages. */
+#tabMixerContent #tftContentArea .tft-module-view {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  gap: 4px;
+}
+#tabMixerContent #tftContentArea .tft-module-graph-box {
+  flex: 0 1 clamp(68px, 11vh, 98px) !important;
+  width: 100%;
+  height: clamp(68px, 11vh, 98px) !important;
+  min-height: 68px !important;
+  max-height: 98px !important;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+#tabMixerContent #tftContentArea .tft-module-graph-box svg {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100%;
+  display: block;
+}
+#tabMixerContent #tftContentArea .tft-module-controls-grid {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+#tabMixerContent #tftContentArea .tft-peq {
+  grid-template-rows: auto minmax(78px, 1fr) auto !important;
+  min-height: 0;
+  overflow: hidden;
+}
+#tabMixerContent #tftContentArea .tft-peq-graph {
+  height: clamp(78px, 14vh, 118px) !important;
+  min-height: 78px !important;
+  max-height: 118px !important;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+@media (max-height: 560px) {
+  #tabMixerContent #tftContentArea .tft-module-graph-box { height: 68px !important; flex-basis: 68px !important; }
+  #tabMixerContent #tftContentArea .tft-peq-graph { height: 78px !important; }
+}
+
 /* RESPONSIVE CURVE VIEWPORT: scale to the available mixer TFT, avoid clipping/zoom gestures, keep touch dragging precise. */
 #tabMixerContent .mixer-tft-screen,
 #tabMixerContent .tft-main-viewport,
