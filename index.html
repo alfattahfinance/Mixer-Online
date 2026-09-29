@@ -3312,6 +3312,50 @@ input[type="range"] { accent-color:#b8bec6 !important; }
     max-width:20px !important;
   }
 }
+
+/* Enlarge the UPPER master stereo L/R meters, not the narrow meter beside the fader. */
+#tabMixerContent .mixer-desk-surface .master-strip .fader-panel-area > .master-meter-stack {
+  box-sizing:border-box !important;
+  flex:0 0 116px !important;
+  width:116px !important;
+  min-width:116px !important;
+  max-width:calc(100% - 8px) !important;
+  align-self:center !important;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack > .master-stereo-meter-vertical {
+  width:100% !important;
+  min-width:0 !important;
+  box-sizing:border-box !important;
+  gap:5px !important;
+  padding:5px !important;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack .master-meter-column {
+  flex:1 1 0 !important;
+  min-width:0 !important;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack .master-meter-column > .master-led-meter {
+  flex:0 0 29px !important;
+  width:29px !important;
+  min-width:29px !important;
+  max-width:29px !important;
+  margin-left:18px !important;
+  align-self:center !important;
+}
+@media (max-width:700px) {
+  #tabMixerContent .mixer-desk-surface .master-strip .fader-panel-area > .master-meter-stack {
+    flex-basis:104px !important;
+    width:104px !important;
+    min-width:104px !important;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack .master-meter-column > .master-led-meter {
+    flex-basis:25px !important;
+    width:25px !important;
+    min-width:25px !important;
+    max-width:25px !important;
+    margin-left:16px !important;
+  }
+}
+
 </style>
 </head>
 
