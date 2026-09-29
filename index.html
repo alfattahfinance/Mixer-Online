@@ -1429,6 +1429,17 @@ header, .topbar {
   #tabMixerContent .master-strip .master-meter-column .master-led-meter { width:9px; margin-left:12px; }
 }
 
+/* MASTER METER CARDS: transparent like channel strips; preserve live LED wells */
+#tabMixerContent .mixer-desk-surface .master-strip .master-stereo-meter-vertical {
+  background:transparent !important; border-color:transparent !important; box-shadow:none !important; padding:4px 5px;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-column { background:transparent; }
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-column .master-led-meter {
+  background:rgba(7,12,20,.55); border:1px solid rgba(148,163,184,.32); border-radius:3px; padding:2px 1px; gap:1px;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-column .master-led-meter span { flex:1 1 0; min-height:1px; }
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .vert-led-meter,
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-led-meter { background:rgba(7,12,20,.55); border-color:rgba(148,163,184,.32); }
 </style>
 </head>
 
@@ -1861,8 +1872,9 @@ function initMixerVerticalMeters() {
     const segmentCount = (id === "masterMeterL" || id === "masterMeterR" || id === "masterMeterCombined") ? 16 : 10;
     for (let i = 0; i < segmentCount; i++) {
       const span = document.createElement("span");
-      if (i >= segmentCount - 2) span.className = "red";
-      else if (i >= segmentCount - 5) span.className = "yellow";
+      // Vertical ladder is painted bottom-up: green at the bottom, yellow mid, red at the top.
+      if (i < 2) span.className = "red";
+      else if (i < 5) span.className = "yellow";
       else span.className = "green";
       container.appendChild(span);
     }
@@ -1874,8 +1886,8 @@ function initMixerVerticalMeters() {
     box.innerHTML = "";
     for (let i = 0; i < 16; i++) {
       const span = document.createElement("span");
-      if (i >= 13) span.className = "red";
-      else if (i >= 10) span.className = "yellow";
+      if (i < 3) span.className = "red";
+      else if (i < 6) span.className = "yellow";
       else span.className = "green";
       box.appendChild(span);
     }
