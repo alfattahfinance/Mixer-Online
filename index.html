@@ -1802,6 +1802,94 @@ hr, .divider, [class*="separator"] { border-color:var(--ui-border) !important; }
 
 /* Keep live signal LEDs vivid and distinguishable; this theme changes only their surrounding UI. */
 
+  
+/* GRAPHITE + SILVER FINISH — neutralize cyan/green UI accents site-wide */
+:root {
+  --ui-bg:#30343a;
+  --ui-surface:#3b4047;
+  --ui-card:#454b53;
+  --ui-card-deep:#363b42;
+  --ui-border:#737b84;
+  --ui-text:#e5e7eb;
+  --ui-muted:#c0c6cd;
+  --ui-control:#555b63;
+  --ui-accent:#b8bec6;
+}
+#tabMixerContent .strip-label-box,
+.strip-label-box {
+  background:linear-gradient(180deg,#777e86,#555b63) !important;
+  color:#f3f4f6 !important;
+  border-color:#9aa1a9 !important;
+}
+#tabMixerContent .master-strip .strip-label-box,
+.master-strip .strip-label-box {
+  background:linear-gradient(180deg,#777e86,#555b63) !important;
+  color:#f3f4f6 !important;
+  border-color:#aeb4bb !important;
+}
+#tabMixerContent .console-channel-strip,
+#tabMixerContent .console-channel-strip.master-strip {
+  background:linear-gradient(180deg,#484e56 0%,#3b4047 58%,#30353b 100%) !important;
+  border-color:#858d96 !important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.035) !important;
+}
+#tabMixerContent .strip-knobs-area,
+#tabMixerContent .fader-slot,
+#tabMixerContent .mixer-control-section,
+#tabMixerContent .console-channel-strip .fader-slot {
+  background:linear-gradient(180deg,#33383f,#292e34) !important;
+  border-color:#737b84 !important;
+}
+#tabMixerContent .fader-slot::before {
+  background:linear-gradient(90deg,#24282d,#aeb5bd,#24282d) !important;
+}
+#tabMixerContent .console-btn.active,
+#tabMixerContent .tft-tab.active,
+#tabMixerContent .tft-mod-ctrl button,
+#tabMixerContent .tft-curve-toggle.active,
+#connectBtButton:not(.connected),
+#connectBtButton.connected {
+  background:linear-gradient(180deg,#858c94,#60666e) !important;
+  color:#fff !important;
+  border-color:#b0b6bd !important;
+  box-shadow:none !important;
+}
+#tabMixerContent .console-btn.active { color:#fff !important; }
+#tabMixerContent .tft-header,
+#tabMixerContent .tft-content-screen,
+#tabMixerContent .tft-encoder-knob span,
+.esp32-panel-box h3 {
+  color:#d1d5db !important;
+}
+#tabMixerContent .tft-peq-graph,
+#tabMixerContent .tft-module-graph-box,
+#tabMixerContent .tft-peq-control,
+#tabMixerContent .tft-mod-ctrl,
+#tabMixerContent .tft-main-viewport,
+#tabMixerContent .tft-encoders-bar {
+  background-color:#30353b !important;
+  border-color:#737b84 !important;
+}
+#tabMixerContent .tft-peq-graph,
+#tabMixerContent .tft-module-graph-box {
+  background-image:linear-gradient(rgba(174,181,189,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(174,181,189,.12) 1px,transparent 1px) !important;
+}
+#tabMixerContent .tft-mod-ctrl input[type="range"],
+input[type="range"] { accent-color:#b8bec6 !important; }
+#tabMixerContent .tft-mod-ctrl button.active-action {
+  background:linear-gradient(180deg,#9aa1a9,#656b73) !important;
+}
+#tabMixerContent .tft-curve-toggle {
+  background:#555b63 !important;
+  color:#f3f4f6 !important;
+  border-color:#858d96 !important;
+}
+#tabMixerContent .eq-response-path { stroke:#cbd0d6 !important; }
+#tabMixerContent .eq-response-grid line { stroke:#737b84 !important; }
+#tabMixerContent .console-channel-strip .fader-slot input[type="range"] {
+  accent-color:#c4c9cf !important;
+}
+
   </style>
 </head>
 
