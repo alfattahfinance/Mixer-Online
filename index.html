@@ -704,6 +704,104 @@ header, .topbar {
   }
 }
 
+
+/* MASTER L/R LAYOUT — stereo meters above, master fader and master meter side-by-side */
+#tabMixerContent .mixer-desk-surface .master-strip .fader-panel-area {
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  justify-content:flex-start;
+  gap:7px;
+  min-height:0;
+  height:auto;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack {
+  order:0;
+  display:flex;
+  flex:0 0 34%;
+  width:100%;
+  min-width:0;
+  min-height:52px;
+  height:auto;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-stereo-meter-vertical {
+  display:flex;
+  flex:1 1 auto;
+  flex-direction:row;
+  align-items:stretch;
+  justify-content:center;
+  width:100%;
+  min-width:0;
+  min-height:0;
+  height:auto;
+  gap:8px;
+  padding:4px 8px;
+  border:1px solid #3b4b61;
+  border-radius:5px;
+  background:#080e19;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-column {
+  display:flex;
+  flex:1 1 0;
+  flex-direction:column;
+  align-items:center;
+  min-width:0;
+  min-height:0;
+  gap:3px;
+  font-size:9px;
+  color:#cbd5e1;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-column .master-led-meter {
+  display:flex;
+  flex:1 1 0;
+  width:10px;
+  min-height:24px;
+  height:auto;
+  flex-direction:column;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-column .master-led-meter span { flex:1 1 0; min-height:1px; }
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row {
+  order:1;
+  display:flex;
+  flex:1 1 0;
+  align-items:stretch;
+  justify-content:center;
+  gap:5px;
+  min-height:100px;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot {
+  order:0;
+  flex:1 1 0;
+  width:auto;
+  min-width:24px;
+  max-width:68px;
+  min-height:100px;
+  height:auto;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-combined-wrap {
+  display:flex;
+  flex:0 0 12px;
+  flex-direction:column;
+  align-items:center;
+  gap:3px;
+  color:#fbbf24;
+  font:800 7px/1 monospace;
+  text-align:center;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-combined-meter {
+  display:flex;
+  flex:1 1 0;
+  width:8px;
+  min-height:0;
+  height:auto;
+  flex-direction:column;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-combined-meter span { flex:1 1 0; min-height:1px; }
+@media (max-width:700px) {
+  #tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack { flex-basis:30%; min-height:44px; }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row { gap:4px; }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot { min-width:20px; }
+}
 </style>
 </head>
 
@@ -1058,14 +1156,16 @@ header, .topbar {
             </div>
             <div class="fader-readout">0.0 dB</div>
             <div class="fader-panel-area">
-              <div class="master-meter-stack" aria-label="Master combined and stereo meters">
-                <div class="master-combined-wrap"><span>MASTER</span><div class="vert-led-meter master-led-meter master-combined-meter" id="masterMeterCombined"></div></div>
+              <div class="master-meter-stack" aria-label="Master stereo output meters">
                 <div class="master-stereo-meter-vertical" aria-label="Master stereo output meters">
-                <div class="master-meter-column"><span>L</span><div class="vert-led-meter master-led-meter" id="masterMeterL"></div></div>
-                <div class="master-meter-column"><span>R</span><div class="vert-led-meter master-led-meter" id="masterMeterR"></div></div>
+                  <div class="master-meter-column"><span>L</span><div class="vert-led-meter master-led-meter" id="masterMeterL"></div></div>
+                  <div class="master-meter-column"><span>R</span><div class="vert-led-meter master-led-meter" id="masterMeterR"></div></div>
                 </div>
               </div>
-              <div class="fader-slot"><input type="range" min="-50" max="6" step="0.5" value="0" aria-label="Master LR fader"></div>
+              <div class="master-fader-row">
+                <div class="fader-slot"><input type="range" min="-50" max="6" step="0.5" value="0" aria-label="Master LR fader"></div>
+                <div class="master-combined-wrap"><span>MASTER</span><div class="vert-led-meter master-led-meter master-combined-meter" id="masterMeterCombined"></div></div>
+              </div>
             </div>
             <div class="strip-action-buttons">
               <button class="console-action-btn mute" style="background:#b45309; color:#fff;">MUTE</button>
