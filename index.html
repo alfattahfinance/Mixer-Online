@@ -2103,6 +2103,42 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   font-weight:900;
 }
 
+  
+/* INPUT / FX STRIP HEADERS: distinct hardware-style colors */
+#tabMixerContent .mixer-desk-surface > .console-channel-strip:nth-child(1) > .strip-label-box {
+  background:linear-gradient(180deg,#2876b8,#174b78) !important;
+  color:#fff !important; border-color:#58a6df !important;
+}
+#tabMixerContent .mixer-desk-surface > .console-channel-strip:nth-child(2) > .strip-label-box {
+  background:linear-gradient(180deg,#66717d,#424a53) !important;
+  color:#fff !important; border-color:#9ba6b1 !important;
+}
+#tabMixerContent .mixer-desk-surface > .console-channel-strip:nth-child(3) > .strip-label-box {
+  background:linear-gradient(180deg,#7860a8,#4e3d77) !important;
+  color:#fff !important; border-color:#aa91d5 !important;
+}
+#tabMixerContent .mixer-desk-surface > .console-channel-strip:nth-child(4) > .strip-label-box {
+  background:linear-gradient(180deg,#168b83,#11645f) !important;
+  color:#fff !important; border-color:#55c8bc !important;
+}
+/* Bottom MUTE / PAFL buttons: gray when OFF, clearly colored when ON */
+#tabMixerContent .mixer-desk-surface > .console-channel-strip:not(.master-strip) .strip-action-buttons .console-action-btn {
+  background:linear-gradient(180deg,#555b63,#383d43) !important;
+  color:#f1f3f5 !important;
+  border:1px solid #818991 !important;
+  box-shadow:inset 0 1px rgba(255,255,255,.08) !important;
+}
+#tabMixerContent .mixer-desk-surface > .console-channel-strip:not(.master-strip) .strip-action-buttons .console-action-btn.mute.active {
+  background:linear-gradient(180deg,#e34b4b,#a91f2b) !important;
+  color:#fff !important; border-color:#ff8585 !important;
+  box-shadow:0 0 7px rgba(239,68,68,.35) !important;
+}
+#tabMixerContent .mixer-desk-surface > .console-channel-strip:not(.master-strip) .strip-action-buttons .console-action-btn.solo.active {
+  background:linear-gradient(180deg,#facc15,#d99a05) !important;
+  color:#292524 !important; border-color:#fde68a !important;
+  box-shadow:0 0 7px rgba(250,204,21,.3) !important;
+}
+
   </style>
 </head>
 
