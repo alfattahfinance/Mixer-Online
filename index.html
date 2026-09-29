@@ -2307,6 +2307,16 @@ input[type="range"] { accent-color:#b8bec6 !important; }
 #tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
 #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box { display:block !important; }
 
+
+/* SHORTEN THE FOUR INPUT STRIPS: align their top edge with the master fader card. */
+@media (min-width: 1200px) {
+  #tabMixerContent .mixer-desk-surface > .console-channel-strip:not(.master-strip) {
+    align-self: end;
+    box-sizing: border-box;
+    height: calc(100% - 80px);
+  }
+}
+
 </style>
 </head>
 
