@@ -3826,6 +3826,28 @@ const tftStatesData = {
   effects: { delay: 0.3, feedback: 0.4, active: true, dot1X: 80, dot1Y: 12, dot2X: 240, dot2Y: 24 }
 };
 
+// Restore and persist the TFT control model independently from the visual page.
+const TFT_STATE_STORAGE_KEY = "mixerOnlineTftStateV1";
+try {
+  const savedState = JSON.parse(localStorage.getItem(TFT_STATE_STORAGE_KEY) || "null");
+  if (savedState && typeof savedState === "object" && !Array.isArray(savedState)) {
+    Object.keys(tftStatesData).forEach(section => {
+      const incoming = savedState[section];
+      if (!incoming || typeof incoming !== "object" || Array.isArray(incoming)) return;
+      Object.keys(tftStatesData[section]).forEach(field => {
+        const current = tftStatesData[section][field];
+        const next = incoming[field];
+        if (typeof current === "number" && Number.isFinite(next)) tftStatesData[section][field] = next;
+        else if (typeof current === "boolean" && typeof next === "boolean") tftStatesData[section][field] = next;
+      });
+    });
+  }
+} catch (err) { /* Ignore corrupt or blocked browser storage; defaults remain usable. */ }
+function persistTftState() {
+  try { localStorage.setItem(TFT_STATE_STORAGE_KEY, JSON.stringify(tftStatesData)); }
+  catch (err) { /* Storage can be unavailable in private/restricted browsing. */ }
+}
+
 const tftSceneSnapshots = Object.create(null);
 try {
   const savedScenes = JSON.parse(localStorage.getItem('mixerOnlineTftScenes') || '{}');
@@ -5101,6 +5123,7 @@ function bindTftDynamicEventListeners(key) {
         if (keyNow === "eq") updateTftPeqVisuals();
         else updateTftModuleCurve(keyNow);
         refreshTftInfoPanel(keyNow);
+        persistTftState();
       });
     });
   }
@@ -5321,7 +5344,10 @@ function loadTftPage(key) {
   tftCurveToggleBtn.textContent = isActive ? "CURVE: ON" : "CURVE: OFF";
   tftCurveToggleBtn.classList.toggle("active", isActive);
 
-  setTimeout(() => { bindTftDynamicEventListeners(key); if (key === "eq") updateTftPeqVisuals(); }, 10);
+  // Bind synchronously to the newly rendered page; delayed binding could attach
+  // listeners for an older page after rapid navigation.
+  bindTftDynamicEventListeners(key);
+  if (key === "eq") updateTftPeqVisuals();
 }
 
 function switchActiveSection(key) {
