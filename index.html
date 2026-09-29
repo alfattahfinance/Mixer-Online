@@ -3886,7 +3886,9 @@ function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed
 
 /* DRAG STABILIZER: all vertical faders only start from their visible cap */
 (function enableStableRangeDragging() {
-  const SENSITIVITY = 0.14; // slower, finer travel to reduce jumps
+  // Touchscreens (especially tablets) need lower travel and a wider thumb pickup zone.
+  const SENSITIVITY = 0.10;
+  const TOUCH_SENSITIVITY = 0.055;
   let active = null;
 
   document.addEventListener("pointerdown", (event) => {
@@ -3904,8 +3906,9 @@ function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed
     const thumbY = rect.top + (1 - fraction) * rect.height;
     const thumbX = rect.left + rect.width / 2;
     const isEq = slider.matches("input.eq-range");
-    const hitY = isEq ? 10 : 12;
-    const hitX = isEq ? 16 : 19;
+    const isTouch = event.pointerType === "touch";
+    const hitY = isTouch ? (isEq ? 25 : 29) : (isEq ? 10 : 12);
+    const hitX = isTouch ? (isEq ? 28 : 32) : (isEq ? 16 : 19);
     if (Math.abs(event.clientY - thumbY) > hitY || Math.abs(event.clientX - thumbX) > hitX) {
       event.preventDefault();
       event.stopPropagation();
@@ -3917,6 +3920,7 @@ function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed
     active = {
       slider, pointerId: event.pointerId, startCoord: event.clientY,
       startValue: value, min, max, step: Number(slider.step || 1),
+      sensitivity: event.pointerType === "touch" ? TOUCH_SENSITIVITY : SENSITIVITY,
       length: Math.max(1, rect.height - (isEq ? 13 : 16))
     };
     try { slider.setPointerCapture(event.pointerId); } catch (_) {}
@@ -3927,7 +3931,7 @@ function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed
     event.preventDefault();
     const rawDelta = active.startCoord - event.clientY;
     const raw = active.startValue + (rawDelta / active.length) *
-      (active.max - active.min) * SENSITIVITY;
+      (active.max - active.min) * active.sensitivity;
     const stepped = active.min + Math.round((raw - active.min) / active.step) * active.step;
     const next = Math.max(active.min, Math.min(active.max, stepped));
     if (next !== Number(active.slider.value)) {
