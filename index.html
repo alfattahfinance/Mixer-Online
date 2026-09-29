@@ -418,6 +418,7 @@ header, .topbar {
   content: ""; position: absolute; width: 4px; height: 94%; background: linear-gradient(90deg, #04060a, #1f293d, #04060a); border-radius: 1px;
 }
 .fader-slot input[type="range"] {
+  pointer-events: none; /* let the slot guard all touch starts */
   -webkit-appearance: none; appearance: none; writing-mode: vertical-lr; direction: rtl; position: absolute; left: 50%; top: 50%;
   width: 100%; height: 94%; margin: 0; padding: 0; transform: translate(-50%, -50%); background: transparent; cursor: pointer; z-index: 2; touch-action: none; -webkit-user-select: none; user-select: none; overscroll-behavior: contain;
 }
@@ -3892,8 +3893,13 @@ function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed
   let active = null;
 
   document.addEventListener("pointerdown", (event) => {
-    const slider = event.target.closest('input.eq-range, .fader-slot input[type="range"]');
-    if (!slider || slider.disabled || event.button > 0) return;
+    const target = event.target instanceof Element ? event.target : null;
+    if (!target || event.button > 0) return;
+    const slot = target.closest(".fader-slot");
+    const slider = target.closest("input.eq-range") || (slot && slot.querySelector('input[type="range"]'));
+    if (!slider || slider.disabled) return;
+    // Fader inputs are pointer-transparent; blank-track taps reach this guard on the slot.
+    if (slot) { event.preventDefault(); event.stopPropagation(); }
 
     const rect = slider.getBoundingClientRect();
     const min = Number(slider.min || 0);
@@ -3933,7 +3939,7 @@ function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed
   // Suppress the browser's synthetic click on the range: only our thumb drag may change it.
   document.addEventListener("click", (event) => {
     const target = event.target instanceof Element ? event.target : null;
-    const slider = target && target.closest('input.eq-range, .fader-slot input[type="range"]');
+    const slider = target && (target.closest("input.eq-range") || target.closest(".fader-slot"));
     if (!slider) return;
     event.preventDefault();
     event.stopPropagation();
