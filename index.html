@@ -1625,6 +1625,26 @@ header, .topbar {
 #tabMixerContent .tft-meter span.red.on,
 #tabMixerContent .meter span.red.on { background:#ff1744 !important; border-color:#ff637f !important; box-shadow:0 0 6px rgba(255,23,68,.95) !important; }
 
+
+/* FINAL IDLE METER OVERRIDE: unlit segments must stay dark on every meter */
+#tabMixerContent .vert-led-meter span:not(.on),
+#tabMixerContent .master-led-meter span:not(.on),
+#tabMixerContent .meter span:not(.on),
+#tabMixerContent .tft-meter span:not(.on),
+#tabMixerContent .tft-led-bar span:not(.on) {
+  background:#0b111b !important;
+  border-color:#1b2635 !important;
+  box-shadow:none !important;
+  opacity:1 !important;
+}
+#tabMixerContent .vert-led-meter span.on,
+#tabMixerContent .master-led-meter span.on,
+#tabMixerContent .meter span.on,
+#tabMixerContent .tft-meter span.on,
+#tabMixerContent .tft-led-bar span.on {
+  opacity:1 !important;
+}
+
 </style>
 </head>
 
