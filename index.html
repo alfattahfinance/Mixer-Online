@@ -2171,9 +2171,15 @@ updateMasterStereoMeters();
 
 /* Update channel, EQ and TFT meters from live Web Audio analyser data.
    Horizontal bars light left-to-right; vertical LED ladders light bottom-up. */
+const meterSampleBuffers = new WeakMap();
 function readMeterDb(analyser) {
   if (!analyser) return -72;
-  const samples = new Float32Array(analyser.fftSize || 1024);
+  let samples = meterSampleBuffers.get(analyser);
+  const sampleLength = analyser.fftSize || 1024;
+  if (!samples || samples.length !== sampleLength) {
+    samples = new Float32Array(sampleLength);
+    meterSampleBuffers.set(analyser, samples);
+  }
   analyser.getFloatTimeDomainData(samples);
   let sum = 0;
   for (let i = 0; i < samples.length; i++) sum += samples[i] * samples[i];
@@ -2463,7 +2469,7 @@ function createBands(channel) {
 /* =========================================================
    AUDIO ENGINE & ROUTING
 ========================================================= */
-const CONTROL_SMOOTHING_SECONDS = 0.03;
+const CONTROL_SMOOTHING_SECONDS = 0.065;
 
 let microphoneStream = null;
 let microphoneSource = null;
@@ -2870,8 +2876,9 @@ function rebuildAudioRouting() {
     // The fader remains downstream and still controls the audible return level.
     alesisWetNode.connect(mixerStripAnalysers[3]);
     mixerStripAnalysers[3].connect(mixerStripGains[3]);
-    mixerStripGains[3].connect(audioChannels[0].inputGain);
-    mixerStripGains[3].connect(audioChannels[1].inputGain);
+    // Return joins the post-EQ main bus, not the input channels:
+    // routing it back to channel inputs creates a digital feedback loop.
+    mixerStripGains[3].connect(masterStripGainNode);
   }
 }
 
