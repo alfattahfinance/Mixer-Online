@@ -1645,6 +1645,42 @@ header, .topbar {
   opacity:1 !important;
 }
 
+
+/* SIGNAL METER SEGMENTS — consistent idle and illuminated states across channel, MAIN L/R and MASTER */
+#tabMixerContent .vert-led-meter span,
+#tabMixerContent .meter span,
+#tabMixerContent #tftMeterL span,
+#tabMixerContent #tftMeterR span {
+  background:#0b111b !important;
+  border-color:#1b2635 !important;
+  box-shadow:none !important;
+  opacity:1 !important;
+}
+#tabMixerContent .vert-led-meter span.green.on,
+#tabMixerContent .meter span.green.on,
+#tabMixerContent #tftMeterL span.green.on,
+#tabMixerContent #tftMeterR span.green.on { background:#00a83b !important; border-color:#00c853 !important; box-shadow:0 0 4px rgba(0,200,83,.55) !important; }
+#tabMixerContent .vert-led-meter span.mint.on,
+#tabMixerContent .meter span.mint.on,
+#tabMixerContent #tftMeterL span.mint.on,
+#tabMixerContent #tftMeterR span.mint.on { background:#39d353 !important; border-color:#65e879 !important; box-shadow:0 0 4px rgba(57,211,83,.55) !important; }
+#tabMixerContent .vert-led-meter span.lime.on,
+#tabMixerContent .meter span.lime.on,
+#tabMixerContent #tftMeterL span.lime.on,
+#tabMixerContent #tftMeterR span.lime.on { background:#a3e635 !important; border-color:#bef264 !important; box-shadow:0 0 4px rgba(163,230,53,.55) !important; }
+#tabMixerContent .vert-led-meter span.yellow.on,
+#tabMixerContent .meter span.yellow.on,
+#tabMixerContent #tftMeterL span.yellow.on,
+#tabMixerContent #tftMeterR span.yellow.on { background:#facc15 !important; border-color:#fde047 !important; box-shadow:0 0 4px rgba(250,204,21,.6) !important; }
+#tabMixerContent .vert-led-meter span.orange.on,
+#tabMixerContent .meter span.orange.on,
+#tabMixerContent #tftMeterL span.orange.on,
+#tabMixerContent #tftMeterR span.orange.on { background:#fb923c !important; border-color:#fdba74 !important; box-shadow:0 0 4px rgba(251,146,60,.6) !important; }
+#tabMixerContent .vert-led-meter span.red.on,
+#tabMixerContent .meter span.red.on,
+#tabMixerContent #tftMeterL span.red.on,
+#tabMixerContent #tftMeterR span.red.on { background:#ef3340 !important; border-color:#ff6670 !important; box-shadow:0 0 5px rgba(239,51,64,.65) !important; }
+
 </style>
 </head>
 
