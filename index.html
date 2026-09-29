@@ -2573,7 +2573,7 @@ const echoToggleBtn = document.getElementById("echoToggleBtn");
 function createAudioContext() {
   if (!audioContext) {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    audioContext = new AudioContextClass({ latencyHint: "interactive" });
+    audioContext = new AudioContextClass({ latencyHint: "balanced" });
   }
   if (audioContext.state === "suspended") audioContext.resume();
   return audioContext;
@@ -2990,9 +2990,11 @@ startMicButton.addEventListener("click", async () => {
     await applyPhysicalOutputDevice();
     await refreshPhysicalInputDevices();
     const selectedInputId = physicalInputDevice?.value || "";
+    // Avoid forcing an ultra-low capture latency on mobile devices; let the
+    // browser/driver choose a stable buffer size to reduce crackles and dropouts.
     const audioConstraints = selectedInputId
-      ? { deviceId: { exact: selectedInputId }, echoCancellation: false, noiseSuppression: false, autoGainControl: false, latency: 0.01 }
-      : { echoCancellation: false, noiseSuppression: false, autoGainControl: false, latency: 0.01 };
+      ? { deviceId: { exact: selectedInputId }, echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+      : { echoCancellation: false, noiseSuppression: false, autoGainControl: false };
     microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
     microphoneSource = audioContext.createMediaStreamSource(microphoneStream);
     microphoneSource.connect(mixerStripGains[0]);
