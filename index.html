@@ -3253,38 +3253,36 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   min-width:0 !important; min-height:0 !important; align-self:stretch !important;
 }
 
-/* Widen the L/R meters ABOVE the master fader; leave the side master meter alone. */
+/* Restore upper L/R meter sizing; widen the combined MASTER bar beside the fader. */
 #tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack {
-  width:112px !important;
-  flex:0 0 112px !important;
-  max-width:calc(100% - 8px) !important;
-}
-#tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack .master-meter-column {
-  flex:1 1 0 !important;
-  min-width:0 !important;
+  width:84px !important;
+  flex:0 0 84px !important;
+  max-width:calc(100% - 12px) !important;
 }
 #tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack #masterMeterL,
 #tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack #masterMeterR {
-  flex:0 0 32px !important;
-  width:32px !important;
-  min-width:32px !important;
-  max-width:32px !important;
-  margin-left:17px !important;
+  flex:1 1 auto !important;
+  width:11px !important;
+  min-width:11px !important;
+  max-width:11px !important;
+  margin-left:15px !important;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-combined-wrap {
+  flex:0 0 26px !important;
+  width:26px !important;
+  min-width:26px !important;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-combined-meter {
+  flex:1 1 auto !important;
+  width:18px !important;
+  min-width:18px !important;
+  max-width:18px !important;
   box-sizing:border-box !important;
 }
 @media (max-width:700px) {
-  #tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack {
-    width:104px !important;
-    flex-basis:104px !important;
-  }
-  #tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack #masterMeterL,
-  #tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack #masterMeterR {
-    flex-basis:28px !important;
-    width:28px !important;
-    min-width:28px !important;
-    max-width:28px !important;
-    margin-left:14px !important;
-  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack { width:84px !important; flex-basis:84px !important; }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-combined-wrap { flex-basis:22px !important; width:22px !important; min-width:22px !important; }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-combined-meter { width:16px !important; min-width:16px !important; max-width:16px !important; }
 }
 
 </style>
