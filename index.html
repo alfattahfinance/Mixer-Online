@@ -2858,26 +2858,18 @@ function rebuildAudioRouting() {
   mixerStripGains[3].disconnect();
   try { alesisDelayNode.disconnect(alesisWetNode); } catch (err) {}
 
+  mixerInputGain.connect(alesisDryNode);
+  alesisDryNode.connect(audioChannels[0].inputGain);
+  alesisDryNode.connect(audioChannels[1].inputGain);
+  // Keep FX SEND metering live even while the processor is bypassed.
+  mixerInputGain.connect(mixerStripGains[2]);
   if (isAlesisFxEnabled) {
-    // Dry path: input blend -> dry level -> both channel buses.
-    mixerInputGain.connect(alesisDryNode);
-    alesisDryNode.connect(audioChannels[0].inputGain);
-    alesisDryNode.connect(audioChannels[1].inputGain);
-
-    // FX send: dedicated send fader and meter feed the delay processor.
-    mixerInputGain.connect(mixerStripGains[2]);
     mixerStripAnalysers[2].connect(alesisDelayNode);
-
-    // FX return: wet mix -> independent return fader -> meter -> channel buses.
     alesisDelayNode.connect(alesisWetNode);
     alesisWetNode.connect(mixerStripGains[3]);
     mixerStripGains[3].connect(mixerStripAnalysers[3]);
     mixerStripAnalysers[3].connect(audioChannels[0].inputGain);
     mixerStripAnalysers[3].connect(audioChannels[1].inputGain);
-  } else {
-    // FX bypass: dry input remains routed to both channel buses.
-    mixerInputGain.connect(audioChannels[0].inputGain);
-    mixerInputGain.connect(audioChannels[1].inputGain);
   }
 }
 
