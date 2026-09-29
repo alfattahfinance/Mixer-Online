@@ -1055,6 +1055,41 @@ header, .topbar {
   }
 }
 
+
+
+/* MASTER FADER HEIGHT CORRECTION — bottom stays anchored; shorten downward from top */
+#tabMixerContent .mixer-desk-surface .master-strip .fader-panel-area {
+  flex:1 1 auto;
+  min-height:0;
+  justify-content:flex-start;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row {
+  flex:0 0 360px;
+  height:360px;
+  min-height:0;
+  max-height:360px;
+  margin-top:auto;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot,
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-combined-wrap {
+  height:100%;
+  min-height:0;
+}
+@media (min-width:701px) and (max-width:1199px) {
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row {
+    flex-basis:260px;
+    height:260px;
+    max-height:260px;
+  }
+}
+@media (max-width:700px) {
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row {
+    flex-basis:220px;
+    height:220px;
+    max-height:220px;
+  }
+}
+
 </style>
 </head>
 
