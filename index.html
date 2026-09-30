@@ -4332,6 +4332,108 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
   #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-freq-labels text { font-size:3.9px; }
 }
 
+
+/* =========================================================
+   UNIVERSAL CHANNEL QUICK PANEL CONTROLS
+   Stable touch/mouse interaction for every DSP/page.
+========================================================= */
+#tabMixerContent .channel-quick-panel .quick-fader,
+#tabMixerContent .channel-quick-panel .quick-knob,
+#tabMixerContent .channel-quick-panel .quick-button-wrap {
+  min-width:0;
+  position:relative;
+}
+#tabMixerContent .channel-quick-panel .quick-fader input[type="range"],
+#tabMixerContent .channel-quick-panel .quick-knob input[type="range"] {
+  width:100%;
+  min-width:0;
+  height:30px;
+  margin:0;
+  cursor:ew-resize;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-appearance:none;
+  appearance:none;
+  background:transparent;
+  accent-color:#38bdf8;
+}
+#tabMixerContent .channel-quick-panel .quick-fader input[type="range"]::-webkit-slider-runnable-track {
+  height:6px;
+  border-radius:999px;
+  border:1px solid #475569;
+  background:linear-gradient(90deg,#38bdf8,#0ea5e9);
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.65);
+}
+#tabMixerContent .channel-quick-panel .quick-fader input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance:none;
+  width:22px;height:22px;margin-top:-9px;
+  border:1px solid #94a3b8;border-radius:4px;
+  background:linear-gradient(180deg,#f8fafc,#94a3b8 45%,#334155 55%,#e2e8f0);
+  box-shadow:0 2px 5px rgba(0,0,0,.75);
+}
+#tabMixerContent .channel-quick-panel .quick-fader input[type="range"]::-moz-range-track {
+  height:6px;border-radius:999px;border:1px solid #475569;background:#0ea5e9;
+}
+#tabMixerContent .channel-quick-panel .quick-fader input[type="range"]::-moz-range-thumb {
+  width:22px;height:22px;border:1px solid #94a3b8;border-radius:4px;
+  background:linear-gradient(180deg,#f8fafc,#94a3b8 45%,#334155 55%,#e2e8f0);
+}
+#tabMixerContent .channel-quick-panel .quick-knob {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 44px;
+  grid-template-rows:auto auto;
+  column-gap:6px;
+  align-items:center;
+}
+#tabMixerContent .channel-quick-panel .quick-knob > span { grid-column:1; }
+#tabMixerContent .channel-quick-panel .quick-knob > input[type="range"] {
+  grid-column:1; grid-row:2;
+  opacity:.01;
+  position:absolute;
+  inset:auto 0 0 0;
+  pointer-events:auto;
+}
+#tabMixerContent .channel-quick-panel .quick-knob > i {
+  grid-column:2; grid-row:1 / span 2;
+  width:40px;height:40px;border-radius:50%;
+  border:2px solid #64748b;
+  background:conic-gradient(from 220deg,#38bdf8 0deg,#0ea5e9 130deg,#1e293b 130deg,#1e293b 280deg,#38bdf8 280deg);
+  box-shadow:inset 0 2px 4px rgba(255,255,255,.18),0 2px 6px rgba(0,0,0,.7);
+  transform-origin:50% 50%;
+  touch-action:none;
+  cursor:ns-resize;
+  position:relative;
+  z-index:3;
+}
+#tabMixerContent .channel-quick-panel .quick-knob > i::after {
+  content:""; position:absolute; left:50%; top:5px; width:3px; height:12px;
+  transform:translateX(-50%); border-radius:2px; background:#f8fafc;
+  box-shadow:0 0 4px rgba(255,255,255,.7);
+}
+#tabMixerContent .channel-quick-panel .quick-knob > i.dragging {
+  box-shadow:0 0 0 2px rgba(56,189,248,.35),inset 0 2px 4px rgba(255,255,255,.18),0 3px 9px rgba(0,0,0,.8);
+}
+#tabMixerContent .channel-quick-panel .quick-button-wrap button,
+#tabMixerContent .channel-quick-panel .quick-curve-button {
+  min-height:30px;
+  min-width:76px;
+  touch-action:manipulation;
+  user-select:none;
+  -webkit-user-select:none;
+}
+#tabMixerContent .channel-quick-panel output {
+  min-width:0;
+  font-variant-numeric:tabular-nums;
+}
+@media(max-width:600px){
+  #tabMixerContent .channel-quick-panel .quick-fader input[type="range"] { height:34px; }
+  #tabMixerContent .channel-quick-panel .quick-fader input[type="range"]::-webkit-slider-thumb { width:24px;height:24px;margin-top:-10px; }
+  #tabMixerContent .channel-quick-panel .quick-knob > i { width:44px;height:44px; }
+  #tabMixerContent .channel-quick-panel .quick-button-wrap button,
+  #tabMixerContent .channel-quick-panel .quick-curve-button { min-height:34px; min-width:82px; }
+}
+
 </style>
 </head>
 
@@ -7119,6 +7221,8 @@ function switchActiveSection(key) {
   consoleSectionBtns.forEach(b => b.classList.toggle("active", b.getAttribute("data-section") === key));
   tftTabs.forEach(t => t.classList.toggle("active", t.getAttribute("data-tft-tab") === key));
   loadTftPage(key);
+  try { refreshChannelQuickPanels(); } catch {}
+  try { syncChannelQuickPanelsFromSources(); } catch {}
 }
 
 consoleSectionBtns.forEach(btn => {
@@ -7387,6 +7491,28 @@ function makeChannelQuickControl(spec) {
   return '<label class="'+cls+'"><span>'+spec.label+'</span><input type="range" min="'+min+'" max="'+max+'" step="'+step+'" value="'+value+'"><i></i><output></output></label>';
 }
 
+/* UNIVERSAL QUICK-PANEL SOURCE SYNC */
+(function bindQuickPanelSourceSync(){
+  const root=document.getElementById("tabMixerContent");
+  if(!root || root.dataset.quickSourceSync==="1") return;
+  root.dataset.quickSourceSync="1";
+  const refresh=()=>{
+    try{ refreshChannelQuickPanels(); }catch{}
+    try{ syncChannelQuickPanelsFromSources(); }catch{}
+  };
+  root.addEventListener("change",(e)=>{
+    const el=e.target;
+    if(el instanceof HTMLInputElement || el instanceof HTMLSelectElement) {
+      if(el.closest(".channel-quick-panel")) setTimeout(refresh,0);
+    }
+  },true);
+  root.addEventListener("input",(e)=>{
+    const el=e.target;
+    if(el instanceof HTMLInputElement && el.closest(".channel-quick-panel")) setTimeout(()=>syncChannelQuickPanelsFromSources(),0);
+  },true);
+})();
+
+
 function refreshChannelQuickPanels() {
   const root=document.getElementById("tabMixerContent");
   if (!root) return;
@@ -7413,10 +7539,25 @@ function refreshChannelQuickPanels() {
       const levelItem=grid.querySelector('[data-generic-channel-level]');
       const hpfItem=grid.querySelector('[data-generic-hpf]');
       if (levelItem && fader) {
-        levelItem.value=fader.value;
-        const out=levelItem.parentElement.querySelector("output"); if(out) out.textContent=Number(fader.value).toFixed(1)+" dB";
-        levelItem.addEventListener("input",()=>{ fader.value=levelItem.value; fader.dispatchEvent(new Event("input",{bubbles:true})); });
-        fader.addEventListener("input",()=>{ levelItem.value=fader.value; const out=levelItem.parentElement.querySelector("output"); if(out) out.textContent=Number(fader.value).toFixed(1)+" dB"; });
+        const syncLevel = () => {
+          levelItem.value = fader.value;
+          const out = levelItem.parentElement.querySelector("output");
+          if (out) out.textContent = Number(fader.value).toFixed(1) + " dB";
+        };
+        syncLevel();
+        if (levelItem.dataset.proxyBound !== "1") {
+          levelItem.dataset.proxyBound = "1";
+          levelItem.addEventListener("input", () => {
+            fader.value = levelItem.value;
+            fader.dispatchEvent(new Event("input",{bubbles:true}));
+            syncLevel();
+          });
+        }
+        if (fader.dataset.quickMirrorBound !== "1") {
+          fader.dataset.quickMirrorBound = "1";
+          fader.addEventListener("input", syncLevel);
+          fader.addEventListener("change", syncLevel);
+        }
       }
       if (hpfItem && hpf) {
         hpfItem.value=hpf.value==="80Hz" ? "1" : "0";
@@ -7479,6 +7620,49 @@ function syncChannelQuickPanelsFromSources() {
 </script>
 
 <script>
+
+/* UNIVERSAL QUICK-PANEL RANGE DRAG
+   One consistent pointer model for every quick-panel fader.
+   The native range remains the source of truth; movement starts from its
+   current value, so opening/dragging never causes a value jump. */
+(function bindUniversalQuickFaders(){
+  const root=document.getElementById("tabMixerContent");
+  if(!root || root.dataset.universalQuickFaders==="1") return;
+  root.dataset.universalQuickFaders="1";
+  let drag=null;
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const apply=(input,v)=>{
+    const min=Number(input.min), max=Number(input.max), step=Number(input.step)||0.01;
+    let next=clamp(v,min,max);
+    next=min+Math.round((next-min)/step)*step;
+    next=clamp(next,min,max);
+    input.value=String(Number(next.toFixed(6)));
+    input.dispatchEvent(new Event("input",{bubbles:true}));
+  };
+  root.addEventListener("pointerdown",(e)=>{
+    const input=e.target instanceof Element ? e.target.closest(".quick-fader input[type=range]") : null;
+    if(!input || !root.contains(input)) return;
+    drag={
+      id:e.pointerId,input,startX:e.clientX,startValue:Number(input.value),
+      min:Number(input.min),max:Number(input.max),
+      pixels:Math.max(140,Math.min(320,input.closest(".quick-fader")?.clientWidth*2.2||190))
+    };
+    try{input.setPointerCapture(e.pointerId);}catch{}
+  },true);
+  root.addEventListener("pointermove",(e)=>{
+    if(!drag || e.pointerId!==drag.id) return;
+    e.preventDefault();
+    const dx=e.clientX-drag.startX;
+    apply(drag.input,drag.startValue+(dx/drag.pixels)*(drag.max-drag.min));
+  },true);
+  const end=(e)=>{
+    if(!drag || (e && e.pointerId!==drag.id)) return;
+    drag=null;
+  };
+  root.addEventListener("pointerup",end,true);
+  root.addEventListener("pointercancel",end,true);
+  root.addEventListener("lostpointercapture",end,true);
+})();
 
 /* STABLE QUICK-PANEL KNOBS
    Drag vertically with a controlled delta. The knob does not jump to the
@@ -7598,7 +7782,8 @@ function syncChannelQuickPanelsFromSources() {
     /* Vertical is primary; horizontal is also usable. Vertical up increases value. */
     const pixels=(-dy + dx*0.35);
     const target=drag.startValue + pixels*drag.sensitivity*0.62;
-    const stepped=Math.round((clamp(target,min=Number(drag.input.min),max=Number(drag.input.max))-min)/step)*step+min;
+    const min=Number(drag.input.min), max=Number(drag.input.max);
+    const stepped=Math.round((clamp(target,min,max)-min)/step)*step+min;
     const bounded=clamp(stepped,Number(drag.input.min),Number(drag.input.max));
     if(Math.abs(bounded-drag.value)<step*0.25) return;
     drag.value=bounded;
