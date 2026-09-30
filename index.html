@@ -5835,7 +5835,8 @@ if (physicalInputDevice) physicalInputDevice.addEventListener("change", async ()
     usbAudioConnected=false;
     usbAudioInputDeviceId="";
     usbAudioInputLabel="";
-    setAudioStatus("USB AUDIO INPUT: pilih perangkat USB Audio Interface.");
+    usbInputConnectedMeterReset();
+    setAudioStatus("USB AUDIO INPUT belum dipilih.");
     return;
   }
   if (!audioContext) createAudioContext();
