@@ -49,6 +49,9 @@ header, .topbar {
 .top-audio-controls { flex: 1 1 auto; min-width: 0; margin: 0; gap: 4px; }
 .top-audio-controls button, .top-audio-controls .file-button { min-height: 24px; padding: 3px 7px; font-size: 8px; }
 .top-audio-controls select { width: clamp(78px, 12vw, 130px); max-width: 130px; min-width: 70px; min-height: 24px; font-size: 8px; }
+.top-audio-route-group{display:flex;flex-direction:column;gap:2px;min-width:145px}
+.top-audio-route-group label{font-size:8px;font-weight:800;letter-spacing:.45px;color:#cbd5e1;text-transform:uppercase}
+.top-audio-route-group select{width:100%;min-height:30px}
 .top-usbc-audio-button {
   min-height: 26px !important; padding: 4px 9px !important; border: 1px solid #22c55e !important;
   border-radius: 5px !important; background: linear-gradient(180deg,#14532d,#166534) !important;
@@ -4486,10 +4489,18 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
       <div class="audio-actions top-audio-controls" aria-label="Audio player and input source">
         <button id="mixerPowerButton" class="mixer-power-toggle powered-on" type="button" aria-pressed="true" title="Nyalakan atau matikan mixer"><span class="mixer-power-led" aria-hidden="true"></span><span class="mixer-power-label">POWER ON</span></button>
         <button id="startMicButton" type="button">MIC</button>
-        <label for="physicalInputDevice" class="sr-only">Pilih sumber input fisik</label>
-        <select id="physicalInputDevice" aria-label="Sumber input fisik" title="Pilih mikrofon atau USB audio interface">
-          <option value="">Default HP</option>
-        </select>
+        <div class="top-audio-route-group">
+          <label for="physicalInputDevice">INPUT AUDIO</label>
+          <select id="physicalInputDevice" aria-label="Pilih sumber input audio">
+            <option value="">INPUT DEFAULT HP</option>
+          </select>
+        </div>
+        <div class="top-audio-route-group">
+          <label for="physicalOutputDeviceTop">OUTPUT AUDIO</label>
+          <select id="physicalOutputDeviceTop" aria-label="Pilih tujuan output audio">
+            <option value="">OUTPUT DEFAULT HP</option>
+          </select>
+        </div>
         <button id="activateUsbAudioButton" class="top-usbc-audio-button" type="button" aria-label="Aktifkan USB-C Audio Input">🔌 USB-C AUDIO</button>
         <label class="file-button">📁 FILE<input id="audioFilesInput" type="file" accept="audio/*" multiple hidden></label>
         <button id="startAudioButton" type="button">▶ PLAY</button>
@@ -5469,6 +5480,7 @@ const playlistContainer = document.getElementById("playlistContainer");
 const startMicButton = document.getElementById("startMicButton");
 const physicalInputDevice = document.getElementById("physicalInputDevice");
 const physicalOutputDevice = document.getElementById("physicalOutputDevice");
+const physicalOutputDeviceTop = document.getElementById("physicalOutputDeviceTop");
 const tftCurveToggleBtn = document.getElementById("tftCurveToggleBtn");
 
 async function refreshPhysicalInputDevices() {
@@ -5493,7 +5505,7 @@ async function refreshPhysicalInputDevices() {
     }
     if (physicalOutputDevice) {
       const previous = physicalOutputDevice.value;
-      physicalOutputDevice.innerHTML = '<option value="">Output default HP / USB</option>';
+      physicalOutputDevice.innerHTML = '<option value="">OUTPUT DEFAULT HP</option>';
       outputs.forEach((device, index) => {
         const option = document.createElement("option");
         option.value = device.deviceId;
@@ -5501,6 +5513,17 @@ async function refreshPhysicalInputDevices() {
         physicalOutputDevice.appendChild(option);
       });
       if (outputs.some(device => device.deviceId === previous)) physicalOutputDevice.value = previous;
+    }
+    if (physicalOutputDeviceTop) {
+      const previousTop = physicalOutputDeviceTop.value || (physicalOutputDevice?.value || "");
+      physicalOutputDeviceTop.innerHTML = '<option value="">OUTPUT DEFAULT HP</option>';
+      outputs.forEach((device, index) => {
+        const option = document.createElement("option");
+        option.value = device.deviceId;
+        option.textContent = device.label || ("Output " + (index + 1));
+        physicalOutputDeviceTop.appendChild(option);
+      });
+      if (outputs.some(device => device.deviceId === previousTop)) physicalOutputDeviceTop.value = previousTop;
     }
     updateIoConnectionStatus(inputs, outputs);
     if (usbAudioConnected && physicalOutputDevice && !physicalOutputDevice.value && usbAudioOutputDeviceId) {
@@ -5704,8 +5727,41 @@ const outputMode = document.getElementById("outputMode");
 const muteOutputButton = document.getElementById("muteOutputButton");
 const mixerPowerButton = document.getElementById("mixerPowerButton");
 if (physicalOutputDevice) physicalOutputDevice.addEventListener("change", async () => {
+  if (physicalOutputDeviceTop) physicalOutputDeviceTop.value = physicalOutputDevice.value;
   await applyPhysicalOutputDevice();
   await refreshPhysicalInputDevices();
+});
+if (physicalOutputDeviceTop) physicalOutputDeviceTop.addEventListener("change", async () => {
+  if (physicalOutputDevice) physicalOutputDevice.value = physicalOutputDeviceTop.value;
+  await applyPhysicalOutputDevice();
+  await refreshPhysicalInputDevices();
+});
+
+if (physicalInputDevice) physicalInputDevice.addEventListener("change", async () => {
+  const id = physicalInputDevice.value || "";
+  if (!id) {
+    setAudioStatus("INPUT: Default HP dipilih.");
+    return;
+  }
+  if (!audioContext) createAudioContext();
+  try {
+    if (microphoneStream) {
+      microphoneSource?.disconnect();
+      microphoneStream.getTracks().forEach(track=>track.stop());
+      microphoneStream=null;
+      microphoneSource=null;
+    }
+    microphoneStream=await navigator.mediaDevices.getUserMedia({audio:{deviceId:{exact:id},echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2}}});
+    microphoneSource=audioContext.createMediaStreamSource(microphoneStream);
+    if (!usbInputAnalyser) { usbInputAnalyser=audioContext.createAnalyser(); usbInputAnalyser.fftSize=1024; usbInputAnalyser.smoothingTimeConstant=.08; }
+    microphoneSource.connect(usbInputAnalyser);
+    microphoneSource.connect(mixerStripGains[0]);
+    startMicButton?.classList.add("active");
+    setAudioStatus("INPUT AKTIF: "+(physicalInputDevice.selectedOptions?.[0]?.textContent || "Audio input"));
+    updateUsbInputLevelMeter();
+  } catch(err) {
+    setAudioStatus("INPUT gagal dipilih: "+(err?.message || "perangkat tidak tersedia."));
+  }
 });
 if (navigator.mediaDevices?.addEventListener) navigator.mediaDevices.addEventListener("devicechange", async () => {
   const hadUsb = usbAudioConnected;
