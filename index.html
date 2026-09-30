@@ -3836,6 +3836,22 @@ body.mixer-refreshing #mixerPowerButton { animation:mixerRefreshPulse .22s ease-
 
 
 /* Mixer power affects TFT screen and both navigation groups; power button remains outside. */
+
+/* POWER OFF VISUAL FIX: mixer remains fully visible/readable.
+   Audio is still muted by the DSP power state; only signal LEDs are allowed to go dark. */
+body.mixer-powered-off #tabMixerContent .mixer-workspace,
+body.mixer-powered-off #tabMixerContent .mixer-desk-surface {
+  filter:none !important;
+  opacity:1 !important;
+  transition:none !important;
+}
+body.mixer-powered-off #tabMixerContent .mixer-workspace-main,
+body.mixer-powered-off #tabMixerContent .mixer-top-console,
+body.mixer-powered-off #tabMixerContent .mixer-desk-surface,
+body.mixer-powered-off #tabMixerContent .mixer-side-nav {
+  filter:none !important;
+  opacity:1 !important;
+}
 body.mixer-powered-off #tabMixerContent .mixer-workspace {
   filter:brightness(.18) saturate(.35) !important;
   pointer-events:none !important;
