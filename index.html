@@ -49,6 +49,21 @@ header, .topbar {
 .top-audio-controls { flex: 1 1 auto; min-width: 0; margin: 0; gap: 4px; }
 .top-audio-controls button, .top-audio-controls .file-button { min-height: 24px; padding: 3px 7px; font-size: 8px; }
 .top-audio-controls select { width: clamp(78px, 12vw, 130px); max-width: 130px; min-width: 70px; min-height: 24px; font-size: 8px; }
+.top-usbc-audio-button {
+  min-height: 26px !important; padding: 4px 9px !important; border: 1px solid #22c55e !important;
+  border-radius: 5px !important; background: linear-gradient(180deg,#14532d,#166534) !important;
+  color: #dcfce7 !important; font-size: 8px !important; font-weight: 900 !important;
+  box-shadow: 0 0 8px rgba(34,197,94,.28), inset 0 1px 0 rgba(255,255,255,.12);
+  white-space: nowrap; touch-action: manipulation;
+}
+.top-usbc-audio-button:hover, .top-usbc-audio-button:focus-visible {
+  background: linear-gradient(180deg,#16a34a,#15803d) !important; border-color:#86efac !important;
+  color:#fff !important; box-shadow:0 0 12px rgba(34,197,94,.5);
+}
+.top-usbc-audio-button.usb-active {
+  background: linear-gradient(180deg,#0284c7,#0369a1) !important; border-color:#7dd3fc !important;
+  color:#fff !important; box-shadow:0 0 12px rgba(56,189,248,.55);
+}
 .top-audio-status { min-width: 0; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #94a3b8; font-size: 7px; }
 
 .mode-menu-wrap { position: relative; flex: 0 0 auto; }
@@ -299,6 +314,8 @@ header, .topbar {
 }
 .mixer-workspace-main .mixer-tft-screen { height:100%; min-height:0; max-height:none; flex:1 1 auto; }
 @media(max-width:600px) {
+  .top-usbc-audio-button { min-height: 28px !important; padding: 5px 8px !important; font-size: 7.5px !important; }
+
   .mixer-workspace { grid-template-columns:82px minmax(0,1fr); }
   .mixer-side-nav { padding:3px; gap:3px; }
   .mixer-side-nav .tft-tab, .mixer-side-nav .console-btn { font-size:7px; min-height:25px; }
@@ -4468,6 +4485,7 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
         <select id="physicalInputDevice" aria-label="Sumber input fisik" title="Pilih mikrofon atau USB audio interface">
           <option value="">Default HP</option>
         </select>
+        <button id="activateUsbAudioButton" class="top-usbc-audio-button" type="button" aria-label="Aktifkan USB-C Audio Input">🔌 USB-C AUDIO</button>
         <label class="file-button">📁 FILE<input id="audioFilesInput" type="file" accept="audio/*" multiple hidden></label>
         <button id="startAudioButton" type="button">▶ PLAY</button>
         <button id="stopAudioButton" type="button">⏹ STOP</button>
@@ -4830,7 +4848,7 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
             <div class="io-device-name" id="usbAudioDeviceName">Belum ada perangkat USB audio terdeteksi.</div>
             <div class="io-status-row"><span class="io-status-dot" id="chargerStatusDot"></span><strong id="chargerStatus">POWER: STATUS TIDAK TERSEDIA</strong></div>
             <div class="io-device-name" id="chargerStatusDetail">Status charger mengikuti informasi daya perangkat/browser.</div>
-            <button id="activateUsbAudioButton" type="button" style="width:100%;margin-top:5px;">AKTIFKAN USB-C AUDIO INPUT</button>
+            <div class="io-device-name">Kontrol USB-C tersedia di bar atas agar mudah diakses dari HP.</div>
             <button id="refreshIoDevicesButton" type="button" style="width:100%;margin-top:5px;">REFRESH INPUT / OUTPUT USB</button>
           </div>
         </div>
