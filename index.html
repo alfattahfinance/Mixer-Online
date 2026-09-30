@@ -4712,6 +4712,35 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
   }
 }
 
+/* =========================================================
+   MASTER FADER — FINAL SIZE / SPACING / RESPONSIVE FIX
+========================================================= */
+#tabMixerContent .mixer-desk-surface .console-channel-strip.master-strip{min-width:132px;width:100%;padding:6px 5px 5px;box-sizing:border-box;overflow:hidden}
+#tabMixerContent .mixer-desk-surface .master-strip .strip-label-box{min-height:28px;height:28px;margin-bottom:4px;font-size:10px;line-height:1;box-sizing:border-box}
+#tabMixerContent .mixer-desk-surface .master-strip .master-status-leds{min-height:18px;margin-bottom:3px;gap:3px}
+#tabMixerContent .mixer-desk-surface .master-strip .strip-knobs-area{padding:4px 5px;margin-bottom:3px;gap:4px;border-radius:5px}
+#tabMixerContent .mixer-desk-surface .master-strip .knob-row{min-height:16px;font-size:8px}
+#tabMixerContent .mixer-desk-surface .master-strip .knob-row select{min-height:20px;height:20px;font-size:8px;padding:1px 3px}
+#tabMixerContent .mixer-desk-surface .master-strip>.fader-readout{min-height:20px;height:20px;margin:2px 0 3px;font-size:10px;line-height:20px}
+#tabMixerContent .mixer-desk-surface .master-strip .fader-panel-area{flex:1 1 auto;min-height:0;margin:2px 0 5px;gap:6px;overflow:hidden}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack{flex:0 0 104px;width:82px;height:104px;min-height:104px;max-height:104px;margin:0}
+#tabMixerContent .mixer-desk-surface .master-strip .master-stereo-meter-vertical{box-sizing:border-box;padding:4px 5px;gap:5px;border-radius:5px}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-column>span{font-size:8px;line-height:10px}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-scale{top:14px;bottom:3px;width:16px;font-size:5px}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-column .master-led-meter{width:9px;margin-left:14px;padding:2px 1px}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row{flex:0 0 240px;width:82px;height:240px;max-height:240px;margin:0;gap:5px}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot{flex:0 0 68px;width:68px;max-width:68px;min-width:68px}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-combined-wrap{flex:0 0 9px;width:9px;font-size:6px}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .master-combined-meter{width:7px}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot input[type=range]::-webkit-slider-thumb{width:34px;height:18px;margin-left:-15.5px}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot input[type=range]::-moz-range-thumb{width:34px;height:18px}
+#tabMixerContent .mixer-desk-surface .master-strip .strip-action-buttons{flex:0 0 auto;height:38px;min-height:38px;margin-top:auto!important;gap:5px}
+#tabMixerContent .mixer-desk-surface .master-strip .console-action-btn{min-height:36px;height:36px;padding:4px 2px;font-size:9px;border-radius:5px}
+#tabMixerContent .mixer-desk-surface .master-strip .console-action-btn.mute{background:#dc2626!important;color:#fff!important;border-color:#f87171!important}
+#tabMixerContent .mixer-desk-surface .master-strip .console-action-btn.active{background:#2563eb!important;color:#fff!important;border-color:#60a5fa!important;box-shadow:0 0 6px rgba(37,99,235,.45)}
+@media (min-width:701px){#tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack{flex-basis:112px;height:112px;min-height:112px;max-height:112px}#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row{flex-basis:250px;height:250px;max-height:250px}}
+@media (max-width:700px){#tabMixerContent .mixer-desk-surface .console-channel-strip.master-strip{min-width:126px}#tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack{flex-basis:92px;width:74px;height:92px;min-height:92px;max-height:92px}#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row{flex-basis:190px;width:74px;height:190px;max-height:190px}#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot{flex-basis:61px;width:61px;max-width:61px;min-width:61px}#tabMixerContent .mixer-desk-surface .master-strip .strip-action-buttons{height:34px;min-height:34px;gap:4px}#tabMixerContent .mixer-desk-surface .master-strip .console-action-btn{min-height:32px;height:32px;font-size:8px}}
+
 </style>
 </head>
 
