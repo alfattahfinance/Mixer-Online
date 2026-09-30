@@ -5139,11 +5139,11 @@ function updateUsbInputLevelMeter() {
   const value=document.getElementById("usbInputLevelValue");
   const status=document.getElementById("usbInputSignalStatus");
   if (!bar || !value || !status) return;
-  const db = microphoneStream && usbInputAnalyser ? readMeterDb(usbInputAnalyser) : -72;
+  const db = usbInputStream && usbInputAnalyser ? readMeterDb(usbInputAnalyser) : -72;
   const pct = Math.max(0, Math.min(100, ((db + 60) / 60) * 100));
   bar.style.width = pct.toFixed(1) + "%";
   value.textContent = db <= -71 ? "-∞ dB" : db.toFixed(1) + " dB";
-  status.textContent = db > -48 ? "USB INPUT: SINYAL MASUK" : (microphoneStream ? "USB INPUT: TERHUBUNG, TIDAK ADA SINYAL" : "USB INPUT: BELUM AKTIF");
+  status.textContent = db > -48 ? "USB INPUT: SINYAL MASUK" : (usbInputStream ? "USB INPUT: TERHUBUNG, TIDAK ADA SINYAL" : "USB INPUT: BELUM AKTIF");
   requestAnimationFrame(updateUsbInputLevelMeter);
 }
 function updateAllSignalMeters() {
@@ -5438,8 +5438,8 @@ function createBands(channel) {
 ========================================================= */
 const CONTROL_SMOOTHING_SECONDS = 0.065;
 
-let microphoneStream = null;
-let microphoneSource = null;
+let usbInputStream = null;
+let usbInputSource = null;
 let audioBuffers = [];
 let audioFileNames = [];
 let currentPlaylistIndex = 0;
@@ -5530,7 +5530,7 @@ async function refreshPhysicalInputDevices() {
     const outputs = devices.filter(device => device.kind === "audiooutput");
     if (physicalInputDevice) {
       const previous = physicalInputDevice.value;
-      const activeTrackId = microphoneStream?.getAudioTracks?.()[0]?.getSettings?.().deviceId || "";
+      const activeTrackId = usbInputStream?.getAudioTracks?.()[0]?.getSettings?.().deviceId || "";
       const preferredInputId = activeTrackId || usbAudioInputDeviceId || previous;
       physicalInputDevice.innerHTML = '<option value="">PILIH USB AUDIO INPUT</option>';
       const usbVisibleInputs = inputs.filter(isLikelyUsbAudioDevice);
@@ -5621,7 +5621,7 @@ function selectBestUsbAudioDevices(inputs=[], outputs=[]) {
     : (activeOutputStillPresent ? [outputs.find(d => d.deviceId === usbAudioOutputDeviceId)] : []);
   if (detectedUsbInputs[0]) usbAudioInputDeviceId = detectedUsbInputs[0].deviceId;
   if (detectedUsbOutputs[0]) usbAudioOutputDeviceId = detectedUsbOutputs[0].deviceId;
-  usbAudioConnected = Boolean(usbInputs.length || usbOutputs.length || microphoneStream);
+  usbAudioConnected = Boolean(usbInputs.length || usbOutputs.length || usbInputStream);
   return {usbInputs:usbInputs.filter(Boolean),usbOutputs:usbOutputs.filter(Boolean)};
 }
 
@@ -5648,7 +5648,7 @@ function updateIoConnectionStatus(inputs=[], outputs=[]) {
 }
 
 /* USB AUDIO INPUT HANDSHAKE
-   Android/browser dapat menyembunyikan label device sampai izin microphone
+   Android/browser dapat menyembunyikan label device sampai izin audio
    diberikan. Buka stream sementara, enumerate ulang, lalu pilih input USB
    yang benar dan sambungkan langsung ke mixer. */
 async function activateUsbAudioInput() {
@@ -5668,7 +5668,7 @@ async function activateUsbAudioInput() {
         audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2}}
       });
     } catch (err) {
-      setAudioStatus("Izin microphone/audio USB ditolak atau perangkat belum siap.");
+      setAudioStatus("Izin audio USB ditolak atau perangkat belum siap.");
       return false;
     }
 
@@ -5730,8 +5730,8 @@ async function activateUsbAudioInput() {
     }
 
     const exact={deviceId:{exact:selectedInput.deviceId},echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2}};
-    microphoneStream=await navigator.mediaDevices.getUserMedia({audio:exact});
-    const activeTrack=microphoneStream.getAudioTracks()[0];
+    usbInputStream=await navigator.mediaDevices.getUserMedia({audio:exact});
+    const activeTrack=usbInputStream.getAudioTracks()[0];
     const activeTrackId=activeTrack?.getSettings?.().deviceId || selectedInput.deviceId;
     usbAudioInputDeviceId=activeTrackId || selectedInput.deviceId;
     usbAudioInputLabel=String(selectedInput.label||"").trim();
@@ -5745,14 +5745,14 @@ async function activateUsbAudioInput() {
       }
       physicalInputDevice.value=usbAudioInputDeviceId;
     }
-    microphoneSource=audioContext.createMediaStreamSource(microphoneStream);
+    usbInputSource=audioContext.createMediaStreamSource(usbInputStream);
     if (!usbInputAnalyser) {
       usbInputAnalyser = audioContext.createAnalyser();
       usbInputAnalyser.fftSize = 1024;
       usbInputAnalyser.smoothingTimeConstant = 0.08;
     }
-    microphoneSource.connect(usbInputAnalyser);
-    microphoneSource.connect(mixerStripGains[0]);
+    usbInputSource.connect(usbInputAnalyser);
+    usbInputSource.connect(mixerStripGains[0]);
     updateUsbInputLevelMeter();
     const label=selectedInput.label || "USB Audio Interface";
     const outputLabel = physicalOutputDevice?.selectedOptions?.[0]?.textContent || "Output default";
@@ -5826,11 +5826,11 @@ if (physicalOutputDeviceTop) physicalOutputDeviceTop.addEventListener("change", 
 if (physicalInputDevice) physicalInputDevice.addEventListener("change", async () => {
   const id = physicalInputDevice.value || "";
   if (!id) {
-    if (microphoneStream) {
-      microphoneSource?.disconnect();
-      microphoneStream.getTracks().forEach(track=>track.stop());
-      microphoneStream=null;
-      microphoneSource=null;
+    if (usbInputStream) {
+      usbInputSource?.disconnect();
+      usbInputStream.getTracks().forEach(track=>track.stop());
+      usbInputStream=null;
+      usbInputSource=null;
     }
     usbAudioConnected=false;
     usbAudioInputDeviceId="";
@@ -5841,20 +5841,20 @@ if (physicalInputDevice) physicalInputDevice.addEventListener("change", async ()
   }
   if (!audioContext) createAudioContext();
   try {
-    if (microphoneStream) {
-      microphoneSource?.disconnect();
-      microphoneStream.getTracks().forEach(track=>track.stop());
-      microphoneStream=null;
-      microphoneSource=null;
+    if (usbInputStream) {
+      usbInputSource?.disconnect();
+      usbInputStream.getTracks().forEach(track=>track.stop());
+      usbInputStream=null;
+      usbInputSource=null;
     }
-    microphoneStream=await navigator.mediaDevices.getUserMedia({audio:{deviceId:{exact:id},echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2}}});
-    const activeTrack=microphoneStream.getAudioTracks()[0];
+    usbInputStream=await navigator.mediaDevices.getUserMedia({audio:{deviceId:{exact:id},echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2}}});
+    const activeTrack=usbInputStream.getAudioTracks()[0];
     usbAudioInputDeviceId=activeTrack?.getSettings?.().deviceId || id;
     usbAudioInputLabel=String(physicalInputDevice.selectedOptions?.[0]?.textContent || "").trim();
-    microphoneSource=audioContext.createMediaStreamSource(microphoneStream);
+    usbInputSource=audioContext.createMediaStreamSource(usbInputStream);
     if (!usbInputAnalyser) { usbInputAnalyser=audioContext.createAnalyser(); usbInputAnalyser.fftSize=1024; usbInputAnalyser.smoothingTimeConstant=.08; }
-    microphoneSource.connect(usbInputAnalyser);
-    microphoneSource.connect(mixerStripGains[0]);
+    usbInputSource.connect(usbInputAnalyser);
+    usbInputSource.connect(mixerStripGains[0]);
     setAudioStatus("INPUT AKTIF: "+(physicalInputDevice.selectedOptions?.[0]?.textContent || "Audio input"));
     updateUsbInputLevelMeter();
   } catch(err) {
@@ -5864,21 +5864,21 @@ if (physicalInputDevice) physicalInputDevice.addEventListener("change", async ()
 if (navigator.mediaDevices?.addEventListener) navigator.mediaDevices.addEventListener("devicechange", async () => {
   const hadUsb = usbAudioConnected;
   await refreshPhysicalInputDevices();
-  if (hadUsb && !usbAudioConnected && microphoneStream) {
-    microphoneSource?.disconnect();
-    microphoneSource=null;
-    microphoneStream.getTracks().forEach(track=>track.stop());
+  if (hadUsb && !usbAudioConnected && usbInputStream) {
+    usbInputSource?.disconnect();
+    usbInputSource=null;
+    usbInputStream.getTracks().forEach(track=>track.stop());
     usbInputConnectedMeterReset();
-    microphoneStream=null;
+    usbInputStream=null;
     setAudioStatus("USB audio dicabut — input dihentikan.");
   }
 });
 document.getElementById("activateUsbAudioButton")?.addEventListener("click", async () => {
-  if (microphoneStream) {
-    microphoneSource?.disconnect();
-    microphoneSource=null;
-    microphoneStream.getTracks().forEach(track=>track.stop());
-    microphoneStream=null;
+  if (usbInputStream) {
+    usbInputSource?.disconnect();
+    usbInputSource=null;
+    usbInputStream.getTracks().forEach(track=>track.stop());
+    usbInputStream=null;
     setAudioStatus("USB AUDIO INPUT dimatikan.");
     return;
   }
@@ -5909,7 +5909,7 @@ async function refreshUsbInterfaceBar(){
     const outputs=devices.filter(d=>d.kind==="audiooutput");
     const usbInputs=inputs.filter(isLikelyUsbAudioDevice);
     const usbOutputs=outputs.filter(isLikelyUsbAudioDevice);
-    const activeTrackId=microphoneStream?.getAudioTracks?.()[0]?.getSettings?.().deviceId || "";
+    const activeTrackId=usbInputStream?.getAudioTracks?.()[0]?.getSettings?.().deviceId || "";
     const activeInput=inputs.find(d=>d.deviceId===activeTrackId);
     const hasInput=Boolean(usbInputs.length||activeInput&&usbAudioConnected);
     const hasOutput=Boolean(usbOutputs.length||usbAudioOutputDeviceId&&outputs.some(d=>d.deviceId===usbAudioOutputDeviceId));
