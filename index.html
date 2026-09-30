@@ -4500,7 +4500,7 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
             <option value="">OUTPUT DEFAULT HP</option>
           </select>
         </div>
-        <button id="activateUsbAudioButton" class="top-usbc-audio-button" type="button" aria-label="Aktifkan USB-C Audio Input">🔌 USB-C AUDIO</button>
+        <button id="activateUsbAudioButton" class="top-usb-audio-button" type="button" aria-label="Aktifkan USB Audio Input">🔌 USB AUDIO</button>
         <label class="file-button">📁 FILE<input id="audioFilesInput" type="file" accept="audio/*" multiple hidden></label>
         <button id="startAudioButton" type="button">▶ PLAY</button>
         <button id="stopAudioButton" type="button">⏹ STOP</button>
@@ -4863,7 +4863,7 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
             <div class="io-device-name" id="usbAudioDeviceName">Belum ada perangkat USB audio terdeteksi.</div>
             <div class="io-status-row"><span class="io-status-dot" id="chargerStatusDot"></span><strong id="chargerStatus">POWER: STATUS TIDAK TERSEDIA</strong></div>
             <div class="io-device-name" id="chargerStatusDetail">Status charger mengikuti informasi daya perangkat/browser.</div>
-            <div class="io-device-name">Kontrol USB-C tersedia di bar atas agar mudah diakses dari HP.</div>
+            <div class="io-device-name">Kontrol USB AUDIO tersedia di bar atas agar mudah diakses dari HP, Android, atau iPhone.</div>
             <div class="usb-live-meter" aria-live="polite">
               <div class="usb-live-meter-head"><strong>USB INPUT LEVEL</strong><span id="usbInputLevelValue">-∞ dB</span></div>
               <div class="usb-live-meter-track" id="usbInputLevelTrack"><i id="usbInputLevelBar"></i></div>
@@ -5502,7 +5502,7 @@ async function refreshPhysicalInputDevices() {
       inputChoices.forEach((device, index) => {
         const option = document.createElement("option");
         option.value = device.deviceId;
-        option.textContent = device.label || "USB-C AUDIO INPUT";
+        option.textContent = device.label || "USB AUDIO INPUT";
         physicalInputDevice.appendChild(option);
       });
       const preferredInput = inputs.find(device => device.deviceId === preferredInputId);
@@ -5510,11 +5510,11 @@ async function refreshPhysicalInputDevices() {
         physicalInputDevice.value = preferredInput.deviceId;
       } else if (usbAudioConnected && preferredInputId) {
         // Android kadang tidak mengembalikan deviceId aktif pada enumerateDevices()
-        // setelah OTG/USB berubah. Pertahankan pilihan aktif agar UI tidak jatuh
+        // setelah USB berubah. Pertahankan pilihan aktif agar UI tidak jatuh
         // kembali ke INPUT DEFAULT HP.
         const activeOption = document.createElement("option");
         activeOption.value = preferredInputId;
-        activeOption.textContent = usbAudioInputLabel || "USB-C AUDIO INPUT (AKTIF)";
+        activeOption.textContent = usbAudioInputLabel || "USB AUDIO INPUT (AKTIF)";
         physicalInputDevice.appendChild(activeOption);
         physicalInputDevice.value = preferredInputId;
       } else if (usbAudioConnected && usbAudioInputLabel) {
@@ -5607,10 +5607,10 @@ function updateIoConnectionStatus(inputs=[], outputs=[]) {
   }
   if(name) name.textContent=usb.length
     ? usb.map(d=>d.label || d.kind).filter(Boolean).slice(0,3).join(" · ")
-    : "Belum ada perangkat audio input/output yang dikenali browser. Tekan USB-C AUDIO untuk meminta izin dan membuka input.";
+    : "Belum ada perangkat audio input/output yang dikenali browser. Tekan USB AUDIO untuk meminta izin dan membuka input.";
 }
 
-/* USB-C AUDIO INPUT HANDSHAKE
+/* USB AUDIO INPUT HANDSHAKE
    Android/browser dapat menyembunyikan label device sampai izin microphone
    diberikan. Buka stream sementara, enumerate ulang, lalu pilih input USB
    yang benar dan sambungkan langsung ke mixer. */
@@ -5624,14 +5624,14 @@ async function activateUsbAudioInput() {
     if (ctx.state==="suspended") await ctx.resume();
     initializeAudioGraph();
 
-    setAudioStatus("Meminta izin audio USB-C...");
+    setAudioStatus("Meminta izin audio USB...");
     let probeStream=null;
     try {
       probeStream=await navigator.mediaDevices.getUserMedia({
         audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2}}
       });
     } catch (err) {
-      setAudioStatus("Izin microphone/audio USB-C ditolak atau perangkat belum siap.");
+      setAudioStatus("Izin microphone/audio USB ditolak atau perangkat belum siap.");
       return false;
     }
 
@@ -5640,7 +5640,7 @@ async function activateUsbAudioInput() {
     const outputs=devices.filter(d=>d.kind==="audiooutput");
     updateIoConnectionStatus(inputs,outputs);
 
-    // USB-C processing path: select the USB/OTG output when the browser exposes
+    // USB processing path: select the USB output when the browser exposes
     // one, so the processed master bus goes back through the same audio interface.
     const usbOutput = outputs.find(isLikelyUsbAudioDevice);
     if (usbOutput && physicalOutputDevice) {
@@ -5672,7 +5672,7 @@ async function activateUsbAudioInput() {
     const isNamedUsb=isLikelyUsbAudioDevice(selectedInput);
     setAudioStatus(
       isNamedUsb
-        ? "USB-C AUDIO INPUT AKTIF: "+(usbLabel||"USB Audio")
+        ? "USB AUDIO INPUT AKTIF: "+(usbLabel||"USB Audio")
         : "AUDIO INPUT AKTIF: "+(usbLabel||"Input browser")+" (Android tidak memberi label USB)"
     );
     if (physicalInputDevice) {
@@ -5682,7 +5682,7 @@ async function activateUsbAudioInput() {
         if (!opt) {
           const option=document.createElement("option");
           option.value=selectedInput.deviceId;
-          option.textContent=selectedInput.label || "USB-C Audio Input";
+          option.textContent=selectedInput.label || "USB Audio Input";
           physicalInputDevice.appendChild(option);
         }
         physicalInputDevice.value=selectedInput.deviceId;
@@ -5700,7 +5700,7 @@ async function activateUsbAudioInput() {
       if (!activeOption) {
         activeOption=document.createElement("option");
         activeOption.value=usbAudioInputDeviceId;
-        activeOption.textContent=usbAudioInputLabel || "USB-C AUDIO INPUT (AKTIF)";
+        activeOption.textContent=usbAudioInputLabel || "USB AUDIO INPUT (AKTIF)";
         physicalInputDevice.appendChild(activeOption);
       }
       physicalInputDevice.value=usbAudioInputDeviceId;
@@ -5715,12 +5715,12 @@ async function activateUsbAudioInput() {
     microphoneSource.connect(mixerStripGains[0]);
     updateUsbInputLevelMeter();
     startMicButton?.classList.add("active");
-    const label=selectedInput.label || "USB-C Audio Interface";
+    const label=selectedInput.label || "USB Audio Interface";
     const outputLabel = physicalOutputDevice?.selectedOptions?.[0]?.textContent || "Output default";
     setAudioStatus("PROCESSING AKTIF: MIXER FISIK → USB IN → DSP → " + outputLabel + " → SOUND");
     return true;
   } catch (err) {
-    setAudioStatus("USB-C audio input gagal: "+(err?.message || "perangkat tidak tersedia."));
+    setAudioStatus("USB audio input gagal: "+(err?.message || "perangkat tidak tersedia."));
     return false;
   }
 }
@@ -5832,7 +5832,7 @@ if (navigator.mediaDevices?.addEventListener) navigator.mediaDevices.addEventLis
     usbInputConnectedMeterReset();
     microphoneStream=null;
     startMicButton?.classList.remove("active");
-    setAudioStatus("USB-C/OTG audio dicabut — input dihentikan.");
+    setAudioStatus("USB audio dicabut — input dihentikan.");
   }
 });
 document.getElementById("activateUsbAudioButton")?.addEventListener("click", async () => {
@@ -5842,7 +5842,7 @@ document.getElementById("activateUsbAudioButton")?.addEventListener("click", asy
     microphoneStream.getTracks().forEach(track=>track.stop());
     microphoneStream=null;
     startMicButton?.classList.remove("active");
-    setAudioStatus("USB-C AUDIO INPUT dimatikan.");
+    setAudioStatus("USB AUDIO INPUT dimatikan.");
     return;
   }
   await activateUsbAudioInput();
@@ -7426,11 +7426,11 @@ function bindTftDynamicEventListeners(key) {
           if (usbOption && physicalOutputDevice) {
             physicalOutputDevice.value = usbOption.value;
             await applyPhysicalOutputDevice();
-            setAudioStatus("USB-C / OTG OUTPUT aktif → " + usbOption.textContent);
+            setAudioStatus("USB / OTG OUTPUT aktif → " + usbOption.textContent);
           } else if (usbAudioConnected) {
-            setAudioStatus("USB-C / OTG AUDIO terdeteksi; output mengikuti perangkat USB yang tersedia.");
+            setAudioStatus("USB / OTG AUDIO terdeteksi; output mengikuti perangkat USB yang tersedia.");
           } else {
-            setAudioStatus("USB Streaming aktif (simulator); colok USB-C/OTG audio untuk output fisik.");
+            setAudioStatus("USB Streaming aktif (simulator); colok USB audio untuk output fisik.");
           }
         }
         updateEncoders(tftDatabase.routing.encoders(s));
