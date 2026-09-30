@@ -6656,8 +6656,10 @@ function loadTftPage(key) {
   const s = tftStatesData[key];
   tftContentArea.innerHTML = typeof data.content === 'function' ? data.content(s) : data.content;
   tftContentArea.dataset.pageKey = key;
-  tftFooterChannel.textContent = data.footerCh;
-  tftFooterStatus.textContent = data.footerSt;
+  // Footer Current/Next was intentionally removed from the mixer screen.
+  // Keep page navigation functional when those legacy elements are absent.
+  if (tftFooterChannel) tftFooterChannel.textContent = data.footerCh || "";
+  if (tftFooterStatus) tftFooterStatus.textContent = data.footerSt || "";
   updateEncoders(typeof data.encoders === 'function' ? data.encoders(s) : data.encoders);
 
   const isCurvePage = key === "eq" || key === "gate" || key === "dynamics" || key === "sends";
