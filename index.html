@@ -7018,11 +7018,13 @@ document.querySelectorAll(".mixer-desk-surface .console-channel-strip").forEach(
     // Main LR has dedicated MUTE/LR logic; never write into channel state arrays.
     strip.querySelector(".console-action-btn.mute")?.addEventListener("click", () => {
       masterStripMuted = !masterStripMuted;
-      updateMixerStripControls();
+      if (audioContext) updateMixerStripControls();
+      else strip.querySelector(".console-action-btn.mute")?.classList.toggle("active", masterStripMuted);
     });
     strip.querySelector(".console-action-btn.lr")?.addEventListener("click", () => {
       masterStripLR = !masterStripLR;
-      updateMixerStripControls();
+      if (audioContext) updateMixerStripControls();
+      else strip.querySelector(".console-action-btn.lr")?.classList.toggle("active", masterStripLR);
     });
     return;
   }
