@@ -4283,8 +4283,15 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
 #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-scale text { fill:#64748b !important; }
 #tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsDot1 { vector-effect:non-scaling-stroke; filter:drop-shadow(0 0 4px rgba(216,180,254,.8)); }
 #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-band-dot {
-  fill:#f5d0fe; stroke:#c084fc; stroke-width:1; vector-effect:non-scaling-stroke; opacity:.9;
+  fill:#f5d0fe; stroke:#c084fc; stroke-width:1.2; vector-effect:non-scaling-stroke; opacity:.95;
+  cursor:ns-resize; pointer-events:all; touch-action:none; transition:r .08s ease, filter .08s ease;
 }
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-band-dot:hover,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-band-dot:focus {
+  r:4.2px; filter:drop-shadow(0 0 4px rgba(216,180,254,.9)); outline:none;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgCurve { pointer-events:none; }
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgFill { pointer-events:none; }
 #tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgCurve {
   stroke:#d8b4fe !important; stroke-width:2.4 !important; filter:drop-shadow(0 0 3px rgba(192,132,252,.65));
 }
@@ -5213,7 +5220,7 @@ const tftStatesData = {
   gate: { thresh: -45, ratio: 2.5, state: true, dot1X: 140, dot1Y: 55, dot2X: 310, dot2Y: 12 },
   dynamics: { thresh: -18, ratio: 3, makeup: 2, dot1X: 10, dot1Y: 55, dot2X: 180, dot2Y: 35, dot3X: 310, dot3Y: 20 },
   eq: { freq: 2500, q: 1.5, gain: 4.5 },
-  sends: { lvl: 0, preset: 0, state: true, dot1X: 160, dot1Y: 30, dot2X: 310, dot2Y: 15 },
+  sends: { lvl: 0, preset: 0, state: true, bands: new Array(31).fill(0), dot1X: 180.2, dot1Y: 32, dot2X: 310, dot2Y: 15 },
   main: { send: 0, limit: -0.5, bypass: false, dot1X: 160, dot1Y: 12, dot2X: 310, dot2Y: 35 },
   routing: { source: 0, dout: 0, usb: true, dotX: 160, dotY: 48 },
   meters: { source: 0, hold: 0, zoom: 1, dotX: 160, dotY: 42 },
@@ -5233,7 +5240,10 @@ try {
       Object.keys(tftStatesData[section]).forEach(field => {
         const current = tftStatesData[section][field];
         const next = incoming[field];
-        if (typeof current === "number" && Number.isFinite(next)) tftStatesData[section][field] = next;
+        if (Array.isArray(current) && Array.isArray(next) && next.length === current.length) {
+          const clean = next.map(v => Number(v)).filter(v => Number.isFinite(v));
+          if (clean.length === current.length) tftStatesData[section][field] = clean.map(v => Math.max(-15, Math.min(15, v)));
+        } else if (typeof current === "number" && Number.isFinite(next)) tftStatesData[section][field] = next;
         else if (typeof current === "boolean" && typeof next === "boolean") tftStatesData[section][field] = next;
       });
     });
@@ -6325,15 +6335,9 @@ const tftDatabase = {
               <text x="317" y="7" text-anchor="end">+15</text><text x="317" y="31" text-anchor="end">0</text><text x="317" y="63" text-anchor="end">-15</text>
             </g>
             <path id="tftSendsSvgFill" d="" fill="#a855f7" opacity=".16"/>
-            <path id="tftSendsSvgCurve" d="" fill="none" stroke="#c084fc" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-            <g id="tftSendsBands" class="tft-geq-band-points" aria-hidden="true"></g>
-            <circle id="tftSendsDot1" cx="180.2" cy="${Math.max(8, Math.min(56, 32 - Number(s.lvl || 0) * (24/15)))}" r="7" fill="#f3e8ff" stroke="#c084fc" stroke-width="2" style="cursor:grab; touch-action:none;" aria-label="GEQ master level point" title="Drag vertically to adjust GEQ master level"/>
-            <g class="tft-geq-freq-labels" aria-hidden="true">
-              <text x="28" y="64">31</text><text x="58.5" y="64">63</text><text x="88.6" y="64">125</text>
-              <text x="119.2" y="64">250</text><text x="149.7" y="64">500</text><text x="180.2" y="64">1k</text>
-              <text x="210.7" y="64">2k</text><text x="241.2" y="64">4k</text><text x="271.7" y="64">8k</text><text x="302.2" y="64">16k</text>
-            </g>
-            <text x="42" y="7" fill="#94a3b8" font-size="5.2">31-BAND GEQ · DRAG MASTER LEVEL</text>
+            <path id="tftSendsSvgCurve" d="" fill="none" stroke="#d8b4fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <g id="tftSendsBands" class="tft-geq-band-points" aria-label="31 GEQ bands"></g>
+            <text x="10" y="7" fill="#94a3b8" font-size="5.2">31-BAND GRAPHIC EQ · DRAG BANDS VERTICALLY</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -6557,25 +6561,28 @@ function updateTftModuleCurve(key) {
     const endY = clamp(y - s.makeup*0.65,5,55);
     points = [[10,55],[x,y],[190,y],[310,endY]];
   } else if (key === "sends") {
-    // 31-band GEQ visualization. The real GEQ controls are represented as
-    // frequency bands so the curve reads like a proper graphic equalizer.
-    const bandGains = s.preset === 1
+    // True 31-band GEQ: each band has its own gain, while GEQ Master is a
+    // global offset. Frequencies are positioned logarithmically.
+    const geqFrequencies = [20,25,31.5,40,50,63,80,100,125,160,200,250,315,400,500,630,800,1000,1250,1600,2000,2500,3150,4000,5000,6300,8000,10000,12500,16000,20000];
+    const presetBands = s.preset === 1
       ? [-2,-2,-1,0,1,2,3,3,2,1,0,1,2,3,3,2,1,0,-1,-2,-2,-1,0,1,1,0,-1,-2,-2,-2,-2]
       : s.preset === 2
         ? [-4,-3,-2,0,3,5,4,2,0,-1,-2,-2,-1,0,1,2,3,4,5,4,3,1,-1,-2,-1,0,2,4,3,1,0]
         : new Array(31).fill(0);
-    const geqFrequencies = [20,25,31.5,40,50,63,80,100,125,160,200,250,315,400,500,630,800,1000,1250,1600,2000,2500,3150,4000,5000,6300,8000,10000,12500,16000,20000];
+    if (!Array.isArray(s.bands) || s.bands.length !== 31) s.bands = presetBands.slice();
+    if (s._lastPreset !== s.preset) {
+      s.bands = presetBands.slice();
+      s._lastPreset = s.preset;
+    }
     const x0 = 8, x1 = 312, span = x1 - x0;
     const logMin = Math.log10(20), logMax = Math.log10(20000);
-    const points31 = bandGains.map((gain, index) => {
-      const totalGain = gain + Number(s.lvl || 0);
+    const points31 = s.bands.map((gain, index) => {
+      const totalGain = Number(gain || 0) + Number(s.lvl || 0);
       const x = x0 + ((Math.log10(geqFrequencies[index]) - logMin) / (logMax - logMin)) * span;
-      const y = clamp(32 - totalGain * (24 / 15), 8, 56);
+      const y = s.state ? clamp(32 - totalGain * (24 / 15), 8, 56) : 32;
       return [x, y];
     });
     points = points31;
-    if (!s.state) points = points31.map(([x]) => [x,32]);
-
     const bandsRoot = document.getElementById("tftSendsBands");
     if (bandsRoot) {
       const frag = document.createDocumentFragment();
@@ -6583,8 +6590,15 @@ function updateTftModuleCurve(key) {
         const circle = document.createElementNS("http://www.w3.org/2000/svg","circle");
         circle.setAttribute("cx", x.toFixed(2));
         circle.setAttribute("cy", y.toFixed(2));
-        circle.setAttribute("r", index % 5 === 0 ? "2.8" : "2");
+        circle.setAttribute("r", index % 5 === 0 ? "3.4" : "2.6");
         circle.setAttribute("class", "tft-geq-band-dot");
+        circle.dataset.bandIndex = String(index);
+        circle.setAttribute("tabindex", "0");
+        circle.setAttribute("role", "slider");
+        circle.setAttribute("aria-label", geqFrequencies[index] + " Hz GEQ band");
+        circle.setAttribute("aria-valuemin", "-15");
+        circle.setAttribute("aria-valuemax", "15");
+        circle.setAttribute("aria-valuenow", Number(s.bands[index] || 0).toFixed(1));
         frag.appendChild(circle);
       });
       bandsRoot.replaceChildren(frag);
@@ -6633,9 +6647,9 @@ function updateTftModuleCurve(key) {
   // Refresh every visible handle from the same calculated point list after
   // either a slider change or a drag, preventing stale/misaligned dots.
   if (key === "sends") {
-    const dot = document.getElementById("tftSendsDot1");
-    const levelY = clamp(32 - s.lvl * (24/15), 8, 56);
-    if (dot) { dot.setAttribute("cx", "180.2"); dot.setAttribute("cy", levelY.toFixed(1)); dot.setAttribute("aria-valuetext", "GEQ master " + s.lvl + " dB"); }
+    document.querySelectorAll("#tftSendsBands .tft-geq-band-dot").forEach((dot, index) => {
+      if (s.bands?.[index] != null) dot.setAttribute("aria-valuenow", Number(s.bands[index]).toFixed(1));
+    });
   } else {
     [1, 2, 3].forEach((n) => {
       const dot = document.getElementById(prefix + "Dot" + n) ||
@@ -6859,9 +6873,9 @@ function bindTftDynamicEventListeners(key) {
       const lvlInp = document.getElementById("send1Lvl");
       const presetSel = document.getElementById("geqPresetSel");
       const stBtn = document.getElementById("geqStateBtn");
-      lvlInp?.addEventListener("input", () => { s.lvl = Number(lvlInp.value); document.getElementById("send1LvlVal").textContent = s.lvl + "dB"; updateEncoders(tftDatabase.sends.encoders(s)); });
-      presetSel?.addEventListener("change", () => { s.preset = presetSel.selectedIndex; updateEncoders(tftDatabase.sends.encoders(s)); updateTftModuleCurve("sends"); refreshTftInfoPanel("sends"); });
-      stBtn?.addEventListener("click", () => { s.state = !s.state; stBtn.textContent = s.state ? "ACTIVE" : "BYPASS"; stBtn.classList.toggle("active-action", s.state); updateEncoders(tftDatabase.sends.encoders(s)); });
+      lvlInp?.addEventListener("input", () => { s.lvl = Number(lvlInp.value); document.getElementById("send1LvlVal").textContent = s.lvl + "dB"; updateEncoders(tftDatabase.sends.encoders(s)); updateTftModuleCurve("sends"); });
+      presetSel?.addEventListener("change", () => { s.preset = presetSel.selectedIndex; s._lastPreset = -1; updateEncoders(tftDatabase.sends.encoders(s)); updateTftModuleCurve("sends"); refreshTftInfoPanel("sends"); persistTftState(); });
+      stBtn?.addEventListener("click", () => { s.state = !s.state; stBtn.textContent = s.state ? "ACTIVE" : "BYPASS"; stBtn.classList.toggle("active-action", s.state); updateEncoders(tftDatabase.sends.encoders(s)); updateTftModuleCurve("sends"); persistTftState(); });
     } else if (key === "main") {
       const sendInp = document.getElementById("mainFohLvl");
       const limInp = document.getElementById("mainLimitLvl");
@@ -6971,6 +6985,22 @@ function bindTftDynamicEventListeners(key) {
         s.dot3X = x; s.dot3Y = y;
         updateTftModuleCurve(key);
         try { syncChannelQuickPanelsFromSources(); } catch (_) {}
+      });
+    }
+
+    if (key === "sends" && container) {
+      const geqBands = container.querySelectorAll("#tftSendsBands .tft-geq-band-dot");
+      geqBands.forEach((bandDot) => {
+        makeSpecificDotDraggable(container, bandDot, (_x, y) => {
+          const index = Number(bandDot.dataset.bandIndex);
+          if (!Number.isInteger(index) || index < 0 || index > 30) return;
+          const nextGain = Math.round(clamp(32 - y, -15, 15) / (24 / 15) * 10) / 10 - Number(s.lvl || 0);
+          s.bands[index] = Math.max(-15, Math.min(15, nextGain));
+          const out = document.getElementById("send1LvlVal");
+          if (out) out.textContent = Number(s.lvl || 0).toFixed(1) + "dB";
+          updateTftModuleCurve("sends");
+          persistTftState();
+        });
       });
     }
   }
