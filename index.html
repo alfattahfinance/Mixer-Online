@@ -6581,23 +6581,26 @@ function updateTftModuleCurve(key) {
     points = points31;
     const bandsRoot = document.getElementById("tftSendsBands");
     if (bandsRoot) {
-      const frag = document.createDocumentFragment();
       points.forEach(([x,y], index) => {
-        const circle = document.createElementNS("http://www.w3.org/2000/svg","circle");
+        let circle = bandsRoot.querySelector('[data-band-index="' + index + '"]');
+        if (!circle) {
+          circle = document.createElementNS("http://www.w3.org/2000/svg","circle");
+          circle.setAttribute("class","tft-geq-band-dot");
+          circle.dataset.bandIndex = String(index);
+          circle.setAttribute("tabindex","0");
+          circle.setAttribute("role","slider");
+          circle.setAttribute("aria-valuemin","-15");
+          circle.setAttribute("aria-valuemax","15");
+          bandsRoot.appendChild(circle);
+        }
         circle.setAttribute("cx", x.toFixed(2));
         circle.setAttribute("cy", y.toFixed(2));
         circle.setAttribute("r", index % 5 === 0 ? "3.4" : "2.6");
-        circle.setAttribute("class", "tft-geq-band-dot");
-        circle.dataset.bandIndex = String(index);
-        circle.setAttribute("tabindex", "0");
-        circle.setAttribute("role", "slider");
         circle.setAttribute("aria-label", geqFrequencies[index] + " Hz GEQ band");
-        circle.setAttribute("aria-valuemin", "-15");
-        circle.setAttribute("aria-valuemax", "15");
         circle.setAttribute("aria-valuenow", Number(s.bands[index] || 0).toFixed(1));
-        frag.appendChild(circle);
       });
-      bandsRoot.replaceChildren(frag);
+      // Keep exactly 31 stable interactive band nodes.
+      Array.from(bandsRoot.children).slice(31).forEach(node => node.remove());
     }
   } else if (key === "main") {
     const y1 = clamp(35 - ((s.send+50)/56)*25,8,58);
