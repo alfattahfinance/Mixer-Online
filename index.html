@@ -3568,6 +3568,31 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   }
 }
 
+
+/* Functional console status lamps */
+.mixer-desk-surface .strip-status-leds {
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  width:100%; min-height:15px; margin:0 0 3px; padding:1px 3px;
+  color:#94a3b8; font-size:7px; font-weight:800; letter-spacing:.35px;
+}
+.mixer-desk-surface .status-led { display:inline-flex; align-items:center; gap:3px; opacity:.68; white-space:nowrap; }
+.mixer-desk-surface .status-led i {
+  display:inline-block; width:6px; height:6px; border-radius:50%;
+  background:#263341; border:1px solid #526273;
+  box-shadow:inset 0 0 2px rgba(0,0,0,.8);
+}
+.mixer-desk-surface .status-led.sig-led.on { color:#86efac; opacity:1; }
+.mixer-desk-surface .status-led.sig-led.on i {
+  background:#22c55e; border-color:#86efac;
+  box-shadow:0 0 5px rgba(34,197,94,.85),0 0 9px rgba(34,197,94,.35);
+}
+.mixer-desk-surface .status-led.clip-led.on { color:#fca5a5; opacity:1; }
+.mixer-desk-surface .status-led.clip-led.on i {
+  background:#ef4444; border-color:#fecaca;
+  box-shadow:0 0 5px rgba(239,68,68,.95),0 0 9px rgba(239,68,68,.4);
+}
+.mixer-desk-surface .master-status-leds { margin-bottom:2px; }
+
 </style>
 </head>
 
@@ -3836,7 +3861,7 @@ input[type="range"] { accent-color:#b8bec6 !important; }
         <!-- PERMUKAAN KONSOLE (FADER STRIPS) -->
         <div class="mixer-desk-surface">
           <div class="console-channel-strip">
-            <div class="strip-label-box">MIC / USB INPUT</div>
+            <div class="strip-label-box">MIC / USB INPUT</div><div class="strip-status-leds" aria-label="MIC / USB INPUT status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
             <div class="fader-panel-area mic-input-fader-area">
               <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
               <div class="hpf-fader-control"><label for="micStripHpf">HPF</label><select id="micStripHpf"><option>OFF</option><option>80Hz</option></select></div>
@@ -3849,7 +3874,7 @@ input[type="range"] { accent-color:#b8bec6 !important; }
           </div>
 
           <div class="console-channel-strip">
-            <div class="strip-label-box">AUDIO / MP3</div>
+            <div class="strip-label-box">AUDIO / MP3</div><div class="strip-status-leds" aria-label="AUDIO / MP3 status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
             <div class="fader-panel-area">
               <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="Audio MP3 channel level"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
               <div class="vert-led-meter" id="mixerMeter2"></div>
@@ -3861,7 +3886,7 @@ input[type="range"] { accent-color:#b8bec6 !important; }
           </div>
 
           <div class="console-channel-strip">
-            <div class="strip-label-box">FX SEND</div>
+            <div class="strip-label-box">FX SEND</div><div class="strip-status-leds" aria-label="FX SEND status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
             <div class="fader-panel-area">
               <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="FX send level"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
               <div class="vert-led-meter" id="mixerMeter3"></div>
@@ -3873,7 +3898,7 @@ input[type="range"] { accent-color:#b8bec6 !important; }
           </div>
 
           <div class="console-channel-strip">
-            <div class="strip-label-box">FX RETURN</div>
+            <div class="strip-label-box">FX RETURN</div><div class="strip-status-leds" aria-label="FX RETURN status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
             <div class="fader-panel-area">
               <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="FX return level"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
               <div class="vert-led-meter" id="mixerMeter4"></div>
@@ -3885,7 +3910,7 @@ input[type="range"] { accent-color:#b8bec6 !important; }
           </div>
 
           <div class="console-channel-strip master-strip">
-            <div class="strip-label-box">Main LR</div>
+            <div class="strip-label-box">Main LR</div><div class="strip-status-leds master-status-leds" aria-label="Main L/R status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
             <div class="strip-knobs-area" style="border-color: #d97706;">
               <div class="knob-row"><span>LIMIT</span><span>ON</span></div>
               <div class="knob-row"><span>PROC</span><select><option>EQ+ALESIS</option><option>BYPASS</option></select></div>
@@ -4156,11 +4181,24 @@ function paintMeter(container, db, direction) {
     led.classList.toggle("on", isLit);
   });
 }
+function updateStripStatusLeds(strip, db) {
+  if (!strip) return;
+  const sig = strip.querySelector('[data-led="sig"]');
+  const clip = strip.querySelector('[data-led="clip"]');
+  if (sig) sig.classList.toggle("on", Number.isFinite(db) && db > -48);
+  if (clip) clip.classList.toggle("on", Number.isFinite(db) && db >= -1);
+}
 function updateAllSignalMeters() {
+  const mixerStrips = Array.from(document.querySelectorAll(".mixer-desk-surface .console-channel-strip"));
   mixerStripAnalysers.forEach((analyser, index) => {
-    if (!analyser) return;
-    paintMeter(document.getElementById("mixerMeter" + (index + 1)), readMeterDb(analyser), "vertical");
+    if (!analyser) { updateStripStatusLeds(mixerStrips[index], -72); return; }
+    const db = readMeterDb(analyser);
+    paintMeter(document.getElementById("mixerMeter" + (index + 1)), db, "vertical");
+    updateStripStatusLeds(mixerStrips[index], db);
   });
+  const masterDbValues = masterStereoAnalysers.filter(Boolean).map(readMeterDb);
+  const masterDb = masterDbValues.length ? Math.max(...masterDbValues) : -72;
+  updateStripStatusLeds(mixerStrips[4], masterDb);
 
   [0, 1].forEach(channelIndex => {
     const channel = audioChannels[channelIndex];
