@@ -7001,7 +7001,7 @@ function syncChannelQuickPanelsFromSources() {
       p.classList.remove("open");
       p.setAttribute("aria-hidden","true");
     });
-    root.querySelectorAll(".channel-title-trigger[aria-expanded="true"]').forEach(t => t.setAttribute("aria-expanded","false"));
+    root.querySelectorAll('.channel-title-trigger[aria-expanded="true"]').forEach(t => t.setAttribute("aria-expanded","false"));
     if (!wasOpen) {
       panel.classList.add("open");
       panel.setAttribute("aria-hidden","false");
