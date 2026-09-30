@@ -3668,6 +3668,29 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   box-shadow:0 0 4px rgba(239,68,68,.55);
 }
 
+
+/* Power OFF: darken and lock the console surface while keeping the top power switch usable. */
+body.mixer-powered-off #tabMixerContent .mixer-desk-surface {
+  filter:brightness(.22) saturate(.45) !important;
+  transition:filter .22s ease;
+}
+body.mixer-powered-off #tabMixerContent .mixer-desk-surface * {
+  pointer-events:none !important;
+}
+body.mixer-powered-off #tabMixerContent .mixer-desk-surface {
+  pointer-events:none !important;
+}
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .vert-led-meter span,
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-led-meter span,
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-combined-meter span {
+  opacity:1 !important;
+  filter:brightness(1.35) !important;
+  box-shadow:0 0 5px currentColor,0 0 10px currentColor !important;
+}
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .status-led {
+  opacity:1 !important;
+}
+
 </style>
 </head>
 
@@ -5291,14 +5314,33 @@ document.getElementById("musicButton").addEventListener("click", () => setPreset
 masterGainControl.addEventListener("input", updateMasterGain);
 outputMode.addEventListener("change", updateMasterGain);
 muteOutputButton.addEventListener("click", () => { outputMuted = !outputMuted; updateOutputMute(); });
+function runMixerStartupTest() {
+  document.body.classList.add("mixer-startup-test");
+  document.querySelectorAll("#tabMixerContent .mixer-desk-surface .vert-led-meter, #tabMixerContent .mixer-desk-surface .master-led-meter, #tabMixerContent .mixer-desk-surface .master-combined-meter").forEach(meter => {
+    meter.querySelectorAll("span").forEach(led => led.classList.add("on"));
+  });
+  document.querySelectorAll("#tabMixerContent .mixer-desk-surface .status-led").forEach(led => led.classList.add("on"));
+  setAudioStatus("Mixer ON — menjalankan uji LED dan meter...");
+  window.setTimeout(() => {
+    document.body.classList.remove("mixer-startup-test");
+    updateAllSignalMeters();
+    setAudioStatus("Mixer siap.");
+  }, 1800);
+}
 mixerPowerButton?.addEventListener("click", () => {
   mixerPowered = !mixerPowered;
   mixerPowerButton.classList.toggle("powered-on", mixerPowered);
   mixerPowerButton.setAttribute("aria-pressed", String(mixerPowered));
   const label = mixerPowerButton.querySelector(".mixer-power-label");
   if (label) label.textContent = mixerPowered ? "POWER ON" : "POWER OFF";
+  document.body.classList.toggle("mixer-powered-off", !mixerPowered);
   updateOutputMute();
-  setAudioStatus(mixerPowered ? "Mixer dinyalakan." : "Mixer dimatikan — output audio nonaktif.");
+  if (mixerPowered) runMixerStartupTest();
+  else {
+    document.body.classList.remove("mixer-startup-test");
+    document.querySelectorAll("#tabMixerContent .mixer-desk-surface .status-led, #tabMixerContent .mixer-desk-surface .vert-led-meter span, #tabMixerContent .mixer-desk-surface .master-led-meter span, #tabMixerContent .mixer-desk-surface .master-combined-meter span").forEach(led => led.classList.remove("on"));
+    setAudioStatus("Mixer OFF — kontrol diredupkan dan output audio dimatikan.");
+  }
 });
 
 document.querySelectorAll(".mixer-desk-surface .console-channel-strip").forEach((strip, index) => {
