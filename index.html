@@ -7034,6 +7034,60 @@ function syncChannelQuickPanelsFromSources() {
 </script>
 
 <script>
+
+/* STABLE QUICK-PANEL KNOBS
+   Drag vertically with a controlled delta. The knob does not jump to the
+   pointer position; it starts from the current value and moves smoothly. */
+(function bindStableQuickKnobs(){
+  const root=document.getElementById("tabMixerContent");
+  if(!root || root.dataset.stableQuickKnobs==="1") return;
+  root.dataset.stableQuickKnobs="1";
+  let drag=null;
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const apply=(input,value)=>{
+    const min=Number(input.min), max=Number(input.max), step=Number(input.step)||1;
+    let v=clamp(value,min,max);
+    if(step>0) v=min+Math.round((v-min)/step)*step;
+    const decimals=(String(step).split(".")[1]||"").length;
+    input.value=decimals?Number(v).toFixed(decimals):String(Math.round(v));
+    input.dispatchEvent(new Event("input",{bubbles:true}));
+  };
+  root.addEventListener("pointerdown",(e)=>{
+    const knob=e.target instanceof Element ? e.target.closest(".quick-knob i") : null;
+    if(!knob || !root.contains(knob)) return;
+    const item=knob.closest(".quick-knob");
+    const input=item?.querySelector('input[type="range"]');
+    if(!input) return;
+    e.preventDefault();
+    e.stopPropagation();
+    drag={
+      pointerId:e.pointerId,
+      input,
+      startY:e.clientY,
+      startValue:Number(input.value),
+      range:Number(input.max)-Number(input.min),
+      sensitivity:Math.max(90,Math.min(180,Number(item.dataset.knobTravel)||130))
+    };
+    knob.setPointerCapture?.(e.pointerId);
+    knob.classList.add("dragging");
+  },true);
+  root.addEventListener("pointermove",(e)=>{
+    if(!drag || e.pointerId!==drag.pointerId) return;
+    e.preventDefault();
+    const dy=drag.startY-e.clientY;
+    apply(drag.input,drag.startValue+(dy/drag.sensitivity)*drag.range);
+  },true);
+  const end=(e)=>{
+    if(!drag || (e && e.pointerId!==drag.pointerId)) return;
+    const knob=drag.input.closest(".quick-knob")?.querySelector("i");
+    knob?.classList.remove("dragging");
+    drag=null;
+  };
+  root.addEventListener("pointerup",end,true);
+  root.addEventListener("pointercancel",end,true);
+  root.addEventListener("lostpointercapture",end,true);
+})();
+
 /* Navigation/TFT recovery layer: survives a UI-layer runtime interruption. */
 (function mixerUiRecovery(){
   const boot = () => {
