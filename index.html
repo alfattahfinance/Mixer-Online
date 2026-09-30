@@ -8335,7 +8335,7 @@ function syncChannelQuickPanelsFromSources() {
 #tabMixerContent .mixer-workspace{
   position:relative !important;
   display:grid !important;
-  grid-template-columns:clamp(82px,9vw,104px) minmax(0,1fr) !important;
+  grid-template-columns:104px minmax(0,1fr) !important;
   grid-template-rows:minmax(0,1fr) !important;
   gap:5px !important;
   width:100% !important;
@@ -8349,15 +8349,18 @@ function syncChannelQuickPanelsFromSources() {
   grid-row:1 !important;
   position:relative !important;
   inset:auto !important;
-  z-index:2 !important;
-  width:auto !important;
+  z-index:20 !important;
+  width:104px !important;
+  max-width:104px !important;
+  min-width:104px !important;
   height:100% !important;
-  min-width:0 !important;
   min-height:0 !important;
+  box-sizing:border-box !important;
   overflow-x:hidden !important;
   overflow-y:auto !important;
   pointer-events:auto !important;
   align-self:stretch !important;
+  justify-self:stretch !important;
 }
 #tabMixerContent .mixer-workspace-main{
   grid-column:2 !important;
@@ -8365,9 +8368,12 @@ function syncChannelQuickPanelsFromSources() {
   position:relative !important;
   z-index:1 !important;
   width:100% !important;
+  max-width:100% !important;
   height:100% !important;
   min-width:0 !important;
   min-height:0 !important;
+  margin:0 !important;
+  box-sizing:border-box !important;
   overflow:hidden !important;
 }
 #tabMixerContent .mixer-side-nav .tft-tab,
@@ -8377,6 +8383,8 @@ function syncChannelQuickPanelsFromSources() {
   flex:0 0 auto !important;
   width:100% !important;
   max-width:100% !important;
+  min-width:0 !important;
+  box-sizing:border-box !important;
   pointer-events:auto !important;
 }
 #tabMixerContent .mixer-side-nav .tft-tab::before,
@@ -8388,11 +8396,19 @@ function syncChannelQuickPanelsFromSources() {
 #tabMixerContent .mixer-side-nav .console-btn{
   isolation:isolate !important;
 }
+#tabMixerContent .mixer-top-console,
+#tabMixerContent .mixer-desk-surface{
+  min-width:0 !important;
+  max-width:100% !important;
+}
 @media(max-width:600px){
   #tabMixerContent .mixer-workspace{
     grid-template-columns:82px minmax(0,1fr) !important;
     gap:4px !important;
   }
+  #tabMixerContent .mixer-side-nav{
+    width:82px !important;
+    min-width:82px !important;
+    max-width:82px !important;
+  }
 }
-
-</style>
