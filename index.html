@@ -5454,9 +5454,31 @@ async function refreshPhysicalInputDevices() {
       if (outputs.some(device => device.deviceId === previous)) physicalOutputDevice.value = previous;
     }
     updateIoConnectionStatus(inputs, outputs);
+    if (usbAudioConnected && physicalOutputDevice && !physicalOutputDevice.value && usbAudioOutputDeviceId) {
+      physicalOutputDevice.value = usbAudioOutputDeviceId;
+      if (audioContext && typeof audioContext.setSinkId === "function") {
+        try { await applyPhysicalOutputDevice(); } catch {}
+      }
+    }
   } catch (err) {
+    usbAudioConnected=false;
+    usbAudioInputDeviceId="";
+    usbAudioOutputDeviceId="";
     updateIoConnectionStatus([],[]);
   }
+}
+
+let usbAudioConnected = false;
+let usbAudioInputDeviceId = "";
+let usbAudioOutputDeviceId = "";
+
+function selectBestUsbAudioDevices(inputs=[], outputs=[]) {
+  const usbInputs = inputs.filter(isLikelyUsbAudioDevice);
+  const usbOutputs = outputs.filter(isLikelyUsbAudioDevice);
+  usbAudioInputDeviceId = usbInputs[0]?.deviceId || "";
+  usbAudioOutputDeviceId = usbOutputs[0]?.deviceId || "";
+  usbAudioConnected = usbInputs.length > 0 || usbOutputs.length > 0;
+  return {usbInputs,usbOutputs};
 }
 
 function isLikelyUsbAudioDevice(device) {
@@ -5465,8 +5487,8 @@ function isLikelyUsbAudioDevice(device) {
 }
 
 function updateIoConnectionStatus(inputs=[], outputs=[]) {
-  const all=[...inputs,...outputs];
-  const usb=all.filter(isLikelyUsbAudioDevice);
+  const {usbInputs,usbOutputs}=selectBestUsbAudioDevices(inputs,outputs);
+  const usb=[...usbInputs,...usbOutputs];
   const dot=document.getElementById("usbAudioStatusDot");
   const status=document.getElementById("usbAudioStatus");
   const name=document.getElementById("usbAudioDeviceName");
@@ -5529,7 +5551,18 @@ if (physicalOutputDevice) physicalOutputDevice.addEventListener("change", async 
   await applyPhysicalOutputDevice();
   await refreshPhysicalInputDevices();
 });
-if (navigator.mediaDevices?.addEventListener) navigator.mediaDevices.addEventListener("devicechange", () => refreshPhysicalInputDevices());
+if (navigator.mediaDevices?.addEventListener) navigator.mediaDevices.addEventListener("devicechange", async () => {
+  const hadUsb = usbAudioConnected;
+  await refreshPhysicalInputDevices();
+  if (hadUsb && !usbAudioConnected && microphoneStream) {
+    microphoneSource?.disconnect();
+    microphoneSource=null;
+    microphoneStream.getTracks().forEach(track=>track.stop());
+    microphoneStream=null;
+    startMicButton?.classList.remove("active");
+    setAudioStatus("USB-C/OTG audio dicabut — input dihentikan.");
+  }
+});
 document.getElementById("refreshIoDevicesButton")?.addEventListener("click", async () => {
   await refreshPhysicalInputDevices();
   await updateChargerStatus();
@@ -5968,14 +6001,16 @@ startMicButton.addEventListener("click", async () => {
     const selectedInputId = physicalInputDevice?.value || "";
     // Avoid forcing an ultra-low capture latency on mobile devices; let the
     // browser/driver choose a stable buffer size to reduce crackles and dropouts.
-    const audioConstraints = selectedInputId
-      ? { deviceId: { exact: selectedInputId }, echoCancellation: false, noiseSuppression: false, autoGainControl: false }
-      : { echoCancellation: false, noiseSuppression: false, autoGainControl: false };
+    const usbInputId = usbAudioInputDeviceId || "";
+    const requestedInputId = selectedInputId || usbInputId;
+    const audioConstraints = requestedInputId
+      ? { deviceId: { exact: requestedInputId }, echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: { ideal: 2 } }
+      : { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: { ideal: 2 } };
     microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
     microphoneSource = audioContext.createMediaStreamSource(microphoneStream);
     microphoneSource.connect(mixerStripGains[0]);
     startMicButton.classList.add("active");
-    setAudioStatus("Mikrofon / Input Fisik aktif.");
+    setAudioStatus(usbAudioInputDeviceId ? "USB-C / OTG AUDIO INPUT aktif." : "Mikrofon / Input Fisik aktif.");
   } catch (err) { setAudioStatus("Gagal mengakses mikrofon atau USB interface."); }
 });
 
@@ -7136,13 +7171,15 @@ function bindTftDynamicEventListeners(key) {
         usbBtn.classList.toggle("active-action", s.usb);
         if (s.usb) {
           await refreshPhysicalInputDevices();
-          const usbOption = [...(physicalOutputDevice?.options || [])].find(o => /usb|audio interface|sound card|dac|dongle|type.?c/i.test(o.textContent || ""));
+          const usbOption = [...(physicalOutputDevice?.options || [])].find(o => /usb|audio interface|sound card|dac|dongle|type.?c|otg/i.test(o.textContent || ""));
           if (usbOption && physicalOutputDevice) {
             physicalOutputDevice.value = usbOption.value;
             await applyPhysicalOutputDevice();
-            setAudioStatus("USB Streaming aktif → " + usbOption.textContent);
+            setAudioStatus("USB-C / OTG OUTPUT aktif → " + usbOption.textContent);
+          } else if (usbAudioConnected) {
+            setAudioStatus("USB-C / OTG AUDIO terdeteksi; output mengikuti perangkat USB yang tersedia.");
           } else {
-            setAudioStatus("USB Streaming aktif (simulator); belum ada USB audio output terdeteksi.");
+            setAudioStatus("USB Streaming aktif (simulator); colok USB-C/OTG audio untuk output fisik.");
           }
         }
         updateEncoders(tftDatabase.routing.encoders(s));
