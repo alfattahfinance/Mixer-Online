@@ -5966,17 +5966,17 @@ function animateMixerFaders(poweringOn) {
   }
 
   // ON: test dulu sampai +5 dB, lalu kembali perlahan dan berhenti tepat di 0 dB.
-  animateStage(entry => entry.testTarget, 1400, () => {
+  animateStage(entry => entry.testTarget, 1600, () => {
     if (token !== mixerFaderMotionToken || !mixerPowered) return;
     window.setTimeout(() => {
       if (token !== mixerFaderMotionToken || !mixerPowered) return;
-      animateStage(entry => entry.startupReturn, 1400, () => {
+      animateStage(entry => entry.startupReturn, 2200, () => {
         if (token === mixerFaderMotionToken && mixerPowered && audioContext) {
           entries.forEach(entry => render(entry, entry.startupReturn));
           updateMixerStripControls();
         }
       });
-    }, 180);
+    }, 300);
   });
 }
 
@@ -5992,6 +5992,7 @@ function runMixerStartupTest(transitionToken) {
   document.querySelectorAll("#tabMixerContent .mixer-desk-surface .status-led, #tabMixerContent .mixer-desk-surface .vert-led-meter span, #tabMixerContent .mixer-desk-surface .master-led-meter span, #tabMixerContent .mixer-desk-surface .master-combined-meter span")
     .forEach(led => led.classList.remove("on"));
   setAudioStatus("Mixer ON — power up bertahap, indikator dan fader bergerak perlahan...");
+  // Beri waktu cukup agar rangkaian +5 dB → 0 dB selesai sebelum test dinyatakan selesai.
   window.setTimeout(() => {
     if (transitionToken !== mixerPowerTransitionToken || !mixerPowered) return;
     clearMixerPowerIndicators();
@@ -5999,7 +6000,7 @@ function runMixerStartupTest(transitionToken) {
     updateOutputMute();
     updateAllSignalMeters();
     setAudioStatus("Mixer siap.");
-  }, 3000);
+  }, 4600);
 }
 
 mixerPowerButton?.addEventListener("click", async () => {
