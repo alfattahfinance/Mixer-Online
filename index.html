@@ -5495,7 +5495,7 @@ async function refreshPhysicalInputDevices() {
       const previous = physicalInputDevice.value;
       const activeTrackId = microphoneStream?.getAudioTracks?.()[0]?.getSettings?.().deviceId || "";
       const preferredInputId = activeTrackId || usbAudioInputDeviceId || previous;
-      physicalInputDevice.innerHTML = '<option value="">INPUT DEFAULT HP</option>';
+      physicalInputDevice.innerHTML = '<option value="">PILIH USB AUDIO INPUT</option>';
       const usbVisibleInputs = inputs.filter(isLikelyUsbAudioDevice);
       const activeVisibleInput = inputs.find(device => device.deviceId === usbAudioInputDeviceId);
       const inputChoices = usbVisibleInputs.length ? usbVisibleInputs : (activeVisibleInput ? [activeVisibleInput] : []);
