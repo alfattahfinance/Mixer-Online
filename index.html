@@ -4165,6 +4165,57 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
   }
 }
 
+
+/* Responsive EQ/TFT curve surfaces: scale with the available screen width. */
+.eq-response-curve {
+  width:100% !important;
+  min-width:0 !important;
+  overflow:hidden !important;
+}
+.eq-response-svg {
+  display:block !important;
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  height:clamp(42px,8vw,72px) !important;
+  min-height:42px !important;
+  max-height:72px !important;
+  overflow:visible !important;
+  touch-action:none !important;
+}
+.eq-response-grid line,
+.eq-response-path {
+  vector-effect:non-scaling-stroke;
+}
+#tabMixerContent #tftContentArea,
+#tabMixerContent #tftContentArea > * {
+  min-width:0 !important;
+  max-width:100% !important;
+}
+#tabMixerContent #tftContentArea svg {
+  display:block !important;
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  height:auto !important;
+  overflow:visible !important;
+}
+#tabMixerContent #tftContentArea .tft-graph,
+#tabMixerContent #tftContentArea [class*="graph"],
+#tabMixerContent #tftContentArea [class*="curve"] {
+  min-width:0 !important;
+  max-width:100% !important;
+  overflow:hidden !important;
+}
+@media (max-width:700px) {
+  .eq-response-curve { padding:3px 4px 4px !important; }
+  .eq-response-heading { font-size:6.5px !important; }
+  .eq-response-svg { height:clamp(40px,15vw,58px) !important; min-height:40px !important; }
+}
+@media (min-width:701px) and (max-width:1199px) {
+  .eq-response-svg { height:clamp(48px,7vw,64px) !important; }
+}
+
 </style>
 </head>
 
