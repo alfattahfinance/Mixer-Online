@@ -4104,6 +4104,67 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
 }
 #tabMixerContent .quick-knob i:active { cursor:grabbing !important; }
 
+
+/* FULL-SCREEN CURVE / PLOT LAYOUT
+   Use all available graph width on tablet/laptop/large screens.
+   No fixed 640/720px cap and no artificial zoom. */
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box {
+  box-sizing:border-box !important;
+  width:100% !important;
+  max-width:none !important;
+  min-width:0 !important;
+  margin-inline:0 !important;
+  align-self:stretch !important;
+  flex:1 1 auto !important;
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box svg,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box svg,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box svg,
+#tabMixerContent #tftContentArea .tft-peq-graph svg {
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  max-width:none !important;
+}
+#tabMixerContent #tftContentArea .tft-peq {
+  width:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  height:100% !important;
+  grid-template-rows:auto minmax(0,1fr) auto !important;
+}
+#tabMixerContent #tftContentArea .tft-peq-graph {
+  box-sizing:border-box !important;
+  width:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  height:100% !important;
+  max-height:none !important;
+  overflow:hidden !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-view,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-view,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-view {
+  width:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  height:100% !important;
+  overflow:hidden !important;
+}
+@media (min-width:700px) {
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+  #tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box {
+    width:100% !important;
+    max-width:none !important;
+  }
+}
+
 </style>
 </head>
 
