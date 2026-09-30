@@ -5906,30 +5906,77 @@ function animateMixerFaders(poweringOn) {
   const controls = getMixerPowerFaders();
   if (!controls.length) return;
   const token = ++mixerFaderMotionToken;
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
   const entries = controls.map(control => {
-    const min = Number.isFinite(control.minAsNumber) ? control.minAsNumber : (Number(control.min) || 0);
+    const min = Number(control.min);
+    const max = Number(control.max);
     const current = Number(control.value);
-    if (!mixerFaderPositions.has(control) && !poweringOn) mixerFaderPositions.set(control, current);
-    const target = poweringOn
-      ? (mixerFaderPositions.has(control) ? mixerFaderPositions.get(control) : current)
-      : min;
-    return {control, start:current, target};
+
+    // Simpan nilai asli sebelum visual power-off menurunkan fader.
+    if (!poweringOn && !mixerFaderPositions.has(control)) {
+      mixerFaderPositions.set(control, current);
+    }
+
+    const saved = mixerFaderPositions.has(control)
+      ? Number(mixerFaderPositions.get(control))
+      : current;
+
+    return {
+      control,
+      saved: clamp(saved, min, max),
+      testTarget: clamp(5, min, max)
+    };
   });
-  const startTime = performance.now();
-  const duration = poweringOn ? 1050 : 520;
-  const tick = now => {
-    if (token !== mixerFaderMotionToken) return;
-    const t = Math.min(1, (now - startTime) / duration);
-    const eased = t * t * (3 - 2 * t);
-    entries.forEach(({control,start,target}) => {
-      control.value = String(start + (target - start) * eased);
-      const readout = control.closest(".console-channel-strip, .master-strip")?.querySelector(".fader-readout");
-      if (readout) readout.textContent = Number(control.value).toFixed(1) + " dB";
-    });
-    if (t < 1) requestAnimationFrame(tick);
-    else if (mixerPowered && audioContext) updateMixerStripControls();
+
+  const render = (entry, value) => {
+    entry.control.value = String(value);
+    const readout = entry.control.closest(".console-channel-strip, .master-strip")?.querySelector(".fader-readout");
+    if (readout) readout.textContent = Number(value).toFixed(1) + " dB";
   };
-  requestAnimationFrame(tick);
+
+  const animateStage = (getTarget, duration, done) => {
+    const starts = entries.map(entry => ({
+      entry,
+      start: Number(entry.control.value),
+      target: getTarget(entry)
+    }));
+    const startTime = performance.now();
+
+    const tick = now => {
+      if (token !== mixerFaderMotionToken) return;
+      const t = Math.min(1, (now - startTime) / duration);
+      const eased = t * t * (3 - 2 * t);
+      starts.forEach(({entry, start, target}) => render(entry, start + (target - start) * eased));
+      if (t < 1) requestAnimationFrame(tick);
+      else if (done) done();
+    };
+    requestAnimationFrame(tick);
+  };
+
+  if (!poweringOn) {
+    // OFF: turun perlahan setelah nilai asli sudah diamankan.
+    animateStage(entry => Number(entry.control.min), 900, () => {
+      if (token === mixerFaderMotionToken && !mixerPowered) {
+        entries.forEach(entry => render(entry, Number(entry.control.min)));
+      }
+    });
+    return;
+  }
+
+  // ON: test dulu sampai +5 dB, lalu kembali tepat ke nilai asli masing-masing.
+  animateStage(entry => entry.testTarget, 1400, () => {
+    if (token !== mixerFaderMotionToken || !mixerPowered) return;
+    window.setTimeout(() => {
+      if (token !== mixerFaderMotionToken || !mixerPowered) return;
+      animateStage(entry => entry.saved, 1400, () => {
+        if (token === mixerFaderMotionToken && mixerPowered && audioContext) {
+          entries.forEach(entry => render(entry, entry.saved));
+          updateMixerStripControls();
+        }
+      });
+    }, 180);
+  });
 }
 
 function clearMixerPowerIndicators() {
