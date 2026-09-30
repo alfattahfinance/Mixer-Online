@@ -363,6 +363,17 @@ header, .topbar {
 .quick-geq-link .quick-curve-button { background:linear-gradient(180deg,#a855f7,#7e22ce); border:1px solid rgba(216,180,254,.5); }
 .quick-geq-link .quick-curve-button:hover { filter:brightness(1.12); }
 .quick-geq-link output { color:#d8b4fe; }
+#tabMixerContent .channel-quick-panel .quick-curve-button.active-action {
+  background:linear-gradient(180deg,#16a34a,#15803d) !important;
+  border-color:rgba(134,239,172,.75) !important;
+  color:#ecfdf5 !important;
+  box-shadow:0 0 8px rgba(34,197,94,.3) !important;
+}
+#tabMixerContent .channel-quick-panel .quick-curve-button.geq-bypass {
+  background:linear-gradient(180deg,#475569,#1e293b) !important;
+  border-color:rgba(148,163,184,.45) !important;
+  color:#cbd5e1 !important;
+}
 
 .tft-curve-toggle { background: #334155; color: #cbd5e1; border: 1px solid #475569; padding: 1px 6px; font-size: 7px; font-weight: 800; border-radius: 3px; cursor: pointer; }
 .tft-curve-toggle.active { background: #10b981; color: #022c22; border-color: #34d399; }
@@ -7278,8 +7289,12 @@ function syncChannelQuickControl(item, spec) {
   if (spec.type === "button") {
     const btn=item.querySelector("button");
     if (btn) {
-      btn.textContent=source.textContent.trim();
-      btn.classList.toggle("active-action",source.classList.contains("active-action"));
+      const isActive = source.classList.contains("active-action") || source.textContent.trim() === "ACTIVE";
+      btn.textContent = isActive ? "ACTIVE" : "BYPASS";
+      btn.classList.toggle("active-action", isActive);
+      btn.classList.toggle("geq-bypass", !isActive);
+      btn.setAttribute("aria-pressed", String(isActive));
+      btn.setAttribute("aria-label", isActive ? "GEQ Active" : "GEQ Bypass");
     }
     if (output) output.textContent=source.textContent.trim();
     return;
@@ -7348,7 +7363,8 @@ function bindChannelQuickProxy(item, spec) {
     proxyBtn.addEventListener("click",e=>{
       e.preventDefault(); e.stopPropagation();
       source.click();
-      sync();
+      window.setTimeout(sync, 0);
+      window.setTimeout(syncChannelQuickPanelsFromSources, 0);
     });
   }
   sync();
