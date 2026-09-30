@@ -7026,14 +7026,28 @@ function bindTftDynamicEventListeners(key) {
     if (key === "sends" && container) {
       const geqBands = container.querySelectorAll("#tftSendsBands .tft-geq-band-dot");
       geqBands.forEach((bandDot) => {
-        makeSpecificDotDraggable(container, bandDot, (_x, y) => {
-          const index = Number(bandDot.dataset.bandIndex);
+        const setGeqBandFromY = (index, y) => {
           if (!Number.isInteger(index) || index < 0 || index > 30) return;
           const clampGeq = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-          const nextGain = Math.round(clampGeq((32 - y) / (24 / 15), -15, 15) * 10) / 10 - Number(s.lvl || 0);
-          s.bands[index] = Math.max(-15, Math.min(15, nextGain));
-          const out = document.getElementById("send1LvlVal");
-          if (out) out.textContent = Number(s.lvl || 0).toFixed(1) + "dB";
+          const totalGain = clampGeq((32 - y) / (24 / 15), -15, 15);
+          s.bands[index] = Math.round(clampGeq(totalGain - Number(s.lvl || 0), -15, 15) * 10) / 10;
+          updateTftModuleCurve("sends");
+          persistTftState();
+        };
+        makeSpecificDotDraggable(container, bandDot, (_x, y) => {
+          const index = Number(bandDot.dataset.bandIndex);
+          setGeqBandFromY(index, y);
+        });
+        bandDot.addEventListener("keydown", (event) => {
+          const index = Number(bandDot.dataset.bandIndex);
+          if (!Number.isInteger(index) || index < 0 || index > 30) return;
+          if (!["ArrowUp","ArrowDown","Home","End"].includes(event.key)) return;
+          event.preventDefault();
+          const current = Number(s.bands[index] || 0);
+          const next = event.key === "ArrowUp" ? current + 0.5
+            : event.key === "ArrowDown" ? current - 0.5
+            : event.key === "Home" ? 15 : -15;
+          s.bands[index] = Math.max(-15, Math.min(15, next));
           updateTftModuleCurve("sends");
           persistTftState();
         });
