@@ -3594,50 +3594,81 @@ input[type="range"] { accent-color:#b8bec6 !important; }
 .mixer-desk-surface .master-status-leds { margin-bottom:2px; }
 
 
-/* Uniform neon color coding for left navigation groups: blue Pages, pink Channel DSP. */
+/* Glass navigation: dim at rest, softly lit when the page/section is active. */
 #tabMixerContent .mixer-workspace .mixer-side-nav .tft-tab[data-tft-tab] {
-  color:#dbeafe !important;
-  background:linear-gradient(180deg,#1269c7 0%,#084b9b 100%) !important;
-  border:1px solid #39a8ff !important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 0 7px rgba(0,132,255,.75),0 0 16px rgba(0,132,255,.42) !important;
-  text-shadow:0 0 5px rgba(80,180,255,.65) !important;
-  position:relative !important; isolation:isolate !important;
+  color:#bfdbfe !important;
+  background:linear-gradient(180deg,rgba(30,64,100,.72),rgba(13,39,70,.72)) !important;
+  border:1px solid rgba(80,150,210,.52) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),
+             0 1px 5px rgba(0,60,120,.28) !important;
+  text-shadow:0 0 3px rgba(80,170,255,.22) !important;
+  position:relative !important;
+  isolation:isolate !important;
+  transition:background .16s ease,box-shadow .16s ease,border-color .16s ease,filter .16s ease !important;
 }
 #tabMixerContent .mixer-workspace .mixer-side-nav .tft-tab[data-tft-tab]::before {
-  content:"" !important; position:absolute !important; z-index:-1 !important;
-  inset:2px -3px !important; border-radius:inherit !important;
-  background:#078bff !important; filter:blur(10px) !important;
-  opacity:.38 !important; pointer-events:none !important;
+  content:"" !important;
+  position:absolute !important;
+  z-index:-1 !important;
+  inset:2px -2px !important;
+  border-radius:inherit !important;
+  background:#078bff !important;
+  filter:blur(8px) !important;
+  opacity:.10 !important;
+  pointer-events:none !important;
+  transition:opacity .16s ease !important;
 }
 #tabMixerContent .mixer-workspace .mixer-side-nav .console-btn[data-section] {
-  color:#fce7f3 !important;
-  background:linear-gradient(180deg,#c21882 0%,#86105d 100%) !important;
-  border:1px solid #ff55c5 !important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 0 7px rgba(255,0,170,.75),0 0 16px rgba(255,0,170,.42) !important;
-  text-shadow:0 0 5px rgba(255,125,215,.65) !important;
-  position:relative !important; isolation:isolate !important;
+  color:#f5c7e5 !important;
+  background:linear-gradient(180deg,rgba(105,36,88,.72),rgba(67,22,58,.72)) !important;
+  border:1px solid rgba(220,82,173,.50) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),
+             0 1px 5px rgba(120,0,80,.28) !important;
+  text-shadow:0 0 3px rgba(255,120,215,.22) !important;
+  position:relative !important;
+  isolation:isolate !important;
+  transition:background .16s ease,box-shadow .16s ease,border-color .16s ease,filter .16s ease !important;
 }
 #tabMixerContent .mixer-workspace .mixer-side-nav .console-btn[data-section]::before {
-  content:"" !important; position:absolute !important; z-index:-1 !important;
-  inset:2px -3px !important; border-radius:inherit !important;
-  background:#ff16b7 !important; filter:blur(10px) !important;
-  opacity:.38 !important; pointer-events:none !important;
+  content:"" !important;
+  position:absolute !important;
+  z-index:-1 !important;
+  inset:2px -2px !important;
+  border-radius:inherit !important;
+  background:#ff16b7 !important;
+  filter:blur(8px) !important;
+  opacity:.10 !important;
+  pointer-events:none !important;
+  transition:opacity .16s ease !important;
 }
 #tabMixerContent .mixer-workspace .mixer-side-nav .tft-tab[data-tft-tab].active {
-  background:linear-gradient(180deg,#238bfa 0%,#0960c7 100%) !important;
-  border-color:#8bd0ff !important; color:#fff !important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 0 10px rgba(0,145,255,.95),0 0 20px rgba(0,145,255,.62) !important;
+  background:linear-gradient(180deg,rgba(35,139,250,.90),rgba(9,96,199,.90)) !important;
+  border-color:rgba(139,208,255,.82) !important;
+  color:#fff !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),
+             0 0 5px rgba(0,145,255,.62),
+             0 0 11px rgba(0,145,255,.28) !important;
+  text-shadow:0 0 5px rgba(130,205,255,.55) !important;
+}
+#tabMixerContent .mixer-workspace .mixer-side-nav .tft-tab[data-tft-tab].active::before {
+  opacity:.24 !important;
 }
 #tabMixerContent .mixer-workspace .mixer-side-nav .console-btn[data-section].active {
-  background:linear-gradient(180deg,#f02bb1 0%,#b50b7c 100%) !important;
-  border-color:#ffb0e5 !important; color:#fff !important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 0 10px rgba(255,0,180,.95),0 0 20px rgba(255,0,180,.62) !important;
+  background:linear-gradient(180deg,rgba(240,43,177,.90),rgba(181,11,124,.90)) !important;
+  border-color:rgba(255,176,229,.82) !important;
+  color:#fff !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),
+             0 0 5px rgba(255,0,180,.62),
+             0 0 11px rgba(255,0,180,.28) !important;
+  text-shadow:0 0 5px rgba(255,150,225,.55) !important;
+}
+#tabMixerContent .mixer-workspace .mixer-side-nav .console-btn[data-section].active::before {
+  opacity:.24 !important;
 }
 #tabMixerContent .mixer-workspace .mixer-side-nav .tft-tab[data-tft-tab]:hover,
 #tabMixerContent .mixer-workspace .mixer-side-nav .console-btn[data-section]:hover {
-  filter:brightness(1.16) saturate(1.08) !important;
+  filter:brightness(1.07) !important;
 }
-
 
 /* Top-bar mixer power switch with a real output mute gate. */
 .top-audio-controls .mixer-power-toggle {
