@@ -5519,7 +5519,7 @@ function updateIoConnectionStatus(inputs=[], outputs=[]) {
   }
   if(name) name.textContent=usb.length
     ? usb.map(d=>d.label || d.kind).filter(Boolean).slice(0,3).join(" · ")
-    : "Colok USB audio/interface lalu tekan AKTIFKAN USB-C AUDIO INPUT.";
+    : "Belum ada perangkat audio input/output yang dikenali browser. Tekan USB-C AUDIO untuk meminta izin dan membuka input.";
 }
 
 /* USB-C AUDIO INPUT HANDSHAKE
@@ -5552,16 +5552,33 @@ async function activateUsbAudioInput() {
     const outputs=devices.filter(d=>d.kind==="audiooutput");
     updateIoConnectionStatus(inputs,outputs);
 
-    const usbInput=inputs.find(isLikelyUsbAudioDevice);
-    if (!usbInput) {
+    /* Android/Chrome may expose USB-routed capture as a normal audioinput
+       without a "USB" label. The opened stream's deviceId identifies the
+       input that the browser actually granted. */
+    const probeTrack=probeStream.getAudioTracks()[0];
+    const probeDeviceId=probeTrack?.getSettings?.().deviceId || "";
+    const selectedInput =
+      inputs.find(d=>d.deviceId===probeDeviceId) ||
+      inputs.find(isLikelyUsbAudioDevice) ||
+      inputs.find(d=>d.deviceId===physicalInputDevice?.value) ||
+      inputs[0];
+
+    if (!selectedInput) {
       probeStream.getTracks().forEach(track=>track.stop());
-      setAudioStatus("USB-C terhubung, tetapi browser tidak melihat USB sebagai AUDIO INPUT. Cek OTG/USB Audio interface.");
+      setAudioStatus("Browser belum menyediakan AUDIO INPUT. Pastikan USB Audio interface terhubung dan izin mikrofon diberikan.");
       return false;
     }
 
     if (probeStream) probeStream.getTracks().forEach(track=>track.stop());
-    usbAudioInputDeviceId=usbInput.deviceId;
+    usbAudioInputDeviceId=selectedInput.deviceId;
     usbAudioConnected=true;
+    const usbLabel=String(selectedInput.label||"").trim();
+    const isNamedUsb=isLikelyUsbAudioDevice(selectedInput);
+    setAudioStatus(
+      isNamedUsb
+        ? "USB-C AUDIO INPUT AKTIF: "+(usbLabel||"USB Audio")
+        : "AUDIO INPUT AKTIF: "+(usbLabel||"Input browser")+" (Android tidak memberi label USB)"
+    );
     if (physicalInputDevice) {
       physicalInputDevice.value=usbInput.deviceId;
       if (physicalInputDevice.value!==usbInput.deviceId) {
