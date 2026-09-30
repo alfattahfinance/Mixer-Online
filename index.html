@@ -5494,7 +5494,8 @@ async function refreshPhysicalInputDevices() {
     const outputs = devices.filter(device => device.kind === "audiooutput");
     if (physicalInputDevice) {
       const previous = physicalInputDevice.value;
-      const preferredInputId = usbAudioInputDeviceId || previous;
+      const activeTrackId = microphoneStream?.getAudioTracks?.()[0]?.getSettings?.().deviceId || "";
+      const preferredInputId = activeTrackId || usbAudioInputDeviceId || previous;
       physicalInputDevice.innerHTML = '<option value="">INPUT DEFAULT HP</option>';
       inputs.forEach((device, index) => {
         const option = document.createElement("option");
@@ -5505,6 +5506,15 @@ async function refreshPhysicalInputDevices() {
       const preferredInput = inputs.find(device => device.deviceId === preferredInputId);
       if (preferredInput) {
         physicalInputDevice.value = preferredInput.deviceId;
+      } else if (usbAudioConnected && preferredInputId) {
+        // Android kadang tidak mengembalikan deviceId aktif pada enumerateDevices()
+        // setelah OTG/USB berubah. Pertahankan pilihan aktif agar UI tidak jatuh
+        // kembali ke INPUT DEFAULT HP.
+        const activeOption = document.createElement("option");
+        activeOption.value = preferredInputId;
+        activeOption.textContent = usbAudioInputLabel || "USB-C AUDIO INPUT (AKTIF)";
+        physicalInputDevice.appendChild(activeOption);
+        physicalInputDevice.value = preferredInputId;
       } else if (usbAudioConnected && usbAudioInputLabel) {
         const labelMatch = inputs.find(device => String(device.label || "").trim() === usbAudioInputLabel);
         if (labelMatch) physicalInputDevice.value = labelMatch.deviceId;
@@ -5680,6 +5690,20 @@ async function activateUsbAudioInput() {
 
     const exact={deviceId:{exact:selectedInput.deviceId},echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2}};
     microphoneStream=await navigator.mediaDevices.getUserMedia({audio:exact});
+    const activeTrack=microphoneStream.getAudioTracks()[0];
+    const activeTrackId=activeTrack?.getSettings?.().deviceId || selectedInput.deviceId;
+    usbAudioInputDeviceId=activeTrackId || selectedInput.deviceId;
+    usbAudioInputLabel=String(selectedInput.label||"").trim();
+    if (physicalInputDevice) {
+      let activeOption=[...physicalInputDevice.options].find(o=>o.value===usbAudioInputDeviceId);
+      if (!activeOption) {
+        activeOption=document.createElement("option");
+        activeOption.value=usbAudioInputDeviceId;
+        activeOption.textContent=usbAudioInputLabel || "USB-C AUDIO INPUT (AKTIF)";
+        physicalInputDevice.appendChild(activeOption);
+      }
+      physicalInputDevice.value=usbAudioInputDeviceId;
+    }
     microphoneSource=audioContext.createMediaStreamSource(microphoneStream);
     if (!usbInputAnalyser) {
       usbInputAnalyser = audioContext.createAnalyser();
@@ -5783,6 +5807,9 @@ if (physicalInputDevice) physicalInputDevice.addEventListener("change", async ()
       microphoneSource=null;
     }
     microphoneStream=await navigator.mediaDevices.getUserMedia({audio:{deviceId:{exact:id},echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2}}});
+    const activeTrack=microphoneStream.getAudioTracks()[0];
+    usbAudioInputDeviceId=activeTrack?.getSettings?.().deviceId || id;
+    usbAudioInputLabel=String(physicalInputDevice.selectedOptions?.[0]?.textContent || "").trim();
     microphoneSource=audioContext.createMediaStreamSource(microphoneStream);
     if (!usbInputAnalyser) { usbInputAnalyser=audioContext.createAnalyser(); usbInputAnalyser.fftSize=1024; usbInputAnalyser.smoothingTimeConstant=.08; }
     microphoneSource.connect(usbInputAnalyser);
