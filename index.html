@@ -4516,6 +4516,202 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
 .io-device-name{font-size:6.5px;line-height:1.25;color:#94a3b8;min-height:16px;overflow:hidden;text-overflow:ellipsis;}
 @media(max-width:800px){.io-power-panel{grid-template-columns:1fr 1fr;}.io-connection-card{grid-column:1 / -1;}}
 @media(max-width:600px){.io-power-panel{grid-template-columns:1fr;}.io-connection-card{grid-column:auto;}}
+
+/* MASTER FADER — FINAL RESPONSIVE PROPORTION
+   Keep the master control readable without changing DSP/routing logic. */
+#tabMixerContent .mixer-desk-surface .console-channel-strip.master-strip{
+  min-width:0;
+  overflow:hidden;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .strip-label-box{
+  min-height:30px;
+  font-size:10px;
+  font-weight:900;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-status-leds{
+  min-height:22px;
+  margin-bottom:2px;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .strip-knobs-area{
+  flex:0 0 auto;
+  min-height:42px;
+  padding:5px 6px;
+}
+#tabMixerContent .mixer-desk-surface .master-strip > .fader-readout{
+  flex:0 0 auto;
+  min-height:20px;
+  margin:2px 0 3px;
+  font-size:10px;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .fader-panel-area{
+  flex:1 1 auto;
+  min-height:190px;
+  margin:2px 0 5px;
+  display:flex;
+  flex-direction:row;
+  align-items:stretch;
+  justify-content:center;
+  gap:6px;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack{
+  order:0;
+  flex:0 0 clamp(42px, 25%, 64px);
+  width:auto;
+  min-width:42px;
+  height:auto;
+  min-height:0;
+  max-width:none;
+  align-self:stretch;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-stereo-meter-vertical{
+  width:100%;
+  height:100%;
+  min-height:0;
+  padding:5px 4px;
+  gap:4px;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-column{
+  min-width:0;
+  gap:2px;
+  font-size:8px;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-meter-column .master-led-meter{
+  width:9px;
+  min-height:0;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row{
+  order:1;
+  flex:1 1 auto;
+  width:auto;
+  min-width:42px;
+  max-width:none;
+  height:auto;
+  min-height:0;
+  align-self:stretch;
+  display:flex;
+  align-items:stretch;
+  justify-content:center;
+  gap:5px;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot{
+  flex:1 1 auto;
+  width:100%;
+  min-width:40px;
+  max-width:64px;
+  height:100%;
+  min-height:0;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot input[type="range"]{
+  width:100%;
+  height:96%;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot input[type="range"]::-webkit-slider-thumb{
+  width:34px;
+  height:18px;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot input[type="range"]::-moz-range-thumb{
+  width:34px;
+  height:18px;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-combined-wrap{
+  flex:0 0 14px;
+  width:14px;
+  min-width:14px;
+  height:100%;
+  min-height:0;
+  justify-content:flex-start;
+  gap:3px;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .master-combined-meter{
+  width:9px;
+  height:100%;
+  min-height:0;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .strip-action-buttons{
+  flex:0 0 auto;
+  width:100%;
+  min-height:34px;
+  margin-top:4px !important;
+  gap:4px;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .strip-action-buttons .console-action-btn{
+  min-height:34px;
+  padding:5px 2px;
+  font-size:9px;
+  font-weight:900;
+  border-radius:4px;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .strip-action-buttons .console-action-btn[style*="background:#b45309"]{
+  background:#dc2626 !important;
+  border-color:#f87171 !important;
+  color:#fff !important;
+}
+#tabMixerContent .mixer-desk-surface .master-strip .strip-action-buttons .console-action-btn[style*="background:#fbbf24"]{
+  background:#facc15 !important;
+  border-color:#fde047 !important;
+  color:#0f172a !important;
+}
+@media (max-width:700px){
+  #tabMixerContent .mixer-desk-surface .master-strip .fader-panel-area{
+    min-height:170px;
+    gap:4px;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack{
+    flex-basis:38%;
+    min-width:36px;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row{
+    min-width:36px;
+    gap:4px;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot{
+    min-width:34px;
+    max-width:56px;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot input[type="range"]::-webkit-slider-thumb{
+    width:30px;
+    height:17px;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot input[type="range"]::-moz-range-thumb{
+    width:30px;
+    height:17px;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .strip-action-buttons .console-action-btn{
+    min-height:31px;
+    font-size:8px;
+  }
+}
+@media (max-width:430px){
+  #tabMixerContent .mixer-desk-surface .master-strip .strip-label-box{
+    min-height:27px;
+    font-size:9px;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .strip-knobs-area{
+    min-height:38px;
+    padding:4px;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .fader-panel-area{
+    min-height:150px;
+    gap:3px;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack{
+    flex-basis:34%;
+    min-width:32px;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row{
+    min-width:32px;
+    gap:3px;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot{
+    min-width:30px;
+    max-width:48px;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .strip-action-buttons .console-action-btn{
+    min-height:29px;
+    font-size:7.5px;
+  }
+}
+
 </style>
 </head>
 
