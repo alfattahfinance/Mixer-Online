@@ -6878,6 +6878,35 @@ function syncChannelQuickPanelsFromSources() {
   });
 }
 
+
+/* Reliable delegated opener for channel quick panels.
+   Capture phase prevents the global outside-click closer from immediately hiding the panel. */
+(function ensureChannelQuickPanelClick(){
+  const root = document.getElementById("tabMixerContent");
+  if (!root || root.dataset.quickPanelDelegated === "1") return;
+  root.dataset.quickPanelDelegated = "1";
+  root.addEventListener("click", function(e){
+    const title = e.target.closest(".channel-title-trigger");
+    if (!title || !root.contains(title)) return;
+    const panel = root.querySelector('[data-channel-panel="' + title.dataset.channelTitle + '"]');
+    if (!panel) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const wasOpen = panel.classList.contains("open");
+    root.querySelectorAll(".channel-quick-panel.open").forEach(p => {
+      p.classList.remove("open");
+      p.setAttribute("aria-hidden","true");
+    });
+    root.querySelectorAll(".channel-title-trigger[aria-expanded="true"]').forEach(t => t.setAttribute("aria-expanded","false"));
+    if (!wasOpen) {
+      panel.classList.add("open");
+      panel.setAttribute("aria-hidden","false");
+      title.setAttribute("aria-expanded","true");
+      refreshChannelQuickPanels();
+    }
+  }, true);
+})();
+
 </script>
 </body>
 </html>
