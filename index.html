@@ -8949,4 +8949,32 @@ function syncChannelQuickPanelsFromSources() {
 
 #tabMixerContent .mixer-desk-surface > .console-channel-strip:not(.master-strip) .strip-action-buttons .console-action-btn.mute:not(.active){background:linear-gradient(180deg,rgba(220,38,38,.58),rgba(153,27,27,.52)) !important;color:rgba(255,255,255,.82) !important;border-color:rgba(248,113,113,.58) !important;}
 #tabMixerContent .mixer-desk-surface > .console-channel-strip:not(.master-strip) .strip-action-buttons .console-action-btn.solo:not(.active){background:linear-gradient(180deg,rgba(250,204,21,.58),rgba(202,138,4,.52)) !important;color:rgba(23,23,23,.86) !important;border-color:rgba(253,230,138,.62) !important;}
+
+/* MASTER MAIN LR STATE: clear active/inactive feedback without changing fader layout. */
+#tabMixerContent .master-strip .console-action-btn.master-mute-btn {
+  background:linear-gradient(180deg,#8a4b16,#66350d) !important;
+  color:#fef3c7 !important;
+  border-color:#b7791f !important;
+  opacity:.72;
+}
+#tabMixerContent .master-strip .console-action-btn.master-mute-btn.active {
+  background:linear-gradient(180deg,#ef4444,#b91c1c) !important;
+  color:#fff !important;
+  border-color:#fca5a5 !important;
+  opacity:1;
+  box-shadow:0 0 7px rgba(239,68,68,.45) !important;
+}
+#tabMixerContent .master-strip .console-action-btn.lr {
+  background:linear-gradient(180deg,#a67c12,#76570b) !important;
+  color:#fef9c3 !important;
+  border-color:#d4af37 !important;
+  opacity:.72;
+}
+#tabMixerContent .master-strip .console-action-btn.lr.active {
+  background:linear-gradient(180deg,#facc15,#eab308) !important;
+  color:#292524 !important;
+  border-color:#fde047 !important;
+  opacity:1;
+  box-shadow:0 0 7px rgba(250,204,21,.35) !important;
+}
 </style>
