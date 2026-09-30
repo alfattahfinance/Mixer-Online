@@ -5885,24 +5885,42 @@ if (navigator.mediaDevices?.addEventListener) navigator.mediaDevices.addEventLis
     setAudioStatus("USB audio dicabut — input dihentikan.");
   }
 });
-document.getElementById("activateUsbAudioButton")?.addEventListener("click", async () => {
-  if (usbInputStream) {
-    usbInputSource?.disconnect();
-    usbInputSource=null;
-    usbInputStream.getTracks().forEach(track=>track.stop());
-    usbInputStream=null;
-    setAudioStatus("USB AUDIO INPUT dimatikan.");
-    return;
+const usbAudioButton = document.getElementById("activateUsbAudioButton");
+usbAudioButton?.addEventListener("click", async (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  if (usbAudioButton.dataset.busy === "1") return;
+  usbAudioButton.dataset.busy = "1";
+  try {
+    if (usbInputStream) {
+      usbInputSource?.disconnect();
+      usbInputSource=null;
+      usbInputStream.getTracks().forEach(track=>track.stop());
+      usbInputStream=null;
+      usbAudioConnected=false;
+      usbAudioInputDeviceId="";
+      usbAudioInputLabel="";
+      usbAudioButton.classList.remove("usb-active");
+      setAudioStatus("USB AUDIO INPUT dimatikan.");
+      return;
+    }
+    const ok = await activateUsbAudioInput();
+    usbAudioButton.classList.toggle("usb-active", !!ok && !!usbInputStream);
+  } catch (err) {
+    console.warn("USB AUDIO button:", err);
+    usbAudioButton.classList.remove("usb-active");
+    setAudioStatus("USB AUDIO gagal diaktifkan. Mic HP tidak digunakan.");
+  } finally {
+    usbAudioButton.dataset.busy = "0";
   }
-  await activateUsbAudioInput();
 });
 document.getElementById("refreshIoDevicesButton")?.addEventListener("click", async () => {
   await refreshPhysicalInputDevices();
   await updateChargerStatus();
   setAudioStatus("Daftar INPUT/OUTPUT USB diperbarui.");
 });
-refreshPhysicalInputDevices();
-updateChargerStatus();
+try { refreshPhysicalInputDevices(); } catch (err) { console.warn("USB device refresh:", err); }
+try { updateChargerStatus(); } catch (err) { console.warn("Charger status:", err); }
 
 async function refreshUsbInterfaceBar(){
   const connection=document.getElementById("usbBarConnection");
@@ -7716,7 +7734,23 @@ tftTabs.forEach(tab => {
 
 /* Initial page activation is deferred until all channel quick-control definitions are initialized. */
 window.setTimeout(() => {
-  try { switchActiveSection("meters"); } catch (err) { console.warn("Mixer navigation init:", err); }
+  try {
+    // Keep the main mixer screen independent from USB diagnostics/audio routing.
+    // Always restore a valid DSP page even when an optional USB operation fails.
+    switchActiveSection("eq");
+  } catch (err) {
+    console.warn("Mixer navigation init:", err);
+    try {
+      if (tftContentArea && tftDatabase?.eq) {
+        tftContentArea.dataset.pageKey = "eq";
+        tftContentArea.innerHTML = typeof tftDatabase.eq.content === "function"
+          ? tftDatabase.eq.content(tftStatesData.eq || {})
+          : (tftDatabase.eq.content || "");
+      }
+    } catch (fallbackErr) {
+      console.warn("Mixer screen fallback:", fallbackErr);
+    }
+  }
 }, 0);
   
 /* Bind channel title quick-control panels. */
