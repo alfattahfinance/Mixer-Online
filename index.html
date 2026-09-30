@@ -5322,7 +5322,7 @@ muteOutputButton.addEventListener("click", () => { outputMuted = !outputMuted; u
 const mixerFaderPositions = new WeakMap();
 let mixerFaderMotionToken = 0;
 function animateMixerFaders(poweringOn) {
-  const controls = Array.from(document.querySelectorAll("#tabMixerContent .mixer-desk-surface input[type="range"]"));
+  const controls = Array.from(document.querySelectorAll('#tabMixerContent .mixer-desk-surface input[type="range"]'));
   if (!controls.length) return;
   const token = ++mixerFaderMotionToken;
   const entries = controls.map(control => {
