@@ -3909,6 +3909,58 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
   #tabMixerContent .quick-knob i { width:30px !important; height:30px !important; }
 }
 
+
+/* Compact channel quick-control popover: replaces the old TFT encoder bar. */
+#tabMixerContent .mixer-desk-surface .channel-quick-panel {
+  width:calc(100% - 10px) !important;
+  max-width:310px !important;
+  min-width:0 !important;
+  max-height:126px !important;
+  overflow:hidden !important;
+  padding:6px !important;
+  background:linear-gradient(180deg,rgba(20,31,47,.98),rgba(7,13,23,.98)) !important;
+  border:1px solid rgba(74,144,226,.8) !important;
+  box-shadow:0 8px 20px rgba(0,0,0,.7),0 0 10px rgba(48,140,255,.22) !important;
+}
+#tabMixerContent .quick-panel-title {
+  font-size:8px !important;
+  margin:0 0 4px !important;
+  line-height:10px !important;
+}
+#tabMixerContent .quick-control-grid {
+  grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+  gap:3px !important;
+}
+#tabMixerContent .quick-control-grid > label {
+  height:96px !important;
+  gap:2px !important;
+}
+#tabMixerContent .quick-fader input[type="range"] {
+  width:24px !important;
+  height:62px !important;
+  cursor:pointer !important;
+}
+#tabMixerContent .quick-knob i {
+  width:38px !important;
+  height:38px !important;
+}
+#tabMixerContent .quick-knob input[type="range"] {
+  width:48px !important;
+  height:48px !important;
+}
+@media (max-width:700px) {
+  #tabMixerContent .mixer-desk-surface .channel-quick-panel {
+    left:3px !important;
+    right:3px !important;
+    width:calc(100% - 6px) !important;
+    max-height:116px !important;
+    padding:5px !important;
+  }
+  #tabMixerContent .quick-control-grid > label { height:88px !important; }
+  #tabMixerContent .quick-fader input[type="range"] { height:54px !important; }
+  #tabMixerContent .quick-knob i { width:32px !important; height:32px !important; }
+}
+
 </style>
 </head>
 
@@ -4158,14 +4210,6 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
               
             </div>
 
-            <div class="tft-encoders-bar">
-              <div class="tft-encoder-knob">GAIN<span id="enc1Val">+12dB</span></div>
-              <div class="tft-encoder-knob">HPF<span id="enc2Val">80Hz</span></div>
-              <div class="tft-encoder-knob">THRESH<span id="enc3Val">-18dB</span></div>
-              <div class="tft-encoder-knob">RATIO<span id="enc4Val">3:1</span></div>
-              <div class="tft-encoder-knob">FREQ<span id="enc5Val">2.5kHz</span></div>
-              <div class="tft-encoder-knob">SEND<span id="enc6Val">0.0dB</span></div>
-            </div>
           </div>
 
         </div>
@@ -6594,8 +6638,48 @@ switchActiveSection("meters");
           knob.style.setProperty("transform","rotate("+deg+"deg)");
         }
       };
-      input.addEventListener("input",render);
+      input.addEventListener("input", () => {
+        render();
+        const strip = input.closest(".console-channel-strip");
+        const channelNo = Number(strip?.querySelector(".channel-title-trigger")?.dataset.channelTitle || 0);
+        const param = input.dataset.quickParam;
+        if (strip && channelNo) {
+          const stateKey = "mixerChannelQuickState";
+          let states = {};
+          try { states = JSON.parse(localStorage.getItem(stateKey) || "{}") || {}; } catch {}
+          states[channelNo] = states[channelNo] || {};
+          states[channelNo][param] = Number(input.value);
+          localStorage.setItem(stateKey, JSON.stringify(states));
+
+          if (param === "send") {
+            const fader = strip.querySelector('.fader-slot input[type="range"]');
+            if (fader) {
+              const next = Math.max(Number(fader.min), Math.min(Number(fader.max), Number(input.value)));
+              fader.value = next;
+              fader.dispatchEvent(new Event("input", {bubbles:true}));
+              fader.dispatchEvent(new Event("change", {bubbles:true}));
+            }
+          } else if (param === "hpf") {
+            const hpf = strip.querySelector("select");
+            if (hpf) {
+              hpf.value = Number(input.value) ? "80Hz" : "OFF";
+              hpf.dispatchEvent(new Event("change", {bubbles:true}));
+            }
+          }
+        }
+      });
       render();
+
+      const strip = panel.closest(".console-channel-strip");
+      const channelNo = Number(strip?.querySelector(".channel-title-trigger")?.dataset.channelTitle || 0);
+      if (channelNo) {
+        try {
+          const states = JSON.parse(localStorage.getItem("mixerChannelQuickState") || "{}") || {};
+          const saved = states[channelNo] || {};
+          if (saved[input.dataset.quickParam] !== undefined) input.value = saved[input.dataset.quickParam];
+        } catch {}
+        render();
+      }
     });
   });
   document.addEventListener("click", () => closeAll(null), {passive:true});
