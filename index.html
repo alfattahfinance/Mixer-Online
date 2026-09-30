@@ -3716,10 +3716,10 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface {
 body.mixer-startup-test #tabMixerContent .mixer-desk-surface .vert-led-meter span,
 body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-led-meter span,
 body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-combined-meter span {
-  opacity:0 !important;
+  opacity:0;
   animation:mixerLedPowerUp 2.8s ease-out forwards !important;
-  filter:brightness(1.15) !important;
-  box-shadow:none !important;
+  filter:brightness(.75);
+  box-shadow:none;
 }
 body.mixer-startup-test #tabMixerContent .mixer-desk-surface .vert-led-meter span:nth-child(1),
 body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-led-meter span:nth-child(1),
@@ -3746,7 +3746,7 @@ body.mixer-startup-test #tabMixerContent .mixer-desk-surface .vert-led-meter spa
 body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-led-meter span:nth-child(8),
 body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-combined-meter span:nth-child(8) { animation-delay:.78s !important; }
 body.mixer-startup-test #tabMixerContent .mixer-desk-surface .status-led {
-  opacity:0 !important;
+  opacity:0;
   animation:mixerStatusPowerUp 1.2s ease-out forwards !important;
 }
 @keyframes mixerLedPowerUp {
