@@ -503,6 +503,12 @@ header, .topbar {
 .console-action-btn.mute.active { background: #dc2626; color: #fff; border-color: #f87171; box-shadow: 0 0 5px #dc2626; }
 .console-action-btn.solo.active { background: #facc15; color: #0f172a; border-color: #fde047; box-shadow: 0 0 5px #facc15; }
 
+/* MASTER MUTE / LR — inactive stays visible but slightly dim; active follows its function color. */
+#tabMixerContent .master-strip .master-strip-actions .master-mute-btn { background:rgba(220,38,38,.20) !important; color:rgba(254,202,202,.72) !important; border-color:rgba(248,113,113,.38) !important; box-shadow:none !important; }
+#tabMixerContent .master-strip .master-strip-actions .master-mute-btn.active { background:#dc2626 !important; color:#fff !important; border-color:#f87171 !important; box-shadow:0 0 6px rgba(239,68,68,.42) !important; }
+#tabMixerContent .master-strip .master-strip-actions .master-lr-btn { background:rgba(251,191,36,.20) !important; color:rgba(254,240,138,.72) !important; border-color:rgba(251,191,36,.38) !important; box-shadow:none !important; }
+#tabMixerContent .master-strip .master-strip-actions .master-lr-btn.active { background:#fbbf24 !important; color:#111827 !important; border-color:#fde68a !important; box-shadow:0 0 6px rgba(251,191,36,.35) !important; }
+
 /* TRUE STEREO MASTER METERS — samping fader master */
 #tabMixerContent .master-stereo-meter-vertical {
   flex: 0 0 34px; width: 34px; min-height: 0; align-self: stretch;
@@ -5119,9 +5125,9 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
                 <div class="master-combined-wrap"><span>MASTER</span><div class="vert-led-meter master-led-meter master-combined-meter" id="masterMeterCombined"></div></div>
               </div>
             </div>
-            <div class="strip-action-buttons">
-              <button class="console-action-btn mute master-mute-btn" style="background:#b45309; color:#fff;" aria-pressed="false">MUTE</button>
-              <button class="console-action-btn lr active" style="background:#fbbf24; color:#000;" aria-pressed="true">LR</button>
+            <div class="strip-action-buttons master-strip-actions">
+              <button class="console-action-btn mute master-mute-btn" aria-pressed="false" aria-label="Main LR mute nonaktif">MUTE</button>
+              <button class="console-action-btn lr master-lr-btn active" aria-pressed="true" aria-label="Main LR routing aktif">LR</button>
             </div>
           </div>
         </div>
@@ -6536,8 +6542,8 @@ function updateMixerStripControls() {
   if (masterStrip) {
     const fader = masterStrip.querySelector('.master-fader-row .fader-slot input[type="range"]');
     const readout = masterStrip.querySelector(".fader-readout");
-    const muteBtn = masterStrip.querySelector(".console-action-btn.mute");
-    const lrBtn = masterStrip.querySelector(".console-action-btn.lr");
+    const muteBtn = masterStrip.querySelector(".master-mute-btn");
+    const lrBtn = masterStrip.querySelector(".master-lr-btn");
 
     if (fader && readout) {
       const db = Number(fader.value);
@@ -7016,15 +7022,19 @@ document.querySelectorAll(".mixer-desk-surface .console-channel-strip").forEach(
 
   if (strip.classList.contains("master-strip")) {
     // Main LR has dedicated MUTE/LR logic; never write into channel state arrays.
-    strip.querySelector(".console-action-btn.mute")?.addEventListener("click", () => {
+    strip.querySelector(".master-mute-btn")?.addEventListener("click", () => {
       masterStripMuted = !masterStripMuted;
-      if (audioContext) updateMixerStripControls();
-      else strip.querySelector(".console-action-btn.mute")?.classList.toggle("active", masterStripMuted);
+      updateMixerStripControls();
+      setAudioStatus(masterStripMuted
+        ? "MASTER MUTE aktif — Main LR dibisukan."
+        : "MASTER MUTE nonaktif — Main LR kembali terdengar.");
     });
-    strip.querySelector(".console-action-btn.lr")?.addEventListener("click", () => {
+    strip.querySelector(".master-lr-btn")?.addEventListener("click", () => {
       masterStripLR = !masterStripLR;
-      if (audioContext) updateMixerStripControls();
-      else strip.querySelector(".console-action-btn.lr")?.classList.toggle("active", masterStripLR);
+      updateMixerStripControls();
+      setAudioStatus(masterStripLR
+        ? "MAIN LR aktif — master terhubung ke output L/R."
+        : "MAIN LR OFF — master dilepas dari output L/R.");
     });
     return;
   }
