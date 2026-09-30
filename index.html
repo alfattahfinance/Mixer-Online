@@ -4066,83 +4066,2984 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
 }
 
 
-/* FINAL MIXER NAVIGATION: one reliable renderer for PAGES + CHANNEL DSP + TFT. */
-(function finalMixerNavigation(){
+/* RECOVERY: keep mixer navigation and TFT controls above decorative layers. */
+#tabMixerContent .mixer-side-nav {
+  position:relative !important;
+  z-index:100 !important;
+  pointer-events:auto !important;
+}
+#tabMixerContent .mixer-side-nav .tft-tab,
+#tabMixerContent .mixer-side-nav .console-btn {
+  position:relative !important;
+  z-index:101 !important;
+  pointer-events:auto !important;
+  cursor:pointer !important;
+}
+#tabMixerContent .mixer-top-console,
+#tabMixerContent .mixer-tft-screen,
+#tabMixerContent .tft-main-viewport,
+#tabMixerContent .tft-content-screen,
+#tabMixerContent #tftContentArea {
+  pointer-events:auto !important;
+}
+#tabMixerContent #tftContentArea .tft-module-view {
+  display:flex !important;
+  visibility:visible !important;
+  opacity:1 !important;
+}
+
+</style>
+</head>
+
+<body>
+  <main class="app">
+    <nav class="mode-switch-bar" id="mainTabNavigation" aria-label="Main pages">
+      <div class="mode-menu-wrap">
+        <button type="button" class="mode-menu-trigger" id="modeMenuTrigger" aria-label="Buka menu halaman" aria-expanded="false" aria-controls="modeMenu">☰</button>
+        <div class="mode-menu" id="modeMenu">
+          <button type="button" class="tab-btn active" id="tabMixerBtn" data-main-tab="mixer" aria-controls="tabMixerContent" aria-selected="true">🎚️ DIGITAL MIXER</button>
+          <button type="button" class="tab-btn" id="tabEqBtn" data-main-tab="eq" aria-controls="tabEqContent" aria-selected="false">🎛️ EQUALIZER</button>
+          <button type="button" class="tab-btn" id="tabEchoBtn" data-main-tab="echo" aria-controls="tabEchoContent" aria-selected="false">🔊 ALESIS FX</button>
+          <button type="button" class="tab-btn" id="tabEspBtn" data-main-tab="esp32" aria-controls="tabEspContent" aria-selected="false">📡 ESP32 &amp; HW</button>
+        </div>
+      </div>
+      <div class="audio-actions top-audio-controls" aria-label="Audio player and input source">
+        <button id="mixerPowerButton" class="mixer-power-toggle powered-on" type="button" aria-pressed="true" title="Nyalakan atau matikan mixer"><span class="mixer-power-led" aria-hidden="true"></span><span class="mixer-power-label">POWER ON</span></button>
+        <button id="startMicButton" type="button">MIC</button>
+        <label for="physicalInputDevice" class="sr-only">Pilih sumber input fisik</label>
+        <select id="physicalInputDevice" aria-label="Sumber input fisik" title="Pilih mikrofon atau USB audio interface">
+          <option value="">Default HP</option>
+        </select>
+        <label class="file-button">📁 FILE<input id="audioFilesInput" type="file" accept="audio/*" multiple hidden></label>
+        <button id="startAudioButton" type="button">▶ PLAY</button>
+        <button id="stopAudioButton" type="button">⏹ STOP</button>
+        <span id="audioStatus" class="top-audio-status">Audio belum aktif.</span>
+      </div>
+      <div class="actions compact-top-actions" aria-label="Preset actions">
+        <button id="saveButton" type="button">SAVE</button>
+        <button id="loadButton" type="button">RECALL</button>
+        <button id="resetButton" type="button">RESET</button>
+      </div>
+    </nav>
+
+    <!-- KONTEN TAB 1: EQUALIZER -->
+    <div class="tab-content" id="tabEqContent">
+      <section class="rack">
+        <div class="rack-header">
+          <div>
+            <div class="model">GQX-3102 PRO</div>
+            <div class="grade">GRADE A • GRAPHIC EQUALIZER</div>
+          </div>
+          <div class="actions">
+            <button id="flatButton">FLAT</button>
+            <button id="vocalButton">VOCAL</button>
+            <button id="musicButton">MUSIC</button>
+          </div>
+        </div>
+
+        <section class="channels">
+          <!-- CHANNEL 1 -->
+          <article class="channel" data-channel="0">
+            <div class="channel-header">
+              <div class="channel-title-group">
+                <span class="status-led active-led" id="ch0_active_led"></span>
+                <div class="channel-title">CHANNEL 1</div>
+              </div>
+              <div class="channel-controls">
+                <button class="small-button eq-action-button bypass-button" type="button" aria-pressed="false">EQ BYPASS</button>
+                <button class="small-button eq-action-button test-button" type="button" aria-pressed="false">TEST</button>
+                <button class="small-button eq-action-button eq-mute-button" type="button" aria-pressed="false">MUTE</button>
+                <button class="small-button eq-action-button eq-solo-button" type="button" aria-pressed="false">SOLO</button>
+                <button class="small-button eq-action-button eq-reset-button" type="button">RESET</button>
+              </div>
+            </div>
+            <div class="control-row">
+              <div class="control">
+                <label>GAIN</label>
+                <input class="gain" type="range" min="-12" max="12" step="0.5" value="0">
+                <div class="gain-value">0.0 dB</div>
+              </div>
+              <div class="control">
+                <label>HPF</label>
+                <select class="hpf">
+                  <option value="off">OFF</option>
+                  <option value="40">40 Hz</option>
+                  <option value="80">80 Hz</option>
+                  <option value="120">120 Hz</option>
+                </select>
+              </div>
+              <div class="control">
+                <label>RANGE</label>
+                <select class="range">
+                  <option value="6">±6 dB</option>
+                  <option value="15" selected>±15 dB</option>
+                </select>
+              </div>
+            </div>
+            <div class="meter-area">
+              <div class="meter-container-box">
+                <div class="meter-scale-labels"><span>-60</span><span>-40</span><span>-20</span><span>-10</span><span>-3</span><span>0</span><span>+3dB</span></div>
+                <div class="meter"></div>
+              </div>
+              <div class="clip">CLIP</div>
+            </div>
+            <div class="eq-response-curve" aria-label="EQ frequency response curve">
+              <div class="eq-response-heading">EQ RESPONSE</div>
+              <svg class="eq-response-svg" viewBox="0 0 320 64" preserveAspectRatio="none" role="img" aria-label="Channel EQ curve">
+                <g class="eq-response-grid">
+                  <line x1="0" y1="8" x2="320" y2="8"/><line x1="0" y1="24" x2="320" y2="24"/>
+                  <line x1="0" y1="32" x2="320" y2="32"/><line x1="0" y1="40" x2="320" y2="40"/>
+                  <line x1="0" y1="56" x2="320" y2="56"/>
+                  <line x1="80" y1="0" x2="80" y2="64"/><line x1="160" y1="0" x2="160" y2="64"/><line x1="240" y1="0" x2="240" y2="64"/>
+                </g>
+                <path class="eq-response-path" d="M0 32 L320 32"/>
+              </svg>
+            </div>
+            <div class="eq-section"><div class="eq"></div></div>
+            <div class="scale"><span>+15 dB</span><span>0 dB</span><span>-15 dB</span></div>
+          </article>
+
+          <!-- CHANNEL 2 -->
+          <article class="channel" data-channel="1">
+            <div class="channel-header">
+              <div class="channel-title-group">
+                <span class="status-led active-led" id="ch1_active_led"></span>
+                <div class="channel-title">CHANNEL 2</div>
+              </div>
+              <div class="channel-controls">
+                <button class="small-button eq-action-button bypass-button" type="button" aria-pressed="false">EQ BYPASS</button>
+                <button class="small-button eq-action-button test-button" type="button" aria-pressed="false">TEST</button>
+                <button class="small-button eq-action-button eq-mute-button" type="button" aria-pressed="false">MUTE</button>
+                <button class="small-button eq-action-button eq-solo-button" type="button" aria-pressed="false">SOLO</button>
+                <button class="small-button eq-action-button eq-reset-button" type="button">RESET</button>
+              </div>
+            </div>
+            <div class="control-row">
+              <div class="control">
+                <label>GAIN</label>
+                <input class="gain" type="range" min="-12" max="12" step="0.5" value="0">
+                <div class="gain-value">0.0 dB</div>
+              </div>
+              <div class="control">
+                <label>HPF</label>
+                <select class="hpf">
+                  <option value="off">OFF</option>
+                  <option value="40">40 Hz</option>
+                  <option value="80">80 Hz</option>
+                  <option value="120">120 Hz</option>
+                </select>
+              </div>
+              <div class="control">
+                <label>RANGE</label>
+                <select class="range">
+                  <option value="6">±6 dB</option>
+                  <option value="15" selected>±15 dB</option>
+                </select>
+              </div>
+            </div>
+            <div class="meter-area">
+              <div class="meter-container-box">
+                <div class="meter-scale-labels"><span>-60</span><span>-40</span><span>-20</span><span>-10</span><span>-3</span><span>0</span><span>+3dB</span></div>
+                <div class="meter"></div>
+              </div>
+              <div class="clip">CLIP</div>
+            </div>
+            <div class="eq-section"><div class="eq"></div></div>
+            <div class="scale"><span>+15 dB</span><span>0 dB</span><span>-15 dB</span></div>
+          </article>
+        </section>
+      </section>
+    </div>
+
+    <!-- KONTEN TAB 2: ALESIS FX PROCESSOR -->
+    <div class="tab-content" id="tabEchoContent">
+      <div class="echo-panel-box">
+        <div class="echo-header-row">
+          <div>
+            <h3 style="color: #38bdf8; margin:0 0 2px 0; font-size: 12px;">ALESIS DIGITAL EFFECTS PROCESSOR</h3>
+            <p style="font-size: 8.5px; color: #94a3b8; margin:0;">Prosesor Efek Studio (Reverb & Delay) di antara Mixer dan Equalizer.</p>
+          </div>
+          <button class="echo-onoff-btn" id="echoToggleBtn">ALESIS FX: OFF</button>
+        </div>
+        
+        <div class="echo-grid">
+          <div class="echo-control-card">
+            <label>DELAY TIME (Waktu Pantulan)</label>
+            <input type="range" id="echoDelay" min="0.05" max="1.0" step="0.05" value="0.3">
+            <div class="echo-val" id="echoDelayVal">0.30 detik</div>
+          </div>
+          
+          <div class="echo-control-card">
+            <label>FEEDBACK (Pengulangan)</label>
+            <input type="range" id="echoFeedback" min="0.0" max="0.9" step="0.05" value="0.4">
+            <div class="echo-val" id="echoFeedbackVal">40%</div>
+          </div>
+
+          <div class="echo-control-card">
+            <label>ROOM DAMPING / TONE</label>
+            <input type="range" id="echoDamping" min="1000" max="15000" step="500" value="5000">
+            <div class="echo-val" id="echoDampingVal">5000 Hz</div>
+          </div>
+
+          <div class="echo-control-card">
+            <label>EFFECTS MIX (Wet / Dry)</label>
+            <input type="range" id="echoMix" min="0.0" max="1.0" step="0.05" value="0.3">
+            <div class="echo-val" id="echoMixVal">30%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KONTEN TAB 3: DIGITAL MIXER CONSOLE & AUDIO PLAYER TERINTEGRASI -->
+    <div class="tab-content active" id="tabMixerContent">
+      <div class="mixer-console">
+        
+        <!-- Playlist data node retained for existing audio selection logic; audio controls live in the top bar. -->
+        <div class="playlist-container" id="playlistContainer" hidden>
+          <div style="text-align: center; padding: 2px; color: #64748b;">Belum ada file audio dipilih.</div>
+        </div>
+
+        <!-- WORKSPACE: NAVIGASI VERTIKAL DI KIRI, TFT + FADER DI KANAN -->
+        <div class="mixer-workspace">
+          <aside class="mixer-side-nav" aria-label="Navigasi mixer">
+            <div class="side-nav-caption">PAGES</div>
+            <button class="tft-tab active" data-tft-tab="eq">Processing</button>
+            <button class="tft-tab" data-tft-tab="routing">Routing</button>
+            <button class="tft-tab" data-tft-tab="meters">Meters</button>
+            <button class="tft-tab" data-tft-tab="scenes">Scenes</button>
+            <button class="tft-tab" data-tft-tab="setup">Setup</button>
+            <button class="tft-tab" data-tft-tab="effects">Utility</button>
+            <div class="side-nav-divider"></div>
+            <div class="side-nav-caption">CHANNEL DSP</div>
+            <button type="button" class="console-btn" data-section="config">Preamp</button>
+            <button type="button" class="console-btn" data-section="gate">Gate</button>
+            <button type="button" class="console-btn" data-section="dynamics">Comp</button>
+            <button type="button" class="console-btn active" data-section="eq">PEQ</button>
+            <button type="button" class="console-btn" data-section="sends">GEQ</button>
+            <button type="button" class="console-btn" data-section="main">Insert</button>
+          </aside>
+          <div class="mixer-workspace-main">
+        <!-- BAGIAN LAYAR UTAMA -->
+        <div class="mixer-top-console">
+          
+          <!-- LAYAR TFT UTAMA (SQ-7 STYLE) -->
+          <div class="mixer-tft-screen">
+            <div class="tft-header">
+              <span id="tftSectionTitle">SQ-7 PEQ / PROCESSING</span>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <button type="button" class="tft-curve-toggle active" id="tftCurveToggleBtn">CURVE: ON</button>
+                <span style="color: #10b981;">● 48kHz / 32-bit</span>
+              </div>
+            </div>
+
+            <div class="tft-main-viewport">
+              <div class="tft-content-screen" id="tftContentArea"></div>
+              
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- PERMUKAAN KONSOLE (FADER STRIPS) -->
+        <div class="mixer-desk-surface">
+          <div class="console-channel-strip">
+            <div class="strip-label-box channel-title-trigger" data-channel-title="1" role="button" tabindex="0" aria-expanded="false">MIC / USB INPUT</div><div class="channel-quick-panel" data-channel-panel="1" aria-hidden="true">
+  <div class="quick-panel-title">CHANNEL 1 • QUICK CONTROL</div>
+  <div class="quick-control-grid" data-dynamic-quick="1"></div>
+</div><div class="strip-status-leds" aria-label="MIC / USB INPUT status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
+            <div class="fader-panel-area mic-input-fader-area">
+              <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
+              <div class="hpf-fader-control"><label for="micStripHpf">HPF</label><select id="micStripHpf"><option>OFF</option><option>80Hz</option></select></div>
+              <div class="vert-led-meter" id="mixerMeter1"></div>
+            </div>
+            <div class="strip-action-buttons">
+              <button class="console-action-btn mute">MUTE</button>
+              <button class="console-action-btn solo">PAFL</button>
+            </div>
+          </div>
+
+          <div class="console-channel-strip">
+            <div class="strip-label-box channel-title-trigger" data-channel-title="2" role="button" tabindex="0" aria-expanded="false">AUDIO / MP3</div><div class="channel-quick-panel" data-channel-panel="2" aria-hidden="true">
+  <div class="quick-panel-title">CHANNEL 2 • QUICK CONTROL</div>
+  <div class="quick-control-grid" data-dynamic-quick="1"></div>
+</div><div class="strip-status-leds" aria-label="AUDIO / MP3 status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
+            <div class="fader-panel-area">
+              <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="Audio MP3 channel level"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
+              <div class="vert-led-meter" id="mixerMeter2"></div>
+            </div>
+            <div class="strip-action-buttons">
+              <button class="console-action-btn mute">MUTE</button>
+              <button class="console-action-btn solo">PAFL</button>
+            </div>
+          </div>
+
+          <div class="console-channel-strip">
+            <div class="strip-label-box channel-title-trigger" data-channel-title="3" role="button" tabindex="0" aria-expanded="false">FX SEND</div><div class="channel-quick-panel" data-channel-panel="3" aria-hidden="true">
+  <div class="quick-panel-title">CHANNEL 3 • QUICK CONTROL</div>
+  <div class="quick-control-grid" data-dynamic-quick="1"></div>
+</div><div class="strip-status-leds" aria-label="FX SEND status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
+            <div class="fader-panel-area">
+              <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="FX send level"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
+              <div class="vert-led-meter" id="mixerMeter3"></div>
+            </div>
+            <div class="strip-action-buttons">
+              <button class="console-action-btn mute">MUTE</button>
+              <button class="console-action-btn solo">PAFL</button>
+            </div>
+          </div>
+
+          <div class="console-channel-strip">
+            <div class="strip-label-box channel-title-trigger" data-channel-title="4" role="button" tabindex="0" aria-expanded="false">FX RETURN</div><div class="channel-quick-panel" data-channel-panel="4" aria-hidden="true">
+  <div class="quick-panel-title">CHANNEL 4 • QUICK CONTROL</div>
+  <div class="quick-control-grid" data-dynamic-quick="1"></div>
+</div><div class="strip-status-leds" aria-label="FX RETURN status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
+            <div class="fader-panel-area">
+              <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="FX return level"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
+              <div class="vert-led-meter" id="mixerMeter4"></div>
+            </div>
+            <div class="strip-action-buttons">
+              <button class="console-action-btn mute">MUTE</button>
+              <button class="console-action-btn solo">PAFL</button>
+            </div>
+          </div>
+
+          <div class="console-channel-strip master-strip">
+            <div class="strip-label-box">Main LR</div><div class="strip-status-leds master-status-leds" aria-label="Main L/R status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
+            <div class="strip-knobs-area" style="border-color: #d97706;">
+              <div class="knob-row"><span>LIMIT</span><span>ON</span></div>
+              <div class="knob-row"><span>PROC</span><select><option>EQ+ALESIS</option><option>BYPASS</option></select></div>
+            </div>
+            <div class="fader-readout">0.0 dB</div>
+            <div class="fader-panel-area">
+              <div class="master-meter-stack" aria-label="Master stereo output meters">
+                <div class="master-stereo-meter-vertical" aria-label="Master stereo output meters">
+                  <div class="master-meter-column"><span>L</span><div class="master-meter-scale" aria-hidden="true"><i>+10</i><i>+5</i><i>0</i><i>-5</i><i>-10</i><i>-20</i><i>-30</i><i>-40</i><i>−∞</i></div><div class="vert-led-meter master-led-meter" id="masterMeterL"></div></div>
+                  <div class="master-meter-column"><span>R</span><div class="master-meter-scale" aria-hidden="true"><i>+10</i><i>+5</i><i>0</i><i>-5</i><i>-10</i><i>-20</i><i>-30</i><i>-40</i><i>−∞</i></div><div class="vert-led-meter master-led-meter" id="masterMeterR"></div></div>
+                </div>
+              </div>
+              <div class="master-fader-row">
+                <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-50" max="6" step="0.5" value="0" aria-label="Master LR fader"></div>
+                <div class="master-combined-wrap"><span>MASTER</span><div class="vert-led-meter master-led-meter master-combined-meter" id="masterMeterCombined"></div></div>
+              </div>
+            </div>
+            <div class="strip-action-buttons">
+              <button class="console-action-btn mute" style="background:#b45309; color:#fff;">MUTE</button>
+              <button class="console-action-btn active" style="background:#fbbf24; color:#000;">LR</button>
+            </div>
+          </div>
+        </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KONTEN TAB 4: ESP32 & HARDWARE -->
+    <div class="tab-content" id="tabEspContent">
+      <div class="esp32-panel-box">
+        <h3>KONTROL HARDWARE ESP32 & KONEKTIVITAS BLUETOOTH</h3>
+        <p style="font-size: 8.5px; color: #94a3b8; margin-bottom: 6px;">Hubungkan mikrokontroler ESP32 via Web Bluetooth untuk sinkronisasi hardware secara real-time.</p>
+
+        <div class="bt-panel">
+          <div>
+            <strong>STATUS KONEKSI BLE ESP32</strong>
+            <div id="btStatus" class="bt-info">Bluetooth terputus.</div>
+          </div>
+          <button id="connectBtButton">SAMBUNGKAN ESP32</button>
+        </div>
+
+        <div class="output-panel">
+          <div class="output-control">
+            <label for="masterGainControl">MASTER OUTPUT</label>
+            <input id="masterGainControl" type="range" min="-30" max="0" step="1" value="-6">
+            <div id="masterGainValue" class="master-value">-6 dB</div>
+          </div>
+          <div class="output-control">
+            <label for="outputMode">OUTPUT MODE</label>
+            <select id="outputMode">
+              <option value="safe" selected>SAFE MODE</option>
+              <option value="normal">NORMAL MODE</option>
+            </select>
+            <label for="physicalOutputDevice" style="display:block;margin-top:4px;">OUTPUT KE MIXER FISIK</label>
+            <select id="physicalOutputDevice" aria-label="Pilih output audio" style="width:100%;">
+              <option value="">Output default HP / USB</option>
+            </select>
+            <button id="muteOutputButton" style="width:100%; margin-top:5px;">MUTE OUTPUT</button>
+          </div>
+        </div>
+
+        <div id="feedbackStatus" class="feedback-status" style="margin-top: 6px;">Alur Sinyal: [PLAYER] ➡️ [SQ-7 DIGITAL MIXER] ➡️ [EQ + ALESIS FX] ➡️ [OUTPUT]</div>
+      </div>
+    </div>
+
+    <div id="status" class="status" style="display:none;">Status: sistem siap digunakan.</div>
+  </main>
+
+  <script>
+"use strict";
+
+/* =========================================================
+   INISIALISASI LED METER & TFT STEREO METER
+========================================================= */
+function initMixerVerticalMeters() {
+  const assignVerticalColor = (span, index, count) => {
+    const level = count <= 1 ? 1 : (count - 1 - index) / (count - 1);
+    span.className = level >= .92 ? "red" :
+      level >= .82 ? "orange" :
+      level >= .70 ? "yellow" :
+      level >= .56 ? "lime" :
+      level >= .40 ? "mint" : "green";
+  };
+  const meterIds = ["mixerMeter1", "mixerMeter2", "mixerMeter3", "mixerMeter4", "masterMeterL", "masterMeterR", "masterMeterCombined"];
+  meterIds.forEach(id => {
+    const container = document.getElementById(id);
+    if (!container) return;
+    container.innerHTML = "";
+    const segmentCount = (id === "masterMeterL" || id === "masterMeterR" || id === "masterMeterCombined") ? 16 : 10;
+    for (let i = 0; i < segmentCount; i++) {
+      const span = document.createElement("span");
+      assignVerticalColor(span, i, segmentCount);
+      container.appendChild(span);
+    }
+  });
+
+  ['tftMeterL', 'tftMeterR'].forEach(id => {
+    const box = document.getElementById(id);
+    if (!box) return;
+    box.innerHTML = "";
+    const segmentCount = 16;
+    for (let i = 0; i < segmentCount; i++) {
+      const span = document.createElement("span");
+      const level = i / (segmentCount - 1);
+      span.className = level >= .92 ? "red" :
+        level >= .82 ? "orange" :
+        level >= .70 ? "yellow" :
+        level >= .56 ? "lime" :
+        level >= .40 ? "mint" : "green";
+      box.appendChild(span);
+    }
+  });
+}
+initMixerVerticalMeters();
+
+let audioContext = null;
+let audioGraphReady = false;
+let masterStereoAnalysers = [null, null];
+let masterStereoMeterBuffers = [new Float32Array(1024), new Float32Array(1024)];
+let masterStereoMeterFrame = null;
+
+function updateMasterStereoMeters() {
+  if (!audioGraphReady || !masterStereoAnalysers.every(Boolean)) {
+    updateTftMetersFromAudio();
+  masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
+    return;
+  }
+  masterStereoAnalysers.forEach((analyser, channel) => {
+    const db = readMeterDb(analyser);
+    const meter = document.getElementById(channel === 0 ? "masterMeterL" : "masterMeterR");
+    paintMeter(meter, db, "vertical");
+  });
+  if (masterMeterAnalyser) {
+    const db = readMeterDb(masterMeterAnalyser);
+    paintMeter(document.getElementById("masterMeterCombined"), db, "vertical");
+  }
+  masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
+}
+updateMasterStereoMeters();
+
+/* Update channel, EQ and TFT meters from live Web Audio analyser data.
+   Horizontal bars light left-to-right; vertical LED ladders light bottom-up. */
+const meterSampleBuffers = new WeakMap();
+function readMeterDb(analyser) {
+  if (!analyser) return -72;
+  let samples = meterSampleBuffers.get(analyser);
+  const sampleLength = analyser.fftSize || 1024;
+  if (!samples || samples.length !== sampleLength) {
+    samples = new Float32Array(sampleLength);
+    meterSampleBuffers.set(analyser, samples);
+  }
+  analyser.getFloatTimeDomainData(samples);
+  let sum = 0;
+  for (let i = 0; i < samples.length; i++) sum += samples[i] * samples[i];
+  const rms = Math.sqrt(sum / samples.length);
+  return rms > 0 ? 20 * Math.log10(rms) : -72;
+}
+
+// Live TFT meter/RTA values read from the active Web Audio graph.
+let tftMeterPeakDb = [-72, -72];
+let tftMeterPeakAt = [0, 0];
+let tftMeterFreqBuffer = null;
+const tftMeterVisualLevels = [0, 0];
+function updateTftMetersFromAudio() {
+  const root = document.getElementById('tftContentArea');
+  if (!root || root.dataset.pageKey !== 'meters') return;
+  const s = tftStatesData.meters;
+  const left = s.source === 0 ? masterStereoAnalysers[0] : (mixerStripAnalysers[0] || audioChannels[0]?.analyser);
+  const right = s.source === 0 ? masterStereoAnalysers[1] : (mixerStripAnalysers[1] || audioChannels[1]?.analyser);
+  const now = performance.now();
+  const tracks = root.querySelectorAll('.tft-digital-meter .meter-track');
+  const bars = root.querySelectorAll('.tft-digital-meter .meter-track i');
+  const labels = root.querySelectorAll('.tft-digital-meter strong');
+  const dbToPct = db => Math.max(0, Math.min(100, ((db + 60) / 60) * 100));
+  [left, right].forEach((analyser, i) => {
+    const db = analyser ? readMeterDb(analyser) : -72;
+    const track = tracks[i], bar = bars[i], label = labels[i];
+    const meterCard = root.querySelectorAll('.tft-digital-meter')[i];
+    if (db >= tftMeterPeakDb[i]) {
+      tftMeterPeakDb[i] = db;
+      tftMeterPeakAt[i] = now;
+    } else if (s.hold === 0 && now - tftMeterPeakAt[i] > 3000) {
+      // 3-second peak hold, then a slow fall-back to the live signal.
+      tftMeterPeakDb[i] = Math.max(db, tftMeterPeakDb[i] - (now - tftMeterPeakAt[i] - 3000) * 0.0015);
+    }
+    const livePct = dbToPct(db);
+    // Smooth the visible L/R bar independently: quick attack, gentle release.
+    const previousPct = tftMeterVisualLevels[i] || 0;
+    const alpha = livePct > previousPct ? 0.48 : 0.16;
+    const shownPct = previousPct + (livePct - previousPct) * alpha;
+    tftMeterVisualLevels[i] = shownPct < 0.15 ? 0 : shownPct;
+    if (meterCard) meterCard.style.setProperty('--meter-card-level', tftMeterVisualLevels[i] + '%');
+    if (bar) {
+      bar.style.height = tftMeterVisualLevels[i] + '%';
+      bar.style.minHeight = tftMeterVisualLevels[i] > 0 ? '2px' : '0';
+    }
+    if (track) {
+      track.setAttribute('aria-valuenow', Math.max(-60, Math.min(0, db)).toFixed(1));
+      track.setAttribute('aria-valuetext', db <= -71 ? 'No signal' : db.toFixed(1) + ' dB');
+    }
+    if (track) {
+      let marker = track.querySelector('.meter-peak-marker');
+      if (!marker) {
+        marker = document.createElement('span');
+        marker.className = 'meter-peak-marker';
+        marker.setAttribute('aria-hidden', 'true');
+        track.appendChild(marker);
+      }
+      marker.style.bottom = dbToPct(tftMeterPeakDb[i]) + '%';
+      marker.classList.toggle('peak-clip', tftMeterPeakDb[i] >= -1);
+    }
+    if (label) {
+      label.textContent = db <= -71 ? '-∞ dB' : db.toFixed(1) + ' dB';
+      label.classList.toggle('meter-clipping', db >= -1);
+    }
+  });
+  const spectrum = root.querySelector('.tft-spectrum');
+  if (spectrum) {
+    const spectrumBars = spectrum.children;
+    if (left && left.getByteFrequencyData) {
+      if (!tftMeterFreqBuffer || tftMeterFreqBuffer.length !== left.frequencyBinCount) {
+        tftMeterFreqBuffer = new Uint8Array(left.frequencyBinCount);
+      }
+      left.getByteFrequencyData(tftMeterFreqBuffer);
+      const bins = tftMeterFreqBuffer;
+      for (let i = 0; i < spectrumBars.length; i++) {
+        const ratio = i / Math.max(1, spectrumBars.length - 1);
+        const idx = Math.min(bins.length - 1, Math.floor(Math.pow(ratio, 2) * (bins.length - 1)));
+        const magnitude = bins[idx] / 255;
+        const scaled = Math.max(0, Math.min(100, Math.pow(magnitude, 0.8) * 100 * s.zoom / 2));
+        spectrumBars[i].style.height = Math.max(2, scaled) + '%';
+      }
+    } else {
+      Array.from(spectrumBars).forEach(bar => bar.style.height = '2%');
+    }
+  }
+  const status = root.querySelector('#tftMeterSignalStatus');
+  if (status) status.textContent = left || right ? 'LIVE · ' + (s.source === 0 ? 'POST-EQ MAIN' : 'PRE-EQ INPUT') : 'NO SIGNAL SOURCE';
+}
+const meterLevelState = new WeakMap();
+function paintMeter(container, db, direction) {
+  if (!container) return;
+  const leds = Array.from(container.children);
+  if (!leds.length) return;
+
+  // Smooth fast attack and gentle release so LEDs follow audio without flicker.
+  // Use a wider practical range so quiet signals are visible; faster attack and smooth release.
+  const target = Math.max(0, Math.min(1, (db + 60) / 66));
+  const previous = meterLevelState.get(container) ?? 0;
+  const smoothed = target > previous
+    ? previous + (target - previous) * 0.78
+    : previous + (target - previous) * 0.22;
+  meterLevelState.set(container, smoothed);
+  const litCount = db <= -60 || smoothed < 0.012
+    ? 0
+    : Math.max(1, Math.min(leds.length, Math.ceil(smoothed * leds.length)));
+
+  leds.forEach((led, index) => {
+    const vertical = direction !== "horizontal";
+    const t = vertical
+      ? (leds.length <= 1 ? 1 : (leds.length - 1 - index) / (leds.length - 1))
+      : (leds.length <= 1 ? 1 : index / (leds.length - 1));
+    const colorClass = t >= .92 ? "red" : t >= .82 ? "orange" : t >= .70 ? "yellow" : t >= .56 ? "lime" : t >= .40 ? "mint" : "green";
+    led.classList.remove("green", "mint", "lime", "yellow", "orange", "red");
+    led.classList.add(colorClass);
+    const isLit = vertical ? index >= leds.length - litCount : index < litCount;
+    led.classList.toggle("on", isLit);
+  });
+}
+function updateStripStatusLeds(strip, db) {
+  if (!strip) return;
+  const sig = strip.querySelector('[data-led="sig"]');
+  const clip = strip.querySelector('[data-led="clip"]');
+  if (sig) sig.classList.toggle("on", Number.isFinite(db) && db > -48);
+  if (clip) clip.classList.toggle("on", Number.isFinite(db) && db >= -1);
+}
+function updateAllSignalMeters() {
+  const mixerStrips = Array.from(document.querySelectorAll(".mixer-desk-surface .console-channel-strip"));
+  mixerStripAnalysers.forEach((analyser, index) => {
+    if (!analyser) { updateStripStatusLeds(mixerStrips[index], -72); return; }
+    const db = readMeterDb(analyser);
+    paintMeter(document.getElementById("mixerMeter" + (index + 1)), db, "vertical");
+    updateStripStatusLeds(mixerStrips[index], db);
+  });
+  const masterDbValues = masterStereoAnalysers.filter(Boolean).map(readMeterDb);
+  const masterDb = masterDbValues.length ? Math.max(...masterDbValues) : -72;
+  updateStripStatusLeds(mixerStrips[4], masterDb);
+
+  [0, 1].forEach(channelIndex => {
+    const channel = audioChannels[channelIndex];
+    if (!channel || !channel.analyser) return;
+    const db = readMeterDb(channel.analyser);
+    const eqMeter = channels[channelIndex]?.querySelector(".meter");
+    if (eqMeter) {
+      if (!eqMeter.children.length) {
+        for (let i = 0; i < 24; i++) {
+          const led = document.createElement("span");
+          led.className = i >= 21 ? "red" : i >= 17 ? "yellow" : "green";
+          eqMeter.appendChild(led);
+        }
+      }
+      paintMeter(eqMeter, db, "horizontal");
+    }
+    const clip = channels[channelIndex]?.querySelector(".clip");
+    if (clip) clip.classList.toggle("on", db >= -1);
+  });
+
+  masterStereoAnalysers.forEach((analyser, channelIndex) => {
+    if (!analyser) return;
+    const db = readMeterDb(analyser);
+    paintMeter(document.getElementById(channelIndex === 0 ? "tftMeterL" : "tftMeterR"), db, "horizontal");
+    const readout = document.getElementById(channelIndex === 0 ? "tftMeterLVal" : "tftMeterRVal");
+    if (readout) readout.textContent = db <= -70 ? "-inf dB" : db.toFixed(1) + " dB";
+  });
+  updateTftMetersFromAudio();
+  requestAnimationFrame(updateAllSignalMeters);
+}
+requestAnimationFrame(updateAllSignalMeters);
+
+
+/* =========================================================
+   NAVIGASI EMPAT TAB UTAMA & HAMBURGER MENU
+========================================================= */
+const mainTabNavigation = document.getElementById("mainTabNavigation");
+const mainTabButtons = Array.from(document.querySelectorAll("[data-main-tab]"));
+const mainTabContents = {
+  eq: document.getElementById("tabEqContent"),
+  echo: document.getElementById("tabEchoContent"),
+  mixer: document.getElementById("tabMixerContent"),
+  esp32: document.getElementById("tabEspContent")
+};
+
+function activateMainTab(tabName) {
+  if (!mainTabContents[tabName]) return;
+  mainTabButtons.forEach(button => {
+    const selected = button.dataset.mainTab === tabName;
+    button.classList.toggle("active", selected);
+    button.setAttribute("aria-selected", String(selected));
+  });
+  Object.entries(mainTabContents).forEach(([name, panel]) => {
+    if (panel) panel.classList.toggle("active", name === tabName);
+  });
+}
+
+const modeMenu = document.getElementById("modeMenu");
+const modeMenuTrigger = document.getElementById("modeMenuTrigger");
+function closeModeMenu() {
+  if (modeMenu) modeMenu.classList.remove("open");
+  if (modeMenuTrigger) modeMenuTrigger.setAttribute("aria-expanded", "false");
+}
+if (modeMenuTrigger && modeMenu) {
+  modeMenuTrigger.addEventListener("click", event => {
+    event.preventDefault();
+    const isOpen = modeMenu.classList.toggle("open");
+    modeMenuTrigger.setAttribute("aria-expanded", String(isOpen));
+  });
+}
+if (mainTabNavigation) {
+  mainTabNavigation.addEventListener("click", event => {
+    const button = event.target.closest("[data-main-tab]");
+    if (!button || !mainTabNavigation.contains(button)) return;
+    event.preventDefault();
+    activateMainTab(button.dataset.mainTab);
+    closeModeMenu();
+  });
+  document.addEventListener("click", event => {
+    if (!mainTabNavigation.contains(event.target)) closeModeMenu();
+  });
+}
+
+/* =========================================================
+   WEB BLUETOOTH API KE ESP32
+========================================================= */
+let bleDevice = null, bleServer = null, eqCharacteristic = null;
+const ESP32_SERVICE_UUID = "12345678-1234-1234-1234-123456789abc";
+const ESP32_CHAR_UUID    = "abcdef01-2345-6789-0123-456789abcdef";
+
+const connectBtButton = document.getElementById("connectBtButton");
+const btStatus = document.getElementById("btStatus");
+
+connectBtButton.addEventListener("click", async () => {
+  if (!navigator.bluetooth) { alert("Web Bluetooth API tidak didukung browser ini."); return; }
+  try {
+    if (!bleDevice || !bleDevice.gatt.connected) {
+      btStatus.textContent = "Memindai perangkat ESP32...";
+      bleDevice = await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: [ESP32_SERVICE_UUID] });
+      bleDevice.addEventListener('gattserverdisconnected', onBleDisconnected);
+      bleServer = await bleDevice.gatt.connect();
+      const service = await bleServer.getPrimaryService(ESP32_SERVICE_UUID);
+      eqCharacteristic = await service.getCharacteristic(ESP32_CHAR_UUID);
+      connectBtButton.textContent = "PUTUSKAN ESP32";
+      connectBtButton.classList.add("connected");
+      btStatus.textContent = "Terhubung ke: " + (bleDevice.name || "ESP32 Device");
+      setStatus("Bluetooth ESP32 terhubung.");
+    } else {
+      if (bleDevice.gatt.connected) bleDevice.gatt.disconnect();
+      onBleDisconnected();
+    }
+  } catch (error) {
+    btStatus.textContent = "Koneksi gagal / dibatalkan.";
+    setStatus("Gagal menghubungkan Bluetooth.");
+  }
+});
+
+function onBleDisconnected() {
+  connectBtButton.textContent = "SAMBUNGKAN ESP32";
+  connectBtButton.classList.remove("connected");
+  btStatus.textContent = "Bluetooth terputus.";
+  eqCharacteristic = null; bleServer = null;
+}
+
+async function sendDataToESP32(dataString) {
+  if (eqCharacteristic && bleDevice && bleDevice.gatt.connected) {
+    try { await eqCharacteristic.writeValue(new TextEncoder().encode(dataString)); } catch (err) {}
+  }
+}
+
+/* =========================================================
+   DATA FREKUENSI & EQUALIZER GRAFIK
+========================================================= */
+const frequencies = [
+  20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160,
+  200, 250, 315, 400, 500, 630, 800, 1000, 1250,
+  1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000,
+  10000, 12500, 16000, 20000
+];
+
+const channels = [...document.querySelectorAll(".channel")];
+function setStatus(msg) { const el = document.getElementById("status"); if (el) el.textContent = "Status: " + msg; }
+function setAudioStatus(msg) { const el = document.getElementById("audioStatus"); if (el) el.textContent = msg; }
+function formatFrequency(v) { return Number.isInteger(v) ? String(v) : v.toFixed(1); }
+
+/* DRAG STABILIZER: all vertical faders only start from their visible cap */
+(function enableStableRangeDragging() {
+  // Touchscreens (especially tablets) need lower travel and a wider thumb pickup zone.
+  const SENSITIVITY = 0.10;
+  const TOUCH_SENSITIVITY = 0.055;
+  let active = null;
+
+  document.addEventListener("pointerdown", (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    if (!target || event.button > 0) return;
+    const slot = target.closest(".fader-slot");
+    // Channel and master faders use the browser native range drag; custom pickup math is EQ-only.
+    if (slot && !target.closest("input.eq-range")) return;
+    const slider = target.closest("input.eq-range");
+    if (!slider || slider.disabled) return;
+    // Fader inputs are pointer-transparent; blank-track taps reach this guard on the slot.
+    if (slot) { event.preventDefault(); event.stopPropagation(); }
+
+    const rect = slider.getBoundingClientRect();
+    const min = Number(slider.min || 0);
+    const max = Number(slider.max || 100);
+    const value = Number(slider.value);
+    if (!rect.height || max <= min) return;
+
+    // Ignore track taps: block native range jump unless the visible thumb was pressed.
+    const fraction = Math.max(0, Math.min(1, (value - min) / (max - min)));
+    const isEq = slider.matches("input.eq-range");
+    // Range thumbs travel between the inner edges, not the full input bounds.
+    const thumbHalf = isEq ? 6.5 : 8;
+    const travel = Math.max(1, rect.height - thumbHalf * 2);
+    const thumbY = rect.bottom - thumbHalf - fraction * travel;
+    const thumbX = rect.left + rect.width / 2;
+    const isTouch = event.pointerType === "touch";
+    // Tight vertical hit zone: tapping blank track above/below must never begin a drag.
+    const hitY = isTouch ? 12 : (isEq ? 8 : 9);
+    const hitX = isTouch ? (isEq ? 25 : 28) : (isEq ? 13 : 15);
+    if (Math.abs(event.clientY - thumbY) > hitY || Math.abs(event.clientX - thumbX) > hitX) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    active = {
+      slider, captureTarget: slot || slider, pointerId: event.pointerId, startCoord: event.clientY,
+      startValue: value, min, max, step: Number(slider.step || 1),
+      sensitivity: event.pointerType === "touch" ? TOUCH_SENSITIVITY : SENSITIVITY,
+      length: Math.max(1, rect.height - (isEq ? 13 : 16))
+    };
+    // Capture on the actual hit surface so movement remains tracked outside the knob.
+    try { active.captureTarget.setPointerCapture(event.pointerId); } catch (_) {}
+  }, { capture: true, passive: false });
+
+  // Suppress the browser's synthetic click on the range: only our thumb drag may change it.
+  document.addEventListener("click", (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    const slider = target && target.closest("input.eq-range");
+    if (!slider) return;
+    event.preventDefault();
+    event.stopPropagation();
+  }, { capture: true });
+
+  document.addEventListener("pointermove", (event) => {
+    if (!active || event.pointerId !== active.pointerId) return;
+    event.preventDefault();
+    const rawDelta = active.startCoord - event.clientY;
+    const raw = active.startValue + (rawDelta / active.length) *
+      (active.max - active.min) * active.sensitivity;
+    const stepped = active.min + Math.round((raw - active.min) / active.step) * active.step;
+    const next = Math.max(active.min, Math.min(active.max, stepped));
+    if (next !== Number(active.slider.value)) {
+      active.slider.value = String(next);
+      active.slider.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  }, { capture: true, passive: false });
+
+  const finish = (event) => {
+    if (!active || event.pointerId !== active.pointerId) return;
+    const slider = active.slider;
+    active = null;
+    slider.dispatchEvent(new Event("change", { bubbles: true }));
+  };
+  document.addEventListener("pointerup", finish, { capture: true });
+  document.addEventListener("pointercancel", finish, { capture: true });
+  document.addEventListener("lostpointercapture", finish, { capture: true });
+  window.addEventListener("blur", () => {
+    if (!active) return;
+    const slider = active.slider;
+    active = null;
+    slider.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+})();
+function createBands(channel) {
+  const eq = channel.querySelector(".eq");
+  if (!eq || eq.children.length > 0) return;
+
+  frequencies.forEach((frequency, index) => {
+    const band = document.createElement("div");
+    band.className = "band";
+
+    const frequencyLabel = document.createElement("div");
+    frequencyLabel.className = "band-frequency";
+    frequencyLabel.textContent = formatFrequency(frequency) + " Hz";
+
+    const trackContainer = document.createElement("div");
+    trackContainer.className = "slider-track-container";
+
+    const slider = document.createElement("input");
+    slider.type = "range"; 
+    slider.className = "eq-range";
+    slider.min = "-15"; slider.max = "15"; slider.step = "0.5"; slider.value = "0";
+    slider.setAttribute("aria-label", formatFrequency(frequency) + " Hz EQ gain");
+    slider.title = formatFrequency(frequency) + " Hz";
+
+    const value = document.createElement("div");
+    value.className = "band-value";
+    value.textContent = "0.0";
+
+    slider.addEventListener("input", () => {
+      value.textContent = Number(slider.value).toFixed(1);
+      syncAudioControlsFromUI();
+      sendDataToESP32(JSON.stringify({ type: "eq", band: index, val: slider.value }));
+    });
+
+    trackContainer.appendChild(slider);
+    band.append(frequencyLabel, trackContainer, value);
+    eq.appendChild(band);
+  });
+}
+
+/* =========================================================
+   AUDIO ENGINE & ROUTING
+========================================================= */
+const CONTROL_SMOOTHING_SECONDS = 0.065;
+
+let microphoneStream = null;
+let microphoneSource = null;
+let audioBuffers = [];
+let audioFileNames = [];
+let currentPlaylistIndex = 0;
+let activeSourceNode = null;
+let isPlaying = false;
+
+let mixerInputGain = null;
+let mixerStripGains = [null, null, null, null];
+let mixerStripAnalysers = [null, null, null, null];
+let masterStripGainNode = null;
+let masterMeterAnalyser = null;
+let masterStereoSplitter = null;
+let mixerStripMuted = [false, false, false, false];
+let mixerStripSolo = [false, false, false, false];
+let alesisDelayNode = null, alesisFeedbackNode = null, alesisFilterNode = null, alesisWetNode = null, alesisDryNode = null;
+let masterGainNode = null, outputMuteGainNode = null, outputMergerNode = null;
+
+let isAlesisFxEnabled = false;
+let outputMuted = false;
+let mixerPowered = true;
+
+let tftPeqFilter = null;
+let tftCurveActiveStates = { config: false, gate: true, dynamics: true, eq: true, sends: false, main: false, routing: false, meters: false, scenes: false, setup: false, effects: false };
+let activeCurrentSectionKey = "eq";
+
+const tftStatesData = {
+  config: { gain: 12, phantom: true, phase: false, dotX: 160, dotY: 32 },
+  gate: { thresh: -45, ratio: 2.5, state: true, dot1X: 140, dot1Y: 55, dot2X: 310, dot2Y: 12 },
+  dynamics: { thresh: -18, ratio: 3, makeup: 2, dot1X: 10, dot1Y: 55, dot2X: 180, dot2Y: 35, dot3X: 310, dot3Y: 20 },
+  eq: { freq: 2500, q: 1.5, gain: 4.5 },
+  sends: { lvl: 0, preset: 0, state: true, dot1X: 160, dot1Y: 30, dot2X: 310, dot2Y: 15 },
+  main: { send: 0, limit: -0.5, bypass: false, dot1X: 160, dot1Y: 12, dot2X: 310, dot2Y: 35 },
+  routing: { source: 0, dout: 0, usb: true, dotX: 160, dotY: 48 },
+  meters: { source: 0, hold: 0, zoom: 1, dotX: 160, dotY: 42 },
+  scenes: { active: 0, safe: true, stored: false, dotX: 160, dotY: 36 },
+  setup: { bright: 85, ble: true, buf: 0, dotX: 160, dotY: 32 },
+  effects: { delay: 0.3, feedback: 0.4, active: true, dot1X: 80, dot1Y: 12, dot2X: 240, dot2Y: 24 }
+};
+
+// Restore and persist the TFT control model independently from the visual page.
+const TFT_STATE_STORAGE_KEY = "mixerOnlineTftStateV1";
+try {
+  const savedState = JSON.parse(localStorage.getItem(TFT_STATE_STORAGE_KEY) || "null");
+  if (savedState && typeof savedState === "object" && !Array.isArray(savedState)) {
+    Object.keys(tftStatesData).forEach(section => {
+      const incoming = savedState[section];
+      if (!incoming || typeof incoming !== "object" || Array.isArray(incoming)) return;
+      Object.keys(tftStatesData[section]).forEach(field => {
+        const current = tftStatesData[section][field];
+        const next = incoming[field];
+        if (typeof current === "number" && Number.isFinite(next)) tftStatesData[section][field] = next;
+        else if (typeof current === "boolean" && typeof next === "boolean") tftStatesData[section][field] = next;
+      });
+    });
+  }
+} catch (err) { /* Ignore corrupt or blocked browser storage; defaults remain usable. */ }
+function persistTftState() {
+  try { localStorage.setItem(TFT_STATE_STORAGE_KEY, JSON.stringify(tftStatesData)); }
+  catch (err) { /* Storage can be unavailable in private/restricted browsing. */ }
+}
+
+const tftSceneSnapshots = Object.create(null);
+try {
+  const savedScenes = JSON.parse(localStorage.getItem('mixerOnlineTftScenes') || '{}');
+  if (savedScenes && typeof savedScenes === 'object' && !Array.isArray(savedScenes)) {
+    [0, 1, 2, 3].forEach(index => { if (savedScenes[index] && typeof savedScenes[index] === 'object') tftSceneSnapshots[index] = savedScenes[index]; });
+  }
+} catch (err) { /* Ignore invalid or unavailable browser storage. */ }
+
+const audioFilesInput = document.getElementById("audioFilesInput");
+const playlistContainer = document.getElementById("playlistContainer");
+const startMicButton = document.getElementById("startMicButton");
+const physicalInputDevice = document.getElementById("physicalInputDevice");
+const physicalOutputDevice = document.getElementById("physicalOutputDevice");
+const tftCurveToggleBtn = document.getElementById("tftCurveToggleBtn");
+
+async function refreshPhysicalInputDevices() {
+  if (!navigator.mediaDevices?.enumerateDevices) return;
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    if (physicalInputDevice) {
+      const inputs = devices.filter(device => device.kind === "audioinput");
+      const previous = physicalInputDevice.value;
+      physicalInputDevice.innerHTML = '<option value="">Default HP</option>';
+      inputs.forEach((device, index) => {
+        const option = document.createElement("option");
+        option.value = device.deviceId;
+        option.textContent = device.label || ("Input " + (index + 1));
+        physicalInputDevice.appendChild(option);
+      });
+      if (inputs.some(device => device.deviceId === previous)) physicalInputDevice.value = previous;
+    }
+    if (physicalOutputDevice) {
+      const outputs = devices.filter(device => device.kind === "audiooutput");
+      const previous = physicalOutputDevice.value;
+      physicalOutputDevice.innerHTML = '<option value="">Output default HP / USB</option>';
+      outputs.forEach((device, index) => {
+        const option = document.createElement("option");
+        option.value = device.deviceId;
+        option.textContent = device.label || ("Output " + (index + 1));
+        physicalOutputDevice.appendChild(option);
+      });
+      if (outputs.some(device => device.deviceId === previous)) physicalOutputDevice.value = previous;
+    }
+  } catch (err) {}
+}
+
+async function applyPhysicalOutputDevice() {
+  const requestedId = physicalOutputDevice?.value || "";
+  if (!audioContext || typeof audioContext.setSinkId !== "function") return;
+  try { await audioContext.setSinkId(requestedId); } catch (err) {}
+}
+
+const startAudioButton = document.getElementById("startAudioButton");
+const stopAudioButton = document.getElementById("stopAudioButton");
+const masterGainControl = document.getElementById("masterGainControl");
+const masterGainValue = document.getElementById("masterGainValue");
+const outputMode = document.getElementById("outputMode");
+const muteOutputButton = document.getElementById("muteOutputButton");
+const mixerPowerButton = document.getElementById("mixerPowerButton");
+if (physicalOutputDevice) physicalOutputDevice.addEventListener("change", applyPhysicalOutputDevice);
+refreshPhysicalInputDevices();
+
+const echoDelay = document.getElementById("echoDelay");
+const echoFeedback = document.getElementById("echoFeedback");
+const echoDamping = document.getElementById("echoDamping");
+const echoMix = document.getElementById("echoMix");
+const echoToggleBtn = document.getElementById("echoToggleBtn");
+
+function createAudioContext() {
+  if (!audioContext) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    audioContext = new AudioContextClass({ latencyHint: "balanced" });
+  }
+  if (audioContext.state === "suspended") audioContext.resume();
+  return audioContext;
+}
+
+function dbToGain(db) { return Math.pow(10, db / 20); }
+function getSafeMasterGainDb() {
+  const req = Number(masterGainControl.value);
+  return outputMode.value === "safe" ? Math.min(req, -3) : req;
+}
+
+function updateMasterGain() {
+  const appliedDb = getSafeMasterGainDb();
+  masterGainValue.textContent = appliedDb.toFixed(0) + " dB";
+  if (masterGainNode && audioContext) {
+    // Dedicated gentle ramp for the ESP32/HW master output control to avoid
+    // zipper/click artifacts while the output level is being adjusted.
+    masterGainNode.gain.setTargetAtTime(dbToGain(appliedDb), audioContext.currentTime, 0.12);
+  }
+}
+
+function updateOutputMute() {
+  if (outputMuteGainNode && audioContext) {
+    outputMuteGainNode.gain.setTargetAtTime((outputMuted || !mixerPowered) ? 0 : 1, audioContext.currentTime, 0.02);
+  }
+  muteOutputButton.textContent = outputMuted ? "UNMUTE OUTPUT" : "MUTE OUTPUT";
+  muteOutputButton.classList.toggle("active", outputMuted);
+}
+
+let playlistLoadId = 0;
+let playlistLoadPromise = null;
+
+async function loadSelectedAudioFiles(files) {
+  if (!files || files.length === 0) return;
+  const loadId = ++playlistLoadId;
+  const task = (async () => {
+    try {
+      createAudioContext();
+      await audioContext.resume();
+      initializeAudioGraph();
+    } catch (err) {
+      setAudioStatus("Audio engine gagal: " + (err?.message || err));
+      return;
+    }
+
+    setAudioStatus("Mendecode " + files.length + " file audio...");
+    const nextBuffers = [];
+    const nextNames = [];
+
+    for (const file of files) {
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const decodedBuffer = await audioContext.decodeAudioData(arrayBuffer);
+        if (loadId !== playlistLoadId) return;
+        nextBuffers.push(decodedBuffer);
+        nextNames.push(file.name);
+      } catch (err) {}
+    }
+
+    if (loadId !== playlistLoadId) return;
+    if (activeSourceNode) {
+      activeSourceNode.onended = null;
+      try { activeSourceNode.stop(); } catch (err) {}
+      activeSourceNode = null;
+    }
+    isPlaying = false;
+    audioBuffers = nextBuffers;
+    audioFileNames = nextNames;
+    currentPlaylistIndex = 0;
+    startAudioButton.classList.remove("active");
+    renderPlaylistUI();
+
+    if (audioBuffers.length > 0) {
+      setAudioStatus(audioBuffers.length + " file siap diputar.");
+      setStatus("Audio siap. Tekan START PLAYLIST.");
+    }
+  })();
+
+  playlistLoadPromise = task;
+  try { await task; } finally { if (playlistLoadPromise === task) playlistLoadPromise = null; }
+}
+
+audioFilesInput.addEventListener("change", async e => {
+  const files = Array.from(e.target.files || []);
+  await loadSelectedAudioFiles(files);
+});
+
+function renderPlaylistUI() {
+  playlistContainer.replaceChildren();
+  if (audioFileNames.length === 0) {
+    const empty = document.createElement("div");
+    empty.textContent = "Tidak ada file audio dipilih.";
+    empty.style.textAlign = "center";
+    empty.style.padding = "2px";
+    playlistContainer.appendChild(empty);
+    return;
+  }
+  audioFileNames.forEach((name, index) => {
+    const item = document.createElement("div");
+    item.className = "playlist-item" + (index === currentPlaylistIndex ? " playing" : "");
+    const label = document.createElement("span");
+    label.textContent = `${index + 1}. ${name}`;
+    item.appendChild(label);
+    item.addEventListener("click", () => {
+      currentPlaylistIndex = index;
+      renderPlaylistUI();
+      playCurrentBuffer();
+    });
+    playlistContainer.appendChild(item);
+  });
+}
+
+const audioChannels = [
+  { inputGain: null, highPass: null, filters: [], outputGain: null, analyser: null, bypass: false },
+  { inputGain: null, highPass: null, filters: [], outputGain: null, analyser: null, bypass: false }
+];
+const eqChannelMuted = [false, false];
+const eqChannelSolo = [false, false];
+
+function buildEqualizerChannel(channelIndex) {
+  const channel = channels[channelIndex];
+  const gainControl = channel.querySelector(".gain");
+  const hpfControl = channel.querySelector(".hpf");
+  const bandControls = [...channel.querySelectorAll(".band input.eq-range")];
+
+  const inputGain = audioContext.createGain();
+  const highPass = audioContext.createBiquadFilter();
+  const outputGain = audioContext.createGain();
+  const analyser = audioContext.createAnalyser();
+
+  inputGain.gain.value = dbToGain(Number(gainControl.value));
+  outputGain.gain.value = 1;
+  highPass.type = "highpass";
+  highPass.frequency.value = hpfControl.value === "off" ? 20 : Number(hpfControl.value);
+  highPass.Q.value = 0.707;
+  analyser.fftSize = 1024;
+
+  inputGain.connect(highPass);
+  let previousNode = highPass;
+  const filters = [];
+
+  bandControls.forEach((control, index) => {
+    const filter = audioContext.createBiquadFilter();
+    filter.type = "peaking";
+    filter.frequency.value = frequencies[index];
+    filter.Q.value = 1.4;
+    filter.gain.value = Number(control.value);
+    previousNode.connect(filter);
+    previousNode = filter;
+    filters.push(filter);
+  });
+
+  previousNode.connect(outputGain);
+  outputGain.connect(analyser);
+  audioChannels[channelIndex] = { inputGain, highPass, filters, outputGain, analyser, bypass: false };
+
+  gainControl.addEventListener("input", () => {
+    inputGain.gain.setTargetAtTime(dbToGain(Number(gainControl.value)), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+  });
+  hpfControl.addEventListener("change", () => {
+    highPass.frequency.setTargetAtTime(hpfControl.value === "off" ? 20 : Number(hpfControl.value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+  });
+  bandControls.forEach((control, index) => {
+    control.addEventListener("input", () => {
+      if (audioChannels[channelIndex].bypass) return;
+      filters[index].gain.setTargetAtTime(Number(control.value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+    });
+  });
+
+  return audioChannels[channelIndex];
+}
+
+function initializeAudioGraph() {
+  createAudioContext();
+  if (audioGraphReady) { 
+    updateMasterGain(); 
+    updateOutputMute(); 
+    return; 
+  }
+
+  mixerInputGain = audioContext.createGain();
+  mixerInputGain.gain.value = 1.0;
+
+  for (let i = 0; i < 4; i++) {
+    mixerStripGains[i] = audioContext.createGain();
+    mixerStripAnalysers[i] = audioContext.createAnalyser();
+    mixerStripAnalysers[i].fftSize = 1024;
+    mixerStripGains[i].connect(mixerStripAnalysers[i]);
+    if (i < 2) mixerStripAnalysers[i].connect(mixerInputGain);
+  }
+  masterStripGainNode = audioContext.createGain();
+  masterMeterAnalyser = audioContext.createAnalyser();
+  masterMeterAnalyser.fftSize = 1024;
+  masterStereoSplitter = audioContext.createChannelSplitter(2);
+  masterStereoAnalysers = [audioContext.createAnalyser(), audioContext.createAnalyser()];
+  masterStereoAnalysers.forEach(analyser => { analyser.fftSize = 1024; analyser.smoothingTimeConstant = 0.35; });
+
+  buildEqualizerChannel(0);
+  buildEqualizerChannel(1);
+
+  tftPeqFilter = audioContext.createBiquadFilter();
+  tftPeqFilter.type = "peaking";
+  tftPeqFilter.frequency.value = tftStatesData.eq.freq;
+  tftPeqFilter.Q.value = tftStatesData.eq.q;
+  tftPeqFilter.gain.value = tftStatesData.eq.gain;
+
+  masterGainNode = audioContext.createGain();
+  outputMuteGainNode = audioContext.createGain();
+
+  alesisDelayNode = audioContext.createDelay(2.0);
+  alesisDelayNode.delayTime.value = Number(echoDelay.value);
+
+  alesisFeedbackNode = audioContext.createGain();
+  alesisFeedbackNode.gain.value = Number(echoFeedback.value);
+
+  alesisFilterNode = audioContext.createBiquadFilter();
+  alesisFilterNode.type = "lowpass";
+  alesisFilterNode.frequency.value = Number(echoDamping.value);
+
+  alesisWetNode = audioContext.createGain();
+  alesisWetNode.gain.value = Number(echoMix.value);
+
+  alesisDryNode = audioContext.createGain();
+  alesisDryNode.gain.value = 1.0 - Number(echoMix.value);
+
+  alesisDelayNode.connect(alesisFilterNode);
+  alesisFilterNode.connect(alesisFeedbackNode);
+  alesisFeedbackNode.connect(alesisDelayNode);
+
+  masterGainNode.gain.value = dbToGain(getSafeMasterGainDb());
+  outputMuteGainNode.gain.value = outputMuted ? 0 : 1;
+
+  outputMergerNode = audioContext.createChannelMerger(2);
+  audioChannels[0].analyser.connect(outputMergerNode, 0, 0);
+  audioChannels[1].analyser.connect(outputMergerNode, 0, 1);
+  
+  outputMergerNode.connect(tftPeqFilter);
+  tftPeqFilter.connect(masterStripGainNode);
+
+  // MAIN L/R meters read the signal after the master fader/gain.
+  masterStripGainNode.connect(masterGainNode);
+  masterGainNode.connect(masterStereoSplitter);
+  masterStereoSplitter.connect(masterStereoAnalysers[0], 0);
+  masterStereoSplitter.connect(masterStereoAnalysers[1], 1);
+
+  // Combined MASTER meter reads the final output after mute; analyser remains in the audio path.
+  masterGainNode.connect(outputMuteGainNode);
+  outputMuteGainNode.connect(masterMeterAnalyser);
+  masterMeterAnalyser.connect(audioContext.destination);
+
+  audioGraphReady = true;
+  rebuildAudioRouting();
+  updateMasterGain();
+  updateOutputMute();
+  updateMixerStripControls();
+  updateEqChannelStates();
+}
+
+function updateMixerStripControls() {
+  const strips = [...document.querySelectorAll(".mixer-desk-surface .console-channel-strip")];
+  const anySolo = mixerStripSolo.some(Boolean);
+  strips.forEach((strip, index) => {
+    const fader = strip.querySelector('.fader-slot input[type="range"]');
+    const readout = strip.querySelector(".fader-readout");
+    if (!fader || !readout) return;
+    const db = Number(fader.value);
+    readout.textContent = db.toFixed(1) + " dB";
+    const allowedBySolo = !anySolo || mixerStripSolo[index];
+    const gain = (mixerStripMuted[index] || !allowedBySolo) ? 0 : dbToGain(db);
+    if (index < 4 && mixerStripGains[index]) {
+      mixerStripGains[index].gain.setTargetAtTime(gain, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+    }
+    if (index === 4 && masterStripGainNode) masterStripGainNode.gain.setTargetAtTime(gain, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+    const muteBtn = strip.querySelector(".console-action-btn.mute");
+    const soloBtn = strip.querySelector(".console-action-btn.solo");
+    if (muteBtn) muteBtn.classList.toggle("active", mixerStripMuted[index]);
+    if (soloBtn) soloBtn.classList.toggle("active", mixerStripSolo[index]);
+  });
+}
+
+function rebuildAudioRouting() {
+  if (!audioGraphReady || !audioContext || !mixerInputGain || !alesisDryNode || !alesisWetNode) return;
+
+  // Clear old branches first so toggling FX never stacks duplicate signal routes.
+  mixerInputGain.disconnect();
+  mixerStripAnalysers[2].disconnect();
+  mixerStripAnalysers[3].disconnect();
+  alesisDryNode.disconnect();
+  alesisWetNode.disconnect();
+  mixerStripGains[3].disconnect();
+  try { alesisDelayNode.disconnect(alesisWetNode); } catch (err) {}
+
+  mixerInputGain.connect(alesisDryNode);
+  alesisDryNode.connect(audioChannels[0].inputGain);
+  alesisDryNode.connect(audioChannels[1].inputGain);
+  // Keep FX SEND metering live even while the processor is bypassed.
+  mixerInputGain.connect(mixerStripGains[2]);
+  if (isAlesisFxEnabled) {
+    mixerStripAnalysers[2].connect(alesisDelayNode);
+    alesisDelayNode.connect(alesisWetNode);
+    // FX RETURN meter taps the wet processor output before the return fader.
+    // The fader remains downstream and still controls the audible return level.
+    alesisWetNode.connect(mixerStripAnalysers[3]);
+    mixerStripAnalysers[3].connect(mixerStripGains[3]);
+    // Return joins the post-EQ main bus, not the input channels:
+    // routing it back to channel inputs creates a digital feedback loop.
+    mixerStripGains[3].connect(masterStripGainNode);
+  }
+}
+
+echoToggleBtn.addEventListener("click", () => {
+  isAlesisFxEnabled = !isAlesisFxEnabled;
+  if (isAlesisFxEnabled) {
+    echoToggleBtn.textContent = "ALESIS FX: ON";
+    echoToggleBtn.classList.add("active");
+    setStatus("Alesis FX diaktifkan.");
+  } else {
+    echoToggleBtn.textContent = "ALESIS FX: OFF";
+    echoToggleBtn.classList.remove("active");
+    setStatus("Alesis FX dimatikan.");
+  }
+  rebuildAudioRouting();
+});
+
+echoDelay.addEventListener("input", () => {
+  document.getElementById("echoDelayVal").textContent = Number(echoDelay.value).toFixed(2) + " detik";
+  if (alesisDelayNode && audioContext) alesisDelayNode.delayTime.setTargetAtTime(Number(echoDelay.value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+});
+
+echoFeedback.addEventListener("input", () => {
+  document.getElementById("echoFeedbackVal").textContent = Math.round(echoFeedback.value * 100) + "%";
+  if (alesisFeedbackNode && audioContext) alesisFeedbackNode.gain.setTargetAtTime(Number(echoFeedback.value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+});
+
+echoDamping.addEventListener("input", () => {
+  document.getElementById("echoDampingVal").textContent = echoDamping.value + " Hz";
+  if (alesisFilterNode && audioContext) alesisFilterNode.frequency.setTargetAtTime(Number(echoDamping.value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+});
+
+echoMix.addEventListener("input", () => {
+  document.getElementById("echoMixVal").textContent = Math.round(echoMix.value * 100) + "%";
+  if (alesisWetNode && alesisDryNode && audioContext) {
+    alesisDryNode.gain.setTargetAtTime(1.0 - Number(echoMix.value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+    alesisWetNode.gain.setTargetAtTime(Number(echoMix.value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+  }
+});
+
+function playCurrentBuffer() {
+  if (audioBuffers.length === 0) { setStatus("Pilih file audio terlebih dahulu di Mixer!"); return; }
+
+  createAudioContext();
+  initializeAudioGraph();
+
+  if (activeSourceNode) {
+    activeSourceNode.onended = null;
+    try { activeSourceNode.stop(); } catch (e) {}
+    activeSourceNode = null;
+  }
+
+  const buffer = audioBuffers[currentPlaylistIndex];
+  if (!buffer) return;
+  const sourceNode = audioContext.createBufferSource();
+  activeSourceNode = sourceNode;
+  sourceNode.buffer = buffer;
+  sourceNode.connect(mixerStripGains[1]);
+
+  sourceNode.start(0);
+  isPlaying = true;
+  startAudioButton.classList.add("active");
+  setAudioStatus("Memutar: " + audioFileNames[currentPlaylistIndex]);
+
+  sourceNode.onended = () => {
+    if (activeSourceNode !== sourceNode) return;
+    activeSourceNode = null;
+    if (isPlaying && audioBuffers.length > 0) {
+      currentPlaylistIndex = (currentPlaylistIndex + 1) % audioBuffers.length;
+      renderPlaylistUI();
+      playCurrentBuffer();
+    } else {
+      startAudioButton.classList.remove("active");
+    }
+  };
+}
+
+startAudioButton.addEventListener("click", async () => {
+  try {
+    if (playlistLoadPromise) await playlistLoadPromise;
+    if (audioBuffers.length === 0 && audioFilesInput.files && audioFilesInput.files.length > 0) {
+      await loadSelectedAudioFiles(Array.from(audioFilesInput.files));
+    }
+    if (audioBuffers.length === 0) { setAudioStatus("Pilih file audio terlebih dahulu."); return; }
+
+    const ctx = createAudioContext();
+    if (ctx.state === "suspended") await ctx.resume();
+    initializeAudioGraph();
+    await applyPhysicalOutputDevice();
+    playCurrentBuffer();
+  } catch (err) { setAudioStatus("Audio gagal dimulai."); }
+});
+
+startMicButton.addEventListener("click", async () => {
+  if (microphoneStream) {
+    microphoneSource?.disconnect();
+    microphoneSource = null;
+    microphoneStream.getTracks().forEach(track => track.stop());
+    microphoneStream = null;
+    startMicButton.classList.remove("active");
+    setAudioStatus("Mikrofon dimatikan.");
+    return;
+  }
+
+  try {
+    const ctx = createAudioContext();
+    if (ctx.state === "suspended") await ctx.resume();
+    initializeAudioGraph();
+    await applyPhysicalOutputDevice();
+    await refreshPhysicalInputDevices();
+    const selectedInputId = physicalInputDevice?.value || "";
+    // Avoid forcing an ultra-low capture latency on mobile devices; let the
+    // browser/driver choose a stable buffer size to reduce crackles and dropouts.
+    const audioConstraints = selectedInputId
+      ? { deviceId: { exact: selectedInputId }, echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+      : { echoCancellation: false, noiseSuppression: false, autoGainControl: false };
+    microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
+    microphoneSource = audioContext.createMediaStreamSource(microphoneStream);
+    microphoneSource.connect(mixerStripGains[0]);
+    startMicButton.classList.add("active");
+    setAudioStatus("Mikrofon / Input Fisik aktif.");
+  } catch (err) { setAudioStatus("Gagal mengakses mikrofon atau USB interface."); }
+});
+
+stopAudioButton.addEventListener("click", () => {
+  const sourceToStop = activeSourceNode;
+  activeSourceNode = null;
+  if (sourceToStop) {
+    sourceToStop.onended = null;
+    try { sourceToStop.stop(); } catch (e) {}
+  }
+  isPlaying = false;
+  startAudioButton.classList.remove("active");
+  setAudioStatus("Playlist dihentikan.");
+});
+
+function updateEqChannelStates() {
+  if (!audioGraphReady || !audioContext) return;
+  const anySolo = eqChannelSolo.some(Boolean);
+  audioChannels.forEach((ac, index) => {
+    if (!ac.outputGain) return;
+    const audible = !eqChannelMuted[index] && (!anySolo || eqChannelSolo[index]);
+    ac.outputGain.gain.setTargetAtTime(audible ? 1 : 0, audioContext.currentTime, 0.02);
+  });
+}
+
+function syncAudioControlsFromUI() {
+  if (!audioGraphReady || !audioContext) return;
+  channels.forEach((channel, index) => {
+    const ac = audioChannels[index];
+    if (!ac.inputGain) return;
+    const gainCtrl = channel.querySelector(".gain");
+    const hpfCtrl = channel.querySelector(".hpf");
+    const bypassBtn = channel.querySelector(".bypass-button");
+    const bands = [...channel.querySelectorAll(".band input.eq-range")];
+
+    ac.inputGain.gain.setTargetAtTime(dbToGain(Number(gainCtrl.value)), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+    ac.highPass.frequency.setTargetAtTime(hpfCtrl.value === "off" ? 20 : Number(hpfCtrl.value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+    ac.bypass = bypassBtn.classList.contains("active");
+
+    ac.filters.forEach((filter, bIdx) => {
+      if (bands[bIdx]) {
+        filter.gain.setTargetAtTime(ac.bypass ? 0 : Number(bands[bIdx].value), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+      }
+    });
+  });
+}
+
+function updateEqResponseCurve(channel) {
+  const path = channel.querySelector(".eq-response-path");
+  if (!path) return;
+  const sliders = [...channel.querySelectorAll(".band input.eq-range")];
+  if (!sliders.length) return;
+  const range = Math.max(1, Number(channel.querySelector(".range")?.value || 15));
+  const points = sliders.map((slider, index) => {
+    const x = (index / Math.max(1, sliders.length - 1)) * 320;
+    const gain = Math.max(-range, Math.min(range, Number(slider.value) || 0));
+    const y = 32 - (gain / range) * 24;
+    return [x.toFixed(1), y.toFixed(1)];
+  });
+  path.setAttribute("d", points.map((p, i) => (i ? "L" : "M") + p[0] + " " + p[1]).join(" "));
+}
+
+function updateValues(channel) {
+  const gain = channel.querySelector(".gain");
+  const gainVal = channel.querySelector(".gain-value");
+  if (gain && gainVal) gainVal.textContent = Number(gain.value).toFixed(1) + " dB";
+  channel.querySelectorAll(".band").forEach(b => {
+    const s = b.querySelector("input");
+    const v = b.querySelector(".band-value");
+    if (s && v) v.textContent = Number(s.value).toFixed(1);
+  });
+  syncAudioControlsFromUI();
+  updateEqResponseCurve(channel);
+}
+
+function setRange(channel, range) {
+  const max = Number(range);
+  channel.querySelectorAll(".band input.eq-range").forEach(s => {
+    s.min = String(-max); s.max = String(max);
+    if (Number(s.value) > max) s.value = String(max);
+    if (Number(s.value) < -max) s.value = String(-max);
+  });
+  channel.querySelector(".scale").innerHTML = `<span>+${max} dB</span><span>0 dB</span><span>-${max} dB</span>`;
+  updateValues(channel);
+}
+
+function setPreset(type) {
+  channels.forEach(channel => {
+    channel.querySelector(".gain").value = "0";
+    channel.querySelectorAll(".band input.eq-range").forEach((slider, index) => {
+      let val = 0;
+      if (type === "vocal") {
+        if (index >= 13 && index <= 21) val = 3;
+        if (index <= 5) val = -2;
+        if (index >= 25) val = 2;
+      } else if (type === "music") {
+        if (index <= 5) val = 4;
+        if (index >= 23) val = 3;
+        if (index >= 12 && index <= 18) val = -1;
+      }
+      slider.value = String(val);
+      const valDisplay = slider.closest(".band").querySelector(".band-value");
+      if (valDisplay) valDisplay.textContent = Number(slider.value).toFixed(1);
+    });
+    updateValues(channel);
+  });
+  setStatus(`Preset ${type.toUpperCase()} diterapkan.`);
+}
+
+channels.forEach((channel, idx) => {
+  createBands(channel);
+  channel.querySelector(".gain").addEventListener("input", () => updateValues(channel));
+  channel.querySelector(".range").addEventListener("change", e => setRange(channel, e.target.value));
+
+  const bypassBtn = channel.querySelector(".bypass-button");
+  const testBtn = channel.querySelector(".test-button");
+  const activeLed = document.getElementById(`ch${idx}_active_led`);
+
+  bypassBtn.addEventListener("click", () => {
+    bypassBtn.classList.toggle("active");
+    const bypassed = bypassBtn.classList.contains("active");
+    channel.querySelectorAll(".gain, .hpf, .range, .band input.eq-range").forEach(c => c.disabled = bypassed);
+    syncAudioControlsFromUI();
+    if (bypassed) activeLed.classList.remove("active-led");
+    else activeLed.classList.add("active-led");
+    setStatus(bypassed ? "Bypass aktif." : "Bypass nonaktif.");
+  });
+
+  testBtn.addEventListener("click", () => {
+    testBtn.classList.toggle("active");
+    testBtn.setAttribute("aria-pressed", String(testBtn.classList.contains("active")));
+    const testing = testBtn.classList.contains("active");
+    channel.querySelector(".gain").value = testing ? "6" : "0";
+    channel.querySelectorAll(".band input.eq-range").forEach(s => {
+      s.value = testing ? "2" : "0";
+      const valDisplay = s.closest(".band").querySelector(".band-value");
+      if (valDisplay) valDisplay.textContent = Number(s.value).toFixed(1);
+    });
+    updateValues(channel);
+  });
+
+  const muteBtn = channel.querySelector(".eq-mute-button");
+  const soloBtn = channel.querySelector(".eq-solo-button");
+  const resetBtn = channel.querySelector(".eq-reset-button");
+  muteBtn.addEventListener("click", () => {
+    eqChannelMuted[idx] = !eqChannelMuted[idx];
+    muteBtn.classList.toggle("active", eqChannelMuted[idx]);
+    updateEqChannelStates();
+  });
+  soloBtn.addEventListener("click", () => {
+    eqChannelSolo[idx] = !eqChannelSolo[idx];
+    soloBtn.classList.toggle("active", eqChannelSolo[idx]);
+    updateEqChannelStates();
+  });
+  resetBtn.addEventListener("click", () => {
+    channel.querySelector(".gain").value = "0";
+    channel.querySelector(".hpf").value = "off";
+    channel.querySelector(".range").value = "15";
+    channel.querySelectorAll(".band input.eq-range").forEach(slider => slider.value = "0");
+    channel.querySelector(".test-button").classList.remove("active");
+    updateValues(channel);
+  });
+  updateValues(channel);
+});
+
+document.getElementById("flatButton").addEventListener("click", () => setPreset("flat"));
+document.getElementById("vocalButton").addEventListener("click", () => setPreset("vocal"));
+document.getElementById("musicButton").addEventListener("click", () => setPreset("music"));
+
+masterGainControl.addEventListener("input", updateMasterGain);
+outputMode.addEventListener("change", updateMasterGain);
+muteOutputButton.addEventListener("click", () => { outputMuted = !outputMuted; updateOutputMute(); });
+const mixerFaderPositions = new WeakMap();
+let mixerFaderMotionToken = 0;
+function animateMixerFaders(poweringOn) {
+  const controls = Array.from(document.querySelectorAll('#tabMixerContent .mixer-desk-surface input[type="range"]'));
+  if (!controls.length) return;
+  const token = ++mixerFaderMotionToken;
+  const entries = controls.map(control => {
+    const min = Number.isFinite(control.minAsNumber) ? control.minAsNumber : (Number(control.min) || 0);
+    const max = Number.isFinite(control.maxAsNumber) ? control.maxAsNumber : (Number(control.max) || 100);
+    const current = Number(control.value);
+    if (!mixerFaderPositions.has(control) && !poweringOn) mixerFaderPositions.set(control, current);
+    const target = poweringOn ? (mixerFaderPositions.has(control) ? mixerFaderPositions.get(control) : current) : min;
+    return {control, start:current, target, min, max};
+  });
+  const startTime = performance.now();
+  const duration = poweringOn ? 1050 : 780;
+  const tick = now => {
+    if (token !== mixerFaderMotionToken) return;
+    const t = Math.min(1, (now - startTime) / duration);
+    const eased = t * t * (3 - 2 * t);
+    entries.forEach(({control,start,target}) => {
+      const next = start + (target - start) * eased;
+      control.value = String(next);
+      control.dispatchEvent(new Event("input", {bubbles:true}));
+    });
+    if (t < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+function runMixerStartupTest() {
+  document.body.classList.add("mixer-startup-test");
+  document.querySelectorAll("#tabMixerContent .mixer-desk-surface .vert-led-meter, #tabMixerContent .mixer-desk-surface .master-led-meter, #tabMixerContent .mixer-desk-surface .master-combined-meter").forEach(meter => {
+    meter.querySelectorAll("span").forEach(led => led.classList.add("on"));
+  });
+  document.querySelectorAll("#tabMixerContent .mixer-desk-surface .status-led").forEach(led => led.classList.add("on"));
+  setAudioStatus("Mixer ON — refresh sistem, fader bergerak naik...");
+  window.setTimeout(() => {
+    document.body.classList.remove("mixer-startup-test");
+    document.querySelectorAll("#tabMixerContent .mixer-desk-surface .vert-led-meter span, #tabMixerContent .mixer-desk-surface .master-led-meter span, #tabMixerContent .mixer-desk-surface .master-combined-meter span, #tabMixerContent .mixer-desk-surface .status-led").forEach(led => led.classList.remove("on"));
+    updateAllSignalMeters();
+    setAudioStatus("Mixer siap.");
+  }, 1800);
+}
+mixerPowerButton?.addEventListener("click", () => {
+  mixerPowered = !mixerPowered;
+  mixerPowerButton.classList.toggle("powered-on", mixerPowered);
+  mixerPowerButton.setAttribute("aria-pressed", String(mixerPowered));
+  const label = mixerPowerButton.querySelector(".mixer-power-label");
+  if (label) label.textContent = mixerPowered ? "POWER ON" : "POWER OFF";
+  document.body.classList.toggle("mixer-powered-off", !mixerPowered);
+  updateOutputMute();
+  if (mixerPowered) {
+    document.body.classList.remove("mixer-refreshing");
+    animateMixerFaders(true);
+    runMixerStartupTest();
+  } else {
+    ++mixerFaderMotionToken;
+    document.body.classList.remove("mixer-startup-test");
+    document.body.classList.add("mixer-refreshing");
+    animateMixerFaders(false);
+    document.querySelectorAll("#tabMixerContent .mixer-desk-surface .status-led, #tabMixerContent .mixer-desk-surface .vert-led-meter span, #tabMixerContent .mixer-desk-surface .master-led-meter span, #tabMixerContent .mixer-desk-surface .master-combined-meter span").forEach(led => led.classList.remove("on"));
+    setAudioStatus("Mixer OFF — refresh / shutdown, fader turun dan output audio dimatikan.");
+    window.setTimeout(() => document.body.classList.remove("mixer-refreshing"), 900);
+  }
+});
+
+document.querySelectorAll(".mixer-desk-surface .console-channel-strip").forEach((strip, index) => {
+  const fader = strip.querySelector('.fader-slot input[type="range"]');
+  fader?.addEventListener("input", () => {
+    if (audioContext) updateMixerStripControls();
+    else {
+      const readout = strip.querySelector(".fader-readout");
+      if (readout) readout.textContent = Number(fader.value).toFixed(1) + " dB";
+    }
+  });
+  strip.querySelector(".console-action-btn.mute")?.addEventListener("click", () => {
+    mixerStripMuted[index] = !mixerStripMuted[index];
+    if (audioContext) updateMixerStripControls();
+    else strip.querySelector(".console-action-btn.mute").classList.toggle("active", mixerStripMuted[index]);
+  });
+  strip.querySelector(".console-action-btn.solo")?.addEventListener("click", () => {
+    mixerStripSolo[index] = !mixerStripSolo[index];
+    if (audioContext) updateMixerStripControls();
+    else strip.querySelector(".console-action-btn.solo").classList.toggle("active", mixerStripSolo[index]);
+  });
+});
+
+/* MASTER LR TOUCH DRAG FIX: use pointer coordinates so mobile/tablet dragging is reliable. */
+(function enableMasterFaderPointerDrag() {
+  const masterStrip = document.querySelector("#tabMixerContent .master-strip");
+  const slider = masterStrip?.querySelector('.master-fader-row .fader-slot input[type="range"]');
+  if (!slider) return;
+  let drag = null;
+  const setFromY = (clientY) => {
+    const rect = slider.getBoundingClientRect();
+    if (!rect.height) return;
+    const min = Number(slider.min || 0);
+    const max = Number(slider.max || 100);
+    const step = Number(slider.step || 1);
+    const fraction = Math.max(0, Math.min(1, (rect.bottom - clientY) / rect.height));
+    const raw = min + fraction * (max - min);
+    const value = Math.max(min, Math.min(max, min + Math.round((raw - min) / step) * step));
+    if (value !== Number(slider.value)) {
+      slider.value = String(value);
+      slider.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  };
+  slider.addEventListener("pointerdown", (event) => {
+    if (event.button > 0 || slider.disabled) return;
+    event.preventDefault();
+    event.stopPropagation();
+    drag = { id: event.pointerId };
+    try { slider.setPointerCapture(event.pointerId); } catch (_) {}
+    setFromY(event.clientY);
+  }, { capture: true, passive: false });
+  slider.addEventListener("pointermove", (event) => {
+    if (!drag || event.pointerId !== drag.id) return;
+    event.preventDefault();
+    setFromY(event.clientY);
+  }, { capture: true, passive: false });
+  const finish = (event) => {
+    if (!drag || event.pointerId !== drag.id) return;
+    drag = null;
+    slider.dispatchEvent(new Event("change", { bubbles: true }));
+  };
+  slider.addEventListener("pointerup", finish, { capture: true });
+  slider.addEventListener("pointercancel", finish, { capture: true });
+  slider.addEventListener("lostpointercapture", finish, { capture: true });
+  window.addEventListener("blur", () => {
+    if (!drag) return;
+    drag = null;
+    slider.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+})();
+
+/* =========================================================
+   DATABASE TFT INTERAKTIF SQ-7 STYLE
+========================================================= */
+const tftSectionTitle = document.getElementById("tftSectionTitle");
+const tftContentArea = document.getElementById("tftContentArea");
+const tftFooterChannel = document.getElementById("tftFooterChannel");
+const tftFooterStatus = document.getElementById("tftFooterStatus");
+const tftTabs = document.querySelectorAll(".tft-tab");
+// DSP navigation lives in the mixer-side-nav (not .mixer-control-section).
+// Keep this selector aligned with the actual markup so each DSP page receives its click handler.
+const consoleSectionBtns = document.querySelectorAll(".mixer-side-nav .console-btn[data-section]");
+
+function updateEncoders(data) {
+  const encoderBoxes = document.querySelectorAll(".tft-encoder-knob");
+  encoderBoxes.forEach((box, index) => {
+    if (data[index]) {
+      box.innerHTML = `${data[index].name}<span id="enc${index+1}Val">${data[index].val}</span>`;
+    }
+  });
+}
+
+const tftDatabase = {
+  config: {
+    title: "SQ-7 PREAMP CONFIG",
+    footerCh: "Current: Ip1 Preamp",
+    footerSt: "Next: Gain & Phantom Setting",
+    content: (s) => `
+      <div class="tft-module-view">
+        <div class="tft-info-panel" id="tftConfigInfo">
+    <div class="tft-info-heading">PREAMP / INPUT STATUS</div>
+    <div class="tft-info-cards">
+      <div class="tft-info-card"><small>ANALOG GAIN</small><strong>+${s.gain} dB</strong><em>Input trim</em></div>
+      <div class="tft-info-card"><small>PHANTOM POWER</small><strong>${s.phantom ? '48V ON' : 'OFF'}</strong><em>Condenser mic supply</em></div>
+      <div class="tft-info-card"><small>PHASE</small><strong>${s.phase ? 'INVERTED' : 'NORMAL'}</strong><em>Polarity</em></div>
+    </div>
+    <div class="tft-info-note">Select an input channel, then adjust gain and hardware options below.</div>
+  </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>Analog Gain</label><input type="range" id="cfgGain" min="0" max="60" value="${s.gain}"><span class="tft-val-disp" id="cfgGainVal">${s.gain}dB</span></div>
+          <div class="tft-mod-ctrl"><label>Phantom 48V</label><button id="cfgPhantomBtn" class="${s.phantom ? 'active-action' : ''}" type="button">${s.phantom ? 'ON' : 'OFF'}</button></div>
+          <div class="tft-mod-ctrl"><label>Phase Invert</label><button id="cfgPhaseBtn" class="${s.phase ? 'active-action' : ''}" type="button">${s.phase ? 'INVERT' : 'NORMAL'}</button></div>
+        </div>
+      </div>
+    `,
+    encoders: (s) => [{name:"GAIN", val:`+${s.gain}dB`}, {name:"HPF", val:"80Hz"}, {name:"POLARITY", val:s.phase?"INV":"NORM"}, {name:"DELAY", val:"0.0ms"}, {name:"WIDTH", val:"100%"}, {name:"TRIM", val:"0.0dB"}]
+  },
+  gate: {
+    title: "SQ-7 NOISE GATE",
+    footerCh: "Current: Ip1 Gate",
+    footerSt: "Next: Threshold & Hold",
+    content: (s) => `
+      <div class="tft-module-view">
+        <div class="tft-module-graph-box" id="tftGateBox">
+          <svg id="tftGateSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="xMidYMid meet" style="width:100%; height:100%; touch-action:none;">
+            <g stroke="#334155" stroke-width=".7" opacity=".6">
+              <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
+              <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
+            </g>
+            <path id="tftGateSvgCurve" d="M10 55 L ${s.dot1X} ${s.dot1Y} L ${s.dot2X} ${s.dot2Y}" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+            <path id="tftGateSvgFill" d="M10 55 L ${s.dot1X} ${s.dot1Y} L ${s.dot2X} ${s.dot2Y} L 310 65 L 10 65 Z" fill="#f59e0b" opacity=".12"/>
+            <circle id="tftGateDot1" cx="${s.dot1X}" cy="${s.dot1Y}" r="7" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Threshold Point"/>
+            <circle id="tftGateDot2" cx="${s.dot2X}" cy="${s.dot2Y}" r="7" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Ratio Point"/>
+            <text x="12" y="12" fill="#94a3b8" font-size="6.5">GATE TRANSFER CURVE (2 Points)</text>
+          </svg>
+        </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>Threshold</label><input type="range" id="gateThresh" min="-80" max="0" step="0.1" value="${s.thresh}"><span class="tft-val-disp" id="gateThreshVal">${s.thresh}dB</span></div>
+          <div class="tft-mod-ctrl"><label>Ratio</label><input type="range" id="gateRatio" min="1" max="10" step="0.1" value="${s.ratio}"><span class="tft-val-disp" id="gateRatioVal">1:${s.ratio}</span></div>
+          <div class="tft-mod-ctrl"><label>Gate State</label><button id="gateStateBtn" class="${s.state ? 'active-action' : ''}" type="button">${s.state ? 'ACTIVE' : 'BYPASS'}</button></div>
+        </div>
+      </div>
+    `,
+    encoders: (s) => [{name:"THRESH", val:`${s.thresh}dB`}, {name:"RATIO", val:`1:${s.ratio}`}, {name:"ATTACK", val:"5ms"}, {name:"HOLD", val:"20ms"}, {name:"RELEASE", val:"300ms"}, {name:"FILTER", val:"OFF"}]
+  },
+  dynamics: {
+    title: "SQ-7 COMPRESSOR DYNAMICS",
+    footerCh: "Current: Ip1 Comp",
+    footerSt: "Next: Threshold & Ratio",
+    content: (s) => `
+      <div class="tft-module-view">
+        <div class="tft-module-graph-box" id="tftCompBox">
+          <svg id="tftCompSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="xMidYMid meet" style="width:100%; height:100%; touch-action:none;">
+            <g stroke="#334155" stroke-width=".7" opacity=".6">
+              <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
+              <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
+            </g>
+            <path id="tftCompSvgCurve" d="M10 55 L ${s.dot2X} ${s.dot2Y} L ${s.dot3X} ${s.dot3Y}" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>
+            <path id="tftCompSvgFill" d="M10 55 L ${s.dot2X} ${s.dot2Y} L ${s.dot3X} ${s.dot3Y} L 310 65 L 10 65 Z" fill="#10b981" opacity=".12"/>
+            <circle id="tftCompDot1" cx="${s.dot1X}" cy="${s.dot1Y}" r="7" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Start Point"/>
+            <circle id="tftCompDot2" cx="${s.dot2X}" cy="${s.dot2Y}" r="7" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Threshold Point"/>
+            <circle id="tftCompDot3" cx="${s.dot3X}" cy="${s.dot3Y}" r="7" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Ratio/Makeup Point"/>
+            <text x="12" y="12" fill="#94a3b8" font-size="6.5">COMPRESSOR CURVE (3 Points)</text>
+          </svg>
+        </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>Threshold</label><input type="range" id="compThresh" min="-60" max="0" step="0.1" value="${s.thresh}"><span class="tft-val-disp" id="compThreshVal">${s.thresh}dB</span></div>
+          <div class="tft-mod-ctrl"><label>Ratio</label><input type="range" id="compRatio" min="1" max="20" step="0.1" value="${s.ratio}"><span class="tft-val-disp" id="compRatioVal">${s.ratio}:1</span></div>
+          <div class="tft-mod-ctrl"><label>Makeup</label><input type="range" id="compMakeup" min="0" max="24" step="0.1" value="${s.makeup}"><span class="tft-val-disp" id="compMakeupVal">+${s.makeup}dB</span></div>
+        </div>
+      </div>
+    `,
+    encoders: (s) => [{name:"THRESH", val:`${s.thresh}dB`}, {name:"RATIO", val:`${s.ratio}:1`}, {name:"ATTACK", val:"10ms"}, {name:"RELEASE", val:"300ms"}, {name:"MAKEUP", val:`+${s.makeup}dB`}, {name:"KNEE", val:"Soft"}]
+  },
+  eq: {
+    title: "SQ-7 PARAMETRIC EQUALIZER (PEQ)",
+    footerCh: "Current: Ip1 PEQ",
+    footerSt: "Next: 4-Band PEQ Response",
+    content: (s) => `
+      <div class="tft-peq">
+        <div class="tft-peq-head">
+          <span>PEQ • 4-BAND SQ-7</span>
+          <span style="color:#10b981;">● Control Point Active</span>
+        </div>
+        <svg class="tft-peq-graph" id="tftPeqSvgContainer" viewBox="0 0 320 120" preserveAspectRatio="none" role="img" aria-label="SQ-7 PEQ frequency response" style="touch-action:none;">
+          <rect x="0" y="0" width="320" height="120" fill="#080d16"/>
+          <g stroke="#253448" stroke-width=".65" opacity=".95">
+            <line x1="0" y1="15" x2="320" y2="15"/>
+            <line x1="0" y1="30" x2="320" y2="30"/>
+            <line x1="0" y1="45" x2="320" y2="45"/>
+            <line x1="0" y1="60" x2="320" y2="60" stroke="#94a3b8" stroke-width="1.3"/>
+            <line x1="0" y1="75" x2="320" y2="75"/>
+            <line x1="0" y1="90" x2="320" y2="90"/>
+            <line x1="0" y1="105" x2="320" y2="105"/>
+          </g>
+          <g stroke="#334155" stroke-width=".6" opacity=".9">
+            <line x1="0" y1="0" x2="0" y2="108"/>
+            <line x1="32" y1="0" x2="32" y2="108"/>
+            <line x1="64" y1="0" x2="64" y2="108"/>
+            <line x1="96" y1="0" x2="96" y2="108"/>
+            <line x1="160" y1="0" x2="160" y2="108"/>
+            <line x1="224" y1="0" x2="224" y2="108"/>
+            <line x1="256" y1="0" x2="256" y2="108"/>
+            <line x1="288" y1="0" x2="288" y2="108"/>
+            <line x1="320" y1="0" x2="320" y2="108"/>
+          </g>
+          <g fill="#94a3b8" font-size="6" font-family="Arial, sans-serif">
+            <text x="3" y="12">+15</text><text x="3" y="27">+10</text><text x="3" y="42">+5</text>
+            <text x="3" y="57">0 dB</text><text x="3" y="72">-5</text><text x="3" y="87">-10</text><text x="3" y="102">-15</text>
+            <text x="1" y="116">20</text><text x="43" y="116">50</text><text x="73" y="116">100</text>
+            <text x="155" y="116">1k</text><text x="249" y="116">5k</text><text x="286" y="116">10k</text><text x="302" y="116">20k Hz</text>
+          </g>
+          <path id="tftPeqSvgFill" d="M0 60 L320 60 Z" fill="#38bdf8" opacity=".14"/>
+          <path id="tftPeqSvgCurve" d="M0 60 L320 60" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle id="tftPeqDot2" cx="160" cy="60" r="7" fill="#f8fafc" stroke="#0284c7" stroke-width="2" style="cursor:grab;touch-action:none;" title="PEQ center frequency / gain"/>
+        </svg>
+        <div class="tft-peq-controls">
+          <div class="tft-peq-control">
+            <label for="tftPeqFreq">FREQ</label>
+            <input id="tftPeqFreq" type="range" min="20" max="20000" step="10" value="${s.freq}">
+            <span class="tft-peq-value" id="tftPeqFreqVal">${s.freq >= 1000 ? (s.freq/1000).toFixed(2)+' kHz' : s.freq+' Hz'}</span>
+          </div>
+          <div class="tft-peq-control">
+            <label for="tftPeqQ">Q BAND</label>
+            <input id="tftPeqQ" type="range" min="0.1" max="10" step="0.1" value="${s.q}">
+            <span class="tft-peq-value" id="tftPeqQVal">${s.q.toFixed(1)}</span>
+          </div>
+          <div class="tft-peq-control">
+            <label for="tftPeqGain">GAIN</label>
+            <input id="tftPeqGain" type="range" min="-15" max="15" step="0.5" value="${s.gain}">
+            <span class="tft-peq-value" id="tftPeqGainVal">${s.gain.toFixed(1)} dB</span>
+          </div>
+        </div>
+      </div>
+    `,
+    encoders: (s) => [{name:"FREQ", val: s.freq>=1000?(s.freq/1000).toFixed(2)+'kHz':s.freq+'Hz'}, {name:"Q", val: s.q.toFixed(1)}, {name:"GAIN", val: s.gain.toFixed(1)+'dB'}, {name:"BAND", val:"PEQ"}, {name:"TYPE", val:"PEAK"}, {name:"BYPASS", val:"OFF"}]
+  },
+  sends: {
+    title: "SQ-7 GRAPHIC EQUALIZER (GEQ)",
+    footerCh: "Current: Master GEQ",
+    footerSt: "Next: 31-Band GEQ Graphic",
+    content: (s) => `
+      <div class="tft-module-view">
+        <div class="tft-module-graph-box" id="tftSendsBox">
+          <svg id="tftSendsSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
+            <g stroke="#334155" stroke-width=".7" opacity=".6">
+              <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
+              <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
+            </g>
+            <path id="tftSendsSvgCurve" d="M10 45 L ${s.dot1X} ${s.dot1Y} L 310 45" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round"/>
+            <path id="tftSendsSvgFill" d="M10 45 L ${s.dot1X} ${s.dot1Y} L 310 45 L 310 65 L 10 65 Z" fill="#a855f7" opacity=".12"/>
+            <circle id="tftSendsDot1" cx="160" cy="${s.dot1Y}" r="9" fill="#f3e8ff" stroke="#a855f7" stroke-width="2.5" style="cursor:grab; touch-action:none;" aria-label="GEQ master level point" title="Drag vertically to adjust GEQ master level"/>
+            <text x="10" y="10" fill="#94a3b8" font-size="5.5">MASTER GEQ LEVEL · DRAG POINT VERTICALLY</text>
+          </svg>
+        </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>GEQ Master</label><input type="range" id="send1Lvl" min="-15" max="15" step="0.1" value="${s.lvl}"><span class="tft-val-disp" id="send1LvlVal">${s.lvl}dB</span></div>
+          <div class="tft-mod-ctrl"><label>Preset GEQ</label><select id="geqPresetSel"><option ${s.preset===0?'selected':''}>Flat</option><option ${s.preset===1?'selected':''}>Vocal Boost</option><option ${s.preset===2?'selected':''}>Music V-Shape</option></select></div>
+          <div class="tft-mod-ctrl"><label>GEQ State</label><button id="geqStateBtn" class="${s.state ? 'active-action' : ''}" type="button">${s.state ? 'ACTIVE' : 'BYPASS'}</button></div>
+        </div>
+      </div>
+    `,
+    encoders: (s) => [{name:"GEQ", val:"31-BAND"}, {name:"MODE", val:"MASTER"}, {name:"BYPASS", val:s.state?"OFF":"ON"}, {name:"PRESET", val:["Flat","Vocal","Music"][s.preset]}, {name:"RTA", val:"ON"}, {name:"GAIN", val:`${s.lvl}dB`}]
+  },
+  main: {
+    title: "SQ-7 INSERT PROCESSOR",
+    footerCh: "Current: Main Insert",
+    footerSt: "Next: External FX / Limiter Insert",
+    content: (s) => `
+      <div class="tft-module-view">
+        <div class="tft-info-panel" id="tftInsertInfo">
+    <div class="tft-info-heading">INSERT / FX SIGNAL PATH</div>
+    <div class="tft-signal-flow"><span>INPUT</span><b>→</b><span>INSERT SEND</span><b>→</b><span>FX / LIMITER</span><b>→</b><span>RETURN</span><b>→</b><span>MAIN L/R</span></div>
+    <div class="tft-info-cards">
+      <div class="tft-info-card"><small>INSERT SEND</small><strong>${s.send} dB</strong><em>Send level</em></div>
+      <div class="tft-info-card"><small>LIMITER PEAK</small><strong>${s.limit} dB</strong><em>Ceiling</em></div>
+      <div class="tft-info-card"><small>INSERT STATE</small><strong>${s.bypass ? 'BYPASS' : 'ACTIVE'}</strong><em>Processor status</em></div>
+    </div>
+  </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>Insert Send</label><input type="range" id="mainFohLvl" min="-50" max="6" value="${s.send}"><span class="tft-val-disp" id="mainFohLvlVal">${s.send}dB</span></div>
+          <div class="tft-mod-ctrl"><label>Limiter Peak</label><input type="range" id="mainLimitLvl" min="-20" max="0" step="0.5" value="${s.limit}"><span class="tft-val-disp" id="mainLimitLvlVal">${s.limit}dB</span></div>
+          <div class="tft-mod-ctrl"><label>Insert State</label><button id="mainMonoBtn" class="${!s.bypass ? 'active-action' : ''}" type="button">${s.bypass ? 'BYPASS' : 'ACTIVE'}</button></div>
+        </div>
+      </div>
+    `,
+    encoders: (s) => [{name:"INSERT", val:"FX RACK"}, {name:"SEND", val:`${s.send}dB`}, {name:"RETURN", val:"0dB"}, {name:"LIMITER", val:`${s.limit}dB`}, {name:"TAP", val:"POST"}, {name:"STATUS", val:s.bypass?"BYPASS":"ACTIVE"}]
+  },
+  routing: {
+    title: "SQ-7 ROUTING & PATCHBAY",
+    footerCh: "Current: I/O Patch",
+    footerSt: "Next: Direct Out & USB Audio Routing",
+    content: (s) => `
+      <div class="tft-module-view">
+        <div class="tft-info-panel" id="tftRoutingInfo">
+    <div class="tft-info-heading">INPUT / OUTPUT PATCHBAY</div>
+    <div class="tft-patch-grid"><div class="patch-head">SOURCE</div><div class="patch-head">MAIN L/R</div><div class="patch-head">BUS 1–2</div><div class="patch-head">USB 1–2</div>
+      <div class="patch-label">Input 1 · ${s.source===0?'Playlist':'Physical Mic'}</div><div class="patch-cell active">●</div><div class="patch-cell">○</div><div class="patch-cell ${s.usb?'active':''}">${s.usb?'●':'○'}</div>
+      <div class="patch-label">Input 2 · IP2</div><div class="patch-cell active">●</div><div class="patch-cell">○</div><div class="patch-cell ${s.usb?'active':''}">${s.usb?'●':'○'}</div>
+      <div class="patch-label">Input 3 · IP3</div><div class="patch-cell">○</div><div class="patch-cell active">●</div><div class="patch-cell">○</div>
+      <div class="patch-label">Input 4 · IP4</div><div class="patch-cell">○</div><div class="patch-cell active">●</div><div class="patch-cell">○</div>
+    </div>
+    <div class="tft-info-note">Patch indicators are a visual routing overview; use the selectors and USB switch below to change settings.</div>
+  </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>Input Source</label><select id="routeSourceSel"><option ${s.source===0?'selected':''}>Playlist Audio</option><option ${s.source===1?'selected':''}>Physical Mic</option></select></div>
+          <div class="tft-mod-ctrl"><label>Direct Out</label><select id="routeDoutSel"><option ${s.dout===0?'selected':''}>Post-Fader</option><option ${s.dout===1?'selected':''}>Pre-Fader</option></select></div>
+          <div class="tft-mod-ctrl"><label>USB Streaming</label><button id="routeUsbBtn" class="${s.usb ? 'active-action' : ''}" type="button">${s.usb ? 'ACTIVE' : 'OFF'}</button></div>
+        </div>
+      </div>
+    `,
+    encoders: (s) => [{name:"IN 1", val:"IP1"}, {name:"IN 2", val:"IP2"}, {name:"IN 3", val:"IP3"}, {name:"IN 4", val:"IP4"}, {name:"USB STREAM", val:s.usb?"CH 1-2":"OFF"}, {name:"OUT", val:"MAIN L/R"}]
+  },
+  meters: {
+    title: "SQ-7 RTA & METERS",
+    footerCh: "Current: RTA Analyzer",
+    footerSt: "Next: Peak Hold & Spectrum View",
+    content: (s) => `
+      <div class="tft-module-view">
+        <div class="tft-info-panel" id="tftMetersInfo">
+    <div class="tft-meter-overview">
+      <div class="tft-digital-meter"><label>LEFT</label><div class="meter-track" role="meter" aria-label="Left audio level" aria-valuemin="-60" aria-valuemax="0"><i style="height:0%"></i></div><strong>-∞ dB</strong></div>
+      <div class="tft-digital-meter"><label>RIGHT</label><div class="meter-track" role="meter" aria-label="Right audio level" aria-valuemin="-60" aria-valuemax="0"><i style="height:0%"></i></div><strong>-∞ dB</strong></div>
+      <div class="tft-spectrum" role="img" aria-label="Live audio frequency spectrum">${Array.from({length:24}, () => '<div style="height:2%"></div>').join('')}</div>
+    </div><div class="tft-info-note"><span id="tftMeterSignalStatus">WAITING FOR AUDIO</span> · Peak hold: ${s.hold===0?'3 seconds':'Infinite'} · Zoom: ${s.zoom}× · Source: ${s.source===0?'Post-EQ Main':'Pre-EQ Input'}</div>
+  </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>RTA Source</label><select id="meterSrcSel"><option ${s.source===0?'selected':''}>Post-EQ Main</option><option ${s.source===1?'selected':''}>Pre-EQ Input</option></select></div>
+          <div class="tft-mod-ctrl"><label>Peak Hold</label><select id="meterHoldSel"><option ${s.hold===0?'selected':''}>3.0 Seconds</option><option ${s.hold===1?'selected':''}>Infinite</option></select></div>
+          <div class="tft-mod-ctrl"><label>Zoom</label><input type="range" id="meterZoomInp" min="1" max="4" value="${s.zoom}"><span class="tft-val-disp" id="meterZoomVal">${s.zoom}x</span></div>
+        </div>
+      </div>
+    `,
+    encoders: (s) => [{name:"SOURCE", val:s.source===0?"POST-EQ":"PRE-EQ"}, {name:"DECAY", val:"Fast"}, {name:"HOLD", val:s.hold===0?"3.0s":"Inf"}, {name:"ZOOM", val:`${s.zoom}x`}, {name:"WEIGHT", val:"A-EQ"}, {name:"VIEW", val:"RTA"}]
+  },
+  scenes: {
+    title: "SQ-7 SCENE MANAGER",
+    footerCh: "Current: Scene #01",
+    footerSt: "Next: Store & Recall Memories",
+    content: (s) => `
+      <div class="tft-module-view">
+        <div class="tft-info-panel" id="tftScenesInfo">
+    <div class="tft-info-heading">SCENE MEMORY BANK</div>
+    <div class="tft-scene-list"><div class="tft-scene-row ${s.active===0?'selected':''}"><b>#01</b><span>Live Stage</span><small>${s.active===0?'ACTIVE':'SAVED'}</small></div><div class="tft-scene-row ${s.active===1?'selected':''}"><b>#02</b><span>Acoustic</span><small>${s.active===1?'ACTIVE':'SAVED'}</small></div><div class="tft-scene-row"><b>#03</b><span>Empty scene</span><small>EMPTY</small></div><div class="tft-scene-row"><b>#04</b><span>Empty scene</span><small>EMPTY</small></div></div>
+    <div class="tft-info-note">Choose a scene, then use Store and Recall Safe controls below.</div>
+  </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>Active Scene</label><select id="sceneActiveSel"><option value="0" ${s.active===0?'selected':''}>#01 Live Stage</option><option value="1" ${s.active===1?'selected':''}>#02 Acoustic</option><option value="2" ${s.active===2?'selected':''}>#03 Scene 3</option><option value="3" ${s.active===3?'selected':''}>#04 Scene 4</option></select></div>
+          <div class="tft-mod-ctrl"><label>Store Scene</label><button id="sceneStoreBtn" type="button">STORE</button></div>
+          <div class="tft-mod-ctrl"><label>Recall Scene</label><button id="sceneRecallBtn" type="button">RECALL</button></div>
+          <div class="tft-mod-ctrl"><label>Recall Safe</label><button id="sceneSafeBtn" class="${s.safe ? 'active-action' : ''}" type="button">${s.safe ? 'SAFE ON' : 'SAFE OFF'}</button></div>
+        </div>
+      </div>
+    `,
+    encoders: (s) => [{name:"SCENE", val:`#${String(s.active+1).padStart(2,"0")}`}, {name:"RECALL", val:s.safe?"SAFE":"DIR"}, {name:"STORE", val:s.stored?"SAVED":"READY"}, {name:"SNIPPET", val:"ALL"}, {name:"USB SAVE", val:"READY"}, {name:"AUTO", val:"ON"}]
+  },
+  setup: {
+    title: "SQ-7 SYSTEM SETUP & HARDWARE",
+    footerCh: "Current: Hardware Pref",
+    footerSt: "Next: Brightness & Audio Clock",
+    content: (s) => `
+      <div class="tft-module-view">
+        <div class="tft-info-panel" id="tftSetupInfo">
+    <div class="tft-info-heading">SYSTEM CONFIGURATION</div>
+    <div class="tft-info-cards">
+      <div class="tft-info-card"><small>SCREEN BRIGHTNESS</small><strong>${s.bright}%</strong><em>Display backlight</em></div>
+      <div class="tft-info-card"><small>AUDIO CLOCK</small><strong>48 kHz</strong><em>Internal sync</em></div>
+      <div class="tft-info-card"><small>BUFFER</small><strong>${s.buf===0?'512':'256'} samples</strong><em>Audio latency</em></div>
+      <div class="tft-info-card"><small>BLE LINK</small><strong>${s.ble?'CONNECTED':'OFFLINE'}</strong><em>Wireless control</em></div>
+    </div><div class="tft-info-note">Adjust system options using the controls below. Changes are reflected in the status readouts.</div>
+  </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>Brightness</label><input type="range" id="setupBrightInp" min="20" max="100" value="${s.bright}"><span class="tft-val-disp" id="setupBrightVal">${s.bright}%</span></div>
+          <div class="tft-mod-ctrl"><label>BLE Link</label><button id="setupBleBtn" class="${s.ble ? 'active-action' : ''}" type="button">${s.ble ? 'ACTIVE' : 'OFF'}</button></div>
+          <div class="tft-mod-ctrl"><label>Buffer Size</label><select id="setupBufSel"><option ${s.buf===0?'selected':''}>512 Samples</option><option ${s.buf===1?'selected':''}>256 Samples</option></select></div>
+        </div>
+      </div>
+    `,
+    encoders: (s) => [{name:"CLOCK", val:"INTERNAL"}, {name:"SAMPLE", val:"48kHz"}, {name:"BUFFER", val:s.buf===0?"512smpl":"256smpl"}, {name:"MIDI", val:"1"}, {name:"BLE LINK", val:s.ble?"ACTIVE":"OFF"}, {name:"BRIGHT", val:`${s.bright}%`}]
+  },
+  effects: {
+    title: "SQ-7 UTILITY & FX RACK",
+    footerCh: "Current: Alesis FX",
+    footerSt: "Next: Reverb & Delay Rack",
+    content: (s) => `
+      <div class="tft-module-view">
+        <div class="tft-info-panel" id="tftUtilityInfo">
+    <div class="tft-info-heading">UTILITY · FX RACK STATUS</div>
+    <div class="tft-info-cards">
+      <div class="tft-info-card"><small>FX 1</small><strong>REVERB</strong><em>Time ${s.delay.toFixed(2)} s</em></div>
+      <div class="tft-info-card"><small>FX 2</small><strong>DELAY</strong><em>350 ms</em></div>
+      <div class="tft-info-card"><small>FEEDBACK / MIX</small><strong>${Math.round(s.feedback*100)}%</strong><em>FX 1 feedback</em></div>
+      <div class="tft-info-card"><small>FX MASTER</small><strong>${s.active?'ACTIVE':'OFF'}</strong><em>Rack enable</em></div>
+    </div><div class="tft-info-note">Set delay time, feedback, and FX master state with the controls below.</div>
+  </div>
+        <div class="tft-module-controls-grid">
+          <div class="tft-mod-ctrl"><label>Delay Time</label><input type="range" id="fxDelayInp" min="0.05" max="1.0" step="0.05" value="${s.delay}"><span class="tft-val-disp" id="fxDelayVal">${s.delay.toFixed(2)}s</span></div>
+          <div class="tft-mod-ctrl"><label>Feedback</label><input type="range" id="fxFeedbackInp" min="0" max="0.9" step="0.05" value="${s.feedback}"><span class="tft-val-disp" id="fxFeedbackVal">${Math.round(s.feedback*100)}%</span></div>
+          <div class="tft-mod-ctrl"><label>FX Master</label><button id="fxStateBtn" class="${s.active ? 'active-action' : ''}" type="button">${s.active ? 'ACTIVE' : 'OFF'}</button></div>
+        </div>
+      </div>
+    `,
+    encoders: (s) => [{name:"FX 1", val:"REVERB"}, {name:"TIME 1", val:`${s.delay.toFixed(2)}s`}, {name:"FX 2", val:"DELAY"}, {name:"TIME 2", val:"350ms"}, {name:"MIX 1", val:`${Math.round(s.feedback*100)}%`}, {name:"MIX 2", val:"30%"}]
+  }
+};
+
+let tftPeqFreqVal = tftStatesData.eq.freq;
+let tftPeqQVal = tftStatesData.eq.q;
+let tftPeqGainVal = tftStatesData.eq.gain;
+
+function updateTftPeqVisuals() {
+  const curve = document.getElementById("tftPeqSvgCurve");
+  const fill = document.getElementById("tftPeqSvgFill");
+  if (!curve || !fill) return;
+
+  const minLog = Math.log10(20), maxLog = Math.log10(20000);
+  const freq = Math.max(20, Math.min(20000, Number(tftPeqFreqVal) || 20));
+  const q = Math.max(0.1, Math.min(10, Number(tftPeqQVal) || 0.7));
+  const gain = Math.max(-15, Math.min(15, Number(tftPeqGainVal) || 0));
+  const centerX = ((Math.log10(freq) - minLog) / (maxLog - minLog)) * 320;
+  const centerY = 60 - (gain / 15) * 45;
+  const bandwidthOctaves = (2 * Math.asinh(1 / (2 * q))) / Math.LN2;
+  const points = [];
+
+  for (let i = 0; i <= 160; i++) {
+    const x = 4 + (i / 160) * 312;
+    const hz = Math.pow(10, minLog + (i / 160) * (maxLog - minLog));
+    const octaves = Math.log2(hz / freq);
+    const response = gain * Math.exp(-4 * Math.LN2 * Math.pow(octaves / bandwidthOctaves, 2));
+    const y = Math.max(16, Math.min(104, 60 - (response / 15) * 45));
+    points.push([x, y]);
+  }
+
+  const pathStr = points.map((p, i) => (i ? "L" : "M") + p[0].toFixed(2) + " " + p[1].toFixed(2)).join(" ");
+  curve.setAttribute("d", pathStr);
+  fill.setAttribute("d", pathStr + " L316 60 L4 60 Z");
+
+  const dot2 = document.getElementById("tftPeqDot2");
+  if (dot2) {
+    dot2.setAttribute("cx", centerX.toFixed(2));
+    dot2.setAttribute("cy", centerY.toFixed(2));
+    dot2.setAttribute("aria-label", `PEQ center ${freq} Hz, ${gain.toFixed(1)} dB`);
+  }
+}
+
+function updateTftModuleCurve(key) {
+  // Only Gate and Compressor expose editable transfer curves.
+  // Other pages use purpose-built patch, meter, scene, setup, utility, or insert views.
+  if (key !== "gate" && key !== "dynamics" && key !== "sends") return;
+  const s = tftStatesData[key];
+  if (!s) return;
+  const prefix = key === "dynamics" ? "tftComp" : "tft" + key.charAt(0).toUpperCase() + key.slice(1);
+  const svg = document.getElementById(prefix + "SvgContainer");
+  const curve = document.getElementById(prefix + "SvgCurve");
+  const fill = document.getElementById(prefix + "SvgFill");
+  if (!svg || !curve) return;
+  let points = [];
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  if (key === "config") {
+    points = [[10,50],[160,clamp(58-(s.gain/60)*48,8,58)],[310,15]];
+  } else if (key === "gate") {
+    const x = clamp(15 + ((s.thresh+80)/80)*280,15,295);
+    const y = clamp(56 - (s.ratio-1)*(48/9),8,56);
+    // Keep the knee handle visibly separate from the threshold handle.
+    const kneeX = clamp(x + 30, x + 24, 300);
+    points = s.state
+      ? [[10,55],[x,55],[kneeX,y],[310,y]]
+      : [[10,55],[x,55],[kneeX,55],[310,55]];
+  } else if (key === "dynamics") {
+    const x = clamp(15 + ((s.thresh+60)/60)*270,15,285);
+    const y = clamp(56 - (s.ratio-1)*(48/19),8,56);
+    const endY = clamp(y - s.makeup*0.65,5,55);
+    points = [[10,55],[x,y],[190,y],[310,endY]];
+  } else if (key === "sends") {
+    const y = clamp(32 - s.lvl*(24/15),8,56);
+    points = s.preset === 1 ? [[10,48],[160,y],[310,18]]
+      : s.preset === 2 ? [[10,18],[160,y],[310,18]]
+      : [[10,32],[160,y],[310,32]];
+    if (!s.state) points = [[10,32],[160,32],[310,32]];
+  } else if (key === "main") {
+    const y1 = clamp(35 - ((s.send+50)/56)*25,8,58);
+    points = [[10,35],[clamp(90+((s.send+50)/56)*95,40,240),y1],[310,35]];
+    if (s.bypass) points = [[10,35],[160,35],[310,35]];
+  } else if (key === "routing") {
+    const y = s.usb ? clamp(48 - s.source*9 + s.dout*4,8,58) : 58;
+    points = [[10,48],[160,y],[310,s.usb?18:58]];
+  } else if (key === "meters") {
+    const y = clamp(50 - s.zoom*10 - s.hold*5,5,58);
+    points = [[10,55],[160,y],[310,clamp(y-8,5,58)]];
+  } else if (key === "scenes") {
+    const y = s.safe ? 22 : 48;
+    const x = clamp(70 + s.active*45,70,250);
+    points = [[10,48],[x,y],[310,s.safe?18:48]];
+  } else if (key === "setup") {
+    const y = clamp(58 - s.bright*0.55,8,58);
+    points = [[10,50],[160,y],[310,s.ble?18:52]];
+  } else if (key === "effects") {
+    const x = clamp(40 + s.delay*230,40,280);
+    const y = clamp(52 - s.feedback*75,5,52);
+    points = [[10,52],[x,y],[310,s.active?18:52]];
+  }
+  if (!points.length) return;
+  points = points.map(([x, y]) => [clamp(x, 5, 315), clamp(y, 5, 60)]);
+  // Catmull-Rom to cubic Bezier: smooth response curve that passes through each
+  // computed control point, so the curve and draggable handles stay in sync.
+  let d = "M" + points[0][0].toFixed(2) + " " + points[0][1].toFixed(2);
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i], p1 = points[i + 1];
+    const prev = points[i - 1] || p0, next = points[i + 2] || p1;
+    const c1x = p0[0] + (p1[0] - prev[0]) / 6;
+    const c1y = p0[1] + (p1[1] - prev[1]) / 6;
+    const c2x = p1[0] - (next[0] - p0[0]) / 6;
+    const c2y = p1[1] - (next[1] - p0[1]) / 6;
+    d += " C" + c1x.toFixed(2) + " " + c1y.toFixed(2) + " " +
+      c2x.toFixed(2) + " " + c2y.toFixed(2) + " " +
+      p1[0].toFixed(2) + " " + p1[1].toFixed(2);
+  }
+  curve.setAttribute("d", d);
+  if (fill) fill.setAttribute("d", d + " L315 63 L5 63 Z");
+
+  // Refresh every visible handle from the same calculated point list after
+  // either a slider change or a drag, preventing stale/misaligned dots.
+  if (key === "sends") {
+    const dot = document.getElementById("tftSendsDot1");
+    const levelY = clamp(32 - s.lvl * (24/15), 8, 56);
+    if (dot) { dot.setAttribute("cx", "160"); dot.setAttribute("cy", levelY.toFixed(1)); dot.setAttribute("aria-valuetext", s.lvl + " dB"); }
+  } else {
+    [1, 2, 3].forEach((n) => {
+      const dot = document.getElementById(prefix + "Dot" + n) ||
+        (n === 1 ? document.getElementById(prefix + "Dot") : null);
+      const point = points[n];
+      if (dot && point) {
+        dot.setAttribute("cx", point[0].toFixed(2));
+        dot.setAttribute("cy", point[1].toFixed(2));
+      }
+    });
+  }
+}
+
+function applyTftGraphPointToControl(key, pointIndex, x, y) {
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  const setRange = (id, value) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.value = String(value);
+    const inputEvent = new Event("input", { bubbles: true }); inputEvent.__fromCurveDrag = true; el.dispatchEvent(inputEvent);
+  };
+  if (key === "gate") {
+    if (pointIndex === 1) setRange("gateThresh", clamp((x-15)/280*80-80,-80,0));
+    else setRange("gateRatio", Math.round(clamp(1 + (56-y)*(9/48),1,10)*10)/10);
+  } else if (key === "dynamics") {
+    if (pointIndex === 1) setRange("compThresh", clamp((x-15)/270*60-60,-60,0));
+    else if (pointIndex === 2) setRange("compRatio", Math.round(clamp(1 + (56-y)*(19/48),1,20)*10)/10);
+    else setRange("compMakeup", Math.round(clamp((20-y)/0.65,0,24)*10)/10);
+  } else if (key === "sends" && pointIndex === 1) {
+    setRange("send1Lvl", Math.round(clamp((32-y)/(24/15),-15,15)*10)/10);
+  }
+}
+
+function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback) {
+  if (!svgContainer || !dotElement || dotElement.dataset.dragReady === "1") return;
+  dotElement.dataset.dragReady = "1";
+  dotElement.style.touchAction = "none";
+  dotElement.style.cursor = "grab";
+  dotElement.style.pointerEvents = "all";
+  dotElement.style.userSelect = "none";
+  if (dotElement.tagName.toLowerCase() === "circle") dotElement.setAttribute("r", "5.5");
+  dotElement.setAttribute("tabindex", "0");
+  dotElement.setAttribute("role", "slider");
+  let activePointerId = null;
+  let dragStart = null;
+  const getSvgPoint = (clientX, clientY) => {
+    const vb = svgContainer.viewBox && svgContainer.viewBox.baseVal;
+    const svgWidth = vb && vb.width ? vb.width : 320;
+    const svgHeight = vb && vb.height ? vb.height : 65;
+    let x, y;
+    try {
+      const matrix = svgContainer.getScreenCTM();
+      if (matrix && svgContainer.createSVGPoint) {
+        const point = svgContainer.createSVGPoint();
+        point.x = clientX; point.y = clientY;
+        const local = point.matrixTransform(matrix.inverse());
+        x = local.x; y = local.y;
+      }
+    } catch (_) {}
+    if (!Number.isFinite(x) || !Number.isFinite(y)) {
+      const rect = svgContainer.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      x = ((clientX - rect.left) / rect.width) * svgWidth;
+      y = ((clientY - rect.top) / rect.height) * svgHeight;
+    }
+    return { x, y, svgWidth, svgHeight };
+  };
+  const onPointerMove = (e) => {
+    if (activePointerId === null || e.pointerId !== activePointerId || !dragStart) return;
+    e.preventDefault();
+    const point = getSvgPoint(e.clientX, e.clientY);
+    if (!point) return;
+    // Keep the grabbed offset and dampen relative travel to avoid snapping.
+    const radius = Number(dotElement.getAttribute("r")) || 7;
+    const relX = Math.max(radius, Math.min(point.svgWidth - radius,
+      dragStart.dotX + (point.x - dragStart.pointerX) * 0.55));
+    const relY = Math.max(radius, Math.min(point.svgHeight - radius,
+      dragStart.dotY + (point.y - dragStart.pointerY) * 0.55));
+    dotElement.setAttribute("cx", relX.toFixed(2));
+    dotElement.setAttribute("cy", relY.toFixed(2));
+    if (typeof onUpdateCallback === "function") onUpdateCallback(relX, relY, point.svgWidth, point.svgHeight);
+  };
+
+  dotElement.addEventListener("pointerdown", (e) => {
+    if (e.button !== undefined && e.button !== 0) return;
+    e.preventDefault();
+    e.stopPropagation();
+    activePointerId = e.pointerId;
+    const point = getSvgPoint(e.clientX, e.clientY);
+    const cx = Number(dotElement.getAttribute("cx"));
+    const cy = Number(dotElement.getAttribute("cy"));
+    dragStart = point && Number.isFinite(cx) && Number.isFinite(cy)
+      ? { pointerX: point.x, pointerY: point.y, dotX: cx, dotY: cy } : null;
+    dotElement.style.cursor = "grabbing";
+    try { svgContainer.setPointerCapture(e.pointerId); } catch (_) {}
+  });
+  svgContainer.addEventListener("pointermove", onPointerMove, { passive: false });
+  const stopDrag = (e) => {
+    if (activePointerId === null || (e.pointerId !== undefined && e.pointerId !== activePointerId)) return;
+    const pointerId = activePointerId;
+    activePointerId = null;
+    dragStart = null;
+    dotElement.style.cursor = "grab";
+    try { if (svgContainer.hasPointerCapture(pointerId)) svgContainer.releasePointerCapture(pointerId); } catch (_) {}
+  };
+  svgContainer.addEventListener("pointerup", stopDrag);
+  svgContainer.addEventListener("pointercancel", stopDrag);
+  svgContainer.addEventListener("lostpointercapture", stopDrag);
+}
+
+function refreshTftInfoPanel(key) {
+  const data = tftDatabase[key];
+  const state = tftStatesData[key];
+  const currentPanel = document.querySelector("#tftContentArea .tft-info-panel");
+  if (!data || !state || !currentPanel || typeof data.content !== "function") return;
+  const template = document.createElement("template");
+  template.innerHTML = data.content(state);
+  const nextPanel = template.content.querySelector(".tft-info-panel");
+  if (nextPanel) currentPanel.replaceWith(nextPanel);
+}
+
+function bindTftDynamicEventListeners(key) {
+  const activeState = tftCurveActiveStates[key] !== false;
+  const graphPrefix = key === "dynamics" ? "tftComp" : "tft" + key.charAt(0).toUpperCase() + key.slice(1);
+  const svgBox = document.getElementById(graphPrefix + "SvgContainer") || document.getElementById("tftPeqSvgContainer");
+  if (svgBox) svgBox.style.opacity = activeState ? "1" : "0.3";
+
+  // Curve visibility is presentation-only: controls on the page must remain
+  // interactive even when the user switches the curve overlay off.
+  const s = tftStatesData[key];
+
+  const moduleRoot = document.getElementById("tftContentArea");
+  if (moduleRoot && !moduleRoot.dataset.curveSyncBound) {
+    moduleRoot.dataset.curveSyncBound = "1";
+    ["input", "change", "click"].forEach(type => {
+      moduleRoot.addEventListener(type, (event) => {
+        const keyNow = activeCurrentSectionKey;
+        if (keyNow === "eq") updateTftPeqVisuals();
+        else updateTftModuleCurve(keyNow);
+        // Synthetic range inputs from graph dragging must not replace the SVG mid-gesture.
+        if (!event.__fromCurveDrag) refreshTftInfoPanel(keyNow);
+        persistTftState();
+      });
+    });
+  }
+  updateTftModuleCurve(key);
+
+  if (key === "eq") {
+    const freqInput = document.getElementById("tftPeqFreq");
+    const qInput = document.getElementById("tftPeqQ");
+    const gainInput = document.getElementById("tftPeqGain");
+    const svgContainer = document.getElementById("tftPeqSvgContainer");
+
+    if (freqInput) freqInput.addEventListener("input", () => {
+      s.freq = tftPeqFreqVal = Number(freqInput.value);
+      document.getElementById("tftPeqFreqVal").textContent = tftPeqFreqVal >= 1000 ? (tftPeqFreqVal/1000).toFixed(2)+' kHz' : tftPeqFreqVal+' Hz';
+      updateEncoders(tftDatabase.eq.encoders(s));
+      updateTftPeqVisuals();
+      if (tftPeqFilter && audioContext) tftPeqFilter.frequency.setTargetAtTime(tftPeqFreqVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+    });
+    if (qInput) qInput.addEventListener("input", () => {
+      s.q = tftPeqQVal = Number(qInput.value);
+      document.getElementById("tftPeqQVal").textContent = tftPeqQVal.toFixed(1);
+      updateEncoders(tftDatabase.eq.encoders(s));
+      updateTftPeqVisuals();
+      if (tftPeqFilter && audioContext) tftPeqFilter.Q.setTargetAtTime(tftPeqQVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+    });
+    if (gainInput) gainInput.addEventListener("input", () => {
+      s.gain = tftPeqGainVal = Number(gainInput.value);
+      document.getElementById("tftPeqGainVal").textContent = tftPeqGainVal.toFixed(1) + " dB";
+      updateEncoders(tftDatabase.eq.encoders(s));
+      updateTftPeqVisuals();
+      if (tftPeqFilter && audioContext) tftPeqFilter.gain.setTargetAtTime(tftPeqGainVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+    });
+
+    const dot2 = document.getElementById("tftPeqDot2");
+    if (svgContainer && dot2) {
+      makeSpecificDotDraggable(svgContainer, dot2, (rx, ry) => {
+        const minLog = Math.log10(20), maxLog = Math.log10(20000);
+        s.freq = tftPeqFreqVal = Math.round(Math.pow(10, minLog + (rx / 320) * (maxLog - minLog)) / 10) * 10;
+        s.gain = tftPeqGainVal = Math.round(((60 - ry) / 45) * 15 * 2) / 2;
+        if (freqInput) freqInput.value = tftPeqFreqVal;
+        if (gainInput) gainInput.value = tftPeqGainVal;
+        document.getElementById("tftPeqFreqVal").textContent = tftPeqFreqVal >= 1000 ? (tftPeqFreqVal/1000).toFixed(2)+' kHz' : tftPeqFreqVal+' Hz';
+        document.getElementById("tftPeqGainVal").textContent = tftPeqGainVal.toFixed(1) + " dB";
+        updateEncoders(tftDatabase.eq.encoders(s));
+        updateTftPeqVisuals();
+        if (tftPeqFilter && audioContext) {
+          tftPeqFilter.frequency.setTargetAtTime(tftPeqFreqVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+          tftPeqFilter.gain.setTargetAtTime(tftPeqGainVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+        }
+      });
+    }
+    updateTftPeqVisuals();
+  } else {
+    if (key === "config") {
+      const gInp = document.getElementById("cfgGain");
+      const phBtn = document.getElementById("cfgPhantomBtn");
+      const phBtn2 = document.getElementById("cfgPhaseBtn");
+      gInp?.addEventListener("input", () => { s.gain = Number(gInp.value); document.getElementById("cfgGainVal").textContent = s.gain + "dB"; updateEncoders(tftDatabase.config.encoders(s)); });
+      phBtn?.addEventListener("click", () => { s.phantom = !s.phantom; phBtn.textContent = s.phantom ? "ON" : "OFF"; phBtn.classList.toggle("active-action", s.phantom); });
+      phBtn2?.addEventListener("click", () => { s.phase = !s.phase; phBtn2.textContent = s.phase ? "INVERT" : "NORMAL"; phBtn2.classList.toggle("active-action", s.phase); updateEncoders(tftDatabase.config.encoders(s)); });
+    } else if (key === "gate") {
+      const thInp = document.getElementById("gateThresh");
+      const ratInp = document.getElementById("gateRatio");
+      const stBtn = document.getElementById("gateStateBtn");
+      thInp?.addEventListener("input", () => { s.thresh = Number(thInp.value); document.getElementById("gateThreshVal").textContent = s.thresh + "dB"; updateEncoders(tftDatabase.gate.encoders(s)); });
+      ratInp?.addEventListener("input", () => { s.ratio = Number(ratInp.value); document.getElementById("gateRatioVal").textContent = "1:" + s.ratio; updateEncoders(tftDatabase.gate.encoders(s)); });
+      stBtn?.addEventListener("click", () => { s.state = !s.state; stBtn.textContent = s.state ? "ACTIVE" : "BYPASS"; stBtn.classList.toggle("active-action", s.state); });
+    } else if (key === "dynamics") {
+      const thInp = document.getElementById("compThresh");
+      const ratInp = document.getElementById("compRatio");
+      const mkInp = document.getElementById("compMakeup");
+      thInp?.addEventListener("input", () => { s.thresh = Number(thInp.value); document.getElementById("compThreshVal").textContent = s.thresh.toFixed(1) + "dB"; updateEncoders(tftDatabase.dynamics.encoders(s)); updateTftModuleCurve("dynamics"); });
+      ratInp?.addEventListener("input", () => { s.ratio = Number(ratInp.value); document.getElementById("compRatioVal").textContent = s.ratio.toFixed(1) + ":1"; updateEncoders(tftDatabase.dynamics.encoders(s)); updateTftModuleCurve("dynamics"); });
+      mkInp?.addEventListener("input", () => { s.makeup = Number(mkInp.value); document.getElementById("compMakeupVal").textContent = "+" + s.makeup.toFixed(1) + "dB"; updateEncoders(tftDatabase.dynamics.encoders(s)); updateTftModuleCurve("dynamics"); });
+    } else if (key === "sends") {
+      const lvlInp = document.getElementById("send1Lvl");
+      const presetSel = document.getElementById("geqPresetSel");
+      const stBtn = document.getElementById("geqStateBtn");
+      lvlInp?.addEventListener("input", () => { s.lvl = Number(lvlInp.value); document.getElementById("send1LvlVal").textContent = s.lvl + "dB"; updateEncoders(tftDatabase.sends.encoders(s)); });
+      presetSel?.addEventListener("change", () => { s.preset = presetSel.selectedIndex; updateEncoders(tftDatabase.sends.encoders(s)); updateTftModuleCurve("sends"); refreshTftInfoPanel("sends"); });
+      stBtn?.addEventListener("click", () => { s.state = !s.state; stBtn.textContent = s.state ? "ACTIVE" : "BYPASS"; stBtn.classList.toggle("active-action", s.state); updateEncoders(tftDatabase.sends.encoders(s)); });
+    } else if (key === "main") {
+      const sendInp = document.getElementById("mainFohLvl");
+      const limInp = document.getElementById("mainLimitLvl");
+      const byBtn = document.getElementById("mainMonoBtn");
+      sendInp?.addEventListener("input", () => { s.send = Number(sendInp.value); document.getElementById("mainFohLvlVal").textContent = s.send + "dB"; updateEncoders(tftDatabase.main.encoders(s)); });
+      limInp?.addEventListener("input", () => { s.limit = Number(limInp.value); document.getElementById("mainLimitLvlVal").textContent = s.limit + "dB"; updateEncoders(tftDatabase.main.encoders(s)); });
+      byBtn?.addEventListener("click", () => { s.bypass = !s.bypass; byBtn.textContent = s.bypass ? "BYPASS" : "ACTIVE"; byBtn.classList.toggle("active-action", !s.bypass); updateEncoders(tftDatabase.main.encoders(s)); });
+    } else if (key === "routing") {
+      const srcSel = document.getElementById("routeSourceSel");
+      const doutSel = document.getElementById("routeDoutSel");
+      const usbBtn = document.getElementById("routeUsbBtn");
+      srcSel?.addEventListener("change", () => { s.source = srcSel.selectedIndex; updateEncoders(tftDatabase.routing.encoders(s)); refreshTftInfoPanel("routing"); });
+      doutSel?.addEventListener("change", () => { s.dout = doutSel.selectedIndex; updateEncoders(tftDatabase.routing.encoders(s)); refreshTftInfoPanel("routing"); });
+      usbBtn?.addEventListener("click", () => { s.usb = !s.usb; usbBtn.textContent = s.usb ? "ACTIVE" : "OFF"; usbBtn.classList.toggle("active-action", s.usb); updateEncoders(tftDatabase.routing.encoders(s)); });
+    } else if (key === "meters") {
+      const srcSel = document.getElementById("meterSrcSel");
+      const holdSel = document.getElementById("meterHoldSel");
+      const zoomInp = document.getElementById("meterZoomInp");
+      srcSel?.addEventListener("change", () => { s.source = srcSel.selectedIndex; tftMeterPeakDb = [-72, -72]; tftMeterPeakAt = [0, 0]; updateEncoders(tftDatabase.meters.encoders(s)); updateTftMetersFromAudio(); persistTftState(); });
+      holdSel?.addEventListener("change", () => { s.hold = holdSel.selectedIndex; tftMeterPeakDb = [-72, -72]; tftMeterPeakAt = [0, 0]; updateEncoders(tftDatabase.meters.encoders(s)); persistTftState(); });
+      zoomInp?.addEventListener("input", () => { s.zoom = Number(zoomInp.value); const zoomLabel = document.getElementById("meterZoomVal"); if (zoomLabel) zoomLabel.textContent = s.zoom + "x"; updateEncoders(tftDatabase.meters.encoders(s)); updateTftMetersFromAudio(); persistTftState(); });
+    } else if (key === "scenes") {
+      const actSel = document.getElementById("sceneActiveSel");
+      const storeBtn = document.getElementById("sceneStoreBtn");
+      const recallBtn = document.getElementById("sceneRecallBtn");
+      const safeBtn = document.getElementById("sceneSafeBtn");
+      actSel?.addEventListener("change", () => { s.active = Number(actSel.value); s.stored = Boolean(tftSceneSnapshots[s.active]); updateEncoders(tftDatabase.scenes.encoders(s)); refreshTftInfoPanel("scenes"); });
+      storeBtn?.addEventListener("click", () => {
+        tftSceneSnapshots[s.active] = JSON.parse(JSON.stringify(tftStatesData));
+        try { localStorage.setItem('mixerOnlineTftScenes', JSON.stringify(tftSceneSnapshots)); } catch (err) { /* Storage may be disabled. */ }
+        s.stored = true;
+        storeBtn.textContent = "STORED";
+        persistTftState();
+        loadTftPage("scenes");
+      });
+      recallBtn?.addEventListener("click", () => {
+        const snapshot = tftSceneSnapshots[s.active];
+        if (!snapshot) {
+          recallBtn.textContent = "EMPTY";
+          return;
+        }
+        const protectedKeys = s.safe ? new Set(['routing', 'setup']) : new Set();
+        Object.keys(snapshot).forEach(sectionKey => {
+          if (sectionKey !== 'scenes' && !protectedKeys.has(sectionKey) && tftStatesData[sectionKey]) {
+            Object.assign(tftStatesData[sectionKey], snapshot[sectionKey]);
+          }
+        });
+        tftPeqFreqVal = tftStatesData.eq.freq;
+        tftPeqQVal = tftStatesData.eq.q;
+        tftPeqGainVal = tftStatesData.eq.gain;
+        if (tftPeqFilter && audioContext) {
+          tftPeqFilter.frequency.setTargetAtTime(tftPeqFreqVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+          tftPeqFilter.Q.setTargetAtTime(tftPeqQVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+          tftPeqFilter.gain.setTargetAtTime(tftPeqGainVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+        }
+        s.stored = true;
+        recallBtn.textContent = "RECALLED";
+        persistTftState();
+        loadTftPage("scenes");
+      });
+      safeBtn?.addEventListener("click", () => { s.safe = !s.safe; safeBtn.textContent = s.safe ? "SAFE ON" : "SAFE OFF"; safeBtn.classList.toggle("active-action", s.safe); updateEncoders(tftDatabase.scenes.encoders(s)); });
+    } else if (key === "setup") {
+      const brInp = document.getElementById("setupBrightInp");
+      const bleBtn = document.getElementById("setupBleBtn");
+      const bufSel = document.getElementById("setupBufSel");
+      brInp?.addEventListener("input", () => { s.bright = Number(brInp.value); document.getElementById("setupBrightVal").textContent = s.bright + "%"; updateEncoders(tftDatabase.setup.encoders(s)); });
+      bleBtn?.addEventListener("click", () => { s.ble = !s.ble; bleBtn.textContent = s.ble ? "ACTIVE" : "OFF"; bleBtn.classList.toggle("active-action", s.ble); updateEncoders(tftDatabase.setup.encoders(s)); });
+      bufSel?.addEventListener("change", () => { s.buf = bufSel.selectedIndex; updateEncoders(tftDatabase.setup.encoders(s)); });
+    } else if (key === "effects") {
+      const delInp = document.getElementById("fxDelayInp");
+      const fbkInp = document.getElementById("fxFeedbackInp");
+      const stBtn = document.getElementById("fxStateBtn");
+      delInp?.addEventListener("input", () => { s.delay = Number(delInp.value); document.getElementById("fxDelayVal").textContent = s.delay.toFixed(2) + "s"; updateEncoders(tftDatabase.effects.encoders(s)); });
+      fbkInp?.addEventListener("input", () => { s.feedback = Number(fbkInp.value); document.getElementById("fxFeedbackVal").textContent = Math.round(s.feedback * 100) + "%"; updateEncoders(tftDatabase.effects.encoders(s)); });
+      stBtn?.addEventListener("click", () => { s.active = !s.active; stBtn.textContent = s.active ? "ACTIVE" : "OFF"; stBtn.classList.toggle("active-action", s.active); });
+    }
+
+    const container = document.getElementById(key === "dynamics" ? "tftCompSvgContainer" : `tft${key.charAt(0).toUpperCase() + key.slice(1)}SvgContainer`);
+    const curve = document.getElementById(key === "dynamics" ? "tftCompSvgCurve" : `tft${key.charAt(0).toUpperCase() + key.slice(1)}SvgCurve`);
+    const dotPrefix = key === "dynamics" ? "tftComp" : `tft${key.charAt(0).toUpperCase() + key.slice(1)}`;
+    const dot1 = document.getElementById(`${dotPrefix}Dot1`) || document.getElementById(`${dotPrefix}Dot`);
+    const dot2 = document.getElementById(`${dotPrefix}Dot2`);
+    const dot3 = document.getElementById(`${dotPrefix}Dot3`);
+
+    if (container && dot1 && curve) {
+      makeSpecificDotDraggable(container, dot1, (x, y) => {
+        if (key === "sends") x = 160;
+        applyTftGraphPointToControl(key, 1, x, y);
+        s.dotX = s.dot1X = x; s.dotY = s.dot1Y = y;
+        updateTftModuleCurve(key);
+      });
+    }
+
+    if (container && dot2 && curve && key !== "sends") {
+      makeSpecificDotDraggable(container, dot2, (x, y) => {
+        applyTftGraphPointToControl(key, 2, x, y);
+        s.dot2X = x; s.dot2Y = y;
+        updateTftModuleCurve(key);
+      });
+    }
+
+    if (container && dot3 && curve) {
+      makeSpecificDotDraggable(container, dot3, (x, y) => {
+        applyTftGraphPointToControl(key, 3, x, y);
+        s.dot3X = x; s.dot3Y = y;
+        updateTftModuleCurve(key);
+      });
+    }
+  }
+}
+
+tftCurveToggleBtn.addEventListener("click", () => {
+  const currentState = tftCurveActiveStates[activeCurrentSectionKey] !== false;
+  tftCurveActiveStates[activeCurrentSectionKey] = !currentState;
+  tftCurveToggleBtn.textContent = tftCurveActiveStates[activeCurrentSectionKey] ? "CURVE: ON" : "CURVE: OFF";
+  tftCurveToggleBtn.classList.toggle("active", tftCurveActiveStates[activeCurrentSectionKey]);
+  const graphPrefix = "tft" + activeCurrentSectionKey.charAt(0).toUpperCase() + activeCurrentSectionKey.slice(1);
+  const graph = document.getElementById(graphPrefix + "SvgContainer") || document.getElementById("tftPeqSvgContainer");
+  if (graph) graph.style.opacity = tftCurveActiveStates[activeCurrentSectionKey] ? "1" : "0.3";
+});
+
+function loadTftPage(key) {
+  activeCurrentSectionKey = key;
+  const data = tftDatabase[key];
+  if (!data || !tftContentArea) return false;
+  const s = tftStatesData[key] || {};
+  try {
+    tftSectionTitle.textContent = data.title || "";
+    tftContentArea.innerHTML = typeof data.content === "function" ? data.content(s) : (data.content || "");
+    tftContentArea.dataset.pageKey = key;
+    if (tftFooterChannel) tftFooterChannel.textContent = data.footerCh || "";
+    if (tftFooterStatus) tftFooterStatus.textContent = data.footerSt || "";
+    try { updateEncoders(typeof data.encoders === "function" ? data.encoders(s) : data.encoders); } catch (_) {}
+
+    const isCurvePage = key === "eq" || key === "gate" || key === "dynamics" || key === "sends";
+    if (tftCurveToggleBtn) {
+      tftCurveToggleBtn.hidden = !isCurvePage;
+      tftCurveToggleBtn.setAttribute("aria-hidden", String(!isCurvePage));
+      const isActive = tftCurveActiveStates[key] !== false;
+      tftCurveToggleBtn.textContent = isActive ? "CURVE: ON" : "CURVE: OFF";
+      tftCurveToggleBtn.classList.toggle("active", isActive);
+    }
+
+    // Page content must remain visible even if an optional dynamic binding fails.
+    try { bindTftDynamicEventListeners(key); } catch (err) { console.warn("TFT page binding:", key, err); }
+    if (key === "eq") { try { updateTftPeqVisuals(); } catch (_) {} }
+    try { refreshChannelQuickPanels(); } catch (err) { console.warn("Quick panel refresh:", err); }
+    return true;
+  } catch (err) {
+    console.warn("TFT page render:", key, err);
+    return !!tftContentArea.innerHTML;
+  }
+}
+
+function switchActiveSection(key) {
+  consoleSectionBtns.forEach(b => b.classList.toggle("active", b.getAttribute("data-section") === key));
+  tftTabs.forEach(t => t.classList.toggle("active", t.getAttribute("data-tft-tab") === key));
+  loadTftPage(key);
+}
+
+consoleSectionBtns.forEach(btn => {
+  btn.addEventListener("click", () => switchActiveSection(btn.getAttribute("data-section")));
+});
+
+tftTabs.forEach(tab => {
+  tab.addEventListener("click", () => switchActiveSection(tab.getAttribute("data-tft-tab")));
+});
+
+/* Initial page activation is deferred until all channel quick-control definitions are initialized. */
+window.setTimeout(() => {
+  try { switchActiveSection("meters"); } catch (err) { console.warn("Mixer navigation init:", err); }
+}, 0);
+  
+/* Bind channel title quick-control panels. */
+(function bindChannelQuickPanels(){
+  const root = document.getElementById("tabMixerContent");
+  if (!root) return;
+  const titles = root.querySelectorAll(".channel-title-trigger");
+  const panels = root.querySelectorAll(".channel-quick-panel");
+  const closeAll = (except) => {
+    panels.forEach(p => {
+      if (p !== except) {
+        p.classList.remove("open");
+        p.setAttribute("aria-hidden","true");
+        const t = root.querySelector('[data-channel-title="'+p.dataset.channelPanel+'"]');
+        if (t) t.setAttribute("aria-expanded","false");
+      }
+    });
+  };
+  titles.forEach(title => {
+    const open = () => {
+      const panel = root.querySelector('[data-channel-panel="'+title.dataset.channelTitle+'"]');
+      if (!panel) return;
+      const wasOpen = panel.classList.contains("open");
+      closeAll(panel);
+      panel.classList.toggle("open", !wasOpen);
+      panel.setAttribute("aria-hidden", String(wasOpen));
+      title.setAttribute("aria-expanded", String(!wasOpen));
+    };
+    title.addEventListener("click", e => { e.stopPropagation(); open(); });
+    title.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); }
+    });
+  });
+  panels.forEach(panel => {
+    panel.addEventListener("click", e => e.stopPropagation());
+    panel.querySelectorAll('input[data-quick-param]').forEach(input => {
+      const output = input.parentElement.querySelector("output");
+      const knob = input.parentElement.querySelector("i");
+      const render = () => {
+        const v = Number(input.value);
+        let text = String(v);
+        if (input.dataset.quickParam === "gain" || input.dataset.quickParam === "thresh" || input.dataset.quickParam === "send") text = v.toFixed(1)+" dB";
+        if (input.dataset.quickParam === "hpf") text = v ? "80 Hz" : "OFF";
+        if (input.dataset.quickParam === "ratio") text = v.toFixed(1).replace(".0","")+":1";
+        if (input.dataset.quickParam === "freq") text = v >= 1000 ? (v/1000).toFixed(1).replace(".0","")+" kHz" : v+" Hz";
+        if (output) output.textContent = text;
+        if (knob) {
+          const min=Number(input.min), max=Number(input.max);
+          const pct=(v-min)/(max-min);
+          const deg=-55+pct*110;
+          knob.style.setProperty("--knob-angle",deg+"deg");
+          knob.style.setProperty("transform","rotate("+deg+"deg)");
+        }
+      };
+      input.addEventListener("input", () => {
+        render();
+        const strip = input.closest(".console-channel-strip");
+        const channelNo = Number(strip?.querySelector(".channel-title-trigger")?.dataset.channelTitle || 0);
+        const param = input.dataset.quickParam;
+        if (strip && channelNo) {
+          const stateKey = "mixerChannelQuickState";
+          let states = {};
+          try { states = JSON.parse(localStorage.getItem(stateKey) || "{}") || {}; } catch {}
+          states[channelNo] = states[channelNo] || {};
+          states[channelNo][param] = Number(input.value);
+          localStorage.setItem(stateKey, JSON.stringify(states));
+
+          if (param === "send") {
+            const fader = strip.querySelector('.fader-slot input[type="range"]');
+            if (fader) {
+              const next = Math.max(Number(fader.min), Math.min(Number(fader.max), Number(input.value)));
+              fader.value = next;
+              fader.dispatchEvent(new Event("input", {bubbles:true}));
+              fader.dispatchEvent(new Event("change", {bubbles:true}));
+            }
+          } else if (param === "hpf") {
+            const hpf = strip.querySelector("select");
+            if (hpf) {
+              hpf.value = Number(input.value) ? "80Hz" : "OFF";
+              hpf.dispatchEvent(new Event("change", {bubbles:true}));
+            }
+          }
+        }
+      });
+      render();
+
+      const strip = panel.closest(".console-channel-strip");
+      const channelNo = Number(strip?.querySelector(".channel-title-trigger")?.dataset.channelTitle || 0);
+      if (channelNo) {
+        try {
+          const states = JSON.parse(localStorage.getItem("mixerChannelQuickState") || "{}") || {};
+          const saved = states[channelNo] || {};
+          if (saved[input.dataset.quickParam] !== undefined) input.value = saved[input.dataset.quickParam];
+        } catch {}
+        render();
+      }
+    });
+  });
+  document.addEventListener("click", () => closeAll(null), {passive:true});
+})();
+
+
+/* PAGE-AWARE CHANNEL CURVE CONTROLS
+   The controls shown in each channel popup proxy the real controls below the curve,
+   so curve dragging and popup adjustment always use the same underlying state. */
+const channelCurveQuickSpecs = {
+  gate: {
+    label:"GATE",
+    controls:[
+      {label:"THRESHOLD", type:"fader", source:"gateThresh", format:v=>Number(v).toFixed(1)+" dB"},
+      {label:"RATIO", type:"knob", source:"gateRatio", format:v=>Number(v).toFixed(1).replace(".0","")+":1"},
+      {label:"GATE STATE", type:"button", source:"gateStateBtn"}
+    ]
+  },
+  dynamics: {
+    label:"COMP",
+    controls:[
+      {label:"THRESHOLD", type:"fader", source:"compThresh", format:v=>Number(v).toFixed(1)+" dB"},
+      {label:"RATIO", type:"knob", source:"compRatio", format:v=>Number(v).toFixed(1).replace(".0","")+":1"},
+      {label:"MAKEUP", type:"fader", source:"compMakeup", format:v=>"+"+Number(v).toFixed(1)+" dB"}
+    ]
+  },
+  eq: {
+    label:"PEQ",
+    controls:[
+      {label:"FREQ", type:"knob", source:"tftPeqFreq", format:v=>Number(v)>=1000?(Number(v)/1000).toFixed(2).replace(".00","")+" kHz":Number(v)+" Hz"},
+      {label:"Q", type:"knob", source:"tftPeqQ", format:v=>Number(v).toFixed(1)},
+      {label:"GAIN", type:"fader", source:"tftPeqGain", format:v=>Number(v).toFixed(1)+" dB"}
+    ]
+  },
+  sends: {
+    label:"GEQ",
+    controls:[
+      {label:"GEQ MASTER", type:"fader", source:"send1Lvl", format:v=>Number(v).toFixed(1)+" dB"},
+      {label:"PRESET", type:"knob-select", source:"geqPresetSel", format:v=>["FLAT","VOCAL","MUSIC"][Number(v)]||"FLAT"},
+      {label:"GEQ STATE", type:"button", source:"geqStateBtn"}
+    ]
+  }
+};
+
+function channelQuickFormatSource(spec, source) {
+  if (!source) return "";
+  if (spec.type === "button") return source.textContent.trim();
+  if (spec.type === "knob-select") return spec.format(source.selectedIndex);
+  return spec.format(source.value);
+}
+
+function syncChannelQuickControl(item, spec) {
+  const source=document.getElementById(spec.source);
+  if (!source) return;
+  const output=item.querySelector("output");
+  const input=item.querySelector('input[type="range"]');
+  const knob=item.querySelector("i");
+  if (spec.type === "button") {
+    const btn=item.querySelector("button");
+    if (btn) {
+      btn.textContent=source.textContent.trim();
+      btn.classList.toggle("active-action",source.classList.contains("active-action"));
+    }
+    if (output) output.textContent=source.textContent.trim();
+    return;
+  }
+  if (spec.type === "knob-select") {
+    if (input) input.value=String(source.selectedIndex);
+    if (knob) {
+      const pct=source.options.length>1 ? source.selectedIndex/(source.options.length-1) : 0;
+      const deg=-55+pct*110;
+      knob.style.transform="rotate("+deg+"deg)";
+    }
+    if (output) output.textContent=spec.format(source.selectedIndex);
+    return;
+  }
+  if (input) input.value=source.value;
+  if (output) output.textContent=channelQuickFormatSource(spec,source);
+  if (knob) {
+    const min=Number(source.min), max=Number(source.max), v=Number(source.value);
+    const pct=(v-min)/(max-min||1);
+    const deg=-55+pct*110;
+    knob.style.transform="rotate("+deg+"deg)";
+  }
+}
+
+function bindChannelQuickProxy(item, spec) {
+  const source=document.getElementById(spec.source);
+  if (!source) return;
+  const input=item.querySelector('input[type="range"]');
+  const proxyBtn=item.querySelector("button");
+  const sync=()=>syncChannelQuickControl(item,spec);
+  if (source.dataset.channelQuickProxyBound !== "1") {
+    source.dataset.channelQuickProxyBound="1";
+    source.addEventListener("input",()=>syncChannelQuickPanelsFromSources());
+    source.addEventListener("change",()=>syncChannelQuickPanelsFromSources());
+    source.addEventListener("click",()=>setTimeout(syncChannelQuickPanelsFromSources,0));
+  }
+  if (input && input.dataset.proxyBound !== "1") {
+    input.dataset.proxyBound="1";
+    input.addEventListener("input",()=>{
+      if (spec.type==="knob-select") {
+        source.selectedIndex=Number(input.value);
+        source.dispatchEvent(new Event("change",{bubbles:true}));
+      } else {
+        source.value=input.value;
+        source.dispatchEvent(new Event("input",{bubbles:true}));
+      }
+      sync();
+    });
+  }
+  if (proxyBtn && proxyBtn.dataset.proxyBound !== "1") {
+    proxyBtn.dataset.proxyBound="1";
+    proxyBtn.addEventListener("click",e=>{
+      e.preventDefault(); e.stopPropagation();
+      source.click();
+      sync();
+    });
+  }
+  sync();
+}
+
+function makeChannelQuickControl(spec) {
+  if (spec.type==="button") {
+    return '<div class="quick-button-wrap"><span>'+spec.label+'</span><button type="button" class="quick-curve-button" data-proxy-source="'+spec.source+'">OFF</button><output></output></div>';
+  }
+  const source=document.getElementById(spec.source);
+  if (!source) return "";
+  let min=source.min||0, max=source.max||1, step=source.step||1, value=source.value;
+  if (spec.type==="knob-select") {
+    min=0; max=Math.max(0,source.options.length-1); step=1; value=source.selectedIndex;
+  }
+  const cls=spec.type==="fader" ? "quick-fader" : "quick-knob";
+  return '<label class="'+cls+'"><span>'+spec.label+'</span><input type="range" min="'+min+'" max="'+max+'" step="'+step+'" value="'+value+'"><i></i><output></output></label>';
+}
+
+function refreshChannelQuickPanels() {
+  const root=document.getElementById("tabMixerContent");
+  if (!root) return;
+  const key=activeCurrentSectionKey;
+  const spec=channelCurveQuickSpecs[key];
+  root.querySelectorAll(".channel-quick-panel").forEach(panel=>{
+    const channelNo=panel.dataset.channelPanel;
+    const title=panel.querySelector(".quick-panel-title");
+    const grid=panel.querySelector("[data-dynamic-quick]");
+    if (!grid) return;
+    if (spec) {
+      if (title) { title.textContent="CHANNEL "+channelNo+" • "+spec.label; title.dataset.pageLabel=key; }
+      grid.innerHTML=spec.controls.map(makeChannelQuickControl).join("");
+      spec.controls.forEach((control,index)=>{
+        const item=grid.children[index];
+        if (item) bindChannelQuickProxy(item,control);
+      });
+    } else {
+      if (title) { title.textContent="CHANNEL "+channelNo+" • CHANNEL CONTROL"; title.dataset.pageLabel="generic"; }
+      grid.innerHTML='<label class="quick-fader"><span>LEVEL</span><input type="range" min="-40" max="10" step="0.5" value="0" data-generic-channel-level="1"><output>0.0 dB</output></label><label class="quick-knob"><span>HPF</span><input type="range" min="0" max="1" step="1" value="0" data-generic-hpf="1"><i></i><output>OFF</output></label>';
+      const strip=panel.closest(".console-channel-strip");
+      const fader=strip?.querySelector('.fader-slot input[type="range"]');
+      const hpf=strip?.querySelector("select");
+      const levelItem=grid.querySelector('[data-generic-channel-level]');
+      const hpfItem=grid.querySelector('[data-generic-hpf]');
+      if (levelItem && fader) {
+        levelItem.value=fader.value;
+        const out=levelItem.parentElement.querySelector("output"); if(out) out.textContent=Number(fader.value).toFixed(1)+" dB";
+        levelItem.addEventListener("input",()=>{ fader.value=levelItem.value; fader.dispatchEvent(new Event("input",{bubbles:true})); });
+        fader.addEventListener("input",()=>{ levelItem.value=fader.value; const out=levelItem.parentElement.querySelector("output"); if(out) out.textContent=Number(fader.value).toFixed(1)+" dB"; });
+      }
+      if (hpfItem && hpf) {
+        hpfItem.value=hpf.value==="80Hz" ? "1" : "0";
+        hpfItem.addEventListener("input",()=>{ hpf.value=Number(hpfItem.value)?"80Hz":"OFF"; hpf.dispatchEvent(new Event("change",{bubbles:true})); });
+      }
+    }
+  });
+}
+
+function syncChannelQuickPanelsFromSources() {
+  const spec=channelCurveQuickSpecs[activeCurrentSectionKey];
+  if (!spec) return;
+  document.querySelectorAll("#tabMixerContent .channel-quick-panel").forEach(panel=>{
+    const grid=panel.querySelector("[data-dynamic-quick]");
+    if (!grid) return;
+    spec.controls.forEach((control,index)=>{
+      const item=grid.children[index];
+      if (item) syncChannelQuickControl(item,control);
+    });
+  });
+}
+
+
+/* Reliable delegated opener for channel quick panels.
+   Capture phase prevents the global outside-click closer from immediately hiding the panel. */
+(function ensureChannelQuickPanelClick(){
+  const root = document.getElementById("tabMixerContent");
+  if (!root || root.dataset.quickPanelDelegated === "1") return;
+  root.dataset.quickPanelDelegated = "1";
+  root.addEventListener("click", function(e){
+    const title = e.target.closest(".channel-title-trigger");
+    if (!title || !root.contains(title)) return;
+    const panel = root.querySelector('[data-channel-panel="' + title.dataset.channelTitle + '"]');
+    if (!panel) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const wasOpen = panel.classList.contains("open");
+    root.querySelectorAll(".channel-quick-panel.open").forEach(p => {
+      p.classList.remove("open");
+      p.setAttribute("aria-hidden","true");
+    });
+    root.querySelectorAll(".channel-title-trigger[aria-expanded="true"]').forEach(t => t.setAttribute("aria-expanded","false"));
+    if (!wasOpen) {
+      panel.classList.add("open");
+      panel.setAttribute("aria-hidden","false");
+      title.setAttribute("aria-expanded","true");
+      refreshChannelQuickPanels();
+    }
+  }, true);
+})();
+
+</script>
+
+<script>
+/* Navigation/TFT recovery layer: survives a UI-layer runtime interruption. */
+(function mixerUiRecovery(){
   const boot = () => {
     const root = document.getElementById("tabMixerContent");
     if (!root) return;
-
-    const screen = root.querySelector("#tftContentArea");
-    const title = root.querySelector("#tftSectionTitle");
-    const tabs = Array.from(root.querySelectorAll(".mixer-side-nav .tft-tab[data-tft-tab]"));
-    const dsps = Array.from(root.querySelectorAll(".mixer-side-nav .console-btn[data-section]"));
-
-    const render = (key) => {
-      if (!key || !screen) return false;
-      const db = window.__mixerTftDatabase || (typeof tftDatabase !== "undefined" ? tftDatabase : null);
-      const states = window.__mixerTftStates || (typeof tftStatesData !== "undefined" ? tftStatesData : null);
-      const data = db && db[key];
-      const state = states && states[key];
-      if (!data || !state) return false;
-
+    const tabs = root.querySelectorAll(".mixer-side-nav .tft-tab[data-tft-tab]");
+    const dsps = root.querySelectorAll(".mixer-side-nav .console-btn[data-section]");
+    const activate = (key) => {
       try {
-        screen.innerHTML = typeof data.content === "function" ? data.content(state) : (data.content || "");
-        screen.dataset.pageKey = key;
-        if (title) title.textContent = data.title || "";
-        tabs.forEach(b => b.classList.toggle("active", b.dataset.tftTab === key));
-        dsps.forEach(b => b.classList.toggle("active", b.dataset.section === key));
-        try { if (typeof updateEncoders === "function") updateEncoders(typeof data.encoders === "function" ? data.encoders(state) : data.encoders); } catch (_) {}
-        try { if (typeof bindTftDynamicEventListeners === "function") bindTftDynamicEventListeners(key); } catch (_) {}
-        try { if (typeof refreshChannelQuickPanels === "function") refreshChannelQuickPanels(); } catch (_) {}
-        return !!screen.innerHTML.trim();
-      } catch (err) {
-        console.warn("Mixer TFT render failed:", key, err);
-        screen.innerHTML = '<div class="tft-module-view"><div class="tft-info-panel"><div class="tft-info-heading">MIXER SCREEN</div><div class="tft-info-note">Halaman siap. Silakan pilih PAGES atau CHANNEL DSP.</div></div></div>';
-        screen.dataset.pageKey = key;
-        return false;
-      }
+        if (typeof switchActiveSection === "function") { switchActiveSection(key); return; }
+      } catch (_) {}
+      try {
+        if (typeof loadTftPage === "function") loadTftPage(key);
+      } catch (_) {}
+      tabs.forEach(b => b.classList.toggle("active", b.dataset.tftTab === key));
+      dsps.forEach(b => b.classList.toggle("active", b.dataset.section === key));
     };
-
-    // Expose the live data references without changing the existing data model.
-    try { if (typeof tftDatabase !== "undefined") window.__mixerTftDatabase = tftDatabase; } catch (_) {}
-    try { if (typeof tftStatesData !== "undefined") window.__mixerTftStates = tftStatesData; } catch (_) {}
-
-    const activate = key => {
-      if (!render(key)) return;
-      try { if (typeof persistTftState === "function") persistTftState(); } catch (_) {}
-    };
-
-    root.addEventListener("click", event => {
-      const button = event.target instanceof Element
-        ? event.target.closest(".mixer-side-nav .tft-tab[data-tft-tab], .mixer-side-nav .console-btn[data-section]")
-        : null;
-      if (!button || !root.contains(button)) return;
-      event.preventDefault();
-      event.stopPropagation();
-      activate(button.dataset.tftTab || button.dataset.section);
-    }, true);
-
-    root.addEventListener("keydown", event => {
-      if (event.key !== "Enter" && event.key !== " ") return;
-      const button = event.target instanceof Element
-        ? event.target.closest(".mixer-side-nav .tft-tab[data-tft-tab], .mixer-side-nav .console-btn[data-section]")
-        : null;
+    root.addEventListener("click", (event) => {
+      const button = event.target instanceof Element ? event.target.closest(".mixer-side-nav .tft-tab[data-tft-tab], .mixer-side-nav .console-btn[data-section]") : null;
       if (!button) return;
       event.preventDefault();
+      event.stopImmediatePropagation();
       activate(button.dataset.tftTab || button.dataset.section);
     }, true);
-
-    const active = root.querySelector(".mixer-side-nav .tft-tab.active, .mixer-side-nav .console-btn.active");
-    const initialKey = active?.dataset.tftTab || active?.dataset.section || "meters";
-    activate(initialKey);
-
-    // Re-render once after layout settles so the TFT cannot remain blank after refresh.
-    window.setTimeout(() => {
-      const current = screen?.dataset.pageKey || initialKey;
-      if (screen && !screen.innerHTML.trim()) activate(current);
-    }, 80);
+    const screen = document.getElementById("tftContentArea");
+    if (screen && !screen.textContent.trim()) {
+      const active = root.querySelector(".mixer-side-nav .tft-tab.active, .mixer-side-nav .console-btn.active");
+      activate(active?.dataset.tftTab || active?.dataset.section || "meters");
+    }
   };
-
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, {once:true});
   else boot();
 })();
