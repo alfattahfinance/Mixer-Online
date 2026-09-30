@@ -5794,6 +5794,10 @@ async function updateChargerStatus() {
       if(status) status.textContent=charging ? "POWER: CHARGER TERHUBUNG" : "POWER: TIDAK SEDANG CHARGING";
       if(detail) detail.textContent="Baterai "+Math.round(battery.level*100)+"% · "+(charging?"sedang mengisi":"menggunakan daya baterai");
     };
+    if (battery.__mixerOnlineChargerPaintHandler) {
+      ["chargingchange","levelchange"].forEach(ev=>battery.removeEventListener(ev,battery.__mixerOnlineChargerPaintHandler));
+    }
+    battery.__mixerOnlineChargerPaintHandler=paint;
     ["chargingchange","levelchange"].forEach(ev=>battery.addEventListener(ev,paint));
     paint();
   } catch {
@@ -5884,6 +5888,7 @@ if (navigator.mediaDevices?.addEventListener) navigator.mediaDevices.addEventLis
     usbInputStream=null;
     setAudioStatus("USB audio dicabut — input dihentikan.");
   }
+  try { await refreshUsbInterfaceBar(); } catch {}
 });
 const usbAudioButton = document.getElementById("activateUsbAudioButton");
 usbAudioButton?.addEventListener("click", async (event) => {
@@ -5956,7 +5961,6 @@ async function refreshUsbInterfaceBar(){
   }
 }
 document.getElementById("usbInterfaceRefreshButton")?.addEventListener("click",refreshUsbInterfaceBar);
-navigator.mediaDevices?.addEventListener?.("devicechange",refreshUsbInterfaceBar);
 refreshUsbInterfaceBar();
 
 const echoDelay = document.getElementById("echoDelay");
