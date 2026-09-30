@@ -4488,11 +4488,10 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
       </div>
       <div class="audio-actions top-audio-controls" aria-label="Audio player and input source">
         <button id="mixerPowerButton" class="mixer-power-toggle powered-on" type="button" aria-pressed="true" title="Nyalakan atau matikan mixer"><span class="mixer-power-led" aria-hidden="true"></span><span class="mixer-power-label">POWER ON</span></button>
-        <button id="startMicButton" type="button">MIC</button>
         <div class="top-audio-route-group">
           <label for="physicalInputDevice">INPUT AUDIO</label>
           <select id="physicalInputDevice" aria-label="Pilih sumber input audio">
-            <option value="">INPUT DEFAULT HP</option>
+            <option value="">PILIH USB AUDIO INPUT</option>
           </select>
         </div>
         <div class="top-audio-route-group">
@@ -5497,10 +5496,13 @@ async function refreshPhysicalInputDevices() {
       const activeTrackId = microphoneStream?.getAudioTracks?.()[0]?.getSettings?.().deviceId || "";
       const preferredInputId = activeTrackId || usbAudioInputDeviceId || previous;
       physicalInputDevice.innerHTML = '<option value="">INPUT DEFAULT HP</option>';
-      inputs.forEach((device, index) => {
+      const usbVisibleInputs = inputs.filter(isLikelyUsbAudioDevice);
+      const activeVisibleInput = inputs.find(device => device.deviceId === usbAudioInputDeviceId);
+      const inputChoices = usbVisibleInputs.length ? usbVisibleInputs : (activeVisibleInput ? [activeVisibleInput] : []);
+      inputChoices.forEach((device, index) => {
         const option = document.createElement("option");
         option.value = device.deviceId;
-        option.textContent = device.label || ("Input " + (index + 1));
+        option.textContent = device.label || "USB-C AUDIO INPUT";
         physicalInputDevice.appendChild(option);
       });
       const preferredInput = inputs.find(device => device.deviceId === preferredInputId);
@@ -5652,14 +5654,13 @@ async function activateUsbAudioInput() {
     const probeTrack=probeStream.getAudioTracks()[0];
     const probeDeviceId=probeTrack?.getSettings?.().deviceId || "";
     const selectedInput =
-      inputs.find(d=>d.deviceId===probeDeviceId) ||
+      inputs.find(d=>d.deviceId===probeDeviceId && isLikelyUsbAudioDevice(d)) ||
       inputs.find(isLikelyUsbAudioDevice) ||
-      inputs.find(d=>d.deviceId===physicalInputDevice?.value) ||
-      inputs[0];
+      inputs.find(d=>d.deviceId===physicalInputDevice?.value && usbAudioInputDeviceId===d.deviceId);
 
     if (!selectedInput) {
       probeStream.getTracks().forEach(track=>track.stop());
-      setAudioStatus("Browser belum menyediakan AUDIO INPUT. Pastikan USB Audio interface terhubung dan izin mikrofon diberikan.");
+      setAudioStatus("USB AUDIO INPUT belum dikenali. Mic HP tidak digunakan. Pastikan USB Audio Interface terhubung melalui OTG.");
       return false;
     }
 
@@ -6262,39 +6263,6 @@ startAudioButton.addEventListener("click", async () => {
     await applyPhysicalOutputDevice();
     playCurrentBuffer();
   } catch (err) { setAudioStatus("Audio gagal dimulai."); }
-});
-
-startMicButton.addEventListener("click", async () => {
-  if (microphoneStream) {
-    microphoneSource?.disconnect();
-    microphoneSource = null;
-    microphoneStream.getTracks().forEach(track => track.stop());
-    microphoneStream = null;
-    startMicButton.classList.remove("active");
-    setAudioStatus("Mikrofon dimatikan.");
-    return;
-  }
-
-  try {
-    const ctx = createAudioContext();
-    if (ctx.state === "suspended") await ctx.resume();
-    initializeAudioGraph();
-    await applyPhysicalOutputDevice();
-    await refreshPhysicalInputDevices();
-    const selectedInputId = physicalInputDevice?.value || "";
-    // Avoid forcing an ultra-low capture latency on mobile devices; let the
-    // browser/driver choose a stable buffer size to reduce crackles and dropouts.
-    const usbInputId = usbAudioInputDeviceId || "";
-    const requestedInputId = selectedInputId || usbInputId;
-    const audioConstraints = requestedInputId
-      ? { deviceId: { exact: requestedInputId }, echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: { ideal: 2 } }
-      : { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: { ideal: 2 } };
-    microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
-    microphoneSource = audioContext.createMediaStreamSource(microphoneStream);
-    microphoneSource.connect(mixerStripGains[0]);
-    startMicButton.classList.add("active");
-    setAudioStatus(usbAudioInputDeviceId ? "USB-C / OTG AUDIO INPUT aktif." : "Mikrofon / Input Fisik aktif.");
-  } catch (err) { setAudioStatus("Gagal mengakses mikrofon atau USB interface."); }
 });
 
 stopAudioButton.addEventListener("click", () => {
