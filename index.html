@@ -8329,3 +8329,70 @@ function syncChannelQuickPanelsFromSources() {
 </body>
 </html>
 \n
+<style>
+
+/* FINAL LAYOUT FIX: PAGES + CHANNEL DSP MUST STAY INSIDE THEIR OWN NAV COLUMN */
+#tabMixerContent .mixer-workspace{
+  position:relative !important;
+  display:grid !important;
+  grid-template-columns:clamp(82px,9vw,104px) minmax(0,1fr) !important;
+  grid-template-rows:minmax(0,1fr) !important;
+  gap:5px !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+}
+#tabMixerContent .mixer-side-nav{
+  grid-column:1 !important;
+  grid-row:1 !important;
+  position:relative !important;
+  inset:auto !important;
+  z-index:2 !important;
+  width:auto !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  pointer-events:auto !important;
+  align-self:stretch !important;
+}
+#tabMixerContent .mixer-workspace-main{
+  grid-column:2 !important;
+  grid-row:1 !important;
+  position:relative !important;
+  z-index:1 !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+}
+#tabMixerContent .mixer-side-nav .tft-tab,
+#tabMixerContent .mixer-side-nav .console-btn{
+  position:relative !important;
+  z-index:1 !important;
+  flex:0 0 auto !important;
+  width:100% !important;
+  max-width:100% !important;
+  pointer-events:auto !important;
+}
+#tabMixerContent .mixer-side-nav .tft-tab::before,
+#tabMixerContent .mixer-side-nav .console-btn::before{
+  z-index:0 !important;
+  pointer-events:none !important;
+}
+#tabMixerContent .mixer-side-nav .tft-tab,
+#tabMixerContent .mixer-side-nav .console-btn{
+  isolation:isolate !important;
+}
+@media(max-width:600px){
+  #tabMixerContent .mixer-workspace{
+    grid-template-columns:82px minmax(0,1fr) !important;
+    gap:4px !important;
+  }
+}
+
+</style>
