@@ -5926,7 +5926,7 @@ function animateMixerFaders(poweringOn) {
       control,
       saved: clamp(saved, min, max),
       testTarget: clamp(5, min, max),
-      startupReturn: clamp(0, min, max)
+      startupReturn: Number(min)
     };
   });
 
@@ -5965,7 +5965,7 @@ function animateMixerFaders(poweringOn) {
     return;
   }
 
-  // ON: test dulu sampai +5 dB, lalu kembali perlahan dan berhenti tepat di 0 dB.
+  // ON: test dulu sampai +5 dB, lalu turun perlahan sampai posisi paling bawah (minimum).
   animateStage(entry => entry.testTarget, 1600, () => {
     if (token !== mixerFaderMotionToken || !mixerPowered) return;
     window.setTimeout(() => {
