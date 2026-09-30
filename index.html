@@ -52,18 +52,18 @@ header, .topbar {
 .top-audio-route-group{display:flex;flex-direction:column;gap:2px;min-width:145px}
 .top-audio-route-group label{font-size:8px;font-weight:800;letter-spacing:.45px;color:#cbd5e1;text-transform:uppercase}
 .top-audio-route-group select{width:100%;min-height:30px}
-.top-usbc-audio-button {
+.top-usb-audio-button {
   min-height: 26px !important; padding: 4px 9px !important; border: 1px solid #22c55e !important;
   border-radius: 5px !important; background: linear-gradient(180deg,#14532d,#166534) !important;
   color: #dcfce7 !important; font-size: 8px !important; font-weight: 900 !important;
   box-shadow: 0 0 8px rgba(34,197,94,.28), inset 0 1px 0 rgba(255,255,255,.12);
   white-space: nowrap; touch-action: manipulation;
 }
-.top-usbc-audio-button:hover, .top-usbc-audio-button:focus-visible {
+.top-usb-audio-button:hover, .top-usb-audio-button:focus-visible {
   background: linear-gradient(180deg,#16a34a,#15803d) !important; border-color:#86efac !important;
   color:#fff !important; box-shadow:0 0 12px rgba(34,197,94,.5);
 }
-.top-usbc-audio-button.usb-active {
+.top-usb-audio-button.usb-active {
   background: linear-gradient(180deg,#0284c7,#0369a1) !important; border-color:#7dd3fc !important;
   color:#fff !important; box-shadow:0 0 12px rgba(56,189,248,.55);
 }
@@ -317,7 +317,7 @@ header, .topbar {
 }
 .mixer-workspace-main .mixer-tft-screen { height:100%; min-height:0; max-height:none; flex:1 1 auto; }
 @media(max-width:600px) {
-  .top-usbc-audio-button { min-height: 28px !important; padding: 5px 8px !important; font-size: 7.5px !important; }
+  .top-usb-audio-button { min-height: 28px !important; padding: 5px 8px !important; font-size: 7.5px !important; }
 
   .mixer-workspace { grid-template-columns:82px minmax(0,1fr); }
   .mixer-side-nav { padding:3px; gap:3px; }
