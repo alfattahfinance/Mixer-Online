@@ -5261,7 +5261,7 @@ function updateMasterGain() {
 
 function updateOutputMute() {
   if (outputMuteGainNode && audioContext) {
-    outputMuteGainNode.gain.setTargetAtTime((outputMuted || !mixerPowered) ? 0 : 1, audioContext.currentTime, 0.02);
+    outputMuteGainNode.gain.setTargetAtTime((outputMuted || !mixerPowered || mixerPowerTransitionMuted) ? 0 : 1, audioContext.currentTime, 0.02);
   }
   muteOutputButton.textContent = outputMuted ? "UNMUTE OUTPUT" : "MUTE OUTPUT";
   muteOutputButton.classList.toggle("active", outputMuted);
@@ -5840,67 +5840,103 @@ outputMode.addEventListener("change", updateMasterGain);
 muteOutputButton.addEventListener("click", () => { outputMuted = !outputMuted; updateOutputMute(); });
 const mixerFaderPositions = new WeakMap();
 let mixerFaderMotionToken = 0;
+let mixerPowerTransitionToken = 0;
+let mixerPowerTransitionMuted = false;
+
+function getMixerPowerFaders() {
+  return Array.from(document.querySelectorAll(
+    '#tabMixerContent .mixer-desk-surface .console-channel-strip .fader-slot input[type="range"],' +
+    '#tabMixerContent .mixer-desk-surface .master-strip .fader-slot input[type="range"]'
+  ));
+}
+
 function animateMixerFaders(poweringOn) {
-  const controls = Array.from(document.querySelectorAll('#tabMixerContent .mixer-desk-surface input[type="range"]'));
+  const controls = getMixerPowerFaders();
   if (!controls.length) return;
   const token = ++mixerFaderMotionToken;
   const entries = controls.map(control => {
     const min = Number.isFinite(control.minAsNumber) ? control.minAsNumber : (Number(control.min) || 0);
-    const max = Number.isFinite(control.maxAsNumber) ? control.maxAsNumber : (Number(control.max) || 100);
     const current = Number(control.value);
     if (!mixerFaderPositions.has(control) && !poweringOn) mixerFaderPositions.set(control, current);
-    const target = poweringOn ? (mixerFaderPositions.has(control) ? mixerFaderPositions.get(control) : current) : min;
-    return {control, start:current, target, min, max};
+    const target = poweringOn
+      ? (mixerFaderPositions.has(control) ? mixerFaderPositions.get(control) : current)
+      : min;
+    return {control, start:current, target};
   });
   const startTime = performance.now();
-  const duration = poweringOn ? 1050 : 780;
+  const duration = poweringOn ? 1050 : 520;
   const tick = now => {
     if (token !== mixerFaderMotionToken) return;
     const t = Math.min(1, (now - startTime) / duration);
     const eased = t * t * (3 - 2 * t);
     entries.forEach(({control,start,target}) => {
-      const next = start + (target - start) * eased;
-      control.value = String(next);
-      control.dispatchEvent(new Event("input", {bubbles:true}));
+      control.value = String(start + (target - start) * eased);
+      const readout = control.closest(".console-channel-strip, .master-strip")?.querySelector(".fader-readout");
+      if (readout) readout.textContent = Number(control.value).toFixed(1) + " dB";
     });
     if (t < 1) requestAnimationFrame(tick);
+    else if (mixerPowered && audioContext) updateMixerStripControls();
   };
   requestAnimationFrame(tick);
 }
-function runMixerStartupTest() {
+
+function clearMixerPowerIndicators() {
+  document.body.classList.remove("mixer-startup-test");
+  document.querySelectorAll("#tabMixerContent .mixer-desk-surface .status-led, #tabMixerContent .mixer-desk-surface .vert-led-meter span, #tabMixerContent .mixer-desk-surface .master-led-meter span, #tabMixerContent .mixer-desk-surface .master-combined-meter span")
+    .forEach(led => led.classList.remove("on"));
+}
+
+function runMixerStartupTest(transitionToken) {
   document.body.classList.add("mixer-startup-test");
   document.querySelectorAll("#tabMixerContent .mixer-desk-surface .vert-led-meter, #tabMixerContent .mixer-desk-surface .master-led-meter, #tabMixerContent .mixer-desk-surface .master-combined-meter").forEach(meter => {
     meter.querySelectorAll("span").forEach(led => led.classList.add("on"));
   });
   document.querySelectorAll("#tabMixerContent .mixer-desk-surface .status-led").forEach(led => led.classList.add("on"));
-  setAudioStatus("Mixer ON — refresh sistem, fader bergerak naik...");
+  setAudioStatus("Mixer ON — power up, memulihkan fader...");
   window.setTimeout(() => {
-    document.body.classList.remove("mixer-startup-test");
-    document.querySelectorAll("#tabMixerContent .mixer-desk-surface .vert-led-meter span, #tabMixerContent .mixer-desk-surface .master-led-meter span, #tabMixerContent .mixer-desk-surface .master-combined-meter span, #tabMixerContent .mixer-desk-surface .status-led").forEach(led => led.classList.remove("on"));
+    if (transitionToken !== mixerPowerTransitionToken || !mixerPowered) return;
+    clearMixerPowerIndicators();
+    mixerPowerTransitionMuted = false;
+    updateOutputMute();
     updateAllSignalMeters();
     setAudioStatus("Mixer siap.");
   }, 1800);
 }
-mixerPowerButton?.addEventListener("click", () => {
-  mixerPowered = !mixerPowered;
+
+mixerPowerButton?.addEventListener("click", async () => {
+  const nextState = !mixerPowered;
+  const transitionToken = ++mixerPowerTransitionToken;
+  mixerPowered = nextState;
+  mixerPowerTransitionMuted = true;
+
   mixerPowerButton.classList.toggle("powered-on", mixerPowered);
   mixerPowerButton.setAttribute("aria-pressed", String(mixerPowered));
   const label = mixerPowerButton.querySelector(".mixer-power-label");
   if (label) label.textContent = mixerPowered ? "POWER ON" : "POWER OFF";
   document.body.classList.toggle("mixer-powered-off", !mixerPowered);
-  updateOutputMute();
+
   if (mixerPowered) {
     document.body.classList.remove("mixer-refreshing");
+    try {
+      createAudioContext();
+      if (audioContext?.state === "suspended") await audioContext.resume();
+      initializeAudioGraph();
+    } catch (_) {}
+    updateOutputMute();
     animateMixerFaders(true);
-    runMixerStartupTest();
+    runMixerStartupTest(transitionToken);
   } else {
     ++mixerFaderMotionToken;
     document.body.classList.remove("mixer-startup-test");
     document.body.classList.add("mixer-refreshing");
+    // Mute FIRST, then visually lower only the real mixer faders.
+    updateOutputMute();
     animateMixerFaders(false);
-    document.querySelectorAll("#tabMixerContent .mixer-desk-surface .status-led, #tabMixerContent .mixer-desk-surface .vert-led-meter span, #tabMixerContent .mixer-desk-surface .master-led-meter span, #tabMixerContent .mixer-desk-surface .master-combined-meter span").forEach(led => led.classList.remove("on"));
-    setAudioStatus("Mixer OFF — refresh / shutdown, fader turun dan output audio dimatikan.");
-    window.setTimeout(() => document.body.classList.remove("mixer-refreshing"), 900);
+    clearMixerPowerIndicators();
+    setAudioStatus("Mixer OFF — output dimatikan, fader turun, parameter tetap tersimpan.");
+    window.setTimeout(() => {
+      if (transitionToken === mixerPowerTransitionToken) document.body.classList.remove("mixer-refreshing");
+    }, 600);
   }
 });
 
