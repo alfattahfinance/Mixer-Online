@@ -5661,115 +5661,117 @@ async function activateUsbAudioInput() {
     if (ctx.state==="suspended") await ctx.resume();
     initializeAudioGraph();
 
-    setAudioStatus("Meminta izin audio USB...");
-    let probeStream=null;
-    try {
-      probeStream=await navigator.mediaDevices.getUserMedia({
-        audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2}}
-      });
-    } catch (err) {
-      setAudioStatus("Izin audio USB ditolak atau perangkat belum siap.");
-      return false;
-    }
-
+    // USB-ONLY: jangan pernah membuka getUserMedia() tanpa deviceId.
+    // Permintaan audio generik Android dapat memilih mic bawaan HP.
     const devices=await navigator.mediaDevices.enumerateDevices();
     const inputs=devices.filter(d=>d.kind==="audioinput");
     const outputs=devices.filter(d=>d.kind==="audiooutput");
     updateIoConnectionStatus(inputs,outputs);
 
-    // USB processing path: select the USB output when the browser exposes
-    // one, so the processed master bus goes back through the same audio interface.
-    const usbOutput = outputs.find(isLikelyUsbAudioDevice);
+    const usbOutput=outputs.find(isLikelyUsbAudioDevice);
     if (usbOutput && physicalOutputDevice) {
-      physicalOutputDevice.value = usbOutput.deviceId;
+      physicalOutputDevice.value=usbOutput.deviceId;
+      usbAudioOutputDeviceId=usbOutput.deviceId;
+      usbAudioOutputLabel=String(usbOutput.label||"").trim();
       try { await applyPhysicalOutputDevice(); } catch {}
     }
 
-    /* Android/Chrome may expose USB-routed capture as a normal audioinput
-       without a "USB" label. The opened stream's deviceId identifies the
-       input that the browser actually granted. */
-    const probeTrack=probeStream.getAudioTracks()[0];
-    const probeDeviceId=probeTrack?.getSettings?.().deviceId || "";
-    // Setelah tombol USB AUDIO ditekan, track yang benar-benar diberikan
-    // oleh browser menjadi sumber input yang dipakai. Android sering memberi
-    // nama generik tanpa kata "USB", jadi jangan bergantung pada label.
-    // The permission probe can be the phone microphone on Android.
-    // Never promote that generic probe device to the DSP input.
     const selectedInput =
       inputs.find(d=>usbAudioInputDeviceId && d.deviceId===usbAudioInputDeviceId) ||
       inputs.find(isLikelyUsbAudioDevice) ||
       null;
 
     if (!selectedInput) {
-      probeStream.getTracks().forEach(track=>track.stop());
-      setAudioStatus("USB AUDIO INPUT belum dikenali. Mic HP tidak digunakan. Pastikan USB Audio Interface terhubung dan izin audio diberikan.");
-      return false;
-    }
-
-    if (probeStream) probeStream.getTracks().forEach(track=>track.stop());
-    const isNamedUsb=isLikelyUsbAudioDevice(selectedInput);
-    if (!isNamedUsb) {
-      if (probeStream) probeStream.getTracks().forEach(track=>track.stop());
+      if (usbInputStream) {
+        usbInputSource?.disconnect();
+        usbInputStream.getTracks().forEach(track=>track.stop());
+        usbInputStream=null;
+        usbInputSource=null;
+      }
       usbAudioConnected=false;
       usbAudioInputDeviceId="";
       usbAudioInputLabel="";
-      setAudioStatus("USB AUDIO INPUT belum dikenali. Mic HP ditolak dan tidak digunakan sebagai fallback.");
+      usbInputConnectedMeterReset();
+      setAudioStatus("USB AUDIO INPUT belum dikenali. Mic HP TIDAK digunakan. Sambungkan USB Audio Interface lalu tekan USB AUDIO lagi.");
       return false;
     }
+
+    const selectedIsUsb=isLikelyUsbAudioDevice(selectedInput);
+    if (!selectedIsUsb) {
+      setAudioStatus("Input ditolak: bukan USB Audio Interface. Mic HP tidak digunakan.");
+      return false;
+    }
+
+    if (usbInputStream) {
+      usbInputSource?.disconnect();
+      usbInputStream.getTracks().forEach(track=>track.stop());
+      usbInputStream=null;
+      usbInputSource=null;
+    }
+
     usbAudioInputDeviceId=selectedInput.deviceId;
     usbAudioInputLabel=String(selectedInput.label||"").trim();
     usbAudioConnected=true;
-    const usbLabel=usbAudioInputLabel;
-    const isNamedUsb=isLikelyUsbAudioDevice(selectedInput);
-    setAudioStatus(
-      "USB AUDIO INPUT AKTIF: "+(usbLabel||"USB Audio Interface")+
-      (isNamedUsb ? "" : " (browser tidak menampilkan label USB)")
-    );
+
     if (physicalInputDevice) {
-      physicalInputDevice.value=selectedInput.deviceId;
-      if (physicalInputDevice.value!==selectedInput.deviceId) {
-        const opt=[...physicalInputDevice.options].find(o=>o.value===selectedInput.deviceId);
-        if (!opt) {
-          const option=document.createElement("option");
-          option.value=selectedInput.deviceId;
-          option.textContent=selectedInput.label || "USB Audio Input";
-          physicalInputDevice.appendChild(option);
-        }
-        physicalInputDevice.value=selectedInput.deviceId;
+      let opt=[...physicalInputDevice.options].find(o=>o.value===selectedInput.deviceId);
+      if (!opt) {
+        opt=document.createElement("option");
+        opt.value=selectedInput.deviceId;
+        opt.textContent=selectedInput.label || "USB AUDIO INPUT";
+        physicalInputDevice.appendChild(opt);
       }
+      physicalInputDevice.value=selectedInput.deviceId;
     }
 
-    const exact={deviceId:{exact:selectedInput.deviceId},echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2}};
+    setAudioStatus("Mengaktifkan USB AUDIO INPUT: "+(usbAudioInputLabel||"USB Audio Interface")+"...");
+    const exact={
+      deviceId:{exact:selectedInput.deviceId},
+      echoCancellation:false,
+      noiseSuppression:false,
+      autoGainControl:false,
+      channelCount:{ideal:2}
+    };
     usbInputStream=await navigator.mediaDevices.getUserMedia({audio:exact});
+
     const activeTrack=usbInputStream.getAudioTracks()[0];
-    const activeTrackId=activeTrack?.getSettings?.().deviceId || selectedInput.deviceId;
-    usbAudioInputDeviceId=activeTrackId || selectedInput.deviceId;
-    usbAudioInputLabel=String(selectedInput.label||"").trim();
-    if (physicalInputDevice) {
-      let activeOption=[...physicalInputDevice.options].find(o=>o.value===usbAudioInputDeviceId);
-      if (!activeOption) {
-        activeOption=document.createElement("option");
-        activeOption.value=usbAudioInputDeviceId;
-        activeOption.textContent=usbAudioInputLabel || "USB AUDIO INPUT (AKTIF)";
-        physicalInputDevice.appendChild(activeOption);
-      }
-      physicalInputDevice.value=usbAudioInputDeviceId;
+    const activeTrackId=activeTrack?.getSettings?.().deviceId || "";
+    if (activeTrackId && activeTrackId!==selectedInput.deviceId) {
+      usbInputStream.getTracks().forEach(track=>track.stop());
+      usbInputStream=null;
+      usbAudioConnected=false;
+      usbAudioInputDeviceId="";
+      usbAudioInputLabel="";
+      usbInputConnectedMeterReset();
+      setAudioStatus("USB AUDIO INPUT ditolak: browser mengembalikan sumber audio berbeda. Mic HP tidak digunakan.");
+      return false;
     }
+
+    usbAudioInputDeviceId=activeTrackId || selectedInput.deviceId;
     usbInputSource=audioContext.createMediaStreamSource(usbInputStream);
     if (!usbInputAnalyser) {
-      usbInputAnalyser = audioContext.createAnalyser();
-      usbInputAnalyser.fftSize = 1024;
-      usbInputAnalyser.smoothingTimeConstant = 0.08;
+      usbInputAnalyser=audioContext.createAnalyser();
+      usbInputAnalyser.fftSize=1024;
+      usbInputAnalyser.smoothingTimeConstant=.08;
     }
     usbInputSource.connect(usbInputAnalyser);
     usbInputSource.connect(mixerStripGains[0]);
     updateUsbInputLevelMeter();
-    const label=selectedInput.label || "USB Audio Interface";
-    const outputLabel = physicalOutputDevice?.selectedOptions?.[0]?.textContent || "Output default";
-    setAudioStatus("PROCESSING AKTIF: MIXER FISIK → USB IN → DSP → " + outputLabel + " → SOUND");
+
+    if (physicalInputDevice) physicalInputDevice.value=usbAudioInputDeviceId;
+    const outputLabel=physicalOutputDevice?.selectedOptions?.[0]?.textContent || "OUTPUT AUDIO";
+    setAudioStatus("PROCESSING AKTIF: MIXER FISIK → USB IN → DSP → "+outputLabel+" → SOUND");
     return true;
-  } catch (err) {
-    setAudioStatus("USB audio input gagal: "+(err?.message || "perangkat tidak tersedia."));
+  } catch(err) {
+    if (usbInputStream) {
+      usbInputSource?.disconnect();
+      usbInputStream.getTracks().forEach(track=>track.stop());
+      usbInputStream=null;
+      usbInputSource=null;
+    }
+    usbAudioConnected=false;
+    usbInputConnectedMeterReset();
+    setAudioStatus("USB AUDIO INPUT gagal: "+(err?.message || "perangkat tidak tersedia."));
     return false;
   }
 }
