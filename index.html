@@ -6651,29 +6651,34 @@ tftCurveToggleBtn.addEventListener("click", () => {
 function loadTftPage(key) {
   activeCurrentSectionKey = key;
   const data = tftDatabase[key];
-  if (!data) return;
-  tftSectionTitle.textContent = data.title;
-  const s = tftStatesData[key];
-  tftContentArea.innerHTML = typeof data.content === 'function' ? data.content(s) : data.content;
-  tftContentArea.dataset.pageKey = key;
-  // Footer Current/Next was intentionally removed from the mixer screen.
-  // Keep page navigation functional when those legacy elements are absent.
-  if (tftFooterChannel) tftFooterChannel.textContent = data.footerCh || "";
-  if (tftFooterStatus) tftFooterStatus.textContent = data.footerSt || "";
-  updateEncoders(typeof data.encoders === 'function' ? data.encoders(s) : data.encoders);
+  if (!data || !tftContentArea) return false;
+  const s = tftStatesData[key] || {};
+  try {
+    tftSectionTitle.textContent = data.title || "";
+    tftContentArea.innerHTML = typeof data.content === "function" ? data.content(s) : (data.content || "");
+    tftContentArea.dataset.pageKey = key;
+    if (tftFooterChannel) tftFooterChannel.textContent = data.footerCh || "";
+    if (tftFooterStatus) tftFooterStatus.textContent = data.footerSt || "";
+    try { updateEncoders(typeof data.encoders === "function" ? data.encoders(s) : data.encoders); } catch (_) {}
 
-  const isCurvePage = key === "eq" || key === "gate" || key === "dynamics" || key === "sends";
-  tftCurveToggleBtn.hidden = !isCurvePage;
-  tftCurveToggleBtn.setAttribute("aria-hidden", String(!isCurvePage));
-  const isActive = tftCurveActiveStates[key] !== false;
-  tftCurveToggleBtn.textContent = isActive ? "CURVE: ON" : "CURVE: OFF";
-  tftCurveToggleBtn.classList.toggle("active", isActive);
+    const isCurvePage = key === "eq" || key === "gate" || key === "dynamics" || key === "sends";
+    if (tftCurveToggleBtn) {
+      tftCurveToggleBtn.hidden = !isCurvePage;
+      tftCurveToggleBtn.setAttribute("aria-hidden", String(!isCurvePage));
+      const isActive = tftCurveActiveStates[key] !== false;
+      tftCurveToggleBtn.textContent = isActive ? "CURVE: ON" : "CURVE: OFF";
+      tftCurveToggleBtn.classList.toggle("active", isActive);
+    }
 
-  // Bind synchronously to the newly rendered page; delayed binding could attach
-  // listeners for an older page after rapid navigation.
-  bindTftDynamicEventListeners(key);
-  if (key === "eq") updateTftPeqVisuals();
-  refreshChannelQuickPanels();
+    // Page content must remain visible even if an optional dynamic binding fails.
+    try { bindTftDynamicEventListeners(key); } catch (err) { console.warn("TFT page binding:", key, err); }
+    if (key === "eq") { try { updateTftPeqVisuals(); } catch (_) {} }
+    try { refreshChannelQuickPanels(); } catch (err) { console.warn("Quick panel refresh:", err); }
+    return true;
+  } catch (err) {
+    console.warn("TFT page render:", key, err);
+    return !!tftContentArea.innerHTML;
+  }
 }
 
 function switchActiveSection(key) {
@@ -7030,7 +7035,7 @@ function syncChannelQuickPanelsFromSources() {
       const button = event.target instanceof Element ? event.target.closest(".mixer-side-nav .tft-tab[data-tft-tab], .mixer-side-nav .console-btn[data-section]") : null;
       if (!button) return;
       event.preventDefault();
-      event.stopPropagation();
+      event.stopImmediatePropagation();
       activate(button.dataset.tftTab || button.dataset.section);
     }, true);
     const screen = document.getElementById("tftContentArea");
