@@ -6221,6 +6221,8 @@ function updateTftPeqVisuals() {
     dot2.setAttribute("cy", centerY.toFixed(2));
     dot2.setAttribute("aria-label", `PEQ center ${freq} Hz, ${gain.toFixed(1)} dB`);
   }
+  // PEQ curve changes must immediately reach the channel popup.
+  try { syncChannelQuickPanelsFromSources(); } catch (_) {}
 }
 
 function updateTftModuleCurve(key) {
@@ -6315,6 +6317,8 @@ function updateTftModuleCurve(key) {
       }
     });
   }
+  // Curve is the visual representation of the same controls used by the channel popup.
+  try { syncChannelQuickPanelsFromSources(); } catch (_) {}
 }
 
 function applyTftGraphPointToControl(key, pointIndex, x, y) {
@@ -6491,6 +6495,7 @@ function bindTftDynamicEventListeners(key) {
         document.getElementById("tftPeqGainVal").textContent = tftPeqGainVal.toFixed(1) + " dB";
         updateEncoders(tftDatabase.eq.encoders(s));
         updateTftPeqVisuals();
+        try { syncChannelQuickPanelsFromSources(); } catch (_) {}
         if (tftPeqFilter && audioContext) {
           tftPeqFilter.frequency.setTargetAtTime(tftPeqFreqVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
           tftPeqFilter.gain.setTargetAtTime(tftPeqGainVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
@@ -6617,6 +6622,7 @@ function bindTftDynamicEventListeners(key) {
         applyTftGraphPointToControl(key, 1, x, y);
         s.dotX = s.dot1X = x; s.dotY = s.dot1Y = y;
         updateTftModuleCurve(key);
+        try { syncChannelQuickPanelsFromSources(); } catch (_) {}
       });
     }
 
@@ -6625,6 +6631,7 @@ function bindTftDynamicEventListeners(key) {
         applyTftGraphPointToControl(key, 2, x, y);
         s.dot2X = x; s.dot2Y = y;
         updateTftModuleCurve(key);
+        try { syncChannelQuickPanelsFromSources(); } catch (_) {}
       });
     }
 
@@ -6633,6 +6640,7 @@ function bindTftDynamicEventListeners(key) {
         applyTftGraphPointToControl(key, 3, x, y);
         s.dot3X = x; s.dot3Y = y;
         updateTftModuleCurve(key);
+        try { syncChannelQuickPanelsFromSources(); } catch (_) {}
       });
     }
   }
