@@ -6688,8 +6688,10 @@ tftTabs.forEach(tab => {
   tab.addEventListener("click", () => switchActiveSection(tab.getAttribute("data-tft-tab")));
 });
 
-switchActiveSection("meters");
-  refreshChannelQuickPanels();
+/* Initial page activation is deferred until all channel quick-control definitions are initialized. */
+window.setTimeout(() => {
+  try { switchActiveSection("meters"); } catch (err) { console.warn("Mixer navigation init:", err); }
+}, 0);
   
 /* Bind channel title quick-control panels. */
 (function bindChannelQuickPanels(){
