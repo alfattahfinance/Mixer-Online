@@ -4065,6 +4065,33 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
   overflow:hidden !important;
 }
 
+
+/* RECOVERY: keep mixer navigation and TFT controls above decorative layers. */
+#tabMixerContent .mixer-side-nav {
+  position:relative !important;
+  z-index:100 !important;
+  pointer-events:auto !important;
+}
+#tabMixerContent .mixer-side-nav .tft-tab,
+#tabMixerContent .mixer-side-nav .console-btn {
+  position:relative !important;
+  z-index:101 !important;
+  pointer-events:auto !important;
+  cursor:pointer !important;
+}
+#tabMixerContent .mixer-top-console,
+#tabMixerContent .mixer-tft-screen,
+#tabMixerContent .tft-main-viewport,
+#tabMixerContent .tft-content-screen,
+#tabMixerContent #tftContentArea {
+  pointer-events:auto !important;
+}
+#tabMixerContent #tftContentArea .tft-module-view {
+  display:flex !important;
+  visibility:visible !important;
+  opacity:1 !important;
+}
+
 </style>
 </head>
 
@@ -6975,6 +7002,42 @@ function syncChannelQuickPanelsFromSources() {
   }, true);
 })();
 
+</script>
+
+<script>
+/* Navigation/TFT recovery layer: survives a UI-layer runtime interruption. */
+(function mixerUiRecovery(){
+  const boot = () => {
+    const root = document.getElementById("tabMixerContent");
+    if (!root) return;
+    const tabs = root.querySelectorAll(".mixer-side-nav .tft-tab[data-tft-tab]");
+    const dsps = root.querySelectorAll(".mixer-side-nav .console-btn[data-section]");
+    const activate = (key) => {
+      try {
+        if (typeof switchActiveSection === "function") { switchActiveSection(key); return; }
+      } catch (_) {}
+      try {
+        if (typeof loadTftPage === "function") loadTftPage(key);
+      } catch (_) {}
+      tabs.forEach(b => b.classList.toggle("active", b.dataset.tftTab === key));
+      dsps.forEach(b => b.classList.toggle("active", b.dataset.section === key));
+    };
+    root.addEventListener("click", (event) => {
+      const button = event.target instanceof Element ? event.target.closest(".mixer-side-nav .tft-tab[data-tft-tab], .mixer-side-nav .console-btn[data-section]") : null;
+      if (!button) return;
+      event.preventDefault();
+      event.stopPropagation();
+      activate(button.dataset.tftTab || button.dataset.section);
+    }, true);
+    const screen = document.getElementById("tftContentArea");
+    if (screen && !screen.textContent.trim()) {
+      const active = root.querySelector(".mixer-side-nav .tft-tab.active, .mixer-side-nav .console-btn.active");
+      activate(active?.dataset.tftTab || active?.dataset.section || "meters");
+    }
+  };
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, {once:true});
+  else boot();
+})();
 </script>
 </body>
 </html>
