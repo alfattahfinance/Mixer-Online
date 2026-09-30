@@ -5653,14 +5653,18 @@ async function activateUsbAudioInput() {
        input that the browser actually granted. */
     const probeTrack=probeStream.getAudioTracks()[0];
     const probeDeviceId=probeTrack?.getSettings?.().deviceId || "";
+    // Setelah tombol USB AUDIO ditekan, track yang benar-benar diberikan
+    // oleh browser menjadi sumber input yang dipakai. Android sering memberi
+    // nama generik tanpa kata "USB", jadi jangan bergantung pada label.
     const selectedInput =
-      inputs.find(d=>d.deviceId===probeDeviceId && isLikelyUsbAudioDevice(d)) ||
+      inputs.find(d=>d.deviceId===probeDeviceId) ||
+      inputs.find(d=>d.deviceId===usbAudioInputDeviceId) ||
       inputs.find(isLikelyUsbAudioDevice) ||
-      inputs.find(d=>d.deviceId===physicalInputDevice?.value && usbAudioInputDeviceId===d.deviceId);
+      null;
 
     if (!selectedInput) {
       probeStream.getTracks().forEach(track=>track.stop());
-      setAudioStatus("USB AUDIO INPUT belum dikenali. Mic HP tidak digunakan. Pastikan USB Audio Interface terhubung melalui OTG.");
+      setAudioStatus("USB AUDIO INPUT belum dikenali. Mic HP tidak digunakan. Pastikan USB Audio Interface terhubung dan izin audio diberikan.");
       return false;
     }
 
@@ -5671,9 +5675,8 @@ async function activateUsbAudioInput() {
     const usbLabel=usbAudioInputLabel;
     const isNamedUsb=isLikelyUsbAudioDevice(selectedInput);
     setAudioStatus(
-      isNamedUsb
-        ? "USB AUDIO INPUT AKTIF: "+(usbLabel||"USB Audio")
-        : "AUDIO INPUT AKTIF: "+(usbLabel||"Input browser")+" (Android tidak memberi label USB)"
+      "USB AUDIO INPUT AKTIF: "+(usbLabel||"USB Audio Interface")+
+      (isNamedUsb ? "" : " (browser tidak menampilkan label USB)")
     );
     if (physicalInputDevice) {
       physicalInputDevice.value=selectedInput.deviceId;
