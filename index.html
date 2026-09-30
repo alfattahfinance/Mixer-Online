@@ -5548,7 +5548,7 @@ async function refreshPhysicalInputDevices() {
       } else if (usbAudioConnected && preferredInputId) {
         // Android kadang tidak mengembalikan deviceId aktif pada enumerateDevices()
         // setelah USB berubah. Pertahankan pilihan aktif agar UI tidak jatuh
-        // kembali ke INPUT DEFAULT HP.
+        // Pertahankan pilihan USB AUDIO INPUT yang sedang aktif.
         const activeOption = document.createElement("option");
         activeOption.value = preferredInputId;
         activeOption.textContent = usbAudioInputLabel || "USB AUDIO INPUT (AKTIF)";
@@ -5854,7 +5854,6 @@ if (physicalInputDevice) physicalInputDevice.addEventListener("change", async ()
     if (!usbInputAnalyser) { usbInputAnalyser=audioContext.createAnalyser(); usbInputAnalyser.fftSize=1024; usbInputAnalyser.smoothingTimeConstant=.08; }
     microphoneSource.connect(usbInputAnalyser);
     microphoneSource.connect(mixerStripGains[0]);
-    startMicButton?.classList.add("active");
     setAudioStatus("INPUT AKTIF: "+(physicalInputDevice.selectedOptions?.[0]?.textContent || "Audio input"));
     updateUsbInputLevelMeter();
   } catch(err) {
@@ -5879,7 +5878,6 @@ document.getElementById("activateUsbAudioButton")?.addEventListener("click", asy
     microphoneSource=null;
     microphoneStream.getTracks().forEach(track=>track.stop());
     microphoneStream=null;
-    startMicButton?.classList.remove("active");
     setAudioStatus("USB AUDIO INPUT dimatikan.");
     return;
   }
