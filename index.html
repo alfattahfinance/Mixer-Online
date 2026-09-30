@@ -3593,6 +3593,51 @@ input[type="range"] { accent-color:#b8bec6 !important; }
 }
 .mixer-desk-surface .master-status-leds { margin-bottom:2px; }
 
+
+/* Uniform neon color coding for left navigation groups: blue Pages, pink Channel DSP. */
+#tabMixerContent .mixer-workspace .mixer-side-nav .tft-tab[data-tft-tab] {
+  color:#dbeafe !important;
+  background:linear-gradient(180deg,#1269c7 0%,#084b9b 100%) !important;
+  border:1px solid #39a8ff !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 0 7px rgba(0,132,255,.75),0 0 16px rgba(0,132,255,.42) !important;
+  text-shadow:0 0 5px rgba(80,180,255,.65) !important;
+  position:relative !important; isolation:isolate !important;
+}
+#tabMixerContent .mixer-workspace .mixer-side-nav .tft-tab[data-tft-tab]::before {
+  content:"" !important; position:absolute !important; z-index:-1 !important;
+  inset:2px -3px !important; border-radius:inherit !important;
+  background:#078bff !important; filter:blur(10px) !important;
+  opacity:.38 !important; pointer-events:none !important;
+}
+#tabMixerContent .mixer-workspace .mixer-side-nav .console-btn[data-section] {
+  color:#fce7f3 !important;
+  background:linear-gradient(180deg,#c21882 0%,#86105d 100%) !important;
+  border:1px solid #ff55c5 !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 0 7px rgba(255,0,170,.75),0 0 16px rgba(255,0,170,.42) !important;
+  text-shadow:0 0 5px rgba(255,125,215,.65) !important;
+  position:relative !important; isolation:isolate !important;
+}
+#tabMixerContent .mixer-workspace .mixer-side-nav .console-btn[data-section]::before {
+  content:"" !important; position:absolute !important; z-index:-1 !important;
+  inset:2px -3px !important; border-radius:inherit !important;
+  background:#ff16b7 !important; filter:blur(10px) !important;
+  opacity:.38 !important; pointer-events:none !important;
+}
+#tabMixerContent .mixer-workspace .mixer-side-nav .tft-tab[data-tft-tab].active {
+  background:linear-gradient(180deg,#238bfa 0%,#0960c7 100%) !important;
+  border-color:#8bd0ff !important; color:#fff !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 0 10px rgba(0,145,255,.95),0 0 20px rgba(0,145,255,.62) !important;
+}
+#tabMixerContent .mixer-workspace .mixer-side-nav .console-btn[data-section].active {
+  background:linear-gradient(180deg,#f02bb1 0%,#b50b7c 100%) !important;
+  border-color:#ffb0e5 !important; color:#fff !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 0 10px rgba(255,0,180,.95),0 0 20px rgba(255,0,180,.62) !important;
+}
+#tabMixerContent .mixer-workspace .mixer-side-nav .tft-tab[data-tft-tab]:hover,
+#tabMixerContent .mixer-workspace .mixer-side-nav .console-btn[data-section]:hover {
+  filter:brightness(1.16) saturate(1.08) !important;
+}
+
 </style>
 </head>
 
