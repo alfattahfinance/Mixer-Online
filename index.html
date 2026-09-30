@@ -6629,7 +6629,7 @@ switchActiveSection("meters");
   });
   panels.forEach(panel => {
     panel.addEventListener("click", e => e.stopPropagation());
-    panel.querySelectorAll('input[type="range"]').forEach(input => {
+    panel.querySelectorAll('input[data-quick-param]').forEach(input => {
       const output = input.parentElement.querySelector("output");
       const knob = input.parentElement.querySelector("i");
       const render = () => {
