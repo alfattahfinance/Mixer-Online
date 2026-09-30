@@ -5580,25 +5580,25 @@ async function activateUsbAudioInput() {
         : "AUDIO INPUT AKTIF: "+(usbLabel||"Input browser")+" (Android tidak memberi label USB)"
     );
     if (physicalInputDevice) {
-      physicalInputDevice.value=usbInput.deviceId;
-      if (physicalInputDevice.value!==usbInput.deviceId) {
-        const opt=[...physicalInputDevice.options].find(o=>o.value===usbInput.deviceId);
+      physicalInputDevice.value=selectedInput.deviceId;
+      if (physicalInputDevice.value!==selectedInput.deviceId) {
+        const opt=[...physicalInputDevice.options].find(o=>o.value===selectedInput.deviceId);
         if (!opt) {
           const option=document.createElement("option");
-          option.value=usbInput.deviceId;
-          option.textContent=usbInput.label || "USB-C Audio Input";
+          option.value=selectedInput.deviceId;
+          option.textContent=selectedInput.label || "USB-C Audio Input";
           physicalInputDevice.appendChild(option);
         }
-        physicalInputDevice.value=usbInput.deviceId;
+        physicalInputDevice.value=selectedInput.deviceId;
       }
     }
 
-    const exact={deviceId:{exact:usbInput.deviceId},echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2}};
+    const exact={deviceId:{exact:selectedInput.deviceId},echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2}};
     microphoneStream=await navigator.mediaDevices.getUserMedia({audio:exact});
     microphoneSource=audioContext.createMediaStreamSource(microphoneStream);
     microphoneSource.connect(mixerStripGains[0]);
     startMicButton?.classList.add("active");
-    const label=usbInput.label || "USB-C Audio Interface";
+    const label=selectedInput.label || "USB-C Audio Interface";
     setAudioStatus("USB-C AUDIO INPUT AKTIF: "+label);
     return true;
   } catch (err) {
