@@ -359,6 +359,10 @@ header, .topbar {
 .tft-mod-ctrl button { width: 100%; background: #0284c7; color: #fff; border: none; padding: 2px; font-size: 7px; font-weight: 800; border-radius: 2px; }
 .tft-mod-ctrl button.active-action { background: #10b981; }
 .tft-val-disp { font-size: 7px; color: #f59e0b; font-family: monospace; font-weight: bold; display: block; }
+.quick-geq-link { grid-column: 1 / -1; }
+.quick-geq-link .quick-curve-button { background:linear-gradient(180deg,#a855f7,#7e22ce); border:1px solid rgba(216,180,254,.5); }
+.quick-geq-link .quick-curve-button:hover { filter:brightness(1.12); }
+.quick-geq-link output { color:#d8b4fe; }
 
 .tft-curve-toggle { background: #334155; color: #cbd5e1; border: 1px solid #475569; padding: 1px 6px; font-size: 7px; font-weight: 800; border-radius: 3px; cursor: pointer; }
 .tft-curve-toggle.active { background: #10b981; color: #022c22; border-color: #34d399; }
@@ -7049,6 +7053,7 @@ function bindTftDynamicEventListeners(key) {
             : event.key === "Home" ? 15 : -15;
           s.bands[index] = Math.max(-15, Math.min(15, next));
           updateTftModuleCurve("sends");
+          try { syncChannelQuickPanelsFromSources(); } catch (_) {}
           persistTftState();
         });
       });
@@ -7251,7 +7256,8 @@ const channelCurveQuickSpecs = {
     controls:[
       {label:"GEQ MASTER", type:"fader", source:"send1Lvl", format:v=>Number(v).toFixed(1)+" dB"},
       {label:"PRESET", type:"knob-select", source:"geqPresetSel", format:v=>["FLAT","VOCAL","MUSIC"][Number(v)]||"FLAT"},
-      {label:"GEQ STATE", type:"button", source:"geqStateBtn"}
+      {label:"GEQ STATE", type:"button", source:"geqStateBtn"},
+      {label:"OPEN 31-BAND GEQ", type:"geq-link", source:"geqPresetSel"}
     ]
   }
 };
@@ -7299,6 +7305,20 @@ function syncChannelQuickControl(item, spec) {
 }
 
 function bindChannelQuickProxy(item, spec) {
+  if (spec.type==="geq-link") {
+    const button=item.querySelector("[data-geq-link]");
+    if (button && button.dataset.proxyBound !== "1") {
+      button.dataset.proxyBound="1";
+      button.addEventListener("click", e => {
+        e.preventDefault();
+        e.stopPropagation();
+        switchActiveSection("sends");
+        const geqPage=document.querySelector('#tftContentArea[data-page-key="sends"]');
+        if (geqPage) geqPage.scrollIntoView({block:"nearest",inline:"nearest"});
+      });
+    }
+    return;
+  }
   const source=document.getElementById(spec.source);
   if (!source) return;
   const input=item.querySelector('input[type="range"]');
@@ -7335,6 +7355,9 @@ function bindChannelQuickProxy(item, spec) {
 }
 
 function makeChannelQuickControl(spec) {
+  if (spec.type==="geq-link") {
+    return '<div class="quick-button-wrap quick-geq-link"><span>'+spec.label+'</span><button type="button" class="quick-curve-button" data-geq-link="1">EDIT GEQ</button><output>31 BANDS</output></div>';
+  }
   if (spec.type==="button") {
     return '<div class="quick-button-wrap"><span>'+spec.label+'</span><button type="button" class="quick-curve-button" data-proxy-source="'+spec.source+'">OFF</button><output></output></div>';
   }
@@ -7397,6 +7420,14 @@ function syncChannelQuickPanelsFromSources() {
       const item=grid.children[index];
       if (item) syncChannelQuickControl(item,control);
     });
+    if (activeCurrentSectionKey === "sends") {
+      const bands = tftStatesData.sends?.bands;
+      const summary = panel.querySelector(".quick-geq-link output");
+      if (summary && Array.isArray(bands)) {
+        const activeBands = bands.filter(v => Math.abs(Number(v)) > 0.05).length;
+        summary.textContent = activeBands + " / 31 BANDS";
+      }
+    }
   });
 }
 
