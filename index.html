@@ -3711,15 +3711,53 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface * {
 body.mixer-powered-off #tabMixerContent .mixer-desk-surface {
   pointer-events:none !important;
 }
+/* Slow sequential power-up animation: indicators wake up one-by-one instead of
+   appearing at full brightness immediately. */
 body.mixer-startup-test #tabMixerContent .mixer-desk-surface .vert-led-meter span,
 body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-led-meter span,
 body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-combined-meter span {
-  opacity:1 !important;
-  filter:brightness(1.35) !important;
-  box-shadow:0 0 5px currentColor,0 0 10px currentColor !important;
+  opacity:0 !important;
+  animation:mixerLedPowerUp 2.8s ease-out forwards !important;
+  filter:brightness(1.15) !important;
+  box-shadow:none !important;
 }
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .vert-led-meter span:nth-child(1),
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-led-meter span:nth-child(1),
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-combined-meter span:nth-child(1) { animation-delay:.08s !important; }
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .vert-led-meter span:nth-child(2),
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-led-meter span:nth-child(2),
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-combined-meter span:nth-child(2) { animation-delay:.18s !important; }
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .vert-led-meter span:nth-child(3),
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-led-meter span:nth-child(3),
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-combined-meter span:nth-child(3) { animation-delay:.28s !important; }
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .vert-led-meter span:nth-child(4),
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-led-meter span:nth-child(4),
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-combined-meter span:nth-child(4) { animation-delay:.38s !important; }
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .vert-led-meter span:nth-child(5),
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-led-meter span:nth-child(5),
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-combined-meter span:nth-child(5) { animation-delay:.48s !important; }
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .vert-led-meter span:nth-child(6),
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-led-meter span:nth-child(6),
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-combined-meter span:nth-child(6) { animation-delay:.58s !important; }
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .vert-led-meter span:nth-child(7),
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-led-meter span:nth-child(7),
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-combined-meter span:nth-child(7) { animation-delay:.68s !important; }
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .vert-led-meter span:nth-child(8),
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-led-meter span:nth-child(8),
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-combined-meter span:nth-child(8) { animation-delay:.78s !important; }
 body.mixer-startup-test #tabMixerContent .mixer-desk-surface .status-led {
-  opacity:1 !important;
+  opacity:0 !important;
+  animation:mixerStatusPowerUp 1.2s ease-out forwards !important;
+}
+@keyframes mixerLedPowerUp {
+  0% { opacity:0; filter:brightness(.55); box-shadow:none; }
+  45% { opacity:.42; filter:brightness(.85); box-shadow:0 0 2px currentColor; }
+  100% { opacity:1; filter:brightness(1.15); box-shadow:0 0 4px currentColor,0 0 7px currentColor; }
+}
+@keyframes mixerStatusPowerUp {
+  0% { opacity:0; filter:brightness(.5); }
+  55% { opacity:.5; filter:brightness(.9); }
+  100% { opacity:1; filter:brightness(1.1); }
 }
 
 
@@ -5888,11 +5926,10 @@ function clearMixerPowerIndicators() {
 
 function runMixerStartupTest(transitionToken) {
   document.body.classList.add("mixer-startup-test");
-  document.querySelectorAll("#tabMixerContent .mixer-desk-surface .vert-led-meter, #tabMixerContent .mixer-desk-surface .master-led-meter, #tabMixerContent .mixer-desk-surface .master-combined-meter").forEach(meter => {
-    meter.querySelectorAll("span").forEach(led => led.classList.add("on"));
-  });
-  document.querySelectorAll("#tabMixerContent .mixer-desk-surface .status-led").forEach(led => led.classList.add("on"));
-  setAudioStatus("Mixer ON — power up, memulihkan fader...");
+  // Do not force every LED ON. CSS performs a slow sequential power-up animation.
+  document.querySelectorAll("#tabMixerContent .mixer-desk-surface .status-led, #tabMixerContent .mixer-desk-surface .vert-led-meter span, #tabMixerContent .mixer-desk-surface .master-led-meter span, #tabMixerContent .mixer-desk-surface .master-combined-meter span")
+    .forEach(led => led.classList.remove("on"));
+  setAudioStatus("Mixer ON — power up bertahap, indikator dan fader bergerak perlahan...");
   window.setTimeout(() => {
     if (transitionToken !== mixerPowerTransitionToken || !mixerPowered) return;
     clearMixerPowerIndicators();
@@ -5900,7 +5937,7 @@ function runMixerStartupTest(transitionToken) {
     updateOutputMute();
     updateAllSignalMeters();
     setAudioStatus("Mixer siap.");
-  }, 1800);
+  }, 3000);
 }
 
 mixerPowerButton?.addEventListener("click", async () => {
