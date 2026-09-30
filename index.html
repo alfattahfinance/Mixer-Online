@@ -9416,4 +9416,152 @@ function syncChannelQuickPanelsFromSources() {
   opacity:1;
   box-shadow:0 0 7px rgba(250,204,21,.35) !important;
 }
+
+/* =========================================================
+   FINAL MIXER CONSOLE LAYOUT — 4 CHANNEL + MASTER
+   Landscape/tablet: keep TFT on top, four fader strips below,
+   and Main LR master on the right across the full height.
+   This intentionally starts below 1200px because Android
+   landscape browsers can report a narrower CSS viewport.
+========================================================= */
+@media (min-width: 900px) {
+  #tabMixerContent .mixer-workspace {
+    grid-template-columns: 104px minmax(0,1fr) !important;
+    grid-template-rows: minmax(0,1fr) !important;
+    gap: 5px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  #tabMixerContent .mixer-side-nav {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+
+  #tabMixerContent .mixer-workspace-main {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0,1fr)) !important;
+    grid-template-rows: minmax(250px, 42vh) minmax(220px, 1fr) !important;
+    column-gap: 5px !important;
+    row-gap: 5px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  #tabMixerContent .mixer-top-console {
+    grid-column: 1 / span 4 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  #tabMixerContent .mixer-desk-surface {
+    display: contents !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  #tabMixerContent .mixer-desk-surface > .console-channel-strip {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  #tabMixerContent .mixer-desk-surface > .console-channel-strip:nth-child(1) {
+    grid-column: 1 !important; grid-row: 2 !important;
+  }
+  #tabMixerContent .mixer-desk-surface > .console-channel-strip:nth-child(2) {
+    grid-column: 2 !important; grid-row: 2 !important;
+  }
+  #tabMixerContent .mixer-desk-surface > .console-channel-strip:nth-child(3) {
+    grid-column: 3 !important; grid-row: 2 !important;
+  }
+  #tabMixerContent .mixer-desk-surface > .console-channel-strip:nth-child(4) {
+    grid-column: 4 !important; grid-row: 2 !important;
+  }
+  #tabMixerContent .mixer-desk-surface > .console-channel-strip.master-strip {
+    grid-column: 5 !important;
+    grid-row: 1 / span 2 !important;
+  }
+
+  /* Keep each input strip internally balanced. */
+  #tabMixerContent .mixer-desk-surface .console-channel-strip:not(.master-strip) {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+  }
+  #tabMixerContent .mixer-desk-surface .console-channel-strip:not(.master-strip) .fader-panel-area {
+    flex: 1 1 auto !important;
+    min-height: 130px !important;
+  }
+  #tabMixerContent .mixer-desk-surface .console-channel-strip:not(.master-strip) .fader-slot {
+    min-width: 32px !important;
+    max-width: 58px !important;
+  }
+
+  /* Main LR stays a true master strip, not a fifth tiny channel. */
+  #tabMixerContent .mixer-desk-surface .master-strip {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .fader-panel-area {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack {
+    flex: 0 0 105px !important;
+    width: 76px !important;
+    height: 105px !important;
+    min-height: 105px !important;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row {
+    flex: 1 1 0 !important;
+    width: 76px !important;
+    height: auto !important;
+    min-height: 145px !important;
+    max-height: none !important;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot {
+    min-width: 26px !important;
+    max-width: 46px !important;
+  }
+  #tabMixerContent .mixer-desk-surface .master-strip .strip-action-buttons {
+    flex: 0 0 auto !important;
+    margin-top: 5px !important;
+  }
+}
+
+/* Landscape phones / narrow tablets: use the same console composition
+   once there is enough horizontal room for the five strips. */
+@media (min-width: 900px) and (max-height: 650px) {
+  #tabMixerContent .mixer-workspace-main {
+    grid-template-rows: minmax(205px, 45vh) minmax(180px, 1fr) !important;
+  }
+  #tabMixerContent .mixer-side-nav .tft-tab,
+  #tabMixerContent .mixer-side-nav .console-btn {
+    min-height: 23px !important;
+  }
+  #tabMixerContent .mixer-desk-surface .console-channel-strip {
+    padding: 3px !important;
+  }
+  #tabMixerContent .mixer-desk-surface .strip-label-box {
+    min-height: 23px !important;
+    font-size: 8px !important;
+  }
+}
+
 </style>
