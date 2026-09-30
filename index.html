@@ -68,6 +68,26 @@ header, .topbar {
   color:#fff !important; box-shadow:0 0 12px rgba(56,189,248,.55);
 }
 .top-audio-status { min-width: 0; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #94a3b8; font-size: 7px; }
+.usb-interface-bar{
+  display:grid;grid-template-columns:auto repeat(3,minmax(120px,1fr)) auto;gap:6px;align-items:center;
+  flex:0 0 auto;padding:5px 7px;border:1px solid #334155;border-radius:7px;
+  background:linear-gradient(180deg,rgba(15,23,42,.96),rgba(17,24,39,.94));
+  box-shadow:0 2px 8px rgba(0,0,0,.35);
+}
+.usb-interface-title{font-size:9px;font-weight:900;letter-spacing:.6px;color:#7dd3fc;white-space:nowrap}
+.usb-interface-cell{min-width:0;padding:4px 7px;border:1px solid #334155;border-radius:5px;background:rgba(2,6,23,.55)}
+.usb-interface-cell label{display:block;font-size:7px;font-weight:800;color:#94a3b8;letter-spacing:.4px}
+.usb-interface-value{display:block;margin-top:2px;font-size:8px;font-weight:900;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.usb-interface-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px;background:#475569;vertical-align:middle}
+.usb-interface-dot.active{background:#22c55e;box-shadow:0 0 7px rgba(34,197,94,.7)}
+.usb-interface-dot.warn{background:#f59e0b;box-shadow:0 0 7px rgba(245,158,11,.5)}
+.usb-interface-refresh{min-height:28px;padding:4px 9px;border:1px solid #38bdf8;border-radius:5px;background:#082f49;color:#bae6fd;font-size:8px;font-weight:900}
+.usb-interface-refresh:active{transform:translateY(1px)}
+@media(max-width:700px){
+  .usb-interface-bar{grid-template-columns:1fr 1fr;gap:4px}
+  .usb-interface-title{grid-column:1/-1}
+  .usb-interface-refresh{width:100%}
+}
 
 .mode-menu-wrap { position: relative; flex: 0 0 auto; }
 .mode-menu-trigger {
@@ -4513,6 +4533,24 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
       </div>
     </nav>
 
+    <!-- USB AUDIO INTERFACE BAR: DIAGNOSTIK TERPISAH DARI MIXER -->
+    <section class="usb-interface-bar" id="usbInterfaceBar" aria-label="USB Audio Interface">
+      <div class="usb-interface-title">🔌 USB AUDIO INTERFACE</div>
+      <div class="usb-interface-cell">
+        <label>CONNECTION</label>
+        <span class="usb-interface-value"><i class="usb-interface-dot" id="usbBarConnectionDot"></i><span id="usbBarConnection">MENUNGGU</span></span>
+      </div>
+      <div class="usb-interface-cell">
+        <label>INPUT</label>
+        <span class="usb-interface-value"><i class="usb-interface-dot" id="usbBarInputDot"></i><span id="usbBarInput">BELUM TERDETEKSI</span></span>
+      </div>
+      <div class="usb-interface-cell">
+        <label>OUTPUT</label>
+        <span class="usb-interface-value"><i class="usb-interface-dot" id="usbBarOutputDot"></i><span id="usbBarOutput">BELUM TERDETEKSI</span></span>
+      </div>
+      <button id="usbInterfaceRefreshButton" class="usb-interface-refresh" type="button">REFRESH INTERFACE</button>
+    </section>
+
     <!-- KONTEN TAB 1: EQUALIZER -->
     <div class="tab-content" id="tabEqContent">
       <section class="rack">
@@ -5857,6 +5895,43 @@ document.getElementById("refreshIoDevicesButton")?.addEventListener("click", asy
 });
 refreshPhysicalInputDevices();
 updateChargerStatus();
+
+async function refreshUsbInterfaceBar(){
+  const connection=document.getElementById("usbBarConnection");
+  const input=document.getElementById("usbBarInput");
+  const output=document.getElementById("usbBarOutput");
+  const cdot=document.getElementById("usbBarConnectionDot");
+  const idot=document.getElementById("usbBarInputDot");
+  const odot=document.getElementById("usbBarOutputDot");
+  if(!navigator.mediaDevices?.enumerateDevices){
+    if(connection) connection.textContent="BROWSER TIDAK MENDUKUNG";
+    return;
+  }
+  try{
+    const devices=await navigator.mediaDevices.enumerateDevices();
+    const inputs=devices.filter(d=>d.kind==="audioinput");
+    const outputs=devices.filter(d=>d.kind==="audiooutput");
+    const usbInputs=inputs.filter(isLikelyUsbAudioDevice);
+    const usbOutputs=outputs.filter(isLikelyUsbAudioDevice);
+    const activeTrackId=microphoneStream?.getAudioTracks?.()[0]?.getSettings?.().deviceId || "";
+    const activeInput=inputs.find(d=>d.deviceId===activeTrackId);
+    const hasInput=Boolean(usbInputs.length||activeInput&&usbAudioConnected);
+    const hasOutput=Boolean(usbOutputs.length||usbAudioOutputDeviceId&&outputs.some(d=>d.deviceId===usbAudioOutputDeviceId));
+    const hasConnection=Boolean(hasInput||hasOutput||usbAudioConnected);
+    if(cdot) cdot.classList.toggle("active",hasConnection);
+    if(idot) idot.classList.toggle("active",hasInput);
+    if(odot) odot.classList.toggle("active",hasOutput);
+    if(connection) connection.textContent=hasConnection?"TERDETEKSI":"TIDAK TERDETEKSI";
+    if(input) input.textContent=hasInput?(activeInput?.label||usbInputs[0]?.label||"AUDIO INPUT AKTIF"):"BELUM TERDETEKSI";
+    if(output) output.textContent=hasOutput?(usbOutputs[0]?.label||"AUDIO OUTPUT AKTIF"):"BELUM TERDETEKSI";
+  }catch(err){
+    if(connection) connection.textContent="GAGAL MEMBACA";
+    if(cdot) cdot.classList.add("warn");
+  }
+}
+document.getElementById("usbInterfaceRefreshButton")?.addEventListener("click",refreshUsbInterfaceBar);
+navigator.mediaDevices?.addEventListener?.("devicechange",refreshUsbInterfaceBar);
+refreshUsbInterfaceBar();
 
 const echoDelay = document.getElementById("echoDelay");
 const echoFeedback = document.getElementById("echoFeedback");
