@@ -4764,6 +4764,88 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
 @media (min-width:701px){#tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack{flex-basis:112px;height:112px;min-height:112px;max-height:112px}#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row{flex-basis:250px;height:250px;max-height:250px}}
 @media (max-width:700px){#tabMixerContent .mixer-desk-surface .console-channel-strip.master-strip{min-width:126px}#tabMixerContent .mixer-desk-surface .master-strip .master-meter-stack{flex-basis:92px;width:74px;height:92px;min-height:92px;max-height:92px}#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row{flex-basis:190px;width:74px;height:190px;max-height:190px}#tabMixerContent .mixer-desk-surface .master-strip .master-fader-row .fader-slot{flex-basis:61px;width:61px;max-width:61px;min-width:61px}#tabMixerContent .mixer-desk-surface .master-strip .strip-action-buttons{height:34px;min-height:34px;gap:4px}#tabMixerContent .mixer-desk-surface .master-strip .console-action-btn{min-height:32px;height:32px;font-size:8px}}
 
+
+/* FINAL REAL-MIXER CONSOLE PASS */
+#tabMixerContent .mixer-desk-surface{
+  display:grid !important;
+  grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+  grid-template-rows:minmax(0,1fr) !important;
+  gap:6px !important;
+  width:100% !important; min-width:0 !important; height:100% !important;
+  overflow:hidden !important; padding:3px !important;
+}
+#tabMixerContent .mixer-desk-surface .console-channel-strip{
+  min-width:0 !important; min-height:0 !important; width:100% !important; height:100% !important;
+  padding:5px 4px !important; border-radius:6px !important;
+  background:linear-gradient(180deg,#1b2635 0%,#111925 58%,#0b111b 100%) !important;
+  border:1px solid #35445a !important;
+  display:flex !important; flex-direction:column !important; align-items:stretch !important;
+  overflow:hidden !important;
+}
+#tabMixerContent .mixer-desk-surface .console-channel-strip.master-strip{
+  background:linear-gradient(180deg,#1c2634 0%,#101722 58%,#0a1019 100%) !important;
+  border-color:#3b82f6 !important;
+  box-shadow:inset 0 0 0 1px rgba(59,130,246,.12),0 4px 12px rgba(0,0,0,.3) !important;
+}
+#tabMixerContent .strip-label-box,
+#tabMixerContent .master-strip .strip-label-box{
+  flex:0 0 auto !important; min-height:28px !important; height:28px !important;
+  margin:0 0 3px !important; padding:3px 4px !important;
+  border-radius:4px !important;
+  background:linear-gradient(180deg,#0ea5e9,#0369a1) !important;
+  color:#eff6ff !important; border:1px solid #38bdf8 !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 0 7px rgba(14,165,233,.18) !important;
+  font-size:8.5px !important; font-weight:900 !important; letter-spacing:.3px !important;
+}
+#tabMixerContent .strip-status-leds{flex:0 0 auto !important;margin:0 0 3px !important;}
+#tabMixerContent .strip-status-leds .status-led{font-size:6.5px !important;}
+#tabMixerContent .strip-knobs-area{
+  flex:0 0 auto !important; margin:0 0 3px !important; padding:3px !important;
+  background:#0b121c !important; border-color:#29384b !important;
+}
+#tabMixerContent .fader-panel-area{
+  flex:1 1 auto !important; min-height:0 !important; height:auto !important;
+  display:flex !important; align-items:stretch !important; justify-content:center !important;
+  gap:4px !important; margin:2px 0 3px !important;
+}
+#tabMixerContent .fader-slot{
+  flex:1 1 auto !important; width:auto !important; max-width:62px !important; min-width:30px !important;
+  min-height:0 !important; height:100% !important;
+  background:linear-gradient(90deg,#070b12,#101827,#070b12) !important;
+  border:1px solid #3a4a60 !important; border-radius:4px !important;
+}
+#tabMixerContent .fader-slot::before{height:92% !important;width:3px !important;background:#334155 !important;}
+#tabMixerContent .fader-slot input[type="range"]{height:92% !important;width:100% !important;}
+#tabMixerContent .fader-slot input[type="range"]::-webkit-slider-thumb{width:28px !important;height:16px !important;}
+#tabMixerContent .fader-readout{flex:0 0 auto !important;margin:2px 0 !important;min-height:14px !important;color:#7dd3fc !important;}
+#tabMixerContent .vert-led-meter{flex:0 0 8px !important;width:8px !important;min-height:0 !important;height:100% !important;}
+#tabMixerContent .strip-action-buttons{flex:0 0 auto !important;margin:0 !important;gap:3px !important;}
+#tabMixerContent .console-action-btn{min-height:28px !important;height:28px !important;padding:4px 2px !important;font-size:7.5px !important;}
+#tabMixerContent .console-action-btn.mute{background:rgba(220,38,38,.18) !important;color:#fecaca !important;border-color:rgba(248,113,113,.42) !important;}
+#tabMixerContent .console-action-btn.mute.active{background:#dc2626 !important;color:#fff !important;border-color:#f87171 !important;}
+#tabMixerContent .console-action-btn.solo{background:rgba(250,204,21,.18) !important;color:#fef08a !important;border-color:rgba(250,204,21,.42) !important;}
+#tabMixerContent .console-action-btn.solo.active{background:#facc15 !important;color:#111827 !important;border-color:#fde047 !important;}
+#tabMixerContent .master-strip .fader-panel-area{flex-direction:row !important;gap:5px !important;}
+#tabMixerContent .master-strip .master-meter-stack{order:2 !important;flex:0 0 38px !important;width:38px !important;min-width:34px !important;height:100% !important;display:flex !important;}
+#tabMixerContent .master-strip .master-stereo-meter-vertical{width:100% !important;height:100% !important;min-height:0 !important;padding:3px 2px !important;gap:3px !important;background:#070b12 !important;border:1px solid #34445a !important;}
+#tabMixerContent .master-strip .master-meter-column{gap:2px !important;}
+#tabMixerContent .master-strip .master-meter-column .master-led-meter{width:7px !important;}
+#tabMixerContent .master-strip .master-fader-row{order:1 !important;display:flex !important;flex:1 1 auto !important;min-width:0 !important;min-height:0 !important;align-items:stretch !important;}
+#tabMixerContent .master-strip .master-fader-row .fader-slot{max-width:64px !important;}
+#tabMixerContent .master-strip .master-combined-wrap{display:none !important;}
+#tabMixerContent .master-strip .fader-readout{color:#93c5fd !important;}
+#tabMixerContent .master-strip .master-strip-actions .master-mute-btn{background:rgba(220,38,38,.18) !important;color:#fecaca !important;border-color:rgba(248,113,113,.42) !important;}
+#tabMixerContent .master-strip .master-strip-actions .master-mute-btn.active{background:#dc2626 !important;color:#fff !important;}
+#tabMixerContent .master-strip .master-strip-actions .master-lr-btn{background:rgba(14,165,233,.18) !important;color:#bae6fd !important;border-color:rgba(56,189,248,.42) !important;}
+#tabMixerContent .master-strip .master-strip-actions .master-lr-btn.active{background:#0284c7 !important;color:#fff !important;border-color:#38bdf8 !important;}
+@media(max-width:700px){
+  #tabMixerContent .mixer-desk-surface{grid-template-columns:repeat(5,minmax(74px,1fr)) !important;overflow-x:auto !important;overflow-y:hidden !important;}
+  #tabMixerContent .mixer-desk-surface .console-channel-strip{min-width:74px !important;}
+  #tabMixerContent .strip-label-box,#tabMixerContent .master-strip .strip-label-box{min-height:26px !important;height:26px !important;font-size:7.5px !important;}
+  #tabMixerContent .console-action-btn{min-height:30px !important;height:30px !important;font-size:7px !important;}
+  #tabMixerContent .master-strip .master-meter-stack{flex-basis:32px !important;width:32px !important;min-width:30px !important;}
+}
+
 </style>
 </head>
 
