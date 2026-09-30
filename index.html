@@ -3820,6 +3820,95 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
   }
 }
 
+
+/* Channel quick-control popover: moved from the global bottom encoder bar. */
+#tabMixerContent .mixer-desk-surface .console-channel-strip { position:relative !important; overflow:visible !important; }
+#tabMixerContent .mixer-desk-surface .channel-title-trigger {
+  cursor:pointer !important;
+  user-select:none !important;
+  transition:filter .16s ease, box-shadow .16s ease !important;
+}
+#tabMixerContent .mixer-desk-surface .channel-title-trigger:hover,
+#tabMixerContent .mixer-desk-surface .channel-title-trigger[aria-expanded="true"] {
+  filter:brightness(1.12) !important;
+  box-shadow:0 0 8px rgba(52,211,153,.35) !important;
+}
+#tabMixerContent .mixer-desk-surface .channel-quick-panel {
+  position:absolute !important;
+  z-index:80 !important;
+  top:34px !important;
+  left:5px !important;
+  right:5px !important;
+  padding:7px !important;
+  border:1px solid #3b82f6 !important;
+  border-radius:6px !important;
+  background:linear-gradient(180deg,#172235 0%,#0b1220 100%) !important;
+  box-shadow:0 8px 22px rgba(0,0,0,.65),0 0 12px rgba(59,130,246,.28) !important;
+  opacity:0 !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+  transform:translateY(-4px) scale(.98) !important;
+  transform-origin:top center !important;
+  transition:opacity .14s ease,transform .14s ease,visibility .14s ease !important;
+}
+#tabMixerContent .mixer-desk-surface .channel-quick-panel.open {
+  opacity:1 !important;
+  visibility:visible !important;
+  pointer-events:auto !important;
+  transform:translateY(0) scale(1) !important;
+}
+#tabMixerContent .quick-panel-title {
+  font-size:7px !important; font-weight:900 !important; letter-spacing:.55px !important;
+  color:#93c5fd !important; text-align:center !important; margin-bottom:5px !important;
+}
+#tabMixerContent .quick-control-grid {
+  display:grid !important;
+  grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+  gap:4px !important;
+  align-items:end !important;
+}
+#tabMixerContent .quick-control-grid > label {
+  min-width:0 !important; height:82px !important; position:relative !important;
+  display:flex !important; flex-direction:column !important; align-items:center !important;
+  justify-content:flex-end !important; gap:2px !important;
+  color:#cbd5e1 !important; font-size:6px !important; font-weight:800 !important;
+}
+#tabMixerContent .quick-control-grid label > span { line-height:8px !important; }
+#tabMixerContent .quick-control-grid output {
+  min-height:9px !important; line-height:9px !important; font-size:6px !important;
+  color:#f8fafc !important; white-space:nowrap !important;
+}
+#tabMixerContent .quick-fader input[type="range"] {
+  appearance:slider-vertical !important; -webkit-appearance:slider-vertical !important;
+  width:22px !important; height:55px !important; accent-color:#38bdf8 !important;
+}
+#tabMixerContent .quick-knob input[type="range"] {
+  position:absolute !important; inset:auto !important; width:44px !important; height:44px !important;
+  opacity:0 !important; cursor:pointer !important; z-index:3 !important;
+  transform:translateY(-12px) !important;
+}
+#tabMixerContent .quick-knob i {
+  width:34px !important; height:34px !important; border-radius:50% !important;
+  display:block !important; position:relative !important;
+  background:radial-gradient(circle at 35% 30%,#7b8798 0%,#3f4b5d 28%,#1a2331 68%,#080d15 100%) !important;
+  border:1px solid #718096 !important;
+  box-shadow:inset 0 1px 2px rgba(255,255,255,.22),0 2px 4px rgba(0,0,0,.55) !important;
+}
+#tabMixerContent .quick-knob i::after {
+  content:"" !important; position:absolute !important; width:2px !important; height:9px !important;
+  left:50% !important; top:4px !important; transform-origin:1px 13px !important;
+  transform:rotate(-55deg) !important; background:#e2e8f0 !important; border-radius:2px !important;
+}
+#tabMixerContent .quick-knob input[type="range"]:focus + i { box-shadow:0 0 7px rgba(56,189,248,.7),inset 0 1px 2px rgba(255,255,255,.22) !important; }
+#tabMixerContent .mixer-tft-screen .tft-encoders-bar { display:none !important; }
+@media (max-width:700px) {
+  #tabMixerContent .mixer-desk-surface .channel-quick-panel { left:3px !important; right:3px !important; padding:5px !important; }
+  #tabMixerContent .quick-control-grid { gap:2px !important; }
+  #tabMixerContent .quick-control-grid > label { height:76px !important; }
+  #tabMixerContent .quick-fader input[type="range"] { height:50px !important; }
+  #tabMixerContent .quick-knob i { width:30px !important; height:30px !important; }
+}
+
 </style>
 </head>
 
@@ -4084,7 +4173,17 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
         <!-- PERMUKAAN KONSOLE (FADER STRIPS) -->
         <div class="mixer-desk-surface">
           <div class="console-channel-strip">
-            <div class="strip-label-box">MIC / USB INPUT</div><div class="strip-status-leds" aria-label="MIC / USB INPUT status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
+            <div class="strip-label-box channel-title-trigger" data-channel-title="1" role="button" tabindex="0" aria-expanded="false">MIC / USB INPUT</div><div class="channel-quick-panel" data-channel-panel="1" aria-hidden="true">
+  <div class="quick-panel-title">CHANNEL 1 • QUICK CONTROL</div>
+  <div class="quick-control-grid">
+    <label class="quick-fader"><span>GAIN</span><input type="range" min="-12" max="12" step="0.5" value="0" data-quick-param="gain"><output>0 dB</output></label>
+    <label class="quick-knob"><span>HPF</span><input type="range" min="0" max="1" step="1" value="0" data-quick-param="hpf"><i></i><output>OFF</output></label>
+    <label class="quick-fader"><span>THRESH</span><input type="range" min="-60" max="0" step="1" value="-18" data-quick-param="thresh"><output>-18 dB</output></label>
+    <label class="quick-knob"><span>RATIO</span><input type="range" min="1" max="10" step="0.5" value="3" data-quick-param="ratio"><i></i><output>3:1</output></label>
+    <label class="quick-knob"><span>FREQ</span><input type="range" min="100" max="10000" step="100" value="2500" data-quick-param="freq"><i></i><output>2.5 kHz</output></label>
+    <label class="quick-fader"><span>SEND</span><input type="range" min="-60" max="6" step="0.5" value="0" data-quick-param="send"><output>0 dB</output></label>
+  </div>
+</div><div class="strip-status-leds" aria-label="MIC / USB INPUT status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
             <div class="fader-panel-area mic-input-fader-area">
               <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
               <div class="hpf-fader-control"><label for="micStripHpf">HPF</label><select id="micStripHpf"><option>OFF</option><option>80Hz</option></select></div>
@@ -4097,7 +4196,17 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
           </div>
 
           <div class="console-channel-strip">
-            <div class="strip-label-box">AUDIO / MP3</div><div class="strip-status-leds" aria-label="AUDIO / MP3 status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
+            <div class="strip-label-box channel-title-trigger" data-channel-title="2" role="button" tabindex="0" aria-expanded="false">AUDIO / MP3</div><div class="channel-quick-panel" data-channel-panel="2" aria-hidden="true">
+  <div class="quick-panel-title">CHANNEL 2 • QUICK CONTROL</div>
+  <div class="quick-control-grid">
+    <label class="quick-fader"><span>GAIN</span><input type="range" min="-12" max="12" step="0.5" value="0" data-quick-param="gain"><output>0 dB</output></label>
+    <label class="quick-knob"><span>HPF</span><input type="range" min="0" max="1" step="1" value="0" data-quick-param="hpf"><i></i><output>OFF</output></label>
+    <label class="quick-fader"><span>THRESH</span><input type="range" min="-60" max="0" step="1" value="-18" data-quick-param="thresh"><output>-18 dB</output></label>
+    <label class="quick-knob"><span>RATIO</span><input type="range" min="1" max="10" step="0.5" value="3" data-quick-param="ratio"><i></i><output>3:1</output></label>
+    <label class="quick-knob"><span>FREQ</span><input type="range" min="100" max="10000" step="100" value="2500" data-quick-param="freq"><i></i><output>2.5 kHz</output></label>
+    <label class="quick-fader"><span>SEND</span><input type="range" min="-60" max="6" step="0.5" value="0" data-quick-param="send"><output>0 dB</output></label>
+  </div>
+</div><div class="strip-status-leds" aria-label="AUDIO / MP3 status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
             <div class="fader-panel-area">
               <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="Audio MP3 channel level"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
               <div class="vert-led-meter" id="mixerMeter2"></div>
@@ -4109,7 +4218,17 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
           </div>
 
           <div class="console-channel-strip">
-            <div class="strip-label-box">FX SEND</div><div class="strip-status-leds" aria-label="FX SEND status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
+            <div class="strip-label-box channel-title-trigger" data-channel-title="3" role="button" tabindex="0" aria-expanded="false">FX SEND</div><div class="channel-quick-panel" data-channel-panel="3" aria-hidden="true">
+  <div class="quick-panel-title">CHANNEL 3 • QUICK CONTROL</div>
+  <div class="quick-control-grid">
+    <label class="quick-fader"><span>GAIN</span><input type="range" min="-12" max="12" step="0.5" value="0" data-quick-param="gain"><output>0 dB</output></label>
+    <label class="quick-knob"><span>HPF</span><input type="range" min="0" max="1" step="1" value="0" data-quick-param="hpf"><i></i><output>OFF</output></label>
+    <label class="quick-fader"><span>THRESH</span><input type="range" min="-60" max="0" step="1" value="-18" data-quick-param="thresh"><output>-18 dB</output></label>
+    <label class="quick-knob"><span>RATIO</span><input type="range" min="1" max="10" step="0.5" value="3" data-quick-param="ratio"><i></i><output>3:1</output></label>
+    <label class="quick-knob"><span>FREQ</span><input type="range" min="100" max="10000" step="100" value="2500" data-quick-param="freq"><i></i><output>2.5 kHz</output></label>
+    <label class="quick-fader"><span>SEND</span><input type="range" min="-60" max="6" step="0.5" value="0" data-quick-param="send"><output>0 dB</output></label>
+  </div>
+</div><div class="strip-status-leds" aria-label="FX SEND status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
             <div class="fader-panel-area">
               <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="FX send level"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
               <div class="vert-led-meter" id="mixerMeter3"></div>
@@ -4121,7 +4240,17 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
           </div>
 
           <div class="console-channel-strip">
-            <div class="strip-label-box">FX RETURN</div><div class="strip-status-leds" aria-label="FX RETURN status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
+            <div class="strip-label-box channel-title-trigger" data-channel-title="4" role="button" tabindex="0" aria-expanded="false">FX RETURN</div><div class="channel-quick-panel" data-channel-panel="4" aria-hidden="true">
+  <div class="quick-panel-title">CHANNEL 4 • QUICK CONTROL</div>
+  <div class="quick-control-grid">
+    <label class="quick-fader"><span>GAIN</span><input type="range" min="-12" max="12" step="0.5" value="0" data-quick-param="gain"><output>0 dB</output></label>
+    <label class="quick-knob"><span>HPF</span><input type="range" min="0" max="1" step="1" value="0" data-quick-param="hpf"><i></i><output>OFF</output></label>
+    <label class="quick-fader"><span>THRESH</span><input type="range" min="-60" max="0" step="1" value="-18" data-quick-param="thresh"><output>-18 dB</output></label>
+    <label class="quick-knob"><span>RATIO</span><input type="range" min="1" max="10" step="0.5" value="3" data-quick-param="ratio"><i></i><output>3:1</output></label>
+    <label class="quick-knob"><span>FREQ</span><input type="range" min="100" max="10000" step="100" value="2500" data-quick-param="freq"><i></i><output>2.5 kHz</output></label>
+    <label class="quick-fader"><span>SEND</span><input type="range" min="-60" max="6" step="0.5" value="0" data-quick-param="send"><output>0 dB</output></label>
+  </div>
+</div><div class="strip-status-leds" aria-label="FX RETURN status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
             <div class="fader-panel-area">
               <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="FX return level"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
               <div class="vert-led-meter" id="mixerMeter4"></div>
@@ -6412,7 +6541,67 @@ tftTabs.forEach(tab => {
 });
 
 switchActiveSection("meters");
-  </script>
+  
+/* Bind channel title quick-control panels. */
+(function bindChannelQuickPanels(){
+  const root = document.getElementById("tabMixerContent");
+  if (!root) return;
+  const titles = root.querySelectorAll(".channel-title-trigger");
+  const panels = root.querySelectorAll(".channel-quick-panel");
+  const closeAll = (except) => {
+    panels.forEach(p => {
+      if (p !== except) {
+        p.classList.remove("open");
+        p.setAttribute("aria-hidden","true");
+        const t = root.querySelector('[data-channel-title="'+p.dataset.channelPanel+'"]');
+        if (t) t.setAttribute("aria-expanded","false");
+      }
+    });
+  };
+  titles.forEach(title => {
+    const open = () => {
+      const panel = root.querySelector('[data-channel-panel="'+title.dataset.channelTitle+'"]');
+      if (!panel) return;
+      const wasOpen = panel.classList.contains("open");
+      closeAll(panel);
+      panel.classList.toggle("open", !wasOpen);
+      panel.setAttribute("aria-hidden", String(wasOpen));
+      title.setAttribute("aria-expanded", String(!wasOpen));
+    };
+    title.addEventListener("click", e => { e.stopPropagation(); open(); });
+    title.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); }
+    });
+  });
+  panels.forEach(panel => {
+    panel.addEventListener("click", e => e.stopPropagation());
+    panel.querySelectorAll('input[type="range"]').forEach(input => {
+      const output = input.parentElement.querySelector("output");
+      const knob = input.parentElement.querySelector("i");
+      const render = () => {
+        const v = Number(input.value);
+        let text = String(v);
+        if (input.dataset.quickParam === "gain" || input.dataset.quickParam === "thresh" || input.dataset.quickParam === "send") text = v.toFixed(1)+" dB";
+        if (input.dataset.quickParam === "hpf") text = v ? "80 Hz" : "OFF";
+        if (input.dataset.quickParam === "ratio") text = v.toFixed(1).replace(".0","")+":1";
+        if (input.dataset.quickParam === "freq") text = v >= 1000 ? (v/1000).toFixed(1).replace(".0","")+" kHz" : v+" Hz";
+        if (output) output.textContent = text;
+        if (knob) {
+          const min=Number(input.min), max=Number(input.max);
+          const pct=(v-min)/(max-min);
+          const deg=-55+pct*110;
+          knob.style.setProperty("--knob-angle",deg+"deg");
+          knob.style.setProperty("transform","rotate("+deg+"deg)");
+        }
+      };
+      input.addEventListener("input",render);
+      render();
+    });
+  });
+  document.addEventListener("click", () => closeAll(null), {passive:true});
+})();
+
+</script>
 </body>
 </html>
 \n
