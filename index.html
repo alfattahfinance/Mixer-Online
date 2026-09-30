@@ -5552,6 +5552,14 @@ async function activateUsbAudioInput() {
     const outputs=devices.filter(d=>d.kind==="audiooutput");
     updateIoConnectionStatus(inputs,outputs);
 
+    // USB-C processing path: select the USB/OTG output when the browser exposes
+    // one, so the processed master bus goes back through the same audio interface.
+    const usbOutput = outputs.find(isLikelyUsbAudioDevice);
+    if (usbOutput && physicalOutputDevice) {
+      physicalOutputDevice.value = usbOutput.deviceId;
+      try { await applyPhysicalOutputDevice(); } catch {}
+    }
+
     /* Android/Chrome may expose USB-routed capture as a normal audioinput
        without a "USB" label. The opened stream's deviceId identifies the
        input that the browser actually granted. */
@@ -5599,7 +5607,8 @@ async function activateUsbAudioInput() {
     microphoneSource.connect(mixerStripGains[0]);
     startMicButton?.classList.add("active");
     const label=selectedInput.label || "USB-C Audio Interface";
-    setAudioStatus("USB-C AUDIO INPUT AKTIF: "+label);
+    const outputLabel = physicalOutputDevice?.selectedOptions?.[0]?.textContent || "Output default";
+    setAudioStatus("PROCESSING AKTIF: MIXER FISIK → USB IN → DSP → " + outputLabel + " → SOUND");
     return true;
   } catch (err) {
     setAudioStatus("USB-C audio input gagal: "+(err?.message || "perangkat tidak tersedia."));
