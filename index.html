@@ -5925,7 +5925,8 @@ function animateMixerFaders(poweringOn) {
     return {
       control,
       saved: clamp(saved, min, max),
-      testTarget: clamp(5, min, max)
+      testTarget: clamp(5, min, max),
+      startupReturn: clamp(0, min, max)
     };
   });
 
@@ -5964,14 +5965,14 @@ function animateMixerFaders(poweringOn) {
     return;
   }
 
-  // ON: test dulu sampai +5 dB, lalu kembali tepat ke nilai asli masing-masing.
+  // ON: test dulu sampai +5 dB, lalu kembali perlahan dan berhenti tepat di 0 dB.
   animateStage(entry => entry.testTarget, 1400, () => {
     if (token !== mixerFaderMotionToken || !mixerPowered) return;
     window.setTimeout(() => {
       if (token !== mixerFaderMotionToken || !mixerPowered) return;
-      animateStage(entry => entry.saved, 1400, () => {
+      animateStage(entry => entry.startupReturn, 1400, () => {
         if (token === mixerFaderMotionToken && mixerPowered && audioContext) {
-          entries.forEach(entry => render(entry, entry.saved));
+          entries.forEach(entry => render(entry, entry.startupReturn));
           updateMixerStripControls();
         }
       });
