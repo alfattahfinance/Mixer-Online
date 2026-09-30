@@ -3928,6 +3928,17 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
 }
 
 
+/* Unified blue channel titles: title text stays one color on every mixer channel. */
+#tabMixerContent .mixer-desk-surface .channel-title,
+#tabMixerContent .mixer-desk-surface .channel-title-trigger,
+#tabMixerContent .mixer-desk-surface .channel-title-trigger * {
+  color:#38bdf8 !important;
+}
+#tabMixerContent .mixer-desk-surface .channel-title-trigger:hover,
+#tabMixerContent .mixer-desk-surface .channel-title-trigger[aria-expanded="true"] {
+  color:#38bdf8 !important;
+}
+
 /* Channel quick-control popover: moved from the global bottom encoder bar. */
 #tabMixerContent .mixer-desk-surface .console-channel-strip { position:relative !important; overflow:visible !important; }
 #tabMixerContent .mixer-desk-surface .channel-title-trigger {
