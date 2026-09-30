@@ -4280,6 +4280,8 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
   fill:#94a3b8 !important; font-family:monospace; font-size:5px; font-weight:700; pointer-events:none;
 }
 #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-freq-labels text { text-anchor:middle; }
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-scale text { fill:#64748b !important; }
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsDot1 { vector-effect:non-scaling-stroke; filter:drop-shadow(0 0 4px rgba(216,180,254,.8)); }
 #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-band-dot {
   fill:#f5d0fe; stroke:#c084fc; stroke-width:1; vector-effect:non-scaling-stroke; opacity:.9;
 }
@@ -6320,18 +6322,18 @@ const tftDatabase = {
               <line x1="272" y1="0" x2="272" y2="65" /><line x1="304" y1="0" x2="304" y2="65" />
             </g>
             <g class="tft-geq-scale" aria-hidden="true">
-              <text x="3" y="7">+15</text><text x="3" y="31">0</text><text x="3" y="63">-15</text>
+              <text x="317" y="7" text-anchor="end">+15</text><text x="317" y="31" text-anchor="end">0</text><text x="317" y="63" text-anchor="end">-15</text>
             </g>
             <path id="tftSendsSvgFill" d="" fill="#a855f7" opacity=".16"/>
             <path id="tftSendsSvgCurve" d="" fill="none" stroke="#c084fc" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
             <g id="tftSendsBands" class="tft-geq-band-points" aria-hidden="true"></g>
-            <circle id="tftSendsDot1" cx="160" cy="${s.dot1Y}" r="7" fill="#f3e8ff" stroke="#c084fc" stroke-width="2" style="cursor:grab; touch-action:none;" aria-label="GEQ master level point" title="Drag vertically to adjust GEQ master level"/>
+            <circle id="tftSendsDot1" cx="180.2" cy="${Math.max(8, Math.min(56, 32 - Number(s.lvl || 0) * (24/15)))}" r="7" fill="#f3e8ff" stroke="#c084fc" stroke-width="2" style="cursor:grab; touch-action:none;" aria-label="GEQ master level point" title="Drag vertically to adjust GEQ master level"/>
             <g class="tft-geq-freq-labels" aria-hidden="true">
-              <text x="16" y="64">31</text><text x="48" y="64">63</text><text x="80" y="64">125</text>
-              <text x="112" y="64">250</text><text x="144" y="64">500</text><text x="176" y="64">1k</text>
-              <text x="208" y="64">2k</text><text x="240" y="64">4k</text><text x="272" y="64">8k</text><text x="300" y="64">16k</text>
+              <text x="28" y="64">31</text><text x="58.5" y="64">63</text><text x="88.6" y="64">125</text>
+              <text x="119.2" y="64">250</text><text x="149.7" y="64">500</text><text x="180.2" y="64">1k</text>
+              <text x="210.7" y="64">2k</text><text x="241.2" y="64">4k</text><text x="271.7" y="64">8k</text><text x="302.2" y="64">16k</text>
             </g>
-            <text x="10" y="7" fill="#94a3b8" font-size="5.2">31-BAND GEQ · DRAG MASTER LEVEL</text>
+            <text x="42" y="7" fill="#94a3b8" font-size="5.2">31-BAND GEQ · DRAG MASTER LEVEL</text>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -6562,10 +6564,12 @@ function updateTftModuleCurve(key) {
       : s.preset === 2
         ? [-4,-3,-2,0,3,5,4,2,0,-1,-2,-2,-1,0,1,2,3,4,5,4,3,1,-1,-2,-1,0,2,4,3,1,0]
         : new Array(31).fill(0);
+    const geqFrequencies = [20,25,31.5,40,50,63,80,100,125,160,200,250,315,400,500,630,800,1000,1250,1600,2000,2500,3150,4000,5000,6300,8000,10000,12500,16000,20000];
     const x0 = 8, x1 = 312, span = x1 - x0;
+    const logMin = Math.log10(20), logMax = Math.log10(20000);
     const points31 = bandGains.map((gain, index) => {
       const totalGain = gain + Number(s.lvl || 0);
-      const x = x0 + (index / 30) * span;
+      const x = x0 + ((Math.log10(geqFrequencies[index]) - logMin) / (logMax - logMin)) * span;
       const y = clamp(32 - totalGain * (24 / 15), 8, 56);
       return [x, y];
     });
@@ -6631,7 +6635,7 @@ function updateTftModuleCurve(key) {
   if (key === "sends") {
     const dot = document.getElementById("tftSendsDot1");
     const levelY = clamp(32 - s.lvl * (24/15), 8, 56);
-    if (dot) { dot.setAttribute("cx", "160"); dot.setAttribute("cy", levelY.toFixed(1)); dot.setAttribute("aria-valuetext", "GEQ master " + s.lvl + " dB"); }
+    if (dot) { dot.setAttribute("cx", "180.2"); dot.setAttribute("cy", levelY.toFixed(1)); dot.setAttribute("aria-valuetext", "GEQ master " + s.lvl + " dB"); }
   } else {
     [1, 2, 3].forEach((n) => {
       const dot = document.getElementById(prefix + "Dot" + n) ||
