@@ -4434,6 +4434,18 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
   #tabMixerContent .channel-quick-panel .quick-curve-button { min-height:34px; min-width:82px; }
 }
 
+
+/* USB AUDIO + CHARGER STATUS */
+.io-power-panel{grid-template-columns:repeat(3,minmax(0,1fr));}
+.io-connection-card{min-width:0;}
+.io-status-row{display:flex;align-items:center;gap:5px;margin:3px 0;min-width:0;}
+.io-status-row strong{font-size:7px;color:#cbd5e1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.io-status-dot{width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:#475569;border:1px solid #64748b;}
+.io-status-dot.active{background:#22c55e;border-color:#86efac;box-shadow:0 0 7px rgba(34,197,94,.7);}
+.io-status-dot.warn{background:#f59e0b;border-color:#fbbf24;box-shadow:0 0 7px rgba(245,158,11,.6);}
+.io-device-name{font-size:6.5px;line-height:1.25;color:#94a3b8;min-height:16px;overflow:hidden;text-overflow:ellipsis;}
+@media(max-width:800px){.io-power-panel{grid-template-columns:1fr 1fr;}.io-connection-card{grid-column:1 / -1;}}
+@media(max-width:600px){.io-power-panel{grid-template-columns:1fr;}.io-connection-card{grid-column:auto;}}
 </style>
 </head>
 
@@ -4794,7 +4806,7 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
           <button id="connectBtButton">SAMBUNGKAN ESP32</button>
         </div>
 
-        <div class="output-panel">
+        <div class="output-panel io-power-panel">
           <div class="output-control">
             <label for="masterGainControl">MASTER OUTPUT</label>
             <input id="masterGainControl" type="range" min="-30" max="0" step="1" value="-6">
@@ -4806,11 +4818,19 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
               <option value="safe" selected>SAFE MODE</option>
               <option value="normal">NORMAL MODE</option>
             </select>
-            <label for="physicalOutputDevice" style="display:block;margin-top:4px;">OUTPUT KE MIXER FISIK</label>
+            <label for="physicalOutputDevice" style="display:block;margin-top:4px;">OUTPUT KE MIXER FISIK / USB</label>
             <select id="physicalOutputDevice" aria-label="Pilih output audio" style="width:100%;">
               <option value="">Output default HP / USB</option>
             </select>
             <button id="muteOutputButton" style="width:100%; margin-top:5px;">MUTE OUTPUT</button>
+          </div>
+          <div class="output-control io-connection-card">
+            <label>USB / CHARGER</label>
+            <div class="io-status-row"><span class="io-status-dot" id="usbAudioStatusDot"></span><strong id="usbAudioStatus">USB AUDIO: MENUNGGU</strong></div>
+            <div class="io-device-name" id="usbAudioDeviceName">Belum ada perangkat USB audio terdeteksi.</div>
+            <div class="io-status-row"><span class="io-status-dot" id="chargerStatusDot"></span><strong id="chargerStatus">POWER: STATUS TIDAK TERSEDIA</strong></div>
+            <div class="io-device-name" id="chargerStatusDetail">Status charger mengikuti informasi daya perangkat/browser.</div>
+            <button id="refreshIoDevicesButton" type="button" style="width:100%;margin-top:5px;">REFRESH INPUT / OUTPUT USB</button>
           </div>
         </div>
 
@@ -5403,13 +5423,17 @@ const physicalOutputDevice = document.getElementById("physicalOutputDevice");
 const tftCurveToggleBtn = document.getElementById("tftCurveToggleBtn");
 
 async function refreshPhysicalInputDevices() {
-  if (!navigator.mediaDevices?.enumerateDevices) return;
+  if (!navigator.mediaDevices?.enumerateDevices) {
+    updateIoConnectionStatus([],[]);
+    return;
+  }
   try {
     const devices = await navigator.mediaDevices.enumerateDevices();
+    const inputs = devices.filter(device => device.kind === "audioinput");
+    const outputs = devices.filter(device => device.kind === "audiooutput");
     if (physicalInputDevice) {
-      const inputs = devices.filter(device => device.kind === "audioinput");
       const previous = physicalInputDevice.value;
-      physicalInputDevice.innerHTML = '<option value="">Default HP</option>';
+      physicalInputDevice.innerHTML = '<option value="">Default HP / USB</option>';
       inputs.forEach((device, index) => {
         const option = document.createElement("option");
         option.value = device.deviceId;
@@ -5419,7 +5443,6 @@ async function refreshPhysicalInputDevices() {
       if (inputs.some(device => device.deviceId === previous)) physicalInputDevice.value = previous;
     }
     if (physicalOutputDevice) {
-      const outputs = devices.filter(device => device.kind === "audiooutput");
       const previous = physicalOutputDevice.value;
       physicalOutputDevice.innerHTML = '<option value="">Output default HP / USB</option>';
       outputs.forEach((device, index) => {
@@ -5430,13 +5453,69 @@ async function refreshPhysicalInputDevices() {
       });
       if (outputs.some(device => device.deviceId === previous)) physicalOutputDevice.value = previous;
     }
-  } catch (err) {}
+    updateIoConnectionStatus(inputs, outputs);
+  } catch (err) {
+    updateIoConnectionStatus([],[]);
+  }
+}
+
+function isLikelyUsbAudioDevice(device) {
+  const label = String(device?.label || "").toLowerCase();
+  return /usb|audio interface|sound card|dac|dongle|headset|type-c|type c/.test(label);
+}
+
+function updateIoConnectionStatus(inputs=[], outputs=[]) {
+  const all=[...inputs,...outputs];
+  const usb=all.filter(isLikelyUsbAudioDevice);
+  const dot=document.getElementById("usbAudioStatusDot");
+  const status=document.getElementById("usbAudioStatus");
+  const name=document.getElementById("usbAudioDeviceName");
+  if(dot) dot.classList.toggle("active",usb.length>0);
+  if(status) status.textContent=usb.length ? "USB AUDIO: TERDETEKSI" : "USB AUDIO: TIDAK TERDETEKSI";
+  if(name) name.textContent=usb.length
+    ? usb.map(d=>d.label || d.kind).filter(Boolean).slice(0,3).join(" · ")
+    : "Colok USB audio/interface untuk menampilkan perangkat di sini.";
+}
+
+async function updateChargerStatus() {
+  const dot=document.getElementById("chargerStatusDot");
+  const status=document.getElementById("chargerStatus");
+  const detail=document.getElementById("chargerStatusDetail");
+  if(!navigator.getBattery) {
+    if(status) status.textContent="POWER: STATUS TIDAK TERSEDIA";
+    if(detail) detail.textContent="Browser tidak menyediakan Battery API; status charger tidak dapat dipastikan.";
+    return;
+  }
+  try {
+    const battery=await navigator.getBattery();
+    const paint=()=>{
+      const charging=Boolean(battery.charging);
+      if(dot) dot.classList.toggle("active",charging);
+      if(dot) dot.classList.toggle("warn",!charging);
+      if(status) status.textContent=charging ? "POWER: CHARGER TERHUBUNG" : "POWER: TIDAK SEDANG CHARGING";
+      if(detail) detail.textContent="Baterai "+Math.round(battery.level*100)+"% · "+(charging?"sedang mengisi":"menggunakan daya baterai");
+    };
+    ["chargingchange","levelchange"].forEach(ev=>battery.addEventListener(ev,paint));
+    paint();
+  } catch {
+    if(status) status.textContent="POWER: STATUS TIDAK TERSEDIA";
+  }
 }
 
 async function applyPhysicalOutputDevice() {
   const requestedId = physicalOutputDevice?.value || "";
-  if (!audioContext || typeof audioContext.setSinkId !== "function") return;
-  try { await audioContext.setSinkId(requestedId); } catch (err) {}
+  if (!audioContext || typeof audioContext.setSinkId !== "function") {
+    updateIoConnectionStatus([],[]);
+    return false;
+  }
+  try {
+    await audioContext.setSinkId(requestedId);
+    setAudioStatus(requestedId ? "Output USB/audio aktif." : "Output default aktif.");
+    return true;
+  } catch (err) {
+    setAudioStatus("Output USB/audio gagal dipilih: " + (err?.message || "perangkat tidak tersedia."));
+    return false;
+  }
 }
 
 const startAudioButton = document.getElementById("startAudioButton");
@@ -5446,8 +5525,18 @@ const masterGainValue = document.getElementById("masterGainValue");
 const outputMode = document.getElementById("outputMode");
 const muteOutputButton = document.getElementById("muteOutputButton");
 const mixerPowerButton = document.getElementById("mixerPowerButton");
-if (physicalOutputDevice) physicalOutputDevice.addEventListener("change", applyPhysicalOutputDevice);
+if (physicalOutputDevice) physicalOutputDevice.addEventListener("change", async () => {
+  await applyPhysicalOutputDevice();
+  await refreshPhysicalInputDevices();
+});
+if (navigator.mediaDevices?.addEventListener) navigator.mediaDevices.addEventListener("devicechange", () => refreshPhysicalInputDevices());
+document.getElementById("refreshIoDevicesButton")?.addEventListener("click", async () => {
+  await refreshPhysicalInputDevices();
+  await updateChargerStatus();
+  setAudioStatus("Daftar INPUT/OUTPUT USB diperbarui.");
+});
 refreshPhysicalInputDevices();
+updateChargerStatus();
 
 const echoDelay = document.getElementById("echoDelay");
 const echoFeedback = document.getElementById("echoFeedback");
@@ -7039,9 +7128,27 @@ function bindTftDynamicEventListeners(key) {
       const srcSel = document.getElementById("routeSourceSel");
       const doutSel = document.getElementById("routeDoutSel");
       const usbBtn = document.getElementById("routeUsbBtn");
-      srcSel?.addEventListener("change", () => { s.source = srcSel.selectedIndex; updateEncoders(tftDatabase.routing.encoders(s)); refreshTftInfoPanel("routing"); });
-      doutSel?.addEventListener("change", () => { s.dout = doutSel.selectedIndex; updateEncoders(tftDatabase.routing.encoders(s)); refreshTftInfoPanel("routing"); });
-      usbBtn?.addEventListener("click", () => { s.usb = !s.usb; usbBtn.textContent = s.usb ? "ACTIVE" : "OFF"; usbBtn.classList.toggle("active-action", s.usb); updateEncoders(tftDatabase.routing.encoders(s)); });
+      srcSel?.addEventListener("change", () => { s.source = srcSel.selectedIndex; updateEncoders(tftDatabase.routing.encoders(s)); refreshTftInfoPanel("routing"); persistTftState(); });
+      doutSel?.addEventListener("change", () => { s.dout = doutSel.selectedIndex; updateEncoders(tftDatabase.routing.encoders(s)); refreshTftInfoPanel("routing"); persistTftState(); });
+      usbBtn?.addEventListener("click", async () => {
+        s.usb = !s.usb;
+        usbBtn.textContent = s.usb ? "ACTIVE" : "OFF";
+        usbBtn.classList.toggle("active-action", s.usb);
+        if (s.usb) {
+          await refreshPhysicalInputDevices();
+          const usbOption = [...(physicalOutputDevice?.options || [])].find(o => /usb|audio interface|sound card|dac|dongle|type.?c/i.test(o.textContent || ""));
+          if (usbOption && physicalOutputDevice) {
+            physicalOutputDevice.value = usbOption.value;
+            await applyPhysicalOutputDevice();
+            setAudioStatus("USB Streaming aktif → " + usbOption.textContent);
+          } else {
+            setAudioStatus("USB Streaming aktif (simulator); belum ada USB audio output terdeteksi.");
+          }
+        }
+        updateEncoders(tftDatabase.routing.encoders(s));
+        refreshTftInfoPanel("routing");
+        persistTftState();
+      });
     } else if (key === "meters") {
       const srcSel = document.getElementById("meterSrcSel");
       const holdSel = document.getElementById("meterHoldSel");
