@@ -4282,8 +4282,17 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
 #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-freq-labels text { text-anchor:middle; }
 #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-scale text { fill:#64748b !important; }
 #tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsDot1 { vector-effect:non-scaling-stroke; filter:drop-shadow(0 0 4px rgba(216,180,254,.8)); }
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box {
+  min-height:clamp(96px, 24vw, 190px) !important;
+  max-height:none !important;
+  height:clamp(96px, 24vw, 190px) !important;
+  flex:0 1 auto !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgContainer {
+  width:100%; height:100%; display:block; touch-action:none; overflow:visible;
+}
 #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-band-dot {
-  fill:#f5d0fe; stroke:#c084fc; stroke-width:1.2; vector-effect:non-scaling-stroke; opacity:.95;
+  fill:#f5d0fe; stroke:#c084fc; stroke-width:1.4; vector-effect:non-scaling-stroke; opacity:.98;
   cursor:ns-resize; pointer-events:all; touch-action:none; transition:r .08s ease, filter .08s ease;
 }
 #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-band-dot:hover,
@@ -4297,8 +4306,15 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
 }
 #tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgFill { fill:#a855f7 !important; opacity:.14 !important; }
 @media(max-width:600px){
-  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-freq-labels text { font-size:4.5px; }
-  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-band-dot { r:1.7px; }
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-freq-labels text { font-size:4.3px; }
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-band-dot { r:3.4px; }
+}
+@media(min-width:601px){
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-band-dot { r:3px; }
+}
+@media(max-width:420px){
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box { min-height:110px !important; height:110px !important; }
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-freq-labels text { font-size:3.9px; }
 }
 
 </style>
@@ -6633,9 +6649,10 @@ function updateTftModuleCurve(key) {
     const p0 = points[i], p1 = points[i + 1];
     const prev = points[i - 1] || p0, next = points[i + 2] || p1;
     const c1x = p0[0] + (p1[0] - prev[0]) / 6;
-    const c1y = p0[1] + (p1[1] - prev[1]) / 6;
     const c2x = p1[0] - (next[0] - p0[0]) / 6;
-    const c2y = p1[1] - (next[1] - p0[1]) / 6;
+    const segMinY = Math.min(p0[1], p1[1]), segMaxY = Math.max(p0[1], p1[1]);
+    const c1y = Math.max(segMinY, Math.min(segMaxY, p0[1] + (p1[1] - prev[1]) / 6));
+    const c2y = Math.max(segMinY, Math.min(segMaxY, p1[1] - (next[1] - p0[1]) / 6));
     d += " C" + c1x.toFixed(2) + " " + c1y.toFixed(2) + " " +
       c2x.toFixed(2) + " " + c2y.toFixed(2) + " " +
       p1[0].toFixed(2) + " " + p1[1].toFixed(2);
@@ -6727,10 +6744,15 @@ function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback) {
     if (!point) return;
     // Keep the grabbed offset and dampen relative travel to avoid snapping.
     const radius = Number(dotElement.getAttribute("r")) || 7;
-    const relX = Math.max(radius, Math.min(point.svgWidth - radius,
-      dragStart.dotX + (point.x - dragStart.pointerX) * 0.55));
-    const relY = Math.max(radius, Math.min(point.svgHeight - radius,
-      dragStart.dotY + (point.y - dragStart.pointerY) * 0.55));
+    const isGeqBand = dotElement.classList.contains("tft-geq-band-dot");
+    const relX = isGeqBand
+      ? dragStart.dotX
+      : Math.max(radius, Math.min(point.svgWidth - radius,
+          dragStart.dotX + (point.x - dragStart.pointerX) * 0.55));
+    const relY = isGeqBand
+      ? Math.max(8, Math.min(56, point.y))
+      : Math.max(radius, Math.min(point.svgHeight - radius,
+          dragStart.dotY + (point.y - dragStart.pointerY) * 0.55));
     dotElement.setAttribute("cx", relX.toFixed(2));
     dotElement.setAttribute("cy", relY.toFixed(2));
     if (typeof onUpdateCallback === "function") onUpdateCallback(relX, relY, point.svgWidth, point.svgHeight);
