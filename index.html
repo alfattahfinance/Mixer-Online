@@ -6570,10 +6570,6 @@ function updateTftModuleCurve(key) {
         ? [-4,-3,-2,0,3,5,4,2,0,-1,-2,-2,-1,0,1,2,3,4,5,4,3,1,-1,-2,-1,0,2,4,3,1,0]
         : new Array(31).fill(0);
     if (!Array.isArray(s.bands) || s.bands.length !== 31) s.bands = presetBands.slice();
-    if (s._lastPreset !== s.preset) {
-      s.bands = presetBands.slice();
-      s._lastPreset = s.preset;
-    }
     const x0 = 8, x1 = 312, span = x1 - x0;
     const logMin = Math.log10(20), logMax = Math.log10(20000);
     const points31 = s.bands.map((gain, index) => {
@@ -6692,7 +6688,9 @@ function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback) {
   dotElement.style.cursor = "grab";
   dotElement.style.pointerEvents = "all";
   dotElement.style.userSelect = "none";
-  if (dotElement.tagName.toLowerCase() === "circle") dotElement.setAttribute("r", "5.5");
+  if (dotElement.tagName.toLowerCase() === "circle" && !dotElement.classList.contains("tft-geq-band-dot")) {
+    dotElement.setAttribute("r", "5.5");
+  }
   dotElement.setAttribute("tabindex", "0");
   dotElement.setAttribute("role", "slider");
   let activePointerId = null;
@@ -6874,7 +6872,19 @@ function bindTftDynamicEventListeners(key) {
       const presetSel = document.getElementById("geqPresetSel");
       const stBtn = document.getElementById("geqStateBtn");
       lvlInp?.addEventListener("input", () => { s.lvl = Number(lvlInp.value); document.getElementById("send1LvlVal").textContent = s.lvl + "dB"; updateEncoders(tftDatabase.sends.encoders(s)); updateTftModuleCurve("sends"); });
-      presetSel?.addEventListener("change", () => { s.preset = presetSel.selectedIndex; s._lastPreset = -1; updateEncoders(tftDatabase.sends.encoders(s)); updateTftModuleCurve("sends"); refreshTftInfoPanel("sends"); persistTftState(); });
+      presetSel?.addEventListener("change", () => {
+        s.preset = presetSel.selectedIndex;
+        const presetBands = s.preset === 1
+          ? [-2,-2,-1,0,1,2,3,3,2,1,0,1,2,3,3,2,1,0,-1,-2,-2,-1,0,1,1,0,-1,-2,-2,-2,-2]
+          : s.preset === 2
+            ? [-4,-3,-2,0,3,5,4,2,0,-1,-2,-2,-1,0,1,2,3,4,5,4,3,1,-1,-2,-1,0,2,4,3,1,0]
+            : new Array(31).fill(0);
+        s.bands = presetBands.slice();
+        updateEncoders(tftDatabase.sends.encoders(s));
+        updateTftModuleCurve("sends");
+        refreshTftInfoPanel("sends");
+        persistTftState();
+      });
       stBtn?.addEventListener("click", () => { s.state = !s.state; stBtn.textContent = s.state ? "ACTIVE" : "BYPASS"; stBtn.classList.toggle("active-action", s.state); updateEncoders(tftDatabase.sends.encoders(s)); updateTftModuleCurve("sends"); persistTftState(); });
     } else if (key === "main") {
       const sendInp = document.getElementById("mainFohLvl");
@@ -6994,7 +7004,8 @@ function bindTftDynamicEventListeners(key) {
         makeSpecificDotDraggable(container, bandDot, (_x, y) => {
           const index = Number(bandDot.dataset.bandIndex);
           if (!Number.isInteger(index) || index < 0 || index > 30) return;
-          const nextGain = Math.round(clamp(32 - y, -15, 15) / (24 / 15) * 10) / 10 - Number(s.lvl || 0);
+          const clampGeq = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+          const nextGain = Math.round(clampGeq((32 - y) / (24 / 15), -15, 15) * 10) / 10 - Number(s.lvl || 0);
           s.bands[index] = Math.max(-15, Math.min(15, nextGain));
           const out = document.getElementById("send1LvlVal");
           if (out) out.textContent = Number(s.lvl || 0).toFixed(1) + "dB";
