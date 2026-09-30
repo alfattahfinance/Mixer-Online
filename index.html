@@ -5120,8 +5120,8 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
               </div>
             </div>
             <div class="strip-action-buttons">
-              <button class="console-action-btn mute" style="background:#b45309; color:#fff;">MUTE</button>
-              <button class="console-action-btn active" style="background:#fbbf24; color:#000;">LR</button>
+              <button class="console-action-btn mute master-mute-btn" style="background:#b45309; color:#fff;" aria-pressed="false">MUTE</button>
+              <button class="console-action-btn lr active" style="background:#fbbf24; color:#000;" aria-pressed="true">LR</button>
             </div>
           </div>
         </div>
@@ -5721,6 +5721,9 @@ let masterMeterAnalyser = null;
 let masterStereoSplitter = null;
 let mixerStripMuted = [false, false, false, false];
 let mixerStripSolo = [false, false, false, false];
+// Master Main LR has its own state; channel MUTE/SOLO must never control it.
+let masterStripMuted = false;
+let masterStripLR = true;
 let alesisDelayNode = null, alesisFeedbackNode = null, alesisFilterNode = null, alesisWetNode = null, alesisDryNode = null;
 let masterGainNode = null, outputMuteGainNode = null, outputMergerNode = null;
 
@@ -6501,23 +6504,65 @@ function initializeAudioGraph() {
 function updateMixerStripControls() {
   const strips = [...document.querySelectorAll(".mixer-desk-surface .console-channel-strip")];
   const anySolo = mixerStripSolo.some(Boolean);
-  strips.forEach((strip, index) => {
+
+  // Four functional strips: channel mute/solo are independent of Main LR.
+  strips.slice(0, 4).forEach((strip, index) => {
     const fader = strip.querySelector('.fader-slot input[type="range"]');
     const readout = strip.querySelector(".fader-readout");
     if (!fader || !readout) return;
+
     const db = Number(fader.value);
     readout.textContent = db.toFixed(1) + " dB";
     const allowedBySolo = !anySolo || mixerStripSolo[index];
     const gain = (mixerStripMuted[index] || !allowedBySolo) ? 0 : dbToGain(db);
-    if (index < 4 && mixerStripGains[index]) {
-      mixerStripGains[index].gain.setTargetAtTime(gain, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+
+    if (mixerStripGains[index]) {
+      mixerStripGains[index].gain.setTargetAtTime(
+        gain, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS
+      );
     }
-    if (index === 4 && masterStripGainNode) masterStripGainNode.gain.setTargetAtTime(gain, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+
     const muteBtn = strip.querySelector(".console-action-btn.mute");
     const soloBtn = strip.querySelector(".console-action-btn.solo");
     if (muteBtn) muteBtn.classList.toggle("active", mixerStripMuted[index]);
-    if (soloBtn) soloBtn.classList.toggle("active", mixerStripSolo[index]);
+    if (soloBtn) {
+      soloBtn.classList.toggle("active", mixerStripSolo[index]);
+      soloBtn.setAttribute("aria-pressed", String(mixerStripSolo[index]));
+    }
   });
+
+  // Main LR: its MUTE and LR routing are independent from channel SOLO.
+  const masterStrip = strips.find(strip => strip.classList.contains("master-strip"));
+  if (masterStrip) {
+    const fader = masterStrip.querySelector('.master-fader-row .fader-slot input[type="range"]');
+    const readout = masterStrip.querySelector(".fader-readout");
+    const muteBtn = masterStrip.querySelector(".console-action-btn.mute");
+    const lrBtn = masterStrip.querySelector(".console-action-btn.lr");
+
+    if (fader && readout) {
+      const db = Number(fader.value);
+      readout.textContent = db.toFixed(1) + " dB";
+
+      // Master is not affected by channel SOLO. Only Master MUTE/LR may cut it.
+      const masterGain = (masterStripMuted || !masterStripLR) ? 0 : dbToGain(db);
+      if (masterStripGainNode) {
+        masterStripGainNode.gain.setTargetAtTime(
+          masterGain, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS
+        );
+      }
+    }
+
+    if (muteBtn) {
+      muteBtn.classList.toggle("active", masterStripMuted);
+      muteBtn.setAttribute("aria-pressed", String(masterStripMuted));
+      muteBtn.setAttribute("aria-label", masterStripMuted ? "Main LR mute aktif" : "Main LR mute nonaktif");
+    }
+    if (lrBtn) {
+      lrBtn.classList.toggle("active", masterStripLR);
+      lrBtn.setAttribute("aria-pressed", String(masterStripLR));
+      lrBtn.setAttribute("aria-label", masterStripLR ? "Main LR routing aktif" : "Main LR routing nonaktif");
+    }
+  }
 }
 
 function rebuildAudioRouting() {
@@ -6968,6 +7013,20 @@ document.querySelectorAll(".mixer-desk-surface .console-channel-strip").forEach(
       if (readout) readout.textContent = Number(fader.value).toFixed(1) + " dB";
     }
   });
+
+  if (strip.classList.contains("master-strip")) {
+    // Main LR has dedicated MUTE/LR logic; never write into channel state arrays.
+    strip.querySelector(".console-action-btn.mute")?.addEventListener("click", () => {
+      masterStripMuted = !masterStripMuted;
+      updateMixerStripControls();
+    });
+    strip.querySelector(".console-action-btn.lr")?.addEventListener("click", () => {
+      masterStripLR = !masterStripLR;
+      updateMixerStripControls();
+    });
+    return;
+  }
+
   strip.querySelector(".console-action-btn.mute")?.addEventListener("click", () => {
     mixerStripMuted[index] = !mixerStripMuted[index];
     if (audioContext) updateMixerStripControls();
