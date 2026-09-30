@@ -3770,6 +3770,56 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
 #tabMixerContent #tftFooterChannel,
 #tabMixerContent #tftFooterStatus { display:none !important; }
 
+
+/* Compact TFT parameter bar: keep GAIN/HPF/THRESH/RATIO/FREQ/SEND visible
+   without consuming unnecessary mixer screen height. */
+#tabMixerContent .mixer-tft-screen .tft-encoders-bar {
+  flex:0 0 24px !important;
+  height:24px !important;
+  min-height:24px !important;
+  max-height:24px !important;
+  box-sizing:border-box !important;
+  gap:2px !important;
+  margin-top:1px !important;
+  padding:1px !important;
+  border-radius:3px !important;
+  overflow:hidden !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-encoder-knob {
+  min-width:0 !important;
+  height:20px !important;
+  min-height:20px !important;
+  max-height:20px !important;
+  box-sizing:border-box !important;
+  padding:1px 2px !important;
+  line-height:8px !important;
+  font-size:6px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  overflow:hidden !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-encoder-knob span {
+  margin-top:0 !important;
+  line-height:8px !important;
+  font-size:7px !important;
+}
+@media (max-width:700px) {
+  #tabMixerContent .mixer-tft-screen .tft-encoders-bar {
+    flex-basis:22px !important;
+    height:22px !important;
+    min-height:22px !important;
+    max-height:22px !important;
+  }
+  #tabMixerContent .mixer-tft-screen .tft-encoder-knob {
+    height:18px !important;
+    min-height:18px !important;
+    max-height:18px !important;
+    padding:1px !important;
+  }
+}
+
 </style>
 </head>
 
