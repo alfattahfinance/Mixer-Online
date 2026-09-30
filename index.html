@@ -4773,10 +4773,10 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
         <!-- PERMUKAAN KONSOLE (FADER STRIPS) -->
         <div class="mixer-desk-surface">
           <div class="console-channel-strip">
-            <div class="strip-label-box channel-title-trigger" data-channel-title="1" role="button" tabindex="0" aria-expanded="false">MIC / USB INPUT</div><div class="channel-quick-panel" data-channel-panel="1" aria-hidden="true">
+            <div class="strip-label-box channel-title-trigger" data-channel-title="1" role="button" tabindex="0" aria-expanded="false">USB AUDIO INPUT</div><div class="channel-quick-panel" data-channel-panel="1" aria-hidden="true">
   <div class="quick-panel-title">CHANNEL 1 • QUICK CONTROL</div>
   <div class="quick-control-grid" data-dynamic-quick="1"></div>
-</div><div class="strip-status-leds" aria-label="MIC / USB INPUT status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
+</div><div class="strip-status-leds" aria-label="USB AUDIO INPUT status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
             <div class="fader-panel-area mic-input-fader-area">
               <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
               <div class="hpf-fader-control"><label for="micStripHpf">HPF</label><select id="micStripHpf"><option>OFF</option><option>80Hz</option></select></div>
@@ -5514,7 +5514,6 @@ try {
 
 const audioFilesInput = document.getElementById("audioFilesInput");
 const playlistContainer = document.getElementById("playlistContainer");
-const startMicButton = document.getElementById("startMicButton");
 const physicalInputDevice = document.getElementById("physicalInputDevice");
 const physicalOutputDevice = document.getElementById("physicalOutputDevice");
 const physicalOutputDeviceTop = document.getElementById("physicalOutputDeviceTop");
@@ -5755,7 +5754,6 @@ async function activateUsbAudioInput() {
     microphoneSource.connect(usbInputAnalyser);
     microphoneSource.connect(mixerStripGains[0]);
     updateUsbInputLevelMeter();
-    startMicButton?.classList.add("active");
     const label=selectedInput.label || "USB Audio Interface";
     const outputLabel = physicalOutputDevice?.selectedOptions?.[0]?.textContent || "Output default";
     setAudioStatus("PROCESSING AKTIF: MIXER FISIK → USB IN → DSP → " + outputLabel + " → SOUND");
@@ -5837,7 +5835,7 @@ if (physicalInputDevice) physicalInputDevice.addEventListener("change", async ()
     usbAudioConnected=false;
     usbAudioInputDeviceId="";
     usbAudioInputLabel="";
-    setAudioStatus("INPUT: Default HP dipilih.");
+    setAudioStatus("USB AUDIO INPUT: pilih perangkat USB Audio Interface.");
     return;
   }
   if (!audioContext) createAudioContext();
@@ -5872,7 +5870,6 @@ if (navigator.mediaDevices?.addEventListener) navigator.mediaDevices.addEventLis
     microphoneStream.getTracks().forEach(track=>track.stop());
     usbInputConnectedMeterReset();
     microphoneStream=null;
-    startMicButton?.classList.remove("active");
     setAudioStatus("USB audio dicabut — input dihentikan.");
   }
 });
@@ -6968,7 +6965,7 @@ const tftDatabase = {
         <div class="tft-info-panel" id="tftRoutingInfo">
     <div class="tft-info-heading">INPUT / OUTPUT PATCHBAY</div>
     <div class="tft-patch-grid"><div class="patch-head">SOURCE</div><div class="patch-head">MAIN L/R</div><div class="patch-head">BUS 1–2</div><div class="patch-head">USB 1–2</div>
-      <div class="patch-label">Input 1 · ${s.source===0?'Playlist':'Physical Mic'}</div><div class="patch-cell active">●</div><div class="patch-cell">○</div><div class="patch-cell ${s.usb?'active':''}">${s.usb?'●':'○'}</div>
+      <div class="patch-label">Input 1 · ${s.source===0?'Playlist':'USB Audio Interface'}</div><div class="patch-cell active">●</div><div class="patch-cell">○</div><div class="patch-cell ${s.usb?'active':''}">${s.usb?'●':'○'}</div>
       <div class="patch-label">Input 2 · IP2</div><div class="patch-cell active">●</div><div class="patch-cell">○</div><div class="patch-cell ${s.usb?'active':''}">${s.usb?'●':'○'}</div>
       <div class="patch-label">Input 3 · IP3</div><div class="patch-cell">○</div><div class="patch-cell active">●</div><div class="patch-cell">○</div>
       <div class="patch-label">Input 4 · IP4</div><div class="patch-cell">○</div><div class="patch-cell active">●</div><div class="patch-cell">○</div>
@@ -6976,7 +6973,7 @@ const tftDatabase = {
     <div class="tft-info-note">Patch indicators are a visual routing overview; use the selectors and USB switch below to change settings.</div>
   </div>
         <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>Input Source</label><select id="routeSourceSel"><option ${s.source===0?'selected':''}>Playlist Audio</option><option ${s.source===1?'selected':''}>Physical Mic</option></select></div>
+          <div class="tft-mod-ctrl"><label>Input Source</label><select id="routeSourceSel"><option ${s.source===0?'selected':''}>Playlist Audio</option><option ${s.source===1?'selected':''}>USB Audio Interface</option></select></div>
           <div class="tft-mod-ctrl"><label>Direct Out</label><select id="routeDoutSel"><option ${s.dout===0?'selected':''}>Post-Fader</option><option ${s.dout===1?'selected':''}>Pre-Fader</option></select></div>
           <div class="tft-mod-ctrl"><label>USB Streaming</label><button id="routeUsbBtn" class="${s.usb ? 'active-action' : ''}" type="button">${s.usb ? 'ACTIVE' : 'OFF'}</button></div>
         </div>
