@@ -3749,6 +3749,20 @@ body.mixer-startup-test #tabMixerContent .mixer-desk-surface .status-led {
   opacity:0;
   animation:mixerStatusPowerUp 1.2s ease-out forwards !important;
 }
+/* TEST MODE: every physical meter segment gets a visible illuminated color.
+   The opacity animation controls the slow wake-up; the background guarantees
+   the test remains visibly lit even while live meter logic is idle. */
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .vert-led-meter span,
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-led-meter span,
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-combined-meter span {
+  background:#10b981 !important;
+  border-color:#34d399 !important;
+}
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .status-led {
+  background:#22c55e !important;
+  border-color:#bbf7d0 !important;
+  box-shadow:0 0 5px #22c55e,0 0 10px rgba(34,197,94,.75) !important;
+}
 @keyframes mixerLedPowerUp {
   0% { opacity:0; filter:brightness(.55); box-shadow:none; }
   45% { opacity:.42; filter:brightness(.85); box-shadow:0 0 2px currentColor; }
