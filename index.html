@@ -4453,6 +4453,11 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
 
 
 /* USB AUDIO + CHARGER STATUS */
+.usb-live-meter{margin-top:6px;padding:6px 7px;border:1px solid rgba(56,189,248,.22);border-radius:8px;background:rgba(2,6,23,.42)}
+.usb-live-meter-head{display:flex;justify-content:space-between;gap:8px;font-size:9px;color:#cbd5e1;margin-bottom:4px}
+.usb-live-meter-track{height:8px;border-radius:999px;overflow:hidden;background:rgba(15,23,42,.9);box-shadow:inset 0 0 0 1px rgba(148,163,184,.14)}
+.usb-live-meter-track i{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#22c55e,#eab308,#ef4444);transition:width .06s linear}
+.usb-live-meter .io-device-name{font-size:8px;margin-top:4px}
 .io-power-panel{grid-template-columns:repeat(3,minmax(0,1fr));}
 .io-connection-card{min-width:0;}
 .io-status-row{display:flex;align-items:center;gap:5px;margin:3px 0;min-width:0;}
@@ -4849,6 +4854,11 @@ body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter 
             <div class="io-status-row"><span class="io-status-dot" id="chargerStatusDot"></span><strong id="chargerStatus">POWER: STATUS TIDAK TERSEDIA</strong></div>
             <div class="io-device-name" id="chargerStatusDetail">Status charger mengikuti informasi daya perangkat/browser.</div>
             <div class="io-device-name">Kontrol USB-C tersedia di bar atas agar mudah diakses dari HP.</div>
+            <div class="usb-live-meter" aria-live="polite">
+              <div class="usb-live-meter-head"><strong>USB INPUT LEVEL</strong><span id="usbInputLevelValue">-∞ dB</span></div>
+              <div class="usb-live-meter-track" id="usbInputLevelTrack"><i id="usbInputLevelBar"></i></div>
+              <div class="io-device-name" id="usbInputSignalStatus">BELUM ADA SINYAL AUDIO</div>
+            </div>
             <button id="refreshIoDevicesButton" type="button" style="width:100%;margin-top:5px;">REFRESH INPUT / OUTPUT USB</button>
           </div>
         </div>
@@ -5067,6 +5077,26 @@ function updateStripStatusLeds(strip, db) {
   const clip = strip.querySelector('[data-led="clip"]');
   if (sig) sig.classList.toggle("on", Number.isFinite(db) && db > -48);
   if (clip) clip.classList.toggle("on", Number.isFinite(db) && db >= -1);
+}
+function usbInputConnectedMeterReset() {
+  const bar=document.getElementById("usbInputLevelBar");
+  const value=document.getElementById("usbInputLevelValue");
+  const status=document.getElementById("usbInputSignalStatus");
+  if (bar) bar.style.width="0%";
+  if (value) value.textContent="-∞ dB";
+  if (status) status.textContent="BELUM ADA SINYAL AUDIO";
+}
+function updateUsbInputLevelMeter() {
+  const bar=document.getElementById("usbInputLevelBar");
+  const value=document.getElementById("usbInputLevelValue");
+  const status=document.getElementById("usbInputSignalStatus");
+  if (!bar || !value || !status) return;
+  const db = microphoneStream && usbInputAnalyser ? readMeterDb(usbInputAnalyser) : -72;
+  const pct = Math.max(0, Math.min(100, ((db + 60) / 60) * 100));
+  bar.style.width = pct.toFixed(1) + "%";
+  value.textContent = db <= -71 ? "-∞ dB" : db.toFixed(1) + " dB";
+  status.textContent = db > -48 ? "USB INPUT: SINYAL MASUK" : (microphoneStream ? "USB INPUT: TERHUBUNG, TIDAK ADA SINYAL" : "USB INPUT: BELUM AKTIF");
+  requestAnimationFrame(updateUsbInputLevelMeter);
 }
 function updateAllSignalMeters() {
   const mixerStrips = Array.from(document.querySelectorAll(".mixer-desk-surface .console-channel-strip"));
@@ -5490,6 +5520,8 @@ async function refreshPhysicalInputDevices() {
 let usbAudioConnected = false;
 let usbAudioInputDeviceId = "";
 let usbAudioOutputDeviceId = "";
+let usbInputAnalyser = null;
+let usbInputMeterFrame = null;
 
 function selectBestUsbAudioDevices(inputs=[], outputs=[]) {
   const usbInputs = inputs.filter(isLikelyUsbAudioDevice);
@@ -5604,7 +5636,14 @@ async function activateUsbAudioInput() {
     const exact={deviceId:{exact:selectedInput.deviceId},echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2}};
     microphoneStream=await navigator.mediaDevices.getUserMedia({audio:exact});
     microphoneSource=audioContext.createMediaStreamSource(microphoneStream);
+    if (!usbInputAnalyser) {
+      usbInputAnalyser = audioContext.createAnalyser();
+      usbInputAnalyser.fftSize = 1024;
+      usbInputAnalyser.smoothingTimeConstant = 0.08;
+    }
+    microphoneSource.connect(usbInputAnalyser);
     microphoneSource.connect(mixerStripGains[0]);
+    updateUsbInputLevelMeter();
     startMicButton?.classList.add("active");
     const label=selectedInput.label || "USB-C Audio Interface";
     const outputLabel = physicalOutputDevice?.selectedOptions?.[0]?.textContent || "Output default";
@@ -5675,6 +5714,7 @@ if (navigator.mediaDevices?.addEventListener) navigator.mediaDevices.addEventLis
     microphoneSource?.disconnect();
     microphoneSource=null;
     microphoneStream.getTracks().forEach(track=>track.stop());
+    usbInputConnectedMeterReset();
     microphoneStream=null;
     startMicButton?.classList.remove("active");
     setAudioStatus("USB-C/OTG audio dicabut — input dihentikan.");
