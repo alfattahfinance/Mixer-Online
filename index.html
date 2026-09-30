@@ -5494,14 +5494,23 @@ async function refreshPhysicalInputDevices() {
     const outputs = devices.filter(device => device.kind === "audiooutput");
     if (physicalInputDevice) {
       const previous = physicalInputDevice.value;
-      physicalInputDevice.innerHTML = '<option value="">Default HP / USB</option>';
+      const preferredInputId = usbAudioInputDeviceId || previous;
+      physicalInputDevice.innerHTML = '<option value="">INPUT DEFAULT HP</option>';
       inputs.forEach((device, index) => {
         const option = document.createElement("option");
         option.value = device.deviceId;
         option.textContent = device.label || ("Input " + (index + 1));
         physicalInputDevice.appendChild(option);
       });
-      if (inputs.some(device => device.deviceId === previous)) physicalInputDevice.value = previous;
+      const preferredInput = inputs.find(device => device.deviceId === preferredInputId);
+      if (preferredInput) {
+        physicalInputDevice.value = preferredInput.deviceId;
+      } else if (usbAudioConnected && usbAudioInputLabel) {
+        const labelMatch = inputs.find(device => String(device.label || "").trim() === usbAudioInputLabel);
+        if (labelMatch) physicalInputDevice.value = labelMatch.deviceId;
+      } else if (inputs.some(device => device.deviceId === previous)) {
+        physicalInputDevice.value = previous;
+      }
     }
     if (physicalOutputDevice) {
       const previous = physicalOutputDevice.value;
@@ -5543,16 +5552,28 @@ async function refreshPhysicalInputDevices() {
 let usbAudioConnected = false;
 let usbAudioInputDeviceId = "";
 let usbAudioOutputDeviceId = "";
+let usbAudioInputLabel = "";
+let usbAudioOutputLabel = "";
 let usbInputAnalyser = null;
 let usbInputMeterFrame = null;
 
 function selectBestUsbAudioDevices(inputs=[], outputs=[]) {
-  const usbInputs = inputs.filter(isLikelyUsbAudioDevice);
-  const usbOutputs = outputs.filter(isLikelyUsbAudioDevice);
-  usbAudioInputDeviceId = usbInputs[0]?.deviceId || "";
-  usbAudioOutputDeviceId = usbOutputs[0]?.deviceId || "";
-  usbAudioConnected = usbInputs.length > 0 || usbOutputs.length > 0;
-  return {usbInputs,usbOutputs};
+  const detectedUsbInputs = inputs.filter(isLikelyUsbAudioDevice);
+  const detectedUsbOutputs = outputs.filter(isLikelyUsbAudioDevice);
+  // Jangan menimpa device USB yang sedang aktif hanya karena Android
+  // sementara menyembunyikan label/deviceId saat enumerateDevices().
+  const activeInputStillPresent = usbAudioInputDeviceId && inputs.some(d => d.deviceId === usbAudioInputDeviceId);
+  const activeOutputStillPresent = usbAudioOutputDeviceId && outputs.some(d => d.deviceId === usbAudioOutputDeviceId);
+  const usbInputs = detectedUsbInputs.length
+    ? detectedUsbInputs
+    : (activeInputStillPresent ? [inputs.find(d => d.deviceId === usbAudioInputDeviceId)] : []);
+  const usbOutputs = detectedUsbOutputs.length
+    ? detectedUsbOutputs
+    : (activeOutputStillPresent ? [outputs.find(d => d.deviceId === usbAudioOutputDeviceId)] : []);
+  if (detectedUsbInputs[0]) usbAudioInputDeviceId = detectedUsbInputs[0].deviceId;
+  if (detectedUsbOutputs[0]) usbAudioOutputDeviceId = detectedUsbOutputs[0].deviceId;
+  usbAudioConnected = Boolean(usbInputs.length || usbOutputs.length || microphoneStream);
+  return {usbInputs:usbInputs.filter(Boolean),usbOutputs:usbOutputs.filter(Boolean)};
 }
 
 function isLikelyUsbAudioDevice(device) {
@@ -5634,8 +5655,9 @@ async function activateUsbAudioInput() {
 
     if (probeStream) probeStream.getTracks().forEach(track=>track.stop());
     usbAudioInputDeviceId=selectedInput.deviceId;
+    usbAudioInputLabel=String(selectedInput.label||"").trim();
     usbAudioConnected=true;
-    const usbLabel=String(selectedInput.label||"").trim();
+    const usbLabel=usbAudioInputLabel;
     const isNamedUsb=isLikelyUsbAudioDevice(selectedInput);
     setAudioStatus(
       isNamedUsb
@@ -5740,6 +5762,15 @@ if (physicalOutputDeviceTop) physicalOutputDeviceTop.addEventListener("change", 
 if (physicalInputDevice) physicalInputDevice.addEventListener("change", async () => {
   const id = physicalInputDevice.value || "";
   if (!id) {
+    if (microphoneStream) {
+      microphoneSource?.disconnect();
+      microphoneStream.getTracks().forEach(track=>track.stop());
+      microphoneStream=null;
+      microphoneSource=null;
+    }
+    usbAudioConnected=false;
+    usbAudioInputDeviceId="";
+    usbAudioInputLabel="";
     setAudioStatus("INPUT: Default HP dipilih.");
     return;
   }
