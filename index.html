@@ -10354,3 +10354,146 @@ body.mixer-powered-off #tabMixerContent .mixer-tft-screen .tft-main-viewport {
 }
 
 </style>
+
+
+<style>
+/* RESTORE MIXER SCREEN + 4 FUNCTIONAL CHANNELS + MASTER LR
+   Final layout override: Pages/Channel DSP are a fixed navigation column,
+   never a full-screen overlay and never allowed to push the mixer content off-screen. */
+#tabMixerContent .mixer-workspace{
+  display:grid !important;
+  grid-template-columns:104px minmax(0,1fr) !important;
+  grid-template-rows:minmax(0,1fr) !important;
+  gap:5px !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+  position:relative !important;
+}
+#tabMixerContent .mixer-side-nav{
+  grid-column:1 !important;
+  grid-row:1 !important;
+  position:relative !important;
+  inset:auto !important;
+  width:100% !important;
+  min-width:0 !important;
+  max-width:none !important;
+  height:100% !important;
+  min-height:0 !important;
+  margin:0 !important;
+  z-index:20 !important;
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+}
+#tabMixerContent .mixer-workspace-main{
+  grid-column:2 !important;
+  grid-row:1 !important;
+  display:grid !important;
+  grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+  grid-template-rows:minmax(230px,48%) minmax(190px,1fr) !important;
+  column-gap:5px !important;
+  row-gap:5px !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  margin:0 !important;
+  overflow:hidden !important;
+}
+#tabMixerContent .mixer-top-console{
+  grid-column:1 / span 4 !important;
+  grid-row:1 !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  margin:0 !important;
+  overflow:hidden !important;
+  position:relative !important;
+}
+#tabMixerContent .mixer-tft-screen{
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  margin:0 !important;
+  overflow:hidden !important;
+  position:relative !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-header{
+  margin-left:0 !important;
+  width:100% !important;
+  max-width:100% !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-main-viewport{
+  margin-left:0 !important;
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  height:calc(100% - 28px) !important;
+  overflow:hidden !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-content-screen{
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+}
+#tabMixerContent .mixer-desk-surface{
+  display:contents !important;
+  width:auto !important;
+  height:auto !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:visible !important;
+  padding:0 !important;
+}
+#tabMixerContent .mixer-desk-surface > .console-channel-strip{
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  margin:0 !important;
+}
+#tabMixerContent .mixer-desk-surface > .console-channel-strip:nth-child(1){
+  grid-column:1 !important; grid-row:2 !important;
+}
+#tabMixerContent .mixer-desk-surface > .console-channel-strip:nth-child(2){
+  grid-column:2 !important; grid-row:2 !important;
+}
+#tabMixerContent .mixer-desk-surface > .console-channel-strip:nth-child(3){
+  grid-column:3 !important; grid-row:2 !important;
+}
+#tabMixerContent .mixer-desk-surface > .console-channel-strip:nth-child(4){
+  grid-column:4 !important; grid-row:2 !important;
+}
+#tabMixerContent .mixer-desk-surface > .console-channel-strip.master-strip{
+  grid-column:5 !important;
+  grid-row:1 / span 2 !important;
+  height:100% !important;
+  min-height:0 !important;
+}
+#tabMixerContent .mixer-desk-surface .channel-quick-panel{
+  z-index:60 !important;
+}
+@media(max-width:700px){
+  #tabMixerContent .mixer-workspace{
+    grid-template-columns:76px minmax(0,1fr) !important;
+    gap:4px !important;
+  }
+  #tabMixerContent .mixer-workspace-main{
+    grid-template-rows:minmax(190px,46%) minmax(175px,1fr) !important;
+    gap:4px !important;
+  }
+  #tabMixerContent .mixer-side-nav{
+    padding:4px 3px !important;
+  }
+  #tabMixerContent .mixer-desk-surface > .console-channel-strip{
+    padding:3px !important;
+  }
+}
+</style>
