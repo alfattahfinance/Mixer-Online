@@ -3732,6 +3732,19 @@ input[type="range"] { accent-color:#b8bec6 !important; }
   filter:brightness(1.07) !important;
 }
 
+/* POWER SWITCH POSITION — keep it on the far right of the top audio bar. */
+.top-audio-controls .mixer-power-toggle{
+  order:99 !important;
+  margin-left:auto !important;
+  flex:0 0 auto !important;
+}
+@media(max-width:700px){
+  .top-audio-controls .mixer-power-toggle{
+    margin-left:auto !important;
+    order:99 !important;
+  }
+}
+
 /* Top-bar mixer power switch with a real output mute gate. */
 .top-audio-controls .mixer-power-toggle {
   display:inline-flex; align-items:center; justify-content:center; gap:5px;
