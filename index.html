@@ -7402,6 +7402,52 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 }
 </style>
 
+<style id="geq-live-drag-final-2026-10-01">
+/* GEQ LIVE DRAG FINAL: points are real touch targets and the neon path updates immediately. */
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgContainer {
+  touch-action:none !important;
+  -webkit-user-select:none !important;
+  user-select:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsBands {
+  pointer-events:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsBands .tft-geq-band-dot {
+  pointer-events:all !important;
+  touch-action:none !important;
+  cursor:ns-resize !important;
+  r:4.2px !important;
+  vector-effect:non-scaling-stroke !important;
+  transition:none !important;
+  will-change:cx,cy !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsBands .tft-geq-band-dot:active,
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsBands .tft-geq-band-dot:focus {
+  r:5px !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgCurve {
+  pointer-events:none !important;
+  vector-effect:non-scaling-stroke !important;
+  stroke-linecap:round !important;
+  stroke-linejoin:round !important;
+  transition:none !important;
+  will-change:d !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgFill,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-value-labels {
+  pointer-events:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-value-label {
+  pointer-events:none !important;
+  font-size:2.8px !important;
+  transition:none !important;
+}
+@media(max-width:600px){
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-band-dot { r:4.4px !important; }
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-value-label { font-size:2.55px !important; }
+}
+</style>
 </head>
 
 <body>
@@ -10527,7 +10573,7 @@ function updateTftModuleCurve(key) {
         circle.setAttribute("cy", y.toFixed(2));
         circle.setAttribute("r", index % 5 === 0 ? "3.4" : "2.6");
         circle.setAttribute("aria-label", geqFrequencies[index] + " Hz GEQ band");
-        circle.setAttribute("aria-valuenow", Number(s.bands[index] || 0).toFixed(1));
+        circle.setAttribute("aria-valuenow", (Number(s.bands[index] || 0) + Number(s.lvl || 0)).toFixed(1));
       });
       // Keep exactly 31 stable interactive band nodes.
       Array.from(bandsRoot.children).slice(31).forEach(node => node.remove());
@@ -10578,7 +10624,7 @@ function updateTftModuleCurve(key) {
   // either a slider change or a drag, preventing stale/misaligned dots.
   if (key === "sends") {
     document.querySelectorAll("#tftSendsBands .tft-geq-band-dot").forEach((dot, index) => {
-      if (s.bands?.[index] != null) dot.setAttribute("aria-valuenow", Number(s.bands[index]).toFixed(1));
+      if (s.bands?.[index] != null) dot.setAttribute("aria-valuenow", (Number(s.bands[index]) + Number(s.lvl || 0)).toFixed(1));
     });
   } else {
     [1, 2, 3].forEach((n) => {
@@ -10692,25 +10738,30 @@ function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback, dr
   dotElement.style.cursor = "grab";
   dotElement.style.pointerEvents = "all";
   dotElement.style.userSelect = "none";
+  dotElement.style.webkitUserSelect = "none";
   if (dotElement.tagName.toLowerCase() === "circle" && !dotElement.classList.contains("tft-geq-band-dot")) {
     dotElement.setAttribute("r", "5.5");
   }
   dotElement.setAttribute("tabindex", "0");
   dotElement.setAttribute("role", "slider");
+
   let activePointerId = null;
   let dragStart = null;
+
   const getSvgPoint = (clientX, clientY) => {
     const vb = svgContainer.viewBox && svgContainer.viewBox.baseVal;
     const svgWidth = vb && vb.width ? vb.width : 320;
-    const svgHeight = vb && vb.height ? vb.height : 65;
+    const svgHeight = vb && vb.height ? vb.height : 120;
     let x, y;
     try {
       const matrix = svgContainer.getScreenCTM();
       if (matrix && svgContainer.createSVGPoint) {
         const point = svgContainer.createSVGPoint();
-        point.x = clientX; point.y = clientY;
+        point.x = clientX;
+        point.y = clientY;
         const local = point.matrixTransform(matrix.inverse());
-        x = local.x; y = local.y;
+        x = local.x;
+        y = local.y;
       }
     } catch (_) {}
     if (!Number.isFinite(x) || !Number.isFinite(y)) {
@@ -10721,17 +10772,18 @@ function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback, dr
     }
     return { x, y, svgWidth, svgHeight };
   };
+
   const onPointerMove = (e) => {
     if (activePointerId === null || e.pointerId !== activePointerId || !dragStart) return;
     e.preventDefault();
     const point = getSvgPoint(e.clientX, e.clientY);
     if (!point) return;
-    // Mixer graph controls should track the finger/mouse 1:1.
-    // GEQ and Gate use direct movement; legacy damping remains available
-    // for other non-critical graph controls.
+
     const radius = Number(dotElement.getAttribute("r")) || 7;
     const isGeqBand = dotElement.classList.contains("tft-geq-band-dot");
     const isDirectDrag = isGeqBand || dragOptions.direct === true;
+
+    // GEQ is vertical-only: X remains locked to the band's frequency.
     const relX = isGeqBand
       ? dragStart.dotX
       : Math.max(radius, Math.min(point.svgWidth - radius,
@@ -10740,38 +10792,67 @@ function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback, dr
       ? Math.max(15, Math.min(105, point.y))
       : Math.max(radius, Math.min(point.svgHeight - radius,
           isDirectDrag ? point.y : dragStart.dotY + (point.y - dragStart.pointerY) * 0.55));
+
     dotElement.setAttribute("cx", relX.toFixed(2));
     dotElement.setAttribute("cy", relY.toFixed(2));
-    if (typeof onUpdateCallback === "function") onUpdateCallback(relX, relY, point.svgWidth, point.svgHeight);
+    if (typeof onUpdateCallback === "function") {
+      onUpdateCallback(relX, relY, point.svgWidth, point.svgHeight);
+    }
+  };
+
+  const stopDrag = (e) => {
+    if (activePointerId === null) return;
+    if (e && e.pointerId !== undefined && e.pointerId !== activePointerId) return;
+    const pointerId = activePointerId;
+    activePointerId = null;
+    dragStart = null;
+    dotElement.style.cursor = "grab";
+    svgContainer.classList.remove("tft-graph-dragging");
+    try {
+      if (dotElement.hasPointerCapture(pointerId)) dotElement.releasePointerCapture(pointerId);
+    } catch (_) {}
   };
 
   dotElement.addEventListener("pointerdown", (e) => {
     if (e.button !== undefined && e.button !== 0) return;
     e.preventDefault();
     e.stopPropagation();
-    activePointerId = e.pointerId;
+
     const point = getSvgPoint(e.clientX, e.clientY);
     const cx = Number(dotElement.getAttribute("cx"));
     const cy = Number(dotElement.getAttribute("cy"));
-    dragStart = point && Number.isFinite(cx) && Number.isFinite(cy)
-      ? { pointerX: point.x, pointerY: point.y, dotX: cx, dotY: cy } : null;
+    if (!point || !Number.isFinite(cx) || !Number.isFinite(cy)) return;
+
+    activePointerId = e.pointerId;
+    dragStart = { pointerX: point.x, pointerY: point.y, dotX: cx, dotY: cy };
     dotElement.style.cursor = "grabbing";
     svgContainer.classList.add("tft-graph-dragging");
-    try { svgContainer.setPointerCapture(e.pointerId); } catch (_) {}
+
+    // Capture on the actual target. Capturing on the parent SVG can silently
+    // fail on some mobile browsers and leaves the line/point stuck.
+    try { dotElement.setPointerCapture(e.pointerId); } catch (_) {}
+  }, { passive: false });
+
+  // Listen globally while dragging so movement remains continuous even when
+  // the finger leaves the tiny SVG point.
+  document.addEventListener("pointermove", onPointerMove, { passive: false });
+  document.addEventListener("pointerup", stopDrag, { passive: false });
+  document.addEventListener("pointercancel", stopDrag, { passive: false });
+  dotElement.addEventListener("lostpointercapture", stopDrag);
+
+  dotElement.addEventListener("keydown", (e) => {
+    if (!["ArrowUp","ArrowDown"].includes(e.key)) return;
+    const point = getSvgPoint(0, 0);
+    if (!point) return;
+    e.preventDefault();
+    const currentY = Number(dotElement.getAttribute("cy"));
+    const step = e.shiftKey ? 3 : 1;
+    const nextY = Math.max(15, Math.min(105, currentY + (e.key === "ArrowUp" ? -step : step)));
+    dotElement.setAttribute("cy", nextY.toFixed(2));
+    if (typeof onUpdateCallback === "function") {
+      onUpdateCallback(Number(dotElement.getAttribute("cx")), nextY, point.svgWidth, point.svgHeight);
+    }
   });
-  svgContainer.addEventListener("pointermove", onPointerMove, { passive: false });
-  const stopDrag = (e) => {
-    if (activePointerId === null || (e.pointerId !== undefined && e.pointerId !== activePointerId)) return;
-    const pointerId = activePointerId;
-    activePointerId = null;
-    dragStart = null;
-    dotElement.style.cursor = "grab";
-    svgContainer.classList.remove("tft-graph-dragging");
-    try { if (svgContainer.hasPointerCapture(pointerId)) svgContainer.releasePointerCapture(pointerId); } catch (_) {}
-  };
-  svgContainer.addEventListener("pointerup", stopDrag);
-  svgContainer.addEventListener("pointercancel", stopDrag);
-  svgContainer.addEventListener("lostpointercapture", stopDrag);
 }
 
 function refreshTftInfoPanel(key) {
