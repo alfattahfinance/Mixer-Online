@@ -5698,42 +5698,6 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 }
 
 
-/* =========================================================
-   NATIVE MIXER CURVE SURFACE — TRANSPARENT GRAPH CARDS
-   The graph is part of the TFT screen, not a separate card.
-========================================================= */
-#tabMixerContent #tftContentArea .tft-peq-graph,
-#tabMixerContent #tftContentArea .tft-module-graph-box {
-  background-color: transparent !important;
-  background-image:
-    linear-gradient(to right, rgba(96,165,250,.18) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(96,165,250,.15) 1px, transparent 1px) !important;
-  background-size: 10% 100%, 100% 20% !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  overflow: visible !important;
-}
-#tabMixerContent #tftContentArea .tft-peq-graph::before,
-#tabMixerContent #tftContentArea .tft-peq-graph::after,
-#tabMixerContent #tftContentArea .tft-module-graph-box::before,
-#tabMixerContent #tftContentArea .tft-module-graph-box::after {
-  display:none !important;
-  content:none !important;
-}
-#tabMixerContent #tftContentArea .tft-peq-graph svg,
-#tabMixerContent #tftContentArea .tft-module-graph-box svg {
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-}
-#tabMixerContent #tftContentArea .tft-peq-graph #tftPeqSvgCurve,
-#tabMixerContent #tftContentArea .tft-module-graph-box #tftGateSvgCurve,
-#tabMixerContent #tftContentArea .tft-module-graph-box #tftCompSvgCurve,
-#tabMixerContent #tftContentArea .tft-module-graph-box #tftSendsSvgCurve {
-  filter: drop-shadow(0 0 3px currentColor) drop-shadow(0 0 8px currentColor) !important;
-}
 </style>
 
 <style>
