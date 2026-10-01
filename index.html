@@ -6292,6 +6292,184 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
   }
 }
 </style>
+<style>
+/* FINAL FULLSCREEN NATIVE MIXER CURVE — 2026-10-01 */
+/* The curve is rendered directly inside the real TFT screen. No nested card. */
+#tabMixerContent .mixer-tft-screen{
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-main-viewport{
+  flex:1 1 auto !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  padding:0 !important;
+  gap:0 !important;
+  background:transparent !important;
+  background-color:transparent !important;
+  border:0 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  overflow:hidden !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-content-screen{
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  padding:0 !important;
+  margin:0 !important;
+  background:transparent !important;
+  background-color:transparent !important;
+  overflow:hidden !important;
+}
+#tabMixerContent #tftContentArea{
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  background:transparent !important;
+  background-color:transparent !important;
+  overflow:hidden !important;
+}
+
+/* PEQ / Gate / Comp / GEQ all use the available TFT plot area. */
+#tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq,
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-view,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-view,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-view{
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  max-width:none !important;
+  max-height:none !important;
+  margin:0 !important;
+  padding:0 !important;
+  background:transparent !important;
+  background-color:transparent !important;
+  overflow:hidden !important;
+}
+
+/* PEQ graph itself fills the TFT plotting area between its native header/controls. */
+#tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq{
+  display:grid !important;
+  grid-template-rows:auto minmax(0,1fr) auto !important;
+  gap:clamp(3px,.7vh,8px) !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq-graph{
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  max-width:none !important;
+  max-height:none !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  background-color:transparent !important;
+  background-image:
+    linear-gradient(to right,rgba(72,154,190,.20) 1px,transparent 1px),
+    linear-gradient(to bottom,rgba(72,154,190,.17) 1px,transparent 1px) !important;
+  background-size:10% 100%,100% 20% !important;
+  background-repeat:repeat !important;
+  overflow:hidden !important;
+}
+
+/* Gate / compressor / GEQ graph boxes are transparent plotting surfaces,
+   with only the integrated digital grid painted by CSS. */
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box{
+  flex:1 1 0 !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  max-width:none !important;
+  max-height:none !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  background-color:transparent !important;
+  background-image:
+    linear-gradient(to right,rgba(72,154,190,.20) 1px,transparent 1px),
+    linear-gradient(to bottom,rgba(72,154,190,.17) 1px,transparent 1px) !important;
+  background-size:10% 100%,100% 20% !important;
+  background-repeat:repeat !important;
+  overflow:hidden !important;
+}
+
+/* SVG is the live mixer curve; it stretches with the real TFT viewport. */
+#tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq-graph,
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box{
+  display:block !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq-graph svg,
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box svg,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box svg,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box svg{
+  width:100% !important;
+  height:100% !important;
+  max-width:none !important;
+  max-height:none !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  background:transparent !important;
+  background-color:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+/* Keep the mixer screen's native dark surface visible through the transparent plot. */
+#tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq,
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-view,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-view,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-view,
+#tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq-graph,
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box{
+  isolation:isolate !important;
+}
+
+/* Responsive: never impose a fixed graph height. */
+@media (max-width:700px){
+  #tabMixerContent .mixer-workspace-main{
+    grid-template-rows:minmax(260px,1.15fr) minmax(190px,1fr) !important;
+  }
+}
+@media (min-width:701px){
+  #tabMixerContent .mixer-workspace-main{
+    grid-template-rows:minmax(300px,1.2fr) minmax(220px,1fr) !important;
+  }
+}
+@media (orientation:portrait){
+  #tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq-graph,
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+  #tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box{
+    background-size:12% 100%,100% 16% !important;
+  }
+}
+@media (orientation:landscape){
+  #tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq-graph,
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+  #tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box{
+    background-size:8% 100%,100% 20% !important;
+  }
+}
+</style>
 </head>
 
 <body>
