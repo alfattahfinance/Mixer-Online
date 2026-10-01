@@ -7948,7 +7948,7 @@ let activeCurrentSectionKey = "eq";
 
 const tftStatesData = {
   config: { gain: 12, phantom: true, phase: false, dotX: 160, dotY: 32 },
-  gate: { thresh: -45, ratio: 2.5, state: true, dot1X: 140, dot1Y: 55, dot2X: 310, dot2Y: 12 },
+  gate: { thresh: -45, ratio: 2.5, state: true, dot1X: 85, dot1Y: 42.5, dot2X: 160, dot2Y: 11.25 },
   dynamics: { thresh: -18, ratio: 3, makeup: 2, dot1X: 10, dot1Y: 55, dot2X: 180, dot2Y: 35, dot3X: 310, dot3Y: 20 },
   eq: { freq: 2500, q: 1.5, gain: 4.5 },
   sends: { lvl: 0, preset: 0, state: true, bands: new Array(31).fill(0), dot1X: 180.2, dot1Y: 32, dot2X: 310, dot2Y: 15 },
@@ -9391,7 +9391,7 @@ const tftDatabase = {
           </svg>
         </div>
         <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>Threshold</label><input type="range" id="gateThresh" min="-80" max="0" step="0.1" value="${s.thresh}"><span class="tft-val-disp" id="gateThreshVal">${s.thresh}dB</span></div>
+          <div class="tft-mod-ctrl"><label>Threshold</label><input type="range" id="gateThresh" min="-60" max="0" step="0.1" value="${s.thresh}"><span class="tft-val-disp" id="gateThreshVal">${s.thresh}dB</span></div>
           <div class="tft-mod-ctrl"><label>Ratio</label><input type="range" id="gateRatio" min="1" max="10" step="0.1" value="${s.ratio}"><span class="tft-val-disp" id="gateRatioVal">1:${s.ratio}</span></div>
           <div class="tft-mod-ctrl"><label>Gate State</label><button id="gateStateBtn" class="${s.state ? 'active-action' : ''}" type="button">${s.state ? 'ACTIVE' : 'BYPASS'}</button></div>
         </div>
@@ -10059,14 +10059,20 @@ function applyTftGraphPointToControl(key, pointIndex, x, y) {
     const inputEvent = new Event("input", { bubbles: true }); inputEvent.__fromCurveDrag = true; el.dispatchEvent(inputEvent);
   };
   if (key === "gate") {
-    // Graph calibration: x=10..310 is -60..0 dB, y=55..5 is -60..0 dB.
-    if (pointIndex === 1) setRange("gateThresh", clamp(((x-10)/300)*60-60,-60,0));
-    else if (pointIndex === 2) {
-      const inputDb = clamp(((x-10)/300)*60-60,-60,0);
-      const outputDb = clamp(((55-y)/50)*60-60,-60,0);
-      const threshold = Number(document.getElementById("gateThresh")?.value ?? -45);
-      const ratio = inputDb < threshold ? (threshold-outputDb) / Math.max(0.001, threshold-inputDb) : 1;
-      setRange("gateRatio", Math.round(clamp(ratio,1,10)*10)/10);
+    // Gate graph calibration: X/Y are both -60..0 dB.
+    // Threshold handle follows the diagonal; ratio handle controls the
+    // below-threshold attenuation. Keep the mapping direct and stable.
+    if (pointIndex === 1) {
+      const thresholdDb = clamp(((x - 10) / 300) * 60 - 60, -60, 0);
+      setRange("gateThresh", Math.round(thresholdDb * 10) / 10);
+    } else if (pointIndex === 2) {
+      const threshold = clamp(Number(document.getElementById("gateThresh")?.value ?? -45), -60, 0);
+      const thresholdX = 10 + ((threshold + 60) / 60) * 300;
+      const safeX = clamp(x, thresholdX + 1, 310);
+      const inputDb = clamp(((safeX - 10) / 300) * 60 - 60, -60, 0);
+      const outputDb = clamp(((55 - y) / 50) * 60 - 60, -60, 0);
+      const ratio = (threshold - outputDb) / Math.max(0.1, threshold - inputDb);
+      setRange("gateRatio", Math.round(clamp(ratio, 1, 10) * 10) / 10);
     }
   } else if (key === "dynamics") {
     if (pointIndex === 1) setRange("compThresh", clamp(((x-10)/300)*60-60,-60,0));
@@ -10089,7 +10095,7 @@ function applyTftGraphPointToControl(key, pointIndex, x, y) {
   }
 }
 
-function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback) {
+function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback, dragOptions = {}) {
   if (!svgContainer || !dotElement || dotElement.dataset.dragReady === "1") return;
   dotElement.dataset.dragReady = "1";
   dotElement.style.touchAction = "none";
@@ -10130,17 +10136,20 @@ function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback) {
     e.preventDefault();
     const point = getSvgPoint(e.clientX, e.clientY);
     if (!point) return;
-    // Keep the grabbed offset and dampen relative travel to avoid snapping.
+    // Mixer graph controls should track the finger/mouse 1:1.
+    // GEQ and Gate use direct movement; legacy damping remains available
+    // for other non-critical graph controls.
     const radius = Number(dotElement.getAttribute("r")) || 7;
     const isGeqBand = dotElement.classList.contains("tft-geq-band-dot");
+    const isDirectDrag = isGeqBand || dragOptions.direct === true;
     const relX = isGeqBand
       ? dragStart.dotX
       : Math.max(radius, Math.min(point.svgWidth - radius,
-          dragStart.dotX + (point.x - dragStart.pointerX) * 0.55));
+          isDirectDrag ? point.x : dragStart.dotX + (point.x - dragStart.pointerX) * 0.55));
     const relY = isGeqBand
       ? Math.max(8, Math.min(56, point.y))
       : Math.max(radius, Math.min(point.svgHeight - radius,
-          dragStart.dotY + (point.y - dragStart.pointerY) * 0.55));
+          isDirectDrag ? point.y : dragStart.dotY + (point.y - dragStart.pointerY) * 0.55));
     dotElement.setAttribute("cx", relX.toFixed(2));
     dotElement.setAttribute("cy", relY.toFixed(2));
     if (typeof onUpdateCallback === "function") onUpdateCallback(relX, relY, point.svgWidth, point.svgHeight);
@@ -10432,20 +10441,31 @@ function bindTftDynamicEventListeners(key) {
     if (container && dot1 && curve) {
       makeSpecificDotDraggable(container, dot1, (x, y) => {
         if (key === "sends") x = 160;
+        if (key === "gate") {
+          const thresholdDb = Math.max(-60, Math.min(0, ((x - 10) / 300) * 60 - 60));
+          x = 10 + ((thresholdDb + 60) / 60) * 300;
+          y = 55 - ((thresholdDb + 60) / 60) * 50;
+        }
         applyTftGraphPointToControl(key, 1, x, y);
         s.dotX = s.dot1X = x; s.dotY = s.dot1Y = y;
         updateTftModuleCurve(key);
         try { syncChannelQuickPanelsFromSources(); } catch (_) {}
-      });
+      }, key === "gate" ? { direct: true } : {});
     }
 
     if (container && dot2 && curve && key !== "sends") {
       makeSpecificDotDraggable(container, dot2, (x, y) => {
+        if (key === "gate") {
+          const threshold = Math.max(-60, Math.min(0, Number(s.thresh)));
+          const thresholdX = 10 + ((threshold + 60) / 60) * 300;
+          x = Math.max(thresholdX + 1, Math.min(310, x));
+          y = Math.max(5.5, Math.min(59.5, y));
+        }
         applyTftGraphPointToControl(key, 2, x, y);
         s.dot2X = x; s.dot2Y = y;
         updateTftModuleCurve(key);
         try { syncChannelQuickPanelsFromSources(); } catch (_) {}
-      });
+      }, key === "gate" ? { direct: true } : {});
     }
 
     if (container && dot3 && curve) {
