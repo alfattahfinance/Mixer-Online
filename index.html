@@ -5610,6 +5610,93 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 #tabMixerContent .mixer-tft-screen #tftContentArea .tft-peq-graph > rect:first-child{
   fill:transparent !important;
 }
+
+/* =========================================================
+   NATIVE MIXER CURVE DISPLAY — TRANSPARENT + INTEGRATED GRID
+   The curve is part of the mixer TFT surface, not a separate card.
+========================================================= */
+#tabMixerContent .mixer-tft-screen .tft-peq-graph,
+#tabMixerContent .mixer-tft-screen .tft-module-graph-box {
+  background-color: transparent !important;
+  background-image:
+    linear-gradient(rgba(72, 125, 158, .22) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(72, 125, 158, .22) 1px, transparent 1px) !important;
+  background-size: 10% 20%, 10% 20% !important;
+  background-position: 0 0, 0 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* SVG itself stays transparent so the dark mixer TFT remains visible underneath. */
+#tabMixerContent .mixer-tft-screen .tft-peq-graph,
+#tabMixerContent .mixer-tft-screen .tft-module-graph-box svg {
+  background-color: transparent !important;
+}
+
+/* Remove the old PEQ solid graph fill; grid remains the only graphic background layer. */
+#tabMixerContent .mixer-tft-screen .tft-peq-graph {
+  background-image:
+    linear-gradient(rgba(72, 125, 158, .22) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(72, 125, 158, .22) 1px, transparent 1px) !important;
+  background-size: 10% 20%, 10% 20% !important;
+}
+
+/* Unified digital/neon response curve treatment. */
+#tabMixerContent .mixer-tft-screen .tft-peq-graph path[id$="SvgCurve"],
+#tabMixerContent .mixer-tft-screen .tft-module-graph-box path[id$="SvgCurve"] {
+  stroke: #00ffcc !important;
+  stroke-width: 2.8 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  filter:
+    drop-shadow(0 0 2px rgba(0,255,204,.95))
+    drop-shadow(0 0 6px rgba(0,255,204,.62))
+    drop-shadow(0 0 11px rgba(0,255,204,.28)) !important;
+}
+
+/* GEQ curve + band points use the same integrated mixer glow. */
+#tabMixerContent .mixer-tft-screen #tftSendsSvgCurve {
+  stroke: #00ffcc !important;
+  stroke-width: 2.8 !important;
+  filter:
+    drop-shadow(0 0 2px rgba(0,255,204,.95))
+    drop-shadow(0 0 6px rgba(0,255,204,.62))
+    drop-shadow(0 0 10px rgba(0,255,204,.25)) !important;
+}
+#tabMixerContent .mixer-tft-screen #tftSendsSvgFill {
+  fill: #00ffcc !important;
+  opacity: .08 !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-geq-band-dot {
+  fill: #eaffff !important;
+  stroke: #00ffcc !important;
+  filter: drop-shadow(0 0 3px rgba(0,255,204,.85)) !important;
+}
+
+/* PEQ control point follows the same native TFT neon language. */
+#tabMixerContent .mixer-tft-screen #tftPeqDot2 {
+  fill: #f8ffff !important;
+  stroke: #00ffcc !important;
+  filter:
+    drop-shadow(0 0 3px rgba(0,255,204,.95))
+    drop-shadow(0 0 8px rgba(0,255,204,.55)) !important;
+}
+
+/* Gate/Compressor curve control points: visible but not boxed. */
+#tabMixerContent .mixer-tft-screen #tftGateSvgContainer circle,
+#tabMixerContent .mixer-tft-screen #tftCompSvgContainer circle {
+  filter: drop-shadow(0 0 4px rgba(0,255,204,.72)) !important;
+}
+
+/* Keep the curve/grid clipped to the actual TFT content viewport. */
+#tabMixerContent .mixer-tft-screen .tft-peq-graph,
+#tabMixerContent .mixer-tft-screen .tft-module-graph-box {
+  overflow: hidden !important;
+  contain: paint;
+}
+
 </style>
 
 <style>
