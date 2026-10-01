@@ -6094,6 +6094,204 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 }
 </style>
 
+<style>
+/* FINAL AUTHORITATIVE MIXER TFT CURVE SURFACE
+   Graphs are part of the native mixer display:
+   - transparent graph/card surface
+   - CSS linear-gradient digital grid belongs to the TFT screen
+   - neon live SVG curves
+   - graph fills every available plotting pixel
+   - Pages / Channel DSP remain outside the plotting viewport
+*/
+#tabMixerContent .mixer-tft-screen .tft-main-viewport.tft-curve-integrated{
+  background:transparent !important;
+  background-color:transparent !important;
+  border:0 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  padding:0 !important;
+  overflow:hidden !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-content-screen.tft-curve-integrated-screen{
+  position:relative !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  max-width:100% !important;
+  max-height:100% !important;
+  overflow:hidden !important;
+  background-color:transparent !important;
+  background-image:
+    linear-gradient(to right, rgba(72,154,190,.18) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(72,154,190,.16) 1px, transparent 1px) !important;
+  background-size:10% 100%, 100% 20% !important;
+  background-repeat:repeat, repeat !important;
+  border:0 !important;
+  box-shadow:none !important;
+  border-radius:0 !important;
+  padding:0 !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="eq"],
+#tabMixerContent #tftContentArea[data-page-key="gate"],
+#tabMixerContent #tftContentArea[data-page-key="dynamics"],
+#tabMixerContent #tftContentArea[data-page-key="sends"]{
+  position:relative !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  max-width:100% !important;
+  max-height:100% !important;
+  overflow:hidden !important;
+  background:transparent !important;
+  padding:0 !important;
+  margin:0 !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq{
+  display:grid !important;
+  grid-template-rows:auto minmax(0,1fr) !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  gap:0 !important;
+  overflow:hidden !important;
+  background:transparent !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-view,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-view,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-view{
+  display:flex !important;
+  flex-direction:column !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  gap:0 !important;
+  overflow:hidden !important;
+  background:transparent !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq-graph,
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box{
+  position:relative !important;
+  display:block !important;
+  flex:1 1 0 !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  max-width:100% !important;
+  max-height:none !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  background:transparent !important;
+  background-color:transparent !important;
+  background-image:none !important;
+  overflow:hidden !important;
+  isolation:auto !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq-graph svg,
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box svg,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box svg,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box svg{
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  max-width:100% !important;
+  max-height:100% !important;
+  background:transparent !important;
+  background-color:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="eq"] #tftPeqSvgCurve{
+  stroke:#00ffcc !important;
+  stroke-width:3 !important;
+  fill:none !important;
+  stroke-linecap:round !important;
+  stroke-linejoin:round !important;
+  filter:drop-shadow(0 0 2px rgba(0,255,204,.98))
+         drop-shadow(0 0 6px rgba(0,255,204,.82))
+         drop-shadow(0 0 12px rgba(0,255,204,.42)) !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] #tftGateSvgCurve{
+  stroke:#ffb000 !important;
+  stroke-width:2.8 !important;
+  fill:none !important;
+  stroke-linecap:round !important;
+  stroke-linejoin:round !important;
+  filter:drop-shadow(0 0 2px rgba(255,176,0,.98))
+         drop-shadow(0 0 6px rgba(255,176,0,.80))
+         drop-shadow(0 0 12px rgba(255,176,0,.38)) !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompSvgCurve{
+  stroke:#00ff9d !important;
+  stroke-width:2.8 !important;
+  fill:none !important;
+  stroke-linecap:round !important;
+  stroke-linejoin:round !important;
+  filter:drop-shadow(0 0 2px rgba(0,255,157,.98))
+         drop-shadow(0 0 6px rgba(0,255,157,.80))
+         drop-shadow(0 0 12px rgba(0,255,157,.38)) !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgCurve{
+  stroke:#ff007f !important;
+  stroke-width:3 !important;
+  fill:none !important;
+  stroke-linecap:round !important;
+  stroke-linejoin:round !important;
+  filter:drop-shadow(0 0 2px rgba(255,0,127,.98))
+         drop-shadow(0 0 6px rgba(255,0,127,.82))
+         drop-shadow(0 0 12px rgba(255,0,127,.42)) !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="eq"] #tftPeqSvgFill{
+  fill:#00ffcc !important; opacity:.055 !important; pointer-events:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] #tftGateSvgFill{
+  fill:#ffb000 !important; opacity:.045 !important; pointer-events:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompSvgFill{
+  fill:#00ff9d !important; opacity:.045 !important; pointer-events:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgFill{
+  fill:#ff007f !important; opacity:.045 !important; pointer-events:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq-controls,
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-controls-grid,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-controls-grid,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-controls-grid{
+  display:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq-head{
+  flex:0 0 auto !important;
+  margin:0 !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq-graph circle,
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box circle,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box circle,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box circle{
+  pointer-events:all !important;
+  touch-action:none !important;
+}
+@media (max-width:700px){
+  #tabMixerContent .mixer-tft-screen .tft-content-screen.tft-curve-integrated-screen{
+    background-size:12% 100%, 100% 16% !important;
+  }
+}
+@media (orientation:landscape) and (min-width:701px){
+  #tabMixerContent .mixer-tft-screen .tft-content-screen.tft-curve-integrated-screen{
+    background-size:8% 100%, 100% 20% !important;
+  }
+}
+</style>
 </head>
 
 <body>
