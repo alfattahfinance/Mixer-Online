@@ -7279,26 +7279,27 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 ========================================================= */
 #tabMixerContent #tftContentArea .tft-module-graph-box svg,
 #tabMixerContent #tftContentArea .tft-peq-graph svg {
-  will-change: transform;
-  contain: layout paint;
+  will-change: auto;
 }
 #tabMixerContent #tftContentArea .tft-module-graph-box svg .tft-transfer-reference,
 #tabMixerContent #tftContentArea .tft-module-graph-box svg .tft-transfer-grid {
   pointer-events:none !important;
 }
-#tabMixerContent #tftContentArea .tft-module-graph-box.tft-graph-dragging #tftGateSvgCurve,
-#tabMixerContent #tftContentArea .tft-module-graph-box.tft-graph-dragging #tftCompSvgCurve,
-#tabMixerContent #tftContentArea .tft-module-graph-box.tft-graph-dragging #tftSendsSvgCurve {
+#tabMixerContent #tftContentArea #tftGateSvgContainer.tft-graph-dragging #tftGateSvgCurve,
+#tabMixerContent #tftContentArea #tftCompSvgContainer.tft-graph-dragging #tftCompSvgCurve,
+#tabMixerContent #tftContentArea #tftSendsSvgContainer.tft-graph-dragging #tftSendsSvgCurve {
   transition:none !important;
   filter:drop-shadow(0 0 2px currentColor) !important;
   will-change:d;
 }
-#tabMixerContent #tftContentArea .tft-module-graph-box.tft-graph-dragging #tftCompSvgFill,
-#tabMixerContent #tftContentArea .tft-module-graph-box.tft-graph-dragging #tftGateSvgFill,
-#tabMixerContent #tftContentArea .tft-module-graph-box.tft-graph-dragging #tftSendsSvgFill {
+#tabMixerContent #tftContentArea #tftCompSvgContainer.tft-graph-dragging #tftCompSvgFill,
+#tabMixerContent #tftContentArea #tftGateSvgContainer.tft-graph-dragging #tftGateSvgFill,
+#tabMixerContent #tftContentArea #tftSendsSvgContainer.tft-graph-dragging #tftSendsSvgFill {
   opacity:.035 !important;
 }
-#tabMixerContent #tftContentArea .tft-module-graph-box.tft-graph-dragging circle {
+#tabMixerContent #tftContentArea #tftCompSvgContainer.tft-graph-dragging circle,
+#tabMixerContent #tftContentArea #tftGateSvgContainer.tft-graph-dragging circle,
+#tabMixerContent #tftContentArea #tftSendsSvgContainer.tft-graph-dragging circle {
   filter:drop-shadow(0 0 2px currentColor) !important;
 }
 #tabMixerContent #tftContentArea .tft-module-graph-box #tftCompSvgCurve {
