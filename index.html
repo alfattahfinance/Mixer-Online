@@ -7468,6 +7468,38 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
   #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-value-label { font-size:2.55px !important; }
 }
 </style>
+
+<style id="geq-curve-drag-glow-final-2026-10-02">
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgCurveHit {
+  pointer-events:stroke !important; stroke:transparent !important; stroke-width:14px !important;
+  cursor:ns-resize !important; touch-action:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgCurve {
+  pointer-events:none !important; stroke:#67ffe1 !important; stroke-width:2.5px !important;
+  filter:drop-shadow(0 0 2px rgba(0,255,204,.98)) drop-shadow(0 0 5px rgba(0,255,204,.65)) drop-shadow(0 0 10px rgba(56,189,248,.32)) !important;
+  will-change:d,filter !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsBands .tft-geq-band-dot {
+  r:4.6px !important; fill:#f8fffd !important; fill-opacity:1 !important;
+  stroke:#00ffd0 !important; stroke-width:2px !important; stroke-opacity:1 !important;
+  filter:drop-shadow(0 0 2px rgba(0,255,208,.98)) drop-shadow(0 0 5px rgba(0,255,208,.58)) !important;
+  pointer-events:all !important; touch-action:none !important; transition:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsBands .tft-geq-band-dot.tft-geq-dragging,
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsBands .tft-geq-band-dot:active,
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsBands .tft-geq-band-dot:focus {
+  r:5.4px !important; stroke-width:2.2px !important;
+  filter:drop-shadow(0 0 3px rgba(0,255,208,1)) drop-shadow(0 0 8px rgba(0,255,208,.82)) !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgContainer.tft-graph-dragging #tftSendsSvgCurve {
+  stroke:#b8fff2 !important; stroke-width:3px !important;
+  filter:drop-shadow(0 0 3px rgba(0,255,208,1)) drop-shadow(0 0 8px rgba(0,255,208,.82)) drop-shadow(0 0 14px rgba(56,189,248,.4)) !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgFill {
+  fill:#00d9b2 !important; opacity:.07 !important; filter:drop-shadow(0 0 8px rgba(0,255,204,.2)) !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-grid { filter:drop-shadow(0 0 1px rgba(0,255,204,.18)); }
+</style>
 </head>
 
 <body>
@@ -10185,6 +10217,7 @@ const tftDatabase = {
             </g>
             <path id="tftSendsSvgFill" d="" fill="#a855f7" opacity=".16"/>
             <path id="tftSendsSvgCurve" d="" fill="none" stroke="#d8b4fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path id="tftSendsSvgCurveHit" d="" fill="none" stroke="transparent" stroke-width="14" stroke-linecap="round" pointer-events="stroke"/>
             <g id="tftSendsBands" class="tft-geq-band-points" aria-label="31 GEQ bands"></g>
             <g class="tft-geq-freq-labels" aria-hidden="true">
               <text x="8" y="64">20</text><text x="44" y="64">50</text><text x="73" y="64">100</text>
@@ -10639,6 +10672,10 @@ function updateTftModuleCurve(key) {
   }
   curve.setAttribute("d", d);
   if (fill) fill.setAttribute("d", d + " L315 105 L5 105 Z");
+  if (key === "sends") {
+    const hit = document.getElementById("tftSendsSvgCurveHit");
+    if (hit) hit.setAttribute("d", d);
+  }
 
   // Refresh every visible handle from the same calculated point list after
   // either a slider change or a drag, preventing stale/misaligned dots.
@@ -11256,7 +11293,20 @@ function bindTftDynamicEventListeners(key) {
         };
 
         container.addEventListener("pointerdown", (event) => {
-          const dot = event.target?.closest?.(".tft-geq-band-dot");
+          const curveHit = event.target?.closest?.("#tftSendsSvgCurveHit");
+          let dot = event.target?.closest?.(".tft-geq-band-dot");
+          if (!dot && curveHit) {
+            const point = getSvgPoint(event.clientX, event.clientY);
+            if (point) {
+              const dots = Array.from(bandsRoot?.querySelectorAll?.(".tft-geq-band-dot") || []);
+              dot = dots.reduce((nearest, candidate) => {
+                if (!nearest) return candidate;
+                const dx = Math.abs(Number(candidate.getAttribute("cx")) - point.x);
+                const ndx = Math.abs(Number(nearest.getAttribute("cx")) - point.x);
+                return dx < ndx ? candidate : nearest;
+              }, null);
+            }
+          }
           if (!dot || !bandsRoot?.contains(dot)) return;
           if (event.button !== undefined && event.button !== 0) return;
           const point = getSvgPoint(event.clientX, event.clientY);
