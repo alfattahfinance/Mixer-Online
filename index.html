@@ -7402,6 +7402,26 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 }
 </style>
 
+<style id="geq-hit-area-live-2026-10-02">
+/* Larger invisible touch target; the visible GEQ dot stays small. */
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsBands .tft-geq-band-dot {
+  stroke:#c084fc !important;
+  stroke-width:8px !important;
+  stroke-opacity:.001 !important;
+  fill:#f5d0fe !important;
+  fill-opacity:1 !important;
+  vector-effect:non-scaling-stroke !important;
+  pointer-events:all !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgCurve {
+  filter:drop-shadow(0 0 2px rgba(216,180,254,.85)) !important;
+  transition:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgContainer.tft-graph-dragging #tftSendsSvgCurve {
+  filter:drop-shadow(0 0 2px rgba(216,180,254,.95)) !important;
+  stroke-width:2.7px !important;
+}
+</style>
 <style id="geq-live-drag-final-2026-10-01">
 /* GEQ LIVE DRAG FINAL: points are real touch targets and the neon path updates immediately. */
 #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box,
@@ -10807,6 +10827,13 @@ function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback, dr
     activePointerId = null;
     dragStart = null;
     dotElement.style.cursor = "grab";
+    if (dotElement.classList.contains("tft-geq-band-dot")) {
+      try {
+        const state = window.tftStatesData && window.tftStatesData.sends;
+        if (state && state.__geqPersistTimer) clearTimeout(state.__geqPersistTimer);
+        if (typeof window.persistTftState === "function") window.persistTftState();
+      } catch (_) {}
+    }
     svgContainer.classList.remove("tft-graph-dragging");
     try {
       if (dotElement.hasPointerCapture(pointerId)) dotElement.releasePointerCapture(pointerId);
@@ -11155,7 +11182,8 @@ function bindTftDynamicEventListeners(key) {
           const totalGain = clampGeq((60 - y) / 3, -15, 15);
           s.bands[index] = Math.round(clampGeq(totalGain - Number(s.lvl || 0), -15, 15) * 10) / 10;
           updateTftModuleCurve("sends");
-          persistTftState();
+          clearTimeout(s.__geqPersistTimer);
+          s.__geqPersistTimer = setTimeout(() => persistTftState(), 120);
         };
         makeSpecificDotDraggable(container, bandDot, (_x, y) => {
           const index = Number(bandDot.dataset.bandIndex);
