@@ -11268,3 +11268,122 @@ body.mixer-powered-off #tabMixerContent .mixer-tft-screen .tft-main-viewport {
 
 </style>
 
+
+
+<style>
+/* =========================================================
+   FINAL FIX — CURVE IS PART OF THE MIXER TFT, NOT A CARD
+   The TFT screen owns the single background surface.
+   PEQ / Gate / Compressor / GEQ curve areas are transparent.
+========================================================= */
+
+/* One continuous TFT surface for every curve page. */
+#tabMixerContent .mixer-tft-screen:has(#tftContentArea) .tft-main-viewport,
+#tabMixerContent .mixer-tft-screen:has(#tftContentArea) .tft-content-screen,
+#tabMixerContent .mixer-tft-screen:has(#tftContentArea) #tftContentArea {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Remove the visual-card treatment from the curve page wrappers. */
+#tabMixerContent #tftContentArea .tft-peq,
+#tabMixerContent #tftContentArea .tft-module-view,
+#tabMixerContent #tftContentArea .curve-native-view {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* The actual graph surface is transparent; no second background/card. */
+#tabMixerContent #tftContentArea .tft-peq-graph,
+#tabMixerContent #tftContentArea .tft-module-graph-box,
+#tabMixerContent #tftContentArea .eq-response-curve {
+  position: relative !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+}
+
+/* Digital frequency grid is an overlay only — it does not create a card. */
+#tabMixerContent #tftContentArea .tft-peq-graph::before,
+#tabMixerContent #tftContentArea .tft-module-graph-box::before,
+#tabMixerContent #tftContentArea .eq-response-curve::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background-image:
+    linear-gradient(to right, rgba(80,160,205,.18) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(80,160,205,.15) 1px, transparent 1px) !important;
+  background-size: 10% 100%, 100% 20% !important;
+  background-repeat: repeat !important;
+}
+
+/* SVG sits directly above the integrated grid. */
+#tabMixerContent #tftContentArea .tft-peq-graph > svg,
+#tabMixerContent #tftContentArea .tft-module-graph-box > svg,
+#tabMixerContent #tftContentArea .eq-response-curve > svg {
+  position: relative !important;
+  z-index: 1 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Neon curve glow, while preserving the existing interactive SVG. */
+#tabMixerContent #tftContentArea #tftPeqSvgCurve {
+  stroke: #00ffcc !important;
+  filter: drop-shadow(0 0 3px rgba(0,255,204,.95))
+          drop-shadow(0 0 8px rgba(0,255,204,.45)) !important;
+}
+#tabMixerContent #tftContentArea #tftGateSvgCurve {
+  stroke: #ffb020 !important;
+  filter: drop-shadow(0 0 3px rgba(255,176,32,.9))
+          drop-shadow(0 0 8px rgba(255,176,32,.38)) !important;
+}
+#tabMixerContent #tftContentArea #tftCompSvgCurve {
+  stroke: #35e0a1 !important;
+  filter: drop-shadow(0 0 3px rgba(53,224,161,.9))
+          drop-shadow(0 0 8px rgba(53,224,161,.38)) !important;
+}
+#tabMixerContent #tftContentArea #tftSendsSvgCurve {
+  stroke: #ff007f !important;
+  filter: drop-shadow(0 0 3px rgba(255,0,127,.95))
+          drop-shadow(0 0 8px rgba(255,0,127,.42)) !important;
+}
+
+/* Do not let the grid or curve spill into Pages / Channel DSP. */
+#tabMixerContent .mixer-side-nav,
+#tabMixerContent .mixer-tft-screen,
+#tabMixerContent .mixer-workspace-main {
+  position: relative !important;
+  overflow: hidden !important;
+}
+#tabMixerContent .mixer-side-nav {
+  z-index: 30 !important;
+}
+#tabMixerContent .mixer-tft-screen {
+  z-index: 10 !important;
+}
+</style>
+
