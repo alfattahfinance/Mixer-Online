@@ -7305,6 +7305,101 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 #tabMixerContent #tftContentArea .tft-module-graph-box #tftCompSvgCurve {
   transition:none !important;
 }
+<style id="final-geq-responsive-cleanup-2026-10-01">
+/* =========================================================
+   FINAL GEQ CLEANUP — 31 POINTS / COMPACT VALUES / 1:1 DRAG
+========================================================= */
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgContainer {
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  display:block !important;
+  overflow:hidden !important;
+  touch-action:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsBands {
+  pointer-events:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsBands .tft-geq-band-dot {
+  pointer-events:all !important;
+  r:2.8px !important;
+  fill:#f7fffd !important;
+  stroke:#00ffcc !important;
+  stroke-width:1.25px !important;
+  vector-effect:non-scaling-stroke !important;
+  cursor:ns-resize !important;
+  filter:drop-shadow(0 0 2px rgba(0,255,204,.9)) !important;
+  transition:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsBands .tft-geq-band-dot:hover,
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsBands .tft-geq-band-dot:focus,
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsBands .tft-geq-band-dot:active {
+  r:3.5px !important;
+  stroke-width:1.45px !important;
+  filter:drop-shadow(0 0 3px rgba(0,255,204,.98)) !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgCurve {
+  vector-effect:non-scaling-stroke !important;
+  stroke:#00ffcc !important;
+  stroke-width:2.2px !important;
+  stroke-linecap:round !important;
+  stroke-linejoin:round !important;
+  transition:none !important;
+  filter:
+    drop-shadow(0 0 2px rgba(0,255,204,.9))
+    drop-shadow(0 0 5px rgba(0,255,204,.38)) !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgFill {
+  pointer-events:none !important;
+  opacity:.055 !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-value-label {
+  fill:#eafffb !important;
+  font-size:2.7px !important;
+  line-height:1 !important;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace !important;
+  font-weight:700 !important;
+  letter-spacing:0 !important;
+  paint-order:stroke !important;
+  stroke:rgba(0,10,15,.88) !important;
+  stroke-width:.38px !important;
+  pointer-events:none !important;
+  user-select:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-scale text,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-freq-labels text {
+  font-size:3.2px !important;
+  font-weight:650 !important;
+  paint-order:stroke !important;
+  stroke:rgba(2,7,12,.8) !important;
+  stroke-width:.35px !important;
+  pointer-events:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-freq-labels .axis-title {
+  font-size:3.1px !important;
+  font-weight:800 !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] > .tft-module-view {
+  min-width:0 !important;
+  max-width:100% !important;
+  overflow:hidden !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-controls-grid {
+  flex:0 0 auto !important;
+  min-width:0 !important;
+}
+@media(max-width:600px) {
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-value-label { font-size:2.35px !important; }
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-scale text,
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-freq-labels text { font-size:2.8px !important; }
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-freq-labels .axis-title { font-size:2.7px !important; }
+}
+@media(min-width:1200px) {
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-value-label { font-size:3px !important; }
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-scale text,
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-freq-labels text { font-size:3.5px !important; }
+}
 </style>
 
 </head>
@@ -10527,10 +10622,14 @@ function updateTftModuleCurve(key) {
           valueRoot.appendChild(label);
         }
         label.setAttribute("x", Number(x).toFixed(2));
-        label.setAttribute("y", Math.max(15, Math.min(105, Number(y) - 4)).toFixed(2));
+        // Keep GEQ numbers compact and alternating so adjacent bands do not
+        // form a large unreadable block on narrow TFT screens.
+        const labelDy = index % 2 === 0 ? -4.5 : 4.5;
+        label.setAttribute("y", Math.max(15, Math.min(105, Number(y) + labelDy)).toFixed(2));
         label.setAttribute("text-anchor", "middle");
         label.setAttribute("dominant-baseline", "middle");
         label.textContent = (gain >= 0 ? "+" : "") + gain.toFixed(1);
+        label.dataset.bandIndex = String(index);
         label.style.display = show ? "" : "none";
       });
     }
@@ -10980,7 +11079,7 @@ function bindTftDynamicEventListeners(key) {
         makeSpecificDotDraggable(container, bandDot, (_x, y) => {
           const index = Number(bandDot.dataset.bandIndex);
           setGeqBandFromY(index, y);
-        });
+        }, { direct: true });
         bandDot.addEventListener("keydown", (event) => {
           const index = Number(bandDot.dataset.bandIndex);
           if (!Number.isInteger(index) || index < 0 || index > 30) return;
