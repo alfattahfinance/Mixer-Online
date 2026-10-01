@@ -7122,6 +7122,13 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 </style>
 
 
+<style id="final-comp-point3-calibration-2026-10-01">
+/* COMP point #3: fixed 0 dB input endpoint at the right edge. */
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer #tftCompDot3 {
+  cursor:grab !important;
+  pointer-events:all !important;
+}
+</style>
 <style id="final-curve-points-grid-cleanup-2026-10-01">
 /* =========================================================
    FINAL CURVE CLEANUP — 3 COMP POINTS + SINGLE DIGITAL GRID
@@ -10530,12 +10537,14 @@ function applyTftGraphPointToControl(key, pointIndex, x, y) {
       const ratio = inputDb > threshold ? (inputDb-threshold) / Math.max(0.001, outputDb-threshold) : 1;
       setRange("compRatio", Math.round(clamp(ratio,1,20)*10)/10);
     } else if (pointIndex === 3) {
-      const outputDb = clamp(((55-y)/50)*60-60,-60,0);
+      // COMP point #3 is the 0 dB input endpoint. Decode Y with the current
+      // calibrated graph mapping: Y=105 => -60 dB, Y=15 => 0 dB.
+      const outputDb = clamp(((105 - y) / 90) * 60 - 60, -60, 24);
       const inputDb = 0;
       const threshold = Number(document.getElementById("compThresh")?.value ?? -18);
       const ratio = Math.max(1, Number(document.getElementById("compRatio")?.value ?? 3));
-      const baseOut = threshold + (inputDb-threshold)/ratio;
-      setRange("compMakeup", Math.round(clamp(outputDb-baseOut,0,24)*10)/10);
+      const baseOut = threshold + (inputDb - threshold) / ratio;
+      setRange("compMakeup", Math.round(clamp(outputDb - baseOut, 0, 24) * 10) / 10);
     }
   } else if (key === "sends" && pointIndex === 1) {
     setRange("send1Lvl", Math.round(clamp((32-y)/(24/15),-15,15)*10)/10);
@@ -10908,11 +10917,16 @@ function bindTftDynamicEventListeners(key) {
 
     if (container && dot3 && curve) {
       makeSpecificDotDraggable(container, dot3, (x, y) => {
+        // COMP point #3 is the fixed 0 dB input endpoint.
+        if (key === "dynamics") {
+          x = 310;
+          y = Math.max(15, Math.min(105, y));
+        }
         applyTftGraphPointToControl(key, 3, x, y);
         s.dot3X = x; s.dot3Y = y;
         updateTftModuleCurve(key);
         try { syncChannelQuickPanelsFromSources(); } catch (_) {}
-      });
+      }, key === "dynamics" ? { direct: true } : {});
     }
 
     if (key === "sends" && container) {
