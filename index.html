@@ -13539,4 +13539,19 @@ body.mixer-powered-off #tabMixerContent .mixer-tft-screen .tft-main-viewport {
   #tabMixerContent .mixer-tft-screen .tft-peq-graph text { font-size:4.6px !important; }
   #tabMixerContent .mixer-tft-screen .tft-graph-value-label { font-size:4.3px !important; }
 }
+
+/* POWER OFF: PAGES + CHANNEL DSP tetap terlihat, tetapi sedikit lebih redup.
+   Hanya dua bar navigasi ini yang terkena efek; layar mixer, fader, dan USB bar tidak ikut. */
+body.mixer-powered-off #tabMixerContent .mixer-side-nav .tft-tab,
+body.mixer-powered-off #tabMixerContent .mixer-side-nav .console-btn {
+  opacity:.62 !important;
+  filter:brightness(.72) saturate(.72) !important;
+  box-shadow:inset 0 1px rgba(255,255,255,.10) !important;
+  transition:opacity .2s ease, filter .2s ease !important;
+}
+body.mixer-powered-off #tabMixerContent .mixer-side-nav .tft-tab.active,
+body.mixer-powered-off #tabMixerContent .mixer-side-nav .console-btn.active {
+  opacity:.72 !important;
+  filter:brightness(.82) saturate(.78) !important;
+}
 </style>
