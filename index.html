@@ -8218,9 +8218,9 @@ function captureMixerScene(){
     globals:{masterGain:document.getElementById("masterGainControl")?.value??null,outputMode:document.getElementById("outputMode")?.value??null}
   };
 }
-function applyMixerScene(snap){
+function applyMixerScene(snap,sceneSafe){
   if(!snap)return false;
-  if(snap.tft){Object.keys(snap.tft).forEach(k=>{if(k!=="scenes"&&tftStatesData[k]&&snap.tft[k])Object.assign(tftStatesData[k],cloneSceneValue(snap.tft[k])||{});});persistTftState();}
+  if(snap.tft){Object.keys(snap.tft).forEach(k=>{if(k==="scenes"||((k==="routing"||k==="setup")&&sceneSafe))return;if(tftStatesData[k]&&snap.tft[k])Object.assign(tftStatesData[k],cloneSceneValue(snap.tft[k])||{});});persistTftState();}
   if(snap.quickState)try{localStorage.setItem("mixerChannelQuickState",JSON.stringify(snap.quickState));}catch{}
   const strips=[...document.querySelectorAll("#tabMixerContent .console-channel-strip:not(.master-strip)")];
   (snap.strips||[]).forEach(saved=>{
@@ -10701,7 +10701,7 @@ function bindTftDynamicEventListeners(key) {
       const refreshSceneUi=()=>{ensureSceneUi();const active=Number(s.active)||0;sceneBank.forEach((x,i)=>{const row=document.querySelector('[data-scene-row="'+i+'"]');if(row)row.classList.toggle("selected",i===active);});s.stored=!!sceneBank[active]?.snapshot;updateEncoders(tftDatabase.scenes.encoders(s));};
       actSel?.addEventListener("change",()=>{s.active=Math.max(0,Math.min(SCENE_COUNT-1,Number(actSel.value)||0));refreshSceneUi();});
       storeBtn?.addEventListener("click",()=>{const i=Number(s.active)||0;const snap=captureMixerScene();sceneBank[i].snapshot=snap;sceneBank[i].updatedAt=Date.now();tftSceneSnapshots[i]=cloneSceneValue(snap.tft);persistSceneBank();persistTftState();sendSceneTransport("SCENE_STORE",i,snap);setStatus("Scene #"+String(i+1).padStart(2,"0")+" tersimpan sebagai FULL MIX SNAPSHOT.");storeBtn.textContent="SAVED ✓";setTimeout(()=>{if(storeBtn.isConnected)storeBtn.textContent="STORE";},1000);refreshSceneUi();});
-      recallBtn?.addEventListener("click",()=>{const i=Number(s.active)||0;const snap=sceneBank[i]?.snapshot;if(!snap){setStatus("Scene kosong.");return;}if(applyMixerScene(snap)){sendSceneTransport("SCENE_RECALL",i,snap);setStatus("Scene #"+String(i+1).padStart(2,"0")+" RECALLED → TX → SIMULATOR → ACK.");refreshSceneUi();}});
+      recallBtn?.addEventListener("click",()=>{const i=Number(s.active)||0;const snap=sceneBank[i]?.snapshot;if(!snap){setStatus("Scene kosong.");return;}if(applyMixerScene(snap,s.safe)){sendSceneTransport("SCENE_RECALL",i,snap);setStatus("Scene #"+String(i+1).padStart(2,"0")+" RECALLED → TX → SIMULATOR → ACK.");refreshSceneUi();}});
       safeBtn?.addEventListener("click",()=>{s.safe=!s.safe;safeBtn.textContent=s.safe?"SAFE ON":"SAFE OFF";safeBtn.classList.toggle("active-action",s.safe);updateEncoders(tftDatabase.scenes.encoders(s));});
       renameBtn?.addEventListener("click",()=>{const i=Number(s.active)||0;const n=prompt("Nama Scene #"+String(i+1).padStart(2,"0"),sceneBank[i].name);if(n&&String(n).trim()){sceneBank[i].name=String(n).trim().slice(0,40);persistSceneBank();loadTftPage("scenes");}});
       duplicateBtn?.addEventListener("click",()=>{const i=Number(s.active)||0;if(!sceneBank[i].snapshot){setStatus("Scene sumber kosong.");return;}const d=sceneBank.findIndex((x,j)=>j!==i&&!x.snapshot);const target=d>=0?d:(i+1)%SCENE_COUNT;sceneBank[target].snapshot=cloneSceneValue(sceneBank[i].snapshot);sceneBank[target].name=sceneBank[i].name+" Copy";sceneBank[target].updatedAt=Date.now();persistSceneBank();s.active=target;loadTftPage("scenes");setStatus("Scene duplicated.");});
