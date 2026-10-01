@@ -7121,6 +7121,150 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 }
 </style>
 
+
+<style id="final-curve-points-grid-cleanup-2026-10-01">
+/* =========================================================
+   FINAL CURVE CLEANUP — 3 COMP POINTS + SINGLE DIGITAL GRID
+   Visual-only: DSP values, transfer math and interaction logic unchanged.
+========================================================= */
+
+/* COMPRESSOR — exactly three compact, clearly separated control points. */
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer #tftCompDot1,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer #tftCompDot2,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer #tftCompDot3 {
+  r:3.6px !important;
+  fill:#f8ffff !important;
+  stroke:#00ff9d !important;
+  stroke-width:1.35px !important;
+  vector-effect:non-scaling-stroke !important;
+  pointer-events:all !important;
+  cursor:grab !important;
+  filter:
+    drop-shadow(0 0 2px rgba(0,255,157,.95))
+    drop-shadow(0 0 5px rgba(0,255,157,.42)) !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer #tftCompDot1:active,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer #tftCompDot2:active,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer #tftCompDot3:active {
+  r:4.1px !important;
+  stroke-width:1.5px !important;
+}
+
+/* The curve must remain visually above the grid and below the points. */
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompSvgCurve {
+  vector-effect:non-scaling-stroke !important;
+  stroke:#00ff9d !important;
+  stroke-width:2.55px !important;
+  stroke-linecap:round !important;
+  stroke-linejoin:round !important;
+  fill:none !important;
+  filter:
+    drop-shadow(0 0 2px rgba(0,255,157,.92))
+    drop-shadow(0 0 6px rgba(0,255,157,.42)) !important;
+}
+
+/* One clean digital background grid, aligned to the real 10..310 / 15..105
+   transfer-graph plotting box. The pseudo-element is clipped to that box,
+   so the grid never crosses the axis labels. */
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompBox {
+  position:relative !important;
+  background:transparent !important;
+  background-image:none !important;
+  border:0 !important;
+  box-shadow:none !important;
+  isolation:isolate !important;
+  overflow:hidden !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompBox::before {
+  content:"" !important;
+  position:absolute !important;
+  left:3.125% !important;
+  right:3.125% !important;
+  top:12.5% !important;
+  bottom:12.5% !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+  background-image:
+    linear-gradient(to right, rgba(88,160,190,.24) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(88,160,190,.22) 1px, transparent 1px),
+    linear-gradient(to right, rgba(88,160,190,.075) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(88,160,190,.065) 1px, transparent 1px) !important;
+  background-size:
+    16.6667% 100%,
+    100% 16.6667%,
+    3.3333% 100%,
+    100% 3.3333% !important;
+  background-position:0 0,0 0,0 0,0 0 !important;
+  background-repeat:repeat !important;
+}
+
+/* Keep SVG above the background grid; labels and three points remain crisp. */
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer {
+  position:relative !important;
+  z-index:1 !important;
+  background:transparent !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer .tft-transfer-grid line {
+  stroke:rgba(150,190,208,.22) !important;
+  stroke-width:.48px !important;
+  vector-effect:non-scaling-stroke !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer .tft-transfer-reference {
+  stroke:rgba(205,220,228,.56) !important;
+  stroke-width:.62px !important;
+  stroke-dasharray:4 4 !important;
+  vector-effect:non-scaling-stroke !important;
+}
+
+/* Same clean background treatment for GATE, so all transfer graphs look like
+   one native mixer TFT family. */
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box {
+  position:relative !important;
+  background:transparent !important;
+  background-image:none !important;
+  border:0 !important;
+  box-shadow:none !important;
+  isolation:isolate !important;
+  overflow:hidden !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box::before {
+  content:"" !important;
+  position:absolute !important;
+  left:3.125% !important;
+  right:3.125% !important;
+  top:12.5% !important;
+  bottom:12.5% !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+  background-image:
+    linear-gradient(to right, rgba(88,160,190,.22) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(88,160,190,.20) 1px, transparent 1px),
+    linear-gradient(to right, rgba(88,160,190,.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(88,160,190,.06) 1px, transparent 1px) !important;
+  background-size:
+    16.6667% 100%,
+    100% 16.6667%,
+    3.3333% 100%,
+    100% 3.3333% !important;
+  background-repeat:repeat !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box > svg {
+  position:relative !important;
+  z-index:1 !important;
+  background:transparent !important;
+}
+
+/* Mobile: preserve the same geometry; only make the points slightly smaller. */
+@media (max-width:600px) {
+  #tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer #tftCompDot1,
+  #tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer #tftCompDot2,
+  #tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer #tftCompDot3 {
+    r:3.25px !important;
+    stroke-width:1.25px !important;
+  }
+}
+</style>
+
 </head>
 
 <body>
@@ -9734,9 +9878,9 @@ const tftDatabase = {
             </g>
             <path id="tftCompSvgCurve" d="M10 55 L ${s.dot2X} ${s.dot2Y} L ${s.dot3X} ${s.dot3Y}" fill="none" stroke="#20d8ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
             <path id="tftCompSvgFill" d="M10 55 L ${s.dot2X} ${s.dot2Y} L ${s.dot3X} ${s.dot3Y} L 310 55 L 10 55 Z" fill="#20d8ff" opacity=".10"/>
-            <circle id="tftCompDot1" cx="${s.dot1X}" cy="${s.dot1Y}" r="7" fill="#f8ffff" stroke="#20d8ff" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Threshold Point"/>
-            <circle id="tftCompDot2" cx="${s.dot2X}" cy="${s.dot2Y}" r="7" fill="#f8ffff" stroke="#20d8ff" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Threshold Point"/>
-            <circle id="tftCompDot3" cx="${s.dot3X}" cy="${s.dot3Y}" r="7" fill="#f8ffff" stroke="#20d8ff" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Output / Makeup Point"/>
+            <circle id="tftCompDot1" cx="${s.dot1X}" cy="${s.dot1Y}" r="3.6" fill="#f8ffff" stroke="#20d8ff" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Threshold Point"/>
+            <circle id="tftCompDot2" cx="${s.dot2X}" cy="${s.dot2Y}" r="3.6" fill="#f8ffff" stroke="#20d8ff" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Threshold Point"/>
+            <circle id="tftCompDot3" cx="${s.dot3X}" cy="${s.dot3Y}" r="3.6" fill="#f8ffff" stroke="#20d8ff" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Output / Makeup Point"/>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
