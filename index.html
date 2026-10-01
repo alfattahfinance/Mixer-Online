@@ -5238,6 +5238,119 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 }
 
 </style>
+
+<style>
+/* FINAL TFT BOUNDARY FIX
+   PAGES + CHANNEL DSP occupy their own column inside the mixer TFT.
+   Graphs/curves/content are clipped to the remaining display area and
+   can never render underneath the navigation bars. */
+#tabMixerContent .mixer-tft-screen{
+  display:grid !important;
+  grid-template-columns:94px minmax(0,1fr) !important;
+  grid-template-rows:auto minmax(0,1fr) !important;
+  column-gap:6px !important;
+  row-gap:3px !important;
+  align-items:stretch !important;
+  justify-items:stretch !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+  padding:5px !important;
+}
+#tabMixerContent .mixer-tft-screen > .mixer-side-nav{
+  position:relative !important;
+  left:auto !important;
+  top:auto !important;
+  right:auto !important;
+  bottom:auto !important;
+  grid-column:1 !important;
+  grid-row:1 / span 2 !important;
+  width:100% !important;
+  min-width:0 !important;
+  max-width:none !important;
+  height:100% !important;
+  min-height:0 !important;
+  max-height:none !important;
+  margin:0 !important;
+  padding:6px 5px !important;
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  z-index:20 !important;
+  align-self:stretch !important;
+}
+#tabMixerContent .mixer-tft-screen > .tft-header{
+  grid-column:2 !important;
+  grid-row:1 !important;
+  width:100% !important;
+  max-width:none !important;
+  min-width:0 !important;
+  margin:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+  position:relative !important;
+  z-index:5 !important;
+}
+#tabMixerContent .mixer-tft-screen > .tft-main-viewport{
+  grid-column:2 !important;
+  grid-row:2 !important;
+  width:100% !important;
+  max-width:none !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  height:100% !important;
+  margin:0 !important;
+  padding:3px !important;
+  overflow:hidden !important;
+  position:relative !important;
+  z-index:4 !important;
+  contain:layout paint !important;
+}
+#tabMixerContent .mixer-tft-screen > .tft-main-viewport > .tft-content-screen{
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  height:100% !important;
+  overflow:hidden !important;
+  position:relative !important;
+  contain:layout paint !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-content-screen > *{
+  max-width:100% !important;
+  min-width:0 !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-peq,
+#tabMixerContent .mixer-tft-screen .tft-module-view,
+#tabMixerContent .mixer-tft-screen .tft-module-graph-box,
+#tabMixerContent .mixer-tft-screen .tft-peq-graph,
+#tabMixerContent .mixer-tft-screen svg{
+  max-width:100% !important;
+  overflow:hidden !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-peq-graph,
+#tabMixerContent .mixer-tft-screen .tft-module-graph-box{
+  width:100% !important;
+  box-sizing:border-box !important;
+}
+@media(max-width:600px){
+  #tabMixerContent .mixer-tft-screen{
+    grid-template-columns:76px minmax(0,1fr) !important;
+    column-gap:4px !important;
+    padding:3px !important;
+  }
+  #tabMixerContent .mixer-tft-screen > .mixer-side-nav{
+    padding:4px 3px !important;
+  }
+}
+@media(min-width:601px) and (max-width:900px){
+  #tabMixerContent .mixer-tft-screen{
+    grid-template-columns:84px minmax(0,1fr) !important;
+  }
+}
+</style>
+
 </head>
 
 <body>
