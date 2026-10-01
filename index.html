@@ -7888,7 +7888,7 @@ const tftDatabase = {
     footerCh: "Current: Ip1 Gate",
     footerSt: "Next: Threshold & Hold",
     content: (s) => `
-      <div class="tft-module-view">
+      <div class="tft-module-view curve-native-view">
         <div class="tft-module-graph-box" id="tftGateBox">
           <svg id="tftGateSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="xMidYMid meet" style="width:100%; height:100%; touch-action:none;">
             <g stroke="#334155" stroke-width=".7" opacity=".6">
@@ -7916,7 +7916,7 @@ const tftDatabase = {
     footerCh: "Current: Ip1 Comp",
     footerSt: "Next: Threshold & Ratio",
     content: (s) => `
-      <div class="tft-module-view">
+      <div class="tft-module-view curve-native-view">
         <div class="tft-module-graph-box" id="tftCompBox">
           <svg id="tftCompSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="xMidYMid meet" style="width:100%; height:100%; touch-action:none;">
             <g stroke="#334155" stroke-width=".7" opacity=".6">
@@ -7945,7 +7945,7 @@ const tftDatabase = {
     footerCh: "Current: Ip1 PEQ",
     footerSt: "Next: 4-Band PEQ Response",
     content: (s) => `
-      <div class="tft-peq">
+      <div class="tft-peq curve-native-view">
         <div class="tft-peq-head">
           <span>PEQ • 4-BAND SQ-7</span>
           <span style="color:#10b981;">● Control Point Active</span>
@@ -8008,7 +8008,7 @@ const tftDatabase = {
     footerCh: "Current: Master GEQ",
     footerSt: "Next: 31-Band GEQ Graphic",
     content: (s) => `
-      <div class="tft-module-view">
+      <div class="tft-module-view curve-native-view">
         <div class="tft-module-graph-box" id="tftSendsBox">
           <svg id="tftSendsSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
             <g class="tft-geq-grid" stroke="#334155" stroke-width=".7" opacity=".7">
@@ -10496,4 +10496,123 @@ body.mixer-powered-off #tabMixerContent .mixer-tft-screen .tft-main-viewport {
     padding:3px !important;
   }
 }
+
+/* =========================================================
+   NATIVE MIXER TFT CURVE PAGES — FINAL AUTHORITY
+   PEQ / GATE / COMP / GEQ are the actual mixer-screen pages.
+   No extra overlay/card is used for the curve canvas.
+========================================================= */
+#tabMixerContent #tftContentArea .curve-native-view {
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  height:100% !important;
+  box-sizing:border-box !important;
+  background:transparent !important;
+  overflow:hidden !important;
+}
+
+#tabMixerContent #tftContentArea .curve-native-view .tft-module-graph-box,
+#tabMixerContent #tftContentArea .curve-native-view .tft-peq-graph {
+  display:block !important;
+  position:relative !important;
+  flex:1 1 auto !important;
+  width:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  max-width:100% !important;
+  max-height:none !important;
+  height:auto !important;
+  margin:0 !important;
+  padding:0 !important;
+  box-sizing:border-box !important;
+  overflow:hidden !important;
+  border:0 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  background:transparent !important;
+  touch-action:none !important;
+}
+
+#tabMixerContent #tftContentArea .curve-native-view .tft-module-graph-box svg,
+#tabMixerContent #tftContentArea .curve-native-view .tft-peq-graph {
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  max-width:100% !important;
+  max-height:100% !important;
+  box-sizing:border-box !important;
+  touch-action:none !important;
+}
+
+/* Native screen grid: graph first, physical mixer controls underneath. */
+#tabMixerContent #tftContentArea .curve-native-view .tft-module-controls-grid,
+#tabMixerContent #tftContentArea .curve-native-view .tft-peq-controls {
+  flex:0 0 auto !important;
+  width:100% !important;
+  min-width:0 !important;
+  box-sizing:border-box !important;
+  margin:0 !important;
+}
+
+/* Keep the PEQ header inside the same native display, not as an extra panel. */
+#tabMixerContent #tftContentArea .tft-peq.curve-native-view {
+  display:grid !important;
+  grid-template-rows:auto minmax(0,1fr) auto !important;
+  gap:5px !important;
+  overflow:hidden !important;
+}
+
+/* Gate / compressor / GEQ use the same native screen geometry. */
+#tabMixerContent #tftContentArea .tft-module-view.curve-native-view {
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  justify-content:flex-start !important;
+  gap:5px !important;
+}
+
+/* Real graph labels remain part of the SVG and scale with the mixer display. */
+#tabMixerContent #tftContentArea .curve-native-view svg text {
+  pointer-events:none;
+}
+
+/* Responsive curve area: never let the graph run underneath the side navigation
+   or outside the mixer TFT viewport. */
+#tabMixerContent .mixer-workspace,
+#tabMixerContent .mixer-workspace-main,
+#tabMixerContent .mixer-tft-screen,
+#tabMixerContent .tft-main-viewport,
+#tabMixerContent .tft-content-screen,
+#tabMixerContent #tftContentArea {
+  min-width:0 !important;
+  min-height:0 !important;
+  max-width:100% !important;
+  box-sizing:border-box !important;
+}
+
+@media (orientation:portrait) {
+  #tabMixerContent #tftContentArea .curve-native-view .tft-module-graph-box,
+  #tabMixerContent #tftContentArea .curve-native-view .tft-peq-graph {
+    min-height:0 !important;
+  }
+}
+
+@media (orientation:landscape) and (min-width:700px) {
+  #tabMixerContent #tftContentArea .curve-native-view .tft-module-graph-box,
+  #tabMixerContent #tftContentArea .curve-native-view .tft-peq-graph {
+    min-height:0 !important;
+  }
+}
+
+/* Restore the curve canvas if an older rule tried to hide all module graphs. */
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box {
+  display:block !important;
+}
+
 </style>
