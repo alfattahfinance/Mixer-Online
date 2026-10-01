@@ -11138,5 +11138,66 @@ body.mixer-powered-off #tabMixerContent .mixer-tft-screen .tft-main-viewport {
 #tabMixerContent #tftContentArea #tftSendsSvgFill {
   pointer-events: none !important;
 }
+
+/* FINAL GRAPH CARD TRANSPARENCY
+   The graph is part of the mixer TFT itself: no solid graph card,
+   no separate surface, only an integrated frequency/grid overlay. */
+#tabMixerContent .mixer-tft-screen .tft-peq-graph,
+#tabMixerContent .mixer-tft-screen .tft-module-graph-box,
+#tabMixerContent .mixer-tft-screen .eq-response-curve,
+#tabMixerContent #tftContentArea .tft-peq-graph,
+#tabMixerContent #tftContentArea .tft-module-graph-box,
+#tabMixerContent #tftContentArea .eq-response-curve {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Grid is painted directly on the transparent graph area. */
+#tabMixerContent .mixer-tft-screen .tft-peq-graph::before,
+#tabMixerContent .mixer-tft-screen .tft-module-graph-box::before,
+#tabMixerContent .mixer-tft-screen .eq-response-curve::before,
+#tabMixerContent #tftContentArea .tft-peq-graph::before,
+#tabMixerContent #tftContentArea .tft-module-graph-box::before,
+#tabMixerContent #tftContentArea .eq-response-curve::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  background-image:
+    linear-gradient(to right, rgba(70, 150, 190, .16) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(70, 150, 190, .14) 1px, transparent 1px) !important;
+  background-size: 10% 20% !important;
+  background-repeat: repeat !important;
+}
+
+/* Real SVG remains transparent and above the integrated grid. */
+#tabMixerContent .mixer-tft-screen .tft-peq-graph > svg,
+#tabMixerContent .mixer-tft-screen .tft-module-graph-box > svg,
+#tabMixerContent .mixer-tft-screen .eq-response-curve > svg,
+#tabMixerContent #tftContentArea .tft-peq-graph > svg,
+#tabMixerContent #tftContentArea .tft-module-graph-box > svg,
+#tabMixerContent #tftContentArea .eq-response-curve > svg {
+  position: relative !important;
+  z-index: 1 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* GEQ keeps the same transparent native-TFT treatment. */
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="sends"] .tft-module-graph-box {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
 </style>
 
