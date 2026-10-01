@@ -3788,6 +3788,38 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface * {
 }
 /* Slow sequential power-up animation: indicators wake up one-by-one instead of
    appearing at full brightness immediately. */
+
+/* STARTUP SELF-TEST: PAGES -> CHANNEL DSP -> MUTE -> PAFL.
+   Visual-only test; does not change mixer state, routing, faders, or audio. */
+@keyframes mixerStartupControlTest {
+  0%, 100% { filter:brightness(1); box-shadow:inset 0 1px rgba(255,255,255,.08); }
+  35%, 65% { filter:brightness(1.75) saturate(1.35); box-shadow:0 0 13px currentColor, inset 0 1px rgba(255,255,255,.55); }
+}
+body.mixer-startup-test #tabMixerContent .mixer-side-nav .mixer-startup-test-control,
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .mixer-startup-test-control {
+  animation:mixerStartupControlTest .34s ease-in-out both !important;
+  animation-delay:var(--startup-delay,0ms) !important;
+  pointer-events:none !important;
+  position:relative;
+  z-index:6;
+}
+body.mixer-startup-test #tabMixerContent .mixer-side-nav .mixer-startup-test-control::after,
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface .mixer-startup-test-control::after {
+  content:"";
+  position:absolute;
+  inset:-2px;
+  border-radius:inherit;
+  pointer-events:none;
+  opacity:.65;
+  box-shadow:0 0 0 1px currentColor, 0 0 12px currentColor;
+  animation:mixerStartupControlRing .34s ease-in-out both;
+  animation-delay:var(--startup-delay,0ms) !important;
+}
+@keyframes mixerStartupControlRing {
+  0%,100% { opacity:0; transform:scale(.98); }
+  45%,60% { opacity:.75; transform:scale(1.015); }
+}
+
 body.mixer-startup-test #tabMixerContent .mixer-desk-surface .vert-led-meter span,
 body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-led-meter span,
 body.mixer-startup-test #tabMixerContent .mixer-desk-surface .master-combined-meter span {
@@ -9300,14 +9332,49 @@ function clearMixerPowerIndicators() {
   document.body.classList.remove("mixer-startup-test");
   document.querySelectorAll("#tabMixerContent .mixer-desk-surface .status-led, #tabMixerContent .mixer-desk-surface .vert-led-meter span, #tabMixerContent .mixer-desk-surface .master-led-meter span, #tabMixerContent .mixer-desk-surface .master-combined-meter span")
     .forEach(led => led.classList.remove("on"));
+  clearMixerStartupControlTest();
+}
+
+function clearMixerStartupControlTest() {
+  document.querySelectorAll("#tabMixerContent .mixer-startup-test-control").forEach(control => {
+    control.classList.remove("mixer-startup-test-control");
+    control.style.removeProperty("--startup-delay");
+  });
+}
+
+function runMixerStartupControlTest() {
+  clearMixerStartupControlTest();
+
+  const pages = Array.from(document.querySelectorAll("#tabMixerContent .mixer-side-nav .tft-tab"));
+  const channelDsp = Array.from(document.querySelectorAll("#tabMixerContent .mixer-side-nav .console-btn"));
+  const mute = Array.from(document.querySelectorAll("#tabMixerContent .mixer-desk-surface .console-channel-strip:not(.master-strip) .console-action-btn.mute"));
+  const pafl = Array.from(document.querySelectorAll("#tabMixerContent .mixer-desk-surface .console-channel-strip:not(.master-strip) .console-action-btn.solo"));
+  const groups = [pages, channelDsp, mute, pafl];
+  let step = 0;
+  const stepGap = 150;
+
+  groups.forEach(group => {
+    group.forEach(control => {
+      control.classList.add("mixer-startup-test-control");
+      control.style.setProperty("--startup-delay", (step * stepGap) + "ms");
+      step += 1;
+    });
+    // Small pause between PAGES, CHANNEL DSP, MUTE, and PAFL groups.
+    step += 1;
+  });
+
+  return Math.max(0, (step * stepGap) + 450);
 }
 
 function runMixerStartupTest(transitionToken) {
   document.body.classList.add("mixer-startup-test");
+  // Visual self-test order:
+  // PAGES -> CHANNEL DSP -> MUTE -> PAFL -> LED/METER.
+  const controlTestDuration = runMixerStartupControlTest();
   // Do not force every LED ON. CSS performs a slow sequential power-up animation.
   document.querySelectorAll("#tabMixerContent .mixer-desk-surface .status-led, #tabMixerContent .mixer-desk-surface .vert-led-meter span, #tabMixerContent .mixer-desk-surface .master-led-meter span, #tabMixerContent .mixer-desk-surface .master-combined-meter span")
     .forEach(led => led.classList.remove("on"));
-  setAudioStatus("Mixer ON — startup test berjalan...");
+  setAudioStatus("Mixer ON — self-test PAGES → CHANNEL DSP → MUTE → PAFL berjalan...");
   window.setTimeout(() => {
     if (transitionToken !== mixerPowerTransitionToken || !mixerPowered) return;
     clearMixerPowerIndicators();
@@ -9316,7 +9383,7 @@ function runMixerStartupTest(transitionToken) {
     updateOutputMute();
     updateAllSignalMeters();
     setAudioStatus("Mixer siap.");
-  }, 4600);
+  }, Math.max(4600, controlTestDuration));
 }
 
 mixerPowerButton?.addEventListener("click", async () => {
