@@ -9058,22 +9058,22 @@ const tftDatabase = {
     content: (s) => `
       <div class="tft-module-view curve-native-view">
         <div class="tft-module-graph-box tft-transfer-graph" id="tftCompBox" aria-label="Compressor transfer curve">
-          <svg id="tftCompSvgContainer" viewBox="0 0 320 100" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;" role="img" aria-label="Compressor input level versus output level">
+          <svg id="tftCompSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;" role="img" aria-label="Compressor input level versus output level">
             <g class="tft-comp-reference" aria-hidden="true">
-              <line x1="0" y1="100" x2="320" y2="0"/>
+              <line x1="0" y1="65" x2="320" y2="0"/>
             </g>
             <g class="tft-comp-scale" aria-hidden="true">
-              <text x="2" y="98">-60</text><text x="55" y="98">-50</text><text x="108" y="98">-40</text>
-              <text x="161" y="98">-30</text><text x="214" y="98">-20</text><text x="267" y="98">-10</text><text x="308" y="98">0 dB</text>
-              <text x="3" y="86">-10</text><text x="3" y="70">-20</text><text x="3" y="53">-30</text>
-              <text x="3" y="36">-40</text><text x="3" y="20">-50</text><text x="3" y="6">0 dB</text>
-              <text class="axis-title x-axis-title" x="160" y="99" text-anchor="middle">INPUT LEVEL (dB)</text>
-              <text class="axis-title y-axis-title" x="7" y="50" text-anchor="middle" transform="rotate(-90 7 50)">OUTPUT LEVEL (dB)</text>
-              <text class="reference-label" x="212" y="33">1:1 NO COMPRESSION</text>
-              <text class="graph-title" x="12" y="12">COMPRESSOR TRANSFER CURVE</text>
+              <text x="2" y="64">-60</text><text x="55" y="64">-50</text><text x="108" y="64">-40</text>
+              <text x="161" y="64">-30</text><text x="214" y="64">-20</text><text x="267" y="64">-10</text><text x="308" y="64">0 dB</text>
+              <text x="3" y="54">-50</text><text x="3" y="44">-40</text><text x="3" y="34">-30</text>
+              <text x="3" y="23">-20</text><text x="3" y="13">-10</text><text x="3" y="4">0 dB</text>
+              <text class="axis-title x-axis-title" x="215" y="7" text-anchor="middle">INPUT LEVEL (dB)</text>
+              <text class="axis-title y-axis-title" x="7" y="33" text-anchor="middle" transform="rotate(-90 7 33)">OUTPUT LEVEL (dB)</text>
+              <text class="reference-label" x="202" y="25">1:1 NO COMPRESSION</text>
+              <text class="graph-title" x="18" y="7">COMPRESSOR TRANSFER CURVE</text>
             </g>
             <path id="tftCompSvgCurve" d="M10 84 L \${s.dot2X} \${s.dot2Y} L \${s.dot3X} \${s.dot3Y}" fill="none" stroke="#20d8ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <path id="tftCompSvgFill" d="M10 84 L \${s.dot2X} \${s.dot2Y} L \${s.dot3X} \${s.dot3Y} L 310 100 L 10 100 Z" fill="#20d8ff" opacity=".10"/>
+            <path id="tftCompSvgFill" d="M10 84 L \${s.dot2X} \${s.dot2Y} L \${s.dot3X} \${s.dot3Y} L 310 65 L 10 65 Z" fill="#20d8ff" opacity=".10"/>
             <circle id="tftCompDot1" cx="\${s.dot1X}" cy="\${s.dot1Y}" r="7" fill="#f8ffff" stroke="#20d8ff" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Start Point"/>
             <circle id="tftCompDot2" cx="\${s.dot2X}" cy="\${s.dot2Y}" r="7" fill="#f8ffff" stroke="#20d8ff" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Threshold Point"/>
             <circle id="tftCompDot3" cx="\${s.dot3X}" cy="\${s.dot3Y}" r="7" fill="#f8ffff" stroke="#20d8ff" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Ratio/Makeup Point"/>
