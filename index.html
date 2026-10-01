@@ -351,6 +351,7 @@ header, .topbar {
 
 /* LAYAR TFT UTAMA (SQ-7 STYLE) - DIPERBAIKI AGAR TIDAK MEMANJANG BERLEBIHAN */
 .mixer-tft-screen {
+  position:relative; isolation:isolate;
   background: #080c14; border: 2px solid #2d3748; border-radius: 6px;
   padding: 5px; box-shadow: inset 0 0 15px rgba(0,0,0,0.9);
   display: flex; flex-direction: column; justify-content: flex-start;
@@ -3843,32 +3844,21 @@ body.mixer-refreshing #mixerPowerButton { animation:mixerRefreshPulse .22s ease-
 
 /* Mixer power affects TFT screen and both navigation groups; power button remains outside. */
 
-/* POWER OFF VISUAL FIX: mixer remains fully visible/readable.
-   Audio is still muted by the DSP power state; only signal LEDs are allowed to go dark. */
-body.mixer-powered-off #tabMixerContent .mixer-workspace,
-body.mixer-powered-off #tabMixerContent .mixer-desk-surface {
+/* POWER OFF: hanya TFT/layar mixer yang benar-benar OFF.
+   PAGES, CHANNEL DSP, fader strips, dan USB bar tetap terlihat normal. */
+body.mixer-powered-off #tabMixerContent .mixer-tft-screen {
   filter:none !important;
   opacity:1 !important;
+  visibility:visible !important;
   transition:none !important;
 }
-body.mixer-powered-off #tabMixerContent .mixer-workspace-main,
-body.mixer-powered-off #tabMixerContent .mixer-top-console,
-body.mixer-powered-off #tabMixerContent .mixer-desk-surface,
-body.mixer-powered-off #tabMixerContent .mixer-side-nav {
-  filter:none !important;
-  opacity:1 !important;
+body.mixer-powered-off #tabMixerContent .mixer-tft-screen .mixer-power-screen {
+  pointer-events:auto !important;
 }
-body.mixer-powered-off #tabMixerContent .mixer-workspace {
-  filter:none !important;
-  opacity:1 !important;
-  pointer-events:none !important;
-  transition:none !important;
-}
-body.mixer-powered-off #tabMixerContent .mixer-workspace * { pointer-events:none !important; }
-body.mixer-powered-off #tabMixerContent .mixer-workspace .status-led,
-body.mixer-powered-off #tabMixerContent .mixer-workspace .vert-led-meter span,
-body.mixer-powered-off #tabMixerContent .mixer-workspace .master-led-meter span,
-body.mixer-powered-off #tabMixerContent .mixer-workspace .master-combined-meter span {
+body.mixer-powered-off #tabMixerContent .mixer-tft-screen .status-led,
+body.mixer-powered-off #tabMixerContent .mixer-tft-screen .vert-led-meter span,
+body.mixer-powered-off #tabMixerContent .mixer-tft-screen .master-led-meter span,
+body.mixer-powered-off #tabMixerContent .mixer-tft-screen .master-combined-meter span {
   opacity:0 !important; box-shadow:none !important;
 }
 /* Translucent glass bars: blue PAGES, pink CHANNEL DSP. */
@@ -5428,16 +5418,6 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
           <div style="text-align: center; padding: 2px; color: #64748b;">Belum ada file audio dipilih.</div>
         </div>
 
-        <div class="mixer-power-screen" id="mixerPowerScreen" aria-live="polite" aria-hidden="true">
-          <div class="power-screen-pulse" aria-hidden="true"></div>
-          <div class="power-screen-inner">
-            <div class="power-screen-title">MIXER-ONLINE</div>
-            <div class="power-screen-subtitle">DIGITAL MIXER CONSOLE</div>
-            <div class="power-screen-status" id="mixerPowerScreenStatus">INITIALIZING • SELF TEST</div>
-            <div class="power-screen-progress" aria-hidden="true"><i></i></div>
-          </div>
-        </div>
-
         <!-- WORKSPACE: NAVIGASI VERTIKAL DI KIRI, TFT + FADER DI KANAN -->
         <div class="mixer-workspace">
           <aside class="mixer-side-nav" aria-label="Navigasi mixer">
@@ -5463,6 +5443,16 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
           
           <!-- LAYAR TFT UTAMA (SQ-7 STYLE) -->
           <div class="mixer-tft-screen">
+            <!-- POWER/SPLASH HANYA MENUTUP LAYAR MIXER (TFT), BUKAN SELURUH HALAMAN -->
+            <div class="mixer-power-screen" id="mixerPowerScreen" aria-live="polite" aria-hidden="true">
+              <div class="power-screen-pulse" aria-hidden="true"></div>
+              <div class="power-screen-inner">
+                <div class="power-screen-title">GQX-3102</div>
+                <div class="power-screen-subtitle">DIGITAL MIXER CONSOLE</div>
+                <div class="power-screen-status" id="mixerPowerScreenStatus">INITIALIZING • SELF TEST</div>
+                <div class="power-screen-progress" aria-hidden="true"><i></i></div>
+              </div>
+            </div>
             <div class="tft-header">
               <span id="tftSectionTitle">SQ-7 PEQ / PROCESSING</span>
               <div style="display:flex; align-items:center; gap:6px;">
@@ -9631,9 +9621,20 @@ function syncChannelQuickPanelsFromSources() {
 @keyframes powerScreenProgress{from{width:0%}to{width:100%}}
 @keyframes powerScreenRefresh{0%{width:0%}35%{width:68%}100%{width:100%}}
 @keyframes powerScreenPulse{0%{transform:translate(-50%,-50%) scale(.62);opacity:.05}55%{opacity:.24}100%{transform:translate(-50%,-50%) scale(1.35);opacity:0}}
-body.mixer-powered-off #tabMixerContent .mixer-workspace{filter:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
-body.mixer-powered-off #tabMixerContent .mixer-workspace *{pointer-events:none!important}
-body.mixer-screen-starting #tabMixerContent .mixer-workspace,body.mixer-screen-refreshing #tabMixerContent .mixer-workspace{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
-body.mixer-screen-starting #tabMixerContent .mixer-power-screen,body.mixer-screen-refreshing #tabMixerContent .mixer-power-screen{opacity:1!important;visibility:visible!important}
+/* Splash/refresh hanya berada di dalam TFT. Jangan pernah menyembunyikan workspace/PAGES/fader. */
+body.mixer-screen-starting #tabMixerContent .mixer-tft-screen,
+body.mixer-screen-refreshing #tabMixerContent .mixer-tft-screen {
+  opacity:1!important;
+  visibility:visible!important;
+}
+body.mixer-screen-starting #tabMixerContent .mixer-tft-screen .mixer-power-screen,
+body.mixer-screen-refreshing #tabMixerContent .mixer-tft-screen .mixer-power-screen {
+  opacity:1!important;
+  visibility:visible!important;
+}
+body.mixer-powered-off #tabMixerContent .mixer-tft-screen .tft-header,
+body.mixer-powered-off #tabMixerContent .mixer-tft-screen .tft-main-viewport {
+  visibility:hidden!important;
+}
 @media(max-width:600px){.mixer-power-screen .power-screen-inner{padding:20px 10px}.mixer-power-screen .power-screen-title{letter-spacing:.11em}}
 </style>
