@@ -9057,18 +9057,26 @@ const tftDatabase = {
     footerSt: "Next: Threshold & Ratio",
     content: (s) => `
       <div class="tft-module-view curve-native-view">
-        <div class="tft-module-graph-box" id="tftCompBox">
-          <svg id="tftCompSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="xMidYMid meet" style="width:100%; height:100%; touch-action:none;">
-            <g stroke="#334155" stroke-width=".7" opacity=".6">
-              <line x1="0" y1="16" x2="320" y2="16" /><line x1="0" y1="32" x2="320" y2="32" stroke="#475569" stroke-width="1"/><line x1="0" y1="48" x2="320" y2="48" />
-              <line x1="80" y1="0" x2="80" y2="65" /><line x1="160" y1="0" x2="160" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
+        <div class="tft-module-graph-box tft-transfer-graph" id="tftCompBox" aria-label="Compressor transfer curve">
+          <svg id="tftCompSvgContainer" viewBox="0 0 320 100" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;" role="img" aria-label="Compressor input level versus output level">
+            <g class="tft-comp-reference" aria-hidden="true">
+              <line x1="0" y1="100" x2="320" y2="0"/>
             </g>
-            <path id="tftCompSvgCurve" d="M10 55 L ${s.dot2X} ${s.dot2Y} L ${s.dot3X} ${s.dot3Y}" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftCompSvgFill" d="M10 55 L ${s.dot2X} ${s.dot2Y} L ${s.dot3X} ${s.dot3Y} L 310 65 L 10 65 Z" fill="#10b981" opacity=".12"/>
-            <circle id="tftCompDot1" cx="${s.dot1X}" cy="${s.dot1Y}" r="7" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Start Point"/>
-            <circle id="tftCompDot2" cx="${s.dot2X}" cy="${s.dot2Y}" r="7" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Threshold Point"/>
-            <circle id="tftCompDot3" cx="${s.dot3X}" cy="${s.dot3Y}" r="7" fill="#d1fae5" stroke="#10b981" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Ratio/Makeup Point"/>
-            <text x="12" y="12" fill="#94a3b8" font-size="6.5">COMPRESSOR CURVE (3 Points)</text>
+            <g class="tft-comp-scale" aria-hidden="true">
+              <text x="2" y="98">-60</text><text x="55" y="98">-50</text><text x="108" y="98">-40</text>
+              <text x="161" y="98">-30</text><text x="214" y="98">-20</text><text x="267" y="98">-10</text><text x="308" y="98">0 dB</text>
+              <text x="3" y="86">-10</text><text x="3" y="70">-20</text><text x="3" y="53">-30</text>
+              <text x="3" y="36">-40</text><text x="3" y="20">-50</text><text x="3" y="6">0 dB</text>
+              <text class="axis-title x-axis-title" x="160" y="99" text-anchor="middle">INPUT LEVEL (dB)</text>
+              <text class="axis-title y-axis-title" x="7" y="50" text-anchor="middle" transform="rotate(-90 7 50)">OUTPUT LEVEL (dB)</text>
+              <text class="reference-label" x="212" y="33">1:1 NO COMPRESSION</text>
+              <text class="graph-title" x="12" y="12">COMPRESSOR TRANSFER CURVE</text>
+            </g>
+            <path id="tftCompSvgCurve" d="M10 84 L \${s.dot2X} \${s.dot2Y} L \${s.dot3X} \${s.dot3Y}" fill="none" stroke="#20d8ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path id="tftCompSvgFill" d="M10 84 L \${s.dot2X} \${s.dot2Y} L \${s.dot3X} \${s.dot3Y} L 310 100 L 10 100 Z" fill="#20d8ff" opacity=".10"/>
+            <circle id="tftCompDot1" cx="\${s.dot1X}" cy="\${s.dot1Y}" r="7" fill="#f8ffff" stroke="#20d8ff" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Start Point"/>
+            <circle id="tftCompDot2" cx="\${s.dot2X}" cy="\${s.dot2Y}" r="7" fill="#f8ffff" stroke="#20d8ff" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Threshold Point"/>
+            <circle id="tftCompDot3" cx="\${s.dot3X}" cy="\${s.dot3Y}" r="7" fill="#f8ffff" stroke="#20d8ff" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Ratio/Makeup Point"/>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -12599,5 +12607,63 @@ body.mixer-powered-off #tabMixerContent .mixer-tft-screen .tft-main-viewport {
   #tabMixerContent .mixer-tft-screen .tft-content-screen{
     background-size:10% 12.5% !important;
   }
+}
+
+/* =========================================================
+   AUTHORITATIVE TFT TRANSFER-GRAPH SURFACE
+   Compressor graph: transparent mixer screen + CSS grid +
+   dB scale labels + 1:1 no-compression reference.
+========================================================= */
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="dynamics"] .tft-transfer-graph {
+  position:relative !important; width:100% !important; height:100% !important;
+  min-width:0 !important; min-height:0 !important; max-width:none !important; max-height:none !important;
+  margin:0 !important; padding:0 !important; border:0 !important; border-radius:0 !important;
+  box-shadow:none !important; background-color:transparent !important;
+  background-image:
+    linear-gradient(to right, rgba(91,160,190,.22) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(91,160,190,.20) 1px, transparent 1px) !important;
+  background-size:16.6667% 100%, 100% 16.6667% !important;
+  background-repeat:repeat !important; overflow:hidden !important; isolation:isolate !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer {
+  width:100% !important; height:100% !important; min-width:0 !important; min-height:0 !important;
+  display:block !important; background:transparent !important; overflow:visible !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer .tft-comp-reference line {
+  stroke:rgba(203,213,225,.62) !important; stroke-width:.8 !important; stroke-dasharray:4 4 !important;
+  vector-effect:non-scaling-stroke !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer .tft-comp-scale text {
+  fill:rgba(203,213,225,.72) !important; font-size:5.2px !important;
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif !important; letter-spacing:.15px !important;
+  paint-order:stroke !important; stroke:rgba(3,7,13,.75) !important; stroke-width:.7px !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer .tft-comp-scale .axis-title {
+  fill:rgba(226,232,240,.86) !important; font-size:4.8px !important; font-weight:800 !important;
+  letter-spacing:.3px !important; stroke:none !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer .tft-comp-scale .reference-label {
+  fill:rgba(203,213,225,.58) !important; font-size:4.5px !important; font-weight:700 !important; stroke:none !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer .tft-comp-scale .graph-title {
+  fill:rgba(226,232,240,.9) !important; font-size:5.2px !important; font-weight:800 !important;
+  letter-spacing:.35px !important; stroke:none !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer #tftCompSvgCurve {
+  stroke:#00ffcc !important; stroke-width:2.6 !important;
+  filter:drop-shadow(0 0 3px rgba(0,255,204,.9)) drop-shadow(0 0 8px rgba(0,255,204,.48)) !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer #tftCompSvgFill {
+  fill:#00ffcc !important; opacity:.08 !important; pointer-events:none !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer circle {
+  fill:#f8ffff !important; stroke:#00ffcc !important; stroke-width:1.8 !important;
+  filter:drop-shadow(0 0 3px rgba(0,255,204,.95)) drop-shadow(0 0 7px rgba(0,255,204,.45)) !important;
+  vector-effect:non-scaling-stroke !important;
+}
+@media (max-width:600px) {
+  #tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer .tft-comp-scale text { font-size:4.4px !important; }
+  #tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer .tft-comp-scale .axis-title { font-size:4.1px !important; }
+  #tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer .tft-comp-scale .reference-label { font-size:3.8px !important; }
 }
 </style>
