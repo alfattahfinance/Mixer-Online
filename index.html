@@ -11170,23 +11170,128 @@ function bindTftDynamicEventListeners(key) {
     }
 
     if (key === "sends" && container) {
-      const geqBands = container.querySelectorAll("#tftSendsBands .tft-geq-band-dot");
-      geqBands.forEach((bandDot) => {
-        const setGeqBandFromY = (index, y) => {
-          if (!Number.isInteger(index) || index < 0 || index > 30) return;
-          const clampGeq = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-          const totalGain = clampGeq((60 - y) / 3, -15, 15);
-          s.bands[index] = Math.round(clampGeq(totalGain - Number(s.lvl || 0), -15, 15) * 10) / 10;
-          updateTftModuleCurve("sends");
-          clearTimeout(s.__geqPersistTimer);
-          s.__geqPersistTimer = setTimeout(() => persistTftState(), 120);
+      /* GEQ uses one delegated pointer drag manager for all 31 bands.
+         This avoids 31 competing document listeners and keeps the pressed
+         point + neon curve locked to the same pointer on touch devices. */
+      if (container.dataset.geqDragBound !== "1") {
+        container.dataset.geqDragBound = "1";
+        const bandsRoot = container.querySelector("#tftSendsBands");
+        let activeBand = null;
+        let activePointerId = null;
+        let pendingY = null;
+        let rafId = 0;
+
+        const getSvgPoint = (clientX, clientY) => {
+          const vb = container.viewBox?.baseVal;
+          const svgWidth = vb?.width || 320;
+          const svgHeight = vb?.height || 120;
+          try {
+            const matrix = container.getScreenCTM();
+            if (matrix && container.createSVGPoint) {
+              const p = container.createSVGPoint();
+              p.x = clientX; p.y = clientY;
+              const local = p.matrixTransform(matrix.inverse());
+              if (Number.isFinite(local.x) && Number.isFinite(local.y)) {
+                return { x: local.x, y: local.y, svgWidth, svgHeight };
+              }
+            }
+          } catch (_) {}
+          const rect = container.getBoundingClientRect();
+          if (!rect.width || !rect.height) return null;
+          return {
+            x: ((clientX - rect.left) / rect.width) * svgWidth,
+            y: ((clientY - rect.top) / rect.height) * svgHeight,
+            svgWidth, svgHeight
+          };
         };
-        makeSpecificDotDraggable(container, bandDot, (_x, y) => {
-          const index = Number(bandDot.dataset.bandIndex);
-          setGeqBandFromY(index, y);
-        }, { direct: true });
-        bandDot.addEventListener("keydown", (event) => {
-          const index = Number(bandDot.dataset.bandIndex);
+
+        const applyBandY = (y) => {
+          if (!activeBand) return;
+          const index = Number(activeBand.dataset.bandIndex);
+          if (!Number.isInteger(index) || index < 0 || index > 30) return;
+          const nextY = Math.max(15, Math.min(105, Number(y)));
+          const totalGain = Math.max(-15, Math.min(15, (60 - nextY) / 3));
+          s.bands[index] = Math.round(
+            Math.max(-15, Math.min(15, totalGain - Number(s.lvl || 0))) * 10
+          ) / 10;
+
+          // Move the pressed point immediately; then redraw the neon path
+          // from the same state in the next animation frame.
+          activeBand.setAttribute("cy", nextY.toFixed(2));
+          pendingY = nextY;
+          if (!rafId) {
+            rafId = requestAnimationFrame(() => {
+              rafId = 0;
+              if (!activeBand) return;
+              updateTftModuleCurve("sends");
+              try { syncChannelQuickPanelsFromSources(); } catch (_) {}
+            });
+          }
+
+          clearTimeout(s.__geqPersistTimer);
+          s.__geqPersistTimer = setTimeout(() => {
+            try { persistTftState(); } catch (_) {}
+          }, 120);
+        };
+
+        const stopGeqDrag = (event) => {
+          if (activePointerId === null) return;
+          if (event?.pointerId !== undefined && event.pointerId !== activePointerId) return;
+          const releasedId = activePointerId;
+          activePointerId = null;
+          activeBand?.classList.remove("tft-geq-dragging");
+          activeBand = null;
+          pendingY = null;
+          container.classList.remove("tft-graph-dragging");
+          if (rafId) {
+            cancelAnimationFrame(rafId);
+            rafId = 0;
+            updateTftModuleCurve("sends");
+          }
+          clearTimeout(s.__geqPersistTimer);
+          try { persistTftState(); } catch (_) {}
+          try {
+            if (container.hasPointerCapture?.(releasedId)) container.releasePointerCapture(releasedId);
+          } catch (_) {}
+        };
+
+        container.addEventListener("pointerdown", (event) => {
+          const dot = event.target?.closest?.(".tft-geq-band-dot");
+          if (!dot || !bandsRoot?.contains(dot)) return;
+          if (event.button !== undefined && event.button !== 0) return;
+          const point = getSvgPoint(event.clientX, event.clientY);
+          if (!point) return;
+          const index = Number(dot.dataset.bandIndex);
+          if (!Number.isInteger(index) || index < 0 || index > 30) return;
+
+          event.preventDefault();
+          event.stopPropagation();
+          activeBand = dot;
+          activePointerId = event.pointerId;
+          container.classList.add("tft-graph-dragging");
+          dot.classList.add("tft-geq-dragging");
+          dot.style.cursor = "grabbing";
+          try { container.setPointerCapture(event.pointerId); } catch (_) {}
+          applyBandY(point.y);
+        }, { passive: false });
+
+        container.addEventListener("pointermove", (event) => {
+          if (activePointerId === null || event.pointerId !== activePointerId || !activeBand) return;
+          event.preventDefault();
+          event.stopPropagation();
+          const point = getSvgPoint(event.clientX, event.clientY);
+          if (!point) return;
+          applyBandY(point.y);
+        }, { passive: false });
+
+        container.addEventListener("pointerup", stopGeqDrag, { passive: false });
+        container.addEventListener("pointercancel", stopGeqDrag, { passive: false });
+        container.addEventListener("lostpointercapture", stopGeqDrag);
+
+        container.addEventListener("keydown", (event) => {
+          const dot = event.target?.closest?.(".tft-geq-band-dot");
+          if (!dot || !bandsRoot?.contains(dot)) return;
+          const index = Number(dot.dataset.bandIndex);
           if (!Number.isInteger(index) || index < 0 || index > 30) return;
           if (!["ArrowUp","ArrowDown","Home","End"].includes(event.key)) return;
           event.preventDefault();
@@ -11199,7 +11304,7 @@ function bindTftDynamicEventListeners(key) {
           try { syncChannelQuickPanelsFromSources(); } catch (_) {}
           persistTftState();
         });
-      });
+      }
     }
   }
 }
