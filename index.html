@@ -5698,6 +5698,174 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 }
 
 
+
+/* =========================================================
+   FINAL MIXER TFT CURVE DISPLAY
+   Transparent graph surface + integrated digital grid +
+   neon glow + full available TFT viewport.
+   The graph is part of the mixer screen, not a separate card.
+========================================================= */
+#tabMixerContent .mixer-tft-screen .tft-main-viewport,
+#tabMixerContent .mixer-tft-screen .tft-content-screen,
+#tabMixerContent .mixer-tft-screen #tftContentArea {
+  min-width:0 !important;
+  min-height:0 !important;
+  max-width:100% !important;
+  box-sizing:border-box !important;
+}
+
+#tabMixerContent .mixer-tft-screen .tft-main-viewport {
+  overflow:hidden !important;
+}
+
+#tabMixerContent #tftContentArea {
+  position:relative !important;
+  overflow:hidden !important;
+  background:transparent !important;
+}
+
+/* One continuous mixer-screen grid: no solid graph/card background. */
+#tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq-graph,
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box {
+  position:relative !important;
+  width:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  max-width:100% !important;
+  max-height:none !important;
+  box-sizing:border-box !important;
+  border:0 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  background-color:transparent !important;
+  background-image:
+    linear-gradient(to bottom, rgba(90,180,220,.18) 1px, transparent 1px),
+    linear-gradient(to right, rgba(90,180,220,.18) 1px, transparent 1px) !important;
+  background-size:8% 20% !important;
+  background-position:0 0 !important;
+  overflow:hidden !important;
+  isolation:isolate !important;
+}
+
+/* Fill all usable mixer-screen graph space while leaving only the native
+   TFT header/control rows their required height. */
+#tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq {
+  display:grid !important;
+  grid-template-rows:auto minmax(0,1fr) auto !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+  background:transparent !important;
+}
+
+#tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq-graph {
+  grid-row:2 !important;
+  height:100% !important;
+  flex:1 1 auto !important;
+}
+
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-view,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-view,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-view {
+  display:flex !important;
+  flex-direction:column !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+  background:transparent !important;
+}
+
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box {
+  flex:1 1 0 !important;
+  height:auto !important;
+}
+
+/* SVG itself is transparent so the mixer TFT surface/grid remains visible. */
+#tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq-graph svg,
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box svg,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box svg,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box svg {
+  width:100% !important;
+  height:100% !important;
+  max-width:100% !important;
+  max-height:100% !important;
+  display:block !important;
+  background:transparent !important;
+}
+
+/* Neon response curves. */
+#tabMixerContent #tftContentArea[data-page-key="eq"] #tftPeqSvgCurve,
+#tabMixerContent #tftContentArea[data-page-key="gate"] #tftGateSvgCurve,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompSvgCurve {
+  stroke:#00ffcc !important;
+  stroke-width:3 !important;
+  stroke-linecap:round !important;
+  stroke-linejoin:round !important;
+  fill:none !important;
+  filter:
+    drop-shadow(0 0 2px rgba(0,255,204,.95))
+    drop-shadow(0 0 6px rgba(0,255,204,.72))
+    drop-shadow(0 0 12px rgba(0,255,204,.42)) !important;
+}
+
+/* GEQ gets a distinct neon-magenta curve while retaining its native data. */
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgCurve {
+  stroke:#ff007f !important;
+  stroke-width:2.8 !important;
+  stroke-linecap:round !important;
+  stroke-linejoin:round !important;
+  fill:none !important;
+  filter:
+    drop-shadow(0 0 2px rgba(255,0,127,.95))
+    drop-shadow(0 0 6px rgba(255,0,127,.75))
+    drop-shadow(0 0 12px rgba(255,0,127,.45)) !important;
+}
+
+/* Curve fills remain translucent; never create a second solid graph card. */
+#tabMixerContent #tftContentArea[data-page-key="eq"] #tftPeqSvgFill,
+#tabMixerContent #tftContentArea[data-page-key="gate"] #tftGateSvgFill,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompSvgFill,
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgFill {
+  opacity:.10 !important;
+  pointer-events:none !important;
+}
+
+/* Keep the actual curve handles above the grid and fully touchable. */
+#tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq-graph circle,
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box circle,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box circle,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box circle {
+  pointer-events:all !important;
+  touch-action:none !important;
+}
+
+/* Responsive grid density follows the real mixer TFT size. */
+@media (max-width:700px) {
+  #tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq-graph,
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+  #tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box {
+    background-size:12% 16% !important;
+  }
+}
+
+@media (orientation:landscape) and (min-width:701px) {
+  #tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq-graph,
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+  #tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box {
+    background-size:8% 20% !important;
+  }
+}
+
 </style>
 
 <style>
