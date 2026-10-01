@@ -10863,3 +10863,43 @@ body.mixer-powered-off #tabMixerContent .mixer-tft-screen .tft-main-viewport {
 }
 
 </style>
+
+<style>
+/* FINAL NATIVE CURVE SURFACE
+   Curve graphics belong directly to the mixer TFT screen.
+   No separate graph card/background/border is used. */
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-module-graph-box,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-peq-graph,
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="sends"] .tft-module-graph-box {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* The mixer TFT owns the single visual surface; SVG owns grid/curve/labels. */
+#tabMixerContent .mixer-tft-screen .tft-main-viewport,
+#tabMixerContent .mixer-tft-screen .tft-content-screen,
+#tabMixerContent .mixer-tft-screen #tftContentArea,
+#tabMixerContent .mixer-tft-screen #tftContentArea > .curve-native-view {
+  background: linear-gradient(180deg,#03070d 0%,#07101a 52%,#02050a 100%) !important;
+}
+
+/* Keep SVG interaction and native curve rendering intact. */
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-module-graph-box svg,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-peq-graph svg {
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  background:transparent !important;
+  border:0 !important;
+  touch-action:none !important;
+}
+</style>
+
