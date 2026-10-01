@@ -6596,6 +6596,159 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
   contain:layout paint !important;
 }
 </style>
+
+<style id="mixer-native-curve-graphics-final">
+/* =========================================================
+   MIXER-NATIVE CURVE GRAPHICS
+   Transparent plotting surface + integrated CSS frequency grid.
+   The TFT screen supplies the dark background; graph containers
+   do not create a separate card/background.
+========================================================= */
+#tabMixerContent .mixer-tft-screen .curve-native-view .tft-peq-graph,
+#tabMixerContent .mixer-tft-screen .curve-native-view .tft-module-graph-box {
+  background-color: transparent !important;
+  background-image:
+    linear-gradient(rgba(42,116,153,.22) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(42,116,153,.22) 1px, transparent 1px) !important;
+  background-size: 10% 20%, 10% 20% !important;
+  background-position: 0 0, 0 0 !important;
+  background-repeat: repeat, repeat !important;
+  border: 1px solid rgba(92,135,162,.30) !important;
+  box-shadow: inset 0 0 18px rgba(0,0,0,.16) !important;
+  isolation: isolate !important;
+}
+
+/* SVG remains transparent: only the mixer TFT surface is visible behind it. */
+#tabMixerContent .mixer-tft-screen .curve-native-view svg,
+#tabMixerContent .mixer-tft-screen .curve-native-view #tftSendsSvgContainer {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* Integrated SVG reference grid stays subtle under the CSS grid. */
+#tabMixerContent .mixer-tft-screen .curve-native-view .tft-geq-grid {
+  opacity: .34 !important;
+}
+#tabMixerContent .mixer-tft-screen .curve-native-view .tft-comp-reference {
+  opacity: .28 !important;
+}
+
+/* PEQ — neon cyan with a controlled digital glow. */
+#tabMixerContent .mixer-tft-screen .curve-native-view #tftPeqSvgCurve {
+  stroke: #00ffcc !important;
+  stroke-width: 2.8 !important;
+  filter:
+    drop-shadow(0 0 2px rgba(0,255,204,.95))
+    drop-shadow(0 0 6px rgba(0,255,204,.68))
+    drop-shadow(0 0 12px rgba(0,255,204,.28)) !important;
+}
+#tabMixerContent .mixer-tft-screen .curve-native-view #tftPeqSvgFill {
+  fill: #00ffcc !important;
+  opacity: .055 !important;
+}
+#tabMixerContent .mixer-tft-screen .curve-native-view #tftPeqDot2 {
+  fill: #f8ffff !important;
+  stroke: #00ffcc !important;
+  filter:
+    drop-shadow(0 0 3px rgba(0,255,204,.95))
+    drop-shadow(0 0 8px rgba(0,255,204,.55)) !important;
+}
+
+/* GEQ — neon magenta/pink, while band handles remain clearly touchable. */
+#tabMixerContent .mixer-tft-screen .curve-native-view #tftSendsSvgCurve {
+  stroke: #ff007f !important;
+  stroke-width: 2.6 !important;
+  filter:
+    drop-shadow(0 0 2px rgba(255,0,127,.95))
+    drop-shadow(0 0 6px rgba(255,0,127,.70))
+    drop-shadow(0 0 12px rgba(255,0,127,.28)) !important;
+}
+#tabMixerContent .mixer-tft-screen .curve-native-view #tftSendsSvgFill {
+  fill: #ff007f !important;
+  opacity: .045 !important;
+}
+#tabMixerContent .mixer-tft-screen .curve-native-view .tft-geq-band-dot {
+  fill: #fff7fc !important;
+  stroke: #ff007f !important;
+  filter: drop-shadow(0 0 4px rgba(255,0,127,.78)) !important;
+}
+#tabMixerContent .mixer-tft-screen .curve-native-view .tft-geq-band-dot:hover,
+#tabMixerContent .mixer-tft-screen .curve-native-view .tft-geq-band-dot:focus {
+  filter:
+    drop-shadow(0 0 3px rgba(255,0,127,1))
+    drop-shadow(0 0 8px rgba(255,0,127,.72)) !important;
+}
+
+/* Gate — neon amber/orange transfer curve. */
+#tabMixerContent .mixer-tft-screen .curve-native-view #tftGateSvgCurve {
+  stroke: #ffb000 !important;
+  stroke-width: 2.6 !important;
+  filter:
+    drop-shadow(0 0 2px rgba(255,176,0,.95))
+    drop-shadow(0 0 7px rgba(255,176,0,.60)) !important;
+}
+#tabMixerContent .mixer-tft-screen .curve-native-view #tftGateSvgFill {
+  fill: #ffb000 !important;
+  opacity: .045 !important;
+}
+#tabMixerContent .mixer-tft-screen .curve-native-view #tftGateDot1,
+#tabMixerContent .mixer-tft-screen .curve-native-view #tftGateDot2 {
+  stroke: #ffb000 !important;
+  filter: drop-shadow(0 0 5px rgba(255,176,0,.78)) !important;
+}
+
+/* Compressor — neon cyan transfer curve. */
+#tabMixerContent .mixer-tft-screen .curve-native-view #tftCompSvgCurve {
+  stroke: #20e6ff !important;
+  stroke-width: 2.6 !important;
+  filter:
+    drop-shadow(0 0 2px rgba(32,230,255,.95))
+    drop-shadow(0 0 7px rgba(32,230,255,.62)) !important;
+}
+#tabMixerContent .mixer-tft-screen .curve-native-view #tftCompSvgFill {
+  fill: #20e6ff !important;
+  opacity: .045 !important;
+}
+#tabMixerContent .mixer-tft-screen .curve-native-view #tftCompDot1,
+#tabMixerContent .mixer-tft-screen .curve-native-view #tftCompDot2,
+#tabMixerContent .mixer-tft-screen .curve-native-view #tftCompDot3 {
+  stroke: #20e6ff !important;
+  filter: drop-shadow(0 0 5px rgba(32,230,255,.78)) !important;
+}
+
+/* Responsive + touch safety: keep the plot inside the TFT viewport. */
+#tabMixerContent .mixer-tft-screen .curve-native-view,
+#tabMixerContent .mixer-tft-screen .curve-native-view .tft-module-view {
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+#tabMixerContent .mixer-tft-screen .curve-native-view .tft-peq-graph,
+#tabMixerContent .mixer-tft-screen .curve-native-view .tft-module-graph-box {
+  overflow: hidden !important;
+  touch-action: none !important;
+}
+#tabMixerContent .mixer-tft-screen .curve-native-view svg {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  display: block !important;
+  touch-action: none !important;
+}
+@media (max-width: 600px) {
+  #tabMixerContent .mixer-tft-screen .curve-native-view .tft-peq-graph,
+  #tabMixerContent .mixer-tft-screen .curve-native-view .tft-module-graph-box {
+    min-height: 86px !important;
+  }
+}
+@media (min-width: 601px) {
+  #tabMixerContent .mixer-tft-screen .curve-native-view .tft-peq-graph,
+  #tabMixerContent .mixer-tft-screen .curve-native-view .tft-module-graph-box {
+    min-height: 96px !important;
+  }
+}
+</style>
 </head>
 
 <body>
