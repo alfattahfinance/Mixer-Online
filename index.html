@@ -3803,6 +3803,27 @@ body.mixer-startup-test #tabMixerContent .mixer-desk-surface .mixer-startup-test
   position:relative;
   z-index:6;
 }
+
+/* CHANNEL TITLES: startup lamp test, one channel at a time. */
+body.mixer-startup-test #tabMixerContent .mixer-desk-surface > .console-channel-strip:not(.master-strip) .strip-label-box.mixer-startup-channel-title {
+  animation:mixerStartupChannelTitle .52s ease-in-out both !important;
+  animation-delay:var(--startup-channel-delay,0ms) !important;
+  position:relative;
+  z-index:7;
+}
+@keyframes mixerStartupChannelTitle {
+  0%,100% {
+    filter:brightness(.9) saturate(.9);
+    box-shadow:inset 0 1px rgba(255,255,255,.12);
+  }
+  35%,65% {
+    filter:brightness(1.75) saturate(1.45);
+    box-shadow:
+      0 0 5px rgba(56,189,248,.75),
+      0 0 13px rgba(56,189,248,.55),
+      inset 0 1px rgba(255,255,255,.72);
+  }
+}
 body.mixer-startup-test #tabMixerContent .mixer-side-nav .mixer-startup-test-control::after,
 body.mixer-startup-test #tabMixerContent .mixer-desk-surface .mixer-startup-test-control::after {
   content:"";
@@ -9347,6 +9368,7 @@ function runMixerStartupControlTest() {
 
   const pages = Array.from(document.querySelectorAll("#tabMixerContent .mixer-side-nav .tft-tab"));
   const channelDsp = Array.from(document.querySelectorAll("#tabMixerContent .mixer-side-nav .console-btn"));
+  const channelTitles = Array.from(document.querySelectorAll("#tabMixerContent .mixer-desk-surface > .console-channel-strip:not(.master-strip) .strip-label-box"));
   const mute = Array.from(document.querySelectorAll("#tabMixerContent .mixer-desk-surface .console-channel-strip:not(.master-strip) .console-action-btn.mute"));
   const pafl = Array.from(document.querySelectorAll("#tabMixerContent .mixer-desk-surface .console-channel-strip:not(.master-strip) .console-action-btn.solo"));
   const groups = [pages, channelDsp, mute, pafl];
@@ -9362,6 +9384,15 @@ function runMixerStartupControlTest() {
     // Small pause between PAGES, CHANNEL DSP, MUTE, and PAFL groups.
     step += 1;
   });
+
+  // Channel title lamps run separately and sequentially across the actual
+  // four mixer strips, without changing any channel state.
+  const titleStart = step + 1;
+  channelTitles.forEach((title, index) => {
+    title.classList.add("mixer-startup-channel-title");
+    title.style.setProperty("--startup-channel-delay", ((titleStart + index) * stepGap) + "ms");
+  });
+  step += channelTitles.length + 1;
 
   return Math.max(0, (step * stepGap) + 450);
 }
