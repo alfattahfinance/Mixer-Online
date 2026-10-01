@@ -10828,11 +10828,7 @@ function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback, dr
     dragStart = null;
     dotElement.style.cursor = "grab";
     if (dotElement.classList.contains("tft-geq-band-dot")) {
-      try {
-        const state = window.tftStatesData && window.tftStatesData.sends;
-        if (state && state.__geqPersistTimer) clearTimeout(state.__geqPersistTimer);
-        if (typeof window.persistTftState === "function") window.persistTftState();
-      } catch (_) {}
+      try { persistTftState(); } catch (_) {}
     }
     svgContainer.classList.remove("tft-graph-dragging");
     try {
