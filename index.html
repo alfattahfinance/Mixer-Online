@@ -5589,7 +5589,28 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 #tabMixerContent .mixer-tft-screen .tft-content-screen {
   background: linear-gradient(180deg,#030509 0%,#070b12 58%,#020408 100%) !important;
 }
-\n</style>
+\n/* NATIVE CURVE DISPLAY: graph is part of the TFT screen, not a separate card. */
+#tabMixerContent .mixer-tft-screen .tft-main-viewport{
+  background:linear-gradient(180deg,#030509 0%,#070b12 58%,#020408 100%) !important;
+  border:0 !important; border-radius:0 !important; box-shadow:none !important; padding:0 !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-content-screen{
+  background:transparent !important; border:0 !important; box-shadow:none !important; padding:0 !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea .tft-peq,
+#tabMixerContent .mixer-tft-screen #tftContentArea .tft-module-view{
+  background:transparent !important; border:0 !important; box-shadow:none !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea .tft-peq-graph,
+#tabMixerContent .mixer-tft-screen #tftContentArea .tft-module-graph-box{
+  background:transparent !important; background-image:none !important;
+  border:0 !important; border-radius:0 !important; box-shadow:none !important;
+  outline:0 !important; padding:0 !important; margin:0 !important; overflow:hidden !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea .tft-peq-graph > rect:first-child{
+  fill:transparent !important;
+}
+</style>
 
 <style>
 /* FINAL TFT BOUNDARY FIX
@@ -8198,7 +8219,7 @@ const tftDatabase = {
           <span style="color:#10b981;">● Control Point Active</span>
         </div>
         <svg class="tft-peq-graph" id="tftPeqSvgContainer" viewBox="0 0 320 120" preserveAspectRatio="none" role="img" aria-label="SQ-7 PEQ frequency response" style="touch-action:none;">
-          <rect x="0" y="0" width="320" height="120" fill="#080d16"/>
+          <rect x="0" y="0" width="320" height="120" fill="transparent"/>
           <g stroke="#253448" stroke-width=".65" opacity=".95">
             <line x1="0" y1="15" x2="320" y2="15"/>
             <line x1="0" y1="30" x2="320" y2="30"/>
