@@ -7961,29 +7961,111 @@ const tftDatabase = {
     encoders: (s) => [{name:"INSERT", val:"FX RACK"}, {name:"SEND", val:`${s.send}dB`}, {name:"RETURN", val:"0dB"}, {name:"LIMITER", val:`${s.limit}dB`}, {name:"TAP", val:"POST"}, {name:"STATUS", val:s.bypass?"BYPASS":"ACTIVE"}]
   },
   routing: {
-    title: "SQ-7 ROUTING & PATCHBAY",
-    footerCh: "Current: I/O Patch",
-    footerSt: "Next: Direct Out & USB Audio Routing",
+    title: "ROUTING • USB I/O PATCH",
+    footerCh: "Current: 4-Strip Console Routing",
+    footerSt: "USB IN 1–2 → DSP → MAIN LR → USB OUT 1–2",
     content: (s) => `
-      <div class="tft-module-view">
-        <div class="tft-info-panel" id="tftRoutingInfo">
-    <div class="tft-info-heading">INPUT / OUTPUT PATCHBAY</div>
-    <div class="tft-patch-grid"><div class="patch-head">SOURCE</div><div class="patch-head">MAIN L/R</div><div class="patch-head">BUS 1–2</div><div class="patch-head">USB 1–2</div>
-      <div class="patch-label">Input 1 · ${s.source===0?'Playlist':'USB Audio Interface'}</div><div class="patch-cell active">●</div><div class="patch-cell">○</div><div class="patch-cell ${s.usb?'active':''}">${s.usb?'●':'○'}</div>
-      <div class="patch-label">Input 2 · IP2</div><div class="patch-cell active">●</div><div class="patch-cell">○</div><div class="patch-cell ${s.usb?'active':''}">${s.usb?'●':'○'}</div>
-      <div class="patch-label">Input 3 · IP3</div><div class="patch-cell">○</div><div class="patch-cell active">●</div><div class="patch-cell">○</div>
-      <div class="patch-label">Input 4 · IP4</div><div class="patch-cell">○</div><div class="patch-cell active">●</div><div class="patch-cell">○</div>
-    </div>
-    <div class="tft-info-note">Patch indicators are a visual routing overview; use the selectors and USB switch below to change settings.</div>
-  </div>
-        <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>Input Source</label><select id="routeSourceSel"><option ${s.source===0?'selected':''}>Playlist Audio</option><option ${s.source===1?'selected':''}>USB Audio Interface</option></select></div>
-          <div class="tft-mod-ctrl"><label>Direct Out</label><select id="routeDoutSel"><option ${s.dout===0?'selected':''}>Post-Fader</option><option ${s.dout===1?'selected':''}>Pre-Fader</option></select></div>
-          <div class="tft-mod-ctrl"><label>USB Streaming</label><button id="routeUsbBtn" class="${s.usb ? 'active-action' : ''}" type="button">${s.usb ? 'ACTIVE' : 'OFF'}</button></div>
+      <div class="tft-module-view routing-native-view">
+        <div class="routing-overview-card">
+          <div class="routing-overview-head">
+            <div>
+              <div class="tft-info-heading">USB AUDIO ROUTING</div>
+              <div class="routing-subtitle">2 INPUT / 2 OUTPUT • 4-FUNCTION CONSOLE</div>
+            </div>
+            <div class="routing-live-badge ${usbAudioConnected ? 'is-live' : ''}">
+              <i></i>${usbAudioConnected ? 'USB AUDIO READY' : 'USB AUDIO NOT DETECTED'}
+            </div>
+          </div>
+          <div class="routing-signal-flow" aria-label="Audio signal flow">
+            <span>MIXER FISIK</span><b>→</b>
+            <span>USB IN 1–2</span><b>→</b>
+            <span>CH 1 • USB AUDIO INPUT</span><b>→</b>
+            <span>DSP / EQ / FX</span><b>→</b>
+            <span>MAIN LR</span><b>→</b>
+            <span>USB OUT L/R</span><b>→</b>
+            <span>SOUND SYSTEM</span>
+          </div>
+        </div>
+
+        <div class="routing-panel-grid">
+          <section class="routing-panel-card">
+            <header><strong>INPUT PATCH</strong><small>INTERFACE 2-IN</small></header>
+            <div class="routing-route-row">
+              <span class="route-port">USB IN 1 / L</span>
+              <strong>CH 1</strong>
+              <em>USB AUDIO INPUT</em>
+            </div>
+            <div class="routing-route-row">
+              <span class="route-port">USB IN 2 / R</span>
+              <strong>CH 1</strong>
+              <em>USB AUDIO INPUT</em>
+            </div>
+            <div class="routing-route-row muted">
+              <span class="route-port">PHONE MIC</span>
+              <strong>—</strong>
+              <em>NOT USED</em>
+            </div>
+          </section>
+
+          <section class="routing-panel-card">
+            <header><strong>4 CHANNEL FUNCTIONS</strong><small>CONSOLE STRIPS</small></header>
+            <div class="routing-channel-map"><b>CH 1</b><span>USB AUDIO INPUT</span><i>INPUT</i></div>
+            <div class="routing-channel-map"><b>CH 2</b><span>AUDIO / MP3</span><i>PLAYBACK</i></div>
+            <div class="routing-channel-map"><b>CH 3</b><span>FX SEND</span><i>BUS</i></div>
+            <div class="routing-channel-map"><b>CH 4</b><span>FX RETURN</span><i>RETURN</i></div>
+          </section>
+
+          <section class="routing-panel-card">
+            <header><strong>MAIN LR OUTPUT</strong><small>STEREO OUT</small></header>
+            <div class="routing-output-flow">
+              <div><b>MAIN L</b><span>→</span><em>USB OUT 1</em></div>
+              <div><b>MAIN R</b><span>→</span><em>USB OUT 2</em></div>
+            </div>
+            <div class="routing-output-status">
+              <span class="${usbAudioConnected ? 'on' : ''}"></span>
+              <strong>${usbAudioConnected ? 'USB OUTPUT AVAILABLE' : 'OUTPUT FOLLOWS SYSTEM ROUTE'}</strong>
+            </div>
+          </section>
+        </div>
+
+        <div class="tft-module-controls-grid routing-control-grid">
+          <div class="tft-mod-ctrl routing-source-control">
+            <label>INPUT SOURCE • CH 1</label>
+            <select id="routeSourceSel">
+              <option value="0" ${s.source===0?'selected':''}>USB AUDIO INTERFACE • IN 1–2</option>
+              <option value="1" ${s.source===1?'selected':''}>PLAYLIST AUDIO</option>
+            </select>
+            <span class="tft-val-disp">${s.source===0 ? 'USB IN 1–2' : 'PLAYBACK'}</span>
+          </div>
+          <div class="tft-mod-ctrl">
+            <label>DIRECT OUT SOURCE</label>
+            <select id="routeDoutSel">
+              <option value="0" ${s.dout===0?'selected':''}>POST-FADER</option>
+              <option value="1" ${s.dout===1?'selected':''}>PRE-FADER</option>
+            </select>
+            <span class="tft-val-disp">${s.dout===0 ? 'FOLLOWS FADER' : 'INDEPENDENT'}</span>
+          </div>
+          <div class="tft-mod-ctrl">
+            <label>USB STREAM TO MAIN LR</label>
+            <button id="routeUsbBtn" class="${s.usb ? 'active-action' : ''}" type="button" aria-pressed="${String(s.usb)}">${s.usb ? 'ACTIVE' : 'OFF'}</button>
+            <span class="tft-val-disp">${s.usb ? 'MAIN L/R → USB OUT' : 'USB ROUTE OFF'}</span>
+          </div>
+        </div>
+
+        <div class="routing-note">
+          <strong>SIGNAL PATH:</strong> MIXER FISIK → USB AUDIO INTERFACE IN 1–2 → CH 1 → DSP → MAIN LR → USB AUDIO INTERFACE OUT 1–2 → SOUND SYSTEM.
+          <span>CH 2, CH 3 dan CH 4 tetap memiliki fungsi masing-masing dan tidak dianggap sebagai input fisik tambahan.</span>
         </div>
       </div>
     `,
-    encoders: (s) => [{name:"IN 1", val:"IP1"}, {name:"IN 2", val:"IP2"}, {name:"IN 3", val:"IP3"}, {name:"IN 4", val:"IP4"}, {name:"USB STREAM", val:s.usb?"CH 1-2":"OFF"}, {name:"OUT", val:"MAIN L/R"}]
+    encoders: (s) => [
+      {name:"SOURCE", val:s.source===0?"USB IN 1–2":"PLAYBACK"},
+      {name:"DIRECT OUT", val:s.dout===0?"POST-FADER":"PRE-FADER"},
+      {name:"USB STREAM", val:s.usb?"MAIN L/R":"OFF"},
+      {name:"CH 1", val:"USB INPUT"},
+      {name:"CH 2", val:"AUDIO / MP3"},
+      {name:"OUTPUT", val:"USB OUT 1–2"}
+    ]
   },
   meters: {
     title: "SQ-7 RTA & METERS",
@@ -8493,25 +8575,51 @@ function bindTftDynamicEventListeners(key) {
       const srcSel = document.getElementById("routeSourceSel");
       const doutSel = document.getElementById("routeDoutSel");
       const usbBtn = document.getElementById("routeUsbBtn");
-      srcSel?.addEventListener("change", () => { s.source = srcSel.selectedIndex; updateEncoders(tftDatabase.routing.encoders(s)); refreshTftInfoPanel("routing"); persistTftState(); });
-      doutSel?.addEventListener("change", () => { s.dout = doutSel.selectedIndex; updateEncoders(tftDatabase.routing.encoders(s)); refreshTftInfoPanel("routing"); persistTftState(); });
+
+      srcSel?.addEventListener("change", async () => {
+        s.source = Number(srcSel.value);
+        updateEncoders(tftDatabase.routing.encoders(s));
+        refreshTftInfoPanel("routing");
+        persistTftState();
+        if (s.source === 0) {
+          if (usbAudioConnected) {
+            setAudioStatus("ROUTING: USB AUDIO IN 1–2 → CH 1 → DSP.");
+          } else {
+            setAudioStatus("ROUTING menunggu USB AUDIO INTERFACE IN 1–2.");
+          }
+        } else {
+          setAudioStatus("ROUTING: PLAYLIST AUDIO → CH 2.");
+        }
+      });
+
+      doutSel?.addEventListener("change", () => {
+        s.dout = Number(doutSel.value);
+        updateEncoders(tftDatabase.routing.encoders(s));
+        refreshTftInfoPanel("routing");
+        persistTftState();
+        setAudioStatus(s.dout === 0
+          ? "DIRECT OUT: POST-FADER — mengikuti fader channel."
+          : "DIRECT OUT: PRE-FADER — tidak mengikuti fader channel.");
+      });
+
       usbBtn?.addEventListener("click", async () => {
         s.usb = !s.usb;
+        if (s.usb) {
+          const usbAudioButton = document.getElementById("activateUsbAudioButton");
+          if (!usbAudioConnected && usbAudioButton) {
+            try { await usbAudioButton.click(); } catch (_) {}
+          }
+          if (usbAudioConnected) {
+            setAudioStatus("ROUTING AKTIF: MAIN LR → USB AUDIO OUT 1–2.");
+          } else {
+            setAudioStatus("USB ROUTING aktif, tetapi USB AUDIO OUT belum terdeteksi.");
+          }
+        } else {
+          setAudioStatus("USB STREAM ROUTING OFF — MAIN LR tetap tersedia di mixer.");
+        }
         usbBtn.textContent = s.usb ? "ACTIVE" : "OFF";
         usbBtn.classList.toggle("active-action", s.usb);
-        if (s.usb) {
-          await refreshPhysicalInputDevices();
-          const usbOption = [...(physicalOutputDevice?.options || [])].find(o => /usb|audio interface|sound card|dac|dongle|type.?c|otg/i.test(o.textContent || ""));
-          if (usbOption && physicalOutputDevice) {
-            physicalOutputDevice.value = usbOption.value;
-            await applyPhysicalOutputDevice();
-            setAudioStatus("USB / OTG OUTPUT aktif → " + usbOption.textContent);
-          } else if (usbAudioConnected) {
-            setAudioStatus("USB / OTG AUDIO terdeteksi; output mengikuti perangkat USB yang tersedia.");
-          } else {
-            setAudioStatus("USB Streaming aktif (simulator); colok USB audio untuk output fisik.");
-          }
-        }
+        usbBtn.setAttribute("aria-pressed", String(s.usb));
         updateEncoders(tftDatabase.routing.encoders(s));
         refreshTftInfoPanel("routing");
         persistTftState();
@@ -9959,4 +10067,28 @@ body.mixer-powered-off #tabMixerContent .mixer-tft-screen .tft-main-viewport {
     max-width:calc(100% - 95px) !important;
   }
 }
+
+/* NATIVE ROUTING SCREEN — 2 IN / 2 OUT, four functional strips */
+#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-native-view{display:flex!important;flex-direction:column!important;gap:7px!important;padding:6px!important;overflow:auto!important;}
+#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-overview-card{flex:0 0 auto;border:1px solid rgba(56,189,248,.3);border-radius:7px;padding:8px;background:linear-gradient(180deg,#0a111b,#050a11);box-shadow:inset 0 1px rgba(255,255,255,.05);}
+#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-overview-head{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-subtitle{margin-top:2px;color:#64748b;font-size:7px;font-weight:800;letter-spacing:.7px;}
+#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-live-badge{display:flex;align-items:center;gap:4px;padding:4px 7px;border:1px solid #475569;border-radius:999px;color:#94a3b8;font-size:7px;font-weight:900;white-space:nowrap;background:#0f172a;}
+#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-live-badge i{width:6px;height:6px;border-radius:50%;background:#64748b;}
+#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-live-badge.is-live{border-color:#22c55e;color:#bbf7d0;}.routing-live-badge.is-live i{background:#22c55e;box-shadow:0 0 7px rgba(34,197,94,.75);}
+#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-signal-flow{display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap;margin-top:7px;color:#cbd5e1;font-size:7px;font-weight:900;letter-spacing:.25px;}
+#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-signal-flow span{padding:4px 5px;border:1px solid rgba(96,165,250,.28);border-radius:4px;background:rgba(30,64,175,.13);white-space:nowrap;}
+#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-signal-flow b{color:#38bdf8;font-size:10px;}
+#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-panel-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;flex:0 0 auto;}
+#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-panel-card{min-width:0;border:1px solid #334155;border-radius:6px;background:linear-gradient(180deg,#111b29,#08101a);overflow:hidden;}
+#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-panel-card>header{display:flex;align-items:center;justify-content:space-between;padding:5px 7px;border:0;border-bottom:1px solid #263447;border-radius:0;background:rgba(30,41,59,.5);}
+#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-panel-card>header strong{font-size:7px;color:#dbeafe;letter-spacing:.5px;}.routing-panel-card>header small{font-size:6px;color:#64748b;font-weight:800;}
+#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-route-row,.routing-channel-map{display:grid;grid-template-columns:1.2fr .55fr 1.2fr;gap:5px;align-items:center;padding:6px 7px;border-bottom:1px solid rgba(51,65,85,.5);font-size:7px;}
+#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-route-row:last-child,.routing-channel-map:last-child{border-bottom:0;}
+#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-route-row strong,.routing-channel-map b{color:#38bdf8;font-weight:900;}.routing-route-row em,.routing-channel-map i{font-style:normal;color:#94a3b8;font-weight:800;text-align:right;}.routing-route-row.muted{opacity:.48;}
+#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-output-flow{padding:5px 7px;}.routing-output-flow div{display:grid;grid-template-columns:1fr 18px 1fr;align-items:center;padding:6px 0;border-bottom:1px solid rgba(51,65,85,.5);font-size:7px;}.routing-output-flow div:last-child{border-bottom:0;}.routing-output-flow b{color:#f8fafc;}.routing-output-flow span{text-align:center;color:#38bdf8;font-size:10px;}.routing-output-flow em{font-style:normal;color:#cbd5e1;text-align:right;}
+#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-output-status{display:flex;align-items:center;gap:5px;margin:0 7px 6px;padding:4px 5px;border:1px solid #334155;border-radius:4px;color:#94a3b8;font-size:6px;font-weight:900;}.routing-output-status span{width:6px;height:6px;border-radius:50%;background:#475569;}.routing-output-status span.on{background:#22c55e;box-shadow:0 0 7px rgba(34,197,94,.65);}.routing-output-status strong{font-size:6px;}
+#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-control-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important;flex:0 0 auto!important;}.routing-control-grid .tft-mod-ctrl{min-width:0;}.routing-control-grid .tft-val-disp{display:block;margin-top:3px;text-align:center;font-size:6px;color:#94a3b8;font-weight:800;}.routing-control-grid select{min-height:31px!important;font-size:7px!important;}.routing-control-grid button{min-height:31px!important;font-size:8px!important;}
+#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-note{flex:0 0 auto;padding:6px 7px;border:1px solid rgba(56,189,248,.2);border-radius:5px;background:rgba(8,47,73,.18);color:#94a3b8;font-size:6.5px;line-height:1.45;}.routing-note strong{color:#67e8f9;}.routing-note span{display:block;margin-top:2px;color:#64748b;}
+@media(max-width:700px){#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-panel-grid,#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-control-grid{grid-template-columns:1fr!important;}.routing-signal-flow{justify-content:flex-start!important;}.routing-live-badge{font-size:6px!important;}}
 </style>
