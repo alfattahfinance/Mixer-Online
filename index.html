@@ -9431,9 +9431,9 @@ const tftDatabase = {
             </g>
             <path id="tftCompSvgCurve" d="M10 55 L ${s.dot2X} ${s.dot2Y} L ${s.dot3X} ${s.dot3Y}" fill="none" stroke="#20d8ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
             <path id="tftCompSvgFill" d="M10 55 L ${s.dot2X} ${s.dot2Y} L ${s.dot3X} ${s.dot3Y} L 310 55 L 10 55 Z" fill="#20d8ff" opacity=".10"/>
-            <circle id="tftCompDot1" cx="${s.dot1X}" cy="${s.dot1Y}" r="7" fill="#f8ffff" stroke="#20d8ff" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Start Point"/>
+            <circle id="tftCompDot1" cx="${s.dot1X}" cy="${s.dot1Y}" r="7" fill="#f8ffff" stroke="#20d8ff" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Threshold Point"/>
             <circle id="tftCompDot2" cx="${s.dot2X}" cy="${s.dot2Y}" r="7" fill="#f8ffff" stroke="#20d8ff" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Threshold Point"/>
-            <circle id="tftCompDot3" cx="${s.dot3X}" cy="${s.dot3Y}" r="7" fill="#f8ffff" stroke="#20d8ff" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Ratio/Makeup Point"/>
+            <circle id="tftCompDot3" cx="${s.dot3X}" cy="${s.dot3Y}" r="7" fill="#f8ffff" stroke="#20d8ff" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Output / Makeup Point"/>
           </svg>
         </div>
         <div class="tft-module-controls-grid">
@@ -9851,10 +9851,11 @@ function updateTftModuleCurve(key) {
     };
     const kneeIn = Math.max(-60, threshold - 12);
     const kneeOut = gateOut(kneeIn);
+    const ratioProbe = Math.min(0, threshold + 15);
     points = [
       [dbToX(-60), dbToY(gateOut(-60))],
-      [dbToX(kneeIn), dbToY(kneeOut)],
       [dbToX(threshold), dbToY(threshold)],
+      [dbToX(ratioProbe), dbToY(gateOut(ratioProbe))],
       [dbToX(0), dbToY(0)]
     ];
   } else if (key === "dynamics") {
@@ -9988,12 +9989,31 @@ function applyTftGraphPointToControl(key, pointIndex, x, y) {
     const inputEvent = new Event("input", { bubbles: true }); inputEvent.__fromCurveDrag = true; el.dispatchEvent(inputEvent);
   };
   if (key === "gate") {
-    if (pointIndex === 1) setRange("gateThresh", clamp((x-15)/280*80-80,-80,0));
-    else setRange("gateRatio", Math.round(clamp(1 + (56-y)*(9/48),1,10)*10)/10);
+    // Graph calibration: x=10..310 is -60..0 dB, y=55..5 is -60..0 dB.
+    if (pointIndex === 1) setRange("gateThresh", clamp(((x-10)/300)*60-60,-60,0));
+    else if (pointIndex === 2) {
+      const inputDb = clamp(((x-10)/300)*60-60,-60,0);
+      const outputDb = clamp(((55-y)/50)*60-60,-60,0);
+      const threshold = Number(document.getElementById("gateThresh")?.value ?? -45);
+      const ratio = inputDb < threshold ? (threshold-outputDb) / Math.max(0.001, threshold-inputDb) : 1;
+      setRange("gateRatio", Math.round(clamp(ratio,1,10)*10)/10);
+    }
   } else if (key === "dynamics") {
-    if (pointIndex === 1) setRange("compThresh", clamp((x-15)/270*60-60,-60,0));
-    else if (pointIndex === 2) setRange("compRatio", Math.round(clamp(1 + (56-y)*(19/48),1,20)*10)/10);
-    else setRange("compMakeup", Math.round(clamp((20-y)/0.65,0,24)*10)/10);
+    if (pointIndex === 1) setRange("compThresh", clamp(((x-10)/300)*60-60,-60,0));
+    else if (pointIndex === 2) {
+      const inputDb = clamp(((x-10)/300)*60-60,-60,0);
+      const outputDb = clamp(((55-y)/50)*60-60,-60,0);
+      const threshold = Number(document.getElementById("compThresh")?.value ?? -18);
+      const ratio = inputDb > threshold ? (inputDb-threshold) / Math.max(0.001, outputDb-threshold) : 1;
+      setRange("compRatio", Math.round(clamp(ratio,1,20)*10)/10);
+    } else if (pointIndex === 3) {
+      const outputDb = clamp(((55-y)/50)*60-60,-60,0);
+      const inputDb = 0;
+      const threshold = Number(document.getElementById("compThresh")?.value ?? -18);
+      const ratio = Math.max(1, Number(document.getElementById("compRatio")?.value ?? 3));
+      const baseOut = threshold + (inputDb-threshold)/ratio;
+      setRange("compMakeup", Math.round(clamp(outputDb-baseOut,0,24)*10)/10);
+    }
   } else if (key === "sends" && pointIndex === 1) {
     setRange("send1Lvl", Math.round(clamp((32-y)/(24/15),-15,15)*10)/10);
   }
