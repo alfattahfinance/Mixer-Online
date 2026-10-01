@@ -9322,6 +9322,10 @@ function loadTftPage(key) {
     try { updateEncoders(typeof data.encoders === "function" ? data.encoders(s) : data.encoders); } catch (_) {}
 
     const isCurvePage = key === "eq" || key === "gate" || key === "dynamics" || key === "sends";
+    const mixerViewport = tftContentArea.closest(".tft-main-viewport");
+    const mixerContentScreen = tftContentArea.closest(".tft-content-screen");
+    if (mixerViewport) mixerViewport.classList.toggle("tft-curve-integrated", isCurvePage);
+    if (mixerContentScreen) mixerContentScreen.classList.toggle("tft-curve-integrated-screen", isCurvePage);
     if (tftCurveToggleBtn) {
       tftCurveToggleBtn.hidden = !isCurvePage;
       tftCurveToggleBtn.setAttribute("aria-hidden", String(!isCurvePage));
@@ -11137,6 +11141,30 @@ body.mixer-powered-off #tabMixerContent .mixer-tft-screen .tft-main-viewport {
 #tabMixerContent #tftContentArea #tftCompSvgFill,
 #tabMixerContent #tftContentArea #tftSendsSvgFill {
   pointer-events: none !important;
+}
+
+/* FINAL INTEGRATED CURVE VIEWPORT
+   Curve pages belong directly to the mixer TFT display. The viewport itself
+   must not create a second black card behind the transparent graph. */
+#tabMixerContent .mixer-tft-screen .tft-main-viewport.tft-curve-integrated {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-content-screen.tft-curve-integrated-screen {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-peq-graph,
+#tabMixerContent .mixer-tft-screen .tft-module-graph-box,
+#tabMixerContent .mixer-tft-screen .eq-response-curve {
+  position: relative !important;
+  isolation: isolate !important;
 }
 
 /* FINAL GRAPH CARD TRANSPARENCY
