@@ -13540,6 +13540,16 @@ body.mixer-powered-off #tabMixerContent .mixer-tft-screen .tft-main-viewport {
   #tabMixerContent .mixer-tft-screen .tft-graph-value-label { font-size:4.3px !important; }
 }
 
+/* POWER OFF: channel headers and MUTE/PAFL remain visible, gently dimmed only. */
+body.mixer-powered-off #tabMixerContent .mixer-desk-surface > .console-channel-strip .strip-label-box,
+body.mixer-powered-off #tabMixerContent .mixer-desk-surface > .console-channel-strip .strip-action-buttons .console-action-btn{
+  opacity:.66 !important;
+  filter:brightness(.78) saturate(.82) !important;
+  transition:opacity .2s ease,filter .2s ease !important;
+}
+body.mixer-powered-off #tabMixerContent .mixer-desk-surface > .console-channel-strip .strip-action-buttons .console-action-btn{
+  box-shadow:none !important;
+}
 /* POWER OFF: PAGES + CHANNEL DSP tetap terlihat, tetapi sedikit lebih redup.
    Hanya dua bar navigasi ini yang terkena efek; layar mixer, fader, dan USB bar tidak ikut. */
 body.mixer-powered-off #tabMixerContent .mixer-side-nav .tft-tab,
