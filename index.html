@@ -7270,6 +7270,40 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
     stroke-width:1.25px !important;
   }
 }
+<style id="responsive-neon-curve-drag-2026-10-01">
+/* =========================================================
+   RESPONSIVE NEON CURVE DRAG
+   While dragging, remove expensive multi-layer glow so the
+   transfer line tracks the finger/mouse immediately. The
+   full neon glow returns as soon as the drag ends.
+========================================================= */
+#tabMixerContent #tftContentArea .tft-module-graph-box svg,
+#tabMixerContent #tftContentArea .tft-peq-graph svg {
+  will-change: transform;
+  contain: layout paint;
+}
+#tabMixerContent #tftContentArea .tft-module-graph-box svg .tft-transfer-reference,
+#tabMixerContent #tftContentArea .tft-module-graph-box svg .tft-transfer-grid {
+  pointer-events:none !important;
+}
+#tabMixerContent #tftContentArea .tft-module-graph-box.tft-graph-dragging #tftGateSvgCurve,
+#tabMixerContent #tftContentArea .tft-module-graph-box.tft-graph-dragging #tftCompSvgCurve,
+#tabMixerContent #tftContentArea .tft-module-graph-box.tft-graph-dragging #tftSendsSvgCurve {
+  transition:none !important;
+  filter:drop-shadow(0 0 2px currentColor) !important;
+  will-change:d;
+}
+#tabMixerContent #tftContentArea .tft-module-graph-box.tft-graph-dragging #tftCompSvgFill,
+#tabMixerContent #tftContentArea .tft-module-graph-box.tft-graph-dragging #tftGateSvgFill,
+#tabMixerContent #tftContentArea .tft-module-graph-box.tft-graph-dragging #tftSendsSvgFill {
+  opacity:.035 !important;
+}
+#tabMixerContent #tftContentArea .tft-module-graph-box.tft-graph-dragging circle {
+  filter:drop-shadow(0 0 2px currentColor) !important;
+}
+#tabMixerContent #tftContentArea .tft-module-graph-box #tftCompSvgCurve {
+  transition:none !important;
+}
 </style>
 
 </head>
@@ -10622,6 +10656,7 @@ function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback, dr
     dragStart = point && Number.isFinite(cx) && Number.isFinite(cy)
       ? { pointerX: point.x, pointerY: point.y, dotX: cx, dotY: cy } : null;
     dotElement.style.cursor = "grabbing";
+    svgContainer.classList.add("tft-graph-dragging");
     try { svgContainer.setPointerCapture(e.pointerId); } catch (_) {}
   });
   svgContainer.addEventListener("pointermove", onPointerMove, { passive: false });
@@ -10631,6 +10666,7 @@ function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback, dr
     activePointerId = null;
     dragStart = null;
     dotElement.style.cursor = "grab";
+    svgContainer.classList.remove("tft-graph-dragging");
     try { if (svgContainer.hasPointerCapture(pointerId)) svgContainer.releasePointerCapture(pointerId); } catch (_) {}
   };
   svgContainer.addEventListener("pointerup", stopDrag);
