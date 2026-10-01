@@ -6927,6 +6927,147 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
   #tabMixerContent .mixer-tft-screen .tft-transfer-scale .reference-label { font-size:3.6px !important; }
 }
 </style>
+
+<style id="canonical-mixer-curve-geometry">
+/* CANONICAL MIXER CURVE GEOMETRY — PEQ is the single visual reference.
+   All curve pages use the same native TFT plotting surface and coordinate scale. */
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view,
+#tabMixerContent .mixer-tft-screen #tftContentArea .tft-peq.curve-native-view{
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+  background:transparent !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-peq-graph,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-module-graph-box{
+  flex:1 1 0 !important;
+  width:100% !important;
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+  margin:0 !important;
+  padding:0 !important;
+  box-sizing:border-box !important;
+  border:0 !important;
+  border-radius:0 !important;
+  outline:0 !important;
+  box-shadow:none !important;
+  overflow:hidden !important;
+  position:relative !important;
+  background-color:transparent !important;
+  background-image:
+    linear-gradient(to right, rgba(78,142,174,.22) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(78,142,174,.20) 1px, transparent 1px) !important;
+  background-size:10% 100%, 100% 12.5% !important;
+  touch-action:none !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-peq-graph::before,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-module-graph-box::before{
+  content:"" !important;
+  position:absolute !important;
+  inset:0 !important;
+  pointer-events:none !important;
+  background:linear-gradient(180deg,rgba(255,255,255,.025),transparent 30%,rgba(0,0,0,.08)) !important;
+  border:0 !important;
+  box-shadow:inset 0 0 18px rgba(0,0,0,.35) !important;
+  z-index:0 !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-peq-graph > *,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-module-graph-box > svg{
+  position:relative !important;
+  z-index:1 !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-peq-graph,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-module-graph-box,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view svg{
+  aspect-ratio:320 / 120 !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view svg{
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  max-width:none !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  background:transparent !important;
+  overflow:visible !important;
+  touch-action:none !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-transfer-grid line,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-geq-grid line,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-peq-graph > g[stroke] line{
+  stroke:rgba(83,148,180,.30) !important;
+  vector-effect:non-scaling-stroke !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view #tftPeqSvgCurve,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view #tftGateSvgCurve,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view #tftCompSvgCurve,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view #tftSendsSvgCurve{
+  stroke:#00ffcc !important;
+  stroke-width:2.6 !important;
+  stroke-linecap:round !important;
+  stroke-linejoin:round !important;
+  fill:none !important;
+  filter:drop-shadow(0 0 2px rgba(0,255,204,.65)) drop-shadow(0 0 5px rgba(0,255,204,.35)) !important;
+  vector-effect:non-scaling-stroke !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view #tftPeqSvgFill,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view #tftGateSvgFill,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view #tftCompSvgFill,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view #tftSendsSvgFill{
+  fill:#00ffcc !important;
+  opacity:.10 !important;
+  pointer-events:none !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view #tftPeqDot2,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view #tftGateDot1,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view #tftGateDot2,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view #tftCompDot1,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view #tftCompDot2,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view #tftCompDot3,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-geq-band-dot{
+  r:4.2px !important;
+  fill:#f4fffd !important;
+  stroke:#00ffcc !important;
+  stroke-width:1.8 !important;
+  filter:drop-shadow(0 0 3px rgba(0,255,204,.75)) !important;
+  vector-effect:non-scaling-stroke !important;
+  pointer-events:all !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-geq-band-dot{
+  r:3.2px !important;
+  cursor:ns-resize !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-geq-band-dot:hover,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-geq-band-dot:focus,
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view circle:hover{
+  filter:drop-shadow(0 0 4px rgba(0,255,204,.95)) !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-transfer-reference{
+  stroke:rgba(180,205,216,.55) !important;
+  stroke-width:.8 !important;
+  stroke-dasharray:4 3 !important;
+  vector-effect:non-scaling-stroke !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view text{
+  paint-order:stroke !important;
+  stroke:rgba(2,7,12,.85) !important;
+  stroke-width:.28px !important;
+  pointer-events:none !important;
+}
+@media(max-width:600px){
+  #tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-module-controls-grid,
+  #tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-peq-controls{
+    flex:0 0 auto !important;
+  }
+  #tabMixerContent .mixer-tft-screen #tftContentArea .curve-native-view .tft-geq-band-dot{
+    r:3.4px !important;
+  }
+}
+</style>
+
 </head>
 
 <body>
@@ -9361,28 +9502,29 @@ const tftDatabase = {
     content: (s) => `
       <div class="tft-module-view curve-native-view">
         <div class="tft-module-graph-box" id="tftGateBox">
-          <svg id="tftGateSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="xMidYMid meet" style="width:100%; height:100%; touch-action:none;" role="img" aria-label="Gate input level versus output level">
+          <svg id="tftGateSvgContainer" viewBox="0 0 320 120" preserveAspectRatio="xMidYMid meet" style="width:100%; height:100%; touch-action:none;" role="img" aria-label="Gate input level versus output level">
             <g class="tft-transfer-grid" aria-hidden="true">
-              <line x1="10" y1="5" x2="310" y2="5"/><line x1="10" y1="15" x2="310" y2="15"/>
-              <line x1="10" y1="25" x2="310" y2="25"/><line x1="10" y1="35" x2="310" y2="35"/>
-              <line x1="10" y1="45" x2="310" y2="45"/><line x1="10" y1="55" x2="310" y2="55"/>
-              <line x1="10" y1="5" x2="10" y2="55"/><line x1="60" y1="5" x2="60" y2="55"/>
-              <line x1="110" y1="5" x2="110" y2="55"/><line x1="160" y1="5" x2="160" y2="55"/>
-              <line x1="210" y1="5" x2="210" y2="55"/><line x1="260" y1="5" x2="260" y2="55"/>
-              <line x1="310" y1="5" x2="310" y2="55"/>
+              <line x1="10" y1="15" x2="310" y2="15"/><line x1="10" y1="30" x2="310" y2="30"/>
+              <line x1="10" y1="45" x2="310" y2="45"/><line x1="10" y1="60" x2="310" y2="60"/>
+              <line x1="10" y1="75" x2="310" y2="75"/><line x1="10" y1="90" x2="310" y2="90"/>
+              <line x1="10" y1="105" x2="310" y2="105"/>
+              <line x1="10" y1="15" x2="10" y2="105"/><line x1="60" y1="15" x2="60" y2="105"/>
+              <line x1="110" y1="15" x2="110" y2="105"/><line x1="160" y1="15" x2="160" y2="105"/>
+              <line x1="210" y1="15" x2="210" y2="105"/><line x1="260" y1="15" x2="260" y2="105"/>
+              <line x1="310" y1="15" x2="310" y2="105"/>
             </g>
-            <line class="tft-transfer-reference" x1="10" y1="55" x2="310" y2="5" aria-hidden="true"/>
+            <line class="tft-transfer-reference" x1="10" y1="105" x2="310" y2="15" aria-hidden="true"/>
             <g class="tft-transfer-scale" aria-hidden="true">
-              <text x="10" y="64" text-anchor="middle">-60</text><text x="60" y="64" text-anchor="middle">-50</text>
-              <text x="110" y="64" text-anchor="middle">-40</text><text x="160" y="64" text-anchor="middle">-30</text>
-              <text x="210" y="64" text-anchor="middle">-20</text><text x="260" y="64" text-anchor="middle">-10</text><text x="310" y="64" text-anchor="end">0 dB</text>
-              <text x="7" y="57" text-anchor="end">-60</text><text x="7" y="49" text-anchor="end">-50</text>
-              <text x="7" y="41" text-anchor="end">-40</text><text x="7" y="33" text-anchor="end">-30</text>
-              <text x="7" y="25" text-anchor="end">-20</text><text x="7" y="17" text-anchor="end">-10</text><text x="7" y="7" text-anchor="end">0 dB</text>
-              <text class="axis-title" x="245" y="4" text-anchor="middle">INPUT LEVEL (dB)</text>
-              <text class="axis-title" x="18" y="31" text-anchor="middle" transform="rotate(-90 18 31)">OUTPUT LEVEL (dB)</text>
-              <text class="reference-label" x="205" y="21">1:1 NO COMPRESSION</text>
-              <text class="graph-title" x="44" y="12">GATE TRANSFER CURVE</text>
+              <text x="10" y="116" text-anchor="middle">-60</text><text x="60" y="116" text-anchor="middle">-50</text>
+              <text x="110" y="116" text-anchor="middle">-40</text><text x="160" y="116" text-anchor="middle">-30</text>
+              <text x="210" y="116" text-anchor="middle">-20</text><text x="260" y="116" text-anchor="middle">-10</text><text x="310" y="116" text-anchor="end">0 dB</text>
+              <text x="7" y="107" text-anchor="end">-60</text><text x="7" y="92" text-anchor="end">-50</text>
+              <text x="7" y="77" text-anchor="end">-40</text><text x="7" y="62" text-anchor="end">-30</text>
+              <text x="7" y="47" text-anchor="end">-20</text><text x="7" y="32" text-anchor="end">-10</text><text x="7" y="17" text-anchor="end">0 dB</text>
+              <text class="axis-title" x="245" y="11" text-anchor="middle">INPUT LEVEL (dB)</text>
+              <text class="axis-title" x="18" y="61" text-anchor="middle" transform="rotate(-90 18 61)">OUTPUT LEVEL (dB)</text>
+              <text class="reference-label" x="205" y="32">1:1 NO COMPRESSION</text>
+              <text class="graph-title" x="44" y="24">GATE TRANSFER CURVE</text>
             </g>
             <path id="tftGateSvgCurve" d="M10 55 L ${s.dot1X} ${s.dot1Y} L ${s.dot2X} ${s.dot2Y}" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
             <path id="tftGateSvgFill" d="M10 55 L ${s.dot1X} ${s.dot1Y} L ${s.dot2X} ${s.dot2Y} L 310 65 L 10 65 Z" fill="#f59e0b" opacity=".12"/>
@@ -9406,15 +9548,16 @@ const tftDatabase = {
     content: (s) => `
       <div class="tft-module-view curve-native-view">
         <div class="tft-module-graph-box tft-transfer-graph" id="tftCompBox" aria-label="Compressor transfer curve">
-          <svg id="tftCompSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;" role="img" aria-label="Compressor input level versus output level">
+          <svg id="tftCompSvgContainer" viewBox="0 0 320 120" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;" role="img" aria-label="Compressor input level versus output level">
             <g class="tft-transfer-grid" aria-hidden="true">
-              <line x1="10" y1="5" x2="310" y2="5"/><line x1="10" y1="15" x2="310" y2="15"/>
-              <line x1="10" y1="25" x2="310" y2="25"/><line x1="10" y1="35" x2="310" y2="35"/>
-              <line x1="10" y1="45" x2="310" y2="45"/><line x1="10" y1="55" x2="310" y2="55"/>
-              <line x1="10" y1="5" x2="10" y2="55"/><line x1="60" y1="5" x2="60" y2="55"/>
-              <line x1="110" y1="5" x2="110" y2="55"/><line x1="160" y1="5" x2="160" y2="55"/>
-              <line x1="210" y1="5" x2="210" y2="55"/><line x1="260" y1="5" x2="260" y2="55"/>
-              <line x1="310" y1="5" x2="310" y2="55"/>
+              <line x1="10" y1="15" x2="310" y2="15"/><line x1="10" y1="30" x2="310" y2="30"/>
+              <line x1="10" y1="45" x2="310" y2="45"/><line x1="10" y1="60" x2="310" y2="60"/>
+              <line x1="10" y1="75" x2="310" y2="75"/><line x1="10" y1="90" x2="310" y2="90"/>
+              <line x1="10" y1="105" x2="310" y2="105"/>
+              <line x1="10" y1="15" x2="10" y2="105"/><line x1="60" y1="15" x2="60" y2="105"/>
+              <line x1="110" y1="15" x2="110" y2="105"/><line x1="160" y1="15" x2="160" y2="105"/>
+              <line x1="210" y1="15" x2="210" y2="105"/><line x1="260" y1="15" x2="260" y2="105"/>
+              <line x1="310" y1="15" x2="310" y2="105"/>
             </g>
             <line class="tft-transfer-reference" x1="10" y1="55" x2="310" y2="5" aria-hidden="true"/>
             <g class="tft-transfer-scale" aria-hidden="true">
@@ -9517,13 +9660,13 @@ const tftDatabase = {
     content: (s) => `
       <div class="tft-module-view curve-native-view">
         <div class="tft-module-graph-box" id="tftSendsBox">
-          <svg id="tftSendsSvgContainer" viewBox="0 0 320 65" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
+          <svg id="tftSendsSvgContainer" viewBox="0 0 320 120" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
             <g class="tft-geq-grid" stroke="#334155" stroke-width=".7" opacity=".7">
-              <line x1="0" y1="8" x2="320" y2="8" />
-              <line x1="0" y1="20" x2="320" y2="20" />
-              <line x1="0" y1="32" x2="320" y2="32" stroke="#64748b" stroke-width="1.2" />
-              <line x1="0" y1="44" x2="320" y2="44" />
-              <line x1="0" y1="56" x2="320" y2="56" />
+              <line x1="0" y1="15" x2="320" y2="15" />
+              <line x1="0" y1="30" x2="320" y2="30" />
+              <line x1="0" y1="60" x2="320" y2="60" stroke="#64748b" stroke-width="1.2" />
+              <line x1="0" y1="75" x2="320" y2="75" />
+              <line x1="0" y1="105" x2="320" y2="105" />
               <line x1="16" y1="0" x2="16" y2="65" /><line x1="48" y1="0" x2="48" y2="65" />
               <line x1="80" y1="0" x2="80" y2="65" /><line x1="112" y1="0" x2="112" y2="65" />
               <line x1="144" y1="0" x2="144" y2="65" /><line x1="176" y1="0" x2="176" y2="65" />
@@ -9531,7 +9674,7 @@ const tftDatabase = {
               <line x1="272" y1="0" x2="272" y2="65" /><line x1="304" y1="0" x2="304" y2="65" />
             </g>
             <g class="tft-geq-scale" aria-hidden="true">
-              <text x="317" y="7" text-anchor="end">+15</text><text x="317" y="31" text-anchor="end">0</text><text x="317" y="63" text-anchor="end">-15</text>
+              <text x="317" y="17" text-anchor="end">+15</text><text x="317" y="62" text-anchor="end">0</text><text x="317" y="116" text-anchor="end">-15</text>
             </g>
             <path id="tftSendsSvgFill" d="" fill="#a855f7" opacity=".16"/>
             <path id="tftSendsSvgCurve" d="" fill="none" stroke="#d8b4fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -9872,7 +10015,7 @@ function updateTftModuleCurve(key) {
     // Gate model: below threshold the signal is attenuated according to
     // the selected ratio; above threshold it follows 1:1.
     const dbToX = db => 10 + ((clamp(db, -60, 0) + 60) / 60) * 300;
-    const dbToY = db => 55 - ((clamp(db, -60, 0) + 60) / 60) * 50;
+    const dbToY = db => 105 - ((clamp(db, -60, 0) + 60) / 60) * 90;
     const threshold = clamp(Number(s.thresh), -60, 0);
     const ratio = Math.max(1, Number(s.ratio) || 1);
     const gateOut = inputDb => {
@@ -9921,7 +10064,7 @@ function updateTftModuleCurve(key) {
     const points31 = s.bands.map((gain, index) => {
       const totalGain = Number(gain || 0) + Number(s.lvl || 0);
       const x = x0 + ((Math.log10(geqFrequencies[index]) - logMin) / (logMax - logMin)) * span;
-      const y = s.state ? clamp(32 - totalGain * (24 / 15), 8, 56) : 32;
+      const y = s.state ? clamp(60 - totalGain * 3, 15, 105) : 60;
       return [x, y];
     });
     points = points31;
@@ -9956,7 +10099,7 @@ function updateTftModuleCurve(key) {
     const y = s.usb ? clamp(48 - s.source*9 + s.dout*4,8,58) : 58;
     points = [[10,48],[160,y],[310,s.usb?18:58]];
   } else if (key === "meters") {
-    const y = clamp(50 - s.zoom*10 - s.hold*5,5,58);
+    const y = clamp(75 - s.zoom*10 - s.hold*5,15,105);
     points = [[10,55],[160,y],[310,clamp(y-8,5,58)]];
   } else if (key === "scenes") {
     const y = s.safe ? 22 : 48;
@@ -9971,7 +10114,7 @@ function updateTftModuleCurve(key) {
     points = [[10,52],[x,y],[310,s.active?18:52]];
   }
   if (!points.length) return;
-  points = points.map(([x, y]) => [clamp(x, 5, 315), clamp(y, 5, 60)]);
+  points = points.map(([x, y]) => [clamp(x, 5, 315), clamp(y, 15, 105)]);
   // Catmull-Rom to cubic Bezier: smooth response curve that passes through each
   // computed control point, so the curve and draggable handles stay in sync.
   let d = "M" + points[0][0].toFixed(2) + " " + points[0][1].toFixed(2);
@@ -9988,7 +10131,7 @@ function updateTftModuleCurve(key) {
       p1[0].toFixed(2) + " " + p1[1].toFixed(2);
   }
   curve.setAttribute("d", d);
-  if (fill) fill.setAttribute("d", d + " L315 63 L5 63 Z");
+  if (fill) fill.setAttribute("d", d + " L315 105 L5 105 Z");
 
   // Refresh every visible handle from the same calculated point list after
   // either a slider change or a drag, preventing stale/misaligned dots.
@@ -10038,7 +10181,7 @@ function updateTftModuleCurve(key) {
           valueRoot.appendChild(label);
         }
         label.setAttribute("x", Number(x).toFixed(2));
-        label.setAttribute("y", Math.max(5, Math.min(58, Number(y) - 4)).toFixed(2));
+        label.setAttribute("y", Math.max(15, Math.min(105, Number(y) - 4)).toFixed(2));
         label.setAttribute("text-anchor", "middle");
         label.setAttribute("dominant-baseline", "middle");
         label.textContent = (gain >= 0 ? "+" : "") + gain.toFixed(1);
@@ -10070,7 +10213,7 @@ function applyTftGraphPointToControl(key, pointIndex, x, y) {
       const thresholdX = 10 + ((threshold + 60) / 60) * 300;
       const safeX = clamp(x, thresholdX + 1, 310);
       const inputDb = clamp(((safeX - 10) / 300) * 60 - 60, -60, 0);
-      const outputDb = clamp(((55 - y) / 50) * 60 - 60, -60, 0);
+      const outputDb = clamp(((105 - y) / 90) * 60 - 60, -60, 0);
       const ratio = (threshold - outputDb) / Math.max(0.1, threshold - inputDb);
       setRange("gateRatio", Math.round(clamp(ratio, 1, 10) * 10) / 10);
     }
@@ -10147,7 +10290,7 @@ function makeSpecificDotDraggable(svgContainer, dotElement, onUpdateCallback, dr
       : Math.max(radius, Math.min(point.svgWidth - radius,
           isDirectDrag ? point.x : dragStart.dotX + (point.x - dragStart.pointerX) * 0.55));
     const relY = isGeqBand
-      ? Math.max(8, Math.min(56, point.y))
+      ? Math.max(15, Math.min(105, point.y))
       : Math.max(radius, Math.min(point.svgHeight - radius,
           isDirectDrag ? point.y : dragStart.dotY + (point.y - dragStart.pointerY) * 0.55));
     dotElement.setAttribute("cx", relX.toFixed(2));
@@ -10444,7 +10587,7 @@ function bindTftDynamicEventListeners(key) {
         if (key === "gate") {
           const thresholdDb = Math.max(-60, Math.min(0, ((x - 10) / 300) * 60 - 60));
           x = 10 + ((thresholdDb + 60) / 60) * 300;
-          y = 55 - ((thresholdDb + 60) / 60) * 50;
+          y = 105 - ((thresholdDb + 60) / 60) * 90;
         }
         applyTftGraphPointToControl(key, 1, x, y);
         s.dotX = s.dot1X = x; s.dotY = s.dot1Y = y;
@@ -10459,7 +10602,7 @@ function bindTftDynamicEventListeners(key) {
           const threshold = Math.max(-60, Math.min(0, Number(s.thresh)));
           const thresholdX = 10 + ((threshold + 60) / 60) * 300;
           x = Math.max(thresholdX + 1, Math.min(310, x));
-          y = Math.max(5.5, Math.min(59.5, y));
+          y = Math.max(15.5, Math.min(104.5, y));
         }
         applyTftGraphPointToControl(key, 2, x, y);
         s.dot2X = x; s.dot2Y = y;
@@ -10483,7 +10626,7 @@ function bindTftDynamicEventListeners(key) {
         const setGeqBandFromY = (index, y) => {
           if (!Number.isInteger(index) || index < 0 || index > 30) return;
           const clampGeq = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-          const totalGain = clampGeq((32 - y) / (24 / 15), -15, 15);
+          const totalGain = clampGeq((60 - y) / 3, -15, 15);
           s.bands[index] = Math.round(clampGeq(totalGain - Number(s.lvl || 0), -15, 15) * 10) / 10;
           updateTftModuleCurve("sends");
           persistTftState();
