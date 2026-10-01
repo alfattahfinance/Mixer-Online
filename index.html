@@ -5237,6 +5237,111 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
   #tabMixerContent .mixer-workspace{grid-template-columns:82px minmax(0,1fr) !important;}
 }
 
+
+/* GEQ / TFT FINAL LAYOUT: navigation is outside the screen, never overlays graph content. */
+#tabMixerContent .mixer-workspace {
+  grid-template-columns:104px minmax(0,1fr) !important;
+  grid-template-rows:minmax(0,1fr) !important;
+  align-items:stretch !important;
+}
+#tabMixerContent .mixer-side-nav {
+  grid-column:1 !important;
+  grid-row:1 !important;
+  position:relative !important;
+  z-index:20 !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+}
+#tabMixerContent .mixer-workspace-main {
+  grid-column:2 !important;
+  grid-row:1 !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  display:grid !important;
+  grid-template-rows:minmax(0,1fr) minmax(0,1fr) !important;
+  overflow:hidden !important;
+}
+#tabMixerContent .mixer-top-console,
+#tabMixerContent .mixer-tft-screen,
+#tabMixerContent .tft-main-viewport,
+#tabMixerContent .tft-content-screen {
+  min-width:0 !important;
+  max-width:100% !important;
+}
+#tabMixerContent .mixer-tft-screen {
+  height:100% !important;
+  min-height:0 !important;
+  max-height:none !important;
+  overflow:hidden !important;
+  box-sizing:border-box !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] {
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-view {
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  display:grid !important;
+  grid-template-rows:auto minmax(90px,1fr) auto !important;
+  gap:6px !important;
+  overflow:hidden !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box {
+  width:100% !important;
+  min-width:0 !important;
+  min-height:90px !important;
+  max-height:none !important;
+  height:auto !important;
+  flex:none !important;
+  box-sizing:border-box !important;
+  overflow:hidden !important;
+  touch-action:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgContainer {
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  touch-action:none !important;
+  overflow:visible !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-controls-grid {
+  width:100% !important;
+  min-width:0 !important;
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:5px !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-mod-ctrl {
+  min-width:0 !important;
+  overflow:hidden !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-band-points circle {
+  pointer-events:all !important;
+  cursor:ns-resize !important;
+  touch-action:none !important;
+}
+@media (max-width:600px) {
+  #tabMixerContent .mixer-workspace { grid-template-columns:82px minmax(0,1fr) !important; }
+  #tabMixerContent .mixer-side-nav { padding:3px !important; gap:3px !important; }
+  #tabMixerContent .mixer-side-nav .tft-tab,
+  #tabMixerContent .mixer-side-nav .console-btn { min-height:25px !important; font-size:7px !important; }
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-view { grid-template-rows:auto minmax(82px,1fr) auto !important; }
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box { min-height:82px !important; }
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-controls-grid { grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:3px !important; }
+}
+@media (orientation:landscape) and (min-width:700px) {
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box { min-height:96px !important; }
+}
 </style>
 
 <style>
@@ -5589,12 +5694,6 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 
         <!-- WORKSPACE: NAVIGASI VERTIKAL DI KIRI, TFT + FADER DI KANAN -->
         <div class="mixer-workspace">
-          <div class="mixer-workspace-main">
-        <!-- BAGIAN LAYAR UTAMA -->
-        <div class="mixer-top-console">
-          
-          <!-- LAYAR TFT UTAMA (SQ-7 STYLE) -->
-          <div class="mixer-tft-screen">
           <aside class="mixer-side-nav" aria-label="Navigasi mixer">
             <div class="side-nav-caption">PAGES</div>
             <button class="tft-tab active" data-tft-tab="eq">Processing</button>
@@ -5612,6 +5711,12 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
             <button type="button" class="console-btn" data-section="sends">GEQ</button>
             <button type="button" class="console-btn" data-section="main">Insert</button>
           </aside>
+          <div class="mixer-workspace-main">
+        <!-- BAGIAN LAYAR UTAMA -->
+        <div class="mixer-top-console">
+          
+          <!-- LAYAR TFT UTAMA (SQ-7 STYLE) -->
+          <div class="mixer-tft-screen">
             <!-- POWER/SPLASH HANYA MENUTUP LAYAR MIXER (TFT), BUKAN SELURUH HALAMAN -->
             <div class="mixer-power-screen" id="mixerPowerScreen" aria-live="polite" aria-hidden="true">
               <div class="power-screen-pulse" aria-hidden="true"></div>
