@@ -9376,9 +9376,9 @@ const tftDatabase = {
               <text x="10" y="64" text-anchor="middle">-60</text><text x="60" y="64" text-anchor="middle">-50</text>
               <text x="110" y="64" text-anchor="middle">-40</text><text x="160" y="64" text-anchor="middle">-30</text>
               <text x="210" y="64" text-anchor="middle">-20</text><text x="260" y="64" text-anchor="middle">-10</text><text x="310" y="64" text-anchor="end">0 dB</text>
-              <text x="7" y="57" text-anchor="end">-60</text><text x="7" y="47" text-anchor="end">-50</text>
-              <text x="7" y="37" text-anchor="end">-40</text><text x="7" y="27" text-anchor="end">-30</text>
-              <text x="7" y="17" text-anchor="end">-20</text><text x="7" y="7" text-anchor="end">-10</text>
+              <text x="7" y="57" text-anchor="end">-60</text><text x="7" y="49" text-anchor="end">-50</text>
+              <text x="7" y="41" text-anchor="end">-40</text><text x="7" y="33" text-anchor="end">-30</text>
+              <text x="7" y="25" text-anchor="end">-20</text><text x="7" y="17" text-anchor="end">-10</text><text x="7" y="7" text-anchor="end">0 dB</text>
               <text class="axis-title" x="245" y="4" text-anchor="middle">INPUT LEVEL (dB)</text>
               <text class="axis-title" x="18" y="31" text-anchor="middle" transform="rotate(-90 18 31)">OUTPUT LEVEL (dB)</text>
               <text class="reference-label" x="205" y="21">1:1 NO COMPRESSION</text>
@@ -9421,9 +9421,9 @@ const tftDatabase = {
               <text x="10" y="64" text-anchor="middle">-60</text><text x="60" y="64" text-anchor="middle">-50</text>
               <text x="110" y="64" text-anchor="middle">-40</text><text x="160" y="64" text-anchor="middle">-30</text>
               <text x="210" y="64" text-anchor="middle">-20</text><text x="260" y="64" text-anchor="middle">-10</text><text x="310" y="64" text-anchor="end">0 dB</text>
-              <text x="7" y="57" text-anchor="end">-60</text><text x="7" y="47" text-anchor="end">-50</text>
-              <text x="7" y="37" text-anchor="end">-40</text><text x="7" y="27" text-anchor="end">-30</text>
-              <text x="7" y="17" text-anchor="end">-20</text><text x="7" y="7" text-anchor="end">-10</text>
+              <text x="7" y="57" text-anchor="end">-60</text><text x="7" y="49" text-anchor="end">-50</text>
+              <text x="7" y="41" text-anchor="end">-40</text><text x="7" y="33" text-anchor="end">-30</text>
+              <text x="7" y="25" text-anchor="end">-20</text><text x="7" y="17" text-anchor="end">-10</text><text x="7" y="7" text-anchor="end">0 dB</text>
               <text class="axis-title" x="245" y="4" text-anchor="middle">INPUT LEVEL (dB)</text>
               <text class="axis-title" x="18" y="31" text-anchor="middle" transform="rotate(-90 18 31)">OUTPUT LEVEL (dB)</text>
               <text class="reference-label" x="205" y="21">1:1 NO COMPRESSION</text>
@@ -9837,18 +9837,43 @@ function updateTftModuleCurve(key) {
   if (key === "config") {
     points = [[10,50],[160,clamp(58-(s.gain/60)*48,8,58)],[310,15]];
   } else if (key === "gate") {
-    const x = clamp(15 + ((s.thresh+80)/80)*280,15,295);
-    const y = clamp(56 - (s.ratio-1)*(48/9),8,56);
-    // Keep the knee handle visibly separate from the threshold handle.
-    const kneeX = clamp(x + 30, x + 24, 300);
-    points = s.state
-      ? [[10,55],[x,55],[kneeX,y],[310,y]]
-      : [[10,55],[x,55],[kneeX,55],[310,55]];
+    // Transfer graph is calibrated: X = input dB, Y = output dB.
+    // Gate model: below threshold the signal is attenuated according to
+    // the selected ratio; above threshold it follows 1:1.
+    const dbToX = db => 10 + ((clamp(db, -60, 0) + 60) / 60) * 300;
+    const dbToY = db => 55 - ((clamp(db, -60, 0) + 60) / 60) * 50;
+    const threshold = clamp(Number(s.thresh), -60, 0);
+    const ratio = Math.max(1, Number(s.ratio) || 1);
+    const gateOut = inputDb => {
+      if (!s.state) return inputDb;
+      if (inputDb >= threshold) return inputDb;
+      return threshold + (inputDb - threshold) * ratio;
+    };
+    const kneeIn = Math.max(-60, threshold - 12);
+    const kneeOut = gateOut(kneeIn);
+    points = [
+      [dbToX(-60), dbToY(gateOut(-60))],
+      [dbToX(kneeIn), dbToY(kneeOut)],
+      [dbToX(threshold), dbToY(threshold)],
+      [dbToX(0), dbToY(0)]
+    ];
   } else if (key === "dynamics") {
-    const x = clamp(15 + ((s.thresh+60)/60)*270,15,285);
-    const y = clamp(56 - (s.ratio-1)*(48/19),8,56);
-    const endY = clamp(y - s.makeup*0.65,5,55);
-    points = [[10,55],[x,y],[190,y],[310,endY]];
+    // Real dB transfer mapping: X = input level, Y = output level.
+    const dbToX = db => 10 + ((clamp(db, -60, 0) + 60) / 60) * 300;
+    const dbToY = db => 55 - ((clamp(db, -60, 0) + 60) / 60) * 50;
+    const threshold = clamp(Number(s.thresh), -60, 0);
+    const ratio = Math.max(1, Number(s.ratio) || 1);
+    const makeup = Number(s.makeup) || 0;
+    const compOut = inputDb => {
+      if (inputDb <= threshold) return inputDb + makeup;
+      return threshold + (inputDb - threshold) / ratio + makeup;
+    };
+    points = [
+      [dbToX(-60), dbToY(compOut(-60))],
+      [dbToX(threshold), dbToY(compOut(threshold))],
+      [dbToX(Math.min(0, threshold + 20)), dbToY(compOut(Math.min(0, threshold + 20)))],
+      [dbToX(0), dbToY(compOut(0))]
+    ];
   } else if (key === "sends") {
     // True 31-band GEQ: each band has its own gain, while GEQ Master is a
     // global offset. Frequencies are positioned logarithmically.
