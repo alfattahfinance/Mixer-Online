@@ -8179,13 +8179,75 @@ function persistTftState() {
   catch (err) { /* Storage can be unavailable in private/restricted browsing. */ }
 }
 
+const SCENE_BANK_KEY = "mixerOnlineSceneBankV2";
+const SCENE_COUNT = 8;
+const DEFAULT_SCENE_NAMES = ["Live Stage","Acoustic","Band","Rehearsal","Speech","Worship","Recording","Backup"];
 const tftSceneSnapshots = Object.create(null);
-try {
-  const savedScenes = JSON.parse(localStorage.getItem('mixerOnlineTftScenes') || '{}');
-  if (savedScenes && typeof savedScenes === 'object' && !Array.isArray(savedScenes)) {
-    [0, 1, 2, 3].forEach(index => { if (savedScenes[index] && typeof savedScenes[index] === 'object') tftSceneSnapshots[index] = savedScenes[index]; });
+const sceneBank = Array.from({length: SCENE_COUNT}, (_, i) => ({name: DEFAULT_SCENE_NAMES[i], snapshot:null, updatedAt:0}));
+function cloneSceneValue(v){try{return JSON.parse(JSON.stringify(v));}catch{return null;}}
+try{
+  const saved=JSON.parse(localStorage.getItem(SCENE_BANK_KEY)||"null");
+  if(Array.isArray(saved)) saved.slice(0,SCENE_COUNT).forEach((x,i)=>{if(x&&typeof x==="object"){sceneBank[i].name=String(x.name||sceneBank[i].name);sceneBank[i].snapshot=x.snapshot||null;sceneBank[i].updatedAt=Number(x.updatedAt)||0;}});
+  else{
+    const legacy=JSON.parse(localStorage.getItem("mixerOnlineTftScenes")||"{}");
+    if(legacy&&typeof legacy==="object") [0,1,2,3].forEach(i=>{if(legacy[i]){sceneBank[i].snapshot={version:1,tft:legacy[i]};sceneBank[i].updatedAt=Date.now();}});
   }
-} catch (err) { /* Ignore invalid or unavailable browser storage. */ }
+}catch{}
+function persistSceneBank(){
+  try{
+    localStorage.setItem(SCENE_BANK_KEY,JSON.stringify(sceneBank));
+    const legacy={};sceneBank.slice(0,4).forEach((x,i)=>{if(x.snapshot?.tft)legacy[i]=x.snapshot.tft;});
+    localStorage.setItem("mixerOnlineTftScenes",JSON.stringify(legacy));
+  }catch{}
+}
+function captureMixerScene(){
+  const strips=[...document.querySelectorAll("#tabMixerContent .console-channel-strip:not(.master-strip)")];
+  const master=document.querySelector("#tabMixerContent .console-channel-strip.master-strip");
+  let quickState={};try{quickState=JSON.parse(localStorage.getItem("mixerChannelQuickState")||"{}")||{};}catch{}
+  return {
+    version:2,timestamp:Date.now(),tft:cloneSceneValue(tftStatesData),
+    strips:strips.map(strip=>{
+      const title=strip.querySelector(".channel-title-trigger");
+      const fader=strip.querySelector(".fader-slot input[type=range]");
+      const quick={};
+      strip.querySelectorAll(".channel-quick-panel input,.channel-quick-panel select").forEach(x=>{const k=x.dataset.quickParam||x.id||x.name;if(k)quick[k]=x.value;});
+      return {channel:Number(title?.dataset.channelTitle||0),fader:fader?.value??null,quick,mute:!!strip.querySelector(".console-action-btn.mute")?.classList.contains("active"),solo:!!strip.querySelector(".console-action-btn.solo")?.classList.contains("active")};
+    }),
+    master:{fader:master?.querySelector(".fader-slot input[type=range]")?.value??null,mute:!!master?.querySelector(".master-mute-btn")?.classList.contains("active"),lr:!!master?.querySelector(".master-lr-btn")?.classList.contains("active")},
+    quickState:cloneSceneValue(quickState),
+    globals:{masterGain:document.getElementById("masterGainControl")?.value??null,outputMode:document.getElementById("outputMode")?.value??null}
+  };
+}
+function applyMixerScene(snap){
+  if(!snap)return false;
+  if(snap.tft){Object.keys(snap.tft).forEach(k=>{if(k!=="scenes"&&tftStatesData[k]&&snap.tft[k])Object.assign(tftStatesData[k],cloneSceneValue(snap.tft[k])||{});});persistTftState();}
+  if(snap.quickState)try{localStorage.setItem("mixerChannelQuickState",JSON.stringify(snap.quickState));}catch{}
+  const strips=[...document.querySelectorAll("#tabMixerContent .console-channel-strip:not(.master-strip)")];
+  (snap.strips||[]).forEach(saved=>{
+    const strip=strips.find(x=>Number(x.querySelector(".channel-title-trigger")?.dataset.channelTitle)===Number(saved.channel));if(!strip)return;
+    const f=strip.querySelector(".fader-slot input[type=range]");
+    if(f&&saved.fader!=null){f.value=String(saved.fader);f.dispatchEvent(new Event("input",{bubbles:true}));f.dispatchEvent(new Event("change",{bubbles:true}));}
+    Object.entries(saved.quick||{}).forEach(([k,v])=>{const x=strip.querySelector("[data-quick-param=\""+CSS.escape(k)+"\"]")||strip.querySelector("#"+CSS.escape(k));if(x){x.value=String(v);x.dispatchEvent(new Event("input",{bubbles:true}));x.dispatchEvent(new Event("change",{bubbles:true}));}});
+    const mute=strip.querySelector(".console-action-btn.mute");if(mute&&mute.classList.contains("active")!==!!saved.mute)mute.click();
+    const solo=strip.querySelector(".console-action-btn.solo");if(solo&&solo.classList.contains("active")!==!!saved.solo)solo.click();
+  });
+  const master=document.querySelector("#tabMixerContent .console-channel-strip.master-strip");
+  if(master){
+    const f=master.querySelector(".fader-slot input[type=range]");if(f&&snap.master?.fader!=null){f.value=String(snap.master.fader);f.dispatchEvent(new Event("input",{bubbles:true}));f.dispatchEvent(new Event("change",{bubbles:true}));}
+    const mute=master.querySelector(".master-mute-btn");if(mute&&mute.classList.contains("active")!==!!snap.master?.mute)mute.click();
+    const lr=master.querySelector(".master-lr-btn");if(lr&&lr.classList.contains("active")!==!!snap.master?.lr)lr.click();
+  }
+  const mg=document.getElementById("masterGainControl");if(mg&&snap.globals?.masterGain!=null){mg.value=String(snap.globals.masterGain);mg.dispatchEvent(new Event("input",{bubbles:true}));}
+  const om=document.getElementById("outputMode");if(om&&snap.globals?.outputMode!=null){om.value=String(snap.globals.outputMode);om.dispatchEvent(new Event("change",{bubbles:true}));}
+  return true;
+}
+function sendSceneTransport(type,index,snapshot){
+  const packet={type,id:"SCENE-"+Date.now()+"-"+index,scene:index+1,snapshot:type==="SCENE_STORE"?snapshot:undefined};
+  try{window.dispatchEvent(new CustomEvent("mixer:scene-transport",{detail:packet}));}catch{}
+  try{sendDataToESP32(JSON.stringify(packet)+"\n");}catch{}
+  setTimeout(()=>{try{window.dispatchEvent(new CustomEvent("mixer:scene-ack",{detail:{type:"ACK",ack:packet.id,ok:true,scene:index+1}}));}catch{}},0);
+}
+persistSceneBank();
 
 const audioFilesInput = document.getElementById("audioFilesInput");
 const playlistContainer = document.getElementById("playlistContainer");
@@ -9969,7 +10031,7 @@ const tftDatabase = {
         </div>
       </div>
     `,
-    encoders: (s) => [{name:"SCENE", val:`#${String(s.active+1).padStart(2,"0")}`}, {name:"RECALL", val:s.safe?"SAFE":"DIR"}, {name:"STORE", val:s.stored?"SAVED":"READY"}, {name:"SNIPPET", val:"ALL"}, {name:"USB SAVE", val:"READY"}, {name:"AUTO", val:"ON"}]
+    encoders: (s) => [{name:"SCENE", val:`#${String(s.active+1).padStart(2,"0")}`}, {name:"RECALL", val:s.safe?"SAFE":"DIR"}, {name:"STORE", val:s.stored?"SAVED":"READY"}, {name:"SLOTS", val:`${sceneBank.filter(x=>x.snapshot).length}/${SCENE_COUNT}`}, {name:"TX", val:"SCENE"}, {name:"ACK", val:"LOOPBACK"}]
   },
   setup: {
     title: "SQ-7 SYSTEM SETUP & HARDWARE",
@@ -10621,42 +10683,33 @@ function bindTftDynamicEventListeners(key) {
       const storeBtn = document.getElementById("sceneStoreBtn");
       const recallBtn = document.getElementById("sceneRecallBtn");
       const safeBtn = document.getElementById("sceneSafeBtn");
-      actSel?.addEventListener("change", () => { s.active = Number(actSel.value); s.stored = Boolean(tftSceneSnapshots[s.active]); updateEncoders(tftDatabase.scenes.encoders(s)); refreshTftInfoPanel("scenes"); });
-      storeBtn?.addEventListener("click", () => {
-        tftSceneSnapshots[s.active] = JSON.parse(JSON.stringify(tftStatesData));
-        try { localStorage.setItem('mixerOnlineTftScenes', JSON.stringify(tftSceneSnapshots)); } catch (err) { /* Storage may be disabled. */ }
-        s.stored = true;
-        storeBtn.textContent = "STORED";
-        persistTftState();
-        loadTftPage("scenes");
-      });
-      recallBtn?.addEventListener("click", () => {
-        const snapshot = tftSceneSnapshots[s.active];
-        if (!snapshot) {
-          recallBtn.textContent = "EMPTY";
-          return;
+      const ensureSceneUi = () => {
+        const list=document.querySelector("#tftScenesInfo .tft-scene-list");
+        if(list){
+          list.innerHTML=sceneBank.map((x,i)=>'<div class="tft-scene-row '+(s.active===i?'selected':'')+'" data-scene-row="'+i+'"><b>#'+String(i+1).padStart(2,"0")+'</b><span>'+x.name+'</span><small>'+(x.snapshot?'SAVED':'EMPTY')+'</small></div>').join("");
         }
-        const protectedKeys = s.safe ? new Set(['routing', 'setup']) : new Set();
-        Object.keys(snapshot).forEach(sectionKey => {
-          if (sectionKey !== 'scenes' && !protectedKeys.has(sectionKey) && tftStatesData[sectionKey]) {
-            Object.assign(tftStatesData[sectionKey], snapshot[sectionKey]);
-          }
-        });
-        tftPeqFreqVal = tftStatesData.eq.freq;
-        tftPeqQVal = tftStatesData.eq.q;
-        tftPeqGainVal = tftStatesData.eq.gain;
-        if (tftPeqFilter && audioContext) {
-          tftPeqFilter.frequency.setTargetAtTime(tftPeqFreqVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
-          tftPeqFilter.Q.setTargetAtTime(tftPeqQVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
-          tftPeqFilter.gain.setTargetAtTime(tftPeqGainVal, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+        if(actSel){
+          actSel.innerHTML=sceneBank.map((x,i)=>'<option value="'+i+'" '+(s.active===i?'selected':'')+'>#'+String(i+1).padStart(2,"0")+' '+x.name+'</option>').join("");
         }
-        s.stored = true;
-        recallBtn.textContent = "RECALLED";
-        persistTftState();
-        loadTftPage("scenes");
-      });
-      safeBtn?.addEventListener("click", () => { s.safe = !s.safe; safeBtn.textContent = s.safe ? "SAFE ON" : "SAFE OFF"; safeBtn.classList.toggle("active-action", s.safe); updateEncoders(tftDatabase.scenes.encoders(s)); });
-    } else if (key === "setup") {
+        const grid=actSel?.closest(".tft-module-controls-grid");
+        if(grid&&!document.getElementById("sceneRenameBtn")){
+          grid.insertAdjacentHTML("beforeend",'<div class="tft-mod-ctrl"><label>RENAME</label><button id="sceneRenameBtn" type="button">RENAME</button></div><div class="tft-mod-ctrl"><label>DUPLICATE</label><button id="sceneDuplicateBtn" type="button">DUPLICATE</button></div><div class="tft-mod-ctrl"><label>DELETE</label><button id="sceneDeleteBtn" type="button">DELETE</button></div><div class="tft-mod-ctrl"><label>BACKUP</label><button id="sceneExportBtn" type="button">EXPORT</button><button id="sceneImportBtn" type="button">IMPORT</button><input id="sceneImportFile" type="file" accept=".json,application/json" hidden></div>');
+        }
+      };
+      ensureSceneUi();
+      const renameBtn=document.getElementById("sceneRenameBtn"),duplicateBtn=document.getElementById("sceneDuplicateBtn"),deleteBtn=document.getElementById("sceneDeleteBtn"),exportBtn=document.getElementById("sceneExportBtn"),importBtn=document.getElementById("sceneImportBtn"),importFile=document.getElementById("sceneImportFile");
+      const refreshSceneUi=()=>{ensureSceneUi();const active=Number(s.active)||0;sceneBank.forEach((x,i)=>{const row=document.querySelector('[data-scene-row="'+i+'"]');if(row)row.classList.toggle("selected",i===active);});s.stored=!!sceneBank[active]?.snapshot;updateEncoders(tftDatabase.scenes.encoders(s));};
+      actSel?.addEventListener("change",()=>{s.active=Math.max(0,Math.min(SCENE_COUNT-1,Number(actSel.value)||0));refreshSceneUi();});
+      storeBtn?.addEventListener("click",()=>{const i=Number(s.active)||0;const snap=captureMixerScene();sceneBank[i].snapshot=snap;sceneBank[i].updatedAt=Date.now();tftSceneSnapshots[i]=cloneSceneValue(snap.tft);persistSceneBank();persistTftState();sendSceneTransport("SCENE_STORE",i,snap);setStatus("Scene #"+String(i+1).padStart(2,"0")+" tersimpan sebagai FULL MIX SNAPSHOT.");storeBtn.textContent="SAVED ✓";setTimeout(()=>{if(storeBtn.isConnected)storeBtn.textContent="STORE";},1000);refreshSceneUi();});
+      recallBtn?.addEventListener("click",()=>{const i=Number(s.active)||0;const snap=sceneBank[i]?.snapshot;if(!snap){setStatus("Scene kosong.");return;}if(applyMixerScene(snap)){sendSceneTransport("SCENE_RECALL",i,snap);setStatus("Scene #"+String(i+1).padStart(2,"0")+" RECALLED → TX → SIMULATOR → ACK.");refreshSceneUi();}});
+      safeBtn?.addEventListener("click",()=>{s.safe=!s.safe;safeBtn.textContent=s.safe?"SAFE ON":"SAFE OFF";safeBtn.classList.toggle("active-action",s.safe);updateEncoders(tftDatabase.scenes.encoders(s));});
+      renameBtn?.addEventListener("click",()=>{const i=Number(s.active)||0;const n=prompt("Nama Scene #"+String(i+1).padStart(2,"0"),sceneBank[i].name);if(n&&String(n).trim()){sceneBank[i].name=String(n).trim().slice(0,40);persistSceneBank();loadTftPage("scenes");}});
+      duplicateBtn?.addEventListener("click",()=>{const i=Number(s.active)||0;if(!sceneBank[i].snapshot){setStatus("Scene sumber kosong.");return;}const d=sceneBank.findIndex((x,j)=>j!==i&&!x.snapshot);const target=d>=0?d:(i+1)%SCENE_COUNT;sceneBank[target].snapshot=cloneSceneValue(sceneBank[i].snapshot);sceneBank[target].name=sceneBank[i].name+" Copy";sceneBank[target].updatedAt=Date.now();persistSceneBank();s.active=target;loadTftPage("scenes");setStatus("Scene duplicated.");});
+      deleteBtn?.addEventListener("click",()=>{const i=Number(s.active)||0;if(sceneBank[i].snapshot&&confirm("Hapus Scene #"+String(i+1).padStart(2,"0")+"?")){sceneBank[i].snapshot=null;sceneBank[i].updatedAt=0;persistSceneBank();loadTftPage("scenes");setStatus("Scene dihapus.");}});
+      exportBtn?.addEventListener("click",()=>{const blob=new Blob([JSON.stringify({format:"Mixer-Online Scene Bank",version:2,exportedAt:new Date().toISOString(),scenes:sceneBank},null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="mixer-online-scenes.json";a.click();setStatus("Scene bank exported.");});
+      importBtn?.addEventListener("click",()=>importFile?.click());
+      importFile?.addEventListener("change",async()=>{const f=importFile.files?.[0];if(!f)return;try{const p=JSON.parse(await f.text()),arr=Array.isArray(p)?p:p.scenes;if(!Array.isArray(arr))throw new Error("Format invalid");arr.slice(0,SCENE_COUNT).forEach((x,i)=>{if(x&&typeof x==="object"){sceneBank[i].name=String(x.name||sceneBank[i].name).slice(0,40);sceneBank[i].snapshot=x.snapshot||null;sceneBank[i].updatedAt=Number(x.updatedAt)||Date.now();}});persistSceneBank();loadTftPage("scenes");setStatus("Scene bank imported.");}catch(e){setStatus("Import gagal: "+e.message);}finally{importFile.value="";}});
+      refreshSceneUi();    } else if (key === "setup") {
       const brInp = document.getElementById("setupBrightInp");
       const bleBtn = document.getElementById("setupBleBtn");
       const bufSel = document.getElementById("setupBufSel");
