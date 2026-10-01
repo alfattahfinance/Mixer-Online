@@ -12367,3 +12367,237 @@ body.mixer-powered-off #tabMixerContent .mixer-tft-screen .tft-main-viewport {
 }
 </style>
 
+
+<style id="mixer-native-screen-layout-final">
+/* =========================================================
+   FINAL: PAGES + CHANNEL DSP STAY OUTSIDE THE MIXER TFT
+   The TFT is only the mixer display. Curve graphics fill the
+   remaining TFT area and never sit underneath the navigation.
+========================================================= */
+#tabMixerContent .mixer-workspace{
+  display:grid !important;
+  grid-template-columns:104px minmax(0,1fr) !important;
+  grid-template-rows:minmax(0,1fr) !important;
+  gap:5px !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+  position:relative !important;
+  box-sizing:border-box !important;
+}
+#tabMixerContent .mixer-side-nav{
+  grid-column:1 !important;
+  grid-row:1 !important;
+  position:relative !important;
+  inset:auto !important;
+  width:100% !important;
+  min-width:0 !important;
+  max-width:none !important;
+  height:100% !important;
+  min-height:0 !important;
+  margin:0 !important;
+  box-sizing:border-box !important;
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  z-index:100 !important;
+}
+#tabMixerContent .mixer-workspace-main{
+  grid-column:2 !important;
+  grid-row:1 !important;
+  display:grid !important;
+  grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+  grid-template-rows:minmax(220px,42vh) minmax(180px,1fr) !important;
+  gap:5px !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  margin:0 !important;
+  overflow:hidden !important;
+  position:relative !important;
+}
+#tabMixerContent .mixer-top-console{
+  grid-column:1 / span 4 !important;
+  grid-row:1 !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  max-height:none !important;
+  margin:0 !important;
+  overflow:hidden !important;
+  box-sizing:border-box !important;
+}
+#tabMixerContent .mixer-desk-surface{
+  display:contents !important;
+}
+#tabMixerContent .mixer-desk-surface > .console-channel-strip:nth-child(1){grid-column:1 !important;grid-row:2 !important;}
+#tabMixerContent .mixer-desk-surface > .console-channel-strip:nth-child(2){grid-column:2 !important;grid-row:2 !important;}
+#tabMixerContent .mixer-desk-surface > .console-channel-strip:nth-child(3){grid-column:3 !important;grid-row:2 !important;}
+#tabMixerContent .mixer-desk-surface > .console-channel-strip:nth-child(4){grid-column:4 !important;grid-row:2 !important;}
+#tabMixerContent .mixer-desk-surface > .console-channel-strip.master-strip{
+  grid-column:5 !important;
+  grid-row:1 / span 2 !important;
+}
+
+/* Restore the TFT itself as a normal display stack — no navigation overlay. */
+#tabMixerContent .mixer-tft-screen{
+  display:flex !important;
+  flex-direction:column !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  max-width:none !important;
+  max-height:none !important;
+  padding:5px !important;
+  gap:3px !important;
+  overflow:hidden !important;
+  position:relative !important;
+  box-sizing:border-box !important;
+}
+#tabMixerContent .mixer-tft-screen > .mixer-side-nav{position:relative !important;inset:auto !important;width:auto !important;height:auto !important;}
+#tabMixerContent .mixer-tft-screen .tft-header{
+  flex:0 0 auto !important;
+  width:100% !important;
+  max-width:none !important;
+  margin:0 !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-main-viewport{
+  flex:1 1 auto !important;
+  width:100% !important;
+  height:auto !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  max-width:none !important;
+  max-height:none !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  overflow:hidden !important;
+  box-sizing:border-box !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-content-screen{
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  max-width:none !important;
+  max-height:none !important;
+  padding:0 !important;
+  margin:0 !important;
+  border:0 !important;
+  background:
+    linear-gradient(to bottom, rgba(72,150,190,.17) 1px, transparent 1px),
+    linear-gradient(to right, rgba(72,150,190,.17) 1px, transparent 1px) !important;
+  background-size:8% 12.5% !important;
+  background-repeat:repeat !important;
+  overflow:hidden !important;
+  box-sizing:border-box !important;
+}
+
+/* The graph is transparent; the TFT's own surface/grid shows through. */
+#tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq,
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-view,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-view,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-view{
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  max-width:none !important;
+  max-height:none !important;
+  background:transparent !important;
+  overflow:hidden !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq-graph,
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box{
+  width:100% !important;
+  min-width:0 !important;
+  max-width:none !important;
+  height:100% !important;
+  max-height:none !important;
+  min-height:0 !important;
+  flex:1 1 auto !important;
+  border:0 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  padding:0 !important;
+  margin:0 !important;
+  background-color:transparent !important;
+  background-image:none !important;
+  overflow:hidden !important;
+  box-sizing:border-box !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq{
+  display:grid !important;
+  grid-template-rows:auto minmax(0,1fr) auto !important;
+  gap:4px !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-view,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-view,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-view{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:4px !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="eq"] .tft-peq-graph svg,
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box svg,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box svg,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box svg{
+  width:100% !important;
+  height:100% !important;
+  max-width:none !important;
+  max-height:none !important;
+  display:block !important;
+  background:transparent !important;
+}
+
+/* Keep neon curve data visible without adding another graph card. */
+#tabMixerContent #tftContentArea[data-page-key="eq"] #tftPeqSvgCurve,
+#tabMixerContent #tftContentArea[data-page-key="gate"] #tftGateSvgCurve,
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompSvgCurve{
+  filter:drop-shadow(0 0 2px currentColor) drop-shadow(0 0 7px currentColor) !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgCurve{
+  filter:drop-shadow(0 0 2px #ff00c8) drop-shadow(0 0 7px #ff00c8) !important;
+}
+
+/* No accidental overlay from the old inside-screen navigation rules. */
+#tabMixerContent .mixer-tft-screen > .mixer-side-nav,
+#tabMixerContent .mixer-tft-screen > .mixer-top-console{
+  position:static !important;
+  left:auto !important;
+  top:auto !important;
+  right:auto !important;
+  bottom:auto !important;
+}
+#tabMixerContent .mixer-tft-screen > .mixer-top-console{
+  width:auto !important;
+  height:auto !important;
+  margin:0 !important;
+}
+
+@media (max-width:700px){
+  #tabMixerContent .mixer-workspace{grid-template-columns:82px minmax(0,1fr) !important;}
+  #tabMixerContent .mixer-workspace-main{
+    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+    grid-template-rows:minmax(190px,42vh) minmax(170px,1fr) !important;
+  }
+  #tabMixerContent .mixer-side-nav .tft-tab,
+  #tabMixerContent .mixer-side-nav .console-btn{
+    min-height:25px !important;
+    height:25px !important;
+    font-size:7px !important;
+  }
+  #tabMixerContent .mixer-tft-screen .tft-content-screen{
+    background-size:10% 12.5% !important;
+  }
+}
+</style>
