@@ -12819,4 +12819,173 @@ body.mixer-powered-off #tabMixerContent .mixer-tft-screen .tft-main-viewport {
   #tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer .tft-comp-scale .axis-title { font-size:4.1px !important; }
   #tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer .tft-comp-scale .reference-label { font-size:3.8px !important; }
 }
+/* =========================================================
+   NATIVE MIXER CURVE SURFACE — TRANSPARENT + DIGITAL GRID
+   The graph is part of the TFT screen; no separate solid card.
+========================================================= */
+#tabMixerContent .mixer-tft-screen .tft-peq-graph,
+#tabMixerContent .mixer-tft-screen .tft-module-graph-box,
+#tabMixerContent .mixer-tft-screen .eq-response-curve {
+  position:relative !important;
+  background-color:transparent !important;
+  background-image:
+    linear-gradient(to right, rgba(80,150,190,.16) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(80,150,190,.16) 1px, transparent 1px) !important;
+  background-size:10% 20% !important;
+  border:0 !important;
+  border-radius:2px !important;
+  box-shadow:none !important;
+  isolation:isolate;
+  overflow:hidden !important;
+}
+
+/* Keep the mixer TFT itself visible through the graph surface. */
+#tabMixerContent .mixer-tft-screen .tft-peq-graph::before,
+#tabMixerContent .mixer-tft-screen .tft-module-graph-box::before,
+#tabMixerContent .mixer-tft-screen .eq-response-curve::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:
+    linear-gradient(to right, rgba(125,211,252,.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(125,211,252,.08) 1px, transparent 1px);
+  background-size:5% 10%;
+  opacity:.72;
+}
+
+/* SVG is the native plotting layer; never paint an opaque rectangle over it. */
+#tabMixerContent .mixer-tft-screen .tft-peq-graph,
+#tabMixerContent .mixer-tft-screen .tft-module-graph-box svg,
+#tabMixerContent .mixer-tft-screen .eq-response-svg {
+  background:transparent !important;
+  min-width:0 !important;
+  max-width:100% !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-peq-graph > *,
+#tabMixerContent .mixer-tft-screen .tft-module-graph-box svg > *,
+#tabMixerContent .mixer-tft-screen .eq-response-svg > * {
+  position:relative;
+}
+
+/* Center/zero/reference lines remain visible but integrated into the TFT. */
+#tabMixerContent .mixer-tft-screen .tft-peq-graph line,
+#tabMixerContent .mixer-tft-screen .tft-module-graph-box line,
+#tabMixerContent .mixer-tft-screen .eq-response-grid line {
+  vector-effect:non-scaling-stroke !important;
+  stroke:rgba(125,170,200,.24) !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-peq-graph line[stroke="#94a3b8"],
+#tabMixerContent .mixer-tft-screen .tft-module-graph-box line[stroke="#475569"] {
+  stroke:rgba(190,220,235,.42) !important;
+}
+
+/* Neon curve treatment — glow without changing the actual DSP path/data. */
+#tabMixerContent .mixer-tft-screen #tftPeqSvgCurve,
+#tabMixerContent .mixer-tft-screen #tftGateSvgCurve,
+#tabMixerContent .mixer-tft-screen #tftCompSvgCurve,
+#tabMixerContent .mixer-tft-screen #tftSendsSvgCurve,
+#tabMixerContent .mixer-tft-screen .eq-response-path {
+  vector-effect:non-scaling-stroke !important;
+  stroke:#00ffcc !important;
+  stroke-width:2.6 !important;
+  stroke-linecap:round !important;
+  stroke-linejoin:round !important;
+  filter:
+    drop-shadow(0 0 2px rgba(0,255,204,.95))
+    drop-shadow(0 0 6px rgba(0,255,204,.62))
+    drop-shadow(0 0 11px rgba(0,255,204,.28)) !important;
+}
+#tabMixerContent .mixer-tft-screen #tftPeqSvgFill,
+#tabMixerContent .mixer-tft-screen #tftGateSvgFill,
+#tabMixerContent .mixer-tft-screen #tftCompSvgFill,
+#tabMixerContent .mixer-tft-screen #tftSendsSvgFill {
+  fill:#00ffcc !important;
+  opacity:.08 !important;
+  pointer-events:none !important;
+}
+
+/* Control points stay bright and touch-friendly. */
+#tabMixerContent .mixer-tft-screen #tftPeqSvgContainer circle,
+#tabMixerContent .mixer-tft-screen #tftGateSvgContainer circle,
+#tabMixerContent .mixer-tft-screen #tftCompSvgContainer circle,
+#tabMixerContent .mixer-tft-screen #tftSendsSvgContainer circle {
+  vector-effect:non-scaling-stroke !important;
+  fill:#f8ffff !important;
+  stroke:#00ffcc !important;
+  stroke-width:1.8 !important;
+  filter:drop-shadow(0 0 3px rgba(0,255,204,.95)) drop-shadow(0 0 7px rgba(0,255,204,.55)) !important;
+}
+
+/* Responsive graph sizing and numeric labels. */
+#tabMixerContent .mixer-tft-screen .tft-peq-graph,
+#tabMixerContent .mixer-tft-screen .tft-module-graph-box {
+  width:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-peq-graph text,
+#tabMixerContent .mixer-tft-screen .tft-module-graph-box text,
+#tabMixerContent .mixer-tft-screen .eq-response-curve text {
+  font-size:clamp(4px, .62vw, 7px) !important;
+  font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
+  font-weight:700 !important;
+  paint-order:stroke !important;
+  stroke:rgba(3,7,13,.55) !important;
+  stroke-width:.35px !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-peq-graph .axis-title,
+#tabMixerContent .mixer-tft-screen .tft-peq-graph .reference-label,
+#tabMixerContent .mixer-tft-screen .tft-peq-graph .graph-title {
+  font-size:clamp(4px, .58vw, 6.5px) !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-module-graph-box {
+  container-type:inline-size;
+}
+@container (max-width:420px) {
+  #tabMixerContent .mixer-tft-screen .tft-module-graph-box text { font-size:4px !important; }
+}
+@media (max-width:600px) {
+  #tabMixerContent .mixer-tft-screen .tft-peq-graph text,
+  #tabMixerContent .mixer-tft-screen .tft-module-graph-box text {
+    font-size:4px !important;
+  }
+  #tabMixerContent .mixer-tft-screen #tftPeqSvgContainer circle,
+  #tabMixerContent .mixer-tft-screen #tftGateSvgContainer circle,
+  #tabMixerContent .mixer-tft-screen #tftCompSvgContainer circle,
+  #tabMixerContent .mixer-tft-screen #tftSendsSvgContainer circle {
+    stroke-width:1.6 !important;
+  }
+}
+@media (min-width:601px) and (max-width:1199px) {
+  #tabMixerContent .mixer-tft-screen .tft-peq-graph text,
+  #tabMixerContent .mixer-tft-screen .tft-module-graph-box text {
+    font-size:clamp(4.5px, .72vw, 7px) !important;
+  }
+}
+@media (min-width:1200px) {
+  #tabMixerContent .mixer-tft-screen .tft-peq-graph text,
+  #tabMixerContent .mixer-tft-screen .tft-module-graph-box text {
+    font-size:7px !important;
+  }
+}
+
+/* Keep graph content inside the TFT viewport; never cover Pages/Channel DSP. */
+#tabMixerContent .mixer-tft-screen,
+#tabMixerContent .mixer-tft-screen .tft-main-viewport,
+#tabMixerContent .mixer-tft-screen .tft-content-screen {
+  min-width:0 !important;
+  max-width:100% !important;
+  overflow:hidden !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-content-screen {
+  position:relative !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-module-view,
+#tabMixerContent .mixer-tft-screen .tft-peq {
+  min-width:0 !important;
+  max-width:100% !important;
+}
+
 </style>
