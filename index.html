@@ -9784,6 +9784,28 @@ let tftPeqFreqVal = tftStatesData.eq.freq;
 let tftPeqQVal = tftStatesData.eq.q;
 let tftPeqGainVal = tftStatesData.eq.gain;
 
+function updateTftGraphValueLabel(svg, id, x, y, textValue, options = {}) {
+  if (!svg) return null;
+  let label = svg.querySelector("#" + id);
+  if (!label) {
+    label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    label.setAttribute("id", id);
+    label.setAttribute("class", "tft-graph-value-label");
+    label.setAttribute("pointer-events", "none");
+    svg.appendChild(label);
+  }
+  const px = Math.max(8, Math.min(312, Number(x) || 0));
+  const py = Math.max(5, Math.min(58, Number(y) || 0));
+  const dy = Number(options.dy) || (py < 14 ? 7 : -5);
+  label.setAttribute("x", px.toFixed(2));
+  label.setAttribute("y", Math.max(5, Math.min(62, py + dy)).toFixed(2));
+  label.setAttribute("text-anchor", options.anchor || "middle");
+  label.setAttribute("dominant-baseline", "middle");
+  label.textContent = String(textValue);
+  label.setAttribute("aria-label", String(textValue));
+  return label;
+}
+
 function updateTftPeqVisuals() {
   const curve = document.getElementById("tftPeqSvgCurve");
   const fill = document.getElementById("tftPeqSvgFill");
@@ -9816,6 +9838,15 @@ function updateTftPeqVisuals() {
     dot2.setAttribute("cx", centerX.toFixed(2));
     dot2.setAttribute("cy", centerY.toFixed(2));
     dot2.setAttribute("aria-label", `PEQ center ${freq} Hz, ${gain.toFixed(1)} dB`);
+  }
+  const peqSvg = document.getElementById("tftPeqSvgContainer");
+  if (peqSvg) {
+    const freqText = freq >= 1000 ? (freq / 1000).toFixed(2) + "kHz" : Math.round(freq) + "Hz";
+    updateTftGraphValueLabel(
+      peqSvg, "tftPeqValueLabel", centerX, centerY,
+      freqText + " • " + (gain >= 0 ? "+" : "") + gain.toFixed(1) + "dB",
+      { dy: centerY < 18 ? 7 : -6 }
+    );
   }
   // PEQ curve changes must immediately reach the channel popup.
   try { syncChannelQuickPanelsFromSources(); } catch (_) {}
@@ -9975,6 +10006,45 @@ function updateTftModuleCurve(key) {
         dot.setAttribute("cy", point[1].toFixed(2));
       }
     });
+  }
+
+  // Live numeric readouts stay attached to the same SVG coordinates as their control points.
+  if (key === "gate") {
+    updateTftGraphValueLabel(svg, "tftGateValueLabel1", points[1]?.[0], points[1]?.[1], "THR " + Number(s.thresh).toFixed(1) + "dB");
+    updateTftGraphValueLabel(svg, "tftGateValueLabel2", points[2]?.[0], points[2]?.[1], "1:" + Number(s.ratio).toFixed(1));
+  } else if (key === "dynamics") {
+    updateTftGraphValueLabel(svg, "tftCompValueLabel1", points[1]?.[0], points[1]?.[1], "THR " + Number(s.thresh).toFixed(1) + "dB");
+    updateTftGraphValueLabel(svg, "tftCompValueLabel2", points[2]?.[0], points[2]?.[1], Number(s.ratio).toFixed(1) + ":1");
+    updateTftGraphValueLabel(svg, "tftCompValueLabel3", points[3]?.[0], points[3]?.[1], "M +" + Number(s.makeup).toFixed(1) + "dB");
+  } else if (key === "sends") {
+    const bandsRoot = document.getElementById("tftSendsBands");
+    if (bandsRoot) {
+      let valueRoot = bandsRoot.querySelector(".tft-geq-value-labels");
+      if (!valueRoot) {
+        valueRoot = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        valueRoot.setAttribute("class", "tft-geq-value-labels");
+        valueRoot.setAttribute("pointer-events", "none");
+        bandsRoot.appendChild(valueRoot);
+      }
+      points.forEach(([x, y], index) => {
+        const gain = Number(s.bands?.[index] || 0) + Number(s.lvl || 0);
+        const show = Math.abs(gain) > 0.05 || index % 5 === 0;
+        let label = valueRoot.querySelector('[data-value-index="' + index + '"]');
+        if (!label) {
+          label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          label.setAttribute("class", "tft-geq-value-label");
+          label.dataset.valueIndex = String(index);
+          label.setAttribute("pointer-events", "none");
+          valueRoot.appendChild(label);
+        }
+        label.setAttribute("x", Number(x).toFixed(2));
+        label.setAttribute("y", Math.max(5, Math.min(58, Number(y) - 4)).toFixed(2));
+        label.setAttribute("text-anchor", "middle");
+        label.setAttribute("dominant-baseline", "middle");
+        label.textContent = (gain >= 0 ? "+" : "") + gain.toFixed(1);
+        label.style.display = show ? "" : "none";
+      });
+    }
   }
   // Curve is the visual representation of the same controls used by the channel popup.
   try { syncChannelQuickPanelsFromSources(); } catch (_) {}
@@ -10200,9 +10270,9 @@ function bindTftDynamicEventListeners(key) {
       const thInp = document.getElementById("gateThresh");
       const ratInp = document.getElementById("gateRatio");
       const stBtn = document.getElementById("gateStateBtn");
-      thInp?.addEventListener("input", () => { s.thresh = Number(thInp.value); document.getElementById("gateThreshVal").textContent = s.thresh + "dB"; updateEncoders(tftDatabase.gate.encoders(s)); });
-      ratInp?.addEventListener("input", () => { s.ratio = Number(ratInp.value); document.getElementById("gateRatioVal").textContent = "1:" + s.ratio; updateEncoders(tftDatabase.gate.encoders(s)); });
-      stBtn?.addEventListener("click", () => { s.state = !s.state; stBtn.textContent = s.state ? "ACTIVE" : "BYPASS"; stBtn.classList.toggle("active-action", s.state); });
+      thInp?.addEventListener("input", () => { s.thresh = Number(thInp.value); document.getElementById("gateThreshVal").textContent = s.thresh.toFixed(1) + "dB"; updateEncoders(tftDatabase.gate.encoders(s)); updateTftModuleCurve("gate"); persistTftState(); });
+      ratInp?.addEventListener("input", () => { s.ratio = Number(ratInp.value); document.getElementById("gateRatioVal").textContent = "1:" + s.ratio.toFixed(1); updateEncoders(tftDatabase.gate.encoders(s)); updateTftModuleCurve("gate"); persistTftState(); });
+      stBtn?.addEventListener("click", () => { s.state = !s.state; stBtn.textContent = s.state ? "ACTIVE" : "BYPASS"; stBtn.classList.toggle("active-action", s.state); updateTftModuleCurve("gate"); persistTftState(); });
     } else if (key === "dynamics") {
       const thInp = document.getElementById("compThresh");
       const ratInp = document.getElementById("compRatio");
@@ -13241,4 +13311,69 @@ body.mixer-powered-off #tabMixerContent .mixer-tft-screen .tft-main-viewport {
   max-width:100% !important;
 }
 
+/* =========================================================
+   FINAL LIVE CURVE VALUES + COMPACT GRAPH SCALE
+   Values follow their draggable SVG control points.
+========================================================= */
+#tabMixerContent .mixer-tft-screen .tft-transfer-scale text,
+#tabMixerContent .mixer-tft-screen .tft-comp-scale text,
+#tabMixerContent .mixer-tft-screen .tft-peq-graph text,
+#tabMixerContent .mixer-tft-screen .tft-graph-value-label,
+#tabMixerContent .mixer-tft-screen .tft-geq-value-label {
+  font-size:4.2px !important;
+  line-height:1 !important;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace !important;
+  font-weight:700 !important;
+  letter-spacing:.04px !important;
+  paint-order:stroke !important;
+  stroke:rgba(3,7,13,.72) !important;
+  stroke-width:.4px !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-transfer-scale .axis-title,
+#tabMixerContent .mixer-tft-screen .tft-comp-scale .axis-title {
+  font-size:3.8px !important;
+  font-weight:800 !important;
+  stroke:none !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-transfer-scale .reference-label,
+#tabMixerContent .mixer-tft-screen .tft-comp-scale .reference-label {
+  font-size:3.6px !important;
+  font-weight:700 !important;
+  stroke:none !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-transfer-scale .graph-title,
+#tabMixerContent .mixer-tft-screen .tft-comp-scale .graph-title {
+  font-size:4.2px !important;
+  font-weight:800 !important;
+  stroke:none !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-graph-value-label {
+  fill:#e6fffb !important;
+  font-size:4.0px !important;
+  font-weight:800 !important;
+  stroke:rgba(0,25,25,.92) !important;
+  stroke-width:.65px !important;
+  filter:drop-shadow(0 0 2px rgba(0,255,204,.5)) !important;
+  pointer-events:none !important;
+}
+#tabMixerContent .mixer-tft-screen .tft-geq-value-label {
+  fill:#e6fffb !important;
+  font-size:3.2px !important;
+  font-weight:800 !important;
+  stroke:rgba(0,25,25,.9) !important;
+  stroke-width:.55px !important;
+  pointer-events:none !important;
+}
+@media (max-width:600px) {
+  #tabMixerContent .mixer-tft-screen .tft-transfer-scale text,
+  #tabMixerContent .mixer-tft-screen .tft-peq-graph text { font-size:3.7px !important; }
+  #tabMixerContent .mixer-tft-screen .tft-transfer-scale .axis-title { font-size:3.3px !important; }
+  #tabMixerContent .mixer-tft-screen .tft-graph-value-label { font-size:3.5px !important; }
+  #tabMixerContent .mixer-tft-screen .tft-geq-value-label { font-size:2.9px !important; }
+}
+@media (min-width:1200px) {
+  #tabMixerContent .mixer-tft-screen .tft-transfer-scale text,
+  #tabMixerContent .mixer-tft-screen .tft-peq-graph text { font-size:4.6px !important; }
+  #tabMixerContent .mixer-tft-screen .tft-graph-value-label { font-size:4.3px !important; }
+}
 </style>
