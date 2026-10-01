@@ -11215,8 +11215,65 @@ function bindTftDynamicEventListeners(key) {
         const bandsRoot = container.querySelector("#tftSendsBands");
         let activeBand = null;
         let activePointerId = null;
-        let pendingY = null;
         let rafId = 0;
+
+        // Drag renderer: update only the GEQ visual layer that is moving.
+        // Do not call updateTftModuleCurve() on every pointer frame; that full
+        // renderer also refreshes labels/state and causes visible glow flicker.
+        const renderGeqDragVisual = () => {
+          const geqFrequencies = [20,25,31.5,40,50,63,80,100,125,160,200,250,315,400,500,630,800,1000,1250,1600,2000,2500,3150,4000,5000,6300,8000,10000,12500,16000,20000];
+          const x0 = 8, x1 = 312, span = x1 - x0;
+          const logMin = Math.log10(20), logMax = Math.log10(20000);
+          const points = s.bands.map((gain, index) => {
+            const totalGain = Number(gain || 0) + Number(s.lvl || 0);
+            const x = x0 + ((Math.log10(geqFrequencies[index]) - logMin) / (logMax - logMin)) * span;
+            const y = s.state ? Math.max(15, Math.min(105, 60 - totalGain * 3)) : 60;
+            return [x, y];
+          });
+
+          let d = "M" + points[0][0].toFixed(2) + " " + points[0][1].toFixed(2);
+          for (let i = 0; i < points.length - 1; i++) {
+            const p0 = points[i], p1 = points[i + 1];
+            const prev = points[i - 1] || p0, next = points[i + 2] || p1;
+            const c1x = p0[0] + (p1[0] - prev[0]) / 6;
+            const c2x = p1[0] - (next[0] - p0[0]) / 6;
+            const minY = Math.min(p0[1], p1[1]), maxY = Math.max(p0[1], p1[1]);
+            const c1y = Math.max(minY, Math.min(maxY, p0[1] + (p1[1] - prev[1]) / 6));
+            const c2y = Math.max(minY, Math.min(maxY, p1[1] - (next[1] - p0[1]) / 6));
+            d += " C" + c1x.toFixed(2) + " " + c1y.toFixed(2) + " " +
+              c2x.toFixed(2) + " " + c2y.toFixed(2) + " " +
+              p1[0].toFixed(2) + " " + p1[1].toFixed(2);
+          }
+
+          const curve = document.getElementById("tftSendsSvgCurve");
+          const hit = document.getElementById("tftSendsSvgCurveHit");
+          const fill = document.getElementById("tftSendsSvgFill");
+          if (curve) curve.setAttribute("d", d);
+          if (hit) hit.setAttribute("d", d);
+          if (fill) fill.setAttribute("d", d + " L315 105 L5 105 Z");
+
+          points.forEach(([x, y], index) => {
+            const dot = bandsRoot?.querySelector?.('[data-band-index="' + index + '"]');
+            if (!dot) return;
+            dot.setAttribute("cx", x.toFixed(2));
+            dot.setAttribute("cy", y.toFixed(2));
+            dot.setAttribute("aria-valuenow", (Number(s.bands[index] || 0) + Number(s.lvl || 0)).toFixed(1));
+          });
+
+          const valueRoot = bandsRoot?.querySelector?.(".tft-geq-value-labels");
+          if (valueRoot) {
+            points.forEach(([x, y], index) => {
+              const label = valueRoot.querySelector('[data-value-index="' + index + '"]');
+              if (!label) return;
+              const gain = Number(s.bands[index] || 0) + Number(s.lvl || 0);
+              label.setAttribute("x", x.toFixed(2));
+              const labelDy = index % 2 === 0 ? -4.5 : 4.5;
+              label.setAttribute("y", Math.max(15, Math.min(105, y + labelDy)).toFixed(2));
+              label.textContent = (gain >= 0 ? "+" : "") + gain.toFixed(1);
+              label.style.display = (Math.abs(gain) > 0.05 || index % 5 === 0) ? "" : "none";
+            });
+          }
+        };
 
         const getSvgPoint = (clientX, clientY) => {
           const vb = container.viewBox?.baseVal;
@@ -11252,16 +11309,14 @@ function bindTftDynamicEventListeners(key) {
             Math.max(-15, Math.min(15, totalGain - Number(s.lvl || 0))) * 10
           ) / 10;
 
-          // Move the pressed point immediately; then redraw the neon path
-          // from the same state in the next animation frame.
+          // Render the moving point + neon curve directly. No full GEQ
+          // rerender occurs during drag, so the glow stays stable.
           activeBand.setAttribute("cy", nextY.toFixed(2));
-          pendingY = nextY;
           if (!rafId) {
             rafId = requestAnimationFrame(() => {
               rafId = 0;
               if (!activeBand) return;
-              updateTftModuleCurve("sends");
-              try { syncChannelQuickPanelsFromSources(); } catch (_) {}
+              renderGeqDragVisual();
             });
           }
 
@@ -11278,7 +11333,6 @@ function bindTftDynamicEventListeners(key) {
           activePointerId = null;
           activeBand?.classList.remove("tft-geq-dragging");
           activeBand = null;
-          pendingY = null;
           container.classList.remove("tft-graph-dragging");
           if (rafId) {
             cancelAnimationFrame(rafId);
