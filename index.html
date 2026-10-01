@@ -7470,6 +7470,18 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 </style>
 
 <style id="geq-curve-drag-glow-final-2026-10-02">
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsBandHits {
+  pointer-events:all !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-band-hit {
+  pointer-events:all !important;
+  fill:transparent !important;
+  stroke:transparent !important;
+  stroke-width:0 !important;
+  cursor:ns-resize !important;
+  touch-action:none !important;
+  -webkit-tap-highlight-color:transparent !important;
+}
 #tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgCurveHit {
   pointer-events:stroke !important; stroke:transparent !important; stroke-width:14px !important;
   cursor:ns-resize !important; touch-action:none !important;
@@ -10630,6 +10642,31 @@ function updateTftModuleCurve(key) {
       });
       // Keep exactly 31 stable interactive band nodes.
       Array.from(bandsRoot.children).slice(31).forEach(node => node.remove());
+
+      // Dedicated transparent touch targets live in a separate top SVG layer.
+      // The visual neon dots remain unchanged; touch never depends on their
+      // small radius or SVG filter/glow.
+      let hitRoot = document.getElementById("tftSendsBandHits");
+      if (!hitRoot) {
+        hitRoot = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        hitRoot.setAttribute("id", "tftSendsBandHits");
+        hitRoot.setAttribute("class", "tft-geq-band-hits");
+        hitRoot.setAttribute("aria-hidden", "true");
+        svg.appendChild(hitRoot);
+      }
+      points.forEach(([x,y], index) => {
+        let hit = hitRoot.querySelector('[data-band-index="' + index + '"]');
+        if (!hit) {
+          hit = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+          hit.setAttribute("class", "tft-geq-band-hit");
+          hit.dataset.bandIndex = String(index);
+          hit.setAttribute("pointer-events", "all");
+          hitRoot.appendChild(hit);
+        }
+        hit.setAttribute("cx", x.toFixed(2));
+        hit.setAttribute("cy", y.toFixed(2));
+        hit.setAttribute("r", "10");
+      });
     }
   } else if (key === "main") {
     const y1 = clamp(35 - ((s.send+50)/56)*25,8,58);
@@ -11348,7 +11385,11 @@ function bindTftDynamicEventListeners(key) {
 
         container.addEventListener("pointerdown", (event) => {
           const curveHit = event.target?.closest?.("#tftSendsSvgCurveHit");
+          const bandHit = event.target?.closest?.(".tft-geq-band-hit");
           let dot = event.target?.closest?.(".tft-geq-band-dot");
+          if (!dot && bandHit) {
+            dot = bandsRoot?.querySelector?.('.tft-geq-band-dot[data-band-index="' + bandHit.dataset.bandIndex + '"]') || null;
+          }
           if (!dot && curveHit) {
             const point = getSvgPoint(event.clientX, event.clientY);
             if (point) {
