@@ -5194,6 +5194,49 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
   }
 }
 
+
+/* RESTORE PAGES + CHANNEL DSP POSITION: navigation stays beside TFT, never overlays page content. */
+#tabMixerContent .mixer-workspace{
+  display:grid !important;
+  grid-template-columns:104px minmax(0,1fr) !important;
+  grid-template-rows:minmax(0,1fr) !important;
+  gap:5px !important;
+  align-items:stretch !important;
+  min-width:0 !important;
+  min-height:0 !important;
+}
+#tabMixerContent .mixer-side-nav{
+  grid-column:1 !important;
+  grid-row:1 !important;
+  position:relative !important;
+  inset:auto !important;
+  z-index:20 !important;
+  width:auto !important;
+  height:auto !important;
+  min-width:0 !important;
+  overflow-y:auto !important;
+}
+#tabMixerContent .mixer-workspace-main{
+  grid-column:2 !important;
+  grid-row:1 !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+}
+#tabMixerContent .mixer-tft-screen{
+  position:relative !important;
+  width:100% !important;
+  min-width:0 !important;
+  margin:0 !important;
+}
+#tabMixerContent .tft-main-viewport,
+#tabMixerContent .tft-content-screen{
+  min-width:0 !important;
+}
+@media(max-width:600px){
+  #tabMixerContent .mixer-workspace{grid-template-columns:82px minmax(0,1fr) !important;}
+}
+
 </style>
 </head>
 
