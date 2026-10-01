@@ -8029,6 +8029,12 @@ const tftDatabase = {
             <path id="tftSendsSvgFill" d="" fill="#a855f7" opacity=".16"/>
             <path id="tftSendsSvgCurve" d="" fill="none" stroke="#d8b4fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
             <g id="tftSendsBands" class="tft-geq-band-points" aria-label="31 GEQ bands"></g>
+            <g class="tft-geq-freq-labels" aria-hidden="true">
+              <text x="8" y="64">20</text><text x="44" y="64">50</text><text x="73" y="64">100</text>
+              <text x="104" y="64">200</text><text x="134" y="64">500</text><text x="160" y="64">1k</text>
+              <text x="190" y="64">2k</text><text x="221" y="64">5k</text><text x="251" y="64">10k</text>
+              <text x="289" y="64">20k Hz</text>
+            </g>
             <text x="10" y="7" fill="#94a3b8" font-size="5.2">31-BAND GRAPHIC EQ · DRAG BANDS VERTICALLY</text>
           </svg>
         </div>
@@ -10196,4 +10202,155 @@ body.mixer-powered-off #tabMixerContent .mixer-tft-screen .tft-main-viewport {
 #tabMixerContent #tftContentArea[data-page-key="routing"] .routing-control-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important;flex:0 0 auto!important;}.routing-control-grid .tft-mod-ctrl{min-width:0;}.routing-control-grid .tft-val-disp{display:block;margin-top:3px;text-align:center;font-size:6px;color:#94a3b8;font-weight:800;}.routing-control-grid select{min-height:31px!important;font-size:7px!important;}.routing-control-grid button{min-height:31px!important;font-size:8px!important;}
 #tabMixerContent #tftContentArea[data-page-key="routing"] .routing-note{flex:0 0 auto;padding:6px 7px;border:1px solid rgba(56,189,248,.2);border-radius:5px;background:rgba(8,47,73,.18);color:#94a3b8;font-size:6.5px;line-height:1.45;}.routing-note strong{color:#67e8f9;}.routing-note span{display:block;margin-top:2px;color:#64748b;}
 @media(max-width:700px){#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-panel-grid,#tabMixerContent #tftContentArea[data-page-key="routing"] .routing-control-grid{grid-template-columns:1fr!important;}.routing-signal-flow{justify-content:flex-start!important;}.routing-live-badge{font-size:6px!important;}}
+
+/* =========================================================
+   FINAL GEQ SCREEN FIX
+   The SQ-7 31-band GEQ is a real mixer-screen page, not a
+   placeholder. Keep it visible, bounded by the TFT viewport,
+   and independent from Pages / Channel DSP navigation.
+========================================================= */
+#tabMixerContent #tftContentArea[data-page-key="sends"] {
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-view {
+  display:grid !important;
+  grid-template-rows:minmax(118px,1fr) auto !important;
+  gap:6px !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box {
+  display:block !important;
+  position:relative !important;
+  width:100% !important;
+  height:auto !important;
+  min-height:118px !important;
+  max-height:none !important;
+  flex:none !important;
+  overflow:hidden !important;
+  box-sizing:border-box !important;
+  padding:0 !important;
+  border:1px solid rgba(56,189,248,.34) !important;
+  border-radius:5px !important;
+  background:
+    linear-gradient(rgba(56,189,248,.09) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(56,189,248,.09) 1px,transparent 1px),
+    radial-gradient(ellipse at 50% 0%,rgba(56,189,248,.13),transparent 70%),
+    #03070d !important;
+  background-size:10% 20%,10% 20%,auto,auto !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgContainer {
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+  touch-action:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgCurve {
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  stroke:#20d8ff !important;
+  stroke-width:2.4 !important;
+  fill:none !important;
+  pointer-events:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsSvgFill {
+  display:block !important;
+  visibility:visible !important;
+  opacity:.16 !important;
+  fill:#0ea5e9 !important;
+  pointer-events:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #tftSendsBands {
+  display:block !important;
+  visibility:visible !important;
+  pointer-events:all !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-band-dot {
+  display:block !important;
+  visibility:visible !important;
+  fill:#f8fafc !important;
+  stroke:#20d8ff !important;
+  stroke-width:1.25 !important;
+  opacity:1 !important;
+  pointer-events:all !important;
+  touch-action:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-grid line {
+  stroke:rgba(96,165,250,.30) !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-grid line:nth-child(3) {
+  stroke:#38bdf8 !important;
+  stroke-width:1.1 !important;
+  opacity:.65 !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-scale text,
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-freq-labels text {
+  fill:#94a3b8 !important;
+  font-family:monospace !important;
+  font-size:5px !important;
+  font-weight:700 !important;
+  pointer-events:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-controls-grid {
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:5px !important;
+  width:100% !important;
+  min-width:0 !important;
+  flex:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-mod-ctrl {
+  min-width:0 !important;
+  padding:4px !important;
+  background:linear-gradient(180deg,#121c29,#080e17) !important;
+  border:1px solid #2b4054 !important;
+  border-radius:4px !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-mod-ctrl label {
+  font-size:clamp(7px,.75vw,10px) !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] .tft-mod-ctrl input[type="range"] {
+  min-height:22px !important;
+  touch-action:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="sends"] #geqStateBtn.active-action {
+  background:linear-gradient(180deg,#16a34a,#15803d) !important;
+  color:#ecfdf5 !important;
+}
+@media(max-width:600px){
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-view {
+    grid-template-rows:minmax(105px,1fr) auto !important;
+  }
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box {
+    min-height:105px !important;
+  }
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-scale text,
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-freq-labels text {
+    font-size:4px !important;
+  }
+}
+@media(max-width:420px){
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-view {
+    grid-template-rows:minmax(96px,1fr) auto !important;
+  }
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-graph-box {
+    min-height:96px !important;
+  }
+  #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-module-controls-grid {
+    gap:3px !important;
+  }
+}
+
 </style>
