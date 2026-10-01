@@ -5530,7 +5530,66 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
   }
 }
 
-</style>
+
+/* =========================================================
+   NATIVE TFT CURVE SURFACE — CURVES ARE PART OF THE MIXER SCREEN
+   No separate graph card/background/frame around PEQ/GEQ/GATE/COMP.
+========================================================= */
+#tabMixerContent .mixer-tft-screen .tft-main-viewport #tftContentArea .curve-native-view,
+#tabMixerContent .mixer-tft-screen .tft-main-viewport #tftContentArea .tft-peq {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+#tabMixerContent .mixer-tft-screen .tft-main-viewport #tftContentArea .tft-module-graph-box,
+#tabMixerContent .mixer-tft-screen .tft-main-viewport #tftContentArea .tft-peq-graph {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  outline: 0 !important;
+  overflow: visible !important;
+}
+
+#tabMixerContent .mixer-tft-screen .tft-main-viewport #tftContentArea .tft-module-graph-box svg,
+#tabMixerContent .mixer-tft-screen .tft-main-viewport #tftContentArea .tft-peq-graph {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+#tabMixerContent .mixer-tft-screen .tft-main-viewport #tftContentArea .tft-peq-graph > rect:first-child {
+  fill: transparent !important;
+}
+
+#tabMixerContent .mixer-tft-screen .tft-main-viewport #tftContentArea .tft-module-view.curve-native-view {
+  gap: 3px !important;
+}
+
+#tabMixerContent .mixer-tft-screen .tft-main-viewport #tftContentArea .tft-module-view.curve-native-view > .tft-module-controls-grid,
+#tabMixerContent .mixer-tft-screen .tft-main-viewport #tftContentArea .tft-peq > .tft-peq-controls {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+#tabMixerContent .mixer-tft-screen .tft-main-viewport #tftContentArea .tft-module-graph-box path[id$="SvgCurve"],
+#tabMixerContent .mixer-tft-screen .tft-main-viewport #tftContentArea .tft-peq-graph path[id$="SvgCurve"] {
+  vector-effect: non-scaling-stroke;
+}
+
+/* The TFT itself remains the only visual screen surface. */
+#tabMixerContent .mixer-tft-screen .tft-main-viewport,
+#tabMixerContent .mixer-tft-screen .tft-content-screen {
+  background: linear-gradient(180deg,#030509 0%,#070b12 58%,#020408 100%) !important;
+}
+\n</style>
 
 <style>
 /* FINAL TFT BOUNDARY FIX
