@@ -5426,6 +5426,16 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
         <!-- Playlist data node retained for existing audio selection logic; audio controls live in the top bar. -->
         <div class="playlist-container" id="playlistContainer" hidden>
           <div style="text-align: center; padding: 2px; color: #64748b;">Belum ada file audio dipilih.</div>
+        <div class="mixer-power-screen" id="mixerPowerScreen" aria-live="polite" aria-hidden="true">
+          <div class="power-screen-pulse" aria-hidden="true"></div>
+          <div class="power-screen-inner">
+            <div class="power-screen-title">MIXER-ONLINE</div>
+            <div class="power-screen-subtitle">DIGITAL MIXER CONSOLE</div>
+            <div class="power-screen-status" id="mixerPowerScreenStatus">INITIALIZING • SELF TEST</div>
+            <div class="power-screen-progress" aria-hidden="true"><i></i></div>
+          </div>
+        </div>
+
         </div>
 
         <!-- WORKSPACE: NAVIGASI VERTIKAL DI KIRI, TFT + FADER DI KANAN -->
@@ -6163,6 +6173,38 @@ let masterGainNode = null, outputMuteGainNode = null, outputMergerNode = null;
 let isAlesisFxEnabled = false;
 let outputMuted = false;
 let mixerPowered = true;
+const mixerPowerScreen=document.getElementById("mixerPowerScreen");
+const mixerPowerScreenStatus=document.getElementById("mixerPowerScreenStatus");
+function showMixerPowerScreen(mode){
+  if(!mixerPowerScreen)return;
+  document.body.classList.remove("mixer-screen-starting","mixer-screen-refreshing");
+  mixerPowerScreen.classList.remove("is-starting","is-refreshing","is-off");
+  mixerPowerScreen.classList.add("is-visible");
+  if(mode==="startup"){
+    document.body.classList.add("mixer-screen-starting");
+    mixerPowerScreen.classList.add("is-starting");
+    if(mixerPowerScreenStatus)mixerPowerScreenStatus.textContent="INITIALIZING • SELF TEST";
+  }else if(mode==="refresh"){
+    document.body.classList.add("mixer-screen-refreshing");
+    mixerPowerScreen.classList.add("is-refreshing");
+    if(mixerPowerScreenStatus)mixerPowerScreenStatus.textContent="REFRESHING • SHUTDOWN";
+  }
+  mixerPowerScreen.setAttribute("aria-hidden","false");
+}
+function finishMixerStartupScreen(){
+  if(!mixerPowerScreen)return;
+  mixerPowerScreen.classList.remove("is-starting","is-refreshing","is-off","is-visible");
+  document.body.classList.remove("mixer-screen-starting","mixer-screen-refreshing");
+  mixerPowerScreen.setAttribute("aria-hidden","true");
+}
+function finishMixerShutdownScreen(){
+  if(!mixerPowerScreen)return;
+  mixerPowerScreen.classList.remove("is-starting","is-refreshing");
+  mixerPowerScreen.classList.add("is-visible","is-off");
+  document.body.classList.remove("mixer-screen-refreshing","mixer-screen-starting");
+  mixerPowerScreen.setAttribute("aria-hidden","false");
+}
+
 
 let tftPeqFilter = null;
 let tftCurveActiveStates = { config: false, gate: true, dynamics: true, eq: true, sends: false, main: false, routing: false, meters: false, scenes: false, setup: false, effects: false };
@@ -7388,11 +7430,11 @@ function runMixerStartupTest(transitionToken) {
   // Do not force every LED ON. CSS performs a slow sequential power-up animation.
   document.querySelectorAll("#tabMixerContent .mixer-desk-surface .status-led, #tabMixerContent .mixer-desk-surface .vert-led-meter span, #tabMixerContent .mixer-desk-surface .master-led-meter span, #tabMixerContent .mixer-desk-surface .master-combined-meter span")
     .forEach(led => led.classList.remove("on"));
-  setAudioStatus("Mixer ON — power up bertahap, indikator dan fader bergerak perlahan...");
-  // Beri waktu cukup agar rangkaian +5 dB → 0 dB selesai sebelum test dinyatakan selesai.
+  setAudioStatus("Mixer ON — startup test berjalan...");
   window.setTimeout(() => {
     if (transitionToken !== mixerPowerTransitionToken || !mixerPowered) return;
     clearMixerPowerIndicators();
+    finishMixerStartupScreen();
     mixerPowerTransitionMuted = false;
     updateOutputMute();
     updateAllSignalMeters();
@@ -7414,6 +7456,7 @@ mixerPowerButton?.addEventListener("click", async () => {
 
   if (mixerPowered) {
     document.body.classList.remove("mixer-refreshing");
+    showMixerPowerScreen("startup");
     try {
       createAudioContext();
       if (audioContext?.state === "suspended") await audioContext.resume();
@@ -7426,14 +7469,17 @@ mixerPowerButton?.addEventListener("click", async () => {
     ++mixerFaderMotionToken;
     document.body.classList.remove("mixer-startup-test");
     document.body.classList.add("mixer-refreshing");
-    // Mute FIRST, then visually lower only the real mixer faders.
+    showMixerPowerScreen("refresh");
     updateOutputMute();
     animateMixerFaders(false);
     clearMixerPowerIndicators();
-    setAudioStatus("Mixer OFF — output dimatikan, fader turun, parameter tetap tersimpan.");
+    setAudioStatus("Mixer OFF — refresh/shutdown layar berjalan...");
     window.setTimeout(() => {
-      if (transitionToken === mixerPowerTransitionToken) document.body.classList.remove("mixer-refreshing");
-    }, 600);
+      if (transitionToken !== mixerPowerTransitionToken || mixerPowered) return;
+      finishMixerShutdownScreen();
+      document.body.classList.remove("mixer-refreshing");
+      setAudioStatus("Mixer OFF — layar mati, output dimatikan.");
+    }, 1150);
   }
 });
 
@@ -9564,4 +9610,30 @@ function syncChannelQuickPanelsFromSources() {
   }
 }
 
+
+/* MIXER POWER SCREEN */
+.mixer-console{position:relative}
+.mixer-power-screen{position:absolute;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#020306;border-radius:8px;pointer-events:auto;opacity:0;visibility:hidden;transition:opacity .18s ease,visibility .18s ease}
+.mixer-power-screen.is-visible{opacity:1;visibility:visible}
+.mixer-power-screen .power-screen-inner{width:min(92%,520px);text-align:center;color:#fff;position:relative;padding:28px 18px}
+.mixer-power-screen .power-screen-title{color:#f1f5f9;font-size:clamp(24px,5vw,48px);line-height:1;letter-spacing:.16em;font-weight:900;text-shadow:0 0 4px rgba(255,255,255,.35),0 0 18px rgba(203,213,225,.25);animation:powerScreenTitle 1.7s ease-in-out infinite alternate}
+.mixer-power-screen .power-screen-subtitle{margin-top:10px;color:#cbd5e1;font-size:clamp(8px,1.7vw,13px);letter-spacing:.24em;font-weight:800}
+.mixer-power-screen .power-screen-status{margin-top:22px;color:#e2e8f0;font-size:clamp(8px,1.5vw,11px);letter-spacing:.12em;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.mixer-power-screen .power-screen-progress{height:3px;width:min(80%,360px);margin:13px auto 0;overflow:hidden;background:#111827;border:1px solid #334155;border-radius:999px}
+.mixer-power-screen .power-screen-progress i{display:block;width:0%;height:100%;background:linear-gradient(90deg,#94a3b8,#f8fafc,#94a3b8);box-shadow:0 0 9px rgba(248,250,252,.75)}
+.mixer-power-screen.is-starting .power-screen-progress i{animation:powerScreenProgress 4.6s linear forwards}
+.mixer-power-screen.is-refreshing .power-screen-progress i{animation:powerScreenRefresh 1.15s ease-in-out forwards}
+.mixer-power-screen .power-screen-pulse{position:absolute;left:50%;top:50%;width:170px;height:170px;transform:translate(-50%,-50%);border:1px solid rgba(226,232,240,.12);border-radius:50%;box-shadow:0 0 30px rgba(226,232,240,.05),inset 0 0 30px rgba(226,232,240,.035);animation:powerScreenPulse 1.9s ease-out infinite;pointer-events:none}
+.mixer-power-screen.is-refreshing .power-screen-pulse{animation-duration:.75s}
+.mixer-power-screen.is-off{background:#000}
+.mixer-power-screen.is-off .power-screen-inner{display:none}
+@keyframes powerScreenTitle{from{opacity:.62;filter:brightness(.78);transform:scale(.985)}to{opacity:1;filter:brightness(1.15);transform:scale(1)}}
+@keyframes powerScreenProgress{from{width:0%}to{width:100%}}
+@keyframes powerScreenRefresh{0%{width:0%}35%{width:68%}100%{width:100%}}
+@keyframes powerScreenPulse{0%{transform:translate(-50%,-50%) scale(.62);opacity:.05}55%{opacity:.24}100%{transform:translate(-50%,-50%) scale(1.35);opacity:0}}
+body.mixer-powered-off #tabMixerContent .mixer-workspace{filter:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+body.mixer-powered-off #tabMixerContent .mixer-workspace *{pointer-events:none!important}
+body.mixer-screen-starting #tabMixerContent .mixer-workspace,body.mixer-screen-refreshing #tabMixerContent .mixer-workspace{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+body.mixer-screen-starting #tabMixerContent .mixer-power-screen,body.mixer-screen-refreshing #tabMixerContent .mixer-power-screen{opacity:1!important;visibility:visible!important}
+@media(max-width:600px){.mixer-power-screen .power-screen-inner{padding:20px 10px}.mixer-power-screen .power-screen-title{letter-spacing:.11em}}
 </style>
