@@ -6470,6 +6470,132 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
   }
 }
 </style>
+<style id="native-tft-curve-surface-final">
+/* FINAL NATIVE TFT CURVE SURFACE
+   PEQ / GEQ / GATE / COMP are drawn directly on the mixer TFT.
+   No separate graph-card background. */
+#tabMixerContent .mixer-tft-screen .tft-main-viewport,
+#tabMixerContent .mixer-tft-screen .tft-content-screen,
+#tabMixerContent .mixer-tft-screen #tftContentArea,
+#tabMixerContent .mixer-tft-screen #tftContentArea > .curve-native-view,
+#tabMixerContent .mixer-tft-screen #tftContentArea > .tft-peq {
+  background: transparent !important;
+}
+
+#tabMixerContent .mixer-tft-screen #tftContentArea > .curve-native-view,
+#tabMixerContent .mixer-tft-screen #tftContentArea > .tft-peq {
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  overflow:hidden !important;
+}
+
+/* The graph is part of the TFT surface: transparent with a digital grid. */
+#tabMixerContent .mixer-tft-screen #tftContentArea .tft-module-graph-box,
+#tabMixerContent .mixer-tft-screen #tftContentArea .tft-peq-graph {
+  background-color:transparent !important;
+  background-image:
+    linear-gradient(to right, rgba(80,150,190,.18) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(80,150,190,.18) 1px, transparent 1px),
+    linear-gradient(to right, rgba(80,150,190,.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(80,150,190,.08) 1px, transparent 1px) !important;
+  background-size:
+    10% 100%,
+    100% 20%,
+    2% 100%,
+    100% 4% !important;
+  background-position:center !important;
+  background-repeat:repeat !important;
+  border:0 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  outline:0 !important;
+}
+
+/* SVG itself stays transparent so the TFT glass/screen remains visible behind it. */
+#tabMixerContent .mixer-tft-screen #tftContentArea .tft-module-graph-box svg,
+#tabMixerContent .mixer-tft-screen #tftContentArea .tft-peq-graph {
+  background-color:transparent !important;
+}
+
+/* Neon curve treatment, while keeping control points touchable. */
+#tabMixerContent .mixer-tft-screen #tftContentArea .tft-module-graph-box path[id$="SvgCurve"],
+#tabMixerContent .mixer-tft-screen #tftContentArea .tft-peq-graph path[id$="SvgCurve"] {
+  fill:none !important;
+  stroke:#00ffcc !important;
+  stroke-width:2.6 !important;
+  stroke-linecap:round !important;
+  stroke-linejoin:round !important;
+  filter:drop-shadow(0 0 2px rgba(0,255,204,.95))
+         drop-shadow(0 0 6px rgba(0,255,204,.72))
+         drop-shadow(0 0 12px rgba(0,255,204,.38)) !important;
+  vector-effect:non-scaling-stroke !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea .tft-module-graph-box path[id$="SvgFill"],
+#tabMixerContent .mixer-tft-screen #tftContentArea .tft-peq-graph path[id$="SvgFill"] {
+  fill:#00ffcc !important;
+  opacity:.08 !important;
+  filter:drop-shadow(0 0 7px rgba(0,255,204,.22)) !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea .tft-module-graph-box circle,
+#tabMixerContent .mixer-tft-screen #tftContentArea .tft-peq-graph circle {
+  fill:#f8ffff !important;
+  stroke:#00ffcc !important;
+  stroke-width:1.8 !important;
+  filter:drop-shadow(0 0 3px rgba(0,255,204,1))
+         drop-shadow(0 0 8px rgba(0,255,204,.65)) !important;
+}
+
+/* Keep the grid/labels inside the TFT and prevent overflow over PAGES/CHANNEL DSP. */
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="eq"],
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="gate"],
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="dynamics"],
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="sends"] {
+  position:relative !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+}
+
+/* Use the available TFT height instead of leaving an unused graph/card gap. */
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="eq"] .tft-peq {
+  grid-template-rows:auto minmax(0,1fr) !important;
+  gap:3px !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="eq"] .tft-peq-graph {
+  width:100% !important;
+  height:100% !important;
+  min-height:0 !important;
+  max-height:none !important;
+  align-self:stretch !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="gate"] .tft-module-view,
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="dynamics"] .tft-module-view,
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="sends"] .tft-module-view {
+  gap:3px !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="gate"] .tft-module-graph-box,
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="dynamics"] .tft-module-graph-box,
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="sends"] .tft-module-graph-box {
+  flex:1 1 0 !important;
+  width:100% !important;
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+}
+
+/* Do not allow graph pixels to paint outside the actual TFT viewport. */
+#tabMixerContent .mixer-tft-screen .tft-main-viewport,
+#tabMixerContent .mixer-tft-screen .tft-content-screen {
+  overflow:hidden !important;
+  contain:layout paint !important;
+}
+</style>
 </head>
 
 <body>
