@@ -9047,9 +9047,9 @@ function updateGainReductionMeter(root, analyser, state) {
 function updateAllSignalMeters() {
   const mixerStrips = Array.from(document.querySelectorAll(".mixer-desk-surface .console-channel-strip"));
   mixerStripAnalysers.forEach((stripAnalyser, index) => {
-    // Channel strip indicators and fader meters use the same live strip point.
-    // This keeps SIG/CLIP and the vertical meter synchronized with the channel.
-    const sourceAnalyser = stripAnalyser || null;
+    // Channel SIG/CLIP + vertical meter are INPUT meters, independent of the
+    // channel fader. The post-fader analyser remains available for DSP/output use.
+    const sourceAnalyser = mixerStripInputAnalysers[index] || stripAnalyser || null;
     const db = sourceAnalyser ? readPeakMeterDb(sourceAnalyser) : -72;
     const strip = mixerStrips[index];
     const active = strip?.classList.contains("master-strip")
@@ -9825,6 +9825,8 @@ async function activateUsbAudioInput() {
       usbInputAnalyser.smoothingTimeConstant=.08;
     }
     usbInputSource.connect(usbInputAnalyser);
+    // PRE-FADER channel meter tap: measure the actual USB input, not the fader.
+    usbInputSource.connect(mixerStripInputAnalysers[0] || mixerStripGains[0]);
     usbInputSource.connect(mixerStripGains[0]);
     updateUsbInputLevelMeter();
 
@@ -9940,6 +9942,8 @@ if (physicalInputDevice) physicalInputDevice.addEventListener("change", async ()
     usbInputSource=audioContext.createMediaStreamSource(usbInputStream);
     if (!usbInputAnalyser) { usbInputAnalyser=audioContext.createAnalyser(); usbInputAnalyser.fftSize=1024; usbInputAnalyser.smoothingTimeConstant=.08; }
     usbInputSource.connect(usbInputAnalyser);
+    // PRE-FADER channel meter tap: measure the actual USB input, not the fader.
+    usbInputSource.connect(mixerStripInputAnalysers[0] || mixerStripGains[0]);
     usbInputSource.connect(mixerStripGains[0]);
     setAudioStatus("INPUT AKTIF: "+(physicalInputDevice.selectedOptions?.[0]?.textContent || "Audio input"));
     updateUsbInputLevelMeter();
@@ -10159,6 +10163,9 @@ const audioChannels = [
   { inputGain: null, highPass: null, filters: [], outputGain: null, analyser: null, bypass: false },
   { inputGain: null, highPass: null, filters: [], outputGain: null, analyser: null, bypass: false }
 ];
+// Dedicated PRE-FADER meter taps. These analysers observe the channel input
+// before the channel fader, so moving the fader cannot move the input meter.
+const mixerStripInputAnalysers = [];
 const eqChannelMuted = [false, false];
 const eqChannelSolo = [false, false];
 
@@ -10247,6 +10254,9 @@ function initializeAudioGraph() {
 
   for (let i = 0; i < 4; i++) {
     mixerStripGains[i] = audioContext.createGain();
+    mixerStripInputAnalysers[i] = audioContext.createAnalyser();
+    mixerStripInputAnalysers[i].fftSize = 1024;
+    mixerStripInputAnalysers[i].smoothingTimeConstant = 0.08;
     mixerStripAnalysers[i] = audioContext.createAnalyser();
     mixerStripAnalysers[i].fftSize = 1024;
     // Meter analysers must react to transients quickly; visual smoothing is handled separately.
@@ -10471,6 +10481,8 @@ function playCurrentBuffer() {
   const sourceNode = audioContext.createBufferSource();
   activeSourceNode = sourceNode;
   sourceNode.buffer = buffer;
+  // CH2 meter taps the raw playback signal before the channel fader.
+  sourceNode.connect(mixerStripInputAnalysers[1] || mixerStripGains[1]);
   sourceNode.connect(mixerStripGains[1]);
 
   sourceNode.start(0);
