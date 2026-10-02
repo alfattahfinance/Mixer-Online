@@ -8568,7 +8568,7 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
   <div class="quick-control-grid" data-dynamic-quick="1"></div>
 </div><div class="strip-status-leds" aria-label="USB AUDIO INPUT status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
             <div class="fader-panel-area mic-input-fader-area">
-              <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
+              <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-60" max="10" step="0.5" value="0"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
 
               <div class="vert-led-meter" id="mixerMeter1"></div>
             </div>
@@ -8584,7 +8584,7 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
   <div class="quick-control-grid" data-dynamic-quick="1"></div>
 </div><div class="strip-status-leds" aria-label="AUDIO / MP3 status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
             <div class="fader-panel-area">
-              <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="Audio MP3 channel level"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
+              <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-60" max="10" step="0.5" value="0" aria-label="Audio MP3 channel level"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
               <div class="vert-led-meter" id="mixerMeter2"></div>
             </div>
             <div class="strip-action-buttons">
@@ -8638,7 +8638,7 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
                 </div>
               </div>
               <div class="master-fader-row">
-                <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-50" max="6" step="0.5" value="0" aria-label="Master LR fader"></div>
+                <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-60" max="10" step="0.5" value="0" aria-label="Master LR fader"></div>
                 <div class="master-combined-wrap"><span>MASTER</span><div class="vert-led-meter master-led-meter master-combined-meter" id="masterMeterCombined"></div></div>
               </div>
             </div>
@@ -9463,7 +9463,7 @@ function createBands(channel) {
 /* =========================================================
    AUDIO ENGINE & ROUTING
 ========================================================= */
-const CONTROL_SMOOTHING_SECONDS = 0.025;
+const CONTROL_SMOOTHING_SECONDS = 0.012;
 
 let usbInputStream = null;
 let usbInputSource = null;
@@ -10107,7 +10107,24 @@ function createAudioContext() {
   return audioContext;
 }
 
-function dbToGain(db) { return Math.pow(10, db / 20); }
+function dbToGain(db) {
+  const value = Number(db);
+  if (!Number.isFinite(value) || value <= -59.5) return 0;
+  return Math.pow(10, value / 20);
+}
+function mixerFaderGain(db) {
+  return dbToGain(Math.max(-60, Math.min(10, Number(db) || 0)));
+}
+function formatMixerFaderDb(db) {
+  const value = Number(db);
+  return value <= -59.5 ? "−∞ dB" : value.toFixed(1) + " dB";
+}
+function applyMixerFaderGain(node, db) {
+  if (!node || !audioContext) return;
+  const gain = mixerFaderGain(db);
+  node.gain.cancelScheduledValues(audioContext.currentTime);
+  node.gain.setTargetAtTime(gain, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+}
 function getSafeMasterGainDb() {
   const req = Number(masterGainControl.value);
   return outputMode.value === "safe" ? Math.min(req, -3) : req;
@@ -10399,14 +10416,12 @@ function updateMixerStripControls() {
     if (!fader || !readout) return;
 
     const db = Number(fader.value);
-    readout.textContent = db.toFixed(1) + " dB";
+    readout.textContent = formatMixerFaderDb(db);
     const allowedBySolo = !anySolo || mixerStripSolo[index];
-    const gain = (mixerStripMuted[index] || !allowedBySolo || !getMixerStripPreampState(index)) ? 0 : dbToGain(db);
+    const gain = (mixerStripMuted[index] || !allowedBySolo || !getMixerStripPreampState(index)) ? 0 : mixerFaderGain(db);
 
     if (mixerStripGains[index]) {
-      mixerStripGains[index].gain.setTargetAtTime(
-        gain, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS
-      );
+      applyMixerFaderGain(mixerStripGains[index], gain <= 0 ? -60 : db);
     }
 
     const muteBtn = strip.querySelector(".console-action-btn.mute");
@@ -10428,14 +10443,12 @@ function updateMixerStripControls() {
 
     if (fader && readout) {
       const db = Number(fader.value);
-      readout.textContent = db.toFixed(1) + " dB";
+      readout.textContent = formatMixerFaderDb(db);
 
       // Master is not affected by channel SOLO. Only Master MUTE/LR may cut it.
-      const masterGain = (masterStripMuted || !masterStripLR) ? 0 : dbToGain(db);
+      const masterGain = (masterStripMuted || !masterStripLR) ? 0 : mixerFaderGain(db);
       if (masterStripGainNode) {
-        masterStripGainNode.gain.setTargetAtTime(
-          masterGain, audioContext.currentTime, CONTROL_SMOOTHING_SECONDS
-        );
+        applyMixerFaderGain(masterStripGainNode, masterGain <= 0 ? -60 : db);
       }
     }
 
