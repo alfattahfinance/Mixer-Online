@@ -9029,7 +9029,7 @@ function updateAllSignalMeters() {
     // Channel strip indicators and fader meters use the same live strip point.
     // This keeps SIG/CLIP and the vertical meter synchronized with the channel.
     const sourceAnalyser = stripAnalyser || null;
-    const db = sourceAnalyser ? readMeterDb(sourceAnalyser) : -72;
+    const db = sourceAnalyser ? readPeakMeterDb(sourceAnalyser) : -72;
     const strip = mixerStrips[index];
     const active = strip?.classList.contains("master-strip")
       ? (typeof masterStripLR === "boolean" ? masterStripLR : true)
@@ -9076,7 +9076,7 @@ function updateAllSignalMeters() {
   });
   const preampRoot = document.getElementById("tftContentArea");
   if (preampRoot?.dataset?.pageKey === "config") {
-    const preampDb = audioChannels[0]?.analyser ? readMeterDb(audioChannels[0].analyser) : -72;
+    const preampDb = audioChannels[0]?.analyser ? readPeakMeterDb(audioChannels[0].analyser) : -72;
     // The Preamp graph point is a user control point, not a live-meter cursor.
     // Keep the hardware meter independent so audio level cannot overwrite a drag.
     updateTftModuleCurve("config");
