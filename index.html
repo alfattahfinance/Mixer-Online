@@ -8073,6 +8073,124 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
   #tabMixerContent .preamp-level-meter{min-height:125px !important;grid-template-columns:20px 16px 1fr !important}
   #tabMixerContent .preamp-meter-leds{width:16px !important}
 }
+</style><style id="compressor-gr-meter-2026-10-02">
+/* REAL-TIME COMPRESSOR GAIN REDUCTION METER — 0 dB to -20 dB */
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .compressor-graph-stage{
+  position:relative !important;
+  overflow:hidden !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-meter{
+  --gr-level:0%;
+  position:absolute !important;
+  z-index:4 !important;
+  top:7px !important;
+  right:5px !important;
+  bottom:7px !important;
+  width:34px !important;
+  display:grid !important;
+  grid-template-columns:12px 10px !important;
+  grid-template-rows:10px 1fr 13px !important;
+  column-gap:3px !important;
+  align-items:stretch !important;
+  padding:2px !important;
+  border:1px solid rgba(120,155,185,.42) !important;
+  border-radius:3px !important;
+  background:rgba(3,8,14,.70) !important;
+  box-shadow:inset 0 0 7px rgba(0,0,0,.8),0 0 5px rgba(0,0,0,.35) !important;
+  pointer-events:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-title{
+  grid-column:1 / -1 !important;
+  color:#ffb000 !important;
+  font:900 7px/10px Arial,sans-serif !important;
+  text-align:center !important;
+  letter-spacing:.4px !important;
+  text-shadow:0 0 4px rgba(255,176,0,.7) !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-scale{
+  grid-column:1 !important;
+  grid-row:2 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:space-between !important;
+  color:#9aa6b2 !important;
+  font:700 5px/1 Arial,sans-serif !important;
+  text-align:right !important;
+  padding:0 1px 0 0 !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-track{
+  grid-column:2 !important;
+  grid-row:2 !important;
+  position:relative !important;
+  width:8px !important;
+  min-height:0 !important;
+  border-radius:3px !important;
+  background:linear-gradient(to bottom,#202830,#11161c) !important;
+  border:1px solid rgba(148,163,184,.28) !important;
+  overflow:visible !important;
+  box-shadow:inset 0 0 4px #000 !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-track::after{
+  content:"" !important;
+  position:absolute !important;
+  inset:0 !important;
+  background:repeating-linear-gradient(to bottom,rgba(255,255,255,.18) 0 1px,transparent 1px 20%) !important;
+  opacity:.5 !important;
+  pointer-events:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-glow{
+  position:absolute !important;
+  left:1px !important;
+  right:1px !important;
+  top:0 !important;
+  height:var(--gr-level) !important;
+  border-radius:2px 2px 0 0 !important;
+  background:linear-gradient(to bottom,#ff4d4d 0%,#ff7a00 45%,#ffb000 100%) !important;
+  opacity:.78 !important;
+  box-shadow:0 0 5px rgba(255,96,0,.6) !important;
+  transition:height .045s linear !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-lamp{
+  position:absolute !important;
+  left:-3px !important;
+  top:0 !important;
+  width:14px !important;
+  height:4px !important;
+  border-radius:2px !important;
+  background:#ffb000 !important;
+  box-shadow:0 0 5px rgba(255,176,0,.9) !important;
+  transform:translateY(-2px) !important;
+  transition:top .045s linear,background .06s linear,box-shadow .06s linear !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-meter.compressing .comp-gr-lamp{
+  background:#ff7a00 !important;
+  box-shadow:0 0 7px rgba(255,122,0,.95) !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-meter.heavy .comp-gr-lamp{
+  background:#ff3b30 !important;
+  box-shadow:0 0 9px rgba(255,59,48,1) !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-meter.limiting .comp-gr-lamp{
+  background:#ff1f1f !important;
+  box-shadow:0 0 11px rgba(255,31,31,1) !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-value{
+  grid-column:1 / -1 !important;
+  grid-row:3 !important;
+  color:#e2e8f0 !important;
+  font:800 5.5px/12px Arial,sans-serif !important;
+  text-align:center !important;
+  white-space:nowrap !important;
+}
+@media(max-width:600px){
+  #tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-meter{
+    right:3px !important;
+    width:31px !important;
+    grid-template-columns:10px 9px !important;
+  }
+  #tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-scale{font-size:4.5px !important}
+  #tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-value{font-size:5px !important}
+}
 </style></head>
 
 <body>
@@ -8803,6 +8921,37 @@ function updateAllSignalMeters() {
       }
     }
   }
+  // Real-time compressor Gain Reduction meter: derive reduction from the live
+  // input level, Threshold and Ratio. GR is shown pre-makeup, 0 dB when idle.
+  const dynamicsRoot = document.getElementById("tftContentArea");
+  if (dynamicsRoot?.dataset?.pageKey === "dynamics") {
+    const ds = tftStatesData.dynamics;
+    const liveDb = audioChannels[0]?.analyser ? readMeterDb(audioChannels[0].analyser) : -72;
+    const threshold = clamp(Number(ds.thresh) || -18, -60, 0);
+    const ratio = Math.max(1, Number(ds.ratio) || 1);
+    const targetGr = liveDb > threshold ? -Math.min(20, (liveDb - threshold) * (1 - 1 / ratio)) : 0;
+    const previousGr = Number(ds.grDb) || 0;
+    const grAlpha = targetGr < previousGr ? 0.58 : 0.20;
+    ds.grDb = previousGr + (targetGr - previousGr) * grAlpha;
+    if (Math.abs(ds.grDb) < 0.05) ds.grDb = 0;
+    const gr = clamp(ds.grDb, -20, 0);
+    const pct = Math.max(0, Math.min(100, (-gr / 20) * 100));
+    const meter = document.getElementById("compGrMeter");
+    const lamp = meter?.querySelector(".comp-gr-lamp");
+    const glow = meter?.querySelector(".comp-gr-glow");
+    const value = document.getElementById("compGrValue");
+    if (meter) {
+      meter.style.setProperty("--gr-level", pct.toFixed(2) + "%");
+      meter.setAttribute("aria-valuenow", gr.toFixed(1));
+      meter.setAttribute("aria-valuetext", gr.toFixed(1) + " dB gain reduction");
+      meter.classList.toggle("compressing", gr < -0.15);
+      meter.classList.toggle("heavy", gr <= -10);
+      meter.classList.toggle("limiting", gr <= -18);
+    }
+    if (lamp) lamp.style.top = pct.toFixed(2) + "%";
+    if (glow) glow.style.height = pct.toFixed(2) + "%";
+    if (value) value.textContent = gr.toFixed(1) + " dB";
+  }
   updateTftMetersFromAudio();
   requestAnimationFrame(updateAllSignalMeters);
 }
@@ -9122,7 +9271,7 @@ let activeCurrentSectionKey = "eq";
 const tftStatesData = {
   config: { gain: 12, hpf: 80, phantom: true, phase: false, active: true, dotX: -30, dotY: -18 },
   gate: { thresh: -45, ratio: 2.5, state: true, dot1X: 85, dot1Y: 42.5, dot2X: 160, dot2Y: 11.25 },
-  dynamics: { thresh: -18, ratio: 3, makeup: 2, dot1X: 10, dot1Y: 55, dot2X: 180, dot2Y: 35, dot3X: 310, dot3Y: 20 },
+  dynamics: { thresh: -18, ratio: 3, makeup: 2, grDb: 0, dot1X: 10, dot1Y: 55, dot2X: 180, dot2Y: 35, dot3X: 310, dot3Y: 20 },
   eq: { freq: 2500, q: 1.5, gain: 4.5 },
   sends: { lvl: 0, preset: 0, state: true, bands: new Array(31).fill(0), dot1X: 180.2, dot1Y: 32, dot2X: 310, dot2Y: 15 },
   main: { send: 0, limit: -0.5, bypass: false, dot1X: 160, dot1Y: 12, dot2X: 310, dot2Y: 35 },
@@ -10743,7 +10892,7 @@ const tftDatabase = {
     footerSt: "Next: Threshold & Ratio",
     content: (s) => `
       <div class="tft-module-view curve-native-view">
-        <div class="tft-module-graph-box tft-transfer-graph" id="tftCompBox" aria-label="Compressor transfer curve">
+        <div class="tft-module-graph-box tft-transfer-graph compressor-graph-stage" id="tftCompBox" aria-label="Compressor transfer curve">
           <svg id="tftCompSvgContainer" viewBox="0 0 320 120" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;" role="img" aria-label="Compressor input level versus output level">
             <g class="tft-transfer-grid" aria-hidden="true">
               <line x1="10" y1="15" x2="310" y2="15"/><line x1="10" y1="30" x2="310" y2="30"/>
@@ -10774,6 +10923,12 @@ const tftDatabase = {
             <circle id="tftCompDot2" cx="${s.dot2X}" cy="${s.dot2Y}" r="3.6" fill="#f8ffff" stroke="#20d8ff" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Threshold Point"/>
             <circle id="tftCompDot3" cx="${s.dot3X}" cy="${s.dot3Y}" r="3.6" fill="#f8ffff" stroke="#20d8ff" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Output / Makeup Point"/>
           </svg>
+          <div class="comp-gr-meter" id="compGrMeter" role="meter" aria-label="Gain Reduction Meter" aria-valuemin="-20" aria-valuemax="0" aria-valuenow="0">
+            <div class="comp-gr-title">GR</div>
+            <div class="comp-gr-scale" aria-hidden="true"><span>0</span><span>-5</span><span>-10</span><span>-15</span><span>-20</span></div>
+            <div class="comp-gr-track"><div class="comp-gr-glow"></div><div class="comp-gr-lamp"></div></div>
+            <div class="comp-gr-value" id="compGrValue">0.0 dB</div>
+          </div>
         </div>
         <div class="tft-module-controls-grid">
           <div class="tft-mod-ctrl"><label>Threshold</label><input type="range" id="compThresh" min="-60" max="0" step="0.1" value="${s.thresh}"><span class="tft-val-disp" id="compThreshVal">${s.thresh}dB</span></div>
