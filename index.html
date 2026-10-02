@@ -9875,8 +9875,9 @@ async function activateUsbAudioInput() {
       usbInputAnalyser.smoothingTimeConstant=.08;
     }
     usbInputSource.connect(usbInputAnalyser);
-    // PRE-FADER channel meter tap: measure the actual USB input, not the fader.
-    usbInputSource.connect(mixerStripInputAnalysers[0] || mixerStripGains[0]);
+    // CH1 signal flow: USB INPUT -> CH1 input meter -> CH1 fader.
+    // The analyser is a passive pre-fader tap; it never drives the audio path.
+    usbInputSource.connect(mixerStripInputAnalysers[0]);
     usbInputSource.connect(mixerStripGains[0]);
     updateUsbInputLevelMeter();
 
@@ -10450,33 +10451,67 @@ function updateMixerStripControls() {
 function rebuildAudioRouting() {
   if (!audioGraphReady || !audioContext || !mixerInputGain || !alesisDryNode || !alesisWetNode) return;
 
-  // Clear old branches first so toggling FX never stacks duplicate signal routes.
-  mixerInputGain.disconnect();
-  mixerStripAnalysers[2].disconnect();
-  mixerStripAnalysers[3].disconnect();
-  alesisDryNode.disconnect();
-  alesisWetNode.disconnect();
-  mixerStripGains[3].disconnect();
-  try { alesisDelayNode.disconnect(alesisWetNode); } catch (err) {}
+  /*
+   * REAL MIXER SIGNAL FLOW
+   *
+   * CH1: USB INPUT -> CH1 PRE-FADER METER -> CH1 FADER -> Main LR
+   * CH2: MP3       -> CH2 PRE-FADER METER -> CH2 FADER -> Main LR
+   *
+   * FX: CH1/CH2 POST-FADER -> FX SEND/CH3 -> Alesis FX -> FX RETURN/CH4
+   *     -> Main LR
+   *
+   * Main L/R meters are taken after the Main LR/master strip.
+   * MASTER is the combined live L/R level.
+   */
 
-  mixerInputGain.connect(alesisDryNode);
-  alesisDryNode.connect(audioChannels[0].inputGain);
-  alesisDryNode.connect(audioChannels[1].inputGain);
-  // Keep FX SEND metering live even while the processor is bypassed.
-  mixerInputGain.connect(mixerStripInputAnalysers[2] || mixerStripGains[2]);
+  // Clear only the routing branches. The analyser nodes remain alive so the
+  // visual meters continue running while PAGES/CHANNEL DSP changes.
+  mixerInputGain.disconnect();
+  mixerStripInputAnalysers.forEach(analyser => { try { analyser?.disconnect(); } catch (err) {} });
+  [0,1,2,3].forEach(i => {
+    try { mixerStripAnalysers[i]?.disconnect(); } catch (err) {}
+  });
+  try { alesisDryNode.disconnect(); } catch (err) {}
+  try { alesisWetNode.disconnect(); } catch (err) {}
+  try { mixerStripGains[2]?.disconnect(); } catch (err) {}
+  try { mixerStripGains[3]?.disconnect(); } catch (err) {}
+  try { alesisDelayNode.disconnect(); } catch (err) {}
+
+  // ---------------- CH1 / CH2 MAIN INPUTS ----------------
+  // Each channel has its own DSP path. Do NOT combine CH1 + CH2 before DSP.
+  mixerStripGains[0].connect(audioChannels[0].inputGain);
+  mixerStripGains[1].connect(audioChannels[1].inputGain);
+
+  // ---------------- FX SEND / CH3 ----------------
+  // CH1 + CH2 post-fader signals feed the dedicated FX send bus.
+  mixerStripAnalysers[0].connect(mixerInputGain);
+  mixerStripAnalysers[1].connect(mixerInputGain);
+
+  // CH3 input meter is PRE-FADER: it shows the signal arriving at FX SEND.
+  mixerInputGain.connect(mixerStripInputAnalysers[2]);
+
+  // CH3 fader controls how much signal is sent into Alesis FX.
   mixerInputGain.connect(mixerStripGains[2]);
+  mixerStripGains[2].connect(mixerStripAnalysers[2]);
+
   if (isAlesisFxEnabled) {
     mixerStripAnalysers[2].connect(alesisDelayNode);
+
+    // Alesis FX return is measured before the CH4 return fader.
     alesisDelayNode.connect(alesisWetNode);
-    // FX RETURN meter taps the wet processor output before the return fader.
-    // The fader remains downstream and still controls the audible return level.
-    alesisWetNode.connect(mixerStripInputAnalysers[3] || mixerStripAnalysers[3]);
-    alesisWetNode.connect(mixerStripAnalysers[3]);
-    mixerStripAnalysers[3].connect(mixerStripGains[3]);
-    // Return joins the post-EQ main bus, not the input channels:
-    // routing it back to channel inputs creates a digital feedback loop.
+    alesisWetNode.connect(mixerStripInputAnalysers[3]);
+
+    // CH4 return fader controls the returned FX level into Main LR.
+    alesisWetNode.connect(mixerStripGains[3]);
+    mixerStripGains[3].connect(mixerStripAnalysers[3]);
     mixerStripGains[3].connect(masterStripGainNode);
   }
+
+  // ---------------- MAIN LR ----------------
+  // CH1/CH2 DSP outputs feed the stereo Main LR bus.
+  // FX RETURN/CH4 joins the same Main LR bus above.
+  audioChannels[0].analyser.connect(outputMergerNode, 0, 0);
+  audioChannels[1].analyser.connect(outputMergerNode, 0, 1);
 }
 
 echoToggleBtn.addEventListener("click", () => {
@@ -10533,8 +10568,9 @@ function playCurrentBuffer() {
   const sourceNode = audioContext.createBufferSource();
   activeSourceNode = sourceNode;
   sourceNode.buffer = buffer;
-  // CH2 meter taps the raw playback signal before the channel fader.
-  sourceNode.connect(mixerStripInputAnalysers[1] || mixerStripGains[1]);
+  // CH2 signal flow: MP3 -> CH2 input meter -> CH2 fader.
+  // Keep MP3 isolated from CH1; it must enter the CH2 strip only.
+  sourceNode.connect(mixerStripInputAnalysers[1]);
   sourceNode.connect(mixerStripGains[1]);
 
   sourceNode.start(0);
