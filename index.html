@@ -8779,7 +8779,18 @@ function updateMasterStereoMeters() {
 
   masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
 }
-requestAnimationFrame(updateMasterStereoMeters);
+masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
+
+// Keep Web Audio alive when the user changes mixer pages or the browser briefly
+// changes visibility. Page navigation must never stop the meter refresh loop.
+document.addEventListener("visibilitychange", () => {
+  if (audioContext && audioContext.state === "suspended") {
+    audioContext.resume().catch(() => {});
+  }
+  if (!masterStereoMeterFrame) {
+    masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
+  }
+});
 
 /* Update channel, EQ and TFT meters from live Web Audio analyser data.
    Horizontal bars light left-to-right; vertical LED ladders light bottom-up. */
@@ -8891,8 +8902,8 @@ function paintMeter(container, db, direction) {
   const target = Math.max(0, Math.min(1, (safeDb - minDb) / (maxDb - minDb)));
   const previous = meterLevelState.get(container) ?? 0;
   const smoothed = target > previous
-    ? previous + (target - previous) * 0.94
-    : previous + (target - previous) * 0.42;
+    ? previous + (target - previous) * 0.985
+    : previous + (target - previous) * 0.68;
   meterLevelState.set(container, smoothed);
 
   const litCount = safeDb <= minDb || smoothed < 0.008
@@ -10240,15 +10251,18 @@ function initializeAudioGraph() {
     mixerStripGains[i] = audioContext.createGain();
     mixerStripAnalysers[i] = audioContext.createAnalyser();
     mixerStripAnalysers[i].fftSize = 1024;
+    // Meter analysers must react to transients quickly; visual smoothing is handled separately.
+    mixerStripAnalysers[i].smoothingTimeConstant = 0.08;
     mixerStripGains[i].connect(mixerStripAnalysers[i]);
     if (i < 2) mixerStripAnalysers[i].connect(mixerInputGain);
   }
   masterStripGainNode = audioContext.createGain();
   masterMeterAnalyser = audioContext.createAnalyser();
   masterMeterAnalyser.fftSize = 1024;
+  masterMeterAnalyser.smoothingTimeConstant = 0.08;
   masterStereoSplitter = audioContext.createChannelSplitter(2);
   masterStereoAnalysers = [audioContext.createAnalyser(), audioContext.createAnalyser()];
-  masterStereoAnalysers.forEach(analyser => { analyser.fftSize = 1024; analyser.smoothingTimeConstant = 0.35; });
+  masterStereoAnalysers.forEach(analyser => { analyser.fftSize = 1024; analyser.smoothingTimeConstant = 0.08; });
 
   buildEqualizerChannel(0);
   buildEqualizerChannel(1);
