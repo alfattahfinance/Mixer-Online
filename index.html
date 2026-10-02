@@ -9082,13 +9082,17 @@ function readLiveMasterStereoLevels() {
   if (!audioGraphReady || !masterStereoAnalysers[0] || !masterStereoAnalysers[1]) {
     return { left: -72, right: -72, combined: -72 };
   }
+  // Main LR -> MASTER L/R are measured after the Main LR/master fader.
   const left = readPeakMeterDb(masterStereoAnalysers[0]);
   const right = readPeakMeterDb(masterStereoAnalysers[1]);
-  return {
-    left,
-    right,
-    combined: Math.max(left, right)
-  };
+
+  // MASTER is the final output point after the output mute stage.
+  // Keep this as a separate tap so MASTER never becomes a copy of a fader knob.
+  const combined = masterMeterAnalyser
+    ? readPeakMeterDb(masterMeterAnalyser)
+    : Math.max(left, right);
+
+  return { left, right, combined };
 }
 
 function updateAllSignalMeters() {
@@ -10483,7 +10487,10 @@ function rebuildAudioRouting() {
   try { audioChannels[1].analyser.disconnect(outputMergerNode); } catch (err) {}
 
   // ---------------- CH1 / CH2 MAIN INPUTS ----------------
-  // Each channel has its own DSP path. Do NOT combine CH1 + CH2 before DSP.
+  // USB INPUT -> CH1 INPUT METER -> CH1 FADER -> Main LR
+  // MP3       -> CH2 INPUT METER -> CH2 FADER -> Main LR
+  // Dedicated input analysers are PRE-FADER taps. Moving a channel fader
+  // changes the audio sent onward, but never changes the INPUT meter source.
   try { mixerStripGains[0].disconnect(audioChannels[0].inputGain); } catch (err) {}
   try { mixerStripGains[1].disconnect(audioChannels[1].inputGain); } catch (err) {}
   mixerStripGains[0].connect(audioChannels[0].inputGain);
