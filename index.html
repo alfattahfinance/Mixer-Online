@@ -8311,11 +8311,11 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
         <span class="usb-interface-value"><i class="usb-interface-dot" id="usbBarConnectionDot"></i><span id="usbBarConnection">MENUNGGU</span></span>
       </div>
       <div class="usb-interface-cell">
-        <label>INPUT</label>
+        <label>INPUT 1 / INPUT 2</label>
         <span class="usb-interface-value"><i class="usb-interface-dot" id="usbBarInputDot"></i><span id="usbBarInput">BELUM TERDETEKSI</span></span>
       </div>
       <div class="usb-interface-cell">
-        <label>OUTPUT</label>
+        <label>OUTPUT L / OUTPUT R</label>
         <span class="usb-interface-value"><i class="usb-interface-dot" id="usbBarOutputDot"></i><span id="usbBarOutput">BELUM TERDETEKSI</span></span>
       </div>
       <button id="usbInterfaceRefreshButton" class="usb-interface-refresh" type="button">REFRESH INTERFACE</button>
@@ -9474,6 +9474,7 @@ const CONTROL_SMOOTHING_SECONDS = 0.012;
 
 let usbInputStream = null;
 let usbInputSource = null;
+let usbInputSplitter = null; // 2-IN interface: input 1 -> CH1, input 2 -> CH2
 let audioBuffers = [];
 let audioFileNames = [];
 let currentPlaylistIndex = 0;
@@ -9863,10 +9864,16 @@ async function activateUsbAudioInput() {
       autoGainControl:false,
       channelCount:{ideal:2}
     };
-    usbInputStream=await navigator.mediaDevices.getUserMedia({audio:exact});
+    try {
+      usbInputStream=await navigator.mediaDevices.getUserMedia({audio:exact});
+    } catch (err) {
+      // Fall back to an ideal stereo request for browsers that reject exact channel constraints.
+      usbInputStream=await navigator.mediaDevices.getUserMedia({audio:{deviceId:{exact:selectedInput.deviceId},echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2}}});
+    }
 
     const activeTrack=usbInputStream.getAudioTracks()[0];
     const activeTrackId=activeTrack?.getSettings?.().deviceId || "";
+    const activeChannelCount=Number(activeTrack?.getSettings?.().channelCount || 0);
     if (activeTrackId && activeTrackId!==selectedInput.deviceId) {
       usbInputStream.getTracks().forEach(track=>track.stop());
       usbInputStream=null;
@@ -9886,15 +9893,24 @@ async function activateUsbAudioInput() {
       usbInputAnalyser.smoothingTimeConstant=.08;
     }
     usbInputSource.connect(usbInputAnalyser);
-    // CH1 signal flow: USB INPUT -> CH1 input meter -> CH1 fader.
-    // The analyser is a passive pre-fader tap; it never drives the audio path.
-    usbInputSource.connect(mixerStripInputAnalysers[0]);
-    usbInputSource.connect(mixerStripGains[0]);
+
+    // TRUE 2-IN ROUTING: USB/interface channel 1 -> CH1, channel 2 -> CH2.
+    // Split before the channel faders so the two physical inputs stay independent.
+    usbInputSplitter=audioContext.createChannelSplitter(2);
+    usbInputSplitter.channelCount=2;
+    usbInputSplitter.channelCountMode="explicit";
+    usbInputSource.connect(usbInputSplitter);
+    usbInputSplitter.connect(mixerStripInputAnalysers[0],0);
+    usbInputSplitter.connect(mixerStripGains[0],0);
+    usbInputSplitter.connect(mixerStripInputAnalysers[1],1);
+    usbInputSplitter.connect(mixerStripGains[1],1);
     updateUsbInputLevelMeter();
 
     if (physicalInputDevice) physicalInputDevice.value=usbAudioInputDeviceId;
     const outputLabel=physicalOutputDevice?.selectedOptions?.[0]?.textContent || "OUTPUT AUDIO";
-    setAudioStatus("PROCESSING AKTIF: MIXER FISIK → USB IN → DSP → "+outputLabel+" → SOUND");
+    setAudioStatus(activeChannelCount >= 2
+      ? "2-IN AKTIF: USB IN 1 → CH1 · USB IN 2 → CH2 · 2-OUT L/R"
+      : "1-IN AKTIF: USB IN 1 → CH1 · CH2 menunggu INPUT 2 · 2-OUT siap");
     return true;
   } catch(err) {
     if (usbInputStream) {
@@ -10088,9 +10104,10 @@ async function refreshUsbInterfaceBar(){
     if(cdot) cdot.classList.toggle("active",hasConnection);
     if(idot) idot.classList.toggle("active",hasInput);
     if(odot) odot.classList.toggle("active",hasOutput);
-    if(connection) connection.textContent=hasConnection?"TERDETEKSI":"TIDAK TERDETEKSI";
-    if(input) input.textContent=hasInput?(activeInput?.label||usbInputs[0]?.label||"AUDIO INPUT AKTIF"):"BELUM TERDETEKSI";
-    if(output) output.textContent=hasOutput?(usbOutputs[0]?.label||"AUDIO OUTPUT AKTIF"):"BELUM TERDETEKSI";
+    if(connection) connection.textContent=hasConnection?"2-IN / 2-OUT AKTIF":"TIDAK TERDETEKSI";
+    const activeChannels=Number(usbInputStream?.getAudioTracks?.()[0]?.getSettings?.().channelCount || 0);
+    if(input) input.textContent=hasInput?((activeChannels>=2?"2 INPUT":"1 INPUT")+" · "+(activeInput?.label||usbInputs[0]?.label||"USB AUDIO")):"BELUM TERDETEKSI";
+    if(output) output.textContent=hasOutput?("2 OUTPUT · "+(usbOutputs[0]?.label||"USB AUDIO OUT")):"BELUM TERDETEKSI";
   }catch(err){
     if(connection) connection.textContent="GAGAL MEMBACA";
     if(cdot) cdot.classList.add("warn");
