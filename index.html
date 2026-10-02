@@ -3954,7 +3954,24 @@ body.mixer-powered-off #tabMixerContent .mixer-tft-screen .master-combined-meter
 
 /* PREAMP native page: replace legacy Gate content with real preamp controls. */
 #tabMixerContent .preamp-native-view{display:flex;flex-direction:column;gap:6px;height:100%;min-height:0;overflow:hidden;}
-#tabMixerContent .preamp-main-panel{display:grid;grid-template-columns:minmax(150px,.65fr) minmax(220px,1.35fr);gap:6px;flex:1 1 auto;min-height:0;}
+#tabMixerContent .preamp-main-panel{display:flex;flex-direction:column;gap:5px;flex:1 1 auto;min-height:0;}
+#tabMixerContent .preamp-graph-card{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;background:#20262d;border:1px solid #59616a;border-radius:5px;padding:5px;overflow:hidden;}
+#tabMixerContent .preamp-graph-head{display:flex;justify-content:space-between;align-items:center;gap:6px;color:#dbe4ec;font-size:9px;padding:0 2px 3px;}
+#tabMixerContent .preamp-graph-head span{color:#38bdf8;font-weight:800;}
+#tabMixerContent .preamp-graph-wrap{position:relative;flex:1 1 auto;min-height:0;width:100%;overflow:hidden;}
+#tabMixerContent #cfgPreampGraph{display:block;width:100%;height:100%;min-height:0;overflow:visible;touch-action:none;}
+#tabMixerContent .preamp-graph-plot{fill:rgba(8,15,22,.42);stroke:rgba(148,163,184,.35);stroke-width:.8;}
+#tabMixerContent .preamp-graph-grid line{stroke:rgba(148,163,184,.20);stroke-width:.55;vector-effect:non-scaling-stroke;}
+#tabMixerContent .preamp-reference-line{stroke:rgba(156,163,175,.78);stroke-width:1;stroke-dasharray:4 4;fill:none;vector-effect:non-scaling-stroke;}
+#tabMixerContent .preamp-curve{stroke:#38bdf8;stroke-width:2;fill:none;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 3px rgba(56,189,248,.45));}
+#tabMixerContent .preamp-curve-fill{fill:url(#cfgPreampCurveGlow);stroke:none;}
+#tabMixerContent .preamp-live-point{fill:#fff;stroke:#38bdf8;stroke-width:1.4;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 3px rgba(56,189,248,.7));}
+#tabMixerContent .preamp-axis-labels text{fill:#94a3b8;font-size:5.4px;font-family:Arial,sans-serif;letter-spacing:.15px;}
+#tabMixerContent .preamp-axis-labels .preamp-axis-title-x,#tabMixerContent .preamp-axis-labels .preamp-axis-title-y{fill:#cbd5e1;font-size:5.7px;font-weight:800;letter-spacing:.45px;}
+#tabMixerContent .preamp-graph-legend text{fill:#aeb9c5;font-size:4.8px;font-family:Arial,sans-serif;}
+#tabMixerContent .preamp-graph-readout{display:flex;justify-content:space-between;align-items:center;color:#94a3b8;font-size:6px;padding:2px 2px 0;}
+#tabMixerContent .preamp-graph-readout b{color:#38bdf8;font-size:7px;}
+#tabMixerContent .preamp-meter-card{display:none;}
 #tabMixerContent .preamp-meter-card,#tabMixerContent .preamp-control-panel{background:#20262d;border:1px solid #59616a;border-radius:5px;min-height:0;padding:6px;}
 #tabMixerContent .preamp-meter-card{display:flex;flex-direction:column;min-width:0;}
 #tabMixerContent .preamp-card-head{display:flex;justify-content:space-between;gap:5px;color:#dbe4ec;font-size:9px;margin-bottom:5px;}
@@ -3975,7 +3992,7 @@ body.mixer-powered-off #tabMixerContent .mixer-tft-screen .master-combined-meter
 #tabMixerContent .preamp-info-grid>div{background:#171c22;border:1px solid #3f4851;border-radius:3px;padding:3px 5px;min-width:0;}
 #tabMixerContent .preamp-info-grid small{display:block;color:#94a3b8;font-size:5.5px;}
 #tabMixerContent .preamp-info-grid strong{display:block;color:#e2e8f0;font-size:8px;margin-top:1px;}
-@media(max-width:600px){#tabMixerContent .preamp-main-panel{grid-template-columns:minmax(80px,.45fr) minmax(170px,1.55fr);}#tabMixerContent .preamp-action-row{grid-template-columns:1fr;}#tabMixerContent .preamp-info-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media(max-width:600px){#tabMixerContent .preamp-graph-head{font-size:8px;}#tabMixerContent .preamp-graph-readout{font-size:5.5px;}#tabMixerContent .preamp-action-row{grid-template-columns:1fr 1fr;}#tabMixerContent .preamp-info-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
 
 /* Hide legacy TFT notification footer; the main screen stays clean. */
 #tabMixerContent #tftFooterChannel,
@@ -10594,26 +10611,66 @@ const tftDatabase = {
   config: {
     title: "SQ-7 PREAMP CONFIG",
     footerCh: "Current: Ip1 Preamp",
-    footerSt: "Gain • HPF • 48V Phantom • Phase",
+    footerSt: "Input Level • Output Level • 1:1 Reference • Gain",
     content: (s) => `
       <div class="tft-module-view preamp-native-view">
-        <div class="preamp-main-panel">
-          <div class="preamp-meter-card">
-            <div class="preamp-card-head"><strong>INPUT PREAMP</strong><span id="cfgPreampStatus">${s.phantom ? "48V ON" : "48V OFF"}</span></div>
-            <div class="preamp-level-meter" aria-label="Input preamp level meter">
-              <div class="preamp-meter-scale" aria-hidden="true"><span>0</span><span>-6</span><span>-12</span><span>-24</span><span>-36</span><span>-48</span><span>-60</span></div>
-              <div class="preamp-meter-leds" id="cfgPreampSegments"><span data-meter-seg="0"></span><span data-meter-seg="1"></span><span data-meter-seg="2"></span><span data-meter-seg="3"></span><span data-meter-seg="4"></span><span data-meter-seg="5"></span><span data-meter-seg="6"></span><span data-meter-seg="7"></span><span data-meter-seg="8"></span><span data-meter-seg="9"></span><span data-meter-seg="10"></span><span data-meter-seg="11"></span><span data-meter-seg="12"></span><span data-meter-seg="13"></span><span data-meter-seg="14"></span><span data-meter-seg="15"></span><span data-meter-seg="16"></span><span data-meter-seg="17"></span><span data-meter-seg="18"></span><span data-meter-seg="19"></span><span data-meter-seg="20"></span><span data-meter-seg="21"></span><span data-meter-seg="22"></span><span data-meter-seg="23"></span></div>
-              <div class="preamp-peak-led" id="cfgPreampPeak" aria-hidden="true"></div>
-            </div>
-            <div class="preamp-readout"><b id="cfgGainVal">${Number(s.gain).toFixed(1)} dB</b><span>INPUT GAIN</span></div>
+        <div class="preamp-graph-card">
+          <div class="preamp-graph-head">
+            <strong>PREAMP TRANSFER</strong>
+            <span id="cfgPreampGraphStatus">GAIN ${Number(s.gain).toFixed(1)} dB</span>
           </div>
-          <div class="preamp-control-panel">
-            <div class="preamp-control-card"><label for="cfgGain">GAIN</label><input id="cfgGain" type="range" min="-20" max="60" step="0.5" value="${s.gain}"><output>${Number(s.gain).toFixed(1)} dB</output></div>
-            <div class="preamp-control-card"><label for="cfgHpf">HPF</label><input id="cfgHpf" type="range" min="20" max="400" step="5" value="${s.hpf}"><output>${Number(s.hpf).toFixed(0)} Hz</output></div>
-            <div class="preamp-action-row">
-              <button id="cfgPhantomBtn" type="button" class="${s.phantom ? "active-action" : ""}" aria-pressed="${s.phantom}">48V PHANTOM <b>${s.phantom ? "ON" : "OFF"}</b></button>
-              <button id="cfgPhaseBtn" type="button" class="${s.phase ? "active-action" : ""}" aria-pressed="${s.phase}">PHASE <b>${s.phase ? "INVERT" : "NORMAL"}</b></button>
-            </div>
+          <div class="preamp-graph-wrap">
+            <svg id="cfgPreampGraph" viewBox="0 0 340 190" preserveAspectRatio="none" role="img" aria-label="Preamp input level versus output level transfer graph">
+              <defs>
+                <linearGradient id="cfgPreampCurveGlow" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#38bdf8" stop-opacity=".28"/>
+                  <stop offset="1" stop-color="#38bdf8" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <rect class="preamp-graph-plot" x="38" y="14" width="288" height="142" rx="2"/>
+              <g class="preamp-graph-grid" aria-hidden="true">
+                <line x1="38" y1="14" x2="326" y2="14"/><line x1="38" y1="37.67" x2="326" y2="37.67"/>
+                <line x1="38" y1="61.33" x2="326" y2="61.33"/><line x1="38" y1="85" x2="326" y2="85"/>
+                <line x1="38" y1="108.67" x2="326" y2="108.67"/><line x1="38" y1="132.33" x2="326" y2="132.33"/>
+                <line x1="38" y1="156" x2="326" y2="156"/>
+                <line x1="38" y1="14" x2="38" y2="156"/><line x1="86" y1="14" x2="86" y2="156"/>
+                <line x1="134" y1="14" x2="134" y2="156"/><line x1="182" y1="14" x2="182" y2="156"/>
+                <line x1="230" y1="14" x2="230" y2="156"/><line x1="278" y1="14" x2="278" y2="156"/>
+                <line x1="326" y1="14" x2="326" y2="156"/>
+              </g>
+              <line id="cfgPreampReference" class="preamp-reference-line" x1="38" y1="156" x2="326" y2="14"/>
+              <path id="cfgPreampCurveFill" class="preamp-curve-fill" d=""/>
+              <path id="cfgPreampCurve" class="preamp-curve" d=""/>
+              <circle id="cfgPreampInputPoint" class="preamp-live-point" cx="38" cy="156" r="3.2"/>
+              <g class="preamp-axis-labels" aria-hidden="true">
+                <text x="38" y="169" text-anchor="middle">-60</text><text x="86" y="169" text-anchor="middle">-50</text>
+                <text x="134" y="169" text-anchor="middle">-40</text><text x="182" y="169" text-anchor="middle">-30</text>
+                <text x="230" y="169" text-anchor="middle">-20</text><text x="278" y="169" text-anchor="middle">-10</text>
+                <text x="326" y="169" text-anchor="middle">0</text>
+                <text x="31" y="158" text-anchor="end">-60</text><text x="31" y="134" text-anchor="end">-50</text>
+                <text x="31" y="110" text-anchor="end">-40</text><text x="31" y="87" text-anchor="end">-30</text>
+                <text x="31" y="63" text-anchor="end">-20</text><text x="31" y="39" text-anchor="end">-10</text>
+                <text x="31" y="17" text-anchor="end">0</text>
+                <text class="preamp-axis-title-x" x="182" y="187" text-anchor="middle">INPUT LEVEL (dB)</text>
+                <text class="preamp-axis-title-y" transform="translate(9 85) rotate(-90)" text-anchor="middle">OUTPUT LEVEL (dB)</text>
+              </g>
+              <g class="preamp-graph-legend" aria-hidden="true">
+                <line x1="49" y1="25" x2="67" y2="25" class="preamp-reference-line"/><text x="72" y="28">1:1 REFERENCE</text>
+                <line x1="49" y1="36" x2="67" y2="36" class="preamp-curve"/><text x="72" y="39">PREAMP RESPONSE</text>
+              </g>
+            </svg>
+          </div>
+          <div class="preamp-graph-readout">
+            <span id="cfgPreampGraphInput">INPUT -60.0 dB</span>
+            <b id="cfgPreampGraphOutput">OUTPUT -48.0 dB</b>
+          </div>
+        </div>
+        <div class="preamp-control-panel">
+          <div class="preamp-control-card"><label for="cfgGain">GAIN</label><input id="cfgGain" type="range" min="-20" max="60" step="0.5" value="${s.gain}"><output>${Number(s.gain).toFixed(1)} dB</output></div>
+          <div class="preamp-control-card"><label for="cfgHpf">HPF</label><input id="cfgHpf" type="range" min="20" max="400" step="5" value="${s.hpf}"><output>${Number(s.hpf).toFixed(0)} Hz</output></div>
+          <div class="preamp-action-row">
+            <button id="cfgPhantomBtn" type="button" class="${s.phantom ? "active-action" : ""}" aria-pressed="${s.phantom}">48V PHANTOM <b>${s.phantom ? "ON" : "OFF"}</b></button>
+            <button id="cfgPhaseBtn" type="button" class="${s.phase ? "active-action" : ""}" aria-pressed="${s.phase}">PHASE <b>${s.phase ? "INVERT" : "NORMAL"}</b></button>
           </div>
         </div>
         <div class="preamp-info-grid">
@@ -11132,10 +11189,42 @@ function updateTftPeqVisuals() {
 function updateTftModuleCurve(key) {
   // Only Gate and Compressor expose editable transfer curves.
   // Other pages use purpose-built patch, meter, scene, setup, utility, or insert views.
-  if (key !== "gate" && key !== "dynamics" && key !== "sends") return;
+  if (key !== "config" && key !== "gate" && key !== "dynamics" && key !== "sends") return;
   const s = tftStatesData[key];
   if (!s) return;
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  if (key === "config") {
+    const svg = document.getElementById("cfgPreampGraph");
+    const curve = document.getElementById("cfgPreampCurve");
+    const fill = document.getElementById("cfgPreampCurveFill");
+    const point = document.getElementById("cfgPreampInputPoint");
+    if (!svg || !curve) return;
+    const x0 = 38, x1 = 326, yTop = 14, yBottom = 156;
+    const dbToX = db => x0 + ((clamp(Number(db), -60, 0) + 60) / 60) * (x1 - x0);
+    const dbToY = db => yBottom - ((clamp(Number(db), -60, 0) + 60) / 60) * (yBottom - yTop);
+    const gain = Number(s.gain) || 0;
+    const response = inputDb => clamp(inputDb + gain, -60, 0);
+    const points = [];
+    for (let i = 0; i <= 60; i++) {
+      const inputDb = -60 + i;
+      points.push([dbToX(inputDb), dbToY(response(inputDb))]);
+    }
+    let d = "M" + points[0][0].toFixed(2) + " " + points[0][1].toFixed(2);
+    for (let i = 1; i < points.length; i++) d += " L" + points[i][0].toFixed(2) + " " + points[i][1].toFixed(2);
+    curve.setAttribute("d", d);
+    if (fill) fill.setAttribute("d", d + " L" + x1 + " " + yBottom + " L" + x0 + " " + yBottom + " Z");
+    const liveInput = clamp(Number(s.dotX), -60, 0);
+    const liveOutput = response(liveInput);
+    if (point) { point.setAttribute("cx", dbToX(liveInput).toFixed(2)); point.setAttribute("cy", dbToY(liveOutput).toFixed(2)); }
+    const inRead = document.getElementById("cfgPreampGraphInput");
+    const outRead = document.getElementById("cfgPreampGraphOutput");
+    const graphStatus = document.getElementById("cfgPreampGraphStatus");
+    if (inRead) inRead.textContent = "INPUT " + liveInput.toFixed(1) + " dB";
+    if (outRead) outRead.textContent = "OUTPUT " + liveOutput.toFixed(1) + " dB";
+    if (graphStatus) graphStatus.textContent = "GAIN " + gain.toFixed(1) + " dB";
+    return;
+  }
+
 
   // GEQ is a bank of real vertical mixer faders, not a curve graph.
   if (key === "sends") {
@@ -11649,6 +11738,7 @@ function bindTftDynamicEventListeners(key) {
         if (hpfInp) hpfInp.nextElementSibling.textContent = Number(s.hpf).toFixed(0) + " Hz";
         if (gInp) gInp.nextElementSibling.textContent = Number(s.gain).toFixed(1) + " dB";
         updateEncoders(tftDatabase.config.encoders(s));
+        updateTftModuleCurve("config");
       };
       gInp?.addEventListener("input", () => {
         s.gain = Number(gInp.value);
@@ -11685,6 +11775,7 @@ function bindTftDynamicEventListeners(key) {
       });
       applyPreampToAudio();
       refreshPreampUi();
+      updateTftModuleCurve("config");
     } else if (key === "gate") {
       const thInp = document.getElementById("gateThresh");
       const ratInp = document.getElementById("gateRatio");
