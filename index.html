@@ -8360,6 +8360,7 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
           <input id="cfgHpf" type="range" min="20" max="400" step="5" value="${s.hpf}">
           <button id="cfgPhantomBtn" type="button" class="${s.phantom ? "active-action" : ""}" aria-pressed="${s.phantom}">48V PHANTOM</button>
           <button id="cfgPhaseBtn" type="button" class="${s.phase ? "active-action" : ""}" aria-pressed="${s.phase}">PHASE</button>
+          <button id="cfgPreampStateBtn" type="button" class="${s.active ? "active-action" : ""}" aria-pressed="${s.active}">${s.active ? "ACTIVE" : "BYPASS"}</button>
           <span id="cfgGainInfo"></span><span id="cfgHpfInfo"></span><span id="cfgPhantomInfo"></span><span id="cfgPhaseInfo"></span>
         </div>
 
@@ -9119,7 +9120,7 @@ let tftCurveActiveStates = { config: false, gate: true, dynamics: true, eq: true
 let activeCurrentSectionKey = "eq";
 
 const tftStatesData = {
-  config: { gain: 12, hpf: 80, phantom: true, phase: false, dotX: -30, dotY: -18 },
+  config: { gain: 12, hpf: 80, phantom: true, phase: false, active: true, dotX: -30, dotY: -18 },
   gate: { thresh: -45, ratio: 2.5, state: true, dot1X: 85, dot1Y: 42.5, dot2X: 160, dot2Y: 11.25 },
   dynamics: { thresh: -18, ratio: 3, makeup: 2, dot1X: 10, dot1Y: 55, dot2X: 180, dot2Y: 35, dot3X: 310, dot3Y: 20 },
   eq: { freq: 2500, q: 1.5, gain: 4.5 },
@@ -11203,7 +11204,7 @@ function updateTftModuleCurve(key) {
     const dbToX = db => x0 + ((clamp(Number(db), -60, 0) + 60) / 60) * (x1 - x0);
     const dbToY = db => yBottom - ((clamp(Number(db), -60, 0) + 60) / 60) * (yBottom - yTop);
     const gain = clamp(Number(s.gain) || 0, -20, 60);
-    const response = inputDb => clamp(inputDb + gain, -60, 0);
+    const response = inputDb => s.active ? clamp(inputDb + gain, -60, 0) : clamp(inputDb, -60, 0);
     const controlInput = clamp(Number(s.dotX), -60, 0);
     const controlOutput = response(controlInput);
     s.dotY = controlOutput;
@@ -11229,7 +11230,7 @@ function updateTftModuleCurve(key) {
     const graphStatus = document.getElementById("cfgPreampGraphStatus");
     if (inRead) inRead.textContent = "INPUT " + controlInput.toFixed(1) + " dB";
     if (outRead) outRead.textContent = "OUTPUT " + controlOutput.toFixed(1) + " dB";
-    if (graphStatus) graphStatus.textContent = "GAIN " + gain.toFixed(1) + " dB • 1 CONTROL POINT";
+    if (graphStatus) graphStatus.textContent = (s.active ? "ACTIVE" : "BYPASS") + " • GAIN " + gain.toFixed(1) + " dB • 1 CONTROL POINT";
     return;
   }
 
@@ -11720,6 +11721,7 @@ function bindTftDynamicEventListeners(key) {
       const hpfInp = document.getElementById("cfgHpf");
       const phBtn = document.getElementById("cfgPhantomBtn");
       const phBtn2 = document.getElementById("cfgPhaseBtn");
+      const stateBtn = document.getElementById("cfgPreampStateBtn");
       const gainVal = document.getElementById("cfgGainVal");
       const gainInfo = document.getElementById("cfgGainInfo");
       const hpfInfo = document.getElementById("cfgHpfInfo");
@@ -11732,9 +11734,9 @@ function bindTftDynamicEventListeners(key) {
         const channel = audioChannels[0];
         if (!channel || !audioContext) return;
         const now = audioContext.currentTime;
-        const gainDb = Number(s.gain) || 0;
-        const hpfHz = Number(s.hpf) || 20;
-        const polarity = s.phase ? -1 : 1;
+        const gainDb = s.active ? (Number(s.gain) || 0) : 0;
+        const hpfHz = s.active ? (Number(s.hpf) || 20) : 20;
+        const polarity = s.active && s.phase ? -1 : 1;
         // Audio is updated immediately; the Web Audio parameter itself is
         // smoothed to prevent clicks while the UI remains responsive.
         if (channel.inputGain?.gain) {
@@ -11759,7 +11761,7 @@ function bindTftDynamicEventListeners(key) {
           channel:1,
           control,
           value,
-          state:{ gain:Number(s.gain), hpf:Number(s.hpf), phantom:!!s.phantom, phase:!!s.phase },
+          state:{ gain:Number(s.gain), hpf:Number(s.hpf), phantom:!!s.phantom, phase:!!s.phase, active:!!s.active },
           timestamp:Date.now()
         };
         try { window.dispatchEvent(new CustomEvent("mixer:preamp-control", { detail: packet })); } catch (_) {}
@@ -11781,6 +11783,7 @@ function bindTftDynamicEventListeners(key) {
         if (status) status.textContent = s.phantom ? "48V ON" : "48V OFF";
         if (phBtn) { phBtn.innerHTML = '48V PHANTOM <b>' + (s.phantom ? "ON" : "OFF") + '</b>'; phBtn.classList.toggle("active-action", !!s.phantom); phBtn.setAttribute("aria-pressed", String(!!s.phantom)); }
         if (phBtn2) { phBtn2.innerHTML = 'PHASE <b>' + (s.phase ? "INVERT" : "NORMAL") + '</b>'; phBtn2.classList.toggle("active-action", !!s.phase); phBtn2.setAttribute("aria-pressed", String(!!s.phase)); }
+        if (stateBtn) { stateBtn.innerHTML = s.active ? "ACTIVE" : "BYPASS"; stateBtn.classList.toggle("active-action", !!s.active); stateBtn.classList.toggle("geq-bypass", !s.active); stateBtn.setAttribute("aria-pressed", String(!!s.active)); }
         if (hpfInp) hpfInp.nextElementSibling.textContent = Number(s.hpf).toFixed(0) + " Hz";
         if (gInp) gInp.nextElementSibling.textContent = Number(s.gain).toFixed(1) + " dB";
         updateEncoders(tftDatabase.config.encoders(s));
@@ -11818,6 +11821,14 @@ function bindTftDynamicEventListeners(key) {
         updateEncoders(tftDatabase.config.encoders(s));
         persistTftState();
         sendPreampFeedback("PHASE", s.phase ? "INVERT" : "NORMAL");
+      });
+      stateBtn?.addEventListener("click", () => {
+        s.active = !s.active;
+        applyPreampToAudio();
+        refreshPreampUi();
+        updateEncoders(tftDatabase.config.encoders(s));
+        persistTftState();
+        sendPreampFeedback("STATE", s.active ? "ACTIVE" : "BYPASS");
       });
       applyPreampToAudio();
       refreshPreampUi();
@@ -12533,7 +12544,8 @@ const channelCurveQuickSpecs = {
       {label:"GAIN", type:"fader", source:"cfgGain", format:v=>Number(v).toFixed(1)+" dB"},
       {label:"HPF", type:"fader", source:"cfgHpf", format:v=>Number(v).toFixed(0)+" Hz"},
       {label:"48V PHANTOM", type:"button", source:"cfgPhantomBtn"},
-      {label:"PHASE", type:"button", source:"cfgPhaseBtn"}
+      {label:"PHASE", type:"button", source:"cfgPhaseBtn"},
+      {label:"PREAMP STATE", type:"button", source:"cfgPreampStateBtn"}
     ]
   },
   gate: {
@@ -12702,7 +12714,7 @@ function makeChannelQuickControl(spec) {
     const labels=[...panel.querySelectorAll("label")];
     const index=labels.indexOf(label);
     const spec=channelCurveQuickSpecs.config?.controls?.[index];
-    if(!spec || (spec.source!=="cfgGain" && spec.source!=="cfgHpf")) return;
+    if(!spec || !["cfgGain","cfgHpf"].includes(spec.source)) return;
     const source=document.getElementById(spec.source);
     if(!source) return;
     source.value=e.target.value;
@@ -12714,7 +12726,7 @@ function makeChannelQuickControl(spec) {
     const btn=e.target.closest?.("button");
     if(!panel || !btn) return;
     const sourceId=btn.dataset.proxySource;
-    if(sourceId!=="cfgPhantomBtn" && sourceId!=="cfgPhaseBtn") return;
+    if(!["cfgPhantomBtn","cfgPhaseBtn","cfgPreampStateBtn"].includes(sourceId)) return;
     setTimeout(sync,0);
   },true);
   window.addEventListener("mixer:preamp-control",sync);
@@ -15408,6 +15420,6 @@ body.mixer-powered-off #tabMixerContent .mixer-side-nav .console-btn.active {
 
 /* PREAMP controls live in the channel-title popover; keep source controls hidden. */
 #tabMixerContent .preamp-source-bank{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;clip-path:inset(50%)!important;white-space:nowrap!important;pointer-events:none!important;opacity:0!important}
-#tabMixerContent .channel-quick-panel[data-channel-panel] .quick-control-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+#tabMixerContent .channel-quick-panel[data-channel-panel] .quick-control-grid{grid-template-columns:repeat(5,minmax(0,1fr))!important}
 @media(max-width:700px){#tabMixerContent .channel-quick-panel[data-channel-panel] .quick-control-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
 </style>
