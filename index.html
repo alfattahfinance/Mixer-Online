@@ -8941,7 +8941,11 @@ function updateUsbInputLevelMeter() {
 }
 function updateGainReductionMeter(root, analyser, state) {
   if (!root) return;
-  const meter = root.classList?.contains("preamp-gr-meter") ? root : root.querySelector?.(".channel-gr-meter");
+  const meter = root.classList?.contains("preamp-gr-meter")
+    ? root
+    : root.classList?.contains("channel-gr-meter")
+      ? root
+      : root.querySelector?.(".channel-gr-meter, .preamp-gr-meter");
   if (!meter) return;
   const liveDb = analyser ? readMeterDb(analyser) : -72;
   const threshold = clamp(Number(state?.thresh ?? -18), -60, 0);
@@ -8959,7 +8963,7 @@ function updateGainReductionMeter(root, analyser, state) {
   const value = meter.querySelector(".preamp-gr-value,.channel-gr-value");
   if (fill) fill.style.height = pct.toFixed(2) + "%";
   if (lamp) lamp.style.top = pct.toFixed(2) + "%";
-  if (value) value.textContent = gr.toFixed(1) + (meter.classList.contains("preamp-gr-meter") ? " dB" : "");
+  if (value) value.textContent = gr.toFixed(1) + " dB";
   if (meter.classList.contains("preamp-gr-meter")) meter.setAttribute("data-source", "CH1 COMPRESSOR");
   meter.setAttribute("aria-valuenow", gr.toFixed(1));
   meter.setAttribute("aria-valuetext", gr.toFixed(1) + " dB gain reduction");
@@ -13336,6 +13340,130 @@ function syncChannelQuickPanelsFromSources() {
 })();
 
 </script>
+
+<style id="final-channel-and-preamp-meter-fix-2026-10-02">
+/* AUTHORITATIVE CHANNEL SIGNAL + GR METERS
+   Signal = green/yellow/red input level.
+   GR = orange/red compression reduction, 0..-20 dB, independent of signal meter.
+*/
+#tabMixerContent .fader-panel-area{
+  align-items:stretch !important;
+}
+#tabMixerContent .vert-led-meter{
+  flex:0 0 9px !important;
+  width:9px !important;
+  min-width:9px !important;
+  padding:2px 1px !important;
+  gap:1px !important;
+  border:1px solid rgba(100,116,139,.55) !important;
+  border-radius:3px !important;
+  background:#03060a !important;
+  box-shadow:inset 0 0 4px rgba(0,0,0,.9) !important;
+  overflow:hidden !important;
+}
+#tabMixerContent .vert-led-meter span{
+  flex:1 1 0 !important;
+  min-height:2px !important;
+  border-radius:1px !important;
+  background:#101820 !important;
+  opacity:.9 !important;
+  transition:background .045s linear,box-shadow .045s linear !important;
+}
+#tabMixerContent .vert-led-meter span.mint.on,
+#tabMixerContent .vert-led-meter span.lime.on,
+#tabMixerContent .vert-led-meter span.green.on{
+  background:#19d27c !important;
+  box-shadow:0 0 4px rgba(25,210,124,.8) !important;
+}
+#tabMixerContent .vert-led-meter span.yellow.on{
+  background:#ffc400 !important;
+  box-shadow:0 0 5px rgba(255,196,0,.9) !important;
+}
+#tabMixerContent .vert-led-meter span.orange.on{
+  background:#ff7a00 !important;
+  box-shadow:0 0 5px rgba(255,122,0,.95) !important;
+}
+#tabMixerContent .vert-led-meter span.red.on{
+  background:#ff3030 !important;
+  box-shadow:0 0 6px rgba(255,48,48,1) !important;
+}
+#tabMixerContent .channel-gr-meter{
+  flex:0 0 16px !important;
+  width:16px !important;
+  min-width:16px !important;
+  padding:2px 1px !important;
+  gap:1px !important;
+  background:linear-gradient(180deg,#090b0f,#030507) !important;
+  border:1px solid rgba(249,115,22,.35) !important;
+  border-radius:3px !important;
+  box-shadow:inset 0 0 4px #000,0 0 3px rgba(249,115,22,.08) !important;
+}
+#tabMixerContent .channel-gr-label{
+  color:#ffb000 !important;
+  font-size:5.5px !important;
+  line-height:7px !important;
+}
+#tabMixerContent .channel-gr-track{
+  width:7px !important;
+  min-height:45px !important;
+  flex:1 1 auto !important;
+  border:1px solid rgba(148,163,184,.42) !important;
+  background:
+    repeating-linear-gradient(to bottom,rgba(255,255,255,.18) 0 1px,transparent 1px 20%),
+    linear-gradient(#181b20,#05070a) !important;
+}
+#tabMixerContent .channel-gr-fill{
+  background:linear-gradient(to bottom,#ffb000 0%,#ff7a00 45%,#ff3b30 100%) !important;
+  box-shadow:0 0 5px rgba(255,100,0,.75) !important;
+}
+#tabMixerContent .channel-gr-lamp{
+  left:-4px !important;
+  width:13px !important;
+  height:4px !important;
+  background:#46515c !important;
+}
+#tabMixerContent .channel-gr-meter.compressing .channel-gr-lamp{
+  background:#ff9d00 !important;
+  box-shadow:0 0 7px rgba(255,157,0,.95) !important;
+}
+#tabMixerContent .channel-gr-meter.heavy .channel-gr-lamp,
+#tabMixerContent .channel-gr-meter.limiting .channel-gr-lamp{
+  background:#ff3030 !important;
+  box-shadow:0 0 8px rgba(255,48,48,1) !important;
+}
+#tabMixerContent .channel-gr-value{
+  color:#ffb000 !important;
+  font:700 4.5px/6px monospace !important;
+  white-space:nowrap !important;
+}
+#tabMixerContent .preamp-gr-meter{
+  min-width:24px !important;
+}
+#tabMixerContent .preamp-gr-track{
+  background:
+    repeating-linear-gradient(to bottom,rgba(255,255,255,.2) 0 1px,transparent 1px 25%),
+    linear-gradient(#171b20,#05070a) !important;
+}
+#tabMixerContent .preamp-gr-fill{
+  background:linear-gradient(to bottom,#ffb000 0%,#ff7a00 45%,#ef3030 100%) !important;
+}
+#tabMixerContent .preamp-gr-lamp{
+  background:#46515c !important;
+}
+#tabMixerContent .preamp-gr-meter.compressing .preamp-gr-lamp{
+  background:#ff9d00 !important;
+  box-shadow:0 0 7px rgba(255,157,0,.95) !important;
+}
+#tabMixerContent .preamp-gr-meter.heavy .preamp-gr-lamp,
+#tabMixerContent .preamp-gr-meter.limiting .preamp-gr-lamp{
+  background:#ff3030 !important;
+  box-shadow:0 0 9px rgba(255,48,48,1) !important;
+}
+@media(max-width:700px){
+  #tabMixerContent .vert-led-meter{flex-basis:8px !important;width:8px !important;min-width:8px !important;}
+  #tabMixerContent .channel-gr-meter{flex-basis:14px !important;width:14px !important;min-width:14px !important;}
+}
+</style>
 </body>
 </html>
 \n
