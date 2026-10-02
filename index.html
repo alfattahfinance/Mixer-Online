@@ -9008,7 +9008,12 @@ function updateAllSignalMeters() {
   });
   const masterDbValues = masterStereoAnalysers.filter(Boolean).map(readMeterDb);
   const masterDb = masterDbValues.length ? Math.max(...masterDbValues) : -72;
-  updateStripStatusLeds(mixerStrips[4], masterDb);
+  const masterActive = (typeof mixerPowered !== "boolean" || mixerPowered)
+    && (typeof masterStripLR !== "boolean" || masterStripLR)
+    && !(typeof masterStripMuted === "boolean" && masterStripMuted);
+  updateStripStatusLeds(mixerStrips[4], masterActive ? masterDb : -72);
+  const masterMeter = document.getElementById("mixerMeter5");
+  if (masterMeter) paintMeter(masterMeter, masterActive ? masterDb : -72, "vertical");
 
   [0, 1].forEach(channelIndex => {
     const channel = audioChannels[channelIndex];
