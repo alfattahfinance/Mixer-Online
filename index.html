@@ -11593,16 +11593,49 @@ function bindTftDynamicEventListeners(key) {
       const phantomInfo = document.getElementById("cfgPhantomInfo");
       const phaseInfo = document.getElementById("cfgPhaseInfo");
       const status = document.getElementById("cfgPreampStatus");
+      let preampPersistTimer = 0;
+      let preampFeedbackTimer = 0;
       const applyPreampToAudio = () => {
         const channel = audioChannels[0];
         if (!channel || !audioContext) return;
-        if (channel.inputGain) channel.inputGain.gain.setTargetAtTime(dbToGain(Number(s.gain)) * (s.phase ? -1 : 1), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
-        if (channel.highPass) channel.highPass.frequency.setTargetAtTime(Number(s.hpf), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+        const now = audioContext.currentTime;
+        const gainDb = Number(s.gain) || 0;
+        const hpfHz = Number(s.hpf) || 20;
+        const polarity = s.phase ? -1 : 1;
+        // Audio is updated immediately; the Web Audio parameter itself is
+        // smoothed to prevent clicks while the UI remains responsive.
+        if (channel.inputGain?.gain) {
+          channel.inputGain.gain.cancelScheduledValues(now);
+          channel.inputGain.gain.setTargetAtTime(dbToGain(gainDb) * polarity, now, CONTROL_SMOOTHING_SECONDS);
+        }
+        if (channel.highPass?.frequency) {
+          channel.highPass.frequency.cancelScheduledValues(now);
+          channel.highPass.frequency.setTargetAtTime(Math.max(20, Math.min(400, hpfHz)), now, CONTROL_SMOOTHING_SECONDS);
+        }
+      };
+      const persistPreampSoon = () => {
+        clearTimeout(preampPersistTimer);
+        preampPersistTimer = setTimeout(() => {
+          try { persistTftState(); } catch (_) {}
+        }, 140);
       };
       const sendPreampFeedback = (control, value) => {
-        const packet = { type:"CONTROL", source:"PREAMP", channel:1, control, value, timestamp:Date.now() };
+        const packet = {
+          type:"CONTROL",
+          source:"PREAMP",
+          channel:1,
+          control,
+          value,
+          state:{ gain:Number(s.gain), hpf:Number(s.hpf), phantom:!!s.phantom, phase:!!s.phase },
+          timestamp:Date.now()
+        };
         try { window.dispatchEvent(new CustomEvent("mixer:preamp-control", { detail: packet })); } catch (_) {}
-        try { sendDataToESP32(JSON.stringify(packet) + "\\n"); } catch (_) {}
+        // Avoid flooding the bridge while the user drags a slider.
+        clearTimeout(preampFeedbackTimer);
+        preampFeedbackTimer = setTimeout(() => {
+          try { sendDataToESP32(JSON.stringify(packet) + "\\n"); } catch (_) {}
+          try { window.dispatchEvent(new CustomEvent("mixer:preamp-feedback", { detail: {...packet, type:"FEEDBACK"} })); } catch (_) {}
+        }, 24);
       };
       const refreshPreampUi = () => {
         if (gainVal) gainVal.textContent = Number(s.gain).toFixed(1) + " dB";
@@ -11617,10 +11650,39 @@ function bindTftDynamicEventListeners(key) {
         if (gInp) gInp.nextElementSibling.textContent = Number(s.gain).toFixed(1) + " dB";
         updateEncoders(tftDatabase.config.encoders(s));
       };
-      gInp?.addEventListener("input", () => { s.gain = Number(gInp.value); applyPreampToAudio(); refreshPreampUi(); persistTftState(); sendPreampFeedback("GAIN", s.gain); });
-      hpfInp?.addEventListener("input", () => { s.hpf = Number(hpfInp.value); applyPreampToAudio(); refreshPreampUi(); persistTftState(); sendPreampFeedback("HPF", s.hpf); });
-      phBtn?.addEventListener("click", () => { s.phantom = !s.phantom; refreshPreampUi(); persistTftState(); sendPreampFeedback("PHANTOM_48V", s.phantom); });
-      phBtn2?.addEventListener("click", () => { s.phase = !s.phase; applyPreampToAudio(); refreshPreampUi(); persistTftState(); sendPreampFeedback("PHASE", s.phase ? "INVERT" : "NORMAL"); });
+      gInp?.addEventListener("input", () => {
+        s.gain = Number(gInp.value);
+        applyPreampToAudio();
+        refreshPreampUi();
+        updateEncoders(tftDatabase.config.encoders(s));
+        persistPreampSoon();
+        sendPreampFeedback("GAIN", s.gain);
+      });
+      gInp?.addEventListener("change", () => { persistTftState(); });
+      hpfInp?.addEventListener("input", () => {
+        s.hpf = Number(hpfInp.value);
+        applyPreampToAudio();
+        refreshPreampUi();
+        updateEncoders(tftDatabase.config.encoders(s));
+        persistPreampSoon();
+        sendPreampFeedback("HPF", s.hpf);
+      });
+      hpfInp?.addEventListener("change", () => { persistTftState(); });
+      phBtn?.addEventListener("click", () => {
+        s.phantom = !s.phantom;
+        refreshPreampUi();
+        updateEncoders(tftDatabase.config.encoders(s));
+        persistTftState();
+        sendPreampFeedback("PHANTOM_48V", s.phantom);
+      });
+      phBtn2?.addEventListener("click", () => {
+        s.phase = !s.phase;
+        applyPreampToAudio();
+        refreshPreampUi();
+        updateEncoders(tftDatabase.config.encoders(s));
+        persistTftState();
+        sendPreampFeedback("PHASE", s.phase ? "INVERT" : "NORMAL");
+      });
       applyPreampToAudio();
       refreshPreampUi();
     } else if (key === "gate") {
