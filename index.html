@@ -7567,6 +7567,34 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
   transform:translate(-50%,-50%) scale(1.04);
   box-shadow:0 1px 3px #000,0 0 10px rgba(125,211,252,.55),inset 0 1px rgba(255,255,255,.9);
 }
+</style><style id="peq-axis-label-layout-2026-10-02">
+/* PEQ axis typography: keep frequency and gain titles clear of ticks/curve. */
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="peq"] .tft-module-graph-box{
+  position:relative !important;
+  overflow:hidden !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="peq"] .tft-module-graph-box svg{
+  overflow:visible !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="peq"] .tft-module-graph-box .axis-title{
+  font-size:5.5px !important;
+  font-weight:700 !important;
+  letter-spacing:.45px !important;
+  fill:#cbd5e1 !important;
+  paint-order:stroke !important;
+  stroke:#07111d !important;
+  stroke-width:1.8px !important;
+  stroke-linejoin:round !important;
+}
+#tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="peq"] .tft-module-graph-box svg text.axis-title:first-of-type{
+  transform:translateY(-1px);
+}
+@media(max-width:700px){
+  #tabMixerContent .mixer-tft-screen #tftContentArea[data-page-key="peq"] .tft-module-graph-box .axis-title{
+    font-size:5px !important;
+    letter-spacing:.25px !important;
+  }
+}
 </style></head>
 
 <body>
