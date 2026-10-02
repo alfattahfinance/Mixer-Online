@@ -9096,9 +9096,8 @@ function updateAllSignalMeters() {
   const preampRoot = document.getElementById("tftContentArea");
   if (preampRoot?.dataset?.pageKey === "config") {
     const preampDb = audioChannels[0]?.analyser ? readPeakMeterDb(audioChannels[0].analyser) : -72;
-    // The Preamp graph point is a user control point, not a live-meter cursor.
-    // Keep the hardware meter independent so audio level cannot overwrite a drag.
-    updateTftModuleCurve("config");
+    // Do not redraw the PREAMP SVG on every meter frame.
+    // The curve is redrawn only when its controls/state change; the meter loop stays lightweight.
     const preampGrMeter = document.getElementById("cfgPreampGrMeter");
     const preampActive = getMixerStripPreampState(0) && (typeof mixerPowered !== "boolean" || mixerPowered);
     if (preampGrMeter) {
@@ -9159,10 +9158,7 @@ function updateAllSignalMeters() {
     if (glow) glow.style.height = pct.toFixed(2) + "%";
     if (value) value.textContent = gr.toFixed(1) + " dB";
   }
-  updateTftMetersFromAudio();
-  requestAnimationFrame(updateAllSignalMeters);
 }
-requestAnimationFrame(updateAllSignalMeters);
 
 
 /* =========================================================
