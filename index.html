@@ -9862,13 +9862,14 @@ async function activateUsbAudioInput() {
       echoCancellation:false,
       noiseSuppression:false,
       autoGainControl:false,
-      channelCount:{ideal:2}
+      channelCount:{ideal:2},
+      latency:{ideal:0.01}
     };
     try {
       usbInputStream=await navigator.mediaDevices.getUserMedia({audio:exact});
     } catch (err) {
       // Fall back to an ideal stereo request for browsers that reject exact channel constraints.
-      usbInputStream=await navigator.mediaDevices.getUserMedia({audio:{deviceId:{exact:selectedInput.deviceId},echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2}}});
+      usbInputStream=await navigator.mediaDevices.getUserMedia({audio:{deviceId:{exact:selectedInput.deviceId},echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2},latency:{ideal:0.01}}});
     }
 
     const activeTrack=usbInputStream.getAudioTracks()[0];
@@ -10019,7 +10020,7 @@ if (physicalInputDevice) physicalInputDevice.addEventListener("change", async ()
       usbInputStream=null;
       usbInputSource=null;
     }
-    usbInputStream=await navigator.mediaDevices.getUserMedia({audio:{deviceId:{exact:id},echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2}}});
+    usbInputStream=await navigator.mediaDevices.getUserMedia({audio:{deviceId:{exact:id},echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2},latency:{ideal:0.01}}});
     const activeTrack=usbInputStream.getAudioTracks()[0];
     const activeChannelCount=Number(activeTrack?.getSettings?.().channelCount || 0);
     usbAudioInputDeviceId=activeTrack?.getSettings?.().deviceId || id;
@@ -10146,7 +10147,7 @@ const echoToggleBtn = document.getElementById("echoToggleBtn");
 function createAudioContext() {
   if (!audioContext) {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    audioContext = new AudioContextClass({ latencyHint: "balanced" });
+    try { audioContext = new AudioContextClass({ latencyHint: "interactive", sampleRate: 48000 }); } catch (err) { audioContext = new AudioContextClass({ latencyHint: "interactive" }); }
   }
   if (audioContext.state === "suspended") audioContext.resume();
   return audioContext;
