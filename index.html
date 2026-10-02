@@ -7669,6 +7669,109 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
     grid-template-columns:repeat(2,minmax(0,1fr)) !important;
   }
 }
+</style><style id="gate-fullscreen-final-2026-10-02">
+/* FINAL GATE SCREEN: fill the actual TFT display, while keeping controls visible. */
+#tabMixerContent .mixer-workspace-main{
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+}
+#tabMixerContent .mixer-top-console,
+#tabMixerContent .mixer-tft-screen,
+#tabMixerContent .tft-main-viewport,
+#tabMixerContent .tft-content-screen{
+  min-width:0 !important;
+  min-height:0 !important;
+  max-width:none !important;
+  max-height:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"]{
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+  padding:0 !important;
+  margin:0 !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-view{
+  display:grid !important;
+  grid-template-rows:minmax(0,1fr) auto !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  gap:5px !important;
+  padding:4px !important;
+  margin:0 !important;
+  overflow:hidden !important;
+  box-sizing:border-box !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box{
+  grid-row:1 !important;
+  width:100% !important;
+  height:auto !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  max-width:none !important;
+  max-height:none !important;
+  margin:0 !important;
+  padding:0 !important;
+  align-self:stretch !important;
+  overflow:hidden !important;
+  box-sizing:border-box !important;
+  flex:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] #tftGateSvgContainer{
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  max-width:none !important;
+  min-height:0 !important;
+  max-height:none !important;
+  preserveAspectRatio:none;
+  touch-action:none !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-controls-grid{
+  grid-row:2 !important;
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  width:100% !important;
+  min-width:0 !important;
+  min-height:48px !important;
+  max-height:64px !important;
+  margin:0 !important;
+  gap:5px !important;
+  overflow:visible !important;
+  box-sizing:border-box !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-controls-grid > .tft-mod-ctrl{
+  min-width:0 !important;
+  min-height:44px !important;
+  padding:4px 7px !important;
+  box-sizing:border-box !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-controls-grid input[type="range"]{
+  width:100% !important;
+  min-width:0 !important;
+  touch-action:none !important;
+}
+@media (orientation:landscape) and (min-width:701px){
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-view{padding:3px 6px !important;gap:4px !important}
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-controls-grid{min-height:50px !important;max-height:58px !important}
+}
+@media (max-width:700px){
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-view{padding:3px !important}
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-controls-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    min-height:82px !important;
+    max-height:90px !important;
+  }
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-controls-grid > .tft-mod-ctrl:nth-child(3){
+    grid-column:1 / -1 !important;
+  }
+}
 </style></head>
 
 <body>
@@ -10223,7 +10326,7 @@ const tftDatabase = {
     content: (s) => `
       <div class="tft-module-view curve-native-view">
         <div class="tft-module-graph-box" id="tftGateBox">
-          <svg id="tftGateSvgContainer" viewBox="0 0 320 120" preserveAspectRatio="xMidYMid meet" style="width:100%; height:100%; touch-action:none;" role="img" aria-label="Gate input level versus output level">
+          <svg id="tftGateSvgContainer" viewBox="0 0 320 120" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;" role="img" aria-label="Gate input level versus output level">
             <g class="tft-transfer-grid" aria-hidden="true">
               <line x1="10" y1="15" x2="310" y2="15"/><line x1="10" y1="30" x2="310" y2="30"/>
               <line x1="10" y1="45" x2="310" y2="45"/><line x1="10" y1="60" x2="310" y2="60"/>
