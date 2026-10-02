@@ -10069,6 +10069,25 @@ const audioChannels = [
 const eqChannelMuted = [false, false];
 const eqChannelSolo = [false, false];
 
+// Per-channel PREAMP power state for the three functional mixer channels.
+// Each channel has its own ACTIVE/BYPASS state; it must never proxy CH1 only.
+const mixerStripPreampActive = [true, true, true, true];
+function getMixerStripPreampState(index) {
+  return mixerStripPreampActive[index] !== false;
+}
+function setMixerStripPreampState(index, active) {
+  if (index < 0 || index >= mixerStripPreampActive.length) return;
+  mixerStripPreampActive[index] = !!active;
+  const strip = document.querySelectorAll("#tabMixerContent .mixer-desk-surface .console-channel-strip")[index];
+  const title = strip?.querySelector(".channel-title-trigger");
+  if (strip) strip.dataset.preampActive = String(!!active);
+  if (title) {
+    title.classList.toggle("preamp-active", !!active);
+    title.setAttribute("aria-pressed", String(!!active));
+  }
+  updateMixerStripControls();
+}
+
 function buildEqualizerChannel(channelIndex) {
   const channel = channels[channelIndex];
   const gainControl = channel.querySelector(".gain");
@@ -10221,7 +10240,7 @@ function updateMixerStripControls() {
     const db = Number(fader.value);
     readout.textContent = db.toFixed(1) + " dB";
     const allowedBySolo = !anySolo || mixerStripSolo[index];
-    const gain = (mixerStripMuted[index] || !allowedBySolo) ? 0 : dbToGain(db);
+    const gain = (mixerStripMuted[index] || !allowedBySolo || !getMixerStripPreampState(index)) ? 0 : dbToGain(db);
 
     if (mixerStripGains[index]) {
       mixerStripGains[index].gain.setTargetAtTime(
@@ -12881,6 +12900,26 @@ function channelQuickFormatSource(spec, source) {
 }
 
 function syncChannelQuickControl(item, spec) {
+  // PREAMP STATE is channel-local for CH1–CH4. Do not mirror CH1's hidden
+  // source button into every channel popup.
+  if (spec.source === "cfgPreampStateBtn") {
+    const strip = item.closest(".console-channel-strip");
+    const channelNo = Number(strip?.querySelector(".channel-title-trigger")?.dataset.channelTitle || 0);
+    if (channelNo >= 1 && channelNo <= mixerStripPreampActive.length) {
+      const active = getMixerStripPreampState(channelNo - 1);
+      const btn = item.querySelector("button");
+      const output = item.querySelector("output");
+      if (btn) {
+        btn.textContent = active ? "ACTIVE" : "BYPASS";
+        btn.classList.toggle("active-action", active);
+        btn.classList.toggle("geq-bypass", !active);
+        btn.setAttribute("aria-pressed", String(active));
+        btn.setAttribute("aria-label", active ? "Channel PREAMP Active" : "Channel PREAMP Bypass");
+      }
+      if (output) output.textContent = active ? "ACTIVE" : "BYPASS";
+      return;
+    }
+  }
   const source=document.getElementById(spec.source);
   if (!source) return;
   const output=item.querySelector("output");
@@ -12962,6 +13001,18 @@ function bindChannelQuickProxy(item, spec) {
     proxyBtn.dataset.proxyBound="1";
     proxyBtn.addEventListener("click",e=>{
       e.preventDefault(); e.stopPropagation();
+
+      if (spec.source === "cfgPreampStateBtn") {
+        const strip = item.closest(".console-channel-strip");
+        const channelNo = Number(strip?.querySelector(".channel-title-trigger")?.dataset.channelTitle || 0);
+        if (channelNo >= 1 && channelNo <= mixerStripPreampActive.length) {
+          setMixerStripPreampState(channelNo - 1, !getMixerStripPreampState(channelNo - 1));
+          syncChannelQuickControl(item, spec);
+          window.setTimeout(syncChannelQuickPanelsFromSources, 0);
+          return;
+        }
+      }
+
       source.click();
       window.setTimeout(sync, 0);
       window.setTimeout(syncChannelQuickPanelsFromSources, 0);
@@ -13016,7 +13067,19 @@ function makeChannelQuickControl(spec) {
     const btn=e.target.closest?.("button");
     if(!panel || !btn) return;
     const sourceId=btn.dataset.proxySource;
-    if(!["cfgPhantomBtn","cfgPhaseBtn","cfgPreampStateBtn"].includes(sourceId)) return;
+    if(!["cfgPhantomBtn","cfgPhaseBtn"].includes(sourceId)) {
+      if (sourceId === "cfgPreampStateBtn") {
+        const strip = panel.closest(".console-channel-strip");
+        const channelNo = Number(strip?.querySelector(".channel-title-trigger")?.dataset.channelTitle || 0);
+        if (channelNo >= 1 && channelNo <= mixerStripPreampActive.length) {
+          setTimeout(()=>syncChannelQuickControl(
+            panel.querySelector('.quick-control-grid [data-proxy-source="cfgPreampStateBtn"]') || panel.querySelector(".quick-button-wrap"),
+            {source:"cfgPreampStateBtn", type:"button"}
+          ),0);
+        }
+      }
+      return;
+    }
     setTimeout(sync,0);
   },true);
   window.addEventListener("mixer:preamp-control",sync);
