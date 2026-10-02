@@ -9914,7 +9914,9 @@ async function activateUsbAudioInput() {
     return true;
   } catch(err) {
     if (usbInputStream) {
+      usbInputSplitter?.disconnect();
       usbInputSource?.disconnect();
+      usbInputSplitter=null;
       usbInputStream.getTracks().forEach(track=>track.stop());
       usbInputStream=null;
       usbInputSource=null;
@@ -9993,7 +9995,9 @@ if (physicalInputDevice) physicalInputDevice.addEventListener("change", async ()
   const id = physicalInputDevice.value || "";
   if (!id) {
     if (usbInputStream) {
+      usbInputSplitter?.disconnect();
       usbInputSource?.disconnect();
+      usbInputSplitter=null;
       usbInputStream.getTracks().forEach(track=>track.stop());
       usbInputStream=null;
       usbInputSource=null;
@@ -10008,24 +10012,39 @@ if (physicalInputDevice) physicalInputDevice.addEventListener("change", async ()
   if (!audioContext) createAudioContext();
   try {
     if (usbInputStream) {
+      usbInputSplitter?.disconnect();
       usbInputSource?.disconnect();
+      usbInputSplitter=null;
       usbInputStream.getTracks().forEach(track=>track.stop());
       usbInputStream=null;
       usbInputSource=null;
     }
     usbInputStream=await navigator.mediaDevices.getUserMedia({audio:{deviceId:{exact:id},echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2}}});
     const activeTrack=usbInputStream.getAudioTracks()[0];
+    const activeChannelCount=Number(activeTrack?.getSettings?.().channelCount || 0);
     usbAudioInputDeviceId=activeTrack?.getSettings?.().deviceId || id;
     usbAudioInputLabel=String(physicalInputDevice.selectedOptions?.[0]?.textContent || "").trim();
+    usbAudioConnected=true;
     usbInputSource=audioContext.createMediaStreamSource(usbInputStream);
     if (!usbInputAnalyser) { usbInputAnalyser=audioContext.createAnalyser(); usbInputAnalyser.fftSize=1024; usbInputAnalyser.smoothingTimeConstant=.08; }
     usbInputSource.connect(usbInputAnalyser);
-    // PRE-FADER channel meter tap: measure the actual USB input, not the fader.
-    usbInputSource.connect(mixerStripInputAnalysers[0] || mixerStripGains[0]);
-    usbInputSource.connect(mixerStripGains[0]);
-    setAudioStatus("INPUT AKTIF: "+(physicalInputDevice.selectedOptions?.[0]?.textContent || "Audio input"));
+
+    usbInputSplitter=audioContext.createChannelSplitter(2);
+    usbInputSplitter.channelCount=2;
+    usbInputSplitter.channelCountMode="explicit";
+    usbInputSource.connect(usbInputSplitter);
+    usbInputSplitter.connect(mixerStripInputAnalysers[0],0);
+    usbInputSplitter.connect(mixerStripGains[0],0);
+    if (activeChannelCount >= 2) {
+      usbInputSplitter.connect(mixerStripInputAnalysers[1],1);
+      usbInputSplitter.connect(mixerStripGains[1],1);
+    }
+    setAudioStatus(activeChannelCount >= 2
+      ? "2-IN AKTIF: USB IN 1 → CH1 · USB IN 2 → CH2 · 2-OUT L/R"
+      : "1-IN AKTIF: USB IN 1 → CH1 · CH2 menunggu INPUT 2 · 2-OUT siap");
     updateUsbInputLevelMeter();
   } catch(err) {
+    usbAudioConnected=false;
     setAudioStatus("INPUT gagal dipilih: "+(err?.message || "perangkat tidak tersedia."));
   }
 });
@@ -10033,7 +10052,9 @@ if (navigator.mediaDevices?.addEventListener) navigator.mediaDevices.addEventLis
   const hadUsb = usbAudioConnected;
   await refreshPhysicalInputDevices();
   if (hadUsb && !usbAudioConnected && usbInputStream) {
+    usbInputSplitter?.disconnect();
     usbInputSource?.disconnect();
+    usbInputSplitter=null;
     usbInputSource=null;
     usbInputStream.getTracks().forEach(track=>track.stop());
     usbInputConnectedMeterReset();
