@@ -8855,15 +8855,21 @@ function updateTftMetersFromAudio() {
   const root = document.getElementById('tftContentArea');
   if (!root || root.dataset.pageKey !== 'meters') return;
   const s = tftStatesData.meters;
-  const left = s.source === 0 ? masterStereoAnalysers[0] : (mixerStripAnalysers[0] || audioChannels[0]?.analyser);
-  const right = s.source === 0 ? masterStereoAnalysers[1] : (mixerStripAnalysers[1] || audioChannels[1]?.analyser);
+  // RTA/METERS follows the same real signal flow as the console:
+  // POST-EQ MAIN = Main L/R; PRE-EQ INPUT = CH1/CH2 input meter taps.
+  const left = s.source === 0
+    ? masterStereoAnalysers[0]
+    : (mixerStripInputAnalysers[0] || audioChannels[0]?.analyser);
+  const right = s.source === 0
+    ? masterStereoAnalysers[1]
+    : (mixerStripInputAnalysers[1] || audioChannels[1]?.analyser);
   const now = performance.now();
   const tracks = root.querySelectorAll('.tft-digital-meter .meter-track');
   const bars = root.querySelectorAll('.tft-digital-meter .meter-track i');
   const labels = root.querySelectorAll('.tft-digital-meter strong');
   const dbToPct = db => Math.max(0, Math.min(100, ((db + 60) / 60) * 100));
   [left, right].forEach((analyser, i) => {
-    const db = analyser ? readMeterDb(analyser) : -72;
+    const db = analyser ? readPeakMeterDb(analyser) : -72;
     const track = tracks[i], bar = bars[i], label = labels[i];
     const meterCard = root.querySelectorAll('.tft-digital-meter')[i];
     if (db >= tftMeterPeakDb[i]) {
@@ -8876,7 +8882,8 @@ function updateTftMetersFromAudio() {
     const livePct = dbToPct(db);
     // Smooth the visible L/R bar independently: quick attack, gentle release.
     const previousPct = tftMeterVisualLevels[i] || 0;
-    const alpha = livePct > previousPct ? 0.48 : 0.16;
+    // Fast attack/release so the RTA meter visibly follows live audio.
+    const alpha = livePct > previousPct ? 0.86 : 0.42;
     const shownPct = previousPct + (livePct - previousPct) * alpha;
     tftMeterVisualLevels[i] = shownPct < 0.15 ? 0 : shownPct;
     if (meterCard) meterCard.style.setProperty('--meter-card-level', tftMeterVisualLevels[i] + '%');
@@ -9144,7 +9151,7 @@ function updateAllSignalMeters() {
 
   masterStereoAnalysers.forEach((analyser, channelIndex) => {
     if (!analyser) return;
-    const db = readMeterDb(analyser);
+    const db = readPeakMeterDb(analyser);
     paintMeter(document.getElementById(channelIndex === 0 ? "tftMeterL" : "tftMeterR"), db, "horizontal");
     const readout = document.getElementById(channelIndex === 0 ? "tftMeterLVal" : "tftMeterRVal");
     if (readout) readout.textContent = db <= -70 ? "-inf dB" : db.toFixed(1) + " dB";
@@ -10380,7 +10387,12 @@ function initializeAudioGraph() {
   outputMuteGainNode.gain.value = outputMuted ? 0 : 1;
 
   outputMergerNode = audioContext.createChannelMerger(2);
+  // Each mono mixer channel feeds the stereo Main LR bus.
+  // Do not hard-pan CH1 to L and CH2 to R: both channels must appear on
+  // both Main L and Main R meters, just like a centered mono mixer channel.
   audioChannels[0].analyser.connect(outputMergerNode, 0, 0);
+  audioChannels[0].analyser.connect(outputMergerNode, 0, 1);
+  audioChannels[1].analyser.connect(outputMergerNode, 0, 0);
   audioChannels[1].analyser.connect(outputMergerNode, 0, 1);
   
   outputMergerNode.connect(tftPeqFilter);
@@ -10545,7 +10557,11 @@ function rebuildAudioRouting() {
   // ---------------- MAIN LR ----------------
   // CH1/CH2 DSP outputs feed the stereo Main LR bus.
   // FX RETURN/CH4 joins the same Main LR bus above.
+  // CH1 + CH2 both feed Main L/R; channel faders control level,
+  // but the meter source remains the actual signal path.
   audioChannels[0].analyser.connect(outputMergerNode, 0, 0);
+  audioChannels[0].analyser.connect(outputMergerNode, 0, 1);
+  audioChannels[1].analyser.connect(outputMergerNode, 0, 0);
   audioChannels[1].analyser.connect(outputMergerNode, 0, 1);
 }
 
