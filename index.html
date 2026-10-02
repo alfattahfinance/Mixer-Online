@@ -3970,7 +3970,18 @@ body.mixer-powered-off #tabMixerContent .mixer-tft-screen .master-combined-meter
 #tabMixerContent .preamp-graph-card{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;background:#20262d;border:1px solid #59616a;border-radius:5px;padding:5px;overflow:hidden;}
 #tabMixerContent .preamp-graph-head{display:flex;justify-content:space-between;align-items:center;gap:6px;color:#dbe4ec;font-size:9px;padding:0 2px 3px;}
 #tabMixerContent .preamp-graph-head span{color:#38bdf8;font-weight:800;}
-#tabMixerContent .preamp-graph-wrap{position:relative;flex:1 1 auto;min-height:0;width:100%;overflow:hidden;}
+#tabMixerContent .preamp-graph-wrap{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 24px;gap:5px;flex:1 1 auto;min-height:0;width:100%;overflow:hidden;}
+#tabMixerContent .preamp-gr-meter{position:relative;min-width:20px;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:10px 2px 25px;border-left:1px solid rgba(148,163,184,.22);box-sizing:border-box;color:#94a3b8;font-size:5px;font-weight:800;user-select:none;}
+#tabMixerContent .preamp-gr-meter .gr-title{color:#fb923c;font-size:6px;letter-spacing:.5px;writing-mode:vertical-rl;transform:rotate(180deg);margin-bottom:2px;}
+#tabMixerContent .preamp-gr-track{position:absolute;top:25px;bottom:29px;right:7px;width:5px;border:1px solid rgba(148,163,184,.38);border-radius:4px;background:repeating-linear-gradient(to bottom,rgba(148,163,184,.18) 0 1px,transparent 1px 25%);overflow:hidden;}
+#tabMixerContent .preamp-gr-fill{position:absolute;left:0;right:0;top:0;height:0%;background:linear-gradient(to bottom,#f97316 0 55%,#ef4444 55% 100%);box-shadow:0 0 7px rgba(249,115,22,.7);transition:height .08s linear;}
+#tabMixerContent .preamp-gr-lamp{position:absolute;left:50%;top:0%;width:11px;height:4px;transform:translate(-50%,-50%);border-radius:3px;background:#fb923c;box-shadow:0 0 4px rgba(251,146,60,.95),0 0 9px rgba(239,68,68,.45);transition:top .08s linear;opacity:.3;}
+#tabMixerContent .preamp-gr-meter.compressing .preamp-gr-lamp{opacity:1;}
+#tabMixerContent .preamp-gr-meter.heavy .preamp-gr-lamp{background:#ef4444;box-shadow:0 0 5px rgba(239,68,68,1),0 0 11px rgba(239,68,68,.65);}
+#tabMixerContent .preamp-gr-scale{position:absolute;top:23px;bottom:27px;left:1px;display:flex;flex-direction:column;justify-content:space-between;line-height:1;}
+#tabMixerContent .preamp-gr-value{position:absolute;bottom:6px;right:2px;color:#fb923c;font-size:5.5px;white-space:nowrap;}
+#tabMixerContent .preamp-gr-note{position:absolute;bottom:0;right:2px;color:#64748b;font-size:4.5px;white-space:nowrap;}
+@media(max-width:600px){#tabMixerContent .preamp-graph-wrap{grid-template-columns:minmax(0,1fr) 21px;gap:3px;}#tabMixerContent .preamp-gr-meter{font-size:4.5px;padding-left:1px;padding-right:1px;}#tabMixerContent .preamp-gr-title{font-size:5.5px;}}
 #tabMixerContent #cfgPreampGraph{display:block;width:100%;height:100%;min-height:0;overflow:visible;touch-action:none;}
 #tabMixerContent .preamp-graph-plot{fill:rgba(8,15,22,.42);stroke:rgba(148,163,184,.35);stroke-width:.8;}
 #tabMixerContent .preamp-graph-grid line{stroke:rgba(148,163,184,.20);stroke-width:.55;vector-effect:non-scaling-stroke;}
@@ -10918,6 +10929,14 @@ const tftDatabase = {
               </g>
             </svg>
           </div>
+          <div id="cfgPreampGrMeter" class="preamp-gr-meter" role="meter" aria-label="Preamp gain reduction meter" aria-valuemin="-20" aria-valuemax="0" aria-valuenow="0" aria-valuetext="0.0 dB gain reduction">
+            <span class="gr-title">GR</span>
+            <div class="preamp-gr-scale" aria-hidden="true"><span>0</span><span>-5</span><span>-10</span><span>-15</span><span>-20</span></div>
+            <div class="preamp-gr-track" aria-hidden="true"><i id="cfgPreampGrFill" class="preamp-gr-fill"></i><b id="cfgPreampGrLamp" class="preamp-gr-lamp"></b></div>
+            <strong id="cfgPreampGrValue" class="preamp-gr-value">0.0 dB</strong>
+            <small class="preamp-gr-note">REDUCTION</small>
+          </div>
+          </div>
           <div class="preamp-graph-readout">
             <span id="cfgPreampGraphInput">INPUT -60.0 dB</span>
             <b id="cfgPreampGraphOutput">OUTPUT -48.0 dB</b>
@@ -11477,6 +11496,22 @@ function updateTftModuleCurve(key) {
     const inRead = document.getElementById("cfgPreampGraphInput");
     const outRead = document.getElementById("cfgPreampGraphOutput");
     const graphStatus = document.getElementById("cfgPreampGraphStatus");
+    const grMeter = document.getElementById("cfgPreampGrMeter");
+    const grFill = document.getElementById("cfgPreampGrFill");
+    const grLamp = document.getElementById("cfgPreampGrLamp");
+    const grValue = document.getElementById("cfgPreampGrValue");
+    const gr = s.active ? Math.min(0, gain) : 0;
+    const grPct = Math.max(0, Math.min(100, (-gr / 20) * 100));
+    if (grMeter) {
+      grMeter.style.setProperty("--gr-level", grPct.toFixed(2) + "%");
+      grMeter.setAttribute("aria-valuenow", gr.toFixed(1));
+      grMeter.setAttribute("aria-valuetext", gr.toFixed(1) + " dB gain reduction");
+      grMeter.classList.toggle("compressing", gr < -0.15);
+      grMeter.classList.toggle("heavy", gr <= -10);
+    }
+    if (grFill) grFill.style.height = grPct.toFixed(2) + "%";
+    if (grLamp) grLamp.style.top = grPct.toFixed(2) + "%";
+    if (grValue) grValue.textContent = gr.toFixed(1) + " dB";
     if (inRead) inRead.textContent = "INPUT " + controlInput.toFixed(1) + " dB";
     if (outRead) outRead.textContent = "OUTPUT " + controlOutput.toFixed(1) + " dB";
     if (graphStatus) graphStatus.textContent = (s.active ? "ACTIVE" : "BYPASS") + " • GAIN " + gain.toFixed(1) + " dB • 1 CONTROL POINT";
