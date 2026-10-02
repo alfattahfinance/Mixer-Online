@@ -7512,7 +7512,41 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 }
 #tabMixerContent #tftContentArea[data-page-key="sends"] .tft-geq-grid { filter:drop-shadow(0 0 1px rgba(0,255,204,.18)); }
 </style>
-</head>
+<style id="geq-real-fader-2026-10-02">
+/* Real mixer-style GEQ: no curve, only 31 vertical faders. */
+#tabMixerContent .geq-fader-view{display:flex;flex-direction:column;min-height:0;height:100%;gap:8px}
+#tabMixerContent .geq-hardware-header{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border:1px solid rgba(148,163,184,.28);border-radius:7px;background:linear-gradient(180deg,rgba(30,41,59,.9),rgba(5,10,18,.94));box-shadow:inset 0 1px rgba(255,255,255,.08)}
+#tabMixerContent .geq-hardware-header strong{display:block;letter-spacing:1.4px;font-size:12px;color:#dbeafe}
+#tabMixerContent .geq-hardware-header small{display:block;margin-top:2px;font-size:8px;letter-spacing:1px;color:#94a3b8}
+#tabMixerContent .geq-live-led{display:flex;align-items:center;gap:5px;font-size:8px;font-weight:800;color:#94a3b8}
+#tabMixerContent .geq-live-led i{width:7px;height:7px;border-radius:50%;background:#475569;box-shadow:0 0 4px rgba(71,85,105,.5)}
+#tabMixerContent .geq-live-led.on{color:#86efac}.geq-live-led.on i{background:#22c55e;box-shadow:0 0 9px #22c55e}
+#tabMixerContent .geq-fader-console{position:relative;display:flex;min-height:0;flex:1;overflow:hidden;border:1px solid rgba(148,163,184,.26);border-radius:8px;background:linear-gradient(180deg,#0b111b,#070b12);box-shadow:inset 0 0 25px rgba(0,0,0,.65)}
+#tabMixerContent .geq-db-ruler{width:32px;flex:0 0 32px;display:flex;flex-direction:column;justify-content:space-between;padding:18px 3px 29px 2px;color:#64748b;font:700 7px/1 Arial;text-align:right;border-right:1px solid rgba(148,163,184,.16)}
+#tabMixerContent .geq-fader-bank{display:flex;align-items:stretch;gap:2px;overflow-x:auto;overflow-y:hidden;padding:12px 8px 5px;flex:1;min-width:0;scrollbar-width:thin;touch-action:pan-x}
+#tabMixerContent .geq-fader-strip{position:relative;flex:0 0 42px;min-width:42px;height:100%;display:flex;flex-direction:column;align-items:center}
+#tabMixerContent .geq-fader-value{height:15px;font:700 7px/15px Arial;color:#dbeafe;white-space:nowrap;text-shadow:0 0 5px rgba(56,189,248,.4)}
+#tabMixerContent .geq-fader-body{position:relative;flex:1;width:34px;min-height:110px;border-radius:4px;background:linear-gradient(90deg,#080d15,#17202d,#080d15);border:1px solid rgba(148,163,184,.22);box-shadow:inset 0 0 8px rgba(0,0,0,.8)}
+#tabMixerContent .geq-fader-body:before{content:"";position:absolute;left:50%;top:7px;bottom:7px;width:4px;transform:translateX(-50%);border-radius:3px;background:linear-gradient(180deg,#1e293b,#64748b 50%,#1e293b);box-shadow:0 0 3px rgba(148,163,184,.25)}
+#tabMixerContent .geq-fader-scale{position:absolute;inset:6px 2px;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none;color:#475569;font:600 5px/1 Arial}
+#tabMixerContent .geq-fader-scale span{text-align:right}
+#tabMixerContent .geq-band-fader{position:absolute!important;z-index:3;left:50%;top:2px;width:calc(100% - 4px)!important;height:calc(100% - 4px)!important;transform:translateX(-50%);margin:0!important;opacity:1!important;background:transparent!important;writing-mode:vertical-lr;direction:rtl;appearance:none;-webkit-appearance:none;cursor:ns-resize;touch-action:none}
+#tabMixerContent .geq-band-fader::-webkit-slider-runnable-track{width:5px;height:100%;background:transparent;border:0}
+#tabMixerContent .geq-band-fader::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:27px;height:11px;border-radius:3px;background:linear-gradient(180deg,#f8fafc,#94a3b8 48%,#475569);border:1px solid #e2e8f0;box-shadow:0 1px 3px #000,0 0 6px rgba(125,211,252,.22);margin-left:0}
+#tabMixerContent .geq-band-fader::-moz-range-track{width:5px;height:100%;background:transparent;border:0}
+#tabMixerContent .geq-band-fader::-moz-range-thumb{width:27px;height:11px;border-radius:3px;background:linear-gradient(180deg,#f8fafc,#94a3b8 48%,#475569);border:1px solid #e2e8f0;box-shadow:0 1px 3px #000,0 0 6px rgba(125,211,252,.22)}
+#tabMixerContent .geq-fader-cap{height:17px;width:30px;margin-top:-1px;position:relative;z-index:4;pointer-events:none}
+#tabMixerContent .geq-fader-cap span{display:block;width:28px;height:6px;margin:5px auto;background:linear-gradient(180deg,#e2e8f0,#64748b);border:1px solid #cbd5e1;border-radius:2px;box-shadow:0 1px 3px #000}
+#tabMixerContent .geq-fader-freq{height:20px;font:700 7px/20px Arial;color:#cbd5e1;white-space:nowrap;text-align:center}
+#tabMixerContent .geq-fader-hint{text-align:center;color:#64748b;font-size:7px;letter-spacing:1px;min-height:12px}
+#tabMixerContent .geq-bottom-controls{flex:0 0 auto}
+@media(max-width:700px){
+  #tabMixerContent .geq-fader-strip{flex-basis:39px;min-width:39px}
+  #tabMixerContent .geq-fader-body{width:31px}
+  #tabMixerContent .geq-fader-bank{gap:1px;padding-left:5px;padding-right:5px}
+  #tabMixerContent .geq-hardware-header strong{font-size:10px}
+}
+</style></head>
 
 <body>
   <main class="app">
@@ -10208,47 +10242,41 @@ const tftDatabase = {
     title: "SQ-7 GRAPHIC EQUALIZER (GEQ)",
     footerCh: "Current: Master GEQ",
     footerSt: "Next: 31-Band GEQ Graphic",
-    content: (s) => `
-      <div class="tft-module-view curve-native-view">
-        <div class="tft-module-graph-box" id="tftSendsBox">
-          <svg id="tftSendsSvgContainer" viewBox="0 0 320 120" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;">
-            <g class="tft-geq-grid" stroke="#334155" stroke-width=".7" opacity=".7">
-              <line x1="0" y1="15" x2="320" y2="15" />
-              <line x1="0" y1="30" x2="320" y2="30" />
-              <line x1="0" y1="60" x2="320" y2="60" stroke="#64748b" stroke-width="1.2" />
-              <line x1="0" y1="75" x2="320" y2="75" />
-              <line x1="0" y1="105" x2="320" y2="105" />
-              <line x1="16" y1="0" x2="16" y2="65" /><line x1="48" y1="0" x2="48" y2="65" />
-              <line x1="80" y1="0" x2="80" y2="65" /><line x1="112" y1="0" x2="112" y2="65" />
-              <line x1="144" y1="0" x2="144" y2="65" /><line x1="176" y1="0" x2="176" y2="65" />
-              <line x1="208" y1="0" x2="208" y2="65" /><line x1="240" y1="0" x2="240" y2="65" />
-              <line x1="272" y1="0" x2="272" y2="65" /><line x1="304" y1="0" x2="304" y2="65" />
-            </g>
-            <g class="tft-geq-scale" aria-hidden="true">
-              <text x="317" y="17" text-anchor="end">+15</text><text x="317" y="62" text-anchor="end">0</text><text x="317" y="116" text-anchor="end">-15</text>
-            </g>
-            <path id="tftSendsSvgFill" d="" fill="#a855f7" opacity=".16"/>
-            <path id="tftSendsSvgCurve" d="" fill="none" stroke="#d8b4fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <path id="tftSendsSvgCurveHit" d="" fill="none" stroke="transparent" stroke-width="14" stroke-linecap="round" pointer-events="stroke"/>
-            <g id="tftSendsBands" class="tft-geq-band-points" aria-label="31 GEQ bands"></g>
-            <g class="tft-geq-freq-labels" aria-hidden="true">
-              <text x="8" y="64">20</text><text x="44" y="64">50</text><text x="73" y="64">100</text>
-              <text x="104" y="64">200</text><text x="134" y="64">500</text><text x="160" y="64">1k</text>
-              <text x="190" y="64">2k</text><text x="221" y="64">5k</text><text x="251" y="64">10k</text>
-              <text x="289" y="64">20k Hz</text>
-              <text class="axis-title" x="232" y="6" text-anchor="middle">FREQUENCY (Hz)</text>
-              <text class="axis-title" x="7" y="34" text-anchor="middle" transform="rotate(-90 7 34)">GAIN (dB)</text>
-            </g>
-            <text x="10" y="7" fill="#94a3b8" font-size="5.2">31-BAND GRAPHIC EQ · DRAG BANDS VERTICALLY</text>
-          </svg>
+    content: (s) => {
+      const freqs = [20,25,31.5,40,50,63,80,100,125,160,200,250,315,400,500,630,800,1000,1250,1600,2000,2500,3150,4000,5000,6300,8000,10000,12500,16000,20000];
+      const labels = ["20","25","31.5","40","50","63","80","100","125","160","200","250","315","400","500","630","800","1k","1.25k","1.6k","2k","2.5k","3.15k","4k","5k","6.3k","8k","10k","12.5k","16k","20k"];
+      const bands = Array.isArray(s.bands) && s.bands.length === 31 ? s.bands : new Array(31).fill(0);
+      const faders = freqs.map((freq, i) => {
+        const value = Number(bands[i] || 0);
+        const total = value + Number(s.lvl || 0);
+        return `<div class="geq-fader-strip" data-geq-band="${i}">
+          <div class="geq-fader-value" id="geqBandVal${i}">${total >= 0 ? "+" : ""}${total.toFixed(1)} dB</div>
+          <div class="geq-fader-body">
+            <div class="geq-fader-scale"><span>+15</span><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-15</span></div>
+            <input class="geq-band-fader" id="geqBand${i}" type="range" min="-15" max="15" step="0.1" value="${value}" aria-label="GEQ ${freq} Hz" data-band-index="${i}">
+          </div>
+          <div class="geq-fader-cap" aria-hidden="true"><span></span></div>
+          <div class="geq-fader-freq">${labels[i]}</div>
+        </div>`;
+      }).join("");
+      return `
+      <div class="tft-module-view geq-fader-view">
+        <div class="geq-hardware-header">
+          <div><strong>SQ-7 GRAPHIC EQUALIZER</strong><small>31-BAND MOTOR FADER • ±15 dB</small></div>
+          <div class="geq-live-led ${s.state ? "on" : ""}"><i></i>${s.state ? "ACTIVE" : "BYPASS"}</div>
         </div>
-        <div class="tft-module-controls-grid">
-          <div class="tft-mod-ctrl"><label>GEQ Master</label><input type="range" id="send1Lvl" min="-15" max="15" step="0.1" value="${s.lvl}"><span class="tft-val-disp" id="send1LvlVal">${s.lvl}dB</span></div>
+        <div class="geq-fader-console">
+          <div class="geq-db-ruler" aria-hidden="true"><span>+15</span><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-15</span></div>
+          <div class="geq-fader-bank" id="tftSendsFaderBank" aria-label="31 band graphic equalizer faders">${faders}</div>
+        </div>
+        <div class="geq-fader-hint">DRAG FADERS VERTICALLY • EACH BAND ±15 dB • MASTER OFFSET ${Number(s.lvl || 0).toFixed(1)} dB</div>
+        <div class="tft-module-controls-grid geq-bottom-controls">
+          <div class="tft-mod-ctrl"><label>GEQ Master</label><input type="range" id="send1Lvl" min="-15" max="15" step="0.1" value="${s.lvl}"><span class="tft-val-disp" id="send1LvlVal">${Number(s.lvl).toFixed(1)}dB</span></div>
           <div class="tft-mod-ctrl"><label>Preset GEQ</label><select id="geqPresetSel"><option ${s.preset===0?'selected':''}>Flat</option><option ${s.preset===1?'selected':''}>Vocal Boost</option><option ${s.preset===2?'selected':''}>Music V-Shape</option></select></div>
           <div class="tft-mod-ctrl"><label>GEQ State</label><button id="geqStateBtn" class="${s.state ? 'active-action' : ''}" type="button">${s.state ? 'ACTIVE' : 'BYPASS'}</button></div>
         </div>
-      </div>
-    `,
+      </div>`;
+    },
     encoders: (s) => [{name:"GEQ", val:"31-BAND"}, {name:"MODE", val:"MASTER"}, {name:"BYPASS", val:s.state?"OFF":"ON"}, {name:"PRESET", val:["Flat","Vocal","Music"][s.preset]}, {name:"RTA", val:"ON"}, {name:"GAIN", val:`${s.lvl}dB`}]
   },
   main: {
@@ -10602,71 +10630,24 @@ function updateTftModuleCurve(key) {
       [dbToX(0), dbToY(compOut(0))]
     ];
   } else if (key === "sends") {
-    // True 31-band GEQ: each band has its own gain, while GEQ Master is a
-    // global offset. Frequencies are positioned logarithmically.
-    const geqFrequencies = [20,25,31.5,40,50,63,80,100,125,160,200,250,315,400,500,630,800,1000,1250,1600,2000,2500,3150,4000,5000,6300,8000,10000,12500,16000,20000];
-    const presetBands = s.preset === 1
-      ? [-2,-2,-1,0,1,2,3,3,2,1,0,1,2,3,3,2,1,0,-1,-2,-2,-1,0,1,1,0,-1,-2,-2,-2,-2]
-      : s.preset === 2
-        ? [-4,-3,-2,0,3,5,4,2,0,-1,-2,-2,-1,0,1,2,3,4,5,4,3,1,-1,-2,-1,0,2,4,3,1,0]
-        : new Array(31).fill(0);
-    if (!Array.isArray(s.bands) || s.bands.length !== 31) s.bands = presetBands.slice();
-    const x0 = 8, x1 = 312, span = x1 - x0;
-    const logMin = Math.log10(20), logMax = Math.log10(20000);
-    const points31 = s.bands.map((gain, index) => {
-      const totalGain = Number(gain || 0) + Number(s.lvl || 0);
-      const x = x0 + ((Math.log10(geqFrequencies[index]) - logMin) / (logMax - logMin)) * span;
-      const y = s.state ? clamp(60 - totalGain * 3, 15, 105) : 60;
-      return [x, y];
+    // GEQ is intentionally rendered as real mixer-style vertical faders.
+    // Keep the data model and preset engine, but never draw a transfer curve.
+    const bands = Array.isArray(s.bands) && s.bands.length === 31 ? s.bands : new Array(31).fill(0);
+    bands.forEach((gain, index) => {
+      const fader = document.getElementById("geqBand" + index);
+      const value = document.getElementById("geqBandVal" + index);
+      if (fader) fader.value = String(clamp(Number(gain) || 0, -15, 15));
+      const total = (Number(gain) || 0) + Number(s.lvl || 0);
+      if (value) value.textContent = (total >= 0 ? "+" : "") + total.toFixed(1) + " dB";
     });
-    points = points31;
-    const bandsRoot = document.getElementById("tftSendsBands");
-    if (bandsRoot) {
-      points.forEach(([x,y], index) => {
-        let circle = bandsRoot.querySelector('[data-band-index="' + index + '"]');
-        if (!circle) {
-          circle = document.createElementNS("http://www.w3.org/2000/svg","circle");
-          circle.setAttribute("class","tft-geq-band-dot");
-          circle.dataset.bandIndex = String(index);
-          circle.setAttribute("tabindex","0");
-          circle.setAttribute("role","slider");
-          circle.setAttribute("aria-valuemin","-15");
-          circle.setAttribute("aria-valuemax","15");
-          bandsRoot.appendChild(circle);
-        }
-        circle.setAttribute("cx", x.toFixed(2));
-        circle.setAttribute("cy", y.toFixed(2));
-        circle.setAttribute("r", index % 5 === 0 ? "3.4" : "2.6");
-        circle.setAttribute("aria-label", geqFrequencies[index] + " Hz GEQ band");
-        circle.setAttribute("aria-valuenow", (Number(s.bands[index] || 0) + Number(s.lvl || 0)).toFixed(1));
-      });
-      // Keep exactly 31 stable interactive band nodes.
-      Array.from(bandsRoot.children).slice(31).forEach(node => node.remove());
-
-      // Dedicated transparent touch targets live in a separate top SVG layer.
-      // The visual neon dots remain unchanged; touch never depends on their
-      // small radius or SVG filter/glow.
-      let hitRoot = document.getElementById("tftSendsBandHits");
-      if (!hitRoot) {
-        hitRoot = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        hitRoot.setAttribute("id", "tftSendsBandHits");
-        hitRoot.setAttribute("class", "tft-geq-band-hits");
-        hitRoot.setAttribute("aria-hidden", "true");
-        svg.appendChild(hitRoot);
-      }
-      points.forEach(([x,y], index) => {
-        let hit = hitRoot.querySelector('[data-band-index="' + index + '"]');
-        if (!hit) {
-          hit = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-          hit.setAttribute("class", "tft-geq-band-hit");
-          hit.dataset.bandIndex = String(index);
-          hit.setAttribute("pointer-events", "all");
-          hitRoot.appendChild(hit);
-        }
-        hit.setAttribute("cx", x.toFixed(2));
-        hit.setAttribute("cy", y.toFixed(2));
-        hit.setAttribute("r", "10");
-      });
+    const master = document.getElementById("send1Lvl");
+    const masterVal = document.getElementById("send1LvlVal");
+    if (master) master.value = String(clamp(Number(s.lvl) || 0, -15, 15));
+    if (masterVal) masterVal.textContent = (Number(s.lvl) >= 0 ? "+" : "") + Number(s.lvl || 0).toFixed(1) + "dB";
+    const stateBtn = document.getElementById("geqStateBtn");
+    if (stateBtn) {
+      stateBtn.textContent = s.state ? "ACTIVE" : "BYPASS";
+      stateBtn.classList.toggle("active-action", !!s.state);
     }
   } else if (key === "main") {
     const y1 = clamp(35 - ((s.send+50)/56)*25,8,58);
@@ -11063,7 +11044,26 @@ function bindTftDynamicEventListeners(key) {
       const lvlInp = document.getElementById("send1Lvl");
       const presetSel = document.getElementById("geqPresetSel");
       const stBtn = document.getElementById("geqStateBtn");
-      lvlInp?.addEventListener("input", () => { s.lvl = Number(lvlInp.value); document.getElementById("send1LvlVal").textContent = s.lvl + "dB"; updateEncoders(tftDatabase.sends.encoders(s)); updateTftModuleCurve("sends"); });
+      lvlInp?.addEventListener("input", () => {
+        s.lvl = Number(lvlInp.value);
+        document.getElementById("send1LvlVal").textContent = s.lvl.toFixed(1) + "dB";
+        updateEncoders(tftDatabase.sends.encoders(s));
+        updateTftModuleCurve("sends");
+        persistTftState();
+      });
+      document.querySelectorAll(".geq-band-fader").forEach(fader => {
+        fader.addEventListener("input", () => {
+          const index = Number(fader.dataset.bandIndex);
+          if (!Number.isInteger(index)) return;
+          s.bands[index] = Number(fader.value);
+          const total = s.bands[index] + Number(s.lvl || 0);
+          const val = document.getElementById("geqBandVal" + index);
+          if (val) val.textContent = (total >= 0 ? "+" : "") + total.toFixed(1) + " dB";
+          updateEncoders(tftDatabase.sends.encoders(s));
+          updateTftModuleCurve("sends");
+        });
+        fader.addEventListener("change", () => persistTftState());
+      });
       presetSel?.addEventListener("change", () => {
         s.preset = presetSel.selectedIndex;
         const presetBands = s.preset === 1
