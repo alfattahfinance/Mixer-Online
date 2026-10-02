@@ -10386,7 +10386,22 @@ function initializeAudioGraph() {
   masterGainNode.gain.value = dbToGain(getSafeMasterGainDb());
   outputMuteGainNode.gain.value = outputMuted ? 0 : 1;
 
+  // MAIN LR is explicitly a 2-channel stereo output bus: L + R.
+  // Keep this fixed so page/DSP/routing changes cannot collapse it to mono.
   outputMergerNode = audioContext.createChannelMerger(2);
+  try {
+    outputMergerNode.channelCount = 2;
+    outputMergerNode.channelCountMode = "explicit";
+    outputMergerNode.channelInterpretation = "speakers";
+  } catch (err) {}
+
+  // The browser output is also explicitly stereo (2 output channels).
+  try {
+    audioContext.destination.channelCount = 2;
+    audioContext.destination.channelCountMode = "explicit";
+    audioContext.destination.channelInterpretation = "speakers";
+  } catch (err) {}
+
   // Each mono mixer channel feeds the stereo Main LR bus.
   // Do not hard-pan CH1 to L and CH2 to R: both channels must appear on
   // both Main L and Main R meters, just like a centered mono mixer channel.
