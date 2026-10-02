@@ -8779,7 +8779,7 @@ function updateMasterStereoMeters() {
 
   masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
 }
-updateMasterStereoMeters();
+requestAnimationFrame(updateMasterStereoMeters);
 
 /* Update channel, EQ and TFT meters from live Web Audio analyser data.
    Horizontal bars light left-to-right; vertical LED ladders light bottom-up. */
