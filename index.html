@@ -8916,8 +8916,29 @@ function updateStripStatusLeds(strip, db) {
   if (!strip) return;
   const sig = strip.querySelector('[data-led="sig"]');
   const clip = strip.querySelector('[data-led="clip"]');
-  if (sig) sig.classList.toggle("on", Number.isFinite(db) && db > -48);
-  if (clip) clip.classList.toggle("on", Number.isFinite(db) && db >= -1);
+  const index = Array.from(document.querySelectorAll(".mixer-desk-surface .console-channel-strip")).indexOf(strip);
+  const isMaster = strip.classList.contains("master-strip");
+  const powered = typeof mixerPowered === "boolean" ? mixerPowered : true;
+  const channelActive = isMaster
+    ? (typeof masterStripLR === "boolean" ? masterStripLR : true) && !(typeof masterStripMuted === "boolean" && masterStripMuted)
+    : getMixerStripPreampState(Math.max(0, index));
+  const muted = !isMaster && Array.isArray(mixerStripMuted) ? !!mixerStripMuted[index] : false;
+  const finiteDb = Number.isFinite(db);
+  const hasSignal = powered && channelActive && !muted && finiteDb && db > -48;
+  const isClip = powered && channelActive && !muted && finiteDb && db >= -1;
+
+  if (sig) {
+    sig.classList.toggle("on", hasSignal);
+    sig.classList.toggle("inactive", !powered || !channelActive || muted);
+    sig.setAttribute("aria-pressed", String(hasSignal));
+    sig.setAttribute("aria-label", hasSignal ? "Signal aktif" : "Tidak ada sinyal");
+  }
+  if (clip) {
+    clip.classList.toggle("on", isClip);
+    clip.classList.toggle("inactive", !powered || !channelActive || muted);
+    clip.setAttribute("aria-pressed", String(isClip));
+    clip.setAttribute("aria-label", isClip ? "Clipping terdeteksi" : "Tidak clip");
+  }
 }
 function usbInputConnectedMeterReset() {
   const bar=document.getElementById("usbInputLevelBar");
@@ -8976,8 +8997,13 @@ function updateAllSignalMeters() {
   const mixerStrips = Array.from(document.querySelectorAll(".mixer-desk-surface .console-channel-strip"));
   mixerStripAnalysers.forEach((analyser, index) => {
     const db = analyser ? readMeterDb(analyser) : -72;
-    updateStripStatusLeds(mixerStrips[index], db);
-    paintMeter(document.getElementById("mixerMeter" + (index + 1)), db, "vertical");
+    const strip = mixerStrips[index];
+    const active = strip?.classList.contains("master-strip")
+      ? ((typeof masterStripLR === "boolean" ? masterStripLR : true) && !(typeof masterStripMuted === "boolean" && masterStripMuted))
+      : (getMixerStripPreampState(index) && !(mixerStripMuted?.[index]));
+    const displayDb = (typeof mixerPowered === "boolean" && !mixerPowered) || !active ? -72 : db;
+    updateStripStatusLeds(strip, displayDb);
+    paintMeter(document.getElementById("mixerMeter" + (index + 1)), displayDb, "vertical");
 
   });
   const masterDbValues = masterStereoAnalysers.filter(Boolean).map(readMeterDb);
