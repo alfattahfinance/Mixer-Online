@@ -10477,8 +10477,15 @@ function rebuildAudioRouting() {
   try { mixerStripGains[3]?.disconnect(); } catch (err) {}
   try { alesisDelayNode.disconnect(); } catch (err) {}
 
+  // Remove old Main LR DSP taps before rebuilding, so repeated FX/routing
+  // changes never stack duplicate signal paths.
+  try { audioChannels[0].analyser.disconnect(outputMergerNode); } catch (err) {}
+  try { audioChannels[1].analyser.disconnect(outputMergerNode); } catch (err) {}
+
   // ---------------- CH1 / CH2 MAIN INPUTS ----------------
   // Each channel has its own DSP path. Do NOT combine CH1 + CH2 before DSP.
+  try { mixerStripGains[0].disconnect(audioChannels[0].inputGain); } catch (err) {}
+  try { mixerStripGains[1].disconnect(audioChannels[1].inputGain); } catch (err) {}
   mixerStripGains[0].connect(audioChannels[0].inputGain);
   mixerStripGains[1].connect(audioChannels[1].inputGain);
 
