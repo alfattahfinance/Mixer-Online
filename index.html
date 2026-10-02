@@ -9796,11 +9796,8 @@ async function activateUsbAudioInput() {
     return false;
   }
   try {
-    const ctx=createAudioContext();
-    if (ctx.state==="suspended") await ctx.resume();
-    initializeAudioGraph();
-
-    // USB-ONLY: jangan pernah membuka getUserMedia() tanpa deviceId.
+    // USB-ONLY: enumerate first so we can bind the Web Audio output sink
+    // to the physical USB interface before creating the audio graph.
     // Permintaan audio generik Android dapat memilih mic bawaan HP.
     const devices=await navigator.mediaDevices.enumerateDevices();
     const inputs=devices.filter(d=>d.kind==="audioinput");
@@ -9808,10 +9805,18 @@ async function activateUsbAudioInput() {
     updateIoConnectionStatus(inputs,outputs);
 
     const usbOutput=outputs.find(isLikelyUsbAudioDevice);
-    if (usbOutput && physicalOutputDevice) {
-      physicalOutputDevice.value=usbOutput.deviceId;
+    if (usbOutput) {
       usbAudioOutputDeviceId=usbOutput.deviceId;
       usbAudioOutputLabel=String(usbOutput.label||"").trim();
+      if (physicalOutputDevice) physicalOutputDevice.value=usbOutput.deviceId;
+      if (physicalOutputDeviceTop) physicalOutputDeviceTop.value=usbOutput.deviceId;
+    }
+
+    // Create the graph only after the preferred USB output is known.
+    const ctx=createAudioContext(usbAudioOutputDeviceId);
+    if (ctx.state==="suspended") await ctx.resume();
+    initializeAudioGraph();
+    if (usbAudioOutputDeviceId) {
       try { await applyPhysicalOutputDevice(); } catch {}
     }
 
@@ -9980,19 +9985,32 @@ async function updateChargerStatus() {
 }
 
 async function applyPhysicalOutputDevice() {
-  const requestedId = physicalOutputDevice?.value || "";
-  if (!audioContext || typeof audioContext.setSinkId !== "function") {
-    updateIoConnectionStatus([],[]);
-    return false;
+  const requestedId = physicalOutputDevice?.value || usbAudioOutputDeviceId || "";
+  if (!audioContext) return false;
+
+  // Some browsers bind the sink only at AudioContext construction time.
+  // Others expose setSinkId() and allow live switching. Support both.
+  if (requestedId && typeof audioContext.setSinkId === "function") {
+    try {
+      await audioContext.setSinkId(requestedId);
+      usbAudioOutputDeviceId = requestedId;
+      setAudioStatus("USB AUDIO OUTPUT aktif → interface fisik.");
+      return true;
+    } catch (err) {
+      setAudioStatus("USB OUTPUT gagal dipilih: " + (err?.message || "perangkat tidak tersedia."));
+      return false;
+    }
   }
-  try {
-    await audioContext.setSinkId(requestedId);
-    setAudioStatus(requestedId ? "Output USB/audio aktif." : "Output default aktif.");
+
+  if (!requestedId) {
+    setAudioStatus("Output default aktif.");
     return true;
-  } catch (err) {
-    setAudioStatus("Output USB/audio gagal dipilih: " + (err?.message || "perangkat tidak tersedia."));
-    return false;
   }
+
+  // If setSinkId is unavailable, the browser/Android OS owns the output route.
+  // Do not pretend the USB output was selected.
+  setAudioStatus("Browser tidak mendukung pemilihan USB OUTPUT langsung; gunakan output USB sebagai perangkat audio sistem.");
+  return false;
 }
 
 const startAudioButton = document.getElementById("startAudioButton");
@@ -10179,10 +10197,20 @@ const echoDamping = document.getElementById("echoDamping");
 const echoMix = document.getElementById("echoMix");
 const echoToggleBtn = document.getElementById("echoToggleBtn");
 
-function createAudioContext() {
+function createAudioContext(preferredSinkId = "") {
   if (!audioContext) {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    try { audioContext = new AudioContextClass({ latencyHint: "interactive", sampleRate: 48000 }); } catch (err) { audioContext = new AudioContextClass({ latencyHint: "interactive" }); }
+    const sinkId = String(preferredSinkId || "").trim();
+    const baseOptions = { latencyHint: "interactive", sampleRate: 48000 };
+    // Chromium supports AudioContext sinkId on browsers that expose it.
+    // Prefer the selected USB interface at construction time so the first
+    // rendered audio frame already targets the physical interface.
+    try {
+      audioContext = new AudioContextClass(sinkId ? { ...baseOptions, sinkId } : baseOptions);
+    } catch (err) {
+      try { audioContext = new AudioContextClass({ latencyHint: "interactive" }); }
+      catch (_) { audioContext = new AudioContextClass(); }
+    }
   }
   if (audioContext.state === "suspended") audioContext.resume();
   return audioContext;
