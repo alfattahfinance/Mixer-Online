@@ -8753,45 +8753,71 @@ let audioGraphReady = false;
 let masterStereoAnalysers = [null, null];
 let masterStereoMeterBuffers = [new Float32Array(1024), new Float32Array(1024)];
 let masterStereoMeterFrame = null;
+let masterStereoMeterHeartbeat = 0;
+let masterStereoMeterWatchdog = null;
+let masterStereoMeterBusy = false;
 
-function updateMasterStereoMeters() {
-  // Keep every mixer/fader/master meter on the same continuous animation loop.
-  // Do this BEFORE the master readiness guard so channel meters cannot freeze
-  // while the master graph is still being initialized or temporarily rebuilt.
-  if (typeof updateAllSignalMeters === "function") updateAllSignalMeters();
-
-  if (!audioGraphReady || !masterStereoAnalysers.every(Boolean)) {
-    updateTftMetersFromAudio();
-    masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
-    return;
-  }
-
-  masterStereoAnalysers.forEach((analyser, channel) => {
-    const db = readPeakMeterDb(analyser);
-    const meter = document.getElementById(channel === 0 ? "masterMeterL" : "masterMeterR");
-    paintMeter(meter, db, "vertical");
-  });
-
-  if (masterMeterAnalyser) {
-    const db = readPeakMeterDb(masterMeterAnalyser);
-    paintMeter(document.getElementById("masterMeterCombined"), db, "vertical");
-  }
-
-  // Keep TFT meters on the same single visual loop; never create a second RAF loop.
-  updateTftMetersFromAudio();
+function scheduleMasterStereoMeterLoop() {
+  // The meter loop is independent from TFT/page rendering. A page change may
+  // replace #tftContentArea, but it must never cancel the live channel→master meters.
+  if (masterStereoMeterFrame) return;
   masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
 }
-masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
 
-// Keep Web Audio alive when the user changes mixer pages or the browser briefly
-// changes visibility. Page navigation must never stop the meter refresh loop.
+function updateMasterStereoMeters() {
+  if (masterStereoMeterBusy) {
+    scheduleMasterStereoMeterLoop();
+    return;
+  }
+  masterStereoMeterBusy = true;
+  try {
+    // Always update channel/input meters first. They are intentionally
+    // independent of the currently selected PAGES or CHANNEL DSP screen.
+    if (typeof updateAllSignalMeters === "function") updateAllSignalMeters();
+
+    if (audioGraphReady && masterStereoAnalysers.every(Boolean)) {
+      masterStereoAnalysers.forEach((analyser, channel) => {
+        const db = readPeakMeterDb(analyser);
+        paintMeter(document.getElementById(channel === 0 ? "masterMeterL" : "masterMeterR"), db, "vertical");
+      });
+
+      if (masterMeterAnalyser) {
+        paintMeter(document.getElementById("masterMeterCombined"), readPeakMeterDb(masterMeterAnalyser), "vertical");
+      }
+    }
+
+    // TFT/RTA is optional UI. If it fails during a page transition, the
+    // channel/master meter loop must continue running.
+    try { updateTftMetersFromAudio(); } catch (err) {
+      console.warn("TFT meter render:", err);
+    }
+    masterStereoMeterHeartbeat = performance.now();
+  } catch (err) {
+    // A transient DOM/page-render error must never kill the meter scheduler.
+    console.warn("Mixer meter loop:", err);
+  } finally {
+    masterStereoMeterBusy = false;
+    masterStereoMeterFrame = null;
+    scheduleMasterStereoMeterLoop();
+  }
+}
+
+scheduleMasterStereoMeterLoop();
+
+// Watchdog: if a page transition/browser rendering hiccup leaves the RAF chain
+// without a frame, restart it automatically. Audio routing is never touched.
+masterStereoMeterWatchdog = window.setInterval(() => {
+  const age = performance.now() - masterStereoMeterHeartbeat;
+  if (!masterStereoMeterFrame || age > 250) scheduleMasterStereoMeterLoop();
+}, 250);
+
+// Keep Web Audio alive when the browser changes visibility. Internal mixer-page
+// navigation is handled by the independent scheduler above.
 document.addEventListener("visibilitychange", () => {
   if (audioContext && audioContext.state === "suspended") {
     audioContext.resume().catch(() => {});
   }
-  if (!masterStereoMeterFrame) {
-    masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
-  }
+  scheduleMasterStereoMeterLoop();
 });
 
 /* Update channel, EQ and TFT meters from live Web Audio analyser data.
