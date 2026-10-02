@@ -8755,23 +8755,28 @@ let masterStereoMeterBuffers = [new Float32Array(1024), new Float32Array(1024)];
 let masterStereoMeterFrame = null;
 
 function updateMasterStereoMeters() {
+  // Keep every mixer/fader/master meter on the same continuous animation loop.
+  // Do this BEFORE the master readiness guard so channel meters cannot freeze
+  // while the master graph is still being initialized or temporarily rebuilt.
+  if (typeof updateAllSignalMeters === "function") updateAllSignalMeters();
+
   if (!audioGraphReady || !masterStereoAnalysers.every(Boolean)) {
     updateTftMetersFromAudio();
-  masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
+    masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
     return;
   }
+
   masterStereoAnalysers.forEach((analyser, channel) => {
-    const db = readMeterDb(analyser);
+    const db = readPeakMeterDb(analyser);
     const meter = document.getElementById(channel === 0 ? "masterMeterL" : "masterMeterR");
     paintMeter(meter, db, "vertical");
   });
+
   if (masterMeterAnalyser) {
-    const db = readMeterDb(masterMeterAnalyser);
+    const db = readPeakMeterDb(masterMeterAnalyser);
     paintMeter(document.getElementById("masterMeterCombined"), db, "vertical");
   }
-  // Channel SIG/CLIP + vertical channel meters must update continuously,
-  // not only after the mixer power-up self-test.
-  if (typeof updateAllSignalMeters === "function") updateAllSignalMeters();
+
   masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
 }
 updateMasterStereoMeters();
@@ -9042,7 +9047,7 @@ function updateAllSignalMeters() {
     paintMeter(document.getElementById("mixerMeter" + (index + 1)), displayDb, "vertical");
 
   });
-  const masterDbValues = masterStereoAnalysers.filter(Boolean).map(readMeterDb);
+  const masterDbValues = masterStereoAnalysers.filter(Boolean).map(readPeakMeterDb);
   const masterDb = masterDbValues.length ? Math.max(...masterDbValues) : -72;
   const masterActive = (typeof mixerPowered !== "boolean" || mixerPowered)
     && (typeof masterStripLR !== "boolean" || masterStripLR)
@@ -9054,7 +9059,7 @@ function updateAllSignalMeters() {
   [0, 1].forEach(channelIndex => {
     const channel = audioChannels[channelIndex];
     if (!channel || !channel.analyser) return;
-    const db = readMeterDb(channel.analyser);
+    const db = readPeakMeterDb(channel.analyser);
     const eqMeter = channels[channelIndex]?.querySelector(".meter");
     if (eqMeter) {
       if (!eqMeter.children.length) {
