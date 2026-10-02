@@ -7530,11 +7530,69 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 #tabMixerContent .geq-fader-body:before{content:"";position:absolute;left:50%;top:7px;bottom:7px;width:4px;transform:translateX(-50%);border-radius:3px;background:linear-gradient(180deg,#1e293b,#64748b 50%,#1e293b);box-shadow:0 0 3px rgba(148,163,184,.25)}
 #tabMixerContent .geq-fader-scale{position:absolute;inset:6px 2px;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none;color:#475569;font:600 5px/1 Arial}
 #tabMixerContent .geq-fader-scale span{text-align:right}
-#tabMixerContent .geq-band-fader{position:absolute!important;z-index:3;left:50%;top:2px;width:calc(100% - 4px)!important;height:calc(100% - 4px)!important;transform:translateX(-50%);margin:0!important;opacity:1!important;background:transparent!important;writing-mode:vertical-lr;direction:rtl;appearance:none;-webkit-appearance:none;cursor:ns-resize;touch-action:none}
-#tabMixerContent .geq-band-fader::-webkit-slider-runnable-track{width:5px;height:100%;background:transparent;border:0}
-#tabMixerContent .geq-band-fader::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:27px;height:11px;border-radius:3px;background:linear-gradient(180deg,#f8fafc,#94a3b8 48%,#475569);border:1px solid #e2e8f0;box-shadow:0 1px 3px #000,0 0 6px rgba(125,211,252,.22);margin-left:0}
-#tabMixerContent .geq-band-fader::-moz-range-track{width:5px;height:100%;background:transparent;border:0}
-#tabMixerContent .geq-band-fader::-moz-range-thumb{width:27px;height:11px;border-radius:3px;background:linear-gradient(180deg,#f8fafc,#94a3b8 48%,#475569);border:1px solid #e2e8f0;box-shadow:0 1px 3px #000,0 0 6px rgba(125,211,252,.22)}
+#tabMixerContent .geq-band-fader{
+  position:absolute!important;
+  z-index:3;
+  left:50%!important;
+  top:50%!important;
+  width:calc(100% - 10px)!important;
+  height:30px!important;
+  transform:translate(-50%,-50%) rotate(-90deg)!important;
+  transform-origin:center center!important;
+  margin:0!important;
+  padding:0!important;
+  opacity:1!important;
+  background:transparent!important;
+  appearance:none!important;
+  -webkit-appearance:none!important;
+  cursor:ns-resize;
+  touch-action:none;
+}
+#tabMixerContent .geq-band-fader::-webkit-slider-runnable-track{
+  width:100%!important;
+  height:5px!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:3px;
+}
+#tabMixerContent .geq-band-fader::-webkit-slider-thumb{
+  -webkit-appearance:none!important;
+  appearance:none!important;
+  width:11px!important;
+  height:28px!important;
+  margin:0!important;
+  border-radius:3px!important;
+  background:linear-gradient(90deg,#475569 0%,#cbd5e1 42%,#f8fafc 50%,#94a3b8 58%,#475569 100%)!important;
+  border:1px solid #e2e8f0!important;
+  box-shadow:0 1px 3px #000,0 0 6px rgba(125,211,252,.28)!important;
+}
+#tabMixerContent .geq-band-fader::-moz-range-track{
+  width:100%!important;
+  height:5px!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:3px;
+}
+#tabMixerContent .geq-band-fader::-moz-range-thumb{
+  width:11px!important;
+  height:28px!important;
+  border-radius:3px!important;
+  background:linear-gradient(90deg,#475569 0%,#cbd5e1 42%,#f8fafc 50%,#94a3b8 58%,#475569 100%)!important;
+  border:1px solid #e2e8f0!important;
+  box-shadow:0 1px 3px #000,0 0 6px rgba(125,211,252,.28)!important;
+}
+#tabMixerContent .geq-fader-body:after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:7px;
+  bottom:7px;
+  width:28px;
+  transform:translateX(-50%);
+  pointer-events:none;
+  border-top:1px solid rgba(255,255,255,.07);
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
 #tabMixerContent .geq-fader-cap{height:17px;width:30px;margin-top:-1px;position:relative;z-index:4;pointer-events:none}
 #tabMixerContent .geq-fader-cap span{display:block;width:28px;height:6px;margin:5px auto;background:linear-gradient(180deg,#e2e8f0,#64748b);border:1px solid #cbd5e1;border-radius:2px;box-shadow:0 1px 3px #000}
 #tabMixerContent .geq-fader-freq{height:20px;font:700 7px/20px Arial;color:#cbd5e1;white-space:nowrap;text-align:center}
