@@ -9073,7 +9073,9 @@ function updateAllSignalMeters() {
     // Channel-strip GR must read the corresponding mixer strip analyser.
     // audioChannels only contains the EQ page's two processing channels,
     // so using it here made CH3/CH4 GR appear frozen at 0 dB.
-    const analyser = mixerStripAnalysers[index] || audioChannels[index]?.analyser || null;
+    // Fader-mounted GR must follow the signal at this mixer strip.
+    // Do not use the PREAMP/EQ analyser here: that is a different DSP point.
+    const analyser = mixerStripAnalysers[index] || null;
     const active = getMixerStripPreampState(index) && !(mixerStripMuted?.[index]);
     if (!active || (typeof mixerPowered === "boolean" && !mixerPowered)) {
       meter.dataset.channelGrDb = "0";
