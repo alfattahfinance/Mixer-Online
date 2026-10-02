@@ -13775,6 +13775,98 @@ function syncChannelQuickPanelsFromSources() {
   #tabMixerContent .channel-gr-meter{flex-basis:14px !important;width:14px !important;min-width:14px !important;}
 }
 </style>
+
+<script id="channel-panel-live-link-2026-10-02">
+/* CHANNEL TITLE PANEL — LIVE DSP LINK / LIVE-SAFE CONTROL
+   The title-panel controls are UI proxies for the same DSP source controls
+   used by the TFT curve. This bridge only synchronizes values/state; it never
+   creates a second audio path. */
+(function bindChannelTitleLiveLink(){
+  const root=document.getElementById("tabMixerContent");
+  if(!root || root.dataset.channelTitleLiveLink==="1") return;
+  root.dataset.channelTitleLiveLink="1";
+
+  const getChannel=(el)=>{
+    const strip=el?.closest?.(".console-channel-strip");
+    return Number(strip?.querySelector(".channel-title-trigger")?.dataset.channelTitle||0);
+  };
+
+  const updateLiveCurve=()=>{
+    try{
+      const key=document.getElementById("tftContentArea")?.dataset?.pageKey||"";
+      if(key==="eq" && typeof updateTftPeqVisuals==="function") updateTftPeqVisuals();
+      else if((key==="config"||key==="gate"||key==="dynamics"||key==="sends") &&
+              typeof updateTftModuleCurve==="function") updateTftModuleCurve(key);
+      if(typeof syncChannelQuickPanelsFromSources==="function") syncChannelQuickPanelsFromSources();
+      if(typeof updateEncoders==="function"){
+        const db=window.tftDatabase?.[key];
+        const state=window.tftStatesData?.[key];
+        if(db && state) updateEncoders(typeof db.encoders==="function" ? db.encoders(state) : db.encoders);
+      }
+    }catch(_){}
+  };
+
+  root.addEventListener("click",(event)=>{
+    const title=event.target instanceof Element ? event.target.closest(".channel-title-trigger") : null;
+    if(!title || !root.contains(title)) return;
+    const ch=getChannel(title);
+    if(ch<1) return;
+
+    /* Keep the selected channel explicit for the live UI. Existing audio/DSP
+       routing remains unchanged, so selecting a title cannot reroute audio. */
+    window.__mixerActiveChannel=ch;
+    root.dataset.activeChannel=String(ch);
+    root.querySelectorAll(".console-channel-strip:not(.master-strip)").forEach(strip=>{
+      strip.classList.toggle("channel-panel-selected",getChannel(strip)===ch);
+    });
+
+    const footer=document.getElementById("tftFooterChannel");
+    if(footer){
+      const current=footer.textContent||"";
+      if(current) footer.dataset.baseChannelText=current;
+      const base=footer.dataset.baseChannelText||current;
+      footer.textContent="CH "+ch+" • "+base.replace(/^Current:\s*/i,"");
+    }
+  },true);
+
+  /* Repaint the real curve immediately after a title-panel control changes.
+     Existing proxy handlers remain authoritative for the actual parameter. */
+  root.addEventListener("input",(event)=>{
+    const input=event.target instanceof Element
+      ? event.target.closest(".channel-quick-panel input[type=range]")
+      : null;
+    if(!input || !root.contains(input)) return;
+    const ch=getChannel(input);
+    if(ch>0){
+      window.__mixerActiveChannel=ch;
+      root.dataset.activeChannel=String(ch);
+    }
+    requestAnimationFrame(updateLiveCurve);
+  },true);
+
+  root.addEventListener("change",(event)=>{
+    const input=event.target instanceof Element
+      ? event.target.closest(".channel-quick-panel input[type=range]")
+      : null;
+    if(!input || !root.contains(input)) return;
+    requestAnimationFrame(updateLiveCurve);
+  },true);
+
+  /* Keep the title-panel readouts aligned after a direct fader move, scene
+     recall, preset recall, or another source-control change. */
+  const refresh=()=>{
+    try{
+      if(typeof refreshChannelQuickPanels==="function") refreshChannelQuickPanels();
+      if(typeof syncChannelQuickPanelsFromSources==="function") syncChannelQuickPanelsFromSources();
+    }catch(_){}
+  };
+  window.addEventListener("mixer:preamp-control",refresh);
+  window.addEventListener("mixer:preamp-point",refresh);
+  window.addEventListener("mixer:scene-recalled",refresh);
+  window.addEventListener("mixer:preset-recalled",refresh);
+  window.setTimeout(refresh,0);
+})();
+</script>
 </body>
 </html>
 \n
