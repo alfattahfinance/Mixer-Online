@@ -8636,12 +8636,7 @@ function updateAllSignalMeters() {
   });
   const preampRoot = document.getElementById("tftContentArea");
   if (preampRoot?.dataset?.pageKey === "config") {
-    const preampMeter = document.getElementById("cfgPreampLevel");
     const preampDb = audioChannels[0]?.analyser ? readMeterDb(audioChannels[0].analyser) : -72;
-    if (preampMeter) {
-      const pct = Math.max(0, Math.min(100, ((preampDb + 60) / 60) * 100));
-      preampMeter.style.height = pct.toFixed(2) + "%";
-    }
     const preampSegments = document.querySelectorAll("#cfgPreampSegments [data-meter-seg]");
     if (preampSegments.length) {
       const pct = Math.max(0, Math.min(100, ((preampDb + 60) / 60) * 100));
