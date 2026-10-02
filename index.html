@@ -11578,22 +11578,8 @@ function updateTftModuleCurve(key) {
     const inRead = document.getElementById("cfgPreampGraphInput");
     const outRead = document.getElementById("cfgPreampGraphOutput");
     const graphStatus = document.getElementById("cfgPreampGraphStatus");
-    const grMeter = document.getElementById("cfgPreampGrMeter");
-    const grFill = document.getElementById("cfgPreampGrFill");
-    const grLamp = document.getElementById("cfgPreampGrLamp");
-    const grValue = document.getElementById("cfgPreampGrValue");
-    const gr = s.active ? Math.min(0, gain) : 0;
-    const grPct = Math.max(0, Math.min(100, (-gr / 20) * 100));
-    if (grMeter) {
-      grMeter.style.setProperty("--gr-level", grPct.toFixed(2) + "%");
-      grMeter.setAttribute("aria-valuenow", gr.toFixed(1));
-      grMeter.setAttribute("aria-valuetext", gr.toFixed(1) + " dB gain reduction");
-      grMeter.classList.toggle("compressing", gr < -0.15);
-      grMeter.classList.toggle("heavy", gr <= -10);
-    }
-    if (grFill) grFill.style.height = grPct.toFixed(2) + "%";
-    if (grLamp) grLamp.style.top = grPct.toFixed(2) + "%";
-    if (grValue) grValue.textContent = gr.toFixed(1) + " dB";
+    // IMPORTANT: PREAMP curve rendering is independent from compressor GR.
+    // Dragging the curve changes gain/response only; it must never move the GR meter.
     if (inRead) inRead.textContent = "INPUT " + controlInput.toFixed(1) + " dB";
     if (outRead) outRead.textContent = "OUTPUT " + controlOutput.toFixed(1) + " dB";
     if (graphStatus) graphStatus.textContent = (s.active ? "ACTIVE" : "BYPASS") + " • GAIN " + gain.toFixed(1) + " dB • 1 CONTROL POINT";
