@@ -7931,6 +7931,28 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 #tabMixerContent .preamp-peak-led.hot{background:#facc15;box-shadow:0 0 6px rgba(250,204,21,.9)}
 #tabMixerContent .preamp-peak-led.clip{background:#ef4444;box-shadow:0 0 8px rgba(239,68,68,.95)}
 #tabMixerContent .preamp-readout b{font-variant-numeric:tabular-nums}
+</style><style id="preamp-transparent-bg-2026-10-02">
+/* PREAMP: remove solid gray panel backgrounds so the mixer screen remains visible. */
+#tabMixerContent .preamp-native-view,
+#tabMixerContent .preamp-main-panel,
+#tabMixerContent .preamp-meter-card,
+#tabMixerContent .preamp-control-panel,
+#tabMixerContent .preamp-control-card,
+#tabMixerContent .preamp-info-grid>div {
+  background: transparent !important;
+}
+#tabMixerContent .preamp-meter-card,
+#tabMixerContent .preamp-control-panel {
+  border-color: rgba(148,163,184,.24) !important;
+  box-shadow: none !important;
+}
+#tabMixerContent .preamp-control-card,
+#tabMixerContent .preamp-info-grid>div {
+  border-color: rgba(148,163,184,.18) !important;
+}
+#tabMixerContent .preamp-control-card input {
+  background: transparent !important;
+}
 </style></head>
 
 <body>
