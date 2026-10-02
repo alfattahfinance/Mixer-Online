@@ -7527,74 +7527,18 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 #tabMixerContent .geq-fader-strip{position:relative;flex:0 0 42px;min-width:42px;height:100%;display:flex;flex-direction:column;align-items:center}
 #tabMixerContent .geq-fader-value{height:15px;font:700 7px/15px Arial;color:#dbeafe;white-space:nowrap;text-shadow:0 0 5px rgba(56,189,248,.4)}
 #tabMixerContent .geq-fader-body{position:relative;flex:1;width:34px;min-height:110px;border-radius:4px;background:linear-gradient(90deg,#080d15,#17202d,#080d15);border:1px solid rgba(148,163,184,.22);box-shadow:inset 0 0 8px rgba(0,0,0,.8)}
-#tabMixerContent .geq-fader-body:before{content:"";position:absolute;left:50%;top:7px;bottom:7px;width:4px;transform:translateX(-50%);border-radius:3px;background:linear-gradient(180deg,#1e293b,#64748b 50%,#1e293b);box-shadow:0 0 3px rgba(148,163,184,.25)}
-#tabMixerContent .geq-fader-scale{position:absolute;inset:6px 2px;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none;color:#475569;font:600 5px/1 Arial}
+#tabMixerContent .geq-fader-body:before{content:"";position:absolute;left:50%;top:8px;bottom:8px;width:4px;transform:translateX(-50%);border-radius:3px;background:linear-gradient(180deg,#1e293b,#64748b 50%,#1e293b);box-shadow:0 0 4px rgba(148,163,184,.35)}
+#tabMixerContent .geq-fader-rail{position:absolute;z-index:1;left:50%;top:8px;bottom:8px;width:5px;transform:translateX(-50%);border-radius:3px;background:linear-gradient(180deg,#0f172a,#94a3b8 48%,#0f172a);box-shadow:inset 0 0 3px #000,0 0 3px rgba(148,163,184,.25);pointer-events:none}
+#tabMixerContent .geq-fader-scale{position:absolute;z-index:1;inset:6px 2px;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none;color:#475569;font:600 5px/1 Arial}
 #tabMixerContent .geq-fader-scale span{text-align:right}
-#tabMixerContent .geq-band-fader{
-  position:absolute!important;
-  z-index:3;
-  left:50%!important;
-  top:50%!important;
-  width:calc(100% - 10px)!important;
-  height:30px!important;
-  transform:translate(-50%,-50%) rotate(-90deg)!important;
-  transform-origin:center center!important;
-  margin:0!important;
-  padding:0!important;
-  opacity:1!important;
-  background:transparent!important;
-  appearance:none!important;
-  -webkit-appearance:none!important;
-  cursor:ns-resize;
-  touch-action:none;
-}
-#tabMixerContent .geq-band-fader::-webkit-slider-runnable-track{
-  width:100%!important;
-  height:5px!important;
-  background:transparent!important;
-  border:0!important;
-  border-radius:3px;
-}
-#tabMixerContent .geq-band-fader::-webkit-slider-thumb{
-  -webkit-appearance:none!important;
-  appearance:none!important;
-  width:11px!important;
-  height:28px!important;
-  margin:0!important;
-  border-radius:3px!important;
-  background:linear-gradient(90deg,#475569 0%,#cbd5e1 42%,#f8fafc 50%,#94a3b8 58%,#475569 100%)!important;
-  border:1px solid #e2e8f0!important;
-  box-shadow:0 1px 3px #000,0 0 6px rgba(125,211,252,.28)!important;
-}
-#tabMixerContent .geq-band-fader::-moz-range-track{
-  width:100%!important;
-  height:5px!important;
-  background:transparent!important;
-  border:0!important;
-  border-radius:3px;
-}
-#tabMixerContent .geq-band-fader::-moz-range-thumb{
-  width:11px!important;
-  height:28px!important;
-  border-radius:3px!important;
-  background:linear-gradient(90deg,#475569 0%,#cbd5e1 42%,#f8fafc 50%,#94a3b8 58%,#475569 100%)!important;
-  border:1px solid #e2e8f0!important;
-  box-shadow:0 1px 3px #000,0 0 6px rgba(125,211,252,.28)!important;
-}
-#tabMixerContent .geq-fader-body:after{
-  content:"";
-  position:absolute;
-  left:50%;
-  top:7px;
-  bottom:7px;
-  width:28px;
-  transform:translateX(-50%);
-  pointer-events:none;
-  border-top:1px solid rgba(255,255,255,.07);
-  border-bottom:1px solid rgba(255,255,255,.07);
-}
-#tabMixerContent .geq-fader-cap{height:17px;width:30px;margin-top:-1px;position:relative;z-index:4;pointer-events:none}
-#tabMixerContent .geq-fader-cap span{display:block;width:28px;height:6px;margin:5px auto;background:linear-gradient(180deg,#e2e8f0,#64748b);border:1px solid #cbd5e1;border-radius:2px;box-shadow:0 1px 3px #000}
+#tabMixerContent .geq-band-fader{position:absolute!important;z-index:5;left:50%!important;top:50%!important;width:calc(100% - 4px)!important;height:100%!important;transform:translate(-50%,-50%) rotate(-90deg)!important;transform-origin:center center!important;margin:0!important;padding:0!important;opacity:.001!important;background:transparent!important;appearance:none!important;-webkit-appearance:none!important;cursor:ns-resize!important;touch-action:none!important}
+#tabMixerContent .geq-band-fader::-webkit-slider-runnable-track{width:100%!important;height:100%!important;background:transparent!important;border:0!important}
+#tabMixerContent .geq-band-fader::-webkit-slider-thumb{-webkit-appearance:none!important;appearance:none!important;width:28px!important;height:12px!important;border:0!important;background:transparent!important}
+#tabMixerContent .geq-band-fader::-moz-range-track{width:100%!important;height:100%!important;background:transparent!important;border:0!important}
+#tabMixerContent .geq-band-fader::-moz-range-thumb{width:28px!important;height:12px!important;border:0!important;background:transparent!important}
+#tabMixerContent .geq-fader-knob{position:absolute;z-index:4;left:50%;top:var(--geq-knob-pos,50%);width:30px;height:13px;transform:translate(-50%,-50%);border-radius:3px;background:linear-gradient(180deg,#f8fafc 0%,#cbd5e1 45%,#64748b 52%,#334155 100%);border:1px solid #f1f5f9;box-shadow:0 1px 3px #000,0 0 7px rgba(125,211,252,.3),inset 0 1px rgba(255,255,255,.8);pointer-events:none;transition:none}
+#tabMixerContent .geq-fader-knob:before,#tabMixerContent .geq-fader-knob:after{content:"";position:absolute;top:4px;width:5px;height:3px;border-radius:1px;background:#475569;opacity:.85}
+#tabMixerContent .geq-fader-knob:before{left:4px}.geq-fader-knob:after{right:4px}
 #tabMixerContent .geq-fader-freq{height:20px;font:700 7px/20px Arial;color:#cbd5e1;white-space:nowrap;text-align:center}
 #tabMixerContent .geq-fader-hint{text-align:center;color:#64748b;font-size:7px;letter-spacing:1px;min-height:12px}
 #tabMixerContent .geq-bottom-controls{flex:0 0 auto}
@@ -10311,9 +10255,10 @@ const tftDatabase = {
           <div class="geq-fader-value" id="geqBandVal${i}">${total >= 0 ? "+" : ""}${total.toFixed(1)} dB</div>
           <div class="geq-fader-body">
             <div class="geq-fader-scale"><span>+15</span><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-15</span></div>
+            <div class="geq-fader-rail" aria-hidden="true"></div>
+            <div class="geq-fader-knob" id="geqBandKnob${i}" aria-hidden="true"><span></span></div>
             <input class="geq-band-fader" id="geqBand${i}" type="range" min="-15" max="15" step="0.1" value="${value}" aria-label="GEQ ${freq} Hz" data-band-index="${i}">
           </div>
-          <div class="geq-fader-cap" aria-hidden="true"><span></span></div>
           <div class="geq-fader-freq">${labels[i]}</div>
         </div>`;
       }).join("");
@@ -10647,8 +10592,10 @@ function updateTftModuleCurve(key) {
     bands.forEach((gain, index) => {
       const fader = document.getElementById("geqBand" + index);
       const value = document.getElementById("geqBandVal" + index);
+      const knob = document.getElementById("geqBandKnob" + index);
       const clean = clamp(Number(gain) || 0, -15, 15);
       if (fader) fader.value = String(clean);
+      if (knob) knob.style.setProperty("--geq-knob-pos", ((15 - clean) / 30 * 100).toFixed(3) + "%");
       const total = clean + Number(s.lvl || 0);
       if (value) value.textContent = (total >= 0 ? "+" : "") + total.toFixed(1) + " dB";
     });
@@ -11120,12 +11067,42 @@ function bindTftDynamicEventListeners(key) {
         fader.addEventListener("input", () => {
           const index = Number(fader.dataset.bandIndex);
           if (!Number.isInteger(index)) return;
-          s.bands[index] = Number(fader.value);
+          const target = Math.max(-15, Math.min(15, Number(fader.value) || 0));
+          // Audio/control state follows the finger immediately.
+          s.bands[index] = Math.round(target * 10) / 10;
+          fader.dataset.targetValue = String(target);
           const total = s.bands[index] + Number(s.lvl || 0);
           const val = document.getElementById("geqBandVal" + index);
           if (val) val.textContent = (total >= 0 ? "+" : "") + total.toFixed(1) + " dB";
+          const knob = document.getElementById("geqBandKnob" + index);
+          if (knob) {
+            const nextPos = (15 - target) / 30 * 100;
+            const currentPos = Number(knob.dataset.pos);
+            knob.dataset.pos = String(Number.isFinite(currentPos) ? currentPos : nextPos);
+            knob.dataset.targetPos = String(nextPos);
+            if (!knob.dataset.raf) {
+              const smooth = () => {
+                const k = document.getElementById("geqBandKnob" + index);
+                if (!k) return;
+                const cur = Number(k.dataset.pos);
+                const dst = Number(k.dataset.targetPos);
+                const next = cur + (dst - cur) * 0.34;
+                k.dataset.pos = String(next);
+                k.style.setProperty("--geq-knob-pos", next.toFixed(3) + "%");
+                if (Math.abs(dst - next) > 0.08) {
+                  k.dataset.raf = "1";
+                  requestAnimationFrame(smooth);
+                } else {
+                  k.dataset.pos = String(dst);
+                  k.style.setProperty("--geq-knob-pos", dst.toFixed(3) + "%");
+                  delete k.dataset.raf;
+                }
+              };
+              knob.dataset.raf = "1";
+              requestAnimationFrame(smooth);
+            }
+          }
           updateEncoders(tftDatabase.sends.encoders(s));
-          updateTftModuleCurve("sends");
         });
         fader.addEventListener("change", () => persistTftState());
       });
