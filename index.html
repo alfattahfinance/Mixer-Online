@@ -8978,8 +8978,12 @@ function updateGainReductionMeter(root, analyser, state) {
   const liveDb = analyser ? readMeterDb(analyser) : -72;
   const threshold = clamp(Number(state?.thresh ?? -18), -60, 0);
   const ratio = Math.max(1, Number(state?.ratio ?? 3));
-  const over = liveDb > threshold;
-  const target = over ? -Math.min(20, (liveDb - threshold) * (1 - 1 / ratio)) : 0;
+  // Below threshold there is no gain reduction. Above it, calculate the
+  // compressor reduction from the over-threshold amount and ratio.
+  const over = Number.isFinite(liveDb) && liveDb > threshold;
+  const target = over
+    ? -Math.min(20, Math.max(0, (liveDb - threshold) * (1 - 1 / ratio)))
+    : 0;
   const key = meter.classList.contains("preamp-gr-meter") ? "preampGrDb" : "channelGrDb";
   const previous = Number(meter.dataset[key]) || 0;
   const alpha = target < previous ? 0.58 : 0.20;
@@ -9057,7 +9061,25 @@ function updateAllSignalMeters() {
     // The Preamp graph point is a user control point, not a live-meter cursor.
     // Keep the hardware meter independent so audio level cannot overwrite a drag.
     updateTftModuleCurve("config");
-    updateGainReductionMeter(document.getElementById("cfgPreampGrMeter"), audioChannels[0]?.analyser, tftStatesData.dynamics);
+    const preampGrMeter = document.getElementById("cfgPreampGrMeter");
+    const preampActive = getMixerStripPreampState(0) && (typeof mixerPowered !== "boolean" || mixerPowered);
+    if (preampGrMeter) {
+      if (preampActive) {
+        // PREAMP/CH1 GR reads the live CH1 DSP analyser, before the mixer fader.
+        updateGainReductionMeter(preampGrMeter, audioChannels[0]?.analyser, tftStatesData.dynamics);
+      } else {
+        preampGrMeter.dataset.preampGrDb = "0";
+        const fill = preampGrMeter.querySelector(".preamp-gr-fill");
+        const lamp = preampGrMeter.querySelector(".preamp-gr-lamp");
+        const value = preampGrMeter.querySelector(".preamp-gr-value");
+        if (fill) fill.style.height = "0%";
+        if (lamp) lamp.style.top = "0%";
+        if (value) value.textContent = "0.0 dB";
+        preampGrMeter.setAttribute("aria-valuenow", "0.0");
+        preampGrMeter.setAttribute("aria-valuetext", "0.0 dB gain reduction");
+        preampGrMeter.classList.remove("compressing","heavy","limiting");
+      }
+    }
     const preampSegments = document.querySelectorAll("#cfgPreampSegments [data-meter-seg]");
     if (preampSegments.length) {
       const pct = Math.max(0, Math.min(100, ((preampDb + 60) / 60) * 100));
@@ -9071,7 +9093,8 @@ function updateAllSignalMeters() {
     }
   }
   // PREAMP GR is the single visible compressor GR meter and is updated above.
-  // Compressor-page GR remains synchronized/ with the same live calculation.
+  // Keep one authoritative dynamics state for the compressor page as well.
+  const grState = tftStatesData.dynamics;
   const dynamicsRoot = document.getElementById("tftContentArea");
   if (dynamicsRoot?.dataset?.pageKey === "dynamics") {
     const liveDb = audioChannels[0]?.analyser ? readMeterDb(audioChannels[0].analyser) : -72;
