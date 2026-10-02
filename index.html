@@ -12685,6 +12685,43 @@ function makeChannelQuickControl(spec) {
   return '<label class="'+cls+'"><span>'+spec.label+'</span><input type="range" min="'+min+'" max="'+max+'" step="'+step+'" value="'+value+'"><i></i><output></output></label>';
 }
 
+/* PREAMP QUICK PANEL <-> MIXER SCREEN BRIDGE
+   Channel-title PREAMP controls and the mixer Preamp page share one source of truth. */
+(function bindPreampQuickPanelBridge(){
+  const root=document.getElementById("tabMixerContent");
+  if(!root || root.dataset.preampQuickBridge==="1") return;
+  root.dataset.preampQuickBridge="1";
+  const sync=()=>{
+    try{ updateTftModuleCurve("config"); }catch{}
+    try{ syncChannelQuickPanelsFromSources(); }catch{}
+  };
+  root.addEventListener("input",(e)=>{
+    const panel=e.target.closest?.(".channel-quick-panel");
+    const label=e.target.closest?.("label");
+    if(!panel || !label) return;
+    const labels=[...panel.querySelectorAll("label")];
+    const index=labels.indexOf(label);
+    const spec=channelCurveQuickSpecs.config?.controls?.[index];
+    if(!spec || (spec.source!=="cfgGain" && spec.source!=="cfgHpf")) return;
+    const source=document.getElementById(spec.source);
+    if(!source) return;
+    source.value=e.target.value;
+    source.dispatchEvent(new Event("input",{bubbles:true}));
+    sync();
+  },true);
+  root.addEventListener("click",(e)=>{
+    const panel=e.target.closest?.(".channel-quick-panel");
+    const btn=e.target.closest?.("button");
+    if(!panel || !btn) return;
+    const sourceId=btn.dataset.proxySource;
+    if(sourceId!=="cfgPhantomBtn" && sourceId!=="cfgPhaseBtn") return;
+    setTimeout(sync,0);
+  },true);
+  window.addEventListener("mixer:preamp-control",sync);
+  window.addEventListener("mixer:preamp-point",sync);
+  setTimeout(sync,0);
+})();
+
 /* UNIVERSAL QUICK-PANEL SOURCE SYNC */
 (function bindQuickPanelSourceSync(){
   const root=document.getElementById("tabMixerContent");
