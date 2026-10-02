@@ -8967,6 +8967,23 @@ function updateUsbInputLevelMeter() {
   status.textContent = db > -48 ? "USB INPUT: SINYAL MASUK" : (usbInputStream ? "USB INPUT: TERHUBUNG, TIDAK ADA SINYAL" : "USB INPUT: BELUM AKTIF");
   requestAnimationFrame(updateUsbInputLevelMeter);
 }
+function readPeakMeterDb(analyser) {
+  if (!analyser) return -72;
+  let samples = meterSampleBuffers.get(analyser);
+  const sampleLength = analyser.fftSize || 1024;
+  if (!samples || samples.length !== sampleLength) {
+    samples = new Float32Array(sampleLength);
+    meterSampleBuffers.set(analyser, samples);
+  }
+  analyser.getFloatTimeDomainData(samples);
+  let peak = 0;
+  for (let i = 0; i < samples.length; i++) {
+    const a = Math.abs(samples[i]);
+    if (a > peak) peak = a;
+  }
+  return peak > 0 ? 20 * Math.log10(peak) : -72;
+}
+
 function updateGainReductionMeter(root, analyser, state) {
   if (!root) return;
   const meter = root.classList?.contains("preamp-gr-meter")
@@ -8975,11 +8992,13 @@ function updateGainReductionMeter(root, analyser, state) {
       ? root
       : root.querySelector?.(".channel-gr-meter, .preamp-gr-meter");
   if (!meter) return;
-  const liveDb = analyser ? readMeterDb(analyser) : -72;
+
+  // GR mengikuti peak audio yang benar-benar masuk ke DSP, bukan posisi
+  // kurva PREAMP dan bukan RMS rata-rata. Dengan peak detection, transient
+  // yang melewati threshold akan langsung menggerakkan GR meter.
+  const liveDb = analyser ? readPeakMeterDb(analyser) : -72;
   const threshold = clamp(Number(state?.thresh ?? -18), -60, 0);
   const ratio = Math.max(1, Number(state?.ratio ?? 3));
-  // Below threshold there is no gain reduction. Above it, calculate the
-  // compressor reduction from the over-threshold amount and ratio.
   const over = Number.isFinite(liveDb) && liveDb > threshold;
   const target = over
     ? -Math.min(20, Math.max(0, (liveDb - threshold) * (1 - 1 / ratio)))
