@@ -3970,7 +3970,7 @@ body.mixer-powered-off #tabMixerContent .mixer-tft-screen .master-combined-meter
 #tabMixerContent .preamp-graph-card{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;background:#20262d;border:1px solid #59616a;border-radius:5px;padding:5px;overflow:hidden;}
 #tabMixerContent .preamp-graph-head{display:flex;justify-content:space-between;align-items:center;gap:6px;color:#dbe4ec;font-size:9px;padding:0 2px 3px;}
 #tabMixerContent .preamp-graph-head span{color:#38bdf8;font-weight:800;}
-#tabMixerContent .preamp-graph-wrap{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 24px;gap:5px;flex:1 1 auto;min-height:0;width:100%;overflow:hidden;}
+#tabMixerContent .preamp-graph-wrap{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 27px;gap:5px;flex:1 1 auto;min-height:0;width:100%;overflow:hidden;}
 #tabMixerContent .preamp-gr-meter{position:relative;min-width:20px;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:10px 2px 25px;border-left:1px solid rgba(148,163,184,.22);box-sizing:border-box;color:#94a3b8;font-size:5px;font-weight:800;user-select:none;}
 #tabMixerContent .preamp-gr-meter .gr-title{color:#fb923c;font-size:6px;letter-spacing:.5px;writing-mode:vertical-rl;transform:rotate(180deg);margin-bottom:2px;}
 #tabMixerContent .preamp-gr-track{position:absolute;top:25px;bottom:29px;right:7px;width:5px;border:1px solid rgba(148,163,184,.38);border-radius:4px;background:repeating-linear-gradient(to bottom,rgba(148,163,184,.18) 0 1px,transparent 1px 25%);overflow:hidden;}
@@ -3981,7 +3981,7 @@ body.mixer-powered-off #tabMixerContent .mixer-tft-screen .master-combined-meter
 #tabMixerContent .preamp-gr-scale{position:absolute;top:23px;bottom:27px;left:1px;display:flex;flex-direction:column;justify-content:space-between;line-height:1;}
 #tabMixerContent .preamp-gr-value{position:absolute;bottom:6px;right:2px;color:#fb923c;font-size:5.5px;white-space:nowrap;}
 #tabMixerContent .preamp-gr-note{position:absolute;bottom:0;right:2px;color:#64748b;font-size:4.5px;white-space:nowrap;}
-@media(max-width:600px){#tabMixerContent .preamp-graph-wrap{grid-template-columns:minmax(0,1fr) 21px;gap:3px;}#tabMixerContent .preamp-gr-meter{font-size:4.5px;padding-left:1px;padding-right:1px;}#tabMixerContent .preamp-gr-title{font-size:5.5px;}}
+@media(max-width:600px){#tabMixerContent .preamp-graph-wrap{grid-template-columns:minmax(0,1fr) 24px;gap:3px;}#tabMixerContent .preamp-gr-meter{font-size:4.5px;padding-left:1px;padding-right:1px;}#tabMixerContent .preamp-gr-title{font-size:5.5px;}}
 #tabMixerContent #cfgPreampGraph{display:block;width:100%;height:100%;min-height:0;overflow:visible;touch-action:none;}
 #tabMixerContent .preamp-graph-plot{fill:rgba(8,15,22,.42);stroke:rgba(148,163,184,.35);stroke-width:.8;}
 #tabMixerContent .preamp-graph-grid line{stroke:rgba(148,163,184,.20);stroke-width:.55;vector-effect:non-scaling-stroke;}
@@ -8960,6 +8960,7 @@ function updateGainReductionMeter(root, analyser, state) {
   if (fill) fill.style.height = pct.toFixed(2) + "%";
   if (lamp) lamp.style.top = pct.toFixed(2) + "%";
   if (value) value.textContent = gr.toFixed(1) + (meter.classList.contains("preamp-gr-meter") ? " dB" : "");
+  if (meter.classList.contains("preamp-gr-meter")) meter.setAttribute("data-source", "CH1 COMPRESSOR");
   meter.setAttribute("aria-valuenow", gr.toFixed(1));
   meter.setAttribute("aria-valuetext", gr.toFixed(1) + " dB gain reduction");
   meter.classList.toggle("compressing", gr < -0.15);
@@ -9011,7 +9012,7 @@ function updateAllSignalMeters() {
     // The Preamp graph point is a user control point, not a live-meter cursor.
     // Keep the hardware meter independent so audio level cannot overwrite a drag.
     updateTftModuleCurve("config");
-    updateGainReductionMeter(document.querySelector(".preamp-gr-meter"), audioChannels[0]?.analyser, tftStatesData.dynamics);
+    updateGainReductionMeter(document.getElementById("cfgPreampGrMeter"), audioChannels[0]?.analyser, tftStatesData.dynamics);
     const preampSegments = document.querySelectorAll("#cfgPreampSegments [data-meter-seg]");
     if (preampSegments.length) {
       const pct = Math.max(0, Math.min(100, ((preampDb + 60) / 60) * 100));
@@ -9026,6 +9027,7 @@ function updateAllSignalMeters() {
   }
   // Keep channel GR meters live even when the compressor page is not open.
   const grState = tftStatesData.dynamics;
+  // Channel GR meters use each channel analyser with the shared compressor threshold/ratio.
   document.querySelectorAll(".channel-gr-meter[data-channel-gr]").forEach(meter => {
     const index = Math.max(0, Number(meter.dataset.channelGr) - 1);
     updateGainReductionMeter(meter, audioChannels[index]?.analyser, grState);
@@ -10929,14 +10931,13 @@ const tftDatabase = {
                 <line x1="49" y1="36" x2="67" y2="36" class="preamp-curve"/><text x="72" y="39">PREAMP RESPONSE</text>
               </g>
             </svg>
-          </div>
-          <div id="cfgPreampGrMeter" class="preamp-gr-meter" role="meter" aria-label="Preamp gain reduction meter" aria-valuemin="-20" aria-valuemax="0" aria-valuenow="0" aria-valuetext="0.0 dB gain reduction">
-            <span class="gr-title">GR</span>
-            <div class="preamp-gr-scale" aria-hidden="true"><span>0</span><span>-5</span><span>-10</span><span>-15</span><span>-20</span></div>
-            <div class="preamp-gr-track" aria-hidden="true"><i id="cfgPreampGrFill" class="preamp-gr-fill"></i><b id="cfgPreampGrLamp" class="preamp-gr-lamp"></b></div>
-            <strong id="cfgPreampGrValue" class="preamp-gr-value">0.0 dB</strong>
-            <small class="preamp-gr-note">REDUCTION</small>
-          </div>
+            <div id="cfgPreampGrMeter" class="preamp-gr-meter" role="meter" aria-label="Channel 1 compressor gain reduction beside Preamp graph" aria-valuemin="-20" aria-valuemax="0" aria-valuenow="0" aria-valuetext="0.0 dB gain reduction">
+              <span class="gr-title">GR</span>
+              <div class="preamp-gr-scale" aria-hidden="true"><span>0 dB</span><span>-5</span><span>-10</span><span>-15</span><span>-20</span></div>
+              <div class="preamp-gr-track" aria-hidden="true"><i id="cfgPreampGrFill" class="preamp-gr-fill"></i><b id="cfgPreampGrLamp" class="preamp-gr-lamp"></b></div>
+              <strong id="cfgPreampGrValue" class="preamp-gr-value">0.0 dB</strong>
+              <small class="preamp-gr-note">CH1 COMP</small>
+            </div>
           </div>
           <div class="preamp-graph-readout">
             <span id="cfgPreampGraphInput">INPUT -60.0 dB</span>
