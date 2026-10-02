@@ -7518,9 +7518,12 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 #tabMixerContent .geq-hardware-header{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border:1px solid rgba(148,163,184,.28);border-radius:7px;background:linear-gradient(180deg,rgba(30,41,59,.9),rgba(5,10,18,.94));box-shadow:inset 0 1px rgba(255,255,255,.08)}
 #tabMixerContent .geq-hardware-header strong{display:block;letter-spacing:1.4px;font-size:12px;color:#dbeafe}
 #tabMixerContent .geq-hardware-header small{display:block;margin-top:2px;font-size:8px;letter-spacing:1px;color:#94a3b8}
-#tabMixerContent .geq-live-led{display:flex;align-items:center;gap:5px;font-size:8px;font-weight:800;color:#94a3b8}
-#tabMixerContent .geq-live-led i{width:7px;height:7px;border-radius:50%;background:#475569;box-shadow:0 0 4px rgba(71,85,105,.5)}
-#tabMixerContent .geq-live-led.on{color:#86efac}.geq-live-led.on i{background:#22c55e;box-shadow:0 0 9px #22c55e}
+#tabMixerContent .geq-live-led{display:flex;align-items:center;gap:6px;font-size:8px;font-weight:900;color:#f87171;text-shadow:0 0 5px rgba(248,113,113,.35)}
+#tabMixerContent .geq-live-led i{display:block;width:9px;height:9px;flex:0 0 9px;border-radius:50%;background:#ef4444;border:1px solid rgba(254,202,202,.75);box-shadow:0 0 5px rgba(239,68,68,.75),inset 0 0 2px rgba(255,255,255,.65)}
+#tabMixerContent .geq-live-led.off{color:#f87171}
+#tabMixerContent .geq-live-led.off i{background:#ef4444;box-shadow:0 0 7px rgba(239,68,68,.95),0 0 14px rgba(239,68,68,.35)}
+#tabMixerContent .geq-live-led.on{color:#86efac}
+#tabMixerContent .geq-live-led.on i{background:#22c55e;border-color:#bbf7d0;box-shadow:0 0 8px #22c55e,0 0 15px rgba(34,197,94,.6),inset 0 0 2px rgba(255,255,255,.8)}
 #tabMixerContent .geq-fader-console{position:relative;display:flex;min-height:0;flex:1;overflow:hidden;border:1px solid rgba(148,163,184,.26);border-radius:8px;background:linear-gradient(180deg,#0b111b,#070b12);box-shadow:inset 0 0 25px rgba(0,0,0,.65)}
 #tabMixerContent .geq-db-ruler{width:32px;flex:0 0 32px;display:flex;flex-direction:column;justify-content:space-between;padding:18px 3px 29px 2px;color:#64748b;font:700 7px/1 Arial;text-align:right;border-right:1px solid rgba(148,163,184,.16)}
 #tabMixerContent .geq-fader-bank{display:flex;align-items:stretch;gap:2px;overflow-x:auto;overflow-y:hidden;padding:12px 8px 5px;flex:1;min-width:0;scrollbar-width:thin;touch-action:pan-x}
@@ -10282,7 +10285,7 @@ const tftDatabase = {
       <div class="tft-module-view geq-fader-view">
         <div class="geq-hardware-header">
           <div><strong>SQ-7 GRAPHIC EQUALIZER</strong><small>31-BAND MOTOR FADER • ±15 dB</small></div>
-          <div class="geq-live-led ${s.state ? "on" : ""}"><i></i>${s.state ? "ACTIVE" : "BYPASS"}</div>
+          <div id="geqLiveLed" class="geq-live-led ${s.state ? "on" : "off"}"><i></i><span>${s.state ? "ACTIVE" : "BYPASS"}</span></div>
         </div>
         <div class="geq-fader-console">
           <div class="geq-db-ruler" aria-hidden="true"><span>+15</span><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-15</span></div>
@@ -11176,10 +11179,12 @@ function bindTftDynamicEventListeners(key) {
           stBtn.textContent = s.state ? "ACTIVE" : "BYPASS";
           stBtn.setAttribute("aria-pressed", s.state ? "true" : "false");
         }
-        const led = document.querySelector(".geq-live-led");
+        const led = document.getElementById("geqLiveLed");
         if (led) {
           led.classList.toggle("on", !!s.state);
-          led.innerHTML = "<i></i>" + (s.state ? "ACTIVE" : "BYPASS");
+          led.classList.toggle("off", !s.state);
+          const ledText = led.querySelector("span");
+          if (ledText) ledText.textContent = s.state ? "ACTIVE" : "BYPASS";
         }
         const hint = document.querySelector(".geq-fader-hint");
         if (hint) hint.textContent = "DRAG FADERS VERTICALLY • EACH BAND ±15 dB • MASTER OFFSET " + Number(s.lvl || 0).toFixed(1) + " dB • " + (s.state ? "GEQ ACTIVE" : "GEQ BYPASS");
