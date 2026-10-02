@@ -15303,4 +15303,16 @@ body.mixer-powered-off #tabMixerContent .mixer-side-nav .console-btn.active {
   #tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer .tft-comp-scale text { font-size:4px !important; }
   #tabMixerContent #tftContentArea[data-page-key="dynamics"] #tftCompSvgContainer .tft-graph-value-label { font-size:4.1px !important; }
 }
+
+/* PREAMP FINAL FIT — never exceed the physical TFT mixer viewport. */
+#tabMixerContent #tftContentArea[data-page-key="config"]{width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;min-width:0!important;min-height:0!important;overflow:hidden!important;box-sizing:border-box!important}
+#tabMixerContent #tftContentArea[data-page-key="config"] .preamp-native-view{width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;min-width:0!important;min-height:0!important;flex:1 1 0!important;overflow:hidden!important;box-sizing:border-box!important;padding:0!important;margin:0!important}
+#tabMixerContent #tftContentArea[data-page-key="config"] .preamp-native-view>*{min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
+#tabMixerContent #tftContentArea[data-page-key="config"] .preamp-main-panel{width:100%!important;max-width:100%!important;min-width:0!important;min-height:0!important;max-height:100%!important;overflow:hidden!important}
+#tabMixerContent #tftContentArea[data-page-key="config"] .preamp-graph-card{width:100%!important;max-width:100%!important;min-width:0!important;min-height:0!important;max-height:100%!important;flex:1 1 0!important;overflow:hidden!important;box-sizing:border-box!important}
+#tabMixerContent #tftContentArea[data-page-key="config"] .preamp-graph-wrap{width:100%!important;max-width:100%!important;min-width:0!important;min-height:0!important;max-height:100%!important;flex:1 1 0!important;overflow:hidden!important;box-sizing:border-box!important}
+#tabMixerContent #tftContentArea[data-page-key="config"] #cfgPreampGraph{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;height:100%!important;max-height:100%!important;min-height:0!important;overflow:hidden!important;box-sizing:border-box!important}
+#tabMixerContent #tftContentArea[data-page-key="config"] .preamp-control-panel{flex:0 1 auto!important;width:100%!important;max-width:100%!important;min-width:0!important;max-height:34%!important;overflow:hidden!important;box-sizing:border-box!important}
+@media(max-width:700px){#tabMixerContent #tftContentArea[data-page-key="config"] .preamp-native-view{gap:3px!important}#tabMixerContent #tftContentArea[data-page-key="config"] .preamp-graph-card{padding:3px!important}#tabMixerContent #tftContentArea[data-page-key="config"] .preamp-control-panel{max-height:38%!important;padding:4px!important;gap:5px!important}#tabMixerContent #tftContentArea[data-page-key="config"] .preamp-control-card{padding:3px!important}}
+@media(orientation:landscape) and (max-height:560px){#tabMixerContent #tftContentArea[data-page-key="config"] .preamp-control-panel{max-height:32%!important}#tabMixerContent #tftContentArea[data-page-key="config"] .preamp-graph-head{padding-bottom:1px!important}}
 </style>
