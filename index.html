@@ -13465,101 +13465,89 @@ function syncChannelQuickPanelsFromSources() {
 
 <script>
 
-/* UNIVERSAL QUICK-PANEL RANGE DRAG
-   One consistent pointer model for every quick-panel fader.
-   The native range remains the source of truth; movement starts from its
-   current value, so opening/dragging never causes a value jump. */
-(function bindUniversalQuickFaders(){
+/* STABLE CHANNEL-TITLE QUICK CONTROL DRAG
+   Native range controls remain the single source of truth. Pointer capture starts
+   from the current value, so touching a fader/knob never jumps to the touch point.
+   DSP input events continue to fire on every movement; curve repaint is rAF-throttled
+   by the live-link layer. */
+(function bindStableChannelQuickControls(){
   const root=document.getElementById("tabMixerContent");
-  if(!root || root.dataset.universalQuickFaders==="1") return;
-  root.dataset.universalQuickFaders="1";
-  let drag=null;
-  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
-  const apply=(input,v)=>{
-    const min=Number(input.min), max=Number(input.max), step=Number(input.step)||0.01;
-    let next=clamp(v,min,max);
-    next=min+Math.round((next-min)/step)*step;
-    next=clamp(next,min,max);
-    input.value=String(Number(next.toFixed(6)));
-    input.dispatchEvent(new Event("input",{bubbles:true}));
-  };
-  root.addEventListener("pointerdown",(e)=>{
-    const input=e.target instanceof Element ? e.target.closest(".quick-fader input[type=range]") : null;
-    if(!input || !root.contains(input)) return;
-    drag={
-      id:e.pointerId,input,startX:e.clientX,startValue:Number(input.value),
-      min:Number(input.min),max:Number(input.max),
-      pixels:Math.max(140,Math.min(320,input.closest(".quick-fader")?.clientWidth*2.2||190))
-    };
-    try{input.setPointerCapture(e.pointerId);}catch{}
-  },true);
-  root.addEventListener("pointermove",(e)=>{
-    if(!drag || e.pointerId!==drag.id) return;
-    e.preventDefault();
-    const dx=e.clientX-drag.startX;
-    apply(drag.input,drag.startValue+(dx/drag.pixels)*(drag.max-drag.min));
-  },true);
-  const end=(e)=>{
-    if(!drag || (e && e.pointerId!==drag.id)) return;
-    drag=null;
-  };
-  root.addEventListener("pointerup",end,true);
-  root.addEventListener("pointercancel",end,true);
-  root.addEventListener("lostpointercapture",end,true);
-})();
+  if(!root || root.dataset.stableChannelQuickControls==="1") return;
+  root.dataset.stableChannelQuickControls="1";
 
-/* STABLE QUICK-PANEL KNOBS
-   Drag vertically with a controlled delta. The knob does not jump to the
-   pointer position; it starts from the current value and moves smoothly. */
-(function bindStableQuickKnobs(){
-  const root=document.getElementById("tabMixerContent");
-  if(!root || root.dataset.stableQuickKnobs==="1") return;
-  root.dataset.stableQuickKnobs="1";
-  let drag=null;
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+  const decimals=(step)=>{
+    const s=String(step);
+    return s.includes(".") ? s.split(".")[1].length : 0;
+  };
   const apply=(input,value)=>{
-    const min=Number(input.min), max=Number(input.max), step=Number(input.step)||1;
-    let v=clamp(value,min,max);
-    if(step>0) v=min+Math.round((v-min)/step)*step;
-    const decimals=(String(step).split(".")[1]||"").length;
-    input.value=decimals?Number(v).toFixed(decimals):String(Math.round(v));
+    const min=Number(input.min||0), max=Number(input.max||1);
+    const step=Math.abs(Number(input.step)||0.01);
+    let next=clamp(value,min,max);
+    if(step>0) next=min+Math.round((next-min)/step)*step;
+    const d=Math.min(6,decimals(step));
+    next=Number(next.toFixed(d));
+    if(Number(input.value)!==next) input.value=String(next);
     input.dispatchEvent(new Event("input",{bubbles:true}));
   };
+  const getDragTarget=(target)=>{
+    if(!(target instanceof Element)) return null;
+    const input=target.closest(".channel-quick-panel input[type=range]");
+    if(!input || !root.contains(input)) return null;
+    const item=input.closest(".quick-fader,.quick-knob");
+    return {input,item};
+  };
+  let drag=null;
+
   root.addEventListener("pointerdown",(e)=>{
-    const knob=e.target instanceof Element ? e.target.closest(".quick-knob i") : null;
-    if(!knob || !root.contains(knob)) return;
-    const item=knob.closest(".quick-knob");
-    const input=item?.querySelector('input[type="range"]');
-    if(!input) return;
+    const hit=getDragTarget(e.target);
+    if(!hit) return;
+    const {input,item}=hit;
+    const isKnob=!!item?.classList.contains("quick-knob");
     e.preventDefault();
     e.stopPropagation();
     drag={
       pointerId:e.pointerId,
       input,
+      isKnob,
+      startX:e.clientX,
       startY:e.clientY,
       startValue:Number(input.value),
-      range:Number(input.max)-Number(input.min),
-      sensitivity:Math.max(90,Math.min(180,Number(item.dataset.knobTravel)||130))
+      min:Number(input.min||0),
+      max:Number(input.max||1),
+      span:Math.max(1,Number(input.max||1)-Number(input.min||0)),
+      travel:isKnob
+        ? Math.max(90,Math.min(180,Number(item?.dataset.knobTravel)||125))
+        : Math.max(90,Math.min(260,Number(item?.clientWidth)||150))
     };
-    knob.setPointerCapture?.(e.pointerId);
-    knob.classList.add("dragging");
+    try{ input.setPointerCapture(e.pointerId); }catch(_){}
+    input.classList.add("quick-dragging");
+    item?.classList.add("quick-dragging");
   },true);
+
   root.addEventListener("pointermove",(e)=>{
     if(!drag || e.pointerId!==drag.pointerId) return;
     e.preventDefault();
-    const dy=drag.startY-e.clientY;
-    apply(drag.input,drag.startValue+(dy/drag.sensitivity)*drag.range);
+    const delta=drag.isKnob
+      ? (drag.startY-e.clientY)
+      : (e.clientX-drag.startX);
+    apply(drag.input,drag.startValue+(delta/drag.travel)*drag.span);
   },true);
+
   const end=(e)=>{
     if(!drag || (e && e.pointerId!==drag.pointerId)) return;
-    const knob=drag.input.closest(".quick-knob")?.querySelector("i");
-    knob?.classList.remove("dragging");
+    const input=drag.input;
+    input?.classList.remove("quick-dragging");
+    input?.closest(".quick-fader,.quick-knob")?.classList.remove("quick-dragging");
+    try{ if(input?.hasPointerCapture?.(drag.pointerId)) input.releasePointerCapture(drag.pointerId); }catch(_){}
     drag=null;
   };
   root.addEventListener("pointerup",end,true);
   root.addEventListener("pointercancel",end,true);
   root.addEventListener("lostpointercapture",end,true);
-})();
+
+  // Keyboard remains native and accessible; pointer dragging is the only custom path.
+})(); 
 
 /* Navigation/TFT recovery layer: survives a UI-layer runtime interruption. */
 (function mixerUiRecovery(){
@@ -13867,6 +13855,8 @@ function syncChannelQuickPanelsFromSources() {
   window.setTimeout(refresh,0);
 })();
 </script>
+
+<script id="channel-title-drag-stability-2026-10-02">window.__channelTitleDragStability="1";</script>
 </body>
 </html>
 \n
@@ -16239,4 +16229,28 @@ body.mixer-powered-off #tabMixerContent .mixer-side-nav .console-btn.active {
 #tabMixerContent .preamp-source-bank{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;clip-path:inset(50%)!important;white-space:nowrap!important;pointer-events:none!important;opacity:0!important}
 #tabMixerContent .channel-quick-panel[data-channel-panel] .quick-control-grid{grid-template-columns:repeat(5,minmax(0,1fr))!important}
 @media(max-width:700px){#tabMixerContent .channel-quick-panel[data-channel-panel] .quick-control-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+
+/* CHANNEL TITLE QUICK CONTROL — FINAL TOUCH/DRAG SAFETY OVERRIDES */
+#tabMixerContent .channel-quick-panel input[type="range"]{
+  touch-action:none !important;
+  -webkit-user-select:none !important;
+  user-select:none !important;
+  -webkit-tap-highlight-color:transparent !important;
+  overscroll-behavior:contain !important;
+}
+#tabMixerContent .channel-quick-panel .quick-fader input[type="range"]{
+  cursor:ew-resize !important;
+}
+#tabMixerContent .channel-quick-panel .quick-knob{
+  touch-action:none !important;
+}
+#tabMixerContent .channel-quick-panel .quick-knob > i{
+  cursor:ns-resize !important;
+  touch-action:none !important;
+  -webkit-tap-highlight-color:transparent !important;
+}
+#tabMixerContent .channel-quick-panel .quick-fader.quick-dragging,
+#tabMixerContent .channel-quick-panel .quick-knob.quick-dragging{
+  filter:brightness(1.06);
+}
 </style>
