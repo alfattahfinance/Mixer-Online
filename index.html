@@ -7536,7 +7536,7 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 #tabMixerContent .geq-band-fader::-webkit-slider-thumb{-webkit-appearance:none!important;appearance:none!important;width:28px!important;height:12px!important;border:0!important;background:transparent!important}
 #tabMixerContent .geq-band-fader::-moz-range-track{width:100%!important;height:100%!important;background:transparent!important;border:0!important}
 #tabMixerContent .geq-band-fader::-moz-range-thumb{width:28px!important;height:12px!important;border:0!important;background:transparent!important}
-#tabMixerContent .geq-fader-knob{position:absolute;z-index:4;left:50%;top:var(--geq-knob-pos,50%);width:30px;height:13px;transform:translate(-50%,-50%);border-radius:3px;background:linear-gradient(180deg,#f8fafc 0%,#cbd5e1 45%,#64748b 52%,#334155 100%);border:1px solid #f1f5f9;box-shadow:0 1px 3px #000,0 0 7px rgba(125,211,252,.3),inset 0 1px rgba(255,255,255,.8);pointer-events:none;transition:none}
+#tabMixerContent .geq-fader-knob{position:absolute;z-index:4;left:50%;top:var(--geq-knob-pos,50%);width:30px;height:13px;transform:translate(-50%,-50%);border-radius:3px;background:linear-gradient(180deg,#f8fafc 0%,#cbd5e1 45%,#64748b 52%,#334155 100%);border:1px solid #f1f5f9;box-shadow:0 1px 3px #000,0 0 7px rgba(125,211,252,.3),inset 0 1px rgba(255,255,255,.8);pointer-events:auto;transition:none}
 #tabMixerContent .geq-fader-knob:before,#tabMixerContent .geq-fader-knob:after{content:"";position:absolute;top:4px;width:5px;height:3px;border-radius:1px;background:#475569;opacity:.85}
 #tabMixerContent .geq-fader-knob:before{left:4px}.geq-fader-knob:after{right:4px}
 #tabMixerContent .geq-fader-freq{height:20px;font:700 7px/20px Arial;color:#cbd5e1;white-space:nowrap;text-align:center}
@@ -7547,6 +7547,22 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
   #tabMixerContent .geq-fader-body{width:31px}
   #tabMixerContent .geq-fader-bank{gap:1px;padding-left:5px;padding-right:5px}
   #tabMixerContent .geq-hardware-header strong{font-size:10px}
+}
+</style><style id="geq-fader-direct-drag-2026-10-02">
+#tabMixerContent .geq-fader-body{touch-action:none!important}
+#tabMixerContent .geq-band-fader{pointer-events:none!important}
+#tabMixerContent .geq-fader-knob{
+  pointer-events:auto!important;
+  touch-action:none!important;
+  cursor:ns-resize!important;
+  -webkit-user-select:none!important;
+  user-select:none!important;
+  z-index:20!important;
+}
+#tabMixerContent .geq-fader-knob:active,
+#tabMixerContent .geq-fader-knob.geq-dragging{
+  transform:translate(-50%,-50%) scale(1.04);
+  box-shadow:0 1px 3px #000,0 0 10px rgba(125,211,252,.55),inset 0 1px rgba(255,255,255,.9);
 }
 </style></head>
 
@@ -10256,7 +10272,7 @@ const tftDatabase = {
           <div class="geq-fader-body">
             <div class="geq-fader-scale"><span>+15</span><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-15</span></div>
             <div class="geq-fader-rail" aria-hidden="true"></div>
-            <div class="geq-fader-knob" id="geqBandKnob${i}" aria-hidden="true"><span></span></div>
+            <div class="geq-fader-knob" id="geqBandKnob${i}" role="slider" tabindex="0" aria-label="GEQ ${freq} Hz"><span></span></div>
             <input class="geq-band-fader" id="geqBand${i}" type="range" min="-15" max="15" step="0.1" value="${value}" aria-label="GEQ ${freq} Hz" data-band-index="${i}">
           </div>
           <div class="geq-fader-freq">${labels[i]}</div>
@@ -11063,48 +11079,79 @@ function bindTftDynamicEventListeners(key) {
         updateTftModuleCurve("sends");
         persistTftState();
       });
-      document.querySelectorAll(".geq-band-fader").forEach(fader => {
-        fader.addEventListener("input", () => {
-          const index = Number(fader.dataset.bandIndex);
-          if (!Number.isInteger(index)) return;
-          const target = Math.max(-15, Math.min(15, Number(fader.value) || 0));
-          // Audio/control state follows the finger immediately.
-          s.bands[index] = Math.round(target * 10) / 10;
-          fader.dataset.targetValue = String(target);
-          const total = s.bands[index] + Number(s.lvl || 0);
+      document.querySelectorAll(".geq-fader-knob").forEach(knob => {
+        const index = Number(knob.id.replace("geqBandKnob", ""));
+        if (!Number.isInteger(index)) return;
+        const body = knob.closest(".geq-fader-body");
+        let dragging = false;
+        let pointerId = null;
+        let lastY = 0;
+        let targetValue = Number(s.bands[index] || 0);
+        let visualValue = targetValue;
+        let raf = 0;
+
+        const applyValue = (value, immediateAudio = true) => {
+          const target = Math.max(-15, Math.min(15, Math.round(value * 10) / 10));
+          targetValue = target;
+          s.bands[index] = target;
+          const fader = document.getElementById("geqBand" + index);
+          if (fader) fader.value = String(target);
+          const total = target + Number(s.lvl || 0);
           const val = document.getElementById("geqBandVal" + index);
           if (val) val.textContent = (total >= 0 ? "+" : "") + total.toFixed(1) + " dB";
-          const knob = document.getElementById("geqBandKnob" + index);
-          if (knob) {
-            const nextPos = (15 - target) / 30 * 100;
-            const currentPos = Number(knob.dataset.pos);
-            knob.dataset.pos = String(Number.isFinite(currentPos) ? currentPos : nextPos);
-            knob.dataset.targetPos = String(nextPos);
-            if (!knob.dataset.raf) {
-              const smooth = () => {
-                const k = document.getElementById("geqBandKnob" + index);
-                if (!k) return;
-                const cur = Number(k.dataset.pos);
-                const dst = Number(k.dataset.targetPos);
-                const next = cur + (dst - cur) * 0.34;
-                k.dataset.pos = String(next);
-                k.style.setProperty("--geq-knob-pos", next.toFixed(3) + "%");
-                if (Math.abs(dst - next) > 0.08) {
-                  k.dataset.raf = "1";
-                  requestAnimationFrame(smooth);
-                } else {
-                  k.dataset.pos = String(dst);
-                  k.style.setProperty("--geq-knob-pos", dst.toFixed(3) + "%");
-                  delete k.dataset.raf;
-                }
-              };
-              knob.dataset.raf = "1";
-              requestAnimationFrame(smooth);
-            }
+          // Audio/control state is updated immediately; only the physical cap
+          // animation is smoothed so the fader feels slightly slower/stable.
+          if (immediateAudio) updateEncoders(tftDatabase.sends.encoders(s));
+          if (!raf) {
+            raf = requestAnimationFrame(function tick() {
+              const delta = targetValue - visualValue;
+              visualValue += delta * 0.30;
+              if (Math.abs(delta) < 0.04) visualValue = targetValue;
+              const pos = (15 - visualValue) / 30 * 100;
+              knob.style.setProperty("--geq-knob-pos", pos.toFixed(3) + "%");
+              if (visualValue !== targetValue) raf = requestAnimationFrame(tick);
+              else raf = 0;
+            });
           }
-          updateEncoders(tftDatabase.sends.encoders(s));
+        };
+
+        const move = event => {
+          if (!dragging || (pointerId !== null && event.pointerId !== pointerId)) return;
+          event.preventDefault();
+          const rect = body.getBoundingClientRect();
+          const travel = Math.max(1, rect.height - 16);
+          const y = Math.max(rect.top + 8, Math.min(rect.bottom - 8, event.clientY));
+          const ratio = (y - (rect.top + 8)) / travel;
+          applyValue(15 - ratio * 30);
+        };
+        const end = event => {
+          if (!dragging || (pointerId !== null && event.pointerId !== pointerId)) return;
+          dragging = false;
+          knob.classList.remove("geq-dragging");
+          try { knob.releasePointerCapture(pointerId); } catch (_) {}
+          pointerId = null;
+          persistTftState();
+        };
+        knob.addEventListener("pointerdown", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          dragging = true;
+          pointerId = event.pointerId;
+          lastY = event.clientY;
+          knob.classList.add("geq-dragging");
+          try { knob.setPointerCapture(pointerId); } catch (_) {}
         });
-        fader.addEventListener("change", () => persistTftState());
+        knob.addEventListener("pointermove", move, {passive:false});
+        knob.addEventListener("pointerup", end);
+        knob.addEventListener("pointercancel", end);
+        knob.addEventListener("keydown", event => {
+          const step = event.shiftKey ? 1 : 0.1;
+          if (event.key === "ArrowUp" || event.key === "ArrowRight") { event.preventDefault(); applyValue(targetValue + step); persistTftState(); }
+          if (event.key === "ArrowDown" || event.key === "ArrowLeft") { event.preventDefault(); applyValue(targetValue - step); persistTftState(); }
+        });
+        const initial = Number(s.bands[index] || 0);
+        visualValue = initial;
+        knob.style.setProperty("--geq-knob-pos", ((15 - initial) / 30 * 100).toFixed(3) + "%");
       });
       presetSel?.addEventListener("change", () => {
         s.preset = presetSel.selectedIndex;
