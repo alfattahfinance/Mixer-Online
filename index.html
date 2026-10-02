@@ -8368,7 +8368,7 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 </div><div class="strip-status-leds" aria-label="USB AUDIO INPUT status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
             <div class="fader-panel-area mic-input-fader-area">
               <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
-              <div class="hpf-fader-control"><label for="micStripHpf">HPF</label><select id="micStripHpf"><option>OFF</option><option>80Hz</option></select></div>
+
               <div class="vert-led-meter" id="mixerMeter1"></div>
             </div>
             <div class="strip-action-buttons">
@@ -10667,19 +10667,12 @@ const tftDatabase = {
             <b id="cfgPreampGraphOutput">OUTPUT -48.0 dB</b>
           </div>
         </div>
-        <div class="preamp-control-panel">
-          <div class="preamp-control-card"><label for="cfgGain">GAIN</label><input id="cfgGain" type="range" min="-20" max="60" step="0.5" value="${s.gain}"><output>${Number(s.gain).toFixed(1)} dB</output></div>
-          <div class="preamp-control-card"><label for="cfgHpf">HPF</label><input id="cfgHpf" type="range" min="20" max="400" step="5" value="${s.hpf}"><output>${Number(s.hpf).toFixed(0)} Hz</output></div>
-          <div class="preamp-action-row">
-            <button id="cfgPhantomBtn" type="button" class="${s.phantom ? "active-action" : ""}" aria-pressed="${s.phantom}">48V PHANTOM <b>${s.phantom ? "ON" : "OFF"}</b></button>
-            <button id="cfgPhaseBtn" type="button" class="${s.phase ? "active-action" : ""}" aria-pressed="${s.phase}">PHASE <b>${s.phase ? "INVERT" : "NORMAL"}</b></button>
-          </div>
-        </div>
-        <div class="preamp-info-grid">
-          <div><small>GAIN</small><strong id="cfgGainInfo">${Number(s.gain).toFixed(1)} dB</strong></div>
-          <div><small>HPF</small><strong id="cfgHpfInfo">${Number(s.hpf).toFixed(0)} Hz</strong></div>
-          <div><small>PHANTOM</small><strong id="cfgPhantomInfo">${s.phantom ? "48V ON" : "OFF"}</strong></div>
-          <div><small>POLARITY</small><strong id="cfgPhaseInfo">${s.phase ? "INVERT" : "NORMAL"}</strong></div>
+        <div class="preamp-source-bank" aria-hidden="true">
+          <input id="cfgGain" type="range" min="-20" max="60" step="0.5" value="${s.gain}">
+          <input id="cfgHpf" type="range" min="20" max="400" step="5" value="${s.hpf}">
+          <button id="cfgPhantomBtn" type="button" class="${s.phantom ? "active-action" : ""}" aria-pressed="${s.phantom}">48V PHANTOM</button>
+          <button id="cfgPhaseBtn" type="button" class="${s.phase ? "active-action" : ""}" aria-pressed="${s.phase}">PHASE</button>
+          <span id="cfgGainInfo"></span><span id="cfgHpfInfo"></span><span id="cfgPhantomInfo"></span><span id="cfgPhaseInfo"></span>
         </div>
       </div>
     `,
@@ -12483,6 +12476,15 @@ window.setTimeout(() => {
    The controls shown in each channel popup proxy the real controls below the curve,
    so curve dragging and popup adjustment always use the same underlying state. */
 const channelCurveQuickSpecs = {
+  config: {
+    label:"PREAMP",
+    controls:[
+      {label:"GAIN", type:"fader", source:"cfgGain", format:v=>Number(v).toFixed(1)+" dB"},
+      {label:"HPF", type:"fader", source:"cfgHpf", format:v=>Number(v).toFixed(0)+" Hz"},
+      {label:"48V PHANTOM", type:"button", source:"cfgPhantomBtn"},
+      {label:"PHASE", type:"button", source:"cfgPhaseBtn"}
+    ]
+  },
   gate: {
     label:"GATE",
     controls:[
@@ -15315,4 +15317,9 @@ body.mixer-powered-off #tabMixerContent .mixer-side-nav .console-btn.active {
 #tabMixerContent #tftContentArea[data-page-key="config"] .preamp-control-panel{flex:0 1 auto!important;width:100%!important;max-width:100%!important;min-width:0!important;max-height:34%!important;overflow:hidden!important;box-sizing:border-box!important}
 @media(max-width:700px){#tabMixerContent #tftContentArea[data-page-key="config"] .preamp-native-view{gap:3px!important}#tabMixerContent #tftContentArea[data-page-key="config"] .preamp-graph-card{padding:3px!important}#tabMixerContent #tftContentArea[data-page-key="config"] .preamp-control-panel{max-height:38%!important;padding:4px!important;gap:5px!important}#tabMixerContent #tftContentArea[data-page-key="config"] .preamp-control-card{padding:3px!important}}
 @media(orientation:landscape) and (max-height:560px){#tabMixerContent #tftContentArea[data-page-key="config"] .preamp-control-panel{max-height:32%!important}#tabMixerContent #tftContentArea[data-page-key="config"] .preamp-graph-head{padding-bottom:1px!important}}
+
+/* PREAMP controls live in the channel-title popover; keep source controls hidden. */
+#tabMixerContent .preamp-source-bank{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;clip-path:inset(50%)!important;white-space:nowrap!important;pointer-events:none!important;opacity:0!important}
+#tabMixerContent .channel-quick-panel[data-channel-panel] .quick-control-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+@media(max-width:700px){#tabMixerContent .channel-quick-panel[data-channel-panel] .quick-control-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
 </style>
