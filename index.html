@@ -8784,27 +8784,12 @@ function updateMasterStereoMeters() {
     // regardless of which PAGES or CHANNEL DSP screen is currently visible.
     try {
       if (audioGraphReady && masterStereoAnalysers.every(Boolean)) {
-        masterStereoAnalysers.forEach((analyser, channel) => {
-          const db = readPeakMeterDb(analyser);
-          paintMeter(
-            document.getElementById(channel === 0 ? "masterMeterL" : "masterMeterR"),
-            db,
-            "vertical"
-          );
-        });
-
-        // COMBINED MASTER follows the live L/R master signal directly.
-        // Do not depend on the separate post-mute analyser here: page/DSP
-        // rendering must never be able to make the MASTER LED meter stop.
-        const masterCombinedDb = Math.max(
-          readPeakMeterDb(masterStereoAnalysers[0]),
-          readPeakMeterDb(masterStereoAnalysers[1])
-        );
-        paintMeter(
-          document.getElementById("masterMeterCombined"),
-          masterCombinedDb,
-          "vertical"
-        );
+        // One shared live snapshot keeps L/R and MASTER visually identical
+        // to the same output signal for this animation frame.
+        const levels = readLiveMasterStereoLevels();
+        paintMeter(document.getElementById("masterMeterL"), levels.left, "vertical");
+        paintMeter(document.getElementById("masterMeterR"), levels.right, "vertical");
+        paintMeter(document.getElementById("masterMeterCombined"), levels.combined, "vertical");
       }
     } catch (err) {
       console.warn("Master meter render:", err);
@@ -9093,6 +9078,19 @@ function updateGainReductionMeter(root, analyser, state) {
   meter.classList.toggle("limiting", gr <= -18);
 }
 
+function readLiveMasterStereoLevels() {
+  if (!audioGraphReady || !masterStereoAnalysers[0] || !masterStereoAnalysers[1]) {
+    return { left: -72, right: -72, combined: -72 };
+  }
+  const left = readPeakMeterDb(masterStereoAnalysers[0]);
+  const right = readPeakMeterDb(masterStereoAnalysers[1]);
+  return {
+    left,
+    right,
+    combined: Math.max(left, right)
+  };
+}
+
 function updateAllSignalMeters() {
   const mixerStrips = Array.from(document.querySelectorAll(".mixer-desk-surface .console-channel-strip"));
   mixerStripAnalysers.forEach((stripAnalyser, index) => {
@@ -9109,14 +9107,17 @@ function updateAllSignalMeters() {
     paintMeter(document.getElementById("mixerMeter" + (index + 1)), displayDb, "vertical");
 
   });
-  const masterDbValues = masterStereoAnalysers.filter(Boolean).map(readPeakMeterDb);
-  const masterDb = masterDbValues.length ? Math.max(...masterDbValues) : -72;
+  // MASTER strip uses the exact same post-master-fader L/R peak source
+  // as the dedicated MASTER L/R indicators. It must never follow the fader
+  // position itself; the fader only changes the measured output level.
+  const masterLevels = readLiveMasterStereoLevels();
   const masterActive = (typeof mixerPowered !== "boolean" || mixerPowered)
     && (typeof masterStripLR !== "boolean" || masterStripLR)
     && !(typeof masterStripMuted === "boolean" && masterStripMuted);
-  updateStripStatusLeds(mixerStrips[4], masterActive ? masterDb : -72);
+  const masterDisplayDb = masterActive ? masterLevels.combined : -72;
+  updateStripStatusLeds(mixerStrips[4], masterDisplayDb);
   const masterMeter = document.getElementById("mixerMeter5");
-  if (masterMeter) paintMeter(masterMeter, masterActive ? masterDb : -72, "vertical");
+  if (masterMeter) paintMeter(masterMeter, masterDisplayDb, "vertical");
 
   [0, 1].forEach(channelIndex => {
     const channel = audioChannels[channelIndex];
