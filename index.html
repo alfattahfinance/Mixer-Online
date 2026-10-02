@@ -8793,13 +8793,18 @@ function updateMasterStereoMeters() {
           );
         });
 
-        if (masterMeterAnalyser) {
-          paintMeter(
-            document.getElementById("masterMeterCombined"),
-            readPeakMeterDb(masterMeterAnalyser),
-            "vertical"
-          );
-        }
+        // COMBINED MASTER follows the live L/R master signal directly.
+        // Do not depend on the separate post-mute analyser here: page/DSP
+        // rendering must never be able to make the MASTER LED meter stop.
+        const masterCombinedDb = Math.max(
+          readPeakMeterDb(masterStereoAnalysers[0]),
+          readPeakMeterDb(masterStereoAnalysers[1])
+        );
+        paintMeter(
+          document.getElementById("masterMeterCombined"),
+          masterCombinedDb,
+          "vertical"
+        );
       }
     } catch (err) {
       console.warn("Master meter render:", err);
