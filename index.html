@@ -7772,6 +7772,79 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
     grid-column:1 / -1 !important;
   }
 }
+</style><style id="gate-fullscreen-layout-2026-10-02">
+/* GATE: use the entire TFT work area. The graph fills all remaining space
+   between the header and the three live controls instead of the old fixed
+   viewport heights. */
+#tabMixerContent #tftContentArea[data-page-key="gate"]{
+  display:flex !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-view{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  gap:5px !important;
+  overflow:hidden !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box{
+  flex:1 1 0 !important;
+  width:100% !important;
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+  box-sizing:border-box !important;
+  margin:0 !important;
+  align-self:stretch !important;
+  overflow:hidden !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] #tftGateSvgContainer{
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  max-width:none !important;
+  max-height:none !important;
+  preserveAspectRatio:none;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-controls-grid{
+  flex:0 0 auto !important;
+  width:100% !important;
+  min-height:0 !important;
+  margin:0 !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-mod-ctrl{
+  min-width:0 !important;
+  min-height:42px !important;
+}
+@media (orientation:portrait){
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box{
+    min-height:0 !important;
+  }
+}
+@media (orientation:landscape){
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box{
+    min-height:0 !important;
+  }
+}
+@media (max-height:480px){
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-controls-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-mod-ctrl{
+    min-height:36px !important;
+    padding:2px !important;
+  }
+}
 </style></head>
 
 <body>
