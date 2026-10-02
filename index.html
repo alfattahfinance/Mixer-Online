@@ -8232,6 +8232,25 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
   #tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-scale{font-size:4.5px !important}
   #tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-value{font-size:5px !important}
 }
+</style><style id="gr-meter-final-2026-10-02">
+#tabMixerContent .channel-gr-meter{position:relative!important;flex:0 0 24px!important;width:24px!important;min-width:24px!important;display:grid!important;grid-template-columns:8px 9px!important;grid-template-rows:7px 1fr 8px!important;column-gap:3px!important;align-items:stretch!important;padding:2px!important;background:linear-gradient(180deg,#080d13,#03070b)!important;border:1px solid rgba(120,155,185,.42)!important;border-radius:3px!important;box-sizing:border-box!important;overflow:visible!important;box-shadow:inset 0 0 5px #000,0 0 3px rgba(0,0,0,.35)!important}
+#tabMixerContent .channel-gr-label{grid-column:1/-1!important;grid-row:1!important;text-align:center!important;font:900 6px/7px Arial,sans-serif!important;color:#ffb000!important;text-shadow:0 0 4px rgba(255,176,0,.75)!important}
+#tabMixerContent .channel-gr-scale{grid-column:1!important;grid-row:2!important;display:flex!important;flex-direction:column!important;justify-content:space-between!important;align-items:flex-end!important;color:#7f8b96!important;font:700 4px/1 Arial,sans-serif!important;padding-right:1px!important}
+#tabMixerContent .channel-gr-track{grid-column:2!important;grid-row:2!important;position:relative!important;width:9px!important;min-height:45px!important;border:1px solid rgba(148,163,184,.34)!important;border-radius:2px!important;background:#111820!important;overflow:visible!important;box-shadow:inset 0 0 4px #000!important}
+#tabMixerContent .channel-gr-track:after{content:""!important;position:absolute!important;inset:1px!important;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.18) 0 1px,transparent 1px 20%)!important;opacity:.55!important;pointer-events:none!important}
+#tabMixerContent .channel-gr-fill{position:absolute!important;left:1px!important;right:1px!important;top:0!important;height:0!important;border-radius:1px 1px 0 0!important;background:linear-gradient(to bottom,#ff3b30 0%,#ff6b00 45%,#ffb000 100%)!important;box-shadow:0 0 5px rgba(255,96,0,.7)!important;transition:height .045s linear!important}
+#tabMixerContent .channel-gr-lamp{position:absolute!important;left:-4px!important;top:0!important;width:15px!important;height:4px!important;border-radius:2px!important;background:#4b5563!important;box-shadow:none!important;transform:translateY(-2px)!important;transition:top .045s linear,background .06s linear,box-shadow .06s linear!important}
+#tabMixerContent .channel-gr-meter.compressing .channel-gr-lamp{background:#ff7a00!important;box-shadow:0 0 7px rgba(255,122,0,.95)!important}
+#tabMixerContent .channel-gr-meter.heavy .channel-gr-lamp{background:#ff3b30!important;box-shadow:0 0 9px rgba(255,59,48,1)!important}
+#tabMixerContent .channel-gr-meter.limiting .channel-gr-lamp{background:#ff1f1f!important;box-shadow:0 0 11px rgba(255,31,31,1)!important}
+#tabMixerContent .channel-gr-value{grid-column:1/-1!important;grid-row:3!important;text-align:center!important;font:800 4.5px/8px monospace!important;color:#dbeafe!important;white-space:nowrap!important}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-meter{right:4px!important;width:42px!important;grid-template-columns:18px 11px!important;grid-template-rows:11px 1fr 14px!important;padding:3px!important;background:rgba(3,8,14,.82)!important;box-shadow:inset 0 0 9px #000,0 0 6px rgba(0,0,0,.4)!important}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-title{font-size:8px!important;line-height:11px!important}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-scale{font-size:5.5px!important;padding-right:2px!important}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-track{width:11px!important;border-color:rgba(148,163,184,.38)!important}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-lamp{left:-4px!important;width:17px!important;height:4px!important}
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-value{font-size:6px!important;line-height:14px!important;color:#f1f5f9!important}
+@media(max-width:700px){#tabMixerContent .channel-gr-meter{flex-basis:21px!important;width:21px!important;min-width:21px!important;grid-template-columns:7px 8px!important;column-gap:2px!important}#tabMixerContent .channel-gr-scale{font-size:3.5px!important}#tabMixerContent .channel-gr-track{width:8px!important;min-height:40px!important}#tabMixerContent .channel-gr-lamp{width:13px!important}#tabMixerContent .channel-gr-value{font-size:4px!important}#tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-meter{right:3px!important;width:38px!important;grid-template-columns:16px 10px!important}}
 </style></head>
 
 <body>
@@ -8540,7 +8559,7 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
             <div class="fader-panel-area mic-input-fader-area">
               <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
 
-              <div class="vert-led-meter" id="mixerMeter1"></div><div class="channel-gr-meter" id="mixerGr1" role="meter" aria-label="Channel 1 Gain Reduction" aria-valuemin="-20" aria-valuemax="0" aria-valuenow="0"><span class="channel-gr-label">GR</span><div class="channel-gr-track"><i class="channel-gr-fill"></i><b class="channel-gr-lamp"></b></div><small class="channel-gr-value">0</small></div>
+              <div class="vert-led-meter" id="mixerMeter1"></div><div class="channel-gr-meter" id="mixerGr1" role="meter" aria-label="Channel 1 Gain Reduction" aria-valuemin="-20" aria-valuemax="0" aria-valuenow="0"><span class="channel-gr-label">GR</span><div class="channel-gr-scale" aria-hidden="true"><span>0</span><span>-5</span><span>-10</span><span>-15</span><span>-20</span></div><div class="channel-gr-track"><i class="channel-gr-fill"></i><b class="channel-gr-lamp"></b></div><small class="channel-gr-value">0.0</small></div>
             </div>
             <div class="strip-action-buttons">
               <button class="console-action-btn mute">MUTE</button>
@@ -8555,7 +8574,7 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 </div><div class="strip-status-leds" aria-label="AUDIO / MP3 status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
             <div class="fader-panel-area">
               <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="Audio MP3 channel level"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
-              <div class="vert-led-meter" id="mixerMeter2"></div><div class="channel-gr-meter" id="mixerGr2" role="meter" aria-label="Channel 2 Gain Reduction" aria-valuemin="-20" aria-valuemax="0" aria-valuenow="0"><span class="channel-gr-label">GR</span><div class="channel-gr-track"><i class="channel-gr-fill"></i><b class="channel-gr-lamp"></b></div><small class="channel-gr-value">0</small></div>
+              <div class="vert-led-meter" id="mixerMeter2"></div><div class="channel-gr-meter" id="mixerGr2" role="meter" aria-label="Channel 2 Gain Reduction" aria-valuemin="-20" aria-valuemax="0" aria-valuenow="0"><span class="channel-gr-label">GR</span><div class="channel-gr-scale" aria-hidden="true"><span>0</span><span>-5</span><span>-10</span><span>-15</span><span>-20</span></div><div class="channel-gr-track"><i class="channel-gr-fill"></i><b class="channel-gr-lamp"></b></div><small class="channel-gr-value">0.0</small></div>
             </div>
             <div class="strip-action-buttons">
               <button class="console-action-btn mute">MUTE</button>
@@ -8570,7 +8589,7 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 </div><div class="strip-status-leds" aria-label="FX SEND status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
             <div class="fader-panel-area">
               <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="FX send level"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
-              <div class="vert-led-meter" id="mixerMeter3"></div><div class="channel-gr-meter" id="mixerGr3" role="meter" aria-label="Channel 3 Gain Reduction" aria-valuemin="-20" aria-valuemax="0" aria-valuenow="0"><span class="channel-gr-label">GR</span><div class="channel-gr-track"><i class="channel-gr-fill"></i><b class="channel-gr-lamp"></b></div><small class="channel-gr-value">0</small></div>
+              <div class="vert-led-meter" id="mixerMeter3"></div><div class="channel-gr-meter" id="mixerGr3" role="meter" aria-label="Channel 3 Gain Reduction" aria-valuemin="-20" aria-valuemax="0" aria-valuenow="0"><span class="channel-gr-label">GR</span><div class="channel-gr-scale" aria-hidden="true"><span>0</span><span>-5</span><span>-10</span><span>-15</span><span>-20</span></div><div class="channel-gr-track"><i class="channel-gr-fill"></i><b class="channel-gr-lamp"></b></div><small class="channel-gr-value">0.0</small></div>
             </div>
             <div class="strip-action-buttons">
               <button class="console-action-btn mute">MUTE</button>
@@ -8585,7 +8604,7 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 </div><div class="strip-status-leds" aria-label="FX RETURN status"><span class="status-led sig-led" data-led="sig"><i></i>SIG</span><span class="status-led clip-led" data-led="clip"><i></i>CLIP</span></div>
             <div class="fader-panel-area">
               <div class="fader-slot"><div class="fader-scale" aria-hidden="true"><span>+10</span><span>+5</span><span>0</span><span>-5</span><span>-10</span><span>-20</span><span>-30</span><span>-40</span><span>−∞</span></div><div class="fader-ticks" aria-hidden="true"></div><input type="range" min="-40" max="10" step="0.5" value="0" aria-label="FX return level"><div class="fader-readout in-fader-readout">0.0 dB</div></div>
-              <div class="vert-led-meter" id="mixerMeter4"></div><div class="channel-gr-meter" id="mixerGr4" role="meter" aria-label="Channel 4 Gain Reduction" aria-valuemin="-20" aria-valuemax="0" aria-valuenow="0"><span class="channel-gr-label">GR</span><div class="channel-gr-track"><i class="channel-gr-fill"></i><b class="channel-gr-lamp"></b></div><small class="channel-gr-value">0</small></div>
+              <div class="vert-led-meter" id="mixerMeter4"></div><div class="channel-gr-meter" id="mixerGr4" role="meter" aria-label="Channel 4 Gain Reduction" aria-valuemin="-20" aria-valuemax="0" aria-valuenow="0"><span class="channel-gr-label">GR</span><div class="channel-gr-scale" aria-hidden="true"><span>0</span><span>-5</span><span>-10</span><span>-15</span><span>-20</span></div><div class="channel-gr-track"><i class="channel-gr-fill"></i><b class="channel-gr-lamp"></b></div><small class="channel-gr-value">0.0</small></div>
             </div>
             <div class="strip-action-buttons">
               <button class="console-action-btn mute">MUTE</button>
