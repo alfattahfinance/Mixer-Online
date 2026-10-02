@@ -8777,6 +8777,8 @@ function updateMasterStereoMeters() {
     paintMeter(document.getElementById("masterMeterCombined"), db, "vertical");
   }
 
+  // Keep TFT meters on the same single visual loop; never create a second RAF loop.
+  updateTftMetersFromAudio();
   masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
 }
 masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
