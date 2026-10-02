@@ -7604,6 +7604,71 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 #tabMixerContent .mixer-tft-screen .tft-encoder-knob.rotary-dragging .tft-knob-face{box-shadow:inset 0 1px 2px rgba(255,255,255,.25),inset 0 -2px 3px rgba(0,0,0,.8),0 0 9px rgba(56,189,248,.65)}
 #tabMixerContent .mixer-tft-screen .tft-encoder-knob.rotary-dragging{border-color:#38bdf8!important}
 @media(max-width:700px){#tabMixerContent .mixer-tft-screen .tft-encoder-knob{grid-template-columns:27px 1fr!important;height:23px!important;min-height:23px!important;max-height:23px!important}.tft-knob-face{width:22px!important;height:22px!important}}
+</style><style id="gate-fullscreen-2026-10-02">
+/* GATE: use the entire available mixer TFT viewport. */
+#tabMixerContent #tftContentArea[data-page-key="gate"]{
+  width:100% !important;
+  height:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  overflow:hidden !important;
+  padding:0 !important;
+  margin:0 !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-view{
+  width:100% !important;
+  height:100% !important;
+  min-height:0 !important;
+  flex:1 1 auto !important;
+  display:flex !important;
+  flex-direction:column !important;
+  overflow:hidden !important;
+  padding:clamp(4px,1vw,10px) !important;
+  box-sizing:border-box !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box{
+  flex:1 1 auto !important;
+  width:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  height:auto !important;
+  aspect-ratio:auto !important;
+  align-self:stretch !important;
+  margin:0 !important;
+  box-sizing:border-box !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box svg{
+  width:100% !important;
+  height:100% !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-controls-grid{
+  flex:0 0 auto !important;
+  width:100% !important;
+  min-width:0 !important;
+  margin-top:clamp(4px,.7vh,8px) !important;
+  box-sizing:border-box !important;
+}
+#tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-controls-grid > *{
+  min-width:0 !important;
+}
+@media (orientation:landscape) and (min-width:701px){
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-view{
+    padding:4px 8px !important;
+  }
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-graph-box{
+    min-height:0 !important;
+  }
+}
+@media (max-width:700px){
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-view{
+    padding:3px !important;
+  }
+  #tabMixerContent #tftContentArea[data-page-key="gate"] .tft-module-controls-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+}
 </style></head>
 
 <body>
