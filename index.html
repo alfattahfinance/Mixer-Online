@@ -8352,6 +8352,14 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 
             <div class="tft-main-viewport">
               <div class="tft-content-screen" id="tftContentArea"></div>
+        <div class="preamp-source-bank" aria-hidden="true">
+          <input id="cfgGain" type="range" min="-20" max="60" step="0.5" value="${s.gain}">
+          <input id="cfgHpf" type="range" min="20" max="400" step="5" value="${s.hpf}">
+          <button id="cfgPhantomBtn" type="button" class="${s.phantom ? "active-action" : ""}" aria-pressed="${s.phantom}">48V PHANTOM</button>
+          <button id="cfgPhaseBtn" type="button" class="${s.phase ? "active-action" : ""}" aria-pressed="${s.phase}">PHASE</button>
+          <span id="cfgGainInfo"></span><span id="cfgHpfInfo"></span><span id="cfgPhantomInfo"></span><span id="cfgPhaseInfo"></span>
+        </div>
+
               
             </div>
 
@@ -10667,14 +10675,7 @@ const tftDatabase = {
             <b id="cfgPreampGraphOutput">OUTPUT -48.0 dB</b>
           </div>
         </div>
-        <div class="preamp-source-bank" aria-hidden="true">
-          <input id="cfgGain" type="range" min="-20" max="60" step="0.5" value="${s.gain}">
-          <input id="cfgHpf" type="range" min="20" max="400" step="5" value="${s.hpf}">
-          <button id="cfgPhantomBtn" type="button" class="${s.phantom ? "active-action" : ""}" aria-pressed="${s.phantom}">48V PHANTOM</button>
-          <button id="cfgPhaseBtn" type="button" class="${s.phase ? "active-action" : ""}" aria-pressed="${s.phase}">PHASE</button>
-          <span id="cfgGainInfo"></span><span id="cfgHpfInfo"></span><span id="cfgPhantomInfo"></span><span id="cfgPhaseInfo"></span>
-        </div>
-      </div>
+     </div>
     `,
     encoders: (s) => [
       {name:"GAIN", val:`${Number(s.gain).toFixed(1)}dB`},
@@ -11722,6 +11723,8 @@ function bindTftDynamicEventListeners(key) {
         }, 24);
       };
       const refreshPreampUi = () => {
+        if (gInp) gInp.value = String(s.gain);
+        if (hpfInp) hpfInp.value = String(s.hpf);
         if (gainVal) gainVal.textContent = Number(s.gain).toFixed(1) + " dB";
         if (gainInfo) gainInfo.textContent = Number(s.gain).toFixed(1) + " dB";
         if (hpfInfo) hpfInfo.textContent = Number(s.hpf).toFixed(0) + " Hz";
