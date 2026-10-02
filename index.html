@@ -9474,7 +9474,7 @@ const CONTROL_SMOOTHING_SECONDS = 0.012;
 
 let usbInputStream = null;
 let usbInputSource = null;
-let usbInputSplitter = null; // 2-IN interface: input 1 -> CH1, input 2 -> CH2
+let usbInputSplitter = null; // Legacy cleanup handle; USB Audio is routed as one source to CH1 only.
 let audioBuffers = [];
 let audioFileNames = [];
 let currentPlaylistIndex = 0;
@@ -9895,23 +9895,16 @@ async function activateUsbAudioInput() {
     }
     usbInputSource.connect(usbInputAnalyser);
 
-    // TRUE 2-IN ROUTING: USB/interface channel 1 -> CH1, channel 2 -> CH2.
-    // Split before the channel faders so the two physical inputs stay independent.
-    usbInputSplitter=audioContext.createChannelSplitter(2);
-    usbInputSplitter.channelCount=2;
-    usbInputSplitter.channelCountMode="explicit";
-    usbInputSource.connect(usbInputSplitter);
-    usbInputSplitter.connect(mixerStripInputAnalysers[0],0);
-    usbInputSplitter.connect(mixerStripGains[0],0);
-    usbInputSplitter.connect(mixerStripInputAnalysers[1],1);
-    usbInputSplitter.connect(mixerStripGains[1],1);
+    // ISOLATED ROUTING: the selected USB Audio Interface is one source for CH1 only.
+    // Never route USB input channel 2 to CH2. CH2 is reserved exclusively for MP3/Audio playback.
+    // Keep the USB source stereo so a stereo interface remains intact inside the CH1 strip.
+    usbInputSource.connect(mixerStripInputAnalysers[0]);
+    usbInputSource.connect(mixerStripGains[0]);
     updateUsbInputLevelMeter();
 
     if (physicalInputDevice) physicalInputDevice.value=usbAudioInputDeviceId;
     const outputLabel=physicalOutputDevice?.selectedOptions?.[0]?.textContent || "OUTPUT AUDIO";
-    setAudioStatus(activeChannelCount >= 2
-      ? "2-IN AKTIF: USB IN 1 → CH1 · USB IN 2 → CH2 · 2-OUT L/R"
-      : "1-IN AKTIF: USB IN 1 → CH1 · CH2 menunggu INPUT 2 · 2-OUT siap");
+    setAudioStatus("USB AUDIO → CH1 · CH2 ← MP3/AUDIO · 2-OUT L/R");
     return true;
   } catch(err) {
     if (usbInputStream) {
@@ -10030,19 +10023,11 @@ if (physicalInputDevice) physicalInputDevice.addEventListener("change", async ()
     if (!usbInputAnalyser) { usbInputAnalyser=audioContext.createAnalyser(); usbInputAnalyser.fftSize=1024; usbInputAnalyser.smoothingTimeConstant=.08; }
     usbInputSource.connect(usbInputAnalyser);
 
-    usbInputSplitter=audioContext.createChannelSplitter(2);
-    usbInputSplitter.channelCount=2;
-    usbInputSplitter.channelCountMode="explicit";
-    usbInputSource.connect(usbInputSplitter);
-    usbInputSplitter.connect(mixerStripInputAnalysers[0],0);
-    usbInputSplitter.connect(mixerStripGains[0],0);
-    if (activeChannelCount >= 2) {
-      usbInputSplitter.connect(mixerStripInputAnalysers[1],1);
-      usbInputSplitter.connect(mixerStripGains[1],1);
-    }
-    setAudioStatus(activeChannelCount >= 2
-      ? "2-IN AKTIF: USB IN 1 → CH1 · USB IN 2 → CH2 · 2-OUT L/R"
-      : "1-IN AKTIF: USB IN 1 → CH1 · CH2 menunggu INPUT 2 · 2-OUT siap");
+    // ISOLATED ROUTING: USB Audio Interface -> CH1 only.
+    // CH2 is exclusively owned by the MP3/Audio playback source.
+    usbInputSource.connect(mixerStripInputAnalysers[0]);
+    usbInputSource.connect(mixerStripGains[0]);
+    setAudioStatus("USB AUDIO → CH1 · CH2 ← MP3/AUDIO · 2-OUT L/R");
     updateUsbInputLevelMeter();
   } catch(err) {
     usbAudioConnected=false;
@@ -10552,7 +10537,7 @@ function rebuildAudioRouting() {
   mixerInputGain.disconnect();
 
   // IMPORTANT: CH1/CH2 input analysers are dedicated source taps.
-  // USB -> CH1 and MP3 -> CH2 are connected at the source, so rebuilding
+  // USB Audio -> CH1 and MP3/Audio -> CH2 are connected at the source, so rebuilding
   // the FX/Main-LR routing must NEVER disconnect those input meter taps.
   // Only CH3/CH4 FX-side input taps are rebuilt below.
   [2,3].forEach(i => {
