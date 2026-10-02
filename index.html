@@ -10471,7 +10471,15 @@ function rebuildAudioRouting() {
   // Clear only the routing branches. The analyser nodes remain alive so the
   // visual meters continue running while PAGES/CHANNEL DSP changes.
   mixerInputGain.disconnect();
-  mixerStripInputAnalysers.forEach(analyser => { try { analyser?.disconnect(); } catch (err) {} });
+
+  // IMPORTANT: CH1/CH2 input analysers are dedicated source taps.
+  // USB -> CH1 and MP3 -> CH2 are connected at the source, so rebuilding
+  // the FX/Main-LR routing must NEVER disconnect those input meter taps.
+  // Only CH3/CH4 FX-side input taps are rebuilt below.
+  [2,3].forEach(i => {
+    try { mixerStripInputAnalysers[i]?.disconnect(); } catch (err) {}
+  });
+
   [0,1,2,3].forEach(i => {
     try { mixerStripAnalysers[i]?.disconnect(); } catch (err) {}
   });
