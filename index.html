@@ -3952,6 +3952,31 @@ body.mixer-powered-off #tabMixerContent .mixer-tft-screen .master-combined-meter
 }
 
 
+/* PREAMP native page: replace legacy Gate content with real preamp controls. */
+#tabMixerContent .preamp-native-view{display:flex;flex-direction:column;gap:6px;height:100%;min-height:0;overflow:hidden;}
+#tabMixerContent .preamp-main-panel{display:grid;grid-template-columns:minmax(150px,.65fr) minmax(220px,1.35fr);gap:6px;flex:1 1 auto;min-height:0;}
+#tabMixerContent .preamp-meter-card,#tabMixerContent .preamp-control-panel{background:#20262d;border:1px solid #59616a;border-radius:5px;min-height:0;padding:6px;}
+#tabMixerContent .preamp-meter-card{display:flex;flex-direction:column;min-width:0;}
+#tabMixerContent .preamp-card-head{display:flex;justify-content:space-between;gap:5px;color:#dbe4ec;font-size:9px;margin-bottom:5px;}
+#tabMixerContent .preamp-card-head span{color:#4ade80;font-weight:800;}
+#tabMixerContent .preamp-level-track{position:relative;flex:1;min-height:75px;border:1px solid #48515a;border-radius:3px;background:repeating-linear-gradient(to top,rgba(148,163,184,.12) 0 1px,transparent 1px 20%);overflow:hidden;}
+#tabMixerContent .preamp-level-track i{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(to top,#22c55e 0 55%,#eab308 55% 82%,#ef4444 82%);box-shadow:0 0 7px rgba(56,189,248,.45);transition:height .08s linear;}
+#tabMixerContent .preamp-level-scale{display:flex;justify-content:space-between;color:#94a3b8;font-size:6px;margin-top:2px;}
+#tabMixerContent .preamp-readout{display:flex;justify-content:space-between;align-items:end;margin-top:4px;color:#94a3b8;font-size:6.5px;}
+#tabMixerContent .preamp-readout b{color:#38bdf8;font-size:13px;}
+#tabMixerContent .preamp-control-panel{display:flex;flex-direction:column;justify-content:center;gap:8px;}
+#tabMixerContent .preamp-control-card{background:#171c22;border:1px solid #3f4851;border-radius:4px;padding:5px;}
+#tabMixerContent .preamp-control-card label{display:block;color:#cbd5e1;font-size:7px;font-weight:800;margin-bottom:2px;}
+#tabMixerContent .preamp-control-card input{width:100%;margin:2px 0;accent-color:#38bdf8;touch-action:manipulation;}
+#tabMixerContent .preamp-control-card output{display:block;text-align:right;color:#38bdf8;font-size:8px;font-weight:800;}
+#tabMixerContent .preamp-action-row{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+#tabMixerContent .preamp-action-row button{min-height:30px;font-size:7px;font-weight:800;cursor:pointer;}
+#tabMixerContent .preamp-info-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;flex:0 0 auto;}
+#tabMixerContent .preamp-info-grid>div{background:#171c22;border:1px solid #3f4851;border-radius:3px;padding:3px 5px;min-width:0;}
+#tabMixerContent .preamp-info-grid small{display:block;color:#94a3b8;font-size:5.5px;}
+#tabMixerContent .preamp-info-grid strong{display:block;color:#e2e8f0;font-size:8px;margin-top:1px;}
+@media(max-width:600px){#tabMixerContent .preamp-main-panel{grid-template-columns:minmax(80px,.45fr) minmax(170px,1.55fr);}#tabMixerContent .preamp-action-row{grid-template-columns:1fr;}#tabMixerContent .preamp-info-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+
 /* Hide legacy TFT notification footer; the main screen stays clean. */
 #tabMixerContent #tftFooterChannel,
 #tabMixerContent #tftFooterStatus { display:none !important; }
@@ -8913,7 +8938,7 @@ let tftCurveActiveStates = { config: false, gate: true, dynamics: true, eq: true
 let activeCurrentSectionKey = "eq";
 
 const tftStatesData = {
-  config: { gain: 12, phantom: true, phase: false, dotX: 160, dotY: 32 },
+  config: { gain: 12, hpf: 80, phantom: true, phase: false, dotX: 160, dotY: 32 },
   gate: { thresh: -45, ratio: 2.5, state: true, dot1X: 85, dot1Y: 42.5, dot2X: 160, dot2Y: 11.25 },
   dynamics: { thresh: -18, ratio: 3, makeup: 2, dot1X: 10, dot1Y: 55, dot2X: 180, dot2Y: 35, dot3X: 310, dot3Y: 20 },
   eq: { freq: 2500, q: 1.5, gain: 4.5 },
@@ -10396,7 +10421,7 @@ const consoleSectionBtns = document.querySelectorAll(".mixer-side-nav .console-b
 function updateEncoders(data) {
   const encoderBoxes = document.querySelectorAll(".tft-encoder-knob");
   const pageKey = document.getElementById("tftContentArea")?.dataset?.pageKey || "";
-  const maps = { config:["cfgGain"], gate:["gateThresh","gateRatio"], dynamics:["compThresh","compRatio","compMakeup"], peq:["tftPeqFreq","tftPeqQ","tftPeqGain"], sends:["send1Lvl"], main:["mainFohLvl","mainLimitLvl"], effect:["fxDelayInp","fxFeedbackInp"] };
+  const maps = { config:["cfgGain","cfgHpf"], gate:["gateThresh","gateRatio"], dynamics:["compThresh","compRatio","compMakeup"], peq:["tftPeqFreq","tftPeqQ","tftPeqGain"], sends:["send1Lvl"], main:["mainFohLvl","mainLimitLvl"], effect:["fxDelayInp","fxFeedbackInp"] };
   const ids = maps[pageKey] || [];
   encoderBoxes.forEach((box, index) => {
     if (!data[index]) return;
@@ -10419,43 +10444,41 @@ const tftDatabase = {
   config: {
     title: "SQ-7 PREAMP CONFIG",
     footerCh: "Current: Ip1 Preamp",
-    footerSt: "Next: Gain & Phantom Setting",
+    footerSt: "Gain • HPF • 48V Phantom • Phase",
     content: (s) => `
-      <div class="tft-module-view gate-fullscreen-view">
-        <div class="tft-module-graph-box gate-fullscreen-graph" id="tftGateBox">
-          <svg id="tftGateSvgContainer" viewBox="0 0 320 120" preserveAspectRatio="none" style="width:100%; height:100%; touch-action:none;" role="img" aria-label="Gate input level versus output level">
-            <g class="tft-transfer-grid" aria-hidden="true">
-              <line x1="10" y1="15" x2="310" y2="15"/><line x1="10" y1="30" x2="310" y2="30"/>
-              <line x1="10" y1="45" x2="310" y2="45"/><line x1="10" y1="60" x2="310" y2="60"/>
-              <line x1="10" y1="75" x2="310" y2="75"/><line x1="10" y1="90" x2="310" y2="90"/>
-              <line x1="10" y1="105" x2="310" y2="105"/>
-              <line x1="10" y1="15" x2="10" y2="105"/><line x1="60" y1="15" x2="60" y2="105"/>
-              <line x1="110" y1="15" x2="110" y2="105"/><line x1="160" y1="15" x2="160" y2="105"/>
-              <line x1="210" y1="15" x2="210" y2="105"/><line x1="260" y1="15" x2="260" y2="105"/>
-              <line x1="310" y1="15" x2="310" y2="105"/>
-            </g>
-            <line class="tft-transfer-reference" x1="10" y1="105" x2="310" y2="15" aria-hidden="true"/>
-            <g class="tft-transfer-scale" aria-hidden="true">
-              <text x="10" y="116" text-anchor="middle">-60</text><text x="60" y="116" text-anchor="middle">-50</text>
-              <text x="110" y="116" text-anchor="middle">-40</text><text x="160" y="116" text-anchor="middle">-30</text>
-              <text x="210" y="116" text-anchor="middle">-20</text><text x="260" y="116" text-anchor="middle">-10</text><text x="310" y="116" text-anchor="end">0 dB</text>
-              <text x="7" y="107" text-anchor="end">-60</text><text x="7" y="92" text-anchor="end">-50</text>
-              <text x="7" y="77" text-anchor="end">-40</text><text x="7" y="62" text-anchor="end">-30</text>
-              <text x="7" y="47" text-anchor="end">-20</text><text x="7" y="32" text-anchor="end">-10</text><text x="7" y="17" text-anchor="end">0 dB</text>
-              <text class="axis-title" x="245" y="11" text-anchor="middle">INPUT LEVEL (dB)</text>
-              <text class="axis-title" x="18" y="61" text-anchor="middle" transform="rotate(-90 18 61)">OUTPUT LEVEL (dB)</text>
-              <text class="reference-label" x="205" y="32">1:1 NO COMPRESSION</text>
-              <text class="graph-title" x="44" y="24">GATE TRANSFER CURVE</text>
-            </g>
-            <path id="tftGateSvgCurve" d="M10 55 L ${s.dot1X} ${s.dot1Y} L ${s.dot2X} ${s.dot2Y}" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
-            <path id="tftGateSvgFill" d="M10 55 L ${s.dot1X} ${s.dot1Y} L ${s.dot2X} ${s.dot2Y} L 310 65 L 10 65 Z" fill="#f59e0b" opacity=".12"/>
-            <circle id="tftGateDot1" cx="${s.dot1X}" cy="${s.dot1Y}" r="7" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Threshold Point"/>
-            <circle id="tftGateDot2" cx="${s.dot2X}" cy="${s.dot2Y}" r="7" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" style="cursor:pointer; touch-action:none;" title="Ratio Point"/>
-          </svg>
+      <div class="tft-module-view preamp-native-view">
+        <div class="preamp-main-panel">
+          <div class="preamp-meter-card">
+            <div class="preamp-card-head"><strong>INPUT PREAMP</strong><span id="cfgPreampStatus">${s.phantom ? "48V ON" : "48V OFF"}</span></div>
+            <div class="preamp-level-track" aria-label="Input level"><i id="cfgPreampLevel" style="height:0%"></i></div>
+            <div class="preamp-level-scale"><span>-60</span><span>-30</span><span>-12</span><span>-6</span><span>0 dB</span></div>
+            <div class="preamp-readout"><b id="cfgGainVal">${Number(s.gain).toFixed(1)} dB</b><span>INPUT GAIN</span></div>
+          </div>
+          <div class="preamp-control-panel">
+            <div class="preamp-control-card"><label for="cfgGain">GAIN</label><input id="cfgGain" type="range" min="-20" max="60" step="0.5" value="${s.gain}"><output>${Number(s.gain).toFixed(1)} dB</output></div>
+            <div class="preamp-control-card"><label for="cfgHpf">HPF</label><input id="cfgHpf" type="range" min="20" max="400" step="5" value="${s.hpf}"><output>${Number(s.hpf).toFixed(0)} Hz</output></div>
+            <div class="preamp-action-row">
+              <button id="cfgPhantomBtn" type="button" class="${s.phantom ? "active-action" : ""}" aria-pressed="${s.phantom}">48V PHANTOM <b>${s.phantom ? "ON" : "OFF"}</b></button>
+              <button id="cfgPhaseBtn" type="button" class="${s.phase ? "active-action" : ""}" aria-pressed="${s.phase}">PHASE <b>${s.phase ? "INVERT" : "NORMAL"}</b></button>
+            </div>
+          </div>
+        </div>
+        <div class="preamp-info-grid">
+          <div><small>GAIN</small><strong id="cfgGainInfo">${Number(s.gain).toFixed(1)} dB</strong></div>
+          <div><small>HPF</small><strong id="cfgHpfInfo">${Number(s.hpf).toFixed(0)} Hz</strong></div>
+          <div><small>PHANTOM</small><strong id="cfgPhantomInfo">${s.phantom ? "48V ON" : "OFF"}</strong></div>
+          <div><small>POLARITY</small><strong id="cfgPhaseInfo">${s.phase ? "INVERT" : "NORMAL"}</strong></div>
         </div>
       </div>
     `,
-    encoders: (s) => [{name:"GAIN", val:`+${s.gain}dB`}, {name:"HPF", val:"80Hz"}, {name:"POLARITY", val:s.phase?"INV":"NORM"}, {name:"DELAY", val:"0.0ms"}, {name:"WIDTH", val:"100%"}, {name:"TRIM", val:"0.0dB"}]
+    encoders: (s) => [
+      {name:"GAIN", val:`${Number(s.gain).toFixed(1)}dB`},
+      {name:"HPF", val:`${Number(s.hpf).toFixed(0)}Hz`},
+      {name:"48V", val:s.phantom?"ON":"OFF"},
+      {name:"PHASE", val:s.phase?"INV":"NORM"},
+      {name:"TRIM", val:"0.0dB"},
+      {name:"INPUT", val:"IP1"}
+    ]
   },
   gate: {
     title: "SQ-7 NOISE GATE",
@@ -11408,11 +11431,45 @@ function bindTftDynamicEventListeners(key) {
   } else {
     if (key === "config") {
       const gInp = document.getElementById("cfgGain");
+      const hpfInp = document.getElementById("cfgHpf");
       const phBtn = document.getElementById("cfgPhantomBtn");
       const phBtn2 = document.getElementById("cfgPhaseBtn");
-      gInp?.addEventListener("input", () => { s.gain = Number(gInp.value); document.getElementById("cfgGainVal").textContent = s.gain + "dB"; updateEncoders(tftDatabase.config.encoders(s)); });
-      phBtn?.addEventListener("click", () => { s.phantom = !s.phantom; phBtn.textContent = s.phantom ? "ON" : "OFF"; phBtn.classList.toggle("active-action", s.phantom); });
-      phBtn2?.addEventListener("click", () => { s.phase = !s.phase; phBtn2.textContent = s.phase ? "INVERT" : "NORMAL"; phBtn2.classList.toggle("active-action", s.phase); updateEncoders(tftDatabase.config.encoders(s)); });
+      const gainVal = document.getElementById("cfgGainVal");
+      const gainInfo = document.getElementById("cfgGainInfo");
+      const hpfInfo = document.getElementById("cfgHpfInfo");
+      const phantomInfo = document.getElementById("cfgPhantomInfo");
+      const phaseInfo = document.getElementById("cfgPhaseInfo");
+      const status = document.getElementById("cfgPreampStatus");
+      const applyPreampToAudio = () => {
+        const channel = audioChannels[0];
+        if (!channel || !audioContext) return;
+        if (channel.inputGain) channel.inputGain.gain.setTargetAtTime(dbToGain(Number(s.gain)) * (s.phase ? -1 : 1), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+        if (channel.highPass) channel.highPass.frequency.setTargetAtTime(Number(s.hpf), audioContext.currentTime, CONTROL_SMOOTHING_SECONDS);
+      };
+      const sendPreampFeedback = (control, value) => {
+        const packet = { type:"CONTROL", source:"PREAMP", channel:1, control, value, timestamp:Date.now() };
+        try { window.dispatchEvent(new CustomEvent("mixer:preamp-control", { detail: packet })); } catch (_) {}
+        try { sendDataToESP32(JSON.stringify(packet) + "\\n"); } catch (_) {}
+      };
+      const refreshPreampUi = () => {
+        if (gainVal) gainVal.textContent = Number(s.gain).toFixed(1) + " dB";
+        if (gainInfo) gainInfo.textContent = Number(s.gain).toFixed(1) + " dB";
+        if (hpfInfo) hpfInfo.textContent = Number(s.hpf).toFixed(0) + " Hz";
+        if (phantomInfo) phantomInfo.textContent = s.phantom ? "48V ON" : "OFF";
+        if (phaseInfo) phaseInfo.textContent = s.phase ? "INVERT" : "NORMAL";
+        if (status) status.textContent = s.phantom ? "48V ON" : "48V OFF";
+        if (phBtn) { phBtn.innerHTML = '48V PHANTOM <b>' + (s.phantom ? "ON" : "OFF") + '</b>'; phBtn.classList.toggle("active-action", !!s.phantom); phBtn.setAttribute("aria-pressed", String(!!s.phantom)); }
+        if (phBtn2) { phBtn2.innerHTML = 'PHASE <b>' + (s.phase ? "INVERT" : "NORMAL") + '</b>'; phBtn2.classList.toggle("active-action", !!s.phase); phBtn2.setAttribute("aria-pressed", String(!!s.phase)); }
+        if (hpfInp) hpfInp.nextElementSibling.textContent = Number(s.hpf).toFixed(0) + " Hz";
+        if (gInp) gInp.nextElementSibling.textContent = Number(s.gain).toFixed(1) + " dB";
+        updateEncoders(tftDatabase.config.encoders(s));
+      };
+      gInp?.addEventListener("input", () => { s.gain = Number(gInp.value); applyPreampToAudio(); refreshPreampUi(); persistTftState(); sendPreampFeedback("GAIN", s.gain); });
+      hpfInp?.addEventListener("input", () => { s.hpf = Number(hpfInp.value); applyPreampToAudio(); refreshPreampUi(); persistTftState(); sendPreampFeedback("HPF", s.hpf); });
+      phBtn?.addEventListener("click", () => { s.phantom = !s.phantom; refreshPreampUi(); persistTftState(); sendPreampFeedback("PHANTOM_48V", s.phantom); });
+      phBtn2?.addEventListener("click", () => { s.phase = !s.phase; applyPreampToAudio(); refreshPreampUi(); persistTftState(); sendPreampFeedback("PHASE", s.phase ? "INVERT" : "NORMAL"); });
+      applyPreampToAudio();
+      refreshPreampUi();
     } else if (key === "gate") {
       const thInp = document.getElementById("gateThresh");
       const ratInp = document.getElementById("gateRatio");
