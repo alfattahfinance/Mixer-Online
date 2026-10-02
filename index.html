@@ -10700,6 +10700,7 @@ function playCurrentBuffer() {
 
   if (activeSourceNode) {
     activeSourceNode.onended = null;
+    try { activeSourceNode.disconnect(); } catch (e) {}
     try { activeSourceNode.stop(); } catch (e) {}
     activeSourceNode = null;
   }
@@ -10722,6 +10723,7 @@ function playCurrentBuffer() {
   setAudioStatus("Memutar: " + audioFileNames[currentPlaylistIndex]);
 
   sourceNode.onended = () => {
+    try { sourceNode.disconnect(); } catch (e) {}
     if (activeSourceNode !== sourceNode) return;
     activeSourceNode = null;
     if (isPlaying && audioBuffers.length > 0) {
@@ -10758,12 +10760,9 @@ stopAudioButton.addEventListener("click", () => {
     try { sourceToStop.disconnect(); } catch (e) {}
     try { sourceToStop.stop(); } catch (e) {}
   }
-  // Clear CH2 analyser immediately so its SIG/CLIP cannot glow from stale samples.
-  const ch2InputAnalyser = mixerStripInputAnalysers[1];
-  if (ch2InputAnalyser) {
-    try { ch2InputAnalyser.disconnect(); } catch (e) {}
-    try { ch2InputAnalyser.connect(audioContext.createGain()); } catch (e) {}
-  }
+  // CH2 meter is source-gated above; after STOP it immediately renders -72 dB.
+  // Do not disconnect the persistent analyser itself because the next MP3 source
+  // must be able to attach to the same dedicated CH2 input meter.
   isPlaying = false;
   startAudioButton.classList.remove("active");
   setAudioStatus("Playlist dihentikan.");
