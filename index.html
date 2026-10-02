@@ -11074,7 +11074,9 @@ function bindTftDynamicEventListeners(key) {
       const stBtn = document.getElementById("geqStateBtn");
       lvlInp?.addEventListener("input", () => {
         s.lvl = Number(lvlInp.value);
-        document.getElementById("send1LvlVal").textContent = s.lvl.toFixed(1) + "dB";
+        document.getElementById("send1LvlVal").textContent = (s.lvl >= 0 ? "+" : "") + s.lvl.toFixed(1) + "dB";
+        const hint = document.querySelector(".geq-fader-hint");
+        if (hint) hint.textContent = "DRAG FADERS VERTICALLY • EACH BAND ±15 dB • MASTER OFFSET " + s.lvl.toFixed(1) + " dB • " + (s.state ? "GEQ ACTIVE" : "GEQ BYPASS");
         updateEncoders(tftDatabase.sends.encoders(s));
         updateTftModuleCurve("sends");
         persistTftState();
@@ -11164,9 +11166,33 @@ function bindTftDynamicEventListeners(key) {
         updateEncoders(tftDatabase.sends.encoders(s));
         updateTftModuleCurve("sends");
         refreshTftInfoPanel("sends");
+        const hint = document.querySelector(".geq-fader-hint");
+        if (hint) hint.textContent = "DRAG FADERS VERTICALLY • EACH BAND ±15 dB • MASTER OFFSET " + Number(s.lvl || 0).toFixed(1) + " dB • " + (s.state ? "GEQ ACTIVE" : "GEQ BYPASS");
         persistTftState();
       });
-      stBtn?.addEventListener("click", () => { s.state = !s.state; stBtn.textContent = s.state ? "ACTIVE" : "BYPASS"; stBtn.classList.toggle("active-action", s.state); updateEncoders(tftDatabase.sends.encoders(s)); updateTftModuleCurve("sends"); persistTftState(); });
+      const updateGeqStateIndicator = () => {
+        stBtn?.classList.toggle("active-action", !!s.state);
+        if (stBtn) {
+          stBtn.textContent = s.state ? "ACTIVE" : "BYPASS";
+          stBtn.setAttribute("aria-pressed", s.state ? "true" : "false");
+        }
+        const led = document.querySelector(".geq-live-led");
+        if (led) {
+          led.classList.toggle("on", !!s.state);
+          led.innerHTML = "<i></i>" + (s.state ? "ACTIVE" : "BYPASS");
+        }
+        const hint = document.querySelector(".geq-fader-hint");
+        if (hint) hint.textContent = "DRAG FADERS VERTICALLY • EACH BAND ±15 dB • MASTER OFFSET " + Number(s.lvl || 0).toFixed(1) + " dB • " + (s.state ? "GEQ ACTIVE" : "GEQ BYPASS");
+      };
+      updateGeqStateIndicator();
+      stBtn?.addEventListener("click", () => {
+        s.state = !s.state;
+        updateGeqStateIndicator();
+        updateEncoders(tftDatabase.sends.encoders(s));
+        updateTftModuleCurve("sends");
+        refreshTftInfoPanel("sends");
+        persistTftState();
+      });
     } else if (key === "main") {
       const sendInp = document.getElementById("mainFohLvl");
       const limInp = document.getElementById("mainLimitLvl");
