@@ -8470,8 +8470,8 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
           
           <div class="echo-control-card">
             <label>FEEDBACK (Pengulangan)</label>
-            <input type="range" id="echoFeedback" min="0.0" max="0.9" step="0.05" value="0.4">
-            <div class="echo-val" id="echoFeedbackVal">40%</div>
+            <input type="range" id="echoFeedback" min="0.0" max="0.9" step="0.05" value="0.0">
+            <div class="echo-val" id="echoFeedbackVal">0%</div>
           </div>
 
           <div class="echo-control-card">
@@ -8482,8 +8482,8 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
 
           <div class="echo-control-card">
             <label>EFFECTS MIX (Wet / Dry)</label>
-            <input type="range" id="echoMix" min="0.0" max="1.0" step="0.05" value="0.3">
-            <div class="echo-val" id="echoMixVal">30%</div>
+            <input type="range" id="echoMix" min="0.0" max="1.0" step="0.05" value="0.0">
+            <div class="echo-val" id="echoMixVal">0%</div>
           </div>
         </div>
       </div>
@@ -9475,6 +9475,7 @@ const CONTROL_SMOOTHING_SECONDS = 0.012;
 let usbInputStream = null;
 let usbInputSource = null;
 let usbInputSplitter = null; // Legacy cleanup handle; USB Audio is routed as one source to CH1 only.
+let usbInputConditioner = null; // Clean USB input: rumble/harsh top-end + gentle peak control.
 let audioBuffers = [];
 let audioFileNames = [];
 let currentPlaylistIndex = 0;
@@ -9895,11 +9896,32 @@ async function activateUsbAudioInput() {
     }
     usbInputSource.connect(usbInputAnalyser);
 
-    // ISOLATED ROUTING: the selected USB Audio Interface is one source for CH1 only.
-    // Never route USB input channel 2 to CH2. CH2 is reserved exclusively for MP3/Audio playback.
-    // Keep the USB source stereo so a stereo interface remains intact inside the CH1 strip.
-    usbInputSource.connect(mixerStripInputAnalysers[0]);
-    usbInputSource.connect(mixerStripGains[0]);
+    // CLEAN USB INPUT: remove subsonic rumble and harsh top-end, then gently tame peaks.
+    const usbHighPass = audioContext.createBiquadFilter();
+    usbHighPass.type = "highpass";
+    usbHighPass.frequency.value = 45;
+    usbHighPass.Q.value = 0.707;
+    const usbLowPass = audioContext.createBiquadFilter();
+    usbLowPass.type = "lowpass";
+    usbLowPass.frequency.value = 16500;
+    usbLowPass.Q.value = 0.707;
+    const usbCompressor = audioContext.createDynamicsCompressor();
+    usbCompressor.threshold.value = -12;
+    usbCompressor.knee.value = 12;
+    usbCompressor.ratio.value = 2;
+    usbCompressor.attack.value = 0.003;
+    usbCompressor.release.value = 0.12;
+    usbInputConditioner = audioContext.createGain();
+    usbInputConditioner.gain.value = 1;
+    usbInputSource.connect(usbHighPass);
+    usbHighPass.connect(usbLowPass);
+    usbLowPass.connect(usbCompressor);
+    usbCompressor.connect(usbInputConditioner);
+
+    // ISOLATED ROUTING: USB Audio Interface -> CH1 only.
+    // CH2 is exclusively owned by the MP3/Audio playback source.
+    usbInputConditioner.connect(mixerStripInputAnalysers[0]);
+    usbInputConditioner.connect(mixerStripGains[0]);
     updateUsbInputLevelMeter();
 
     if (physicalInputDevice) physicalInputDevice.value=usbAudioInputDeviceId;
@@ -10023,10 +10045,32 @@ if (physicalInputDevice) physicalInputDevice.addEventListener("change", async ()
     if (!usbInputAnalyser) { usbInputAnalyser=audioContext.createAnalyser(); usbInputAnalyser.fftSize=1024; usbInputAnalyser.smoothingTimeConstant=.08; }
     usbInputSource.connect(usbInputAnalyser);
 
+    // CLEAN USB INPUT: remove rumble/harsh top-end and tame peaks before CH1.
+    const usbHighPass = audioContext.createBiquadFilter();
+    usbHighPass.type = "highpass";
+    usbHighPass.frequency.value = 45;
+    usbHighPass.Q.value = 0.707;
+    const usbLowPass = audioContext.createBiquadFilter();
+    usbLowPass.type = "lowpass";
+    usbLowPass.frequency.value = 16500;
+    usbLowPass.Q.value = 0.707;
+    const usbCompressor = audioContext.createDynamicsCompressor();
+    usbCompressor.threshold.value = -12;
+    usbCompressor.knee.value = 12;
+    usbCompressor.ratio.value = 2;
+    usbCompressor.attack.value = 0.003;
+    usbCompressor.release.value = 0.12;
+    usbInputConditioner = audioContext.createGain();
+    usbInputConditioner.gain.value = 1;
+    usbInputSource.connect(usbHighPass);
+    usbHighPass.connect(usbLowPass);
+    usbLowPass.connect(usbCompressor);
+    usbCompressor.connect(usbInputConditioner);
+
     // ISOLATED ROUTING: USB Audio Interface -> CH1 only.
     // CH2 is exclusively owned by the MP3/Audio playback source.
-    usbInputSource.connect(mixerStripInputAnalysers[0]);
-    usbInputSource.connect(mixerStripGains[0]);
+    usbInputConditioner.connect(mixerStripInputAnalysers[0]);
+    usbInputConditioner.connect(mixerStripGains[0]);
     setAudioStatus("USB AUDIO → CH1 · CH2 ← MP3/AUDIO · 2-OUT L/R");
     updateUsbInputLevelMeter();
   } catch(err) {
@@ -10580,7 +10624,8 @@ function rebuildAudioRouting() {
   mixerInputGain.connect(mixerStripGains[2]);
   mixerStripGains[2].connect(mixerStripAnalysers[2]);
 
-  if (isAlesisFxEnabled) {
+  if (isAlesisFxEnabled && Number(echoMix.value) > 0) {
+    // FX is opt-in; at 0% mix there is no audible echo/feedback path.
     mixerStripAnalysers[2].connect(alesisDelayNode);
 
     // Alesis FX return is measured before the CH4 return fader.
