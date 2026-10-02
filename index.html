@@ -8150,6 +8150,13 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
   box-shadow:0 0 5px rgba(255,96,0,.6) !important;
   transition:height .045s linear !important;
 }
+#tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-segments{
+  position:absolute !important;
+  inset:2px 1px !important;
+  pointer-events:none !important;
+  background:repeating-linear-gradient(to bottom,rgba(255,176,0,.75) 0 3px,transparent 3px 7px) !important;
+  opacity:.20 !important;
+}
 #tabMixerContent #tftContentArea[data-page-key="dynamics"] .comp-gr-lamp{
   position:absolute !important;
   left:-3px !important;
@@ -8929,7 +8936,8 @@ function updateAllSignalMeters() {
     const liveDb = audioChannels[0]?.analyser ? readMeterDb(audioChannels[0].analyser) : -72;
     const threshold = clamp(Number(ds.thresh) || -18, -60, 0);
     const ratio = Math.max(1, Number(ds.ratio) || 1);
-    const targetGr = liveDb > threshold ? -Math.min(20, (liveDb - threshold) * (1 - 1 / ratio)) : 0;
+    const overThreshold = liveDb > threshold;
+    const targetGr = overThreshold ? -Math.min(20, (liveDb - threshold) * (1 - 1 / ratio)) : 0;
     const previousGr = Number(ds.grDb) || 0;
     const grAlpha = targetGr < previousGr ? 0.58 : 0.20;
     ds.grDb = previousGr + (targetGr - previousGr) * grAlpha;
@@ -8945,6 +8953,7 @@ function updateAllSignalMeters() {
       meter.setAttribute("aria-valuenow", gr.toFixed(1));
       meter.setAttribute("aria-valuetext", gr.toFixed(1) + " dB gain reduction");
       meter.classList.toggle("compressing", gr < -0.15);
+      meter.classList.toggle("threshold-hit", overThreshold);
       meter.classList.toggle("heavy", gr <= -10);
       meter.classList.toggle("limiting", gr <= -18);
     }
@@ -10926,7 +10935,7 @@ const tftDatabase = {
           <div class="comp-gr-meter" id="compGrMeter" role="meter" aria-label="Gain Reduction Meter" aria-valuemin="-20" aria-valuemax="0" aria-valuenow="0">
             <div class="comp-gr-title">GR</div>
             <div class="comp-gr-scale" aria-hidden="true"><span>0</span><span>-5</span><span>-10</span><span>-15</span><span>-20</span></div>
-            <div class="comp-gr-track"><div class="comp-gr-glow"></div><div class="comp-gr-lamp"></div></div>
+            <div class="comp-gr-track" aria-hidden="true"><div class="comp-gr-glow"></div><div class="comp-gr-lamp"></div><div class="comp-gr-segments"></div></div>
             <div class="comp-gr-value" id="compGrValue">0.0 dB</div>
           </div>
         </div>
