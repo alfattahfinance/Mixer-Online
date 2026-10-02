@@ -10581,13 +10581,40 @@ function updateTftModuleCurve(key) {
   if (key !== "gate" && key !== "dynamics" && key !== "sends") return;
   const s = tftStatesData[key];
   if (!s) return;
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+  // GEQ is a bank of real vertical mixer faders, not a curve graph.
+  if (key === "sends") {
+    const bands = Array.isArray(s.bands) && s.bands.length === 31 ? s.bands : new Array(31).fill(0);
+    bands.forEach((gain, index) => {
+      const fader = document.getElementById("geqBand" + index);
+      const value = document.getElementById("geqBandVal" + index);
+      const clean = clamp(Number(gain) || 0, -15, 15);
+      if (fader) fader.value = String(clean);
+      const total = clean + Number(s.lvl || 0);
+      if (value) value.textContent = (total >= 0 ? "+" : "") + total.toFixed(1) + " dB";
+    });
+    const master = document.getElementById("send1Lvl");
+    const masterVal = document.getElementById("send1LvlVal");
+    if (master) master.value = String(clamp(Number(s.lvl) || 0, -15, 15));
+    if (masterVal) {
+      const masterGain = Number(s.lvl) || 0;
+      masterVal.textContent = (masterGain >= 0 ? "+" : "") + masterGain.toFixed(1) + "dB";
+    }
+    const stateBtn = document.getElementById("geqStateBtn");
+    if (stateBtn) {
+      stateBtn.textContent = s.state ? "ACTIVE" : "BYPASS";
+      stateBtn.classList.toggle("active-action", !!s.state);
+    }
+    return;
+  }
+
   const prefix = key === "dynamics" ? "tftComp" : "tft" + key.charAt(0).toUpperCase() + key.slice(1);
   const svg = document.getElementById(prefix + "SvgContainer");
   const curve = document.getElementById(prefix + "SvgCurve");
   const fill = document.getElementById(prefix + "SvgFill");
   if (!svg || !curve) return;
   let points = [];
-  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
   if (key === "config") {
     points = [[10,50],[160,clamp(58-(s.gain/60)*48,8,58)],[310,15]];
   } else if (key === "gate") {
@@ -10629,26 +10656,6 @@ function updateTftModuleCurve(key) {
       [dbToX(Math.min(0, threshold + 20)), dbToY(compOut(Math.min(0, threshold + 20)))],
       [dbToX(0), dbToY(compOut(0))]
     ];
-  } else if (key === "sends") {
-    // GEQ is intentionally rendered as real mixer-style vertical faders.
-    // Keep the data model and preset engine, but never draw a transfer curve.
-    const bands = Array.isArray(s.bands) && s.bands.length === 31 ? s.bands : new Array(31).fill(0);
-    bands.forEach((gain, index) => {
-      const fader = document.getElementById("geqBand" + index);
-      const value = document.getElementById("geqBandVal" + index);
-      if (fader) fader.value = String(clamp(Number(gain) || 0, -15, 15));
-      const total = (Number(gain) || 0) + Number(s.lvl || 0);
-      if (value) value.textContent = (total >= 0 ? "+" : "") + total.toFixed(1) + " dB";
-    });
-    const master = document.getElementById("send1Lvl");
-    const masterVal = document.getElementById("send1LvlVal");
-    if (master) master.value = String(clamp(Number(s.lvl) || 0, -15, 15));
-    if (masterVal) masterVal.textContent = (Number(s.lvl) >= 0 ? "+" : "") + Number(s.lvl || 0).toFixed(1) + "dB";
-    const stateBtn = document.getElementById("geqStateBtn");
-    if (stateBtn) {
-      stateBtn.textContent = s.state ? "ACTIVE" : "BYPASS";
-      stateBtn.classList.toggle("active-action", !!s.state);
-    }
   } else if (key === "main") {
     const y1 = clamp(35 - ((s.send+50)/56)*25,8,58);
     points = [[10,35],[clamp(90+((s.send+50)/56)*95,40,240),y1],[310,35]];
