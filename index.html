@@ -8769,6 +8769,9 @@ function updateMasterStereoMeters() {
     const db = readMeterDb(masterMeterAnalyser);
     paintMeter(document.getElementById("masterMeterCombined"), db, "vertical");
   }
+  // Channel SIG/CLIP + vertical channel meters must update continuously,
+  // not only after the mixer power-up self-test.
+  if (typeof updateAllSignalMeters === "function") updateAllSignalMeters();
   masterStereoMeterFrame = requestAnimationFrame(updateMasterStereoMeters);
 }
 updateMasterStereoMeters();
@@ -8883,8 +8886,8 @@ function paintMeter(container, db, direction) {
   const target = Math.max(0, Math.min(1, (safeDb - minDb) / (maxDb - minDb)));
   const previous = meterLevelState.get(container) ?? 0;
   const smoothed = target > previous
-    ? previous + (target - previous) * 0.72
-    : previous + (target - previous) * 0.18;
+    ? previous + (target - previous) * 0.94
+    : previous + (target - previous) * 0.42;
   meterLevelState.set(container, smoothed);
 
   const litCount = safeDb <= minDb || smoothed < 0.008
@@ -9392,7 +9395,7 @@ function createBands(channel) {
 /* =========================================================
    AUDIO ENGINE & ROUTING
 ========================================================= */
-const CONTROL_SMOOTHING_SECONDS = 0.065;
+const CONTROL_SMOOTHING_SECONDS = 0.025;
 
 let usbInputStream = null;
 let usbInputSource = null;
