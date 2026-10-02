@@ -8771,23 +8771,41 @@ function updateMasterStereoMeters() {
   }
   masterStereoMeterBusy = true;
   try {
-    // Always update channel/input meters first. They are intentionally
-    // independent of the currently selected PAGES or CHANNEL DSP screen.
-    if (typeof updateAllSignalMeters === "function") updateAllSignalMeters();
-
-    if (audioGraphReady && masterStereoAnalysers.every(Boolean)) {
-      masterStereoAnalysers.forEach((analyser, channel) => {
-        const db = readPeakMeterDb(analyser);
-        paintMeter(document.getElementById(channel === 0 ? "masterMeterL" : "masterMeterR"), db, "vertical");
-      });
-
-      if (masterMeterAnalyser) {
-        paintMeter(document.getElementById("masterMeterCombined"), readPeakMeterDb(masterMeterAnalyser), "vertical");
-      }
+    // Channel/input meters are independent of PAGES and CHANNEL DSP.
+    // Isolate their rendering so a transient page-render error can NEVER
+    // prevent the physical mixer MASTER L/R meters from being painted.
+    try {
+      if (typeof updateAllSignalMeters === "function") updateAllSignalMeters();
+    } catch (err) {
+      console.warn("Channel meter render:", err);
     }
 
-    // TFT/RTA is optional UI. If it fails during a page transition, the
-    // channel/master meter loop must continue running.
+    // MASTER L/R + combined MASTER always run from their analyser taps,
+    // regardless of which PAGES or CHANNEL DSP screen is currently visible.
+    try {
+      if (audioGraphReady && masterStereoAnalysers.every(Boolean)) {
+        masterStereoAnalysers.forEach((analyser, channel) => {
+          const db = readPeakMeterDb(analyser);
+          paintMeter(
+            document.getElementById(channel === 0 ? "masterMeterL" : "masterMeterR"),
+            db,
+            "vertical"
+          );
+        });
+
+        if (masterMeterAnalyser) {
+          paintMeter(
+            document.getElementById("masterMeterCombined"),
+            readPeakMeterDb(masterMeterAnalyser),
+            "vertical"
+          );
+        }
+      }
+    } catch (err) {
+      console.warn("Master meter render:", err);
+    }
+
+    // TFT/RTA is optional UI and is isolated from the master meter path.
     try { updateTftMetersFromAudio(); } catch (err) {
       console.warn("TFT meter render:", err);
     }
