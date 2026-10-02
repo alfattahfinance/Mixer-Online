@@ -9105,10 +9105,16 @@ function readLiveMasterStereoLevels() {
 function updateAllSignalMeters() {
   const mixerStrips = Array.from(document.querySelectorAll(".mixer-desk-surface .console-channel-strip"));
   mixerStripAnalysers.forEach((stripAnalyser, index) => {
-    // Channel SIG/CLIP + vertical meter are INPUT meters, independent of the
-    // channel fader. The post-fader analyser remains available for DSP/output use.
+    // HARD INPUT OWNERSHIP:
+    // CH1 meter is driven ONLY by the USB input source.
+    // CH2 meter is driven ONLY by the currently playing MP3/Audio source.
+    // This prevents stereo USB frames or stale analyser samples from lighting CH2.
+    const inputSourceActive =
+      index === 0 ? !!usbAudioConnected && !!usbInputStream :
+      index === 1 ? !!activeSourceNode && !!isPlaying :
+      true;
     const sourceAnalyser = mixerStripInputAnalysers[index] || stripAnalyser || null;
-    const db = sourceAnalyser ? readPeakMeterDb(sourceAnalyser) : -72;
+    const db = inputSourceActive && sourceAnalyser ? readPeakMeterDb(sourceAnalyser) : -72;
     const strip = mixerStrips[index];
     const active = strip?.classList.contains("master-strip")
       ? (typeof masterStripLR === "boolean" ? masterStripLR : true)
@@ -10705,6 +10711,8 @@ function playCurrentBuffer() {
   sourceNode.buffer = buffer;
   // CH2 signal flow: MP3 -> CH2 input meter -> CH2 fader.
   // Keep MP3 isolated from CH1; it must enter the CH2 strip only.
+  // CH2 owns this analyser exclusively while MP3/Audio is actually playing.
+  // Never share the USB/CH1 analyser or leave a stopped source attached.
   sourceNode.connect(mixerStripInputAnalysers[1]);
   sourceNode.connect(mixerStripGains[1]);
 
@@ -10747,7 +10755,14 @@ stopAudioButton.addEventListener("click", () => {
   activeSourceNode = null;
   if (sourceToStop) {
     sourceToStop.onended = null;
+    try { sourceToStop.disconnect(); } catch (e) {}
     try { sourceToStop.stop(); } catch (e) {}
+  }
+  // Clear CH2 analyser immediately so its SIG/CLIP cannot glow from stale samples.
+  const ch2InputAnalyser = mixerStripInputAnalysers[1];
+  if (ch2InputAnalyser) {
+    try { ch2InputAnalyser.disconnect(); } catch (e) {}
+    try { ch2InputAnalyser.connect(audioContext.createGain()); } catch (e) {}
   }
   isPlaying = false;
   startAudioButton.classList.remove("active");
