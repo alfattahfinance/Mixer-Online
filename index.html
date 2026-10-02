@@ -10413,12 +10413,14 @@ function rebuildAudioRouting() {
   alesisDryNode.connect(audioChannels[0].inputGain);
   alesisDryNode.connect(audioChannels[1].inputGain);
   // Keep FX SEND metering live even while the processor is bypassed.
+  mixerInputGain.connect(mixerStripInputAnalysers[2] || mixerStripGains[2]);
   mixerInputGain.connect(mixerStripGains[2]);
   if (isAlesisFxEnabled) {
     mixerStripAnalysers[2].connect(alesisDelayNode);
     alesisDelayNode.connect(alesisWetNode);
     // FX RETURN meter taps the wet processor output before the return fader.
     // The fader remains downstream and still controls the audible return level.
+    alesisWetNode.connect(mixerStripInputAnalysers[3] || mixerStripAnalysers[3]);
     alesisWetNode.connect(mixerStripAnalysers[3]);
     mixerStripAnalysers[3].connect(mixerStripGains[3]);
     // Return joins the post-EQ main bus, not the input channels:
