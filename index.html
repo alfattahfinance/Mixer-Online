@@ -8995,8 +8995,13 @@ function updateGainReductionMeter(root, analyser, state) {
 
 function updateAllSignalMeters() {
   const mixerStrips = Array.from(document.querySelectorAll(".mixer-desk-surface .console-channel-strip"));
-  mixerStripAnalysers.forEach((analyser, index) => {
-    const db = analyser ? readMeterDb(analyser) : -72;
+  mixerStripAnalysers.forEach((stripAnalyser, index) => {
+    // CH1/CH2 receive their real program signal through the EQ channel graph.
+    // CH3/CH4 are FX/send-return strips and use their dedicated strip analysers.
+    const sourceAnalyser = (index < 2 && audioChannels[index]?.analyser)
+      ? audioChannels[index].analyser
+      : stripAnalyser;
+    const db = sourceAnalyser ? readMeterDb(sourceAnalyser) : -72;
     const strip = mixerStrips[index];
     const active = strip?.classList.contains("master-strip")
       ? ((typeof masterStripLR === "boolean" ? masterStripLR : true) && !(typeof masterStripMuted === "boolean" && masterStripMuted))
