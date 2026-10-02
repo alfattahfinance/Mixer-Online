@@ -3966,6 +3966,9 @@ body.mixer-powered-off #tabMixerContent .mixer-tft-screen .master-combined-meter
 #tabMixerContent .preamp-curve{stroke:#38bdf8;stroke-width:2;fill:none;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 3px rgba(56,189,248,.45));}
 #tabMixerContent .preamp-curve-fill{fill:url(#cfgPreampCurveGlow);stroke:none;}
 #tabMixerContent .preamp-live-point{fill:#fff;stroke:#38bdf8;stroke-width:1.4;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 3px rgba(56,189,248,.7));}
+#tabMixerContent .preamp-control-point{r:5.5px;fill:#f8ffff;stroke:#00ffcc;stroke-width:1.6;cursor:grab;touch-action:none;pointer-events:all;filter:drop-shadow(0 0 3px rgba(0,255,204,.95)) drop-shadow(0 0 7px rgba(0,255,204,.5));vector-effect:non-scaling-stroke;}
+#tabMixerContent .preamp-control-point:hover,#tabMixerContent .preamp-control-point:active{r:7px;cursor:grabbing;filter:drop-shadow(0 0 4px rgba(0,255,204,1)) drop-shadow(0 0 9px rgba(0,255,204,.7));}
+
 #tabMixerContent .preamp-axis-labels text{fill:#94a3b8;font-size:5.4px;font-family:Arial,sans-serif;letter-spacing:.15px;}
 #tabMixerContent .preamp-axis-labels .preamp-axis-title-x,#tabMixerContent .preamp-axis-labels .preamp-axis-title-y{fill:#cbd5e1;font-size:5.7px;font-weight:800;letter-spacing:.45px;}
 #tabMixerContent .preamp-graph-legend text{fill:#aeb9c5;font-size:4.8px;font-family:Arial,sans-serif;}
@@ -8784,7 +8787,8 @@ function updateAllSignalMeters() {
   const preampRoot = document.getElementById("tftContentArea");
   if (preampRoot?.dataset?.pageKey === "config") {
     const preampDb = audioChannels[0]?.analyser ? readMeterDb(audioChannels[0].analyser) : -72;
-    if (tftStatesData?.config) tftStatesData.config.dotX = Math.max(-60, Math.min(0, preampDb));
+    // The Preamp graph point is a user control point, not a live-meter cursor.
+    // Keep the hardware meter independent so audio level cannot overwrite a drag.
     updateTftModuleCurve("config");
     const preampSegments = document.querySelectorAll("#cfgPreampSegments [data-meter-seg]");
     if (preampSegments.length) {
@@ -9115,7 +9119,7 @@ let tftCurveActiveStates = { config: false, gate: true, dynamics: true, eq: true
 let activeCurrentSectionKey = "eq";
 
 const tftStatesData = {
-  config: { gain: 12, hpf: 80, phantom: true, phase: false, dotX: 160, dotY: 32 },
+  config: { gain: 12, hpf: 80, phantom: true, phase: false, dotX: -30, dotY: -18 },
   gate: { thresh: -45, ratio: 2.5, state: true, dot1X: 85, dot1Y: 42.5, dot2X: 160, dot2Y: 11.25 },
   dynamics: { thresh: -18, ratio: 3, makeup: 2, dot1X: 10, dot1Y: 55, dot2X: 180, dot2Y: 35, dot3X: 310, dot3Y: 20 },
   eq: { freq: 2500, q: 1.5, gain: 4.5 },
@@ -10651,7 +10655,7 @@ const tftDatabase = {
               <line id="cfgPreampReference" class="preamp-reference-line" x1="38" y1="156" x2="326" y2="14"/>
               <path id="cfgPreampCurveFill" class="preamp-curve-fill" d=""/>
               <path id="cfgPreampCurve" class="preamp-curve" d=""/>
-              <circle id="cfgPreampInputPoint" class="preamp-live-point" cx="38" cy="156" r="3.2"/>
+              <circle id="cfgPreampInputPoint" class="preamp-live-point preamp-control-point" cx="182" cy="56.6" r="5.5" tabindex="0" role="slider" aria-label="Preamp control point" style="cursor:grab;touch-action:none;pointer-events:all;"/>
               <g class="preamp-axis-labels" aria-hidden="true">
                 <text x="38" y="169" text-anchor="middle">-60</text><text x="86" y="169" text-anchor="middle">-50</text>
                 <text x="134" y="169" text-anchor="middle">-40</text><text x="182" y="169" text-anchor="middle">-30</text>
@@ -11198,8 +11202,12 @@ function updateTftModuleCurve(key) {
     const x0 = 38, x1 = 326, yTop = 14, yBottom = 156;
     const dbToX = db => x0 + ((clamp(Number(db), -60, 0) + 60) / 60) * (x1 - x0);
     const dbToY = db => yBottom - ((clamp(Number(db), -60, 0) + 60) / 60) * (yBottom - yTop);
-    const gain = Number(s.gain) || 0;
+    const gain = clamp(Number(s.gain) || 0, -20, 60);
     const response = inputDb => clamp(inputDb + gain, -60, 0);
+    const controlInput = clamp(Number(s.dotX), -60, 0);
+    const controlOutput = response(controlInput);
+    s.dotY = controlOutput;
+
     const points = [];
     for (let i = 0; i <= 60; i++) {
       const inputDb = -60 + i;
@@ -11209,15 +11217,19 @@ function updateTftModuleCurve(key) {
     for (let i = 1; i < points.length; i++) d += " L" + points[i][0].toFixed(2) + " " + points[i][1].toFixed(2);
     curve.setAttribute("d", d);
     if (fill) fill.setAttribute("d", d + " L" + x1 + " " + yBottom + " L" + x0 + " " + yBottom + " Z");
-    const liveInput = clamp(Number(s.dotX), -60, 0);
-    const liveOutput = response(liveInput);
-    if (point) { point.setAttribute("cx", dbToX(liveInput).toFixed(2)); point.setAttribute("cy", dbToY(liveOutput).toFixed(2)); }
+
+    if (point) {
+      point.setAttribute("cx", dbToX(controlInput).toFixed(2));
+      point.setAttribute("cy", dbToY(controlOutput).toFixed(2));
+      point.setAttribute("aria-valuenow", controlOutput.toFixed(1));
+      point.setAttribute("aria-label", "Preamp point: Input " + controlInput.toFixed(1) + " dB, Output " + controlOutput.toFixed(1) + " dB, Gain " + gain.toFixed(1) + " dB");
+    }
     const inRead = document.getElementById("cfgPreampGraphInput");
     const outRead = document.getElementById("cfgPreampGraphOutput");
     const graphStatus = document.getElementById("cfgPreampGraphStatus");
-    if (inRead) inRead.textContent = "INPUT " + liveInput.toFixed(1) + " dB";
-    if (outRead) outRead.textContent = "OUTPUT " + liveOutput.toFixed(1) + " dB";
-    if (graphStatus) graphStatus.textContent = "GAIN " + gain.toFixed(1) + " dB";
+    if (inRead) inRead.textContent = "INPUT " + controlInput.toFixed(1) + " dB";
+    if (outRead) outRead.textContent = "OUTPUT " + controlOutput.toFixed(1) + " dB";
+    if (graphStatus) graphStatus.textContent = "GAIN " + gain.toFixed(1) + " dB • 1 CONTROL POINT";
     return;
   }
 
@@ -11617,6 +11629,42 @@ function bindTftDynamicEventListeners(key) {
     });
   }
   updateTftModuleCurve(key);
+
+  // PREAMP: exactly one editable control point. Its X coordinate is the
+  // selected input level and its Y coordinate determines the gain offset.
+  // The point snaps back onto the valid linear Preamp response after each drag.
+  if (key === "config") {
+    const container = document.getElementById("cfgPreampGraph");
+    const point = document.getElementById("cfgPreampInputPoint");
+    if (container && point) {
+      makeSpecificDotDraggable(container, point, (x, y) => {
+        const x0 = 38, x1 = 326, yTop = 14, yBottom = 156;
+        const clampDb = v => Math.max(-60, Math.min(0, v));
+        const inputDb = clampDb(((x - x0) / (x1 - x0)) * 60 - 60);
+        const rawOutputDb = clampDb(((yBottom - y) / (yBottom - yTop)) * 60 - 60);
+        const gain = Math.max(-20, Math.min(60, rawOutputDb - inputDb));
+        const outputDb = clampDb(inputDb + gain);
+
+        s.dotX = Math.round(inputDb * 10) / 10;
+        s.dotY = Math.round(outputDb * 10) / 10;
+        s.gain = Math.round(gain * 10) / 10;
+
+        const gainInput = document.getElementById("cfgGain");
+        if (gainInput) {
+          gainInput.value = String(s.gain);
+          const ev = new Event("input", { bubbles:true });
+          ev.__fromCurveDrag = true;
+          gainInput.dispatchEvent(ev);
+        } else {
+          updateTftModuleCurve("config");
+          try { persistTftState(); } catch (_) {}
+        }
+        try { window.dispatchEvent(new CustomEvent("mixer:preamp-point", {
+          detail:{ input:Number(s.dotX), output:Number(s.dotY), gain:Number(s.gain), channel:1 }
+        })); } catch (_) {}
+      }, { direct:true });
+    }
+  }
 
   if (key === "eq") {
     const freqInput = document.getElementById("tftPeqFreq");
