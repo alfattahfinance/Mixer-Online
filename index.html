@@ -13583,62 +13583,7 @@ function syncChannelQuickPanelsFromSources() {
   else boot();
 })();
 
-/* Stable, touch-friendly encoder interaction.
-   Drag the visible knob vertically/horizontally; movement is deliberately damped
-   so small finger movements do not cause large parameter jumps. */
-(function bindStableQuickKnobs(){
-  const root=document.getElementById("tabMixerContent");
-  if(!root || root.dataset.stableKnobsBound==="1") return;
-  root.dataset.stableKnobsBound="1";
-  let drag=null;
-  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
-  const begin=(e, knob, input)=>{
-    if(!input) return;
-    e.preventDefault();
-    e.stopPropagation();
-    const min=Number(input.min), max=Number(input.max), step=Number(input.step)||0.01;
-    const span=max-min || 1;
-    drag={
-      input, pointerId:e.pointerId,
-      startX:e.clientX, startY:e.clientY,
-      startValue:Number(input.value),
-      value:Number(input.value),
-      sensitivity:span/220
-    };
-    try{ knob.setPointerCapture?.(e.pointerId); }catch{}
-  };
-  const move=(e)=>{
-    if(!drag || (e.pointerId!==undefined && e.pointerId!==drag.pointerId)) return;
-    e.preventDefault();
-    const dx=e.clientX-drag.startX, dy=e.clientY-drag.startY;
-    /* Vertical is primary; horizontal is also usable. Vertical up increases value. */
-    const pixels=(-dy + dx*0.35);
-    const target=drag.startValue + pixels*drag.sensitivity*0.62;
-    const min=Number(drag.input.min), max=Number(drag.input.max);
-    const stepped=Math.round((clamp(target,min,max)-min)/step)*step+min;
-    const bounded=clamp(stepped,Number(drag.input.min),Number(drag.input.max));
-    if(Math.abs(bounded-drag.value)<step*0.25) return;
-    drag.value=bounded;
-    drag.input.value=String(bounded);
-    drag.input.dispatchEvent(new Event("input",{bubbles:true}));
-  };
-  const end=(e)=>{
-    if(!drag || (e.pointerId!==undefined && e.pointerId!==drag.pointerId)) return;
-    drag=null;
-  };
-  root.addEventListener("pointerdown",e=>{
-    const knob=e.target.closest(".quick-knob i");
-    if(!knob || !root.contains(knob)) return;
-    const input=knob.parentElement?.querySelector('input[type="range"]');
-    begin(e,knob,input);
-  },true);
-  root.addEventListener("pointermove",move,{capture:true,passive:false});
-  root.addEventListener("pointerup",end,true);
-  root.addEventListener("pointercancel",end,true);
-  root.addEventListener("lostpointercapture",end,true);
-})();
 
-</script>
 
 <style id="final-channel-and-preamp-meter-fix-2026-10-02">
 /* AUTHORITATIVE CHANNEL SIGNAL + GR METERS
