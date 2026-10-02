@@ -8776,6 +8776,8 @@ function updateAllSignalMeters() {
   const preampRoot = document.getElementById("tftContentArea");
   if (preampRoot?.dataset?.pageKey === "config") {
     const preampDb = audioChannels[0]?.analyser ? readMeterDb(audioChannels[0].analyser) : -72;
+    if (tftStatesData?.config) tftStatesData.config.dotX = Math.max(-60, Math.min(0, preampDb));
+    updateTftModuleCurve("config");
     const preampSegments = document.querySelectorAll("#cfgPreampSegments [data-meter-seg]");
     if (preampSegments.length) {
       const pct = Math.max(0, Math.min(100, ((preampDb + 60) / 60) * 100));
