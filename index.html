@@ -7918,6 +7918,19 @@ body.mixer-powered-off #tabMixerContent .mixer-desk-surface .fader-slot{
     max-height:none !important;
   }
 }
+</style><style id="preamp-hardware-meter-2026-10-02">
+/* Hardware-style input meter: segmented vertical LED ladder, peak/clip indication. */
+#tabMixerContent .preamp-level-meter{position:relative;display:flex;align-items:stretch;justify-content:center;gap:4px;flex:1;min-height:110px;padding:5px 8px 4px;border:1px solid #4b5563;border-radius:3px;background:linear-gradient(90deg,#111820,#202830 48%,#111820);box-shadow:inset 0 0 12px rgba(0,0,0,.8),inset 0 1px rgba(255,255,255,.08);overflow:hidden}
+#tabMixerContent .preamp-meter-scale{display:flex;flex-direction:column;justify-content:space-between;color:#7f8b96;font:600 6px/1 Arial;text-align:right;width:18px;padding:1px 0}
+#tabMixerContent .preamp-meter-leds{display:flex;flex-direction:column-reverse;justify-content:flex-start;gap:2px;width:28px;min-height:0;padding:1px 0}
+#tabMixerContent .preamp-meter-leds span{display:block;flex:1;min-height:2px;border-radius:1px;background:#27313a;box-shadow:inset 0 0 2px rgba(0,0,0,.8);transition:background .045s linear,box-shadow .045s linear}
+#tabMixerContent .preamp-meter-leds span.active{background:#16a34a;box-shadow:0 0 4px rgba(34,197,94,.48),inset 0 1px rgba(255,255,255,.16)}
+#tabMixerContent .preamp-meter-leds span:nth-child(n+16).active{background:#eab308;box-shadow:0 0 5px rgba(234,179,8,.55)}
+#tabMixerContent .preamp-meter-leds span:nth-child(n+22).active{background:#ef4444;box-shadow:0 0 6px rgba(239,68,68,.7)}
+#tabMixerContent .preamp-peak-led{position:absolute;right:4px;top:5px;width:5px;height:5px;border-radius:50%;background:#26313a;box-shadow:inset 0 0 2px #000}
+#tabMixerContent .preamp-peak-led.hot{background:#facc15;box-shadow:0 0 6px rgba(250,204,21,.9)}
+#tabMixerContent .preamp-peak-led.clip{background:#ef4444;box-shadow:0 0 8px rgba(239,68,68,.95)}
+#tabMixerContent .preamp-readout b{font-variant-numeric:tabular-nums}
 </style></head>
 
 <body>
@@ -8628,6 +8641,17 @@ function updateAllSignalMeters() {
     if (preampMeter) {
       const pct = Math.max(0, Math.min(100, ((preampDb + 60) / 60) * 100));
       preampMeter.style.height = pct.toFixed(2) + "%";
+    }
+    const preampSegments = document.querySelectorAll("#cfgPreampSegments [data-meter-seg]");
+    if (preampSegments.length) {
+      const pct = Math.max(0, Math.min(100, ((preampDb + 60) / 60) * 100));
+      const activeCount = Math.round((pct / 100) * preampSegments.length);
+      preampSegments.forEach((seg, index) => seg.classList.toggle("active", index < activeCount));
+      const peak = document.getElementById("cfgPreampPeak");
+      if (peak) {
+        peak.classList.toggle("hot", preampDb >= -6);
+        peak.classList.toggle("clip", preampDb >= -1);
+      }
     }
   }
   updateTftMetersFromAudio();
@@ -10459,8 +10483,11 @@ const tftDatabase = {
         <div class="preamp-main-panel">
           <div class="preamp-meter-card">
             <div class="preamp-card-head"><strong>INPUT PREAMP</strong><span id="cfgPreampStatus">${s.phantom ? "48V ON" : "48V OFF"}</span></div>
-            <div class="preamp-level-track" aria-label="Input level"><i id="cfgPreampLevel" style="height:0%"></i></div>
-            <div class="preamp-level-scale"><span>-60</span><span>-30</span><span>-12</span><span>-6</span><span>0 dB</span></div>
+            <div class="preamp-level-meter" aria-label="Input preamp level meter">
+              <div class="preamp-meter-scale" aria-hidden="true"><span>0</span><span>-6</span><span>-12</span><span>-24</span><span>-36</span><span>-48</span><span>-60</span></div>
+              <div class="preamp-meter-leds" id="cfgPreampSegments"><span data-meter-seg="0"></span><span data-meter-seg="1"></span><span data-meter-seg="2"></span><span data-meter-seg="3"></span><span data-meter-seg="4"></span><span data-meter-seg="5"></span><span data-meter-seg="6"></span><span data-meter-seg="7"></span><span data-meter-seg="8"></span><span data-meter-seg="9"></span><span data-meter-seg="10"></span><span data-meter-seg="11"></span><span data-meter-seg="12"></span><span data-meter-seg="13"></span><span data-meter-seg="14"></span><span data-meter-seg="15"></span><span data-meter-seg="16"></span><span data-meter-seg="17"></span><span data-meter-seg="18"></span><span data-meter-seg="19"></span><span data-meter-seg="20"></span><span data-meter-seg="21"></span><span data-meter-seg="22"></span><span data-meter-seg="23"></span></div>
+              <div class="preamp-peak-led" id="cfgPreampPeak" aria-hidden="true"></div>
+            </div>
             <div class="preamp-readout"><b id="cfgGainVal">${Number(s.gain).toFixed(1)} dB</b><span>INPUT GAIN</span></div>
           </div>
           <div class="preamp-control-panel">
